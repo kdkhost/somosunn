@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNN - Conectando Empreendedores</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -61,6 +62,17 @@
 
         .sidebar-menu.active {
             left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-menu {
+                width: 70%;
+                left: -70% !important;
+            }
+
+            .sidebar-menu.active {
+                left: 0 !important;
+            }
         }
 
         .gradient-text {
@@ -205,8 +217,11 @@
     <!-- Sidebar Menu -->
     <aside class="sidebar-menu" id="sidebarMenu">
         <div class="p-6 border-b border-white/20">
-            <h1 class="text-2xl font-bold text-white">UNN</h1>
-            <p class="text-white/70 text-sm mt-1">Networking que gera resultados</p>
+            <!-- Logo -->
+            <div class="mb-3">
+                <img src="img/logo.png" alt="UNN Logo" class="h-16 w-auto">
+            </div>
+            <p class="text-white/70 text-sm">Networking que gera resultados</p>
         </div>
 
         <nav class="p-6 space-y-4">
@@ -255,9 +270,10 @@
 
     <!-- Navigation Desktop -->
     <nav class="hidden md:flex fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-lg shadow-sm z-30">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between w-full">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between w-full">
             <div class="flex items-center space-x-12">
-                <h1 class="text-2xl font-bold text-gray-800">UNN</h1>
+                <!-- Logo Desktop -->
+                <img src="img/logo.png" alt="UNN Logo" class="h-14 w-auto">
                 <div class="flex space-x-8">
                     <a href="#o-que-e-unn" class="text-gray-700 hover:text-blue-600 transition">Sobre</a>
                     <a href="#nossos-eventos" class="text-gray-700 hover:text-blue-600 transition">Eventos</a>
@@ -558,8 +574,9 @@
                 <!-- Evento 1 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
-                        <i class="fas fa-handshake text-6xl text-blue-200"></i>
+                        class="aspect-video bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1531058020387-3be344556be6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Networking" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <div class="flex items-center text-gray-500 text-sm mb-3">
@@ -582,8 +599,9 @@
                 <!-- Evento 2 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center">
-                        <i class="fas fa-chalkboard-user text-6xl text-green-200"></i>
+                        class="aspect-video bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1765438863717-49fca900f861?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Workshop" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <div class="flex items-center text-gray-500 text-sm mb-3">
@@ -605,8 +623,9 @@
                 <!-- Evento 3 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center">
-                        <i class="fas fa-coffee text-6xl text-orange-200"></i>
+                        class="aspect-video bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1759873066311-ce4966c249ac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Cafe" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <div class="flex items-center text-gray-500 text-sm mb-3">
@@ -628,8 +647,9 @@
                 <!-- Evento 4 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center">
-                        <i class="fas fa-trophy text-6xl text-purple-200"></i>
+                        class="aspect-video bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Summit" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <div class="flex items-center text-gray-500 text-sm mb-3">
@@ -652,8 +672,9 @@
                 <!-- Evento 5 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-pink-100 to-pink-50 flex items-center justify-center">
-                        <i class="fas fa-rocket text-6xl text-pink-200"></i>
+                        class="aspect-video bg-gradient-to-br from-pink-100 to-pink-50 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1531058020387-3be344556be6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Startups" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <div class="flex items-center text-gray-500 text-sm mb-3">
@@ -675,8 +696,9 @@
                 <!-- Evento 6 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-indigo-100 to-indigo-50 flex items-center justify-center">
-                        <i class="fas fa-chart-line text-6xl text-indigo-200"></i>
+                        class="aspect-video bg-gradient-to-br from-indigo-100 to-indigo-50 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Marketing" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <div class="flex items-center text-gray-500 text-sm mb-3">

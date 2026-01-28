@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal de Networking Digital</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -61,6 +62,17 @@
 
         .sidebar-menu.active {
             left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-menu {
+                width: 70%;
+                left: -70% !important;
+            }
+
+            .sidebar-menu.active {
+                left: 0 !important;
+            }
         }
 
         .text-gradient {
@@ -203,8 +215,11 @@
     <!-- Sidebar Menu -->
     <aside class="sidebar-menu" id="sidebarMenu">
         <div class="p-6 border-b border-white/20">
-            <h1 class="text-2xl font-bold text-white">Portal UNN</h1>
-            <p class="text-white/70 text-sm mt-1">Networking Digital</p>
+            <!-- Logo -->
+            <div class="mb-3">
+                <img src="img/logo.png" alt="UNN Logo" class="h-16 w-auto">
+            </div>
+            <p class="text-white/70 text-sm">Networking Digital</p>
         </div>
 
         <nav class="p-6 space-y-4">
@@ -245,9 +260,10 @@
 
     <!-- Navigation Desktop -->
     <nav class="hidden md:flex fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-lg shadow-sm z-30">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between w-full">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between w-full">
             <div class="flex items-center space-x-12">
-                <a href="index.html" class="text-2xl font-bold text-gray-800">Portal UNN</a>
+                <!-- Logo Desktop -->
+                <img src="img/logo.png" alt="UNN Logo" class="h-14 w-auto">
                 <div class="flex space-x-8">
                     <a href="#palestras" class="text-gray-700 hover:text-blue-600 transition">Palestras</a>
                     <a href="#mentorias" class="text-gray-700 hover:text-blue-600 transition">Mentorias</a>
@@ -311,8 +327,9 @@
                 <!-- Palestra 1 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
-                        <i class="fas fa-play-circle text-6xl text-blue-300"></i>
+                        class="aspect-video bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Primeiros Passos" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <span class="badge badge-free">
@@ -345,8 +362,9 @@
                 <!-- Palestra 2 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center">
-                        <i class="fas fa-play-circle text-6xl text-green-300"></i>
+                        class="aspect-video bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Marketing Digital" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <span class="badge badge-free">
@@ -379,8 +397,9 @@
                 <!-- Palestra 3 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center">
-                        <i class="fas fa-play-circle text-6xl text-purple-300"></i>
+                        class="aspect-video bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1709715357510-b687304cee3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Networking" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <span class="badge badge-free">
@@ -413,8 +432,9 @@
                 <!-- Palestra 4 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center">
-                        <i class="fas fa-play-circle text-6xl text-orange-300"></i>
+                        class="aspect-video bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1758876019673-704b039d405c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Gestao Financeira" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <span class="badge badge-free">
@@ -464,8 +484,9 @@
                 <!-- Mentoria 1 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center relative">
-                        <i class="fas fa-book text-6xl text-blue-300"></i>
+                        class="aspect-video bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1537444532052-2afbf769b76c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="E-commerce" class="w-full h-full object-cover">
                         <span class="badge badge-premium absolute top-3 right-3">
                             <i class="fas fa-crown mr-1"></i> Premium
                         </span>
@@ -511,8 +532,9 @@
                 <!-- Mentoria 2 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center relative">
-                        <i class="fas fa-book text-6xl text-green-300"></i>
+                        class="aspect-video bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1529119368496-2dfda6ec2804?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Investimentos" class="w-full h-full object-cover">
                         <span class="badge badge-premium absolute top-3 right-3">
                             <i class="fas fa-crown mr-1"></i> Premium
                         </span>
@@ -558,8 +580,9 @@
                 <!-- Mentoria 3 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center relative">
-                        <i class="fas fa-book text-6xl text-purple-300"></i>
+                        class="aspect-video bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Expansao" class="w-full h-full object-cover">
                         <span class="badge badge-premium absolute top-3 right-3">
                             <i class="fas fa-crown mr-1"></i> Premium
                         </span>
@@ -605,8 +628,9 @@
                 <!-- Mentoria 4 -->
                 <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
                     <div
-                        class="aspect-video bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center relative">
-                        <i class="fas fa-book text-6xl text-orange-300"></i>
+                        class="aspect-video bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Growth Hacking" class="w-full h-full object-cover">
                         <span class="badge badge-premium absolute top-3 right-3">
                             <i class="fas fa-crown mr-1"></i> Premium
                         </span>

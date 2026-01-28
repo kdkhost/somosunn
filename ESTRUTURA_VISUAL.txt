@@ -1,0 +1,242 @@
+ESTRUTURA VISUAL DO PROJETO
+═════════════════════════════════════════════════════════════════════════════════
+
+📄 INDEX.HTML - PÁGINA PRINCIPAL
+─────────────────────────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  [☰] MENU MOBILE              [LOGO] Menu Desktop    [BOTÃO ENTRAR]        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                                                                     │   │
+│  │   CONECTANDO EMPREENDEDORES. CRIANDO OPORTUNIDADES REAIS.         │   │
+│  │   A UNN é uma comunidade de networking...                          │   │
+│  │                                                                     │   │
+│  │   [BOTÃO] Quero fazer parte     [BOTÃO] Conheça a UNN            │   │
+│  │                                                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                               │
+│ O QUE É A UNN                                                                │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
+│ │ Conexões    │ │ Crescimento │ │ Troca de    │ │ Oportunidades│          │
+│ │ reais       │ │ coletivo    │ │ experiências│ │ de negócios  │          │
+│ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘           │
+│                                                                               │
+│ PARA QUEM É A UNN                                                            │
+│ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐       │
+│ │ Empreendedor │ │ Empresários  │ │ Profissionais│ │ Donos de PMEs│       │
+│ │ iniciantes   │ │ em crescimento│ │ liberais     │ │              │       │
+│ └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘       │
+│ ┌──────────────┐                                                             │
+│ │ Pessoas que  │                                                             │
+│ │ valorizam    │                                                             │
+│ │ networking   │                                                             │
+│ └──────────────┘                                                             │
+│                                                                               │
+│ COMO FUNCIONA                                                                │
+│   01              02              03              04                        │
+│ CONEXÃO ————— NETWORKING ———— TROCA ————— CRESCIMENTO                     │
+│ Entra para    Participa de    Compartilha   Gera parcerias               │
+│ comunidade    encontros       experiências   e oportunidades             │
+│                                                                               │
+│ PRÓXIMO EVENTO UNN                                                           │
+│ ┌─────────────────────────────────────┐  Networking & Negócios 2026     │
+│ │     [IMAGEM DO EVENTO]              │  25 de Fevereiro, 2026          │
+│ │     [IMAGEM DO EVENTO]              │  19h00 às 22h00                 │
+│ └─────────────────────────────────────┘  Centro de Convenções UNN       │
+│                                          [INSCREVER] [SAIBA MAIS]        │
+│                                                                               │
+│ NOSSOS EVENTOS (6 cards em grid)                                            │
+│ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐                        │
+│ │ [IMAGEM]     │ │ [IMAGEM]     │ │ [IMAGEM]     │                        │
+│ │ Encontro de  │ │ Workshop:    │ │ Café com     │                        │
+│ │ Networking   │ │ Estratégias  │ │ Empreendedor │                        │
+│ │ 15 jan 2026  │ │ 10 dez 2025  │ │ 5 nov 2025   │                        │
+│ │ 85 part.     │ │ 120 part.    │ │ 50 part.     │                        │
+│ └──────────────┘ └──────────────┘ └──────────────┘                        │
+│ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐                        │
+│ │ [IMAGEM]     │ │ [IMAGEM]     │ │ [IMAGEM]     │                        │
+│ │ Summit UNN   │ │ Meetup       │ │ Masterclass  │                        │
+│ │ 20 out 2025  │ │ 12 set 2025  │ │ 8 ago 2025   │                        │
+│ │ 200+ part.   │ │ 75 part.     │ │ 95 part.     │                        │
+│ └──────────────┘ └──────────────┘ └──────────────┘                        │
+│                                     [VER TODOS OS EVENTOS]                  │
+│                                                                               │
+│ MEMBROS DA UNN (8 membros em grid)                                          │
+│ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐                           │
+│ │ Ana     │ │ Carlos  │ │ Patricia│ │ Ricardo │                           │
+│ │ Silva   │ │ Mendes  │ │ Costa   │ │ Santos  │                           │
+│ │ CEO     │ │ Diretor │ │ Emprend.│ │ Consultor│                          │
+│ └─────────┘ └─────────┘ └─────────┘ └─────────┘                           │
+│ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐                           │
+│ │ Juliana │ │Fernando │ │Mariana  │ │ Bruno   │                           │
+│ │Oliveira │ │ Lima    │ │ Rocha   │ │Almeida  │                           │
+│ │Fundadora│ │   CEO   │ │Diretora │ │Empreend.│                           │
+│ └─────────┘ └─────────┘ └─────────┘ └─────────┘                           │
+│                   [500+ MEMBROS - CONHEÇA TODOS]                            │
+│                                                                               │
+│ @SOMOSUNN (Feed Instagram - 6 posts em grid)                               │
+│ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐  │
+│ │ 234 ❤️  │ │ 456 ❤️  │ │ 189 ❤️  │ │ 312 ❤️  │ │ 278 ❤️  │ │ 425 ❤️  │  │
+│ │ 18 💬   │ │ 32 💬   │ │ 12 💬   │ │ 24 💬   │ │ 21 💬   │ │ 37 💬   │  │
+│ │Conexões │ │Celebrand│ │Café +   │ │Workshop │ │Conversas│ │Palestr.│  │
+│ │que geram│ │conquist.│ │network  │ │transform│ │que trans│ │compart.│  │
+│ └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘  │
+│                          [SIGA @SOMOSUNN - 5.2K SEGUIDORES]                │
+│                                                                               │
+│ NOSSOS VALORES (5 colunas)                                                  │
+│ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐          │
+│ │Colaboraç.│ │Transpard.│ │Crescimen.│ │ Respeito │ │Empreende.│          │
+│ │Juntos    │ │Honestos  │ │ Coletivo │ │Diversid.│ │ Conscient│          │
+│ └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘          │
+│                                                                               │
+│ O QUE DIZEM NOSSOS MEMBROS (3 testimonials)                                │
+│ ┌──────────────────────────────────────┐                                    │
+│ │ ⭐⭐⭐⭐⭐                                │                                    │
+│ │ "A UNN me conectou com pessoas certas│                                    │
+│ │  no momento certo..."                │                                    │
+│ │                           - Membro 1 │                                    │
+│ └──────────────────────────────────────┘                                    │
+│                                                                               │
+│ PARCEIROS DA UNN (12 logos em grid)                                         │
+│ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐        │
+│ │TechStar│ │Innovate│ │Growth  │ │Digital │ │Business│ │Smart   │        │
+│ └────────┘ └────────┘ └────────┘ └────────┘ └────────┘ └────────┘        │
+│ ... (mais 6 parceiros) ...                                                   │
+│                                                                               │
+│ FAÇA PARTE DA UNN                                                            │
+│ ┌──────────────────────────────────────┐                                    │
+│ │ Pronto para se conectar?             │                                    │
+│ │                                      │                                    │
+│ │ [BOTÃO] Quero entrar    [BOTÃO] Contato                                 │
+│ │                                      │                                    │
+│ │ 500+ MEMBROS | 50+ EVENTOS | 1000+ PARCERIAS                             │
+│ └──────────────────────────────────────┘                                    │
+│                                                                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ FOOTER                                                                        │
+│ UNN Links Rápidos | Contato       | Redes Sociais                          │
+│ © 2026 UNN - Todos os direitos reservados                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+📄 PORTAL.HTML - PORTAL DE NETWORKING
+─────────────────────────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  [☰] MENU MOBILE              [LOGO] Portal UNN    [BOTÃO ENTRAR]          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                                                                     │   │
+│  │   BEM-VINDO AO PORTAL DE NETWORKING! 🚀                           │   │
+│  │   Conecte-se e Cresça                                              │   │
+│  │                                                                     │   │
+│  │   4 Palestras | 4 Mentorias | 4+ Cursos | 85% Satisfação         │   │
+│  │                                                                     │   │
+│  │   [COMEÇAR AGORA]                                                 │   │
+│  │                                                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                               │
+│ PALESTRAS GRATUITAS (4 cards em grid)                                       │
+│ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐       │
+│ │ [IMAGEM]     │ │ [IMAGEM]     │ │ [IMAGEM]     │ │ [IMAGEM]     │       │
+│ │ Primeiros    │ │ Marketing    │ │ Networking   │ │ Gestão       │       │
+│ │ Passos       │ │ Digital      │ │ Eficiente    │ │ Financeira   │       │
+│ │ Roberto      │ │ Fernanda     │ │ Marcos       │ │ Patricia     │       │
+│ │ 45 min       │ │ 60 min       │ │ 40 min       │ │ 50 min       │       │
+│ │ 1250 views   │ │ 980 views    │ │ 1500 views   │ │ 820 views    │       │
+│ │ [Assistir]   │ │ [Assistir]   │ │ [Assistir]   │ │ [Assistir]   │       │
+│ └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘       │
+│                          [VER TODAS AS PALESTRAS]                           │
+│                                                                               │
+│ MENTORIAS PREMIUM (4 cards em grid)                                         │
+│ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐       │
+│ │ [IMAGEM]     │ │ [IMAGEM]     │ │ [IMAGEM]     │ │ [IMAGEM]     │       │
+│ │ E-commerce   │ │ Investimentos│ │ Expansão     │ │ Growth       │       │
+│ │ 👑 Premium   │ │ 👑 Premium   │ │ 👑 Premium   │ │ 👑 Premium   │       │
+│ │ Roberto      │ │ Marcos       │ │ Patricia     │ │ Fernanda     │       │
+│ │ 8 semanas    │ │ 12 semanas   │ │ 16 semanas   │ │ 10 semanas   │       │
+│ │ 245 alunos   │ │ 156 alunos   │ │ 89 alunos    │ │ 312 alunos   │       │
+│ │ ⭐4.9 (245)   │ │ ⭐5.0 (156)   │ │ ⭐4.8 (89)    │ │ ⭐4.7 (312)   │       │
+│ │ A partir de  │ │ A partir de  │ │ A partir de  │ │ A partir de  │       │
+│ │ R$ 497       │ │ R$ 897       │ │ R$ 1.297     │ │ R$ 697       │       │
+│ │ [Saiba Mais] │ │ [Saiba Mais] │ │ [Saiba Mais] │ │ [Saiba Mais] │       │
+│ └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘       │
+│                       [VER TODAS AS MENTORIAS]                              │
+│                                                                               │
+│ SEU DASHBOARD                                                                │
+│ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐                        │
+│ │ Dashboard    │ │ Cursos em    │ │ Certificados │                        │
+│ │              │ │ Andamento    │ │ Ganhos       │                        │
+│ │ Iniciante    │ │              │ │              │                        │
+│ │ 65% até next │ │ 3 cursos     │ │ 2 certificad.│                        │
+│ │ nível        │ │              │ │              │                        │
+│ └──────────────┘ └──────────────┘ └──────────────┘                        │
+│                                                                               │
+│ PRONTO PARA COMEÇAR?                                                        │
+│ ┌──────────────────────────────────────┐                                    │
+│ │ [COMEÇAR GRATUITAMENTE] [SAIBA MAIS]│                                    │
+│ └──────────────────────────────────────┘                                    │
+│                                                                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ FOOTER                                                                        │
+│ Portal UNN Links Rápidos | Suporte | Redes Sociais                         │
+│ © 2026 Portal UNN - Todos os direitos reservados                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+🎨 PALETA DE CORES
+═════════════════════════════════════════════════════════════════════════════════
+
+Primária:       #1a3a52 (Azul Escuro)
+Gradiente:      #1a3a52 → #2d5a7b (Azul para Azul-Cinza)
+Secundárias:    
+  • Verde:      #10b981
+  • Roxo:       #8b5cf6
+  • Laranja:    #f97316
+  • Rosa:       #ec4899
+  • Cyan:       #06b6d4
+  • Índigo:     #6366f1
+
+Neutras:
+  • Branco:     #ffffff
+  • Cinza:      #f1f5f9, #e5e7eb, #d1d5db
+
+
+📱 RESPONSIVIDADE
+═════════════════════════════════════════════════════════════════════════════════
+
+Mobile (< 768px):
+  • Menu hamburger (70% da tela)
+  • Logo: 64px de altura
+  • Grids: 1 ou 2 colunas
+  • Fonte: ajustada para leitura
+
+Desktop (≥ 768px):
+  • Menu horizontal
+  • Logo: 56px de altura
+  • Grids: até 4 colunas
+  • Navegação fixa no topo
+
+
+✅ CHECKLIST FINAL
+═════════════════════════════════════════════════════════════════════════════════
+
+☑ HTML semântico e bem estruturado
+☑ Tailwind CSS 4 integrado
+☑ Font Awesome 6.4 com ícones
+☑ Google Fonts (Inter)
+☑ Menu hamburger deslizante
+☑ Imagens reais do Unsplash
+☑ Logo integrada (placeholder pronto)
+☑ Favicon configurado
+☑ Smooth scroll em links
+☑ Animações CSS suaves
+☑ 100% responsivo
+☑ Sem dependências pesadas
+☑ Performance otimizada
+☑ SEO friendly
+☑ Acessibilidade
+☑ Documentação completa
