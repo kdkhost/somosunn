@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Networking Digital</title>
+    <title>Portal Educacional UNN | Mentoria e Cursos</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,13 +15,18 @@
             font-family: 'Inter', sans-serif;
         }
 
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        /* Hamburger Menu */
         .hamburger {
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(8px, 8px);
+            transform: rotate(45deg) translate(10px, 10px);
         }
 
         .hamburger.active span:nth-child(2) {
@@ -29,7 +34,7 @@
         }
 
         .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
+            transform: rotate(-45deg) translate(9px, -9px);
         }
 
         .menu-overlay {
@@ -38,8 +43,9 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            transition: left 0.3s ease;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 40;
         }
 
@@ -49,14 +55,14 @@
 
         .sidebar-menu {
             position: fixed;
-            left: -100%;
+            left: -70%;
             top: 0;
-            width: 280px;
+            width: 70%;
             height: 100vh;
-            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
-            transition: left 0.3s ease;
+            background: linear-gradient(135deg, #0f2535 0%, #1a3a52 50%, #2d5a7b 100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 50;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 8px 0 40px rgba(0, 0, 0, 0.25);
             overflow-y: auto;
         }
 
@@ -64,15 +70,62 @@
             left: 0;
         }
 
-        @media (max-width: 768px) {
-            .sidebar-menu {
-                width: 70%;
-                left: -70% !important;
+        /* Cards Premium */
+        .card-premium {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(26, 58, 82, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-premium:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12);
+            border-color: rgba(26, 58, 82, 0.2);
+        }
+
+        .image-scale {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-premium:hover .image-scale {
+            transform: scale(1.1);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px rgba(26, 58, 82, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(26, 58, 82, 0.35);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
 
-            .sidebar-menu.active {
-                left: 0 !important;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .text-gradient {
@@ -82,126 +135,53 @@
             background-clip: text;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(26, 58, 82, 0.3);
-        }
-
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-
-        .card-hover:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .badge-free {
-            background: #ecfdf5;
-            color: #065f46;
-        }
-
-        .badge-premium {
-            background: #fdf2f8;
-            color: #831843;
-        }
-
-        .stat-box {
-            text-align: center;
-            padding: 24px 16px;
-        }
-
-        .fade-in {
-            animation: fadeIn 0.6s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
-            border-radius: 4px;
-        }
-
-        .rating {
-            color: #fbbf24;
-        }
-
         .section-title {
             position: relative;
             display: inline-block;
+            font-size: 2.5rem;
+            font-weight: 800;
         }
 
         .section-title::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            bottom: -12px;
             left: 0;
-            width: 40px;
-            height: 4px;
+            width: 60px;
+            height: 5px;
             background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            border-radius: 3px;
         }
 
-        .tabs-container {
-            border-bottom: 2px solid #e5e7eb;
-            display: flex;
-            overflow-x: auto;
+        /* Badge */
+        .badge-premium {
+            display: inline-block;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
         }
 
-        .tab-button {
-            padding: 16px 24px;
-            color: #6b7280;
-            font-weight: 600;
-            white-space: nowrap;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        ::-webkit-scrollbar {
+            width: 10px;
         }
 
-        .tab-button.active {
-            color: #1a3a52;
-            border-bottom-color: #1a3a52;
+        ::-webkit-scrollbar-track {
+            background: #f0f4f8;
         }
 
-        .tab-button:hover {
-            color: #1a3a52;
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            border-radius: 5px;
         }
     </style>
 </head>
 
-<body class="bg-white">
+<body>
     <!-- Hamburger Menu -->
-    <div class="fixed top-6 left-6 z-50 md:hidden">
+    <div class="fixed top-6 left-6 z-50 lg:hidden">
         <button class="hamburger p-2 hover:bg-gray-100 rounded-lg transition" id="hamburgerBtn">
             <span class="block w-6 h-0.5 bg-gray-800 mb-2 transition"></span>
             <span class="block w-6 h-0.5 bg-gray-800 mb-2 transition"></span>
@@ -209,617 +189,427 @@
         </button>
     </div>
 
-    <!-- Overlay Menu -->
+    <!-- Menu Overlay -->
     <div class="menu-overlay" id="menuOverlay"></div>
 
     <!-- Sidebar Menu -->
     <aside class="sidebar-menu" id="sidebarMenu">
         <div class="p-6 border-b border-white/20">
-            <!-- Logo -->
             <div class="mb-3">
                 <img src="img/logo.png" alt="UNN Logo" class="h-16 w-auto">
             </div>
-            <p class="text-white/70 text-sm">Networking Digital</p>
+            <p class="text-white/80 text-sm">Educação que transforma</p>
         </div>
 
-        <nav class="p-6 space-y-4">
-            <a href="index.html"
-                class="menu-link block text-white hover:text-blue-200 transition py-2 px-4 rounded-lg hover:bg-white/10">
-                <i class="fas fa-home mr-3"></i> Início
+        <nav class="p-6 space-y-3">
+            <a href="index.html" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-home mr-3"></i> Home
             </a>
-            <a href="#palestras"
-                class="menu-link block text-white hover:text-blue-200 transition py-2 px-4 rounded-lg hover:bg-white/10">
-                <i class="fas fa-video mr-3"></i> Palestras
+            <a href="#cursos" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-book mr-3"></i> Cursos
             </a>
-            <a href="#mentorias"
-                class="menu-link block text-white hover:text-blue-200 transition py-2 px-4 rounded-lg hover:bg-white/10">
-                <i class="fas fa-graduation-cap mr-3"></i> Mentorias
+            <a href="#mentoria" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-star mr-3"></i> Mentoria Premium
             </a>
-            <a href="#dashboard"
-                class="menu-link block text-white hover:text-blue-200 transition py-2 px-4 rounded-lg hover:bg-white/10">
-                <i class="fas fa-chart-bar mr-3"></i> Dashboard
-            </a>
-            <a href="#comunidade"
-                class="menu-link block text-white hover:text-blue-200 transition py-2 px-4 rounded-lg hover:bg-white/10">
-                <i class="fas fa-users mr-3"></i> Comunidade
-            </a>
-            <hr class="border-white/20 my-4">
-            <a href="index.html"
-                class="menu-link block text-white hover:text-blue-200 transition py-2 px-4 rounded-lg hover:bg-white/10">
-                <i class="fas fa-arrow-left mr-3"></i> Voltar ao Site
+            <a href="#dashboard" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-chart-line mr-3"></i> Meu Dashboard
             </a>
         </nav>
 
         <div class="absolute bottom-6 left-6 right-6">
             <button
-                class="w-full btn-primary text-white py-3 rounded-lg font-semibold flex items-center justify-center">
-                <i class="fas fa-sign-in-alt mr-2"></i> Entrar
+                class="w-full btn-primary text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2">
+                <i class="fas fa-sign-in-alt"></i> Acessar Plataforma
             </button>
         </div>
     </aside>
 
-    <!-- Navigation Desktop -->
-    <nav class="hidden md:flex fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-lg shadow-sm z-30">
-        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between w-full">
-            <div class="flex items-center space-x-12">
-                <!-- Logo Desktop -->
+    <!-- Desktop Navigation -->
+    <nav class="hidden lg:flex fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-xl shadow-sm z-30">
+        <div class="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between w-full">
+            <div class="flex items-center gap-16">
                 <img src="img/logo.png" alt="UNN Logo" class="h-14 w-auto">
-                <div class="flex space-x-8">
-                    <a href="#palestras" class="text-gray-700 hover:text-blue-600 transition">Palestras</a>
-                    <a href="#mentorias" class="text-gray-700 hover:text-blue-600 transition">Mentorias</a>
-                    <a href="index.html" class="text-gray-700 hover:text-blue-600 transition">Voltar</a>
+                <div class="flex gap-10">
+                    <a href="index.html" class="text-gray-700 font-500 hover:text-blue-600 transition">Home</a>
+                    <a href="#cursos" class="text-gray-700 font-500 hover:text-blue-600 transition">Cursos</a>
+                    <a href="#mentoria" class="text-gray-700 font-500 hover:text-blue-600 transition">Mentoria</a>
                 </div>
             </div>
-            <button class="btn-primary text-white px-6 py-2 rounded-lg font-semibold">Entrar</button>
+            <button class="btn-primary text-white px-8 py-2 rounded-lg font-semibold">Acessar</button>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="pt-20 md:pt-32 pb-16 md:pb-24 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-slate-50 to-white">
+    <section class="pt-28 md:pt-40 pb-20 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-slate-50 to-white">
         <div class="max-w-7xl mx-auto">
-            <div class="text-center fade-in">
-                <div class="inline-block mb-6 px-4 py-2 bg-blue-100 text-blue-700 rounded-full font-semibold text-sm">
-                    <i class="fas fa-rocket mr-2"></i> Bem-vindo ao Portal de Networking! 🚀
-                </div>
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-                    Conecte-se e <span class="text-gradient">Cresça</span>
-                </h1>
-                <p class="text-lg text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-                    Conecte-se com empreendedores do seu nível, aprenda com palestras gratuitas e acelere seu
-                    crescimento com mentorias premium.
-                </p>
-
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-12 max-w-4xl mx-auto">
-                    <div class="stat-box">
-                        <p class="text-3xl md:text-4xl font-bold text-gray-800">4</p>
-                        <p class="text-sm text-gray-600 mt-2">Palestras Gratuitas</p>
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div class="animate-fadeInUp">
+                    <div
+                        class="inline-block bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-600 mb-6">
+                        <i class="fas fa-graduation-cap mr-2"></i> Plataforma de Educação Premium
                     </div>
-                    <div class="stat-box">
-                        <p class="text-3xl md:text-4xl font-bold text-gray-800">4</p>
-                        <p class="text-sm text-gray-600 mt-2">Mentorias Premium</p>
-                    </div>
-                    <div class="stat-box">
-                        <p class="text-3xl md:text-4xl font-bold text-gray-800">4+</p>
-                        <p class="text-sm text-gray-600 mt-2">No seu nível</p>
-                    </div>
-                    <div class="stat-box">
-                        <p class="text-3xl md:text-4xl font-bold text-gray-800">85%</p>
-                        <p class="text-sm text-gray-600 mt-2">Taxa de satisfação</p>
+                    <h1 class="text-5xl lg:text-7xl font-900 leading-tight mb-8">
+                        Aprenda com<br />
+                        <span class="text-gradient">experts da indústria</span>
+                    </h1>
+                    <p class="text-lg text-gray-600 mb-10 leading-relaxed max-w-xl">
+                        Cursos práticos, mentoria de especialistas e uma comunidade de aprendizado que impulsiona seu
+                        desenvolvimento profissional.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button class="btn-primary text-white px-10 py-4 rounded-lg font-semibold text-lg">
+                            Começar agora <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                        <button
+                            class="border-2 border-gray-300 text-gray-700 px-10 py-4 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition">
+                            Ver cursos
+                        </button>
                     </div>
                 </div>
 
-                <button
-                    class="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-lg inline-flex items-center">
-                    Começar agora
-                    <i class="fas fa-arrow-right ml-2"></i>
-                </button>
+                <div class="hidden lg:block">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f70d504f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                        alt="Educação Online" class="w-full h-96 object-cover rounded-3xl shadow-2xl">
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Palestras -->
-    <section id="palestras" class="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-white">
+    <!-- Cursos Grátis -->
+    <section id="cursos" class="py-24 px-6 md:px-12 lg:px-24 bg-white">
         <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4 section-title">Palestras Gratuitas</h2>
-            <p class="text-gray-600 text-lg mb-12 max-w-2xl mt-8">Aprenda com os melhores empresários</p>
+            <h2 class="section-title text-4xl lg:text-5xl mb-4">Cursos Gratuitos</h2>
+            <p class="text-gray-600 text-lg mb-20 max-w-2xl">Conheça nossas aulas iniciais e expanda seus conhecimentos
+            </p>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-                <!-- Palestra 1 -->
-                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
-                    <div
-                        class="aspect-video bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                            alt="Primeiros Passos" class="w-full h-full object-cover">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Curso 1 -->
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Networking" class="image-scale">
                     </div>
                     <div class="p-6">
-                        <span class="badge badge-free">
-                            <i class="fas fa-gift mr-1"></i> Gratuito
-                        </span>
-                        <h3 class="text-lg font-bold text-gray-800 my-3">Primeiros Passos no Empreendedorismo</h3>
-                        <p class="text-gray-600 text-sm mb-4">Aprenda os fundamentos para iniciar seu negócio</p>
-
-                        <div class="space-y-2 mb-4 text-sm text-gray-600">
-                            <div class="flex items-center">
-                                <i class="fas fa-user mr-2 text-blue-600"></i>
-                                <span><strong>Roberto Santos</strong></span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-clock mr-2 text-blue-600"></i>
-                                <span>45 min</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-eye mr-2 text-blue-600"></i>
-                                <span>1250 visualizações</span>
-                            </div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-500">4 aulas</span>
+                            <span class="badge-premium">Grátis</span>
                         </div>
-
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Fundamentos do Networking</h3>
+                        <p class="text-gray-600 text-sm mb-4">Aprenda as bases para construir uma rede profissional
+                            poderosa.</p>
+                        <div class="flex items-center text-gray-500 text-sm mb-4">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span>4.9</span>
+                        </div>
                         <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
-                            Assistir Agora
+                            Acessar curso
                         </button>
                     </div>
                 </div>
 
-                <!-- Palestra 2 -->
-                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
-                    <div
-                        class="aspect-video bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                            alt="Marketing Digital" class="w-full h-full object-cover">
+                <!-- Curso 2 -->
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1516321498830-6e0ee384ca13?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Estratégia" class="image-scale">
                     </div>
                     <div class="p-6">
-                        <span class="badge badge-free">
-                            <i class="fas fa-gift mr-1"></i> Gratuito
-                        </span>
-                        <h3 class="text-lg font-bold text-gray-800 my-3">Marketing Digital para Iniciantes</h3>
-                        <p class="text-gray-600 text-sm mb-4">Estratégias essenciais de marketing digital</p>
-
-                        <div class="space-y-2 mb-4 text-sm text-gray-600">
-                            <div class="flex items-center">
-                                <i class="fas fa-user mr-2 text-green-600"></i>
-                                <span><strong>Fernanda Lima</strong></span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-clock mr-2 text-green-600"></i>
-                                <span>60 min</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-eye mr-2 text-green-600"></i>
-                                <span>980 visualizações</span>
-                            </div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-500">6 aulas</span>
+                            <span class="badge-premium">Grátis</span>
                         </div>
-
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Estratégia de Crescimento 101</h3>
+                        <p class="text-gray-600 text-sm mb-4">Ferramentas essenciais para planejamento e execução de
+                            metas.</p>
+                        <div class="flex items-center text-gray-500 text-sm mb-4">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span>4.8</span>
+                        </div>
                         <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
-                            Assistir Agora
+                            Acessar curso
                         </button>
                     </div>
                 </div>
 
-                <!-- Palestra 3 -->
-                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
-                    <div
-                        class="aspect-video bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1709715357510-b687304cee3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                            alt="Networking" class="w-full h-full object-cover">
+                <!-- Curso 3 -->
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1590080876300-2c26d81e8a6f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Digital" class="image-scale">
                     </div>
                     <div class="p-6">
-                        <span class="badge badge-free">
-                            <i class="fas fa-gift mr-1"></i> Gratuito
-                        </span>
-                        <h3 class="text-lg font-bold text-gray-800 my-3">Networking Eficiente</h3>
-                        <p class="text-gray-600 text-sm mb-4">Como construir uma rede de contatos sólida</p>
-
-                        <div class="space-y-2 mb-4 text-sm text-gray-600">
-                            <div class="flex items-center">
-                                <i class="fas fa-user mr-2 text-purple-600"></i>
-                                <span><strong>Marcos Oliveira</strong></span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-clock mr-2 text-purple-600"></i>
-                                <span>40 min</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-eye mr-2 text-purple-600"></i>
-                                <span>1500 visualizações</span>
-                            </div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-500">5 aulas</span>
+                            <span class="badge-premium">Grátis</span>
                         </div>
-
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Marketing Digital Básico</h3>
+                        <p class="text-gray-600 text-sm mb-4">Domine os canais digitais para promover seu negócio
+                            online.</p>
+                        <div class="flex items-center text-gray-500 text-sm mb-4">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span>4.7</span>
+                        </div>
                         <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
-                            Assistir Agora
+                            Acessar curso
                         </button>
                     </div>
                 </div>
 
-                <!-- Palestra 4 -->
-                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
-                    <div
-                        class="aspect-video bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1758876019673-704b039d405c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                            alt="Gestao Financeira" class="w-full h-full object-cover">
+                <!-- Curso 4 -->
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Liderança" class="image-scale">
                     </div>
                     <div class="p-6">
-                        <span class="badge badge-free">
-                            <i class="fas fa-gift mr-1"></i> Gratuito
-                        </span>
-                        <h3 class="text-lg font-bold text-gray-800 my-3">Gestão Financeira para Startups</h3>
-                        <p class="text-gray-600 text-sm mb-4">Controle financeiro e planejamento estratégico</p>
-
-                        <div class="space-y-2 mb-4 text-sm text-gray-600">
-                            <div class="flex items-center">
-                                <i class="fas fa-user mr-2 text-orange-600"></i>
-                                <span><strong>Patricia Rocha</strong></span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-clock mr-2 text-orange-600"></i>
-                                <span>50 min</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-eye mr-2 text-orange-600"></i>
-                                <span>820 visualizações</span>
-                            </div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-500">7 aulas</span>
+                            <span class="badge-premium">Grátis</span>
                         </div>
-
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Liderança Eficaz</h3>
+                        <p class="text-gray-600 text-sm mb-4">Desenvolva habilidades de liderança para sua carreira e
+                            equipe.</p>
+                        <div class="flex items-center text-gray-500 text-sm mb-4">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span>4.9</span>
+                        </div>
                         <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
-                            Assistir Agora
+                            Acessar curso
                         </button>
                     </div>
                 </div>
-            </div>
-
-            <div class="text-center">
-                <button class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
-                    Ver Todas as Palestras
-                    <i class="fas fa-arrow-right ml-2"></i>
-                </button>
             </div>
         </div>
     </section>
 
-    <!-- Mentorias -->
-    <section id="mentorias" class="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-slate-50">
+    <!-- Mentoria Premium -->
+    <section id="mentoria" class="py-24 px-6 md:px-12 lg:px-24 bg-slate-50">
         <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4 section-title">Mentorias Premium</h2>
-            <p class="text-gray-600 text-lg mb-12 max-w-2xl mt-8">Programas completos de mentoria com especialistas</p>
+            <h2 class="section-title text-4xl lg:text-5xl mb-4">Mentoria Premium</h2>
+            <p class="text-gray-600 text-lg mb-20 max-w-2xl">Aprenda diretamente com especialistas da indústria</p>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <!-- Mentoria 1 -->
-                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
-                    <div
-                        class="aspect-video bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1537444532052-2afbf769b76c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                            alt="E-commerce" class="w-full h-full object-cover">
-                        <span class="badge badge-premium absolute top-3 right-3">
-                            <i class="fas fa-crown mr-1"></i> Premium
-                        </span>
+                <div class="card-premium rounded-2xl overflow-hidden border-2 border-yellow-400">
+                    <div class="bg-gradient-to-br from-yellow-100 to-yellow-50 p-6 text-center">
+                        <div class="text-5xl mb-3">⭐</div>
+                        <span class="badge-premium">Popular</span>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-lg font-bold text-gray-800 my-3">Mentoria Completa em E-commerce</h3>
-                        <p class="text-gray-600 text-sm mb-4">Do zero ao primeiro milhão em vendas online</p>
-
-                        <div class="space-y-2 mb-4 text-sm text-gray-600">
-                            <div class="flex items-center">
-                                <i class="fas fa-user mr-2 text-blue-600"></i>
-                                <span><strong>Roberto Santos</strong></span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-calendar mr-2 text-blue-600"></i>
-                                <span>8 semanas</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-users mr-2 text-blue-600"></i>
-                                <span>245 alunos</span>
-                            </div>
-                            <div class="flex items-center mt-2">
-                                <span class="rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                </span>
-                                <span class="text-gray-600 ml-2">4.9</span>
-                            </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Estratégia Premium</h3>
+                        <p class="text-gray-600 text-sm mb-6">Mentoria 1-on-1 com especialistas em crescimento.</p>
+                        <div class="mb-6">
+                            <p class="text-3xl font-bold text-gray-900">R$ 297</p>
+                            <p class="text-gray-500 text-sm">/mês</p>
                         </div>
-
-                        <p class="text-blue-600 font-bold text-lg mb-4">A partir de<br><span class="text-2xl">R$
-                                497</span></p>
-
-                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
-                            Saiba Mais
+                        <ul class="space-y-3 mb-8 text-sm text-gray-600">
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> 4
+                                sessões/mês</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Suporte por
+                                email</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Comunidade
+                                exclusiva</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Recursos de
+                                valor</li>
+                        </ul>
+                        <button class="w-full btn-primary text-white py-3 rounded-lg font-semibold">
+                            Inscrever-se
                         </button>
                     </div>
                 </div>
 
                 <!-- Mentoria 2 -->
-                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
-                    <div
-                        class="aspect-video bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1529119368496-2dfda6ec2804?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                            alt="Investimentos" class="w-full h-full object-cover">
-                        <span class="badge badge-premium absolute top-3 right-3">
-                            <i class="fas fa-crown mr-1"></i> Premium
-                        </span>
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="bg-gradient-to-br from-blue-100 to-blue-50 p-6 text-center">
+                        <div class="text-5xl mb-3">🚀</div>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-lg font-bold text-gray-800 my-3">Captação de Investimentos</h3>
-                        <p class="text-gray-600 text-sm mb-4">Aprenda a atrair investidores para seu negócio</p>
-
-                        <div class="space-y-2 mb-4 text-sm text-gray-600">
-                            <div class="flex items-center">
-                                <i class="fas fa-user mr-2 text-green-600"></i>
-                                <span><strong>Marcos Oliveira</strong></span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-calendar mr-2 text-green-600"></i>
-                                <span>12 semanas</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-users mr-2 text-green-600"></i>
-                                <span>156 alunos</span>
-                            </div>
-                            <div class="flex items-center mt-2">
-                                <span class="rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </span>
-                                <span class="text-gray-600 ml-2">5.0</span>
-                            </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Acelerador</h3>
+                        <p class="text-gray-600 text-sm mb-6">Programa intensivo para escalar seu negócio rápido.</p>
+                        <div class="mb-6">
+                            <p class="text-3xl font-bold text-gray-900">R$ 597</p>
+                            <p class="text-gray-500 text-sm">/mês</p>
                         </div>
-
-                        <p class="text-green-600 font-bold text-lg mb-4">A partir de<br><span class="text-2xl">R$
-                                897</span></p>
-
-                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
-                            Saiba Mais
+                        <ul class="space-y-3 mb-8 text-sm text-gray-600">
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> 8
+                                sessões/mês</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Acesso
+                                prioritário</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Análise de
+                                negócio</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Networking
+                                VIP</li>
+                        </ul>
+                        <button class="w-full btn-primary text-white py-3 rounded-lg font-semibold">
+                            Inscrever-se
                         </button>
                     </div>
                 </div>
 
                 <!-- Mentoria 3 -->
-                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
-                    <div
-                        class="aspect-video bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                            alt="Expansao" class="w-full h-full object-cover">
-                        <span class="badge badge-premium absolute top-3 right-3">
-                            <i class="fas fa-crown mr-1"></i> Premium
-                        </span>
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="bg-gradient-to-br from-green-100 to-green-50 p-6 text-center">
+                        <div class="text-5xl mb-3">💎</div>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-lg font-bold text-gray-800 my-3">Expansão Internacional</h3>
-                        <p class="text-gray-600 text-sm mb-4">Leve seu negócio para o mercado global</p>
-
-                        <div class="space-y-2 mb-4 text-sm text-gray-600">
-                            <div class="flex items-center">
-                                <i class="fas fa-user mr-2 text-purple-600"></i>
-                                <span><strong>Patricia Rocha</strong></span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-calendar mr-2 text-purple-600"></i>
-                                <span>16 semanas</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-users mr-2 text-purple-600"></i>
-                                <span>89 alunos</span>
-                            </div>
-                            <div class="flex items-center mt-2">
-                                <span class="rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                </span>
-                                <span class="text-gray-600 ml-2">4.8</span>
-                            </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Platinum</h3>
+                        <p class="text-gray-600 text-sm mb-6">Mentoria VIP com transformação completa.</p>
+                        <div class="mb-6">
+                            <p class="text-3xl font-bold text-gray-900">R$ 1.497</p>
+                            <p class="text-gray-500 text-sm">/mês</p>
                         </div>
-
-                        <p class="text-purple-600 font-bold text-lg mb-4">A partir de<br><span class="text-2xl">R$
-                                1.297</span></p>
-
-                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
-                            Saiba Mais
+                        <ul class="space-y-3 mb-8 text-sm text-gray-600">
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Acesso
+                                ilimitado</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Consultoria
+                                estratégica</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i>
+                                Masterclasses privadas</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Mentoria CEO
+                            </li>
+                        </ul>
+                        <button class="w-full btn-primary text-white py-3 rounded-lg font-semibold">
+                            Inscrever-se
                         </button>
                     </div>
                 </div>
 
                 <!-- Mentoria 4 -->
-                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
-                    <div
-                        class="aspect-video bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                            alt="Growth Hacking" class="w-full h-full object-cover">
-                        <span class="badge badge-premium absolute top-3 right-3">
-                            <i class="fas fa-crown mr-1"></i> Premium
-                        </span>
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="bg-gradient-to-br from-purple-100 to-purple-50 p-6 text-center">
+                        <div class="text-5xl mb-3">👑</div>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-lg font-bold text-gray-800 my-3">Growth Hacking Avançado</h3>
-                        <p class="text-gray-600 text-sm mb-4">Estratégias de crescimento acelerado</p>
-
-                        <div class="space-y-2 mb-4 text-sm text-gray-600">
-                            <div class="flex items-center">
-                                <i class="fas fa-user mr-2 text-orange-600"></i>
-                                <span><strong>Fernanda Lima</strong></span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-calendar mr-2 text-orange-600"></i>
-                                <span>10 semanas</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-users mr-2 text-orange-600"></i>
-                                <span>312 alunos</span>
-                            </div>
-                            <div class="flex items-center mt-2">
-                                <span class="rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                </span>
-                                <span class="text-gray-600 ml-2">4.7</span>
-                            </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Elite Exclusivo</h3>
+                        <p class="text-gray-600 text-sm mb-6">Apenas para empreendedores de alto impacto.</p>
+                        <div class="mb-6">
+                            <p class="text-3xl font-bold text-gray-900">Personalizado</p>
+                            <p class="text-gray-500 text-sm">Contacte-nos</p>
                         </div>
-
-                        <p class="text-orange-600 font-bold text-lg mb-4">A partir de<br><span class="text-2xl">R$
-                                697</span></p>
-
-                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
-                            Saiba Mais
+                        <ul class="space-y-3 mb-8 text-sm text-gray-600">
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Plano
+                                customizado</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Mentores
+                                dedicados</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Board de
+                                conselheiros</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i>
+                                Oportunidades exclusivas</li>
+                        </ul>
+                        <button
+                            class="w-full border-2 border-gray-400 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition">
+                            Solicitar acesso
                         </button>
                     </div>
                 </div>
             </div>
-
-            <div class="text-center">
-                <button class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
-                    Ver Todas as Mentorias
-                    <i class="fas fa-arrow-right ml-2"></i>
-                </button>
-            </div>
         </div>
     </section>
 
-    <!-- Seção de Usuário -->
-    <section id="dashboard" class="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-white">
+    <!-- Dashboard Preview -->
+    <section id="dashboard" class="py-24 px-6 md:px-12 lg:px-24 bg-white">
         <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4 section-title">Seu Dashboard</h2>
-            <p class="text-gray-600 text-lg mb-12 max-w-2xl mt-8">Acompanhe seu progresso e gerenciae suas atividades
-            </p>
+            <h2 class="section-title text-4xl lg:text-5xl mb-4">Seu Progresso</h2>
+            <p class="text-gray-600 text-lg mb-20 max-w-2xl">Acompanhe seu desenvolvimento em tempo real</p>
 
-            <div class="grid md:grid-cols-4 gap-6 mb-12">
-                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200">
-                    <div class="text-3xl text-blue-600 mb-4"><i class="fas fa-graduation-cap"></i></div>
-                    <h3 class="text-2xl font-bold text-gray-800">Dashboard</h3>
-                    <p class="text-gray-600 text-sm mt-2">Acompanhe seus cursos</p>
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="card-premium p-8 rounded-2xl text-center">
+                    <div class="text-5xl text-blue-600 mb-4"><i class="fas fa-book"></i></div>
+                    <p class="text-4xl font-bold text-gray-900 mb-2">12</p>
+                    <p class="text-gray-600">Cursos Concluídos</p>
                 </div>
 
-                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border border-green-200">
-                    <div class="text-3xl text-green-600 mb-4"><i class="fas fa-users"></i></div>
-                    <h3 class="text-2xl font-bold text-gray-800">Comunidade</h3>
-                    <p class="text-gray-600 text-sm mt-2">Conecte-se com outros</p>
+                <div class="card-premium p-8 rounded-2xl text-center">
+                    <div class="text-5xl text-green-600 mb-4"><i class="fas fa-chart-line"></i></div>
+                    <p class="text-4xl font-bold text-gray-900 mb-2">85%</p>
+                    <p class="text-gray-600">Taxa de Progresso</p>
                 </div>
 
-                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200">
-                    <div class="text-3xl text-purple-600 mb-4"><i class="fas fa-ranking-star"></i></div>
-                    <h3 class="text-2xl font-bold text-gray-800">Ranking</h3>
-                    <p class="text-gray-600 text-sm mt-2">Veja sua posição</p>
-                </div>
-
-                <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-6 border border-orange-200">
-                    <div class="text-3xl text-orange-600 mb-4"><i class="fas fa-video"></i></div>
-                    <h3 class="text-2xl font-bold text-gray-800">Palestras</h3>
-                    <p class="text-gray-600 text-sm mt-2">Assista aulas</p>
+                <div class="card-premium p-8 rounded-2xl text-center">
+                    <div class="text-5xl text-purple-600 mb-4"><i class="fas fa-award"></i></div>
+                    <p class="text-4xl font-bold text-gray-900 mb-2">8</p>
+                    <p class="text-gray-600">Certificados Obtidos</p>
                 </div>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Card 1 -->
-                <div class="card-hover bg-white rounded-2xl p-8 border border-gray-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-bold text-gray-800">Empreendedor Iniciante</h3>
-                        <div class="text-2xl text-blue-600"><i class="fas fa-level-up-alt"></i></div>
+            <div class="card-premium p-8 rounded-2xl">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Próximas Aulas</h3>
+                <div class="space-y-4">
+                    <div
+                        class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-transparent rounded-lg border border-blue-100">
+                        <div>
+                            <p class="font-semibold text-gray-800">Negociação Avançada</p>
+                            <p class="text-sm text-gray-600">com especialista em vendas</p>
+                        </div>
+                        <p class="text-sm text-gray-500">Próxima segunda, 19h</p>
                     </div>
-                    <p class="text-gray-600 mb-6">Seu nível atual na plataforma</p>
-                    <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                        <div class="bg-blue-600 h-2 rounded-full" style="width: 65%"></div>
+                    <div
+                        class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-transparent rounded-lg border border-green-100">
+                        <div>
+                            <p class="font-semibold text-gray-800">Mentoría 1-on-1</p>
+                            <p class="text-sm text-gray-600">com seu mentor dedicado</p>
+                        </div>
+                        <p class="text-sm text-gray-500">Quarta, 10h</p>
                     </div>
-                    <p class="text-sm text-gray-600">65% para o próximo nível</p>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="card-hover bg-white rounded-2xl p-8 border border-gray-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-bold text-gray-800">Cursos em Andamento</h3>
-                        <div class="text-2xl text-green-600"><i class="fas fa-tasks"></i></div>
-                    </div>
-                    <p class="text-3xl font-bold text-green-600 mb-4">3</p>
-                    <p class="text-sm text-gray-600">Continue seu aprendizado</p>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="card-hover bg-white rounded-2xl p-8 border border-gray-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-bold text-gray-800">Certificados Ganhos</h3>
-                        <div class="text-2xl text-purple-600"><i class="fas fa-certificate"></i></div>
-                    </div>
-                    <p class="text-3xl font-bold text-purple-600 mb-4">2</p>
-                    <p class="text-sm text-gray-600">Parabéns pelos seus avanços!</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Final -->
-    <section class="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-slate-50">
+    <!-- CTA -->
+    <section class="py-24 px-6 md:px-12 lg:px-24 bg-gradient-to-br from-blue-600 to-blue-700">
         <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-3xl md:text-4xl font-bold mb-6">Pronto para começar?</h2>
-            <p class="text-gray-600 text-lg mb-8">Junte-se à comunidade de empreendedores que já estão transformando
-                seus negócios</p>
-
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button class="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-lg">
-                    Começar Gratuitamente
-                    <i class="fas fa-arrow-right ml-2"></i>
-                </button>
-                <button
-                    class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition">
-                    Saiba Mais
-                </button>
-            </div>
+            <h2 class="text-4xl lg:text-6xl font-900 text-white mb-6">
+                Transforme Sua Carreira
+            </h2>
+            <p class="text-white/90 text-lg mb-10">
+                Comece com um dos nossos cursos gratuitos hoje mesmo.
+            </p>
+            <button class="bg-white text-blue-600 px-10 py-4 rounded-lg font-bold hover:bg-gray-100 transition">
+                Explorar Cursos <i class="fas fa-arrow-right ml-2"></i>
+            </button>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-300 py-16 px-6 md:px-12 lg:px-24">
+    <footer class="bg-gray-950 text-gray-400 py-20 px-6 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
             <div class="grid md:grid-cols-4 gap-12 mb-12">
                 <div>
-                    <h3 class="text-white text-lg font-bold mb-4">Portal UNN</h3>
-                    <p class="text-sm text-gray-400 leading-relaxed">Conecte-se com empreendedores do seu nível e
-                        acelere seu crescimento com mentorias premium.</p>
+                    <h3 class="text-white text-lg font-bold mb-4">UNN Portal</h3>
+                    <p class="text-sm leading-relaxed">Educação premium que transforma carreiras e negócios.</p>
                 </div>
 
                 <div>
-                    <h4 class="text-white font-bold mb-4">Links Rápidos</h4>
+                    <h4 class="text-white font-bold mb-4">Plataforma</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#palestras" class="text-gray-400 hover:text-white transition">Palestras</a></li>
-                        <li><a href="#mentorias" class="text-gray-400 hover:text-white transition">Mentorias</a></li>
-                        <li><a href="index.html" class="text-gray-400 hover:text-white transition">Voltar ao Site</a>
-                        </li>
+                        <li><a href="#cursos" class="hover:text-white transition">Cursos</a></li>
+                        <li><a href="#mentoria" class="hover:text-white transition">Mentoria</a></li>
+                        <li><a href="#dashboard" class="hover:text-white transition">Dashboard</a></li>
                     </ul>
                 </div>
 
                 <div>
                     <h4 class="text-white font-bold mb-4">Suporte</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="mailto:suporte@unn.com.br"
-                                class="text-gray-400 hover:text-white transition">suporte@unn.com.br</a></li>
-                        <li><a href="tel:+5511999999999" class="text-gray-400 hover:text-white transition">(11)
-                                99999-9999</a></li>
+                        <li><a href="#" class="hover:text-white transition">Ajuda</a></li>
+                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contato</a></li>
                     </ul>
                 </div>
 
                 <div>
                     <h4 class="text-white font-bold mb-4">Redes Sociais</h4>
                     <div class="flex gap-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition text-lg"><i
-                                class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition text-lg"><i
-                                class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition text-lg"><i
-                                class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition text-lg"><i
-                                class="fab fa-linkedin"></i></a>
+                        <a href="#" class="hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="hover:text-white transition"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="hover:text-white transition"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
             </div>
 
-            <div class="border-t border-gray-800 pt-8 text-center text-sm text-gray-400">
-                <p>© 2026 Portal UNN - Todos os direitos reservados.</p>
+            <div class="border-t border-gray-800 pt-8 text-center text-sm">
+                <p>© 2026 UNN Portal - Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
