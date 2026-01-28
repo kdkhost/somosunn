@@ -190,8 +190,8 @@ ESTRUTURA VISUAL DO PROJETO
 🎨 PALETA DE CORES
 ═════════════════════════════════════════════════════════════════════════════════
 
-Primária:       #1a3a52 (Azul Escuro)
-Gradiente:      #1a3a52 → #2d5a7b (Azul para Azul-Cinza)
+Primária:       #5B21B6 (Roxo)
+Gradiente:      #5B21B6 → #D946EF → #2563EB (Roxo→Magenta→Azul)
 Secundárias:    
   • Verde:      #10b981
   • Roxo:       #8b5cf6

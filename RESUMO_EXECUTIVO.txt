@@ -35,11 +35,11 @@ Repositório: https://github.com/kdkhost/somosunn
    📸 Sem limites de acesso (grátis)
 
 3. CORES DO FIGMA IMPLEMENTADAS
-   🎨 Primary: #1a3a52 (Azul escuro)
-   🎨 Secondary: #2d5a7b (Azul médio)
-   🎨 Gradient: 135deg com ambos os azuis
+   🎨 Primary: #5B21B6 (Roxo escuro)
+   🎨 Secondary: #D946EF (Magenta vibrante)
+   🎨 Accent: #2563EB (Azul vivo)
+   🎨 Gradient: 135deg com roxo→magenta→azul
    🎨 Background: Gradiente sutil branco/cinza
-   🎨 Acessórias: Ouro, Verde, Vermelho
 
 4. LAYOUT 100% RESPONSIVO
    📱 Mobile: Menu 70% com sliding animation
@@ -168,9 +168,8 @@ ADICIONAR LOGO:
 MUDAR CORES:
 1. Abra index.html em editor
 2. Localize <style> section
-3. Altere valores HEX:
-   #1a3a52 → sua cor primária
-   #2d5a7b → sua cor secundária
+3. Altere valores HEX para a paleta final:
+   #5B21B6 → #D946EF → #2563EB (roxo→magenta→azul)
 4. Salve e recarregue
 
 EDITAR TEXTOS:

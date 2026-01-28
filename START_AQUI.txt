@@ -119,8 +119,8 @@ ADICIONAR LOGO:
 
 MUDAR CORES PRINCIPAIS:
 1. Abra index.html em editor
-2. Procure por #1a3a52 (substitua por sua cor)
-3. Procure por #2d5a7b (substitua por sua cor)
+2. Procure por #5B21B6, #D946EF e #2563EB (gradiente roxo→magenta→azul)
+3. Substitua se desejar por outras cores
 4. Salve e recarregue
 
 EDITAR TEXTOS:

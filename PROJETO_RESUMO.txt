@@ -45,7 +45,7 @@ SOMOS_UNN/
 Framework:          Tailwind CSS 4 (CDN)
 Font:              Inter (Google Fonts)
 Ícones:            Font Awesome 6.4
-Paleta Principal:   Azul escuro #1a3a52 → #2d5a7b
+Paleta Principal:   Roxo #5B21B6 → Magenta #D946EF → Azul #2563EB
 Cores Secundárias:  Verde, Roxo, Laranja, Rosa
 Responsividade:     Mobile First (100%)
 

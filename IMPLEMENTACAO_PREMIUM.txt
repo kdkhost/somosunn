@@ -16,10 +16,10 @@
 
 🎯 CORES IMPLEMENTADAS (Do Figma)
 ==================================
-Primary Blue: #1a3a52
-Secondary Blue: #2d5a7b
-Gradient: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%)
-Accent: #2d5a7b
+Primary: #5B21B6
+Secondary: #D946EF
+Gradient: linear-gradient(135deg, #5B21B6 0%, #D946EF 45%, #2563EB 100%)
+Accent: #2563EB
 Background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)
 
 📸 IMAGENS IMPLEMENTADAS

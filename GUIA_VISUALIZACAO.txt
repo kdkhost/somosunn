@@ -145,9 +145,9 @@ SOMOS_UNN/
 ===================
 
 Cores Primárias:
-- #1a3a52 (Azul escuro)
-- #2d5a7b (Azul médio)
-- Gradient: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%)
+- #5B21B6 (Roxo escuro)
+- #D946EF (Magenta vibrante)
+- Gradient: linear-gradient(135deg, #5B21B6 0%, #D946EF 45%, #2563EB 100%)
 
 Cores Secundárias:
 - #ffffff (Branco)
