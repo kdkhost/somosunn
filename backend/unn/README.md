@@ -10,7 +10,9 @@ Passos iniciais para rodar localmente (recomendado com Docker):
 3. No contêiner PHP: `composer install` e `php artisan key:generate` e `php artisan migrate --seed`.
 4. Frontend: `npm install` e `npm run dev` (ou usar `npm run build` para produção).
 
-Quando você criar o banco, me passe as credenciais (host, db, user, password) que eu ajusto o `.env` e executo as migrations/seeders aqui se desejar.
+When you create the database, pass the credentials (host, db, user, password) or note that I've already set the `.env.example` to use the provided values and chosen host `15.235.57.3`. If you prefer to use `localhost` instead, tell me and I'll change it.
+
+NOTE: You asked for PHP 8.4 — I updated the Dockerfile base to `php:8.4-fpm` and set `composer.json` to require `php:^8.4`. If your environment doesn't yet have PHP 8.4, tell me and I can adjust back to your required version.
 
 ---
 

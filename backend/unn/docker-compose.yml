@@ -27,9 +27,9 @@ services:
     container_name: unn_db
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: unn
-      MYSQL_USER: unn
-      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: somosunn_2026
+      MYSQL_USER: somosunn_2026
+      MYSQL_PASSWORD: somosunn_2026
     volumes:
       - dbdata:/var/lib/mysql
     ports:
