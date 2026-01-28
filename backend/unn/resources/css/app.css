@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --g1: #5B21B6;
+  --g2: #D946EF;
+  --g3: #2563EB;
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 45%, var(--g3) 100%);
+}
