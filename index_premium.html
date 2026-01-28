@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNN - Conectando Empreendedores | Networking Premium</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            min-height: 100vh;
+        }
+
+        /* Animações premium */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-25px);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate-slideInRight {
+            animation: slideInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Menu Mobile */
+        .hamburger {
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(10px, 10px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(9px, -9px);
+        }
+
+        .menu-overlay {
+            position: fixed;
+            left: -100%;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 40;
+        }
+
+        .menu-overlay.active {
+            left: 0;
+        }
+
+        .sidebar-menu {
+            position: fixed;
+            left: -70%;
+            top: 0;
+            width: 70%;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f2535 0%, #1a3a52 50%, #2d5a7b 100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+            box-shadow: 8px 0 40px rgba(0, 0, 0, 0.25);
+            overflow-y: auto;
+        }
+
+        .sidebar-menu.active {
+            left: 0;
+        }
+
+        @media (min-width: 769px) {
+            .sidebar-menu {
+                display: none;
+            }
+        }
+
+        /* Botões */
+        .btn-primary {
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px rgba(26, 58, 82, 0.25);
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(26, 58, 82, 0.35);
+        }
+
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Cards */
+        .card-premium {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(26, 58, 82, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-premium::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(26, 58, 82, 0.05) 0%, rgba(45, 90, 123, 0.02) 100%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .card-premium:hover::before {
+            opacity: 1;
+        }
+
+        .card-premium:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12);
+            border-color: rgba(26, 58, 82, 0.2);
+        }
+
+        .image-container {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-scale {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-premium:hover .image-scale {
+            transform: scale(1.1);
+        }
+
+        /* Gradients */
+        .text-gradient {
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-border {
+            position: relative;
+            border: 2px solid transparent;
+            background-image: linear-gradient(white, white),
+                linear-gradient(135deg, #1a3a52, #2d5a7b);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+
+        /* Section Styling */
+        .section-title {
+            position: relative;
+            display: inline-block;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 60px;
+            height: 5px;
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            border-radius: 3px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f0f4f8;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #0f2535 0%, #1a3a52 100%);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Hamburger Menu -->
+    <div class="fixed top-6 left-6 z-50 lg:hidden">
+        <button class="hamburger p-2 hover:bg-gray-100 rounded-lg transition" id="hamburgerBtn">
+            <span class="block w-6 h-0.5 bg-gray-800 transition"></span>
+            <span class="block w-6 h-0.5 bg-gray-800 transition"></span>
+            <span class="block w-6 h-0.5 bg-gray-800 transition"></span>
+        </button>
+    </div>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Sidebar Menu -->
+    <aside class="sidebar-menu" id="sidebarMenu">
+        <div class="p-6 border-b border-white/20">
+            <div class="mb-3">
+                <img src="img/logo.png" alt="UNN Logo" class="h-16 w-auto">
+            </div>
+            <p class="text-white/80 text-sm font-light">Networking que gera resultados</p>
+        </div>
+
+        <nav class="p-6 space-y-3">
+            <a href="#inicio" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-home mr-3"></i> Início
+            </a>
+            <a href="#sobre" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-info-circle mr-3"></i> Sobre
+            </a>
+            <a href="#como" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-cog mr-3"></i> Como funciona
+            </a>
+            <a href="#eventos" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-calendar mr-3"></i> Eventos
+            </a>
+            <a href="portal.html" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-graduation-cap mr-3"></i> Portal
+            </a>
+            <hr class="border-white/20 my-4">
+            <a href="#contato" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-envelope mr-3"></i> Contato
+            </a>
+        </nav>
+
+        <div class="absolute bottom-6 left-6 right-6">
+            <button
+                class="w-full btn-primary text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2">
+                <i class="fas fa-arrow-right"></i> Entrar
+            </button>
+        </div>
+    </aside>
+
+    <!-- Desktop Navigation -->
+    <nav
+        class="hidden lg:flex fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-xl shadow-sm z-30 border-b border-gray-200/50">
+        <div class="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between w-full">
+            <div class="flex items-center gap-16">
+                <img src="img/logo.png" alt="UNN Logo" class="h-14 w-auto">
+                <div class="flex gap-10">
+                    <a href="#sobre" class="text-gray-700 font-500 hover:text-blue-600 transition">Sobre</a>
+                    <a href="#eventos" class="text-gray-700 font-500 hover:text-blue-600 transition">Eventos</a>
+                    <a href="portal.html" class="text-gray-700 font-500 hover:text-blue-600 transition">Portal</a>
+                </div>
+            </div>
+            <button class="btn-primary text-white px-8 py-2 rounded-lg font-semibold">Entrar</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio"
+        class="pt-28 md:pt-40 pb-20 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-slate-50 via-white to-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div class="animate-fadeInUp">
+                    <div class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-600 mb-6">
+                        <i class="fas fa-star mr-2"></i> A maior comunidade de networking do Brasil
+                    </div>
+                    <h1 class="text-5xl lg:text-7xl font-900 leading-tight mb-8">
+                        Conectando<br />
+                        <span class="text-gradient">empreendedores</span>
+                    </h1>
+                    <p class="text-lg text-gray-600 mb-10 leading-relaxed max-w-xl">
+                        Faça parte de uma comunidade estratégica onde empreendedores compartilham experiências,
+                        constroem conexões reais e crescem juntos.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button
+                            class="btn-primary text-white px-10 py-4 rounded-lg font-semibold text-lg relative z-10">
+                            Quero fazer parte <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                        <button
+                            class="border-2 border-gray-300 text-gray-700 px-10 py-4 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition">
+                            Conheça a UNN
+                        </button>
+                    </div>
+                </div>
+
+                <div class="hidden lg:block animate-slideInRight animate-float">
+                    <div class="relative">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-400 rounded-3xl opacity-20 blur-3xl">
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Networking" class="relative w-full h-96 object-cover rounded-3xl shadow-2xl">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-8 mt-20 pt-20 border-t border-gray-200">
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-gray-900">500+</p>
+                    <p class="text-gray-600 mt-2">Membros Ativos</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-gray-900">50+</p>
+                    <p class="text-gray-600 mt-2">Eventos/Ano</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-gray-900">1000+</p>
+                    <p class="text-gray-600 mt-2">Parcerias</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sobre -->
+    <section id="sobre" class="py-24 px-6 md:px-12 lg:px-24 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-16 items-center mb-20">
+                <div>
+                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                        alt="Sobre UNN" class="w-full h-96 object-cover rounded-3xl shadow-xl">
+                </div>
+                <div class="animate-fadeInUp">
+                    <h2 class="section-title text-4xl lg:text-5xl mb-12">O que é a UNN</h2>
+                    <p class="text-gray-600 text-lg mb-6 leading-relaxed">
+                        A UNN nasceu para unir empreendedores que acreditam no crescimento colaborativo. Somos um grupo
+                        de networking focado em troca de experiências, conexões estratégicas e geração de oportunidades
+                        reais de negócios.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex gap-4">
+                            <div class="text-2xl text-blue-600 flex-shrink-0"><i class="fas fa-handshake"></i></div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">Conexões reais</h3>
+                                <p class="text-gray-600 text-sm">Networking genuíno com empreendedores que compartilham
+                                    seus valores</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="text-2xl text-blue-600 flex-shrink-0"><i class="fas fa-chart-line"></i></div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">Crescimento coletivo</h3>
+                                <p class="text-gray-600 text-sm">Juntos somos mais fortes e alcançamos resultados
+                                    maiores</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="text-2xl text-blue-600 flex-shrink-0"><i class="fas fa-lightbulb"></i></div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">Troca de experiências</h3>
+                                <p class="text-gray-600 text-sm">Aprenda com quem já passou pelos desafios que você
+                                    enfrenta</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Como Funciona -->
+    <section id="como" class="py-24 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-slate-50 to-white">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="section-title text-4xl lg:text-5xl mb-4">Como funciona</h2>
+            <p class="text-gray-600 text-lg mb-20 max-w-2xl">Seu caminho para crescimento em 4 passos simples</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="card-premium p-8 rounded-2xl text-center">
+                    <div
+                        class="bg-gradient-to-br from-blue-500 to-blue-600 w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-6">
+                        01
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Conexão</h3>
+                    <p class="text-gray-600">Você entra para a comunidade UNN</p>
+                </div>
+
+                <div class="card-premium p-8 rounded-2xl text-center">
+                    <div
+                        class="bg-gradient-to-br from-green-500 to-green-600 w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-6">
+                        02
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Networking</h3>
+                    <p class="text-gray-600">Participa de encontros e eventos exclusivos</p>
+                </div>
+
+                <div class="card-premium p-8 rounded-2xl text-center">
+                    <div
+                        class="bg-gradient-to-br from-purple-500 to-purple-600 w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-6">
+                        03
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Troca</h3>
+                    <p class="text-gray-600">Compartilha experiências e aprendizados</p>
+                </div>
+
+                <div class="card-premium p-8 rounded-2xl text-center">
+                    <div
+                        class="bg-gradient-to-br from-orange-500 to-orange-600 w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-6">
+                        04
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Crescimento</h3>
+                    <p class="text-gray-600">Gera parcerias e oportunidades reais</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Eventos -->
+    <section id="eventos" class="py-24 px-6 md:px-12 lg:px-24 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="section-title text-4xl lg:text-5xl mb-4">Próximos Eventos</h2>
+            <p class="text-gray-600 text-lg mb-20 max-w-2xl">Confira os eventos que irão transformar sua jornada
+                empreendedora</p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Evento 1 -->
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="image-container h-48">
+                        <img src="https://images.unsplash.com/photo-1531058020387-3be344556be6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Networking" class="image-scale">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 text-gray-500 text-sm mb-3">
+                            <i class="fas fa-calendar-alt"></i>
+                            25 de Janeiro
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Networking & Negócios 2026</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Um encontro exclusivo para empreendedores que buscam
+                            crescimento através de conexões estratégicas.</p>
+                        <button class="text-blue-600 font-semibold text-sm hover:text-blue-700">Ver detalhes →</button>
+                    </div>
+                </div>
+
+                <!-- Evento 2 -->
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="image-container h-48">
+                        <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Workshop" class="image-scale">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 text-gray-500 text-sm mb-3">
+                            <i class="fas fa-calendar-alt"></i>
+                            10 de Fevereiro
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Workshop: Estratégias de Crescimento</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Workshop prático sobre estratégias de crescimento para
+                            PMEs com especialistas da área.</p>
+                        <button class="text-blue-600 font-semibold text-sm hover:text-blue-700">Ver detalhes →</button>
+                    </div>
+                </div>
+
+                <!-- Evento 3 -->
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="image-container h-48">
+                        <img src="https://images.unsplash.com/photo-1759873066311-ce4966c249ac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Café" class="image-scale">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 text-gray-500 text-sm mb-3">
+                            <i class="fas fa-calendar-alt"></i>
+                            5 de Março
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Café com Empreendedores</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Encontro matinal para networking em ambiente descontraído
+                            com empreendedores do dia a dia.</p>
+                        <button class="text-blue-600 font-semibold text-sm hover:text-blue-700">Ver detalhes →</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <button class="btn-primary text-white px-10 py-4 rounded-lg font-semibold">
+                    Ver todos os eventos <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Membros -->
+    <section class="py-24 px-6 md:px-12 lg:px-24 bg-slate-50">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="section-title text-4xl lg:text-5xl mb-4">Conheça os Membros</h2>
+            <p class="text-gray-600 text-lg mb-20 max-w-2xl">Empreendedores que transformam a UNN em comunidade</p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Membro 1 -->
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-blue-100 to-blue-50">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400"
+                            alt="Ana Silva" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-gray-800">Ana Silva</h3>
+                        <p class="text-blue-600 font-semibold text-sm mb-1">CEO & Fundadora</p>
+                        <p class="text-gray-600 text-sm">TechStart Solutions</p>
+                    </div>
+                </div>
+
+                <!-- Membro 2 -->
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-green-100 to-green-50">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400"
+                            alt="Carlos Mendes" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-gray-800">Carlos Mendes</h3>
+                        <p class="text-green-600 font-semibold text-sm mb-1">Diretor Comercial</p>
+                        <p class="text-gray-600 text-sm">Innovate Corp</p>
+                    </div>
+                </div>
+
+                <!-- Membro 3 -->
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-purple-100 to-purple-50">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400"
+                            alt="Patricia" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-gray-800">Patricia Costa</h3>
+                        <p class="text-purple-600 font-semibold text-sm mb-1">Empreendedora Digital</p>
+                        <p class="text-gray-600 text-sm">Marketing Pro</p>
+                    </div>
+                </div>
+
+                <!-- Membro 4 -->
+                <div class="card-premium rounded-2xl overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-orange-100 to-orange-50">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400"
+                            alt="Ricardo" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-gray-800">Ricardo Santos</h3>
+                        <p class="text-orange-600 font-semibold text-sm mb-1">Consultor de Negócios</p>
+                        <p class="text-gray-600 text-sm">Growth Partners</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Valores -->
+    <section class="py-24 px-6 md:px-12 lg:px-24 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="section-title text-4xl lg:text-5xl mb-4">Nossos Valores</h2>
+            <p class="text-gray-600 text-lg mb-20 max-w-2xl">Os princípios que guiam nossa comunidade</p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+                <div class="card-premium p-8 rounded-2xl text-center">
+                    <div class="text-5xl text-blue-600 mb-4"><i class="fas fa-users"></i></div>
+                    <h3 class="font-bold text-gray-800 mb-2">Colaboração</h3>
+                    <p class="text-gray-600 text-sm">Juntos vamos mais longe</p>
+                </div>
+
+                <div class="card-premium p-8 rounded-2xl text-center">
+                    <div class="text-5xl text-green-600 mb-4"><i class="fas fa-eye"></i></div>
+                    <h3 class="font-bold text-gray-800 mb-2">Transparência</h3>
+                    <p class="text-gray-600 text-sm">Relacionamentos honestos</p>
+                </div>
+
+                <div class="card-premium p-8 rounded-2xl text-center">
+                    <div class="text-5xl text-purple-600 mb-4"><i class="fas fa-chart-line"></i></div>
+                    <h3 class="font-bold text-gray-800 mb-2">Crescimento</h3>
+                    <p class="text-gray-600 text-sm">Sucesso coletivo sempre</p>
+                </div>
+
+                <div class="card-premium p-8 rounded-2xl text-center">
+                    <div class="text-5xl text-orange-600 mb-4"><i class="fas fa-handshake"></i></div>
+                    <h3 class="font-bold text-gray-800 mb-2">Respeito</h3>
+                    <p class="text-gray-600 text-sm">Valorizamos a diversidade</p>
+                </div>
+
+                <div class="card-premium p-8 rounded-2xl text-center">
+                    <div class="text-5xl text-pink-600 mb-4"><i class="fas fa-leaf"></i></div>
+                    <h3 class="font-bold text-gray-800 mb-2">Impacto</h3>
+                    <p class="text-gray-600 text-sm">Negócios conscientes</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="py-24 px-6 md:px-12 lg:px-24 bg-gradient-to-br from-blue-600 to-blue-700">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl lg:text-6xl font-900 text-white mb-6">
+                Pronto para crescer com a UNN?
+            </h2>
+            <p class="text-white/90 text-lg mb-10">
+                Conecte-se com empreendedores que pensam como você e descubra novas oportunidades.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="bg-white text-blue-600 px-10 py-4 rounded-lg font-bold hover:bg-gray-100 transition">
+                    Quero entrar <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+                <button
+                    class="border-2 border-white text-white px-10 py-4 rounded-lg font-bold hover:bg-white/10 transition">
+                    Agendar apresentação
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-950 text-gray-400 py-20 px-6 md:px-12 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">UNN</h3>
+                    <p class="text-sm leading-relaxed">Networking que gera resultados. Conectando empreendedores desde
+                        2024.</p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#sobre" class="hover:text-white transition">Sobre</a></li>
+                        <li><a href="#como" class="hover:text-white transition">Como funciona</a></li>
+                        <li><a href="#eventos" class="hover:text-white transition">Eventos</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">Contato</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="mailto:contato@unn.com.br"
+                                class="hover:text-white transition">contato@unn.com.br</a></li>
+                        <li><a href="tel:+5511999999999" class="hover:text-white transition">(11) 99999-9999</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">Redes Sociais</h4>
+                    <div class="flex gap-4">
+                        <a href="#" class="hover:text-white transition"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="hover:text-white transition"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="hover:text-white transition"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 pt-8 text-center text-sm">
+                <p>© 2026 UNN - Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Menu Mobile
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const sidebarMenu = document.getElementById('sidebarMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const menuLinks = document.querySelectorAll('.menu-link');
+
+        hamburgerBtn.addEventListener('click', () => {
+            hamburgerBtn.classList.toggle('active');
+            sidebarMenu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+        });
+
+        menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburgerBtn.classList.remove('active');
+                sidebarMenu.classList.remove('active');
+                menuOverlay.classList.remove('active');
+            });
+        });
+
+        menuOverlay.addEventListener('click', () => {
+            hamburgerBtn.classList.remove('active');
+            sidebarMenu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
