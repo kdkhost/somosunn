@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNN - Conectando Empreendedores</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="img/logo.svg">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -13,6 +17,15 @@
 
         * {
             font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .section-title {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            letter-spacing: -0.5px;
         }
 
         body {
@@ -73,15 +86,23 @@
         /* Buttons */
         .btn-primary {
             background: linear-gradient(135deg, #5B21B6 0%, #D946EF 45%, #2563EB 100%);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 24px rgba(91, 33, 182, 0.25);
+            transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.24s ease;
+            box-shadow: 0 8px 24px rgba(91, 33, 182, 0.22);
             border: none;
             cursor: pointer;
+            padding: 0.75rem 1.25rem;
+            border-radius: 999px;
+            font-weight: 700;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            -webkit-font-smoothing: antialiased;
         }
 
         .btn-primary:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 48px rgba(37, 99, 235, 0.25);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 20px 54px rgba(37, 99, 235, 0.22);
         }
 
         /* Cards */

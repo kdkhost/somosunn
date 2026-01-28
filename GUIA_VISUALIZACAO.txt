@@ -37,7 +37,7 @@ SOMOS_UNN/
 │
 ├── index.html ........................... Página principal (Premium)
 ├── portal.html .......................... Portal educacional (Premium)
-├── favicon.ico .......................... Ícone do site
+├── img/logo.svg .......................... Ícone do site (SVG recomendado) 
 │
 ├── img/
 │   ├── logo.png ......................... Logo da empresa (240x70px)

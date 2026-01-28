@@ -255,7 +255,7 @@ DEPOIS:
 ✅ index_premium.html (backup premium)
 ✅ portal_premium.html (backup premium)
 ✅ img/logo.png (placeholder 240x70px)
-✅ favicon.ico (presente)
+✅ img/logo.svg (presente - SVG recomendado) 
 
 🔗 REPOSITÓRIO
 ===============

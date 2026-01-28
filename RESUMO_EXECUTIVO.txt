@@ -62,7 +62,7 @@ HTML:
 └── portal_premium.html ............ Backup premium (2.8 KB)
 
 IMAGENS:
-├── img/logo.png ................... Logo placeholder (240x70px)
+├── img/logo.svg ................... Logo (SVG recomendado, 240x70px)
 ├── img/logo.jpeg .................. Alternativa PNG
 └── img/logo1.jpeg ................. Backup
 

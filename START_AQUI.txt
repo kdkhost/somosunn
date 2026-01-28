@@ -58,7 +58,7 @@ Passo 3: Customize Conforme Necessário
 VISUALIZAR SITE:
 ├── index.html ................... Clique aqui (main page)
 ├── portal.html .................. Portal educacional
-└── favicon.ico .................. Ícone do site
+└── img/logo.svg .................. Ícone do site (SVG recomendado) 
 
 IMAGENS:
 └── img/
@@ -93,7 +93,7 @@ IMEDIATAMENTE:
 
 CURTO PRAZO:
 □ Prepare seu logo (240x70px PNG)
-□ Substitua img/logo.png
+□ Substitua img/logo.svg (240x70px, SVG preferível) 
 □ Altere textos conforme necessário
 □ Mude cores se desejado
 

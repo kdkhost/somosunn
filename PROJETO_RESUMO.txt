@@ -31,7 +31,7 @@
 SOMOS_UNN/
 ├─ index.html (SITE PRINCIPAL)
 ├─ portal.html (PORTAL)
-├─ favicon.ico (JÁ PRESENTE)
+├─ img/logo.svg (Já presente - SVG recomendado)
 ├─ img/
 │  └─ logo.png (PLACEHOLDER)
 ├─ README.md
