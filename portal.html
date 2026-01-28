@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Educacional UNN | Mentoria e Cursos</title>
+    <title>Portal de Networking Digital - UNN</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,94 +15,13 @@
         }
 
         body {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            background-color: #ffffff;
         }
 
-        /* Hamburger Menu */
-        .hamburger {
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(10px, 10px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(9px, -9px);
-        }
-
-        .menu-overlay {
-            position: fixed;
-            left: -100%;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 40;
-        }
-
-        .menu-overlay.active {
-            left: 0;
-        }
-
-        .sidebar-menu {
-            position: fixed;
-            left: -70%;
-            top: 0;
-            width: 70%;
-            height: 100vh;
-            background: linear-gradient(135deg, #0f2535 0%, #1a3a52 50%, #2d5a7b 100%);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 50;
-            box-shadow: 8px 0 40px rgba(0, 0, 0, 0.25);
-            overflow-y: auto;
-        }
-
-        .sidebar-menu.active {
-            left: 0;
-        }
-
-        /* Cards Premium */
-        .card-premium {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(26, 58, 82, 0.1);
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-        }
-
-        .card-premium:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12);
-            border-color: rgba(26, 58, 82, 0.2);
-        }
-
-        .image-scale {
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .card-premium:hover .image-scale {
-            transform: scale(1.1);
-        }
-
-        /* Buttons */
         .btn-primary {
             background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 8px 24px rgba(26, 58, 82, 0.25);
-            position: relative;
-            overflow: hidden;
         }
 
         .btn-primary:hover {
@@ -111,35 +29,27 @@
             box-shadow: 0 16px 48px rgba(26, 58, 82, 0.35);
         }
 
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(26, 58, 82, 0.1);
         }
 
-        .animate-fadeInUp {
-            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        .card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12);
         }
 
-        .text-gradient {
-            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .image-scale {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover .image-scale {
+            transform: scale(1.08);
         }
 
         .section-title {
             position: relative;
             display: inline-block;
-            font-size: 2.5rem;
-            font-weight: 800;
         }
 
         .section-title::after {
@@ -153,15 +63,26 @@
             border-radius: 3px;
         }
 
-        /* Badge */
-        .badge-premium {
-            display: inline-block;
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 700;
+        .text-gradient {
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         ::-webkit-scrollbar {
@@ -176,380 +97,280 @@
             background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
             border-radius: 5px;
         }
+
+        .badge-free {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .badge-premium {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .price-card {
+            border: 2px solid rgba(26, 58, 82, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .price-card:hover {
+            border-color: #1a3a52;
+        }
     </style>
 </head>
 
-<body>
-    <!-- Hamburger Menu -->
-    <div class="fixed top-6 left-6 z-50 lg:hidden">
-        <button class="hamburger p-2 hover:bg-gray-100 rounded-lg transition" id="hamburgerBtn">
-            <span class="block w-6 h-0.5 bg-gray-800 mb-2 transition"></span>
-            <span class="block w-6 h-0.5 bg-gray-800 mb-2 transition"></span>
-            <span class="block w-6 h-0.5 bg-gray-800 transition"></span>
-        </button>
-    </div>
-
-    <!-- Menu Overlay -->
-    <div class="menu-overlay" id="menuOverlay"></div>
-
-    <!-- Sidebar Menu -->
-    <aside class="sidebar-menu" id="sidebarMenu">
-        <div class="p-6 border-b border-white/20">
-            <div class="mb-3">
-                <img src="img/logo.png" alt="UNN Logo" class="h-16 w-auto">
+<body class="bg-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-xl shadow-sm z-30 border-b border-gray-200/50">
+        <div class="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <a href="index.html">
+                    <img src="img/logo.png" alt="UNN Logo" class="h-14 w-auto">
+                </a>
+                <a href="index.html" class="hidden lg:block text-gray-700 font-500 hover:text-blue-600 transition">
+                    <i class="fas fa-arrow-left mr-2"></i>Voltar para o site
+                </a>
             </div>
-            <p class="text-white/80 text-sm">Educação que transforma</p>
-        </div>
-
-        <nav class="p-6 space-y-3">
-            <a href="index.html" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
-                <i class="fas fa-home mr-3"></i> Home
-            </a>
-            <a href="#cursos" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
-                <i class="fas fa-book mr-3"></i> Cursos
-            </a>
-            <a href="#mentoria" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
-                <i class="fas fa-star mr-3"></i> Mentoria Premium
-            </a>
-            <a href="#dashboard" class="menu-link block text-white hover:bg-white/15 px-4 py-3 rounded-lg transition">
-                <i class="fas fa-chart-line mr-3"></i> Meu Dashboard
-            </a>
-        </nav>
-
-        <div class="absolute bottom-6 left-6 right-6">
-            <button
-                class="w-full btn-primary text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2">
-                <i class="fas fa-sign-in-alt"></i> Acessar Plataforma
-            </button>
-        </div>
-    </aside>
-
-    <!-- Desktop Navigation -->
-    <nav class="hidden lg:flex fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-xl shadow-sm z-30">
-        <div class="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between w-full">
-            <div class="flex items-center gap-16">
-                <img src="img/logo.png" alt="UNN Logo" class="h-14 w-auto">
-                <div class="flex gap-10">
-                    <a href="index.html" class="text-gray-700 font-500 hover:text-blue-600 transition">Home</a>
-                    <a href="#cursos" class="text-gray-700 font-500 hover:text-blue-600 transition">Cursos</a>
-                    <a href="#mentoria" class="text-gray-700 font-500 hover:text-blue-600 transition">Mentoria</a>
-                </div>
-            </div>
-            <button class="btn-primary text-white px-8 py-2 rounded-lg font-semibold">Acessar</button>
+            <button class="btn-primary text-white px-8 py-2 rounded-lg font-semibold">Entrar</button>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="pt-28 md:pt-40 pb-20 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-slate-50 to-white">
+    <section class="pt-32 pb-20 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-slate-50 via-white to-white">
         <div class="max-w-7xl mx-auto">
-            <div class="grid lg:grid-cols-2 gap-16 items-center">
-                <div class="animate-fadeInUp">
-                    <div
-                        class="inline-block bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-600 mb-6">
-                        <i class="fas fa-graduation-cap mr-2"></i> Plataforma de Educação Premium
-                    </div>
-                    <h1 class="text-5xl lg:text-7xl font-900 leading-tight mb-8">
-                        Aprenda com<br />
-                        <span class="text-gradient">experts da indústria</span>
-                    </h1>
-                    <p class="text-lg text-gray-600 mb-10 leading-relaxed max-w-xl">
-                        Cursos práticos, mentoria de especialistas e uma comunidade de aprendizado que impulsiona seu
-                        desenvolvimento profissional.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <button class="btn-primary text-white px-10 py-4 rounded-lg font-semibold text-lg">
-                            Começar agora <i class="fas fa-arrow-right ml-2"></i>
-                        </button>
-                        <button
-                            class="border-2 border-gray-300 text-gray-700 px-10 py-4 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition">
-                            Ver cursos
-                        </button>
-                    </div>
-                </div>
+            <div class="text-center mb-20 animate-fadeInUp">
+                <h1 class="text-5xl lg:text-6xl font-900 leading-tight mb-6">
+                    Portal de <span class="text-gradient">Networking Digital</span>
+                </h1>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.
+                </p>
+            </div>
 
-                <div class="hidden lg:block">
-                    <img src="https://images.unsplash.com/photo-1516321318423-f06f70d504f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                        alt="Educação Online" class="w-full h-96 object-cover rounded-3xl shadow-2xl">
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
+                    <p class="text-4xl font-bold text-blue-600 mb-2">4</p>
+                    <p class="text-gray-700 font-semibold">Palestras<br><span class="text-sm text-gray-500">Gratuitas</span></p>
+                </div>
+                <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
+                    <p class="text-4xl font-bold text-green-600 mb-2">4</p>
+                    <p class="text-gray-700 font-semibold">Mentorias<br><span class="text-sm text-gray-500">Premium</span></p>
+                </div>
+                <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
+                    <p class="text-4xl font-bold text-purple-600 mb-2">4</p>
+                    <p class="text-gray-700 font-semibold">Níveis de<br><span class="text-sm text-gray-500">Networking</span></p>
+                </div>
+                <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
+                    <p class="text-4xl font-bold text-orange-600 mb-2">85%</p>
+                    <p class="text-gray-700 font-semibold">Taxa de<br><span class="text-sm text-gray-500">Satisfação</span></p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Cursos Grátis -->
-    <section id="cursos" class="py-24 px-6 md:px-12 lg:px-24 bg-white">
+    <!-- Palestras Gratuitas -->
+    <section class="py-24 px-6 md:px-12 lg:px-24 bg-white">
         <div class="max-w-7xl mx-auto">
-            <h2 class="section-title text-4xl lg:text-5xl mb-4">Cursos Gratuitos</h2>
-            <p class="text-gray-600 text-lg mb-20 max-w-2xl">Conheça nossas aulas iniciais e expanda seus conhecimentos
-            </p>
+            <h2 class="section-title text-4xl lg:text-5xl mb-4 font-900">Palestras Gratuitas</h2>
+            <p class="text-gray-600 text-lg mb-16 max-w-2xl mt-8">Aprenda com especialistas da comunidade UNN</p>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Curso 1 -->
-                <div class="card-premium rounded-2xl overflow-hidden">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                            alt="Networking" class="image-scale">
+                <!-- Palestra 1 -->
+                <div class="card rounded-2xl overflow-hidden bg-white">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Palestra" class="image-scale w-full h-full object-cover">
+                        <div class="absolute top-3 right-3">
+                            <span class="badge-free text-white text-xs font-bold px-3 py-1 rounded-full">GRATUITO</span>
+                        </div>
                     </div>
                     <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-sm text-gray-500">4 aulas</span>
-                            <span class="badge-premium">Grátis</span>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Estratégia de Negócios</h3>
+                        <p class="text-gray-600 text-sm mb-4">Como estruturar seu negócio para crescimento sustentável.</p>
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <span><i class="fas fa-video mr-1"></i> 45 minutos</span>
+                            <span><i class="fas fa-users mr-1"></i> 234 membros</span>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">Fundamentos do Networking</h3>
-                        <p class="text-gray-600 text-sm mb-4">Aprenda as bases para construir uma rede profissional
-                            poderosa.</p>
-                        <div class="flex items-center text-gray-500 text-sm mb-4">
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <span>4.9</span>
-                        </div>
-                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
-                            Acessar curso
-                        </button>
                     </div>
                 </div>
 
-                <!-- Curso 2 -->
-                <div class="card-premium rounded-2xl overflow-hidden">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1516321498830-6e0ee384ca13?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                            alt="Estratégia" class="image-scale">
+                <!-- Palestra 2 -->
+                <div class="card rounded-2xl overflow-hidden bg-white">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Palestra" class="image-scale w-full h-full object-cover">
+                        <div class="absolute top-3 right-3">
+                            <span class="badge-free text-white text-xs font-bold px-3 py-1 rounded-full">GRATUITO</span>
+                        </div>
                     </div>
                     <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-sm text-gray-500">6 aulas</span>
-                            <span class="badge-premium">Grátis</span>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Marketing Digital</h3>
+                        <p class="text-gray-600 text-sm mb-4">Estratégias práticas para crescer nas redes sociais.</p>
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <span><i class="fas fa-video mr-1"></i> 60 minutos</span>
+                            <span><i class="fas fa-users mr-1"></i> 456 membros</span>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">Estratégia de Crescimento 101</h3>
-                        <p class="text-gray-600 text-sm mb-4">Ferramentas essenciais para planejamento e execução de
-                            metas.</p>
-                        <div class="flex items-center text-gray-500 text-sm mb-4">
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <span>4.8</span>
-                        </div>
-                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
-                            Acessar curso
-                        </button>
                     </div>
                 </div>
 
-                <!-- Curso 3 -->
-                <div class="card-premium rounded-2xl overflow-hidden">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1590080876300-2c26d81e8a6f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                            alt="Digital" class="image-scale">
+                <!-- Palestra 3 -->
+                <div class="card rounded-2xl overflow-hidden bg-white">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1709715357510-b687304cee3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Palestra" class="image-scale w-full h-full object-cover">
+                        <div class="absolute top-3 right-3">
+                            <span class="badge-free text-white text-xs font-bold px-3 py-1 rounded-full">GRATUITO</span>
+                        </div>
                     </div>
                     <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-sm text-gray-500">5 aulas</span>
-                            <span class="badge-premium">Grátis</span>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Liderança Empreendedora</h3>
+                        <p class="text-gray-600 text-sm mb-4">Desenvolva as habilidades de um líder de sucesso.</p>
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <span><i class="fas fa-video mr-1"></i> 50 minutos</span>
+                            <span><i class="fas fa-users mr-1"></i> 178 membros</span>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">Marketing Digital Básico</h3>
-                        <p class="text-gray-600 text-sm mb-4">Domine os canais digitais para promover seu negócio
-                            online.</p>
-                        <div class="flex items-center text-gray-500 text-sm mb-4">
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <span>4.7</span>
-                        </div>
-                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
-                            Acessar curso
-                        </button>
                     </div>
                 </div>
 
-                <!-- Curso 4 -->
-                <div class="card-premium rounded-2xl overflow-hidden">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                            alt="Liderança" class="image-scale">
+                <!-- Palestra 4 -->
+                <div class="card rounded-2xl overflow-hidden bg-white">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1758876019673-704b039d405c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Palestra" class="image-scale w-full h-full object-cover">
+                        <div class="absolute top-3 right-3">
+                            <span class="badge-free text-white text-xs font-bold px-3 py-1 rounded-full">GRATUITO</span>
+                        </div>
                     </div>
                     <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-sm text-gray-500">7 aulas</span>
-                            <span class="badge-premium">Grátis</span>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Inovação e Disrupção</h3>
+                        <p class="text-gray-600 text-sm mb-4">Como inovar em seu mercado e criar diferenciais.</p>
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <span><i class="fas fa-video mr-1"></i> 55 minutos</span>
+                            <span><i class="fas fa-users mr-1"></i> 312 membros</span>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">Liderança Eficaz</h3>
-                        <p class="text-gray-600 text-sm mb-4">Desenvolva habilidades de liderança para sua carreira e
-                            equipe.</p>
-                        <div class="flex items-center text-gray-500 text-sm mb-4">
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <span>4.9</span>
-                        </div>
-                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
-                            Acessar curso
-                        </button>
                     </div>
                 </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <button class="btn-primary text-white px-10 py-4 rounded-lg font-semibold">
+                    Acessar todas as palestras <i class="fas fa-arrow-right ml-2"></i>
+                </button>
             </div>
         </div>
     </section>
 
-    <!-- Mentoria Premium -->
-    <section id="mentoria" class="py-24 px-6 md:px-12 lg:px-24 bg-slate-50">
+    <!-- Mentorias Premium -->
+    <section class="py-24 px-6 md:px-12 lg:px-24 bg-slate-50">
         <div class="max-w-7xl mx-auto">
-            <h2 class="section-title text-4xl lg:text-5xl mb-4">Mentoria Premium</h2>
-            <p class="text-gray-600 text-lg mb-20 max-w-2xl">Aprenda diretamente com especialistas da indústria</p>
+            <h2 class="section-title text-4xl lg:text-5xl mb-4 font-900">Mentorias Premium</h2>
+            <p class="text-gray-600 text-lg mb-16 max-w-2xl mt-8">Orientação individual com especialistas e empreendedores de sucesso</p>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <!-- Mentoria 1 -->
-                <div class="card-premium rounded-2xl overflow-hidden border-2 border-yellow-400">
-                    <div class="bg-gradient-to-br from-yellow-100 to-yellow-50 p-6 text-center">
-                        <div class="text-5xl mb-3">⭐</div>
-                        <span class="badge-premium">Popular</span>
+                <div class="price-card rounded-2xl overflow-hidden bg-white">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1537444532052-2afbf769b76c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Mentoria" class="image-scale w-full h-full object-cover">
+                        <div class="absolute top-3 right-3">
+                            <span class="badge-premium text-white text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span>
+                        </div>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Estratégia Premium</h3>
-                        <p class="text-gray-600 text-sm mb-6">Mentoria 1-on-1 com especialistas em crescimento.</p>
-                        <div class="mb-6">
-                            <p class="text-3xl font-bold text-gray-900">R$ 297</p>
-                            <p class="text-gray-500 text-sm">/mês</p>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Mentorado 1:1</h3>
+                        <p class="text-gray-600 text-sm mb-6">Sessões personalizadas com mentores experientes.</p>
+                        <div class="mb-4">
+                            <p class="text-3xl font-bold text-blue-600 mb-1">R$ 299<span class="text-lg text-gray-500">/mês</span></p>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span class="ml-2 text-gray-600">(4.8)</span>
+                            </div>
                         </div>
-                        <ul class="space-y-3 mb-8 text-sm text-gray-600">
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> 4
-                                sessões/mês</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Suporte por
-                                email</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Comunidade
-                                exclusiva</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Recursos de
-                                valor</li>
-                        </ul>
-                        <button class="w-full btn-primary text-white py-3 rounded-lg font-semibold">
-                            Inscrever-se
+                        <button class="btn-primary text-white w-full py-2 rounded-lg font-semibold text-sm">
+                            Contratar
                         </button>
                     </div>
                 </div>
 
                 <!-- Mentoria 2 -->
-                <div class="card-premium rounded-2xl overflow-hidden">
-                    <div class="bg-gradient-to-br from-blue-100 to-blue-50 p-6 text-center">
-                        <div class="text-5xl mb-3">🚀</div>
+                <div class="price-card rounded-2xl overflow-hidden bg-white">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1529119368496-2dfda6ec2804?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Mentoria" class="image-scale w-full h-full object-cover">
+                        <div class="absolute top-3 right-3">
+                            <span class="badge-premium text-white text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span>
+                        </div>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Acelerador</h3>
-                        <p class="text-gray-600 text-sm mb-6">Programa intensivo para escalar seu negócio rápido.</p>
-                        <div class="mb-6">
-                            <p class="text-3xl font-bold text-gray-900">R$ 597</p>
-                            <p class="text-gray-500 text-sm">/mês</p>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Consultoria Estratégica</h3>
+                        <p class="text-gray-600 text-sm mb-6">Análise completa e planejamento do seu negócio.</p>
+                        <div class="mb-4">
+                            <p class="text-3xl font-bold text-blue-600 mb-1">R$ 499<span class="text-lg text-gray-500">/mês</span></p>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span class="ml-2 text-gray-600">(5.0)</span>
+                            </div>
                         </div>
-                        <ul class="space-y-3 mb-8 text-sm text-gray-600">
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> 8
-                                sessões/mês</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Acesso
-                                prioritário</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Análise de
-                                negócio</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Networking
-                                VIP</li>
-                        </ul>
-                        <button class="w-full btn-primary text-white py-3 rounded-lg font-semibold">
-                            Inscrever-se
+                        <button class="btn-primary text-white w-full py-2 rounded-lg font-semibold text-sm">
+                            Contratar
                         </button>
                     </div>
                 </div>
 
                 <!-- Mentoria 3 -->
-                <div class="card-premium rounded-2xl overflow-hidden">
-                    <div class="bg-gradient-to-br from-green-100 to-green-50 p-6 text-center">
-                        <div class="text-5xl mb-3">💎</div>
+                <div class="price-card rounded-2xl overflow-hidden bg-white">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Mentoria" class="image-scale w-full h-full object-cover">
+                        <div class="absolute top-3 right-3">
+                            <span class="badge-premium text-white text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span>
+                        </div>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Platinum</h3>
-                        <p class="text-gray-600 text-sm mb-6">Mentoria VIP com transformação completa.</p>
-                        <div class="mb-6">
-                            <p class="text-3xl font-bold text-gray-900">R$ 1.497</p>
-                            <p class="text-gray-500 text-sm">/mês</p>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Acelerador Empreendedor</h3>
+                        <p class="text-gray-600 text-sm mb-6">Programa intensivo de 12 semanas de mentoria.</p>
+                        <div class="mb-4">
+                            <p class="text-3xl font-bold text-blue-600 mb-1">R$ 799<span class="text-lg text-gray-500">/3m</span></p>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span class="ml-2 text-gray-600">(4.9)</span>
+                            </div>
                         </div>
-                        <ul class="space-y-3 mb-8 text-sm text-gray-600">
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Acesso
-                                ilimitado</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Consultoria
-                                estratégica</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i>
-                                Masterclasses privadas</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Mentoria CEO
-                            </li>
-                        </ul>
-                        <button class="w-full btn-primary text-white py-3 rounded-lg font-semibold">
-                            Inscrever-se
+                        <button class="btn-primary text-white w-full py-2 rounded-lg font-semibold text-sm">
+                            Contratar
                         </button>
                     </div>
                 </div>
 
                 <!-- Mentoria 4 -->
-                <div class="card-premium rounded-2xl overflow-hidden">
-                    <div class="bg-gradient-to-br from-purple-100 to-purple-50 p-6 text-center">
-                        <div class="text-5xl mb-3">👑</div>
+                <div class="price-card rounded-2xl overflow-hidden bg-white">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Mentoria" class="image-scale w-full h-full object-cover">
+                        <div class="absolute top-3 right-3">
+                            <span class="badge-premium text-white text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span>
+                        </div>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Elite Exclusivo</h3>
-                        <p class="text-gray-600 text-sm mb-6">Apenas para empreendedores de alto impacto.</p>
-                        <div class="mb-6">
-                            <p class="text-3xl font-bold text-gray-900">Personalizado</p>
-                            <p class="text-gray-500 text-sm">Contacte-nos</p>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Mentoria Executiva</h3>
+                        <p class="text-gray-600 text-sm mb-6">Desenvolvimento de liderança para CEOs e fundadores.</p>
+                        <div class="mb-4">
+                            <p class="text-3xl font-bold text-blue-600 mb-1">R$ 1.199<span class="text-lg text-gray-500">/mês</span></p>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span class="ml-2 text-gray-600">(5.0)</span>
+                            </div>
                         </div>
-                        <ul class="space-y-3 mb-8 text-sm text-gray-600">
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Plano
-                                customizado</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Mentores
-                                dedicados</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i> Board de
-                                conselheiros</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-green-600"></i>
-                                Oportunidades exclusivas</li>
-                        </ul>
-                        <button
-                            class="w-full border-2 border-gray-400 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition">
-                            Solicitar acesso
+                        <button class="btn-primary text-white w-full py-2 rounded-lg font-semibold text-sm">
+                            Contratar
                         </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Dashboard Preview -->
-    <section id="dashboard" class="py-24 px-6 md:px-12 lg:px-24 bg-white">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="section-title text-4xl lg:text-5xl mb-4">Seu Progresso</h2>
-            <p class="text-gray-600 text-lg mb-20 max-w-2xl">Acompanhe seu desenvolvimento em tempo real</p>
-
-            <div class="grid md:grid-cols-3 gap-8 mb-16">
-                <div class="card-premium p-8 rounded-2xl text-center">
-                    <div class="text-5xl text-blue-600 mb-4"><i class="fas fa-book"></i></div>
-                    <p class="text-4xl font-bold text-gray-900 mb-2">12</p>
-                    <p class="text-gray-600">Cursos Concluídos</p>
-                </div>
-
-                <div class="card-premium p-8 rounded-2xl text-center">
-                    <div class="text-5xl text-green-600 mb-4"><i class="fas fa-chart-line"></i></div>
-                    <p class="text-4xl font-bold text-gray-900 mb-2">85%</p>
-                    <p class="text-gray-600">Taxa de Progresso</p>
-                </div>
-
-                <div class="card-premium p-8 rounded-2xl text-center">
-                    <div class="text-5xl text-purple-600 mb-4"><i class="fas fa-award"></i></div>
-                    <p class="text-4xl font-bold text-gray-900 mb-2">8</p>
-                    <p class="text-gray-600">Certificados Obtidos</p>
-                </div>
-            </div>
-
-            <div class="card-premium p-8 rounded-2xl">
-                <h3 class="text-2xl font-bold text-gray-800 mb-6">Próximas Aulas</h3>
-                <div class="space-y-4">
-                    <div
-                        class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-transparent rounded-lg border border-blue-100">
-                        <div>
-                            <p class="font-semibold text-gray-800">Negociação Avançada</p>
-                            <p class="text-sm text-gray-600">com especialista em vendas</p>
-                        </div>
-                        <p class="text-sm text-gray-500">Próxima segunda, 19h</p>
-                    </div>
-                    <div
-                        class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-transparent rounded-lg border border-green-100">
-                        <div>
-                            <p class="font-semibold text-gray-800">Mentoría 1-on-1</p>
-                            <p class="text-sm text-gray-600">com seu mentor dedicado</p>
-                        </div>
-                        <p class="text-sm text-gray-500">Quarta, 10h</p>
                     </div>
                 </div>
             </div>
@@ -557,93 +378,66 @@
     </section>
 
     <!-- CTA -->
-    <section class="py-24 px-6 md:px-12 lg:px-24 bg-gradient-to-br from-blue-600 to-blue-700">
+    <section class="py-24 px-6 md:px-12 lg:px-24 bg-white">
         <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-4xl lg:text-6xl font-900 text-white mb-6">
-                Transforme Sua Carreira
-            </h2>
-            <p class="text-white/90 text-lg mb-10">
-                Comece com um dos nossos cursos gratuitos hoje mesmo.
-            </p>
-            <button class="bg-white text-blue-600 px-10 py-4 rounded-lg font-bold hover:bg-gray-100 transition">
-                Explorar Cursos <i class="fas fa-arrow-right ml-2"></i>
-            </button>
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">Comece sua transformação digital</h2>
+            <p class="text-gray-600 text-lg mb-12">Acesso a palestras, mentorias e uma comunidade de empreendedores prontos para crescer junto.</p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="btn-primary text-white px-10 py-4 rounded-lg font-semibold text-lg">
+                    Acessar portal <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+                <button class="border-2 border-gray-300 text-gray-700 px-10 py-4 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition">
+                    Falar com consultor
+                </button>
+            </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-950 text-gray-400 py-20 px-6 md:px-12 lg:px-24">
+    <footer class="bg-gray-900 text-gray-300 py-16 px-6 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
             <div class="grid md:grid-cols-4 gap-12 mb-12">
                 <div>
                     <h3 class="text-white text-lg font-bold mb-4">UNN Portal</h3>
-                    <p class="text-sm leading-relaxed">Educação premium que transforma carreiras e negócios.</p>
+                    <p class="text-sm text-gray-400">Plataforma de desenvolvimento empreendedor.</p>
                 </div>
 
                 <div>
-                    <h4 class="text-white font-bold mb-4">Plataforma</h4>
+                    <h4 class="text-white font-bold mb-4">Links</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#cursos" class="hover:text-white transition">Cursos</a></li>
-                        <li><a href="#mentoria" class="hover:text-white transition">Mentoria</a></li>
-                        <li><a href="#dashboard" class="hover:text-white transition">Dashboard</a></li>
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition">Voltar ao site</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Palestras</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Mentorias</a></li>
                     </ul>
                 </div>
 
                 <div>
-                    <h4 class="text-white font-bold mb-4">Suporte</h4>
+                    <h4 class="text-white font-bold mb-4">Contato</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Ajuda</a></li>
-                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
-                        <li><a href="#" class="hover:text-white transition">Contato</a></li>
+                        <li><a href="mailto:contato@unn.com.br" class="text-gray-400 hover:text-white transition">contato@unn.com.br</a></li>
                     </ul>
                 </div>
 
                 <div>
-                    <h4 class="text-white font-bold mb-4">Redes Sociais</h4>
+                    <h4 class="text-white font-bold mb-4">Redes</h4>
                     <div class="flex gap-4">
-                        <a href="#" class="hover:text-white transition"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="hover:text-white transition"><i class="fab fa-linkedin"></i></a>
-                        <a href="#" class="hover:text-white transition"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
             </div>
 
-            <div class="border-t border-gray-800 pt-8 text-center text-sm">
+            <div class="border-t border-gray-800 pt-8 text-center text-sm text-gray-400">
                 <p>© 2026 UNN Portal - Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Menu Mobile
-        const hamburgerBtn = document.getElementById('hamburgerBtn');
-        const sidebarMenu = document.getElementById('sidebarMenu');
-        const menuOverlay = document.getElementById('menuOverlay');
-        const menuLinks = document.querySelectorAll('.menu-link');
-
-        hamburgerBtn.addEventListener('click', () => {
-            hamburgerBtn.classList.toggle('active');
-            sidebarMenu.classList.toggle('active');
-            menuOverlay.classList.toggle('active');
-        });
-
-        menuLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                hamburgerBtn.classList.remove('active');
-                sidebarMenu.classList.remove('active');
-                menuOverlay.classList.remove('active');
-            });
-        });
-
-        menuOverlay.addEventListener('click', () => {
-            hamburgerBtn.classList.remove('active');
-            sidebarMenu.classList.remove('active');
-            menuOverlay.classList.remove('active');
-        });
-
-        // Smooth Scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+            anchor.addEventListener('click', function(e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
@@ -653,5 +447,4 @@
         });
     </script>
 </body>
-
 </html>
