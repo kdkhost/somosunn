@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Networking Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hamburger {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .menu-overlay {
+            position: fixed;
+            left: -100%;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            transition: left 0.3s ease;
+            z-index: 40;
+        }
+
+        .menu-overlay.active {
+            left: 0;
+        }
+
+        .sidebar-menu {
+            position: fixed;
+            left: -100%;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            transition: left 0.3s ease;
+            z-index: 50;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+        }
+
+        .sidebar-menu.active {
+            left: 0;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(26, 58, 82, 0.3);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-free {
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .badge-premium {
+            background: #fdf2f8;
+            color: #831843;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 24px 16px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            border-radius: 4px;
+        }
+
+        .rating {
+            color: #fbbf24;
+        }
+
+        .section-title {
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40px;
+            height: 4px;
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+        }
+
+        .tabs-container {
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: 16px 24px;
+            color: #6b7280;
+            font-weight: 600;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #1a3a52;
+            border-bottom-color: #1a3a52;
+        }
+
+        .tab-button:hover {
+            color: #1a3a52;
+        }
+    </style>
+</head>
+
+<body class="bg-white">
+    <!-- Hamburger Menu -->
+    <div class="fixed top-6 left-6 z-50 md:hidden">
+        <button class="hamburger p-2 hover:bg-gray-100 rounded-lg transition" id="hamburgerBtn">
+            <span class="block w-6 h-0.5 bg-gray-800 mb-2 transition"></span>
+            <span class="block w-6 h-0.5 bg-gray-800 mb-2 transition"></span>
+            <span class="block w-6 h-0.5 bg-gray-800 transition"></span>
+        </button>
+    </div>
+
+    <!-- Overlay Menu -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Sidebar Menu -->
+    <aside class="sidebar-menu" id="sidebarMenu">
+        <div class="p-6 border-b border-white/20">
+            <h1 class="text-2xl font-bold text-white">Portal UNN</h1>
+            <p class="text-white/70 text-sm mt-1">Networking Digital</p>
+        </div>
+
+        <nav class="p-6 space-y-4">
+            <a href="index.html"
+                class="menu-link block text-white hover:text-blue-200 transition py-2 px-4 rounded-lg hover:bg-white/10">
+                <i class="fas fa-home mr-3"></i> Início
+            </a>
+            <a href="#palestras"
+                class="menu-link block text-white hover:text-blue-200 transition py-2 px-4 rounded-lg hover:bg-white/10">
+                <i class="fas fa-video mr-3"></i> Palestras
+            </a>
+            <a href="#mentorias"
+                class="menu-link block text-white hover:text-blue-200 transition py-2 px-4 rounded-lg hover:bg-white/10">
+                <i class="fas fa-graduation-cap mr-3"></i> Mentorias
+            </a>
+            <a href="#dashboard"
+                class="menu-link block text-white hover:text-blue-200 transition py-2 px-4 rounded-lg hover:bg-white/10">
+                <i class="fas fa-chart-bar mr-3"></i> Dashboard
+            </a>
+            <a href="#comunidade"
+                class="menu-link block text-white hover:text-blue-200 transition py-2 px-4 rounded-lg hover:bg-white/10">
+                <i class="fas fa-users mr-3"></i> Comunidade
+            </a>
+            <hr class="border-white/20 my-4">
+            <a href="index.html"
+                class="menu-link block text-white hover:text-blue-200 transition py-2 px-4 rounded-lg hover:bg-white/10">
+                <i class="fas fa-arrow-left mr-3"></i> Voltar ao Site
+            </a>
+        </nav>
+
+        <div class="absolute bottom-6 left-6 right-6">
+            <button
+                class="w-full btn-primary text-white py-3 rounded-lg font-semibold flex items-center justify-center">
+                <i class="fas fa-sign-in-alt mr-2"></i> Entrar
+            </button>
+        </div>
+    </aside>
+
+    <!-- Navigation Desktop -->
+    <nav class="hidden md:flex fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-lg shadow-sm z-30">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between w-full">
+            <div class="flex items-center space-x-12">
+                <a href="index.html" class="text-2xl font-bold text-gray-800">Portal UNN</a>
+                <div class="flex space-x-8">
+                    <a href="#palestras" class="text-gray-700 hover:text-blue-600 transition">Palestras</a>
+                    <a href="#mentorias" class="text-gray-700 hover:text-blue-600 transition">Mentorias</a>
+                    <a href="index.html" class="text-gray-700 hover:text-blue-600 transition">Voltar</a>
+                </div>
+            </div>
+            <button class="btn-primary text-white px-6 py-2 rounded-lg font-semibold">Entrar</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-20 md:pt-32 pb-16 md:pb-24 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-slate-50 to-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center fade-in">
+                <div class="inline-block mb-6 px-4 py-2 bg-blue-100 text-blue-700 rounded-full font-semibold text-sm">
+                    <i class="fas fa-rocket mr-2"></i> Bem-vindo ao Portal de Networking! 🚀
+                </div>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                    Conecte-se e <span class="text-gradient">Cresça</span>
+                </h1>
+                <p class="text-lg text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
+                    Conecte-se com empreendedores do seu nível, aprenda com palestras gratuitas e acelere seu
+                    crescimento com mentorias premium.
+                </p>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-12 max-w-4xl mx-auto">
+                    <div class="stat-box">
+                        <p class="text-3xl md:text-4xl font-bold text-gray-800">4</p>
+                        <p class="text-sm text-gray-600 mt-2">Palestras Gratuitas</p>
+                    </div>
+                    <div class="stat-box">
+                        <p class="text-3xl md:text-4xl font-bold text-gray-800">4</p>
+                        <p class="text-sm text-gray-600 mt-2">Mentorias Premium</p>
+                    </div>
+                    <div class="stat-box">
+                        <p class="text-3xl md:text-4xl font-bold text-gray-800">4+</p>
+                        <p class="text-sm text-gray-600 mt-2">No seu nível</p>
+                    </div>
+                    <div class="stat-box">
+                        <p class="text-3xl md:text-4xl font-bold text-gray-800">85%</p>
+                        <p class="text-sm text-gray-600 mt-2">Taxa de satisfação</p>
+                    </div>
+                </div>
+
+                <button
+                    class="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-lg inline-flex items-center">
+                    Começar agora
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Palestras -->
+    <section id="palestras" class="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 section-title">Palestras Gratuitas</h2>
+            <p class="text-gray-600 text-lg mb-12 max-w-2xl mt-8">Aprenda com os melhores empresários</p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <!-- Palestra 1 -->
+                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
+                    <div
+                        class="aspect-video bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
+                        <i class="fas fa-play-circle text-6xl text-blue-300"></i>
+                    </div>
+                    <div class="p-6">
+                        <span class="badge badge-free">
+                            <i class="fas fa-gift mr-1"></i> Gratuito
+                        </span>
+                        <h3 class="text-lg font-bold text-gray-800 my-3">Primeiros Passos no Empreendedorismo</h3>
+                        <p class="text-gray-600 text-sm mb-4">Aprenda os fundamentos para iniciar seu negócio</p>
+
+                        <div class="space-y-2 mb-4 text-sm text-gray-600">
+                            <div class="flex items-center">
+                                <i class="fas fa-user mr-2 text-blue-600"></i>
+                                <span><strong>Roberto Santos</strong></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-clock mr-2 text-blue-600"></i>
+                                <span>45 min</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-eye mr-2 text-blue-600"></i>
+                                <span>1250 visualizações</span>
+                            </div>
+                        </div>
+
+                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
+                            Assistir Agora
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Palestra 2 -->
+                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
+                    <div
+                        class="aspect-video bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center">
+                        <i class="fas fa-play-circle text-6xl text-green-300"></i>
+                    </div>
+                    <div class="p-6">
+                        <span class="badge badge-free">
+                            <i class="fas fa-gift mr-1"></i> Gratuito
+                        </span>
+                        <h3 class="text-lg font-bold text-gray-800 my-3">Marketing Digital para Iniciantes</h3>
+                        <p class="text-gray-600 text-sm mb-4">Estratégias essenciais de marketing digital</p>
+
+                        <div class="space-y-2 mb-4 text-sm text-gray-600">
+                            <div class="flex items-center">
+                                <i class="fas fa-user mr-2 text-green-600"></i>
+                                <span><strong>Fernanda Lima</strong></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-clock mr-2 text-green-600"></i>
+                                <span>60 min</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-eye mr-2 text-green-600"></i>
+                                <span>980 visualizações</span>
+                            </div>
+                        </div>
+
+                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
+                            Assistir Agora
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Palestra 3 -->
+                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
+                    <div
+                        class="aspect-video bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center">
+                        <i class="fas fa-play-circle text-6xl text-purple-300"></i>
+                    </div>
+                    <div class="p-6">
+                        <span class="badge badge-free">
+                            <i class="fas fa-gift mr-1"></i> Gratuito
+                        </span>
+                        <h3 class="text-lg font-bold text-gray-800 my-3">Networking Eficiente</h3>
+                        <p class="text-gray-600 text-sm mb-4">Como construir uma rede de contatos sólida</p>
+
+                        <div class="space-y-2 mb-4 text-sm text-gray-600">
+                            <div class="flex items-center">
+                                <i class="fas fa-user mr-2 text-purple-600"></i>
+                                <span><strong>Marcos Oliveira</strong></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-clock mr-2 text-purple-600"></i>
+                                <span>40 min</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-eye mr-2 text-purple-600"></i>
+                                <span>1500 visualizações</span>
+                            </div>
+                        </div>
+
+                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
+                            Assistir Agora
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Palestra 4 -->
+                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
+                    <div
+                        class="aspect-video bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center">
+                        <i class="fas fa-play-circle text-6xl text-orange-300"></i>
+                    </div>
+                    <div class="p-6">
+                        <span class="badge badge-free">
+                            <i class="fas fa-gift mr-1"></i> Gratuito
+                        </span>
+                        <h3 class="text-lg font-bold text-gray-800 my-3">Gestão Financeira para Startups</h3>
+                        <p class="text-gray-600 text-sm mb-4">Controle financeiro e planejamento estratégico</p>
+
+                        <div class="space-y-2 mb-4 text-sm text-gray-600">
+                            <div class="flex items-center">
+                                <i class="fas fa-user mr-2 text-orange-600"></i>
+                                <span><strong>Patricia Rocha</strong></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-clock mr-2 text-orange-600"></i>
+                                <span>50 min</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-eye mr-2 text-orange-600"></i>
+                                <span>820 visualizações</span>
+                            </div>
+                        </div>
+
+                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
+                            Assistir Agora
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
+                    Ver Todas as Palestras
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mentorias -->
+    <section id="mentorias" class="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-slate-50">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 section-title">Mentorias Premium</h2>
+            <p class="text-gray-600 text-lg mb-12 max-w-2xl mt-8">Programas completos de mentoria com especialistas</p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <!-- Mentoria 1 -->
+                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
+                    <div
+                        class="aspect-video bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center relative">
+                        <i class="fas fa-book text-6xl text-blue-300"></i>
+                        <span class="badge badge-premium absolute top-3 right-3">
+                            <i class="fas fa-crown mr-1"></i> Premium
+                        </span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-gray-800 my-3">Mentoria Completa em E-commerce</h3>
+                        <p class="text-gray-600 text-sm mb-4">Do zero ao primeiro milhão em vendas online</p>
+
+                        <div class="space-y-2 mb-4 text-sm text-gray-600">
+                            <div class="flex items-center">
+                                <i class="fas fa-user mr-2 text-blue-600"></i>
+                                <span><strong>Roberto Santos</strong></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar mr-2 text-blue-600"></i>
+                                <span>8 semanas</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-users mr-2 text-blue-600"></i>
+                                <span>245 alunos</span>
+                            </div>
+                            <div class="flex items-center mt-2">
+                                <span class="rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </span>
+                                <span class="text-gray-600 ml-2">4.9</span>
+                            </div>
+                        </div>
+
+                        <p class="text-blue-600 font-bold text-lg mb-4">A partir de<br><span class="text-2xl">R$
+                                497</span></p>
+
+                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
+                            Saiba Mais
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mentoria 2 -->
+                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
+                    <div
+                        class="aspect-video bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center relative">
+                        <i class="fas fa-book text-6xl text-green-300"></i>
+                        <span class="badge badge-premium absolute top-3 right-3">
+                            <i class="fas fa-crown mr-1"></i> Premium
+                        </span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-gray-800 my-3">Captação de Investimentos</h3>
+                        <p class="text-gray-600 text-sm mb-4">Aprenda a atrair investidores para seu negócio</p>
+
+                        <div class="space-y-2 mb-4 text-sm text-gray-600">
+                            <div class="flex items-center">
+                                <i class="fas fa-user mr-2 text-green-600"></i>
+                                <span><strong>Marcos Oliveira</strong></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar mr-2 text-green-600"></i>
+                                <span>12 semanas</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-users mr-2 text-green-600"></i>
+                                <span>156 alunos</span>
+                            </div>
+                            <div class="flex items-center mt-2">
+                                <span class="rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </span>
+                                <span class="text-gray-600 ml-2">5.0</span>
+                            </div>
+                        </div>
+
+                        <p class="text-green-600 font-bold text-lg mb-4">A partir de<br><span class="text-2xl">R$
+                                897</span></p>
+
+                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
+                            Saiba Mais
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mentoria 3 -->
+                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
+                    <div
+                        class="aspect-video bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center relative">
+                        <i class="fas fa-book text-6xl text-purple-300"></i>
+                        <span class="badge badge-premium absolute top-3 right-3">
+                            <i class="fas fa-crown mr-1"></i> Premium
+                        </span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-gray-800 my-3">Expansão Internacional</h3>
+                        <p class="text-gray-600 text-sm mb-4">Leve seu negócio para o mercado global</p>
+
+                        <div class="space-y-2 mb-4 text-sm text-gray-600">
+                            <div class="flex items-center">
+                                <i class="fas fa-user mr-2 text-purple-600"></i>
+                                <span><strong>Patricia Rocha</strong></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar mr-2 text-purple-600"></i>
+                                <span>16 semanas</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-users mr-2 text-purple-600"></i>
+                                <span>89 alunos</span>
+                            </div>
+                            <div class="flex items-center mt-2">
+                                <span class="rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </span>
+                                <span class="text-gray-600 ml-2">4.8</span>
+                            </div>
+                        </div>
+
+                        <p class="text-purple-600 font-bold text-lg mb-4">A partir de<br><span class="text-2xl">R$
+                                1.297</span></p>
+
+                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
+                            Saiba Mais
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mentoria 4 -->
+                <div class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200">
+                    <div
+                        class="aspect-video bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center relative">
+                        <i class="fas fa-book text-6xl text-orange-300"></i>
+                        <span class="badge badge-premium absolute top-3 right-3">
+                            <i class="fas fa-crown mr-1"></i> Premium
+                        </span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-gray-800 my-3">Growth Hacking Avançado</h3>
+                        <p class="text-gray-600 text-sm mb-4">Estratégias de crescimento acelerado</p>
+
+                        <div class="space-y-2 mb-4 text-sm text-gray-600">
+                            <div class="flex items-center">
+                                <i class="fas fa-user mr-2 text-orange-600"></i>
+                                <span><strong>Fernanda Lima</strong></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar mr-2 text-orange-600"></i>
+                                <span>10 semanas</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-users mr-2 text-orange-600"></i>
+                                <span>312 alunos</span>
+                            </div>
+                            <div class="flex items-center mt-2">
+                                <span class="rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </span>
+                                <span class="text-gray-600 ml-2">4.7</span>
+                            </div>
+                        </div>
+
+                        <p class="text-orange-600 font-bold text-lg mb-4">A partir de<br><span class="text-2xl">R$
+                                697</span></p>
+
+                        <button class="w-full btn-primary text-white py-2 rounded-lg font-semibold text-sm">
+                            Saiba Mais
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
+                    Ver Todas as Mentorias
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção de Usuário -->
+    <section id="dashboard" class="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 section-title">Seu Dashboard</h2>
+            <p class="text-gray-600 text-lg mb-12 max-w-2xl mt-8">Acompanhe seu progresso e gerenciae suas atividades
+            </p>
+
+            <div class="grid md:grid-cols-4 gap-6 mb-12">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200">
+                    <div class="text-3xl text-blue-600 mb-4"><i class="fas fa-graduation-cap"></i></div>
+                    <h3 class="text-2xl font-bold text-gray-800">Dashboard</h3>
+                    <p class="text-gray-600 text-sm mt-2">Acompanhe seus cursos</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border border-green-200">
+                    <div class="text-3xl text-green-600 mb-4"><i class="fas fa-users"></i></div>
+                    <h3 class="text-2xl font-bold text-gray-800">Comunidade</h3>
+                    <p class="text-gray-600 text-sm mt-2">Conecte-se com outros</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200">
+                    <div class="text-3xl text-purple-600 mb-4"><i class="fas fa-ranking-star"></i></div>
+                    <h3 class="text-2xl font-bold text-gray-800">Ranking</h3>
+                    <p class="text-gray-600 text-sm mt-2">Veja sua posição</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-6 border border-orange-200">
+                    <div class="text-3xl text-orange-600 mb-4"><i class="fas fa-video"></i></div>
+                    <h3 class="text-2xl font-bold text-gray-800">Palestras</h3>
+                    <p class="text-gray-600 text-sm mt-2">Assista aulas</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="card-hover bg-white rounded-2xl p-8 border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Empreendedor Iniciante</h3>
+                        <div class="text-2xl text-blue-600"><i class="fas fa-level-up-alt"></i></div>
+                    </div>
+                    <p class="text-gray-600 mb-6">Seu nível atual na plataforma</p>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: 65%"></div>
+                    </div>
+                    <p class="text-sm text-gray-600">65% para o próximo nível</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="card-hover bg-white rounded-2xl p-8 border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Cursos em Andamento</h3>
+                        <div class="text-2xl text-green-600"><i class="fas fa-tasks"></i></div>
+                    </div>
+                    <p class="text-3xl font-bold text-green-600 mb-4">3</p>
+                    <p class="text-sm text-gray-600">Continue seu aprendizado</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="card-hover bg-white rounded-2xl p-8 border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Certificados Ganhos</h3>
+                        <div class="text-2xl text-purple-600"><i class="fas fa-certificate"></i></div>
+                    </div>
+                    <p class="text-3xl font-bold text-purple-600 mb-4">2</p>
+                    <p class="text-sm text-gray-600">Parabéns pelos seus avanços!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-slate-50">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Pronto para começar?</h2>
+            <p class="text-gray-600 text-lg mb-8">Junte-se à comunidade de empreendedores que já estão transformando
+                seus negócios</p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-lg">
+                    Começar Gratuitamente
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+                <button
+                    class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition">
+                    Saiba Mais
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-16 px-6 md:px-12 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Portal UNN</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">Conecte-se com empreendedores do seu nível e
+                        acelere seu crescimento com mentorias premium.</p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">Links Rápidos</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#palestras" class="text-gray-400 hover:text-white transition">Palestras</a></li>
+                        <li><a href="#mentorias" class="text-gray-400 hover:text-white transition">Mentorias</a></li>
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition">Voltar ao Site</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">Suporte</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="mailto:suporte@unn.com.br"
+                                class="text-gray-400 hover:text-white transition">suporte@unn.com.br</a></li>
+                        <li><a href="tel:+5511999999999" class="text-gray-400 hover:text-white transition">(11)
+                                99999-9999</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">Redes Sociais</h4>
+                    <div class="flex gap-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition text-lg"><i
+                                class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition text-lg"><i
+                                class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition text-lg"><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition text-lg"><i
+                                class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 pt-8 text-center text-sm text-gray-400">
+                <p>© 2026 Portal UNN - Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Menu Mobile
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const sidebarMenu = document.getElementById('sidebarMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const menuLinks = document.querySelectorAll('.menu-link');
+
+        hamburgerBtn.addEventListener('click', () => {
+            hamburgerBtn.classList.toggle('active');
+            sidebarMenu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+        });
+
+        menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburgerBtn.classList.remove('active');
+                sidebarMenu.classList.remove('active');
+                menuOverlay.classList.remove('active');
+            });
+        });
+
+        menuOverlay.addEventListener('click', () => {
+            hamburgerBtn.classList.remove('active');
+            sidebarMenu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
