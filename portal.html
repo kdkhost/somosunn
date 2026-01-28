@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,9 +20,20 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            background: linear-gradient(135deg, #7C3AED 0%, #EC4899 45%, #3B82F6 100%);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 24px rgba(26, 58, 82, 0.25);
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.25);
+        }
+
+        .hero-landing {
+            background: linear-gradient(135deg, #7C3AED 0%, #EC4899 40%, #3B82F6 100%);
+            position: relative;
+            overflow: visible;
+            color: #ffffff;
+            padding-top: 4.5rem;
+            padding-bottom: 4.5rem;
+            background-image: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.03) 1px, transparent 1px), radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px, 60px 60px;
         }
 
         .btn-primary:hover {
@@ -59,7 +71,7 @@
             left: 0;
             width: 60px;
             height: 5px;
-            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            background: linear-gradient(135deg, #7C3AED 0%, #EC4899 45%, #3B82F6 100%);
             border-radius: 3px;
         }
 
@@ -75,6 +87,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -94,7 +107,7 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            background: linear-gradient(135deg, #7C3AED 0%, #EC4899 45%, #3B82F6 100%);
             border-radius: 5px;
         }
 
@@ -104,6 +117,20 @@
 
         .badge-premium {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .badge-free,
+        .badge-premium {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .price-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
         }
 
         .price-card {
@@ -134,14 +161,15 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="pt-32 pb-20 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-slate-50 via-white to-white">
+    <section class="pt-32 pb-20 px-6 md:px-12 lg:px-24 hero-landing">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-20 animate-fadeInUp">
                 <h1 class="text-5xl lg:text-6xl font-900 leading-tight mb-6">
                     Portal de <span class="text-gradient">Networking Digital</span>
                 </h1>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                    Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.
+                    Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento
+                    empreendedor.
                 </p>
             </div>
 
@@ -149,19 +177,23 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
                     <p class="text-4xl font-bold text-blue-600 mb-2">4</p>
-                    <p class="text-gray-700 font-semibold">Palestras<br><span class="text-sm text-gray-500">Gratuitas</span></p>
+                    <p class="text-gray-700 font-semibold">Palestras<br><span
+                            class="text-sm text-gray-500">Gratuitas</span></p>
                 </div>
                 <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
                     <p class="text-4xl font-bold text-green-600 mb-2">4</p>
-                    <p class="text-gray-700 font-semibold">Mentorias<br><span class="text-sm text-gray-500">Premium</span></p>
+                    <p class="text-gray-700 font-semibold">Mentorias<br><span
+                            class="text-sm text-gray-500">Premium</span></p>
                 </div>
                 <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
                     <p class="text-4xl font-bold text-purple-600 mb-2">4</p>
-                    <p class="text-gray-700 font-semibold">Níveis de<br><span class="text-sm text-gray-500">Networking</span></p>
+                    <p class="text-gray-700 font-semibold">Níveis de<br><span
+                            class="text-sm text-gray-500">Networking</span></p>
                 </div>
                 <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
                     <p class="text-4xl font-bold text-orange-600 mb-2">85%</p>
-                    <p class="text-gray-700 font-semibold">Taxa de<br><span class="text-sm text-gray-500">Satisfação</span></p>
+                    <p class="text-gray-700 font-semibold">Taxa de<br><span
+                            class="text-sm text-gray-500">Satisfação</span></p>
                 </div>
             </div>
         </div>
@@ -177,14 +209,16 @@
                 <!-- Palestra 1 -->
                 <div class="card rounded-2xl overflow-hidden bg-white">
                     <div class="relative h-40 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Palestra" class="image-scale w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Palestra" class="image-scale w-full h-full object-cover">
                         <div class="absolute top-3 right-3">
                             <span class="badge-free text-white text-xs font-bold px-3 py-1 rounded-full">GRATUITO</span>
                         </div>
                     </div>
                     <div class="p-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-2">Estratégia de Negócios</h3>
-                        <p class="text-gray-600 text-sm mb-4">Como estruturar seu negócio para crescimento sustentável.</p>
+                        <p class="text-gray-600 text-sm mb-4">Como estruturar seu negócio para crescimento sustentável.
+                        </p>
                         <div class="flex items-center justify-between text-sm text-gray-500">
                             <span><i class="fas fa-video mr-1"></i> 45 minutos</span>
                             <span><i class="fas fa-users mr-1"></i> 234 membros</span>
@@ -195,7 +229,8 @@
                 <!-- Palestra 2 -->
                 <div class="card rounded-2xl overflow-hidden bg-white">
                     <div class="relative h-40 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Palestra" class="image-scale w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Palestra" class="image-scale w-full h-full object-cover">
                         <div class="absolute top-3 right-3">
                             <span class="badge-free text-white text-xs font-bold px-3 py-1 rounded-full">GRATUITO</span>
                         </div>
@@ -213,7 +248,8 @@
                 <!-- Palestra 3 -->
                 <div class="card rounded-2xl overflow-hidden bg-white">
                     <div class="relative h-40 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1709715357510-b687304cee3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Palestra" class="image-scale w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1709715357510-b687304cee3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Palestra" class="image-scale w-full h-full object-cover">
                         <div class="absolute top-3 right-3">
                             <span class="badge-free text-white text-xs font-bold px-3 py-1 rounded-full">GRATUITO</span>
                         </div>
@@ -231,7 +267,8 @@
                 <!-- Palestra 4 -->
                 <div class="card rounded-2xl overflow-hidden bg-white">
                     <div class="relative h-40 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1758876019673-704b039d405c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Palestra" class="image-scale w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1758876019673-704b039d405c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Palestra" class="image-scale w-full h-full object-cover">
                         <div class="absolute top-3 right-3">
                             <span class="badge-free text-white text-xs font-bold px-3 py-1 rounded-full">GRATUITO</span>
                         </div>
@@ -259,22 +296,26 @@
     <section class="py-24 px-6 md:px-12 lg:px-24 bg-slate-50">
         <div class="max-w-7xl mx-auto">
             <h2 class="section-title text-4xl lg:text-5xl mb-4 font-900">Mentorias Premium</h2>
-            <p class="text-gray-600 text-lg mb-16 max-w-2xl mt-8">Orientação individual com especialistas e empreendedores de sucesso</p>
+            <p class="text-gray-600 text-lg mb-16 max-w-2xl mt-8">Orientação individual com especialistas e
+                empreendedores de sucesso</p>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <!-- Mentoria 1 -->
                 <div class="price-card rounded-2xl overflow-hidden bg-white">
                     <div class="relative h-40 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1537444532052-2afbf769b76c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Mentoria" class="image-scale w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1537444532052-2afbf769b76c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Mentoria" class="image-scale w-full h-full object-cover">
                         <div class="absolute top-3 right-3">
-                            <span class="badge-premium text-white text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span>
+                            <span
+                                class="badge-premium text-white text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span>
                         </div>
                     </div>
                     <div class="p-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-2">Mentorado 1:1</h3>
                         <p class="text-gray-600 text-sm mb-6">Sessões personalizadas com mentores experientes.</p>
                         <div class="mb-4">
-                            <p class="text-3xl font-bold text-blue-600 mb-1">R$ 299<span class="text-lg text-gray-500">/mês</span></p>
+                            <p class="text-3xl font-bold text-blue-600 mb-1">R$ 299<span
+                                    class="text-lg text-gray-500">/mês</span></p>
                             <div class="flex text-yellow-400 text-sm">
                                 <i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
@@ -293,16 +334,19 @@
                 <!-- Mentoria 2 -->
                 <div class="price-card rounded-2xl overflow-hidden bg-white">
                     <div class="relative h-40 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1529119368496-2dfda6ec2804?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Mentoria" class="image-scale w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1529119368496-2dfda6ec2804?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Mentoria" class="image-scale w-full h-full object-cover">
                         <div class="absolute top-3 right-3">
-                            <span class="badge-premium text-white text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span>
+                            <span
+                                class="badge-premium text-white text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span>
                         </div>
                     </div>
                     <div class="p-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-2">Consultoria Estratégica</h3>
                         <p class="text-gray-600 text-sm mb-6">Análise completa e planejamento do seu negócio.</p>
                         <div class="mb-4">
-                            <p class="text-3xl font-bold text-blue-600 mb-1">R$ 499<span class="text-lg text-gray-500">/mês</span></p>
+                            <p class="text-3xl font-bold text-blue-600 mb-1">R$ 499<span
+                                    class="text-lg text-gray-500">/mês</span></p>
                             <div class="flex text-yellow-400 text-sm">
                                 <i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
@@ -321,16 +365,19 @@
                 <!-- Mentoria 3 -->
                 <div class="price-card rounded-2xl overflow-hidden bg-white">
                     <div class="relative h-40 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Mentoria" class="image-scale w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Mentoria" class="image-scale w-full h-full object-cover">
                         <div class="absolute top-3 right-3">
-                            <span class="badge-premium text-white text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span>
+                            <span
+                                class="badge-premium text-white text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span>
                         </div>
                     </div>
                     <div class="p-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-2">Acelerador Empreendedor</h3>
                         <p class="text-gray-600 text-sm mb-6">Programa intensivo de 12 semanas de mentoria.</p>
                         <div class="mb-4">
-                            <p class="text-3xl font-bold text-blue-600 mb-1">R$ 799<span class="text-lg text-gray-500">/3m</span></p>
+                            <p class="text-3xl font-bold text-blue-600 mb-1">R$ 799<span
+                                    class="text-lg text-gray-500">/3m</span></p>
                             <div class="flex text-yellow-400 text-sm">
                                 <i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
@@ -349,16 +396,19 @@
                 <!-- Mentoria 4 -->
                 <div class="price-card rounded-2xl overflow-hidden bg-white">
                     <div class="relative h-40 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" alt="Mentoria" class="image-scale w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                            alt="Mentoria" class="image-scale w-full h-full object-cover">
                         <div class="absolute top-3 right-3">
-                            <span class="badge-premium text-white text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span>
+                            <span
+                                class="badge-premium text-white text-xs font-bold px-3 py-1 rounded-full">PREMIUM</span>
                         </div>
                     </div>
                     <div class="p-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-2">Mentoria Executiva</h3>
                         <p class="text-gray-600 text-sm mb-6">Desenvolvimento de liderança para CEOs e fundadores.</p>
                         <div class="mb-4">
-                            <p class="text-3xl font-bold text-blue-600 mb-1">R$ 1.199<span class="text-lg text-gray-500">/mês</span></p>
+                            <p class="text-3xl font-bold text-blue-600 mb-1">R$ 1.199<span
+                                    class="text-lg text-gray-500">/mês</span></p>
                             <div class="flex text-yellow-400 text-sm">
                                 <i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
@@ -381,13 +431,15 @@
     <section class="py-24 px-6 md:px-12 lg:px-24 bg-white">
         <div class="max-w-4xl mx-auto text-center">
             <h2 class="text-4xl md:text-5xl font-bold mb-6">Comece sua transformação digital</h2>
-            <p class="text-gray-600 text-lg mb-12">Acesso a palestras, mentorias e uma comunidade de empreendedores prontos para crescer junto.</p>
+            <p class="text-gray-600 text-lg mb-12">Acesso a palestras, mentorias e uma comunidade de empreendedores
+                prontos para crescer junto.</p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <button class="btn-primary text-white px-10 py-4 rounded-lg font-semibold text-lg">
                     Acessar portal <i class="fas fa-arrow-right ml-2"></i>
                 </button>
-                <button class="border-2 border-gray-300 text-gray-700 px-10 py-4 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition">
+                <button
+                    class="border-2 border-gray-300 text-gray-700 px-10 py-4 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition">
                     Falar com consultor
                 </button>
             </div>
@@ -406,7 +458,8 @@
                 <div>
                     <h4 class="text-white font-bold mb-4">Links</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="index.html" class="text-gray-400 hover:text-white transition">Voltar ao site</a></li>
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition">Voltar ao site</a>
+                        </li>
                         <li><a href="#" class="text-gray-400 hover:text-white transition">Palestras</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-white transition">Mentorias</a></li>
                     </ul>
@@ -415,16 +468,20 @@
                 <div>
                     <h4 class="text-white font-bold mb-4">Contato</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="mailto:contato@unn.com.br" class="text-gray-400 hover:text-white transition">contato@unn.com.br</a></li>
+                        <li><a href="mailto:contato@unn.com.br"
+                                class="text-gray-400 hover:text-white transition">contato@unn.com.br</a></li>
                     </ul>
                 </div>
 
                 <div>
                     <h4 class="text-white font-bold mb-4">Redes</h4>
                     <div class="flex gap-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i
+                                class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i
+                                class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
             </div>
@@ -437,7 +494,7 @@
 
     <script>
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
+            anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
@@ -447,4 +504,5 @@
         });
     </script>
 </body>
+
 </html>
