@@ -1,18 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Home');
+    return view('home');
 });
 
-// Auth routes stub - will be wired with Laravel auth
+// Auth routes - will be wired with Laravel auth (Breeze)
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function() {
-        return Inertia::render('Dashboard');
-    });
+        return view('dashboard');
+    })->name('dashboard');
 
     Route::resource('events', '\\App\\Http\\Controllers\\EventController');
     Route::resource('children', '\\App\\Http\\Controllers\\ChildController');
