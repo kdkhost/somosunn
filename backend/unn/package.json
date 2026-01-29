@@ -11,10 +11,5 @@
     "tailwindcss": "^4.0.0",
     "vite": "^5.0.0"
   },
-  "dependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "@inertiajs/inertia": "^0.12.0",
-    "@inertiajs/inertia-react": "^1.4.0"
-  }
+  "dependencies": {}
 }
