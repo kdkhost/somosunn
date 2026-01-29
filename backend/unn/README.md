@@ -18,6 +18,25 @@ NOTE: You asked for PHP 8.4 — I updated the Dockerfile base to `php:8.4-fpm` a
 
 ---
 
+Deploy to cPanel (SSH instructions):
+
+1. Upload project files to your hosting via Git or FTP/SFTP.
+2. SSH into the server and run (in project root):
+
+   cp .env.example .env
+   composer install --no-dev --optimize-autoloader
+   php artisan key:generate
+   php artisan vendor:publish --provider="JeroenNoten\AdminLte\AdminLteServiceProvider" --tag=config
+   php artisan migrate --seed
+   php artisan storage:link
+   npm install && npm run build    # optional if you use assets
+
+Notes:
+- On cPanel the database can be configured via phpMyAdmin; update `.env` with DB credentials before running migrations.
+- If you cannot run composer on the server, run locally and upload the vendor/ folder.
+
+---
+
 Funcionalidades deste esqueleto:
 - Autenticação (admin / pastor / membro / responsável) com roles
 - CRUD eventos, crianças, apadrinhamentos
