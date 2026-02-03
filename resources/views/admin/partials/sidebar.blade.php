@@ -6,15 +6,22 @@
     // Tenta carregar logo específica do admin, se não tiver, usa a logo principal, senão usa o padrão
     $logoAdmin = \App\Models\Setting::get('logo_admin');
     $logoMain = \App\Models\Setting::get('logo_image');
+    $logoFavicon = \App\Models\Setting::get('favicon_image');
     
     $brandLogo = $logoAdmin ? asset($logoAdmin) : ($logoMain ? asset($logoMain) : asset('img/logo.svg'));
-    $brandFavicon = file_exists(public_path('favicon.ico')) ? asset('favicon.ico') : $brandLogo;
+    $brandFavicon = $logoFavicon ? asset($logoFavicon) : (file_exists(public_path('favicon.ico')) ? asset('favicon.ico') : $brandLogo);
 @endphp
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center justify-content-center p-0" style="height:60px; overflow:hidden;">
-        <img src="{{ $brandLogo }}" alt="UNN" class="brand-logo-img" style="width: 100%; height: 100%; object-fit: contain; padding: 5px;">
-        <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img d-none" style="width: 100%; height: 100%; object-fit: contain; padding: 5px;">
+        <img src="{{ $brandLogo }}" alt="UNN" class="brand-logo-img" style="width: auto; height: 100%; max-width: 100%; object-fit: contain; padding: 5px;">
+        <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img" style="width: auto; height: 100%; max-width: 100%; object-fit: contain; padding: 5px; display: none;">
     </a>
+    <style>
+        .sidebar-collapse .brand-link .brand-logo-img { display: none !important; }
+        .sidebar-collapse .brand-link .brand-favicon-img { display: block !important; }
+        .sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link .brand-logo-img { display: block !important; }
+        .sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link .brand-favicon-img { display: none !important; }
+    </style>
     <div class="sidebar">
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" data-accordion="true" id="sidebar-tree" role="menu">
