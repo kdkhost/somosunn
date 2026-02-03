@@ -11,18 +11,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portal', [HomeController::class, 'portal'])->name('portal');
 Route::get('/premium', [HomeController::class, 'premium'])->name('premium');
 
-// Emergency Cache Fixer
-Route::get('/fix-server', function() {
-    try {
-        Artisan::call('view:clear');
-        Artisan::call('route:clear');
-        Artisan::call('config:clear');
-        Artisan::call('cache:clear');
-        return "Cache limpo com sucesso! <br> <a href='/'>Voltar para Home</a>";
-    } catch (\Exception $e) {
-        return "Erro ao limpar: " . $e->getMessage();
-    }
-});
+
 
 // Institutional Pages
 Route::get('/sobre', fn() => view('site.institucional.sobre'))->name('sobre');
@@ -187,9 +176,7 @@ Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMi
         // Ranking
         Route::get('/ranking', [\App\Http\Controllers\Admin\RankingController::class, 'index'])->name('ranking');
     
-        // Emergency fix for cached sidebars
-        Route::get('/upload/test', function() { return redirect()->route('admin.dashboard'); })->name('upload.test');
-        
+
         // Chunked uploads
         Route::post('/upload/chunk', [\App\Http\Controllers\UploadChunkController::class, 'storeChunk'])->name('upload.chunk');
         Route::post('/upload/assemble', [\App\Http\Controllers\UploadChunkController::class, 'assemble'])->name('upload.assemble');
