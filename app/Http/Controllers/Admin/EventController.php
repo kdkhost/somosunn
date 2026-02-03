@@ -18,7 +18,9 @@ class EventController extends Controller
                            ->get(['id', 'title', 'start_at as start', 'end_at as end', 'color', 'all_day', 'address', 'latitude', 'longitude', 'description', 'location', 'price', 'capacity']);
             return response()->json($events);
         }
-        return view('admin.events.calendar');
+        $settings = \App\Models\Setting::whereIn('key', ['company_city', 'company_state'])->pluck('value', 'key');
+        $companyLocation = ($settings['company_city'] ?? '') . ' ' . ($settings['company_state'] ?? '');
+        return view('admin.events.calendar', compact('companyLocation'));
     }
 
     public function create()

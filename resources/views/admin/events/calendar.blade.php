@@ -277,7 +277,14 @@
             }
 
             debounceTimer = setTimeout(function() {
-                fetch('https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=' + encodeURIComponent(query))
+                var bias = '{{ $companyLocation ?? "" }}';
+                // Append company location to query if it looks like a simple street name and bias exists
+                var searchQuery = query;
+                if(bias && query.indexOf(',') === -1 && query.length < 15) {
+                    searchQuery = query + ', ' + bias;
+                }
+
+                fetch('https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=' + encodeURIComponent(searchQuery))
                     .then(response => response.json())
                     .then(data => {
                         suggestions.empty();
