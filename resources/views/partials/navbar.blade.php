@@ -5,14 +5,14 @@
     $menuItems = [
         [
             'label' => 'Institucional',
-            'href' => route('home').'#sobre',
+            'href' => route('sobre'),
             'children' => [
-                ['label' => 'Sobre a UNN', 'href' => route('home').'#sobre'],
-                ['label' => 'Manifesto', 'href' => route('home').'#manifesto'],
-                ['label' => 'Quem somos', 'href' => route('home').'#quem-somos'],
-                ['label' => 'Como funciona', 'href' => route('home').'#como-funciona'],
-                ['label' => 'Valores', 'href' => route('home').'#valores'],
-                ['label' => 'Contato', 'href' => route('home').'#contato'],
+                ['label' => 'Sobre a UNN', 'href' => route('sobre')],
+                ['label' => 'Manifesto', 'href' => route('manifesto')],
+                ['label' => 'Quem somos', 'href' => route('quem-somos')],
+                ['label' => 'Como funciona', 'href' => route('como-funciona')],
+                ['label' => 'Valores', 'href' => route('valores')],
+                ['label' => 'Contato', 'href' => route('contato')],
             ],
         ],
         [
@@ -24,7 +24,7 @@
                 ['label' => 'Feed Social', 'href' => route('social.feed'), 'setting_key' => 'feature_social'],
                 ['label' => 'Cursos', 'href' => route('courses.index'), 'setting_key' => 'feature_courses'],
                 ['label' => 'Eventos', 'href' => route('events.index'), 'setting_key' => 'feature_events'],
-                ['label' => 'Membros', 'href' => url('/membros')],
+                ['label' => 'Membros', 'href' => route('membros')],
             ],
         ],
         ['label' => 'Premium', 'href' => route('premium'), 'setting_key' => 'feature_premium'],
@@ -112,7 +112,7 @@
 
 <div id="mobile-menu" class="fixed inset-0 z-40 hidden" aria-hidden="true">
     <div id="mobile-menu-overlay" class="absolute inset-0 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
-    <div id="mobile-menu-panel" class="relative z-10 w-4/5 max-w-sm h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-400 ease-out">
+    <div id="mobile-menu-panel" class="relative z-10 w-4/5 max-w-sm h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-400 ease-out overflow-y-auto">
         <div class="flex items-center justify-between border-b border-slate-100 px-6 py-5">
             <div class="flex items-center gap-3">
                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#1F5EDB] to-[#1D3FC4] text-white font-black text-lg overflow-hidden">
@@ -125,7 +125,7 @@
             </div>
             <button id="mobile-menu-close" class="text-gray-500 hover:text-gray-900 text-3xl leading-none">&times;</button>
         </div>
-        <nav class="px-6 py-4 flex flex-col gap-2 text-gray-700">
+        <nav class="px-6 py-4 flex flex-col gap-2 text-gray-700 pb-24">
             @foreach($menuItems as $item)
                 <div>
                     <a href="{{ $item['href'] }}" class="block rounded-2xl px-4 py-3 font-semibold hover:bg-slate-100 transition-colors">
