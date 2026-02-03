@@ -35,9 +35,11 @@
 <nav class="fixed inset-x-0 top-0 z-30 bg-white shadow-xl border-b border-slate-100">
     <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-4 flex items-center justify-between gap-4">
         <!-- Logo -->
+        <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0">
             <div class="inline-flex h-12 md:h-16 w-auto items-center justify-center overflow-hidden">
                 <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain" onerror="this.style.display='none';">
             </div>
+        </a>
 
         <!-- Menu + Actions (aligned right) -->
         <div class="flex items-center gap-6">

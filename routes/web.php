@@ -187,14 +187,4 @@ Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMi
     // Social / Comunidade Moderação
     Route::get('/social', [\App\Http\Controllers\Admin\SocialController::class, 'index'])->name('social.index');
     Route::delete('/social/{post}', [\App\Http\Controllers\Admin\SocialController::class, 'destroy'])->name('social.destroy');
-
-    // Rota de Emergência para corrigir Banco de Dados
-    Route::get('/fix-migration', function () {
-        try {
-            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-            return '<h3>Sucesso! Banco de dados atualizado.</h3><pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
-        } catch (\Exception $e) {
-            return '<h3>Erro ao migrar:</h3> ' . $e->getMessage();
-        }
-    })->middleware('auth'); // Protegido por auth admin
 });
