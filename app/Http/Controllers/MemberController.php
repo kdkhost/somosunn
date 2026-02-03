@@ -19,10 +19,15 @@ class MemberController extends Controller
             abort(404, 'Membros temporariamente indisponível');
         }
 
-        $members = User::where('is_active', true)
-            ->latest()
-            ->take(12)
-            ->get();
+        $members = collect();
+        
+        try {
+            $members = User::latest()
+                ->take(12)
+                ->get();
+        } catch (\Throwable $e) {
+            // Fallback to demo data on any DB error
+        }
 
         // If no members exist, provide demo data
         if ($members->isEmpty()) {
