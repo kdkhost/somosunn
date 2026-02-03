@@ -116,6 +116,8 @@
                         <div id="modalMap" style="height: 200px; border-radius: 8px; border: 1px solid #ddd;"></div>
                     </div>
                 </div>
+                <input type="hidden" id="event_latitude" name="latitude">
+                <input type="hidden" id="event_longitude" name="longitude">
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-danger" id="btnDelete" style="display:none;">Excluir</button>
                     <button type="submit" class="btn btn-primary">Salvar</button>
@@ -173,6 +175,8 @@
         function openModal(event) {
             $('#eventForm')[0].reset();
             $('#event_id').val('');
+            $('#event_latitude').val('');
+            $('#event_longitude').val('');
             $('#btnDelete').hide();
             $('#modalMapContainer').hide();
             
@@ -193,20 +197,9 @@
                 
                 // Map Handling
                 if (event.extendedProps.latitude && event.extendedProps.longitude) {
-                     $('#modalMapContainer').show();
-                     $('#modalAddress').text(event.extendedProps.address || 'Localização no mapa');
-                     
-                     setTimeout(function(){
-                         if(!modalMap) {
-                             modalMap = L.map('modalMap');
-                             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OSM'}).addTo(modalMap);
-                         }
-                         modalMap.invalidateSize();
-                         modalMap.setView([event.extendedProps.latitude, event.extendedProps.longitude], 15);
-                         
-                         if(modalMarker) modalMap.removeLayer(modalMarker);
-                         modalMarker = L.marker([event.extendedProps.latitude, event.extendedProps.longitude]).addTo(modalMap);
-                     }, 300);
+                     $('#event_latitude').val(event.extendedProps.latitude);
+                     $('#event_longitude').val(event.extendedProps.longitude);
+                     showMap(event.extendedProps.latitude, event.extendedProps.longitude, event.extendedProps.address);
                 }
 
                 $('#btnDelete').show().off('click').on('click', function(){
@@ -221,6 +214,45 @@
             }
             $('#eventModal').modal('show');
         }
+
+        function showMap(lat, lng, address) {
+            $('#modalMapContainer').show();
+            $('#modalAddress').text(address || 'Localização aproximada');
+            
+            setTimeout(function(){
+                if(!modalMap) {
+                    modalMap = L.map('modalMap');
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OSM'}).addTo(modalMap);
+                }
+                modalMap.invalidateSize();
+                modalMap.setView([lat, lng], 15);
+                
+                if(modalMarker) modalMap.removeLayer(modalMarker);
+                modalMarker = L.marker([lat, lng]).addTo(modalMap);
+            }, 300);
+        }
+
+        // Live Geocoding
+        let debounceTimer;
+        $('#address').on('input', function() {
+            clearTimeout(debounceTimer);
+            var query = $(this).val();
+            if (query.length > 5) {
+                debounceTimer = setTimeout(function() {
+                    fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                var lat = data[0].lat;
+                                var lon = data[0].lon;
+                                $('#event_latitude').val(lat);
+                                $('#event_longitude').val(lon);
+                                showMap(lat, lon, query);
+                            }
+                        });
+                }, 1000); // 1 sec delay
+            }
+        });
 
         // Format Date for Input
         function formatDate(date) {
