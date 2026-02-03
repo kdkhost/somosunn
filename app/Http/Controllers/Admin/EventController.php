@@ -13,14 +13,46 @@ class EventController extends Controller
         if ($request->ajax()) {
             // FullCalendar event feed
             // FullCalendar event feed
-            $events = Event::where(function($query) use ($request) {
-                                $query->whereDate('start_at', '<=', $request->end)
-                                      ->where(function($q) use ($request) {
-                                          $q->whereDate('end_at', '>=', $request->start)
+            $start = \Carbon\Carbon::parse($request->start);
+            $end = \Carbon\Carbon::parse($request->end);
+
+            $events = Event::where(function($query) use ($start, $end) {
+                                $query->where('start_at', '<', $end)
+                                      ->where(function($q) use ($start) {
+                                          $q->where('end_at', '>', $start)
                                             ->orWhereNull('end_at');
                                       });
                             })->get();
-            return response()->json($events);
+
+            $formattedEvents = $events->map(function ($event) {
+                return [
+                    'id' => $event->id,
+                    'title' => $event->title,
+                    'start' => $event->start, // Uses Model Accessor (ISO8601)
+                    'end' => $event->end,     // Uses Model Accessor (ISO8601)
+                    'backgroundColor' => $event->color,
+                    'borderColor' => $event->color,
+                    'textColor' => '#ffffff',
+                    'allDay' => (bool)$event->all_day,
+                    'extendedProps' => [
+                        'description' => $event->description,
+                        'address' => $event->address,
+                        'location' => $event->location,
+                        'capacity' => $event->capacity,
+                        'price' => $event->price,
+                        'latitude' => $event->latitude,
+                        'longitude' => $event->longitude,
+                        'batch_1_price' => $event->batch_1_price,
+                        'batch_1_deadline' => $event->batch_1_deadline ? \Carbon\Carbon::parse($event->batch_1_deadline)->toIso8601String() : null,
+                        'batch_2_price' => $event->batch_2_price,
+                        'batch_2_deadline' => $event->batch_2_deadline ? \Carbon\Carbon::parse($event->batch_2_deadline)->toIso8601String() : null,
+                        'batch_3_price' => $event->batch_3_price,
+                        'batch_3_deadline' => $event->batch_3_deadline ? \Carbon\Carbon::parse($event->batch_3_deadline)->toIso8601String() : null,
+                    ]
+                ];
+            });
+
+            return response()->json($formattedEvents);
         }
         $settings = \App\Models\Setting::whereIn('key', ['company_city', 'company_state'])->pluck('value', 'key');
         $companyLocation = ($settings['company_city'] ?? '') . ' ' . ($settings['company_state'] ?? '');
