@@ -45,7 +45,7 @@
             @forelse($mentorings as $mentorship)
                 <article class="card bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
                     <div class="flex justify-between items-center mb-3">
-                        <p class="text-xs uppercase tracking-wide text-gray-500">{{ $mentorship->mentor->name ? 'Mentor UNN' }}</p>
+                        <p class="text-xs uppercase tracking-wide text-gray-500">{{ $mentorship->mentor?->name ?? 'Mentor UNN' }}</p>
                         <span class="text-purple-600 font-bold">R$ {{ number_format($mentorship->price, 2, ',', '.') }}</span>
                     </div>
                     <h3 class="text-2xl font-semibold text-gray-900 mb-2">{{ $mentorship->title }}</h3>
@@ -68,12 +68,12 @@
         <div class="grid md:grid-cols-2 gap-8">
             <div class="card rounded-3xl p-8 bg-slate-50 border border-gray-200 text-center">
                 <p class="text-sm uppercase font-semibold text-gray-500 mb-3">Iniciantes</p>
-                <p class="text-5xl font-bold text-blue-600">{{ $levelSummary['iniciante'] ? 0 }}</p>
+                <p class="text-5xl font-bold text-blue-600">{{ $levelSummary['iniciante'] ?? 0 }}</p>
                 <p class="text-gray-600 mt-4">Interações restritas ao mesmo nível, garantindo acolhimento e aprendizado seguro.</p>
             </div>
             <div class="card rounded-3xl p-8 bg-slate-50 border border-gray-200 text-center">
                 <p class="text-sm uppercase font-semibold text-gray-500 mb-3">Empresários de sucesso</p>
-                <p class="text-5xl font-bold text-purple-600">{{ $levelSummary['sucesso'] ? 0 }}</p>
+                <p class="text-5xl font-bold text-purple-600">{{ $levelSummary['sucesso'] ?? 0 }}</p>
                 <p class="text-gray-600 mt-4">Líderes e mentores conectando oportunidades premium e trocando insights estratégicos.</p>
             </div>
         </div>
@@ -90,7 +90,7 @@
             @forelse($topRankings as $rank)
                 <article class="card bg-white rounded-3xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition">
                     <p class="text-xs uppercase text-gray-500">{{ ucfirst($rank->level) }}</p>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ $rank->user->name ? 'Empreendedor' }}</h3>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ $rank->user?->name ?? 'Empreendedor' }}</h3>
                     <p class="text-sm text-gray-500 mb-4">{{ $rank->interactions_count }} conexões avaliadas</p>
                     <div class="text-lg font-bold text-blue-600">Score {{ number_format($rank->score, 2, ',', '.') }}</div>
                     <p class="text-sm text-gray-600 mt-2">Média {{ number_format($rank->average_rating, 1, ',', '.') }}</p>
