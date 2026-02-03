@@ -125,16 +125,16 @@
             </div>
             <button id="mobile-menu-close" class="text-gray-500 hover:text-gray-900 text-3xl leading-none">&times;</button>
         </div>
-        <nav class="px-6 py-4 flex flex-col gap-2 text-gray-700 pb-24">
+        <nav class="px-6 py-4 flex flex-col gap-1 text-gray-700">
             @foreach($menuItems as $item)
                 <div>
-                    <a href="{{ $item['href'] }}" class="block rounded-2xl px-4 py-3 font-semibold hover:bg-slate-100 transition-colors">
+                    <a href="{{ $item['href'] }}" class="block rounded-2xl px-4 py-2 font-semibold hover:bg-slate-100 transition-colors">
                         {{ $item['label'] }}
                     </a>
                     @if(isset($item['children']))
-                        <div class="pl-4 space-y-2">
+                        <div class="pl-4 space-y-1">
                             @foreach($item['children'] as $child)
-                                <a href="{{ $child['href'] }}" class="block rounded-xl px-3 py-2 text-sm text-gray-600 hover:bg-slate-100 transition-colors">
+                                <a href="{{ $child['href'] }}" class="block rounded-xl px-3 py-1.5 text-sm text-gray-600 hover:bg-slate-100 transition-colors">
                                     {{ $child['label'] }}
                                 </a>
                             @endforeach
@@ -143,7 +143,7 @@
                 </div>
             @endforeach
         </nav>
-        <div class="px-6 mt-4 mb-6">
+        <div class="px-6 mt-2 mb-6">
             <a href="{{ $cta['href'] }}" class="inline-flex w-full items-center justify-center rounded-full border border-[#1F5EDB] px-6 py-3 text-sm font-semibold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
                 {{ $cta['label'] }}
             </a>
