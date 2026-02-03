@@ -77,7 +77,7 @@
                             
                             @if($isEnrolled || $lesson->is_free_preview)
                                 <a href="{{ route('courses.lessons.show', [$course->id, $lesson->id]) }}" class="text-sm font-semibold text-[#1F5EDB] opacity-0 group-hover:opacity-100 transition">
-                                    Assistir
+                                    Assistir  @if($lesson->duration) <span class="text-gray-400 font-normal ml-1">({{ gmdate("H:i", $lesson->duration) }})</span> @endif
                                 </a>
                             @endif
                         </div>

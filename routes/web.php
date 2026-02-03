@@ -136,6 +136,12 @@ Route::put('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonCon
 Route::delete('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'destroy'])->name('courses.lessons.destroy');
 Route::get('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'show'])->name('courses.lessons.show');
 
+// Attachments
+Route::post('courses/{course}/lessons/{lesson}/attachments', [\App\Http\Controllers\LessonController::class, 'uploadAttachment'])->name('courses.lessons.attachments.upload');
+Route::delete('courses/{course}/lessons/{lesson}/attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'deleteAttachment'])->name('courses.lessons.attachments.destroy');
+Route::put('courses/{course}/lessons/{lesson}/attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'renameAttachment'])->name('courses.lessons.attachments.rename');
+Route::get('courses/{course}/lessons/{lesson}/details', [\App\Http\Controllers\LessonController::class, 'getDetails'])->name('courses.lessons.details');
+
 // Public Events
 Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
 

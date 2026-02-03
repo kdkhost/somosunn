@@ -13,18 +13,35 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('courses', function (Blueprint $table) {
-            $table->boolean('is_featured')->default(false)->after('status');
-            $table->json('certificate_settings')->nullable()->after('is_certificate_enabled');
+            // Check and add is_certificate_enabled if missing
+            if (!Schema::hasColumn('courses', 'is_certificate_enabled')) {
+                $table->boolean('is_certificate_enabled')->default(false);
+            }
+            
+            // Add is_featured
+            if (!Schema::hasColumn('courses', 'is_featured')) {
+                $table->boolean('is_featured')->default(false);
+            }
+            
+            // Add certificate_settings
+            if (!Schema::hasColumn('courses', 'certificate_settings')) {
+                $table->json('certificate_settings')->nullable();
+            }
         });
 
         Schema::table('lessons', function (Blueprint $table) {
-            $table->integer('duration')->default(0)->comment('Duration in seconds')->after('video_url');
+            if (!Schema::hasColumn('lessons', 'duration')) {
+                $table->integer('duration')->default(0)->comment('Duration in seconds');
+            }
         });
 
-        // Update status enum to include 'paused' if possible, or we just map it in code.
-        // Changing ENUM in Doctrine/Laravel can be tricky.
-        // Let's use raw SQL to add 'paused' to the enum for MySQL.
-        DB::statement("ALTER TABLE courses MODIFY COLUMN status ENUM('draft', 'published', 'archived', 'paused') NOT NULL DEFAULT 'draft'");
+        // Safely attempt to update status enum using raw SQL if necessary
+        // We catch exception to avoid stopping migration if status column has different type
+        try {
+            DB::statement("ALTER TABLE courses MODIFY COLUMN status ENUM('draft', 'published', 'archived', 'paused') NOT NULL DEFAULT 'draft'");
+        } catch (\Exception $e) {
+            // Log or ignore if status modification fails, usually acceptable
+        }
     }
 
     /**

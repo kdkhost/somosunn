@@ -48,6 +48,10 @@
                                 <div class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 px-2 py-1 text-xs font-bold rounded shadow">
                                     DEMONSTRAÇÃO
                                 </div>
+                            @elseif($course->is_featured)
+                                <div class="absolute top-2 left-2 bg-purple-600 text-white px-2 py-1 text-xs font-bold rounded shadow">
+                                    DESTAQUE
+                                </div>
                             @endif
                         </div>
                         <div class="p-5">

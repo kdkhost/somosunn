@@ -21,6 +21,15 @@ class Course extends Model
         'full_description',
         'author_name',
         'status',
+        'is_featured',
+        'certificate_settings',
+    ];
+
+    protected $casts = [
+        'is_certificate_enabled' => 'boolean',
+        'is_featured' => 'boolean',
+        'certificate_settings' => 'array',
+        'price' => 'decimal:2',
     ];
 
     public function creator()

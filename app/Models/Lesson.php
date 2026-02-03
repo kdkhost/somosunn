@@ -16,11 +16,17 @@ class Lesson extends Model
         'video_url',
         'is_free_preview',
         'content',
+        'duration', // Seconds
     ];
 
     public function course()
     {
         return $this->belongsTo(Course::class);
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(LessonAttachment::class);
     }
 
     public function progress()

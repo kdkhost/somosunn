@@ -28,6 +28,11 @@
                         <p class="text-sm font-medium {{ $l->id == $lesson->id ? 'text-[#1F5EDB]' : 'text-gray-700' }}">
                             {{ $l->order }}. {{ $l->title }}
                         </p>
+                        @if($l->duration > 0)
+                        <p class="text-xs text-gray-400 mt-1">
+                            <i class="far fa-clock mr-1"></i> {{ gmdate("H:i", $l->duration) }}
+                        </p>
+                        @endif>
                     </div>
                 </a>
             @endforeach
@@ -54,6 +59,30 @@
                 <div class="prose max-w-none text-gray-700">
                     {!! nl2br(e($lesson->content)) !!}
                 </div>
+
+                @if($lesson->attachments->count() > 0)
+                <div class="mt-8 pt-6 border-t border-gray-100">
+                    <h4 class="text-md font-bold mb-3 flex items-center text-gray-800">
+                        <i class="fas fa-paperclip mr-2 text-gray-500"></i> Materiais de Apoio
+                    </h4>
+                    <div class="grid gap-3">
+                        @foreach($lesson->attachments as $attachment)
+                        <a href="{{ asset('storage/'.$attachment->file_path) }}" target="_blank" class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition group">
+                            <div class="flex items-center overflow-hidden">
+                                <div class="bg-blue-100 text-blue-600 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 mr-3">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="truncate">
+                                    <p class="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 transition">{{ $attachment->file_name }}</p>
+                                    <p class="text-xs text-gray-500">{{ round($attachment->file_size / 1024 / 1024, 2) }} MB</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-download text-gray-400 group-hover:text-blue-600 transition"></i>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </div>
 
             <div class="flex justify-between items-center">
