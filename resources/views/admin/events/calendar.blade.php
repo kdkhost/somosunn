@@ -79,23 +79,49 @@
                         <input type="text" class="form-control" name="address" id="address" placeholder="Ex: Av. Paulista, 1000 - SP">
                     </div>
                     
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Vagas (0 = ilimitado)</label>
-                                <input type="number" class="form-control" name="capacity" id="capacity" min="0">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Preço (R$)</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">R$</span>
-                                    </div>
-                                    <input type="number" class="form-control mask-money" name="price" id="price" step="0.01" min="0">
-                                </div>
-                            </div>
+                    <div class="form-group">
+                        <label>Vagas (0 = ilimitado)</label>
+                        <input type="number" class="form-control" name="capacity" id="capacity" min="0">
+                    </div>
+
+                    <div class="card card-secondary">
+                        <div class="card-header"><h3 class="card-title" style="font-size:1rem;">Lotes / Ingressos</h3></div>
+                        <div class="card-body p-2">
+                             <!-- Batch 1 -->
+                             <div class="row">
+                                 <div class="col-6">
+                                     <label>1º Lote (R$)</label>
+                                     <input type="text" class="form-control mask-money" name="batch_1_price" id="batch_1_price" placeholder="R$ 0,00">
+                                 </div>
+                                 <div class="col-6">
+                                     <label>Até quando?</label>
+                                     <input type="datetime-local" class="form-control" name="batch_1_deadline" id="batch_1_deadline">
+                                 </div>
+                             </div>
+                             <div class="dropdown-divider"></div>
+                             <!-- Batch 2 -->
+                             <div class="row">
+                                 <div class="col-6">
+                                     <label>2º Lote (R$)</label>
+                                     <input type="text" class="form-control mask-money" name="batch_2_price" id="batch_2_price" placeholder="R$ 0,00">
+                                 </div>
+                                 <div class="col-6">
+                                     <label>Até quando?</label>
+                                     <input type="datetime-local" class="form-control" name="batch_2_deadline" id="batch_2_deadline">
+                                 </div>
+                             </div>
+                             <div class="dropdown-divider"></div>
+                             <!-- Batch 3 -->
+                             <div class="row">
+                                 <div class="col-6">
+                                     <label>3º Lote / Na hora (R$)</label>
+                                     <input type="text" class="form-control mask-money" name="batch_3_price" id="batch_3_price" placeholder="R$ 0,00">
+                                 </div>
+                                 <div class="col-6">
+                                     <label>Até (ou na hora)</label>
+                                     <input type="datetime-local" class="form-control" name="batch_3_deadline" id="batch_3_deadline">
+                                 </div>
+                             </div>
                         </div>
                     </div>
 
@@ -195,6 +221,16 @@
                 $('#address').val(event.extendedProps.address || '');
                 $('#capacity').val(event.extendedProps.capacity || '');
                 $('#price').val(event.extendedProps.price || '');
+                
+                // Batches
+                $('#batch_1_price').val(event.extendedProps.batch_1_price || '');
+                if(event.extendedProps.batch_1_deadline) $('#batch_1_deadline').val(formatDate(new Date(event.extendedProps.batch_1_deadline)));
+                
+                $('#batch_2_price').val(event.extendedProps.batch_2_price || '');
+                if(event.extendedProps.batch_2_deadline) $('#batch_2_deadline').val(formatDate(new Date(event.extendedProps.batch_2_deadline)));
+                
+                $('#batch_3_price').val(event.extendedProps.batch_3_price || '');
+                if(event.extendedProps.batch_3_deadline) $('#batch_3_deadline').val(formatDate(new Date(event.extendedProps.batch_3_deadline)));
                 
                 // Map Handling
                 if (event.extendedProps.latitude && event.extendedProps.longitude) {

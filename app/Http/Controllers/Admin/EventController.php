@@ -15,7 +15,11 @@ class EventController extends Controller
             $events = Event::whereDate('start_at', '>=', $request->start)
                            ->whereDate('end_at', '<=', $request->end)
                            ->whereDate('end_at', '<=', $request->end)
-                           ->get(['id', 'title', 'start_at as start', 'end_at as end', 'color', 'all_day', 'address', 'latitude', 'longitude', 'description', 'location', 'price', 'capacity']);
+                           ->get(['id', 'title', 'start_at as start', 'end_at as end', 'color', 'all_day', 'address', 'latitude', 'longitude', 'description', 'location', 
+                                  'price', 'capacity', 
+                                  'batch_1_price', 'batch_1_deadline',
+                                  'batch_2_price', 'batch_2_deadline',
+                                  'batch_3_price', 'batch_3_deadline']);
             return response()->json($events);
         }
         $settings = \App\Models\Setting::whereIn('key', ['company_city', 'company_state'])->pluck('value', 'key');
@@ -38,6 +42,12 @@ class EventController extends Controller
         if($request->has('price') && $request->price){
              $request->merge(['price' => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->price))]);
         }
+        // Sanitize batches
+        foreach(['batch_1_price', 'batch_2_price', 'batch_3_price'] as $field){
+            if($request->has($field) && $request->$field){
+                $request->merge([$field => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->$field))]);
+            }
+        }
         
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -50,7 +60,13 @@ class EventController extends Controller
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'price' => 'nullable|numeric|min:0',
-            'capacity' => 'nullable|integer|min:0'
+            'capacity' => 'nullable|integer|min:0',
+            'batch_1_price' => 'nullable|numeric|min:0',
+            'batch_1_deadline' => 'nullable|date',
+            'batch_2_price' => 'nullable|numeric|min:0',
+            'batch_2_deadline' => 'nullable|date',
+            'batch_3_price' => 'nullable|numeric|min:0',
+            'batch_3_deadline' => 'nullable|date',
         ]);
 
         $event = Event::create($validated);
@@ -67,6 +83,12 @@ class EventController extends Controller
         if($request->has('price') && $request->price){
              $request->merge(['price' => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->price))]);
         }
+        // Sanitize batches
+        foreach(['batch_1_price', 'batch_2_price', 'batch_3_price'] as $field){
+            if($request->has($field) && $request->$field){
+                $request->merge([$field => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->$field))]);
+            }
+        }
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -79,7 +101,13 @@ class EventController extends Controller
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'price' => 'nullable|numeric|min:0',
-            'capacity' => 'nullable|integer|min:0'
+            'capacity' => 'nullable|integer|min:0',
+            'batch_1_price' => 'nullable|numeric|min:0',
+            'batch_1_deadline' => 'nullable|date',
+            'batch_2_price' => 'nullable|numeric|min:0',
+            'batch_2_deadline' => 'nullable|date',
+            'batch_3_price' => 'nullable|numeric|min:0',
+            'batch_3_deadline' => 'nullable|date',
         ]);
 
         $event->update($validated);
