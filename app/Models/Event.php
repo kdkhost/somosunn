@@ -27,6 +27,19 @@ class Event extends Model
         'published' => 'boolean'
     ];
 
+    protected $appends = ['start', 'end'];
+
+    public function getStartAttribute()
+    {
+        return $this->start_at instanceof \DateTime ? $this->start_at->toIso8601String() : \Carbon\Carbon::parse($this->start_at)->toIso8601String();
+    }
+
+    public function getEndAttribute()
+    {
+        if (!$this->end_at) return null;
+        return $this->end_at instanceof \DateTime ? $this->end_at->toIso8601String() : \Carbon\Carbon::parse($this->end_at)->toIso8601String();
+    }
+
     public function getCurrentPriceAttribute()
     {
         $now = now();

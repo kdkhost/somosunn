@@ -19,12 +19,7 @@ class EventController extends Controller
                                           $q->whereDate('end_at', '>=', $request->start)
                                             ->orWhereNull('end_at');
                                       });
-                            })
-                           ->get(['id', 'title', 'start_at as start', 'end_at as end', 'color', 'all_day', 'address', 'latitude', 'longitude', 'description', 'location', 
-                                  'price', 'capacity', 
-                                  'batch_1_price', 'batch_1_deadline',
-                                  'batch_2_price', 'batch_2_deadline',
-                                  'batch_3_price', 'batch_3_deadline']);
+                            })->get();
             return response()->json($events);
         }
         $settings = \App\Models\Setting::whereIn('key', ['company_city', 'company_state'])->pluck('value', 'key');
