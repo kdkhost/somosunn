@@ -36,6 +36,8 @@
                 ['label' => 'Dashboard', 'href' => route('portal').'#dashboard'],
             ],
         ],
+        ['label' => 'Cursos', 'href' => route('courses.index')],
+        ['label' => 'Comunidade', 'href' => route('social.feed')],
         ['label' => 'Premium', 'href' => route('premium')],
         ['label' => 'Contato', 'href' => route('home').'#contato'],
     ];
