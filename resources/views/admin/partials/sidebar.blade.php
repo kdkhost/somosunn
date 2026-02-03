@@ -60,7 +60,7 @@
                         <p>Eventos<i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview pl-4">
-                        <li class="nav-item"><a href="{{ route('admin.events.index') }}" class="nav-link {{ $is('admin.events.index') }}"><i class="fas fa-list nav-icon"></i><p>Listar</p></a></li>
+                        <li class="nav-item"><a href="{{ route('admin.events.index') }}" class="nav-link {{ $is('admin.events.index') }}"><i class="fas fa-calendar-alt nav-icon"></i><p>Calendário</p></a></li>
                         <li class="nav-item"><a href="{{ route('admin.events.create') }}" class="nav-link {{ $is('admin.events.create') }}"><i class="fas fa-plus nav-icon"></i><p>Novo</p></a></li>
                     </ul>
                 </li>
@@ -148,13 +148,7 @@
                     </a>
                 </li>
 
-                <!-- Eventos / FullCalendar -->
-                <li class="nav-item">
-                    <a href="{{ route('admin.events.index') }}" class="nav-link {{ $is('admin.events.*') }}">
-                         <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>Eventos</p>
-                    </a>
-                </li>
+
                 
                 <li class="nav-item"><a href="{{ route('admin.settings') }}" class="nav-link {{ $is('admin.settings') }}"><i class="nav-icon fas fa-cogs"></i><p>Configurações</p></a></li>
             </ul>

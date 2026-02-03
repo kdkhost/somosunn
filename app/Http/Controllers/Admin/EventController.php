@@ -18,7 +18,7 @@ class EventController extends Controller
                            ->get(['id', 'title', 'start_at as start', 'end_at as end', 'color', 'all_day', 'address', 'latitude', 'longitude', 'description', 'location']);
             return response()->json($events);
         }
-        return view('admin.events.index');
+        return view('admin.events.calendar');
     }
 
     public function create()
