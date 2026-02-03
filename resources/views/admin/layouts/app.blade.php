@@ -50,15 +50,15 @@
     }
     body{font-family:'Inter',sans-serif;}
     /* layout espaçamentos padrão AdminLTE */
+    /* layout espaçamentos padrão AdminLTE */
     .content-wrapper{
         background:#f4f6f9;
-        min-height: calc(100vh - calc(3.5rem + 1px) - calc(3.5rem + 1px)); /* ajuste altura */
+        /* min-height calculation handled by AdminLTE JS */
         transition: margin-left .3s ease-in-out;
     }
-    /* evita faixa branca com navbar fixa */
-    .layout-navbar-fixed .wrapper .content-wrapper{
-        margin-top: calc(var(--main-header-height) + 1px) !important;
-        padding-top: 0 !important;
+    /* AdminLTE 3.2 navbar-fixed handles padding automatically via body class, no need for overriding here unless using custom implementation */
+    body.layout-navbar-fixed .content-wrapper {
+        margin-top: calc(3.5rem + 1px); 
     }
     .content-wrapper>.content{
         padding:0 1rem 1rem 1rem;

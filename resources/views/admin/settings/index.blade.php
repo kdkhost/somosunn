@@ -246,17 +246,47 @@
 
                 {{-- GATEWAY --}}
                 <div class="tab-pane fade" id="tab-gateway" role="tabpanel">
-                    <h5 class="mb-3">MercadoPago</h5>
+                    <h5 class="mb-3 text-primary"><i class="fas fa-credit-card mr-2"></i>MercadoPago</h5>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Public Key</label>
+                            <input name="payments.mercadopago.public_key" class="form-control" value="{{ $settings['payments.mercadopago.public_key'] ?? '' }}">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Access Token</label>
+                            <input name="payments.mercadopago.access_token" class="form-control" value="{{ $settings['payments.mercadopago.access_token'] ?? '' }}">
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="form-group col-md-4"><label>Taxa (%)</label><input name="payments.mercadopago.fee_percentage" class="form-control mask-money" value="{{ $settings['payments.mercadopago.fee_percentage'] ?? '' }}"></div>
                         <div class="form-group col-md-4"><label>Taxa fixa</label><input name="payments.mercadopago.fee_fixed" class="form-control mask-money" value="{{ $settings['payments.mercadopago.fee_fixed'] ?? '' }}"></div>
                         <div class="form-group col-md-4"><label>Repassar taxa ao comprador</label><select name="payments.mercadopago.pass_fee" class="form-control"><option value="1" {{ (isset($settings['payments.mercadopago.pass_fee']) && $settings['payments.mercadopago.pass_fee']) ? 'selected' : '' }}>Sim</option><option value="0">Não</option></select></div>
                     </div>
-                    <h5 class="mb-3 mt-4">PagSeguro</h5>
+
+                    <hr>
+
+                    <h5 class="mb-3 mt-4 text-primary"><i class="fas fa-money-bill-wave mr-2"></i>PagSeguro</h5>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>E-mail</label>
+                            <input name="payments.pagseguro.email" class="form-control" value="{{ $settings['payments.pagseguro.email'] ?? '' }}">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Token</label>
+                            <input name="payments.pagseguro.token" class="form-control" value="{{ $settings['payments.pagseguro.token'] ?? '' }}">
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="form-group col-md-4"><label>Taxa (%)</label><input name="payments.pagseguro.fee_percentage" class="form-control mask-money" value="{{ $settings['payments.pagseguro.fee_percentage'] ?? '' }}"></div>
                         <div class="form-group col-md-4"><label>Taxa fixa</label><input name="payments.pagseguro.fee_fixed" class="form-control mask-money" value="{{ $settings['payments.pagseguro.fee_fixed'] ?? '' }}"></div>
                         <div class="form-group col-md-4"><label>Repassar taxa ao comprador</label><select name="payments.pagseguro.pass_fee" class="form-control"><option value="1" {{ (isset($settings['payments.pagseguro.pass_fee']) && $settings['payments.pagseguro.pass_fee']) ? 'selected' : '' }}>Sim</option><option value="0">Não</option></select></div>
+                    </div>
+                    <div class="form-group mt-2">
+                        <div class="custom-control custom-switch">
+                            <input type="hidden" name="payments.pagseguro.sandbox" value="0">
+                            <input type="checkbox" class="custom-control-input" id="ps_sandbox" name="payments.pagseguro.sandbox" value="1" {{ ($settings['payments.pagseguro.sandbox'] ?? 0) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="ps_sandbox">Modo Sandbox (Testes)</label>
+                        </div>
                     </div>
                 </div>
 
