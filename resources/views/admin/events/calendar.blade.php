@@ -276,7 +276,46 @@
                 return;
             }
 
+            debounceTimer = setTimeout(function() {
+                var bias = '{{ $companyLocation ?? "" }}';
+                // Append company location to query if it looks like a simple street name and bias exists
+                var searchQuery = query;
+                if(bias && query.indexOf(',') === -1 && query.length < 15) {
+                    searchQuery = query + ', ' + bias;
+                }
 
+                fetch('https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=' + encodeURIComponent(searchQuery))
+                    .then(response => response.json())
+                    .then(data => {
+                        suggestions.empty();
+                        if (data && data.length > 0) {
+                            data.forEach(function(item) {
+                                let display_name = item.display_name;
+                                // Simple list item
+                                let li = $('<li class="list-group-item list-group-item-action" style="cursor:pointer;">' + display_name + '</li>');
+                                li.on('click', function() {
+                                    $('#address').val(display_name);
+                                    $('#event_latitude').val(item.lat);
+                                    $('#event_longitude').val(item.lon);
+                                    suggestions.hide();
+                                    showMap(item.lat, item.lon, display_name);
+                                });
+                                suggestions.append(li);
+                            });
+                            suggestions.show();
+                        } else {
+                            suggestions.hide();
+                        }
+                    });
+            }, 500); // 500ms delay
+        });
+
+        // Hide suggestions when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('#address').length && !$(e.target).closest('#suggestions').length) {
+                $('#suggestions').hide();
+            }
+        });
 
         // Format Date for Input
         function formatDate(date) {
