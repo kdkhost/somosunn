@@ -1,9 +1,0 @@
-/vendor
-/node_modules
-/.env
-/storage/*.key
-/public/hot
-/public/storage
-/storage/framework/cache/data
-/.idea
-.DS_Store

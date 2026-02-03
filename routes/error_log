@@ -1,4 +1,0 @@
-[29-Jan-2026 03:46:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/somosunn/public_html/backend/routes/web.php:7
-Stack trace:
-#0 {main}
-  thrown in /home/somosunn/public_html/backend/routes/web.php on line 7
