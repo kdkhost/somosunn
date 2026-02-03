@@ -121,6 +121,22 @@
                     </ul>
                 </li>
 
+                <!-- Financeiro / Vendas -->
+                <li class="nav-item">
+                    <a href="{{ route('admin.orders.index') }}" class="nav-link {{ $is('admin.orders.*') }}">
+                        <i class="nav-icon fas fa-shopping-cart"></i>
+                        <p>Vendas</p>
+                    </a>
+                </li>
+
+                <!-- Comunidade -->
+                <li class="nav-item">
+                    <a href="{{ route('admin.social.index') }}" class="nav-link {{ $is('admin.social.*') }}">
+                        <i class="nav-icon fas fa-comments"></i>
+                        <p>Comunidade</p>
+                    </a>
+                </li>
+
                 <li class="nav-item"><a href="{{ route('admin.settings') }}" class="nav-link {{ $is('admin.settings') }}"><i class="nav-icon fas fa-cogs"></i><p>Configurações</p></a></li>
             </ul>
         </nav>
