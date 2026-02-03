@@ -34,13 +34,83 @@ class HomeController extends Controller
             }
         }
 
+        // Demo data fallback for events
+        if ($freeEvents->isEmpty()) {
+            $freeEvents = collect([
+                (object)[
+                    'id' => 1,
+                    'title' => 'Masterclass: Como Escalar seu Negócio',
+                    'description' => 'Aprenda estratégias práticas para levar seu negócio ao próximo nível com mentores que já faturaram milhões.',
+                    'start_at' => now()->addDays(7)->setHour(19)->setMinute(0),
+                    'location' => 'Online - Zoom',
+                    'is_demo' => true,
+                ],
+                (object)[
+                    'id' => 2,
+                    'title' => 'Workshop de Networking Estratégico',
+                    'description' => 'Domine a arte de fazer conexões valiosas que geram negócios reais e parcerias duradouras.',
+                    'start_at' => now()->addDays(14)->setHour(20)->setMinute(0),
+                    'location' => 'Online - Google Meet',
+                    'is_demo' => true,
+                ],
+                (object)[
+                    'id' => 3,
+                    'title' => 'Palestra: Mentalidade de Sucesso',
+                    'description' => 'Descubra os padrões mentais dos empreendedores de alto desempenho e como aplicá-los.',
+                    'start_at' => now()->addDays(21)->setHour(19)->setMinute(30),
+                    'location' => 'Online - YouTube',
+                    'is_demo' => true,
+                ],
+            ]);
+        }
+
+        // Demo data fallback for mentorships
+        if ($paidMentorings->isEmpty()) {
+            $paidMentorings = collect([
+                (object)[
+                    'id' => 1,
+                    'title' => 'Mentoria: Vendas B2B de Alta Performance',
+                    'description' => 'Aprenda a fechar contratos de alto valor com empresas usando técnicas avançadas de negociação.',
+                    'mentor' => (object)['name' => 'Carlos Mendes'],
+                    'price' => 997,
+                    'slots' => 5,
+                    'is_demo' => true,
+                ],
+                (object)[
+                    'id' => 2,
+                    'title' => 'Mentoria: Marketing Digital 360°',
+                    'description' => 'Domine tráfego pago, orgânico, funis de vendas e automações para escalar suas vendas online.',
+                    'mentor' => (object)['name' => 'Ana Paula Costa'],
+                    'price' => 797,
+                    'slots' => 8,
+                    'is_demo' => true,
+                ],
+                (object)[
+                    'id' => 3,
+                    'title' => 'Mentoria: Gestão Financeira Empresarial',
+                    'description' => 'Organize as finanças da sua empresa e tome decisões baseadas em dados para crescer com segurança.',
+                    'mentor' => (object)['name' => 'Roberto Almeida'],
+                    'price' => 597,
+                    'slots' => 10,
+                    'is_demo' => true,
+                ],
+            ]);
+        }
+
         $overview = $this->networkingOverview();
+
+        // Demo data for levels if empty
+        $levelSummary = $overview['levelSummary'];
+        if (empty($levelSummary) || (($levelSummary['iniciante'] ?? 0) == 0 && ($levelSummary['sucesso'] ?? 0) == 0)) {
+            $levelSummary = ['iniciante' => 1250, 'sucesso' => 380];
+        }
 
         return view('site.index', [
             'freeEvents' => $freeEvents,
             'paidMentorings' => $paidMentorings,
-            'levelSummary' => $overview['levelSummary'],
+            'levelSummary' => $levelSummary,
             'topRankings' => $overview['leaderboard'],
+            'isDemo' => $freeEvents->first()->is_demo ?? false,
         ]);
     }
 

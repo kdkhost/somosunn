@@ -54,9 +54,29 @@
             color:#fff;
             border: none;
         }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
         body {
             background: linear-gradient(180deg,#f8fbff 0%, #ffffff 40%);
             color: var(--unn-text);
+        }
+        /* Responsive fixes */
+        img, video, iframe {
+            max-width: 100%;
+            height: auto;
+        }
+        .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        @media (max-width: 640px) {
+            .text-5xl { font-size: 2rem; line-height: 1.2; }
+            .text-6xl { font-size: 2.25rem; line-height: 1.2; }
+            .text-4xl { font-size: 1.75rem; line-height: 1.3; }
+            .px-10 { padding-left: 1.5rem; padding-right: 1.5rem; }
+            table { display: block; overflow-x: auto; }
         }
     </style>
 </head>
