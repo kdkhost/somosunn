@@ -75,6 +75,31 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label>Endereço / Local</label>
+                        <input type="text" class="form-control" name="address" id="address" placeholder="Ex: Av. Paulista, 1000 - SP">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Vagas (0 = ilimitado)</label>
+                                <input type="number" class="form-control" name="capacity" id="capacity" min="0">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Preço (R$)</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">R$</span>
+                                    </div>
+                                    <input type="number" class="form-control mask-money" name="price" id="price" step="0.01" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label>Cor</label>
                         <div class="input-group">
                             <input type="color" class="form-control" name="color" id="color" value="#3788d8">
@@ -160,6 +185,11 @@
                 // Format dates for input datetime-local
                 if(event.start) $('#start_at').val(formatDate(event.start));
                 if(event.end) $('#end_at').val(formatDate(event.end));
+                
+                // New Fields
+                $('#address').val(event.extendedProps.address || '');
+                $('#capacity').val(event.extendedProps.capacity || '');
+                $('#price').val(event.extendedProps.price || '');
                 
                 // Map Handling
                 if (event.extendedProps.latitude && event.extendedProps.longitude) {

@@ -15,7 +15,7 @@ class EventController extends Controller
             $events = Event::whereDate('start_at', '>=', $request->start)
                            ->whereDate('end_at', '<=', $request->end)
                            ->whereDate('end_at', '<=', $request->end)
-                           ->get(['id', 'title', 'start_at as start', 'end_at as end', 'color', 'all_day', 'address', 'latitude', 'longitude', 'description', 'location']);
+                           ->get(['id', 'title', 'start_at as start', 'end_at as end', 'color', 'all_day', 'address', 'latitude', 'longitude', 'description', 'location', 'price', 'capacity']);
             return response()->json($events);
         }
         return view('admin.events.calendar');
@@ -42,7 +42,9 @@ class EventController extends Controller
             'location' => 'nullable|string',
             'address' => 'nullable|string',
             'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric'
+            'longitude' => 'nullable|numeric',
+            'price' => 'nullable|numeric|min:0',
+            'capacity' => 'nullable|integer|min:0'
         ]);
 
         $event = Event::create($validated);
@@ -65,7 +67,9 @@ class EventController extends Controller
             'location' => 'nullable|string',
             'address' => 'nullable|string',
             'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric'
+            'longitude' => 'nullable|numeric',
+            'price' => 'nullable|numeric|min:0',
+            'capacity' => 'nullable|integer|min:0'
         ]);
 
         $event->update($validated);
