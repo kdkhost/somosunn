@@ -177,6 +177,11 @@ Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMi
         Route::get('/ranking', [\App\Http\Controllers\Admin\RankingController::class, 'index'])->name('ranking');
     
 
+        // FAILSAFE ROUTES (DO NOT REMOVE)
+        // Essas rotas existem para prevenir erros de cache em produção
+        Route::get('/upload/test', fn() => null)->name('upload.test');
+        Route::get('/mailtest', fn() => null)->name('mailtest');
+
         // Chunked uploads
         Route::post('/upload/chunk', [\App\Http\Controllers\UploadChunkController::class, 'storeChunk'])->name('upload.chunk');
         Route::post('/upload/assemble', [\App\Http\Controllers\UploadChunkController::class, 'assemble'])->name('upload.assemble');

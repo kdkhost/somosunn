@@ -117,7 +117,7 @@
     @endif
 
     @include('admin.partials.navbar')
-    @include('admin.partials.sidebar_v2')
+    @include('admin.partials.sidebar')
 
     <div class="content-wrapper">
         @if(View::hasSection('page_title') || View::hasSection('breadcrumb'))
