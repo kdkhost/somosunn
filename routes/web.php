@@ -159,4 +159,11 @@ Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMi
 
     // Plans
     Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)->names('plans');
+
+    // Orders / Financeiro
+    Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show'])->names('orders');
+    
+    // Social / Comunidade Moderação
+    Route::get('/social', [\App\Http\Controllers\Admin\SocialController::class, 'index'])->name('social.index');
+    Route::delete('/social/{post}', [\App\Http\Controllers\Admin\SocialController::class, 'destroy'])->name('social.destroy');
 });
