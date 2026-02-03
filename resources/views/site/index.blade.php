@@ -138,7 +138,12 @@
                         <i class="fas fa-map-marker-alt"></i> {{ $event->location }}
                     </div>
                     @if($event->is_demo ?? false)
-                    <button onclick="alert('Este é um evento de demonstração.')" class="w-full btn-primary text-white py-3 rounded-xl font-semibold opacity-75">
+                    <button onclick="Swal.fire({
+                        title: 'Evento Demo',
+                        text: 'Este é um evento de demonstração.',
+                        icon: 'info',
+                        confirmButtonColor: '#1F5EDB'
+                    })" class="w-full btn-primary text-white py-3 rounded-xl font-semibold opacity-75">
                         Quero participar
                     </button>
                     @else
@@ -182,7 +187,12 @@
                     <p class="text-gray-600 text-sm mb-4">{{ Str::limit($mentorship->description, 100) }}</p>
                     <p class="text-sm text-gray-500 mb-6">Vagas: <strong>{{ $mentorship->slots }}</strong></p>
                     @if($mentorship->is_demo ?? false)
-                    <button onclick="alert('Esta é uma mentoria de demonstração.')" class="w-full btn-primary text-white py-3 rounded-xl font-semibold opacity-75">
+                    <button onclick="Swal.fire({
+                        title: 'Mentoria Demo',
+                        text: 'Esta é uma mentoria de demonstração.',
+                        icon: 'info',
+                        confirmButtonColor: '#1F5EDB'
+                    })" class="w-full btn-primary text-white py-3 rounded-xl font-semibold opacity-75">
                         Garantir vaga
                     </button>
                     @else

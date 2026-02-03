@@ -119,7 +119,12 @@
                                     Ver Perfil
                                 </a>
                                 @else
-                                <button onclick="alert('Este é um perfil de demonstração.')" class="flex-1 btn-primary text-white py-3 rounded-xl font-semibold opacity-75 cursor-not-allowed">
+                                <button onclick="Swal.fire({
+                                    title: 'Perfil Demo',
+                                    text: 'Este é um perfil de demonstração.',
+                                    icon: 'info',
+                                    confirmButtonColor: '#1F5EDB'
+                                })" class="flex-1 btn-primary text-white py-3 rounded-xl font-semibold opacity-75 cursor-not-allowed">
                                     Ver Perfil
                                 </button>
                                 @endif
