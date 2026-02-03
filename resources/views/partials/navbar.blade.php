@@ -39,7 +39,7 @@
             <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#1F5EDB] to-[#1D3FC4] text-white font-black tracking-wide text-xl shadow-lg overflow-hidden">
                 <img src="{{ $logoSrc }}" alt="UNN" class="h-10 w-10 object-contain" onerror="this.style.display='none';">
             </span>
-            <div class="hidden sm:flex flex-col leading-tight">
+            <div class="hidden xl:flex flex-col leading-tight">
                 <span class="text-sm font-semibold text-gray-600">Networking que gera resultados</span>
                 <span class="text-xs uppercase tracking-[0.35em] text-gray-400">Universidade de Negócios</span>
             </div>

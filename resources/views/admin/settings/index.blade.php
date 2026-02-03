@@ -38,6 +38,7 @@
                 <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-gateway" role="tab">Gateway</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-preloader" role="tab">Preloader</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-smtp" role="tab">SMTP</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-social" role="tab">Login Social</a></li>
             </ul>
         </div>
         <div class="card-body">
@@ -333,6 +334,92 @@
                     </div>
                 </div>
 
+                </div>
+
+                {{-- LOGIN SOCIAL --}}
+                <div class="tab-pane fade" id="tab-social" role="tabpanel">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle mr-1"></i> URLs de Callback (Adicione no App):
+                        <br>Google: <code>{{ config('app.url').'/auth/callback/google' }}</code>
+                        <br>Facebook: <code>{{ config('app.url').'/auth/callback/facebook' }}</code>
+                        <br>LinkedIn: <code>{{ config('app.url').'/auth/callback/linkedin' }}</code>
+                    </div>
+
+                    {{-- Google --}}
+                    <div class="card card-outline card-danger">
+                        <div class="card-header">
+                            <h3 class="card-title text-danger"><i class="fab fa-google mr-2"></i>Google</h3>
+                            <div class="card-tools">
+                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="hidden" name="social_google_active" value="0">
+                                    <input type="checkbox" class="custom-control-input" id="social_google_active" name="social_google_active" value="1" {{ ($settings['social_google_active'] ?? 0) ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="social_google_active">Ativo</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Client ID</label>
+                                <input name="social_google_client_id" class="form-control" value="{{ $settings['social_google_client_id'] ?? '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Client Secret</label>
+                                <input name="social_google_client_secret" class="form-control" value="{{ $settings['social_google_client_secret'] ?? '' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Facebook --}}
+                    <div class="card card-outline card-primary collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title text-primary"><i class="fab fa-facebook mr-2"></i>Facebook</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success d-inline-block ml-2">
+                                    <input type="hidden" name="social_facebook_active" value="0">
+                                    <input type="checkbox" class="custom-control-input" id="social_facebook_active" name="social_facebook_active" value="1" {{ ($settings['social_facebook_active'] ?? 0) ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="social_facebook_active"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body" style="display: none;">
+                            <div class="form-group">
+                                <label>App ID</label>
+                                <input name="social_facebook_client_id" class="form-control" value="{{ $settings['social_facebook_client_id'] ?? '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label>App Secret</label>
+                                <input name="social_facebook_client_secret" class="form-control" value="{{ $settings['social_facebook_client_secret'] ?? '' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- LinkedIn --}}
+                    <div class="card card-outline card-info collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title text-info"><i class="fab fa-linkedin mr-2"></i>LinkedIn</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success d-inline-block ml-2">
+                                    <input type="hidden" name="social_linkedin_active" value="0">
+                                    <input type="checkbox" class="custom-control-input" id="social_linkedin_active" name="social_linkedin_active" value="1" {{ ($settings['social_linkedin_active'] ?? 0) ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="social_linkedin_active"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body" style="display: none;">
+                            <div class="form-group">
+                                <label>Client ID</label>
+                                <input name="social_linkedin_client_id" class="form-control" value="{{ $settings['social_linkedin_client_id'] ?? '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Client Secret</label>
+                                <input name="social_linkedin_client_secret" class="form-control" value="{{ $settings['social_linkedin_client_secret'] ?? '' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
         <div class="card-footer text-right"><button class="btn btn-primary">Salvar</button></div>
