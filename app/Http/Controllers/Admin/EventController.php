@@ -22,7 +22,12 @@ class EventController extends Controller
 
     public function create()
     {
-        return view('admin.events.form');
+        return view('admin.events.form', ['event' => new Event]);
+    }
+
+    public function edit(Event $event)
+    {
+        return view('admin.events.form', compact('event'));
     }
 
     public function store(Request $request)
