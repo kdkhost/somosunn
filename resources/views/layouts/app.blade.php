@@ -31,6 +31,7 @@
     @endphp
     <link rel="icon" href="{{ $favicon }}" type="image/x-icon">
     <link rel="apple-touch-icon" href="{{ $logo }}">
+    <link rel="manifest" href="{{ route('manifest') }}">
     <meta name="theme-color" content="{{ $pwaTheme }}">
 
     <!-- Fonts & Icons -->

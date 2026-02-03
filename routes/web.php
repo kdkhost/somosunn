@@ -36,11 +36,6 @@ Route::get('/service-worker.js', function () {
     abort_unless(file_exists($path), 404);
     return response()->file($path, ['Content-Type' => 'application/javascript']);
 });
-Route::get('/manifest.webmanifest', function () {
-    $path = public_path('manifest.webmanifest');
-    abort_unless(file_exists($path), 404);
-    return response()->file($path, ['Content-Type' => 'application/manifest+json']);
-});
 Route::get('/favicon.ico', function () {
     $custom = \App\Models\Setting::get('favicon_image');
     if($custom && file_exists(public_path($custom))){
