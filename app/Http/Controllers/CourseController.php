@@ -15,9 +15,57 @@ class CourseController extends Controller
      */
     public function index()
     {
+        // Check if courses feature is enabled in settings
+        $isEnabled = \App\Models\Setting::get('feature_courses', '1') === '1';
+        
+        if (!$isEnabled) {
+            abort(404, 'Cursos temporariamente indisponível');
+        }
+
         $courses = Course::with('creator')
             ->latest()
             ->paginate(12);
+
+        // If no courses exist, provide demo data
+        if ($courses->isEmpty()) {
+            $demoCourses = collect([
+                (object)[
+                    'id' => 1,
+                    'title' => 'Networking Estratégico',
+                    'slug' => 'networking-estrategico-demo',
+                    'short_description' => 'Aprenda a construir conexões que geram resultados reais para seu negócio.',
+                    'price' => 297.00,
+                    'duration' => 480,
+                    'thumbnail' => null,
+                    'creator' => (object)['name' => 'UNN Academy'],
+                    'is_demo' => true,
+                ],
+                (object)[
+                    'id' => 2,
+                    'title' => 'Vendas de Alto Impacto',
+                    'slug' => 'vendas-alto-impacto-demo',
+                    'short_description' => 'Técnicas avançadas para fechar negócios e aumentar seu faturamento.',
+                    'price' => 497.00,
+                    'duration' => 600,
+                    'thumbnail' => null,
+                    'creator' => (object)['name' => 'UNN Academy'],
+                    'is_demo' => true,
+                ],
+                (object)[
+                    'id' => 3,
+                    'title' => 'Liderança e Gestão de Equipes',
+                    'slug' => 'lideranca-gestao-demo',
+                    'short_description' => 'Desenvolva habilidades de liderança para conduzir equipes de alta performance.',
+                    'price' => 397.00,
+                    'duration' => 540,
+                    'thumbnail' => null,
+                    'creator' => (object)['name' => 'UNN Academy'],
+                    'is_demo' => true,
+                ],
+            ]);
+            
+            return view('courses.index', ['courses' => $demoCourses, 'isDemo' => true]);
+        }
 
         return view('courses.index', compact('courses'));
     }

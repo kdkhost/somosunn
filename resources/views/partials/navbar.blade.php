@@ -18,63 +18,80 @@
         [
             'label' => 'Comunidade',
             'href' => route('portal'),
+            'setting_key' => 'feature_community',
             'children' => [
                 ['label' => 'Portal', 'href' => route('portal')],
-                ['label' => 'Feed Social', 'href' => route('social.feed')],
-                ['label' => 'Cursos', 'href' => route('courses.index')],
-                ['label' => 'Eventos', 'href' => route('portal').'#eventos'],
+                ['label' => 'Feed Social', 'href' => route('social.feed'), 'setting_key' => 'feature_social'],
+                ['label' => 'Cursos', 'href' => route('courses.index'), 'setting_key' => 'feature_courses'],
+                ['label' => 'Eventos', 'href' => route('portal').'#eventos', 'setting_key' => 'feature_events'],
                 ['label' => 'Membros', 'href' => url('/membros')],
             ],
         ],
-        ['label' => 'Premium', 'href' => route('premium')],
+        ['label' => 'Premium', 'href' => route('premium'), 'setting_key' => 'feature_premium'],
     ];
     $cta = ['label' => 'Fazer parte', 'href' => route('register'), 'class' => 'bg-gradient-to-br from-[#1F5EDB] via-[#177FD6] to-[#1D3FC4] text-white shadow-[0_15px_30px_-10px_rgba(29,63,196,0.45)]'];
 @endphp
 
 <nav class="fixed inset-x-0 top-0 z-30 bg-white shadow-xl border-b border-slate-100">
     <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-4 flex items-center justify-between gap-4">
-        <div class="flex items-center gap-6">
-            <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0">
-                <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#1F5EDB] to-[#1D3FC4] text-white font-black tracking-wide text-xl shadow-lg overflow-hidden">
-                    <img src="{{ $logoSrc }}" alt="UNN" class="h-10 w-10 object-contain" onerror="this.style.display='none';">
-                </span>
-                <div class="hidden sm:flex flex-col leading-tight">
-                    <span class="text-sm font-semibold text-gray-600">Networking que gera resultados</span>
-                    <span class="text-xs uppercase tracking-[0.35em] text-gray-400">Universidade de Negócios</span>
-                </div>
-            </a>
+        <!-- Logo -->
+        <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0">
+            <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#1F5EDB] to-[#1D3FC4] text-white font-black tracking-wide text-xl shadow-lg overflow-hidden">
+                <img src="{{ $logoSrc }}" alt="UNN" class="h-10 w-10 object-contain" onerror="this.style.display='none';">
+            </span>
+            <div class="hidden sm:flex flex-col leading-tight">
+                <span class="text-sm font-semibold text-gray-600">Networking que gera resultados</span>
+                <span class="text-xs uppercase tracking-[0.35em] text-gray-400">Universidade de Negócios</span>
+            </div>
+        </a>
 
+        <!-- Menu + Actions (aligned right) -->
+        <div class="flex items-center gap-6">
+            <!-- Desktop Menu -->
             <div class="hidden lg:flex items-center gap-4 text-sm font-semibold text-gray-800">
                 @foreach($menuItems as $item)
-                    @if(isset($item['children']))
-                        <div class="relative group">
-                            <a href="{{ $item['href'] }}" class="inline-flex items-center gap-1 hover:text-[#1F5EDB] transition-colors py-2">
-                                {{ $item['label'] }}
-                                <i class="fas fa-chevron-down text-xs ml-0.5 opacity-70"></i>
-                            </a>
-                            <div class="absolute left-0 top-full pt-2 hidden group-hover:block z-40">
-                                <div class="rounded-2xl bg-white shadow-xl border border-slate-100 min-w-[220px] py-2 overflow-hidden">
-                                    @foreach($item['children'] as $child)
-                                        <a href="{{ $child['href'] }}" class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
-                                            {{ $child['label'] }}
-                                        </a>
-                                    @endforeach
+                    @php
+                        // Check if this menu item has a setting key and if it's enabled
+                        $settingKey = $item['setting_key'] ?? null;
+                        $isEnabled = $settingKey ? \App\Models\Setting::get($settingKey, '1') === '1' : true;
+                    @endphp
+                    @if($isEnabled)
+                        @if(isset($item['children']))
+                            <div class="relative group">
+                                <a href="{{ $item['href'] }}" class="inline-flex items-center gap-1 hover:text-[#1F5EDB] transition-colors py-2">
+                                    {{ $item['label'] }}
+                                    <i class="fas fa-chevron-down text-xs ml-0.5 opacity-70"></i>
+                                </a>
+                                <div class="absolute right-0 top-full pt-2 hidden group-hover:block z-40">
+                                    <div class="rounded-2xl bg-white shadow-xl border border-slate-100 min-w-[220px] py-2 overflow-hidden">
+                                        @foreach($item['children'] as $child)
+                                            @php
+                                                $childSettingKey = $child['setting_key'] ?? null;
+                                                $childEnabled = $childSettingKey ? \App\Models\Setting::get($childSettingKey, '1') === '1' : true;
+                                            @endphp
+                                            @if($childEnabled)
+                                                <a href="{{ $child['href'] }}" class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    {{ $child['label'] }}
+                                                </a>
+                                            @endif
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @else
-                        <a href="{{ $item['href'] }}" class="hover:text-[#1F5EDB] transition-colors">{{ $item['label'] }}</a>
+                        @else
+                            <a href="{{ $item['href'] }}" class="hover:text-[#1F5EDB] transition-colors">{{ $item['label'] }}</a>
+                        @endif
                     @endif
                 @endforeach
             </div>
-        </div>
 
-        <div class="ml-auto flex items-center gap-3 shrink-0">
+            <!-- Mobile Toggle -->
             <button id="mobile-menu-toggle" class="lg:hidden inline-flex items-center justify-center rounded-full border border-[#1F5EDB] px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
                 <span class="sr-only">Abrir menu</span>
                 <i class="fas fa-bars text-lg"></i>
             </button>
 
+            <!-- Action Buttons -->
             <div class="hidden lg:flex items-center gap-3">
                 @guest
                     <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
