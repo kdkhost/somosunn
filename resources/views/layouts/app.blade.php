@@ -187,33 +187,73 @@
             }
 
             let deferredPrompt;
-            const showInstallBanner = () => {
-                if (document.getElementById('pwa-install-banner')) return;
-                const banner = document.createElement('div');
-                banner.id = 'pwa-install-banner';
-                banner.className = 'fixed bottom-6 right-6 bg-white border border-slate-200 shadow-xl rounded-2xl px-5 py-4 flex items-center gap-4';
-                banner.style.zIndex = 9999;
-                banner.innerHTML = `
-                    <div class="text-sm">
-                        <p class="font-semibold text-slate-800">Instalar aplicativo UNN</p>
-                        <p class="text-slate-500">Adicione na sua tela inicial em segundos.</p>
+            
+            const showInstallModal = () => {
+                if (document.getElementById('pwa-install-modal')) return;
+                
+                const modal = document.createElement('div');
+                modal.id = 'pwa-install-modal';
+                modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-fade-in';
+                
+                modal.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center relative transform transition-all scale-100">
+                        <div class="flex justify-center mb-6">
+                            <img src="{{ $logo }}" alt="Logo" class="h-16 object-contain">
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Instale nosso aplicativo!</h3>
+                        <p class="text-slate-600 text-sm mb-8 leading-relaxed">
+                            Tenha acesso mais rápido e use mesmo offline! Instale nosso app diretamente na sua tela inicial.
+                        </p>
+                        
+                        <div class="flex flex-col gap-3">
+                            <button id="pwa-install-btn" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all">
+                                Instalar Agora
+                            </button>
+                            <button id="pwa-dismiss-btn" class="w-full py-3 px-4 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-colors">
+                                Mais tarde
+                            </button>
+                        </div>
                     </div>
-                    <button id="pwa-install-btn" class="btn-primary px-4 py-2 rounded-full text-sm font-semibold">Instalar</button>
                 `;
-                document.body.appendChild(banner);
+                
+                document.body.appendChild(modal);
+                
+                // Animação de entrada
+                requestAnimationFrame(() => {
+                    modal.querySelector('div').classList.add('scale-100');
+                    modal.querySelector('div').classList.remove('scale-95');
+                });
+
                 document.getElementById('pwa-install-btn').addEventListener('click', async () => {
                     if (!deferredPrompt) return;
                     deferredPrompt.prompt();
-                    await deferredPrompt.userChoice;
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log('User response to the install prompt: ' + outcome);
                     deferredPrompt = null;
-                    banner.remove();
+                    removeModal();
                 });
+
+                document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
+                    removeModal();
+                    // Opcional: Salvar em cookie/localStorage para não mostrar novamente por X dias
+                });
+                
+                function removeModal() {
+                    modal.classList.add('opacity-0');
+                    setTimeout(() => modal.remove(), 300);
+                }
             };
 
             window.addEventListener('beforeinstallprompt', (e) => {
+                // Impede que o Chrome mostre o prompt nativo automaticamente (para mobile principalmente)
                 e.preventDefault();
+                // Guarda o evento para acionar depois
                 deferredPrompt = e;
-                showInstallBanner();
+                
+                // Mostra o modal customizado
+                // Pequeno delay para garantir que a página carregou
+                setTimeout(showInstallModal, 2000);
             });
         </script>
     @endif
