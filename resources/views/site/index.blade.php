@@ -245,7 +245,21 @@
             
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($topRankings as $rank)
-                <article class="bg-slate-50 rounded-3xl p-6 hover:shadow-lg transition">
+                <article class="bg-slate-50 rounded-3xl p-6 hover:shadow-lg transition relative overflow-hidden">
+                    @if($loop->index == 0)
+                        <div class="absolute top-0 right-0 bg-yellow-400 text-white w-10 h-10 rounded-bl-2xl flex items-center justify-center shadow-sm">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                    @elseif($loop->index == 1)
+                        <div class="absolute top-0 right-0 bg-gray-300 text-white w-10 h-10 rounded-bl-2xl flex items-center justify-center shadow-sm">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                    @elseif($loop->index == 2)
+                        <div class="absolute top-0 right-0 bg-orange-400 text-white w-10 h-10 rounded-bl-2xl flex items-center justify-center shadow-sm">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                    @endif
+
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-14 h-14 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl">
                             {{ substr(optional($rank->user)->name ?? 'E', 0, 1) }}
@@ -268,8 +282,22 @@
                         ['name' => 'Fernando Alves', 'level' => 'Empresário', 'connections' => 176, 'score' => 7650],
                     ];
                 @endphp
-                @foreach($demoRanking as $rank)
-                <article class="bg-slate-50 rounded-3xl p-6 ring-2 ring-yellow-400">
+                @foreach($demoRanking as $index => $rank)
+                <article class="bg-slate-50 rounded-3xl p-6 ring-2 ring-yellow-400 relative overflow-hidden">
+                    @if($index == 0)
+                        <div class="absolute top-0 right-0 bg-yellow-400 text-white w-10 h-10 rounded-bl-2xl flex items-center justify-center shadow-sm">
+                            <i class="fas fa-medal text-lg"></i>
+                        </div>
+                    @elseif($index == 1)
+                        <div class="absolute top-0 right-0 bg-gray-400 text-white w-10 h-10 rounded-bl-2xl flex items-center justify-center shadow-sm">
+                            <i class="fas fa-medal text-lg"></i>
+                        </div>
+                    @elseif($index == 2)
+                        <div class="absolute top-0 right-0 bg-[#CD7F32] text-white w-10 h-10 rounded-bl-2xl flex items-center justify-center shadow-sm">
+                            <i class="fas fa-medal text-lg"></i>
+                        </div>
+                    @endif
+
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-14 h-14 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl">
                             {{ substr($rank['name'], 0, 1) }}
