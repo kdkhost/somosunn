@@ -18,4 +18,41 @@ class OrderController extends Controller
     {
         return view('admin.orders.show', compact('order'));
     }
+
+    public function refund(Order $order)
+    {
+        if ($order->status !== 'paid') {
+            return back()->with('error', 'Apenas pedidos pagos podem ser reembolsados.');
+        }
+
+        try {
+            $account = $order->gatewayAccount;
+            if (!$account) {
+                 // Fallback: try to find seller's account for this gateway
+                 $account = \App\Models\GatewayAccount::where('user_id', $order->seller_id)
+                    ->where('gateway', $order->gateway)
+                    ->firstOrFail();
+            }
+
+            if ($order->gateway === 'mercadopago') {
+                $service = new \App\Services\Payment\MercadoPagoService();
+                $service->refundPayment($order, $account);
+            } elseif ($order->gateway === 'pagseguro') {
+                $service = new \App\Services\Payment\PagSeguroService();
+                $service->refundPayment($order, $account);
+            } else {
+                return back()->with('error', 'Gateway não suportado para reembolso automático.');
+            }
+
+            $order->update([
+                'status' => 'refunded',
+                'refunded_at' => now()
+            ]);
+
+            return back()->with('success', 'Reembolso processado com sucesso.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erro ao processar reembolso: ' . $e->getMessage());
+        }
+    }
 }

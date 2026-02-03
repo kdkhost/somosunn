@@ -137,6 +137,14 @@
                     </a>
                 </li>
 
+                <!-- Eventos / FullCalendar -->
+                <li class="nav-item">
+                    <a href="{{ route('admin.events.index') }}" class="nav-link {{ $is('admin.events.*') }}">
+                         <i class="nav-icon far fa-calendar-alt"></i>
+                        <p>Eventos</p>
+                    </a>
+                </li>
+                
                 <li class="nav-item"><a href="{{ route('admin.settings') }}" class="nav-link {{ $is('admin.settings') }}"><i class="nav-icon fas fa-cogs"></i><p>Configurações</p></a></li>
             </ul>
         </nav>

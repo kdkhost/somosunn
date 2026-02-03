@@ -20,7 +20,8 @@ class Order extends Model
         'gateway',
         'gateway_account_id',
         'metadata',
-        'transaction_id'
+        'transaction_id',
+        'refunded_at'
     ];
 
     protected $casts = [

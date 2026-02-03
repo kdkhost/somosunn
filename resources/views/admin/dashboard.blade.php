@@ -1,113 +1,184 @@
 @extends('admin.layouts.app')
 
-@section('page_title','Dashboard')
+@section('page_title', 'Dashboard')
 @section('breadcrumb')
     <li class="breadcrumb-item active">Dashboard</li>
 @endsection
 
 @section('content')
 <div class="row">
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-info">
-            <div class="inner"><h3>150</h3><p>New Orders</p></div>
-            <div class="icon"><i class="fas fa-shopping-cart"></i></div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
+    <!-- Balance -->
     <div class="col-lg-3 col-6">
         <div class="small-box bg-success">
-            <div class="inner"><h3>53<sup style="font-size:20px">%</sup></h3><p>Bounce Rate</p></div>
-            <div class="icon"><i class="fas fa-chart-line"></i></div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            <div class="inner">
+                <h3>R$ {{ number_format($totalRevenue, 2, ',', '.') }}</h3>
+                <p>Saldo Total (Vendas)</p>
+            </div>
+            <div class="icon"><i class="fas fa-wallet"></i></div>
+            <a href="{{ route('admin.orders.index') }}" class="small-box-footer">Ver detalhes <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-warning">
-            <div class="inner"><h3>44</h3><p>User Registrations</p></div>
-            <div class="icon"><i class="fas fa-user-plus"></i></div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
+
+    <!-- Refunds -->
     <div class="col-lg-3 col-6">
         <div class="small-box bg-danger">
-            <div class="inner"><h3>65</h3><p>Unique Visitors</p></div>
-            <div class="icon"><i class="fas fa-chart-pie"></i></div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            <div class="inner">
+                <h3>R$ {{ number_format($refundedAmount, 2, ',', '.') }}</h3>
+                <p>Reembolsados</p>
+            </div>
+            <div class="icon"><i class="fas fa-undo"></i></div>
+            <a href="{{ route('admin.orders.index') }}" class="small-box-footer">Ver detalhes <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <!-- Users -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>{{ $totalUsers }}</h3>
+                <p>Usuários Registrados</p>
+            </div>
+            <div class="icon"><i class="fas fa-users"></i></div>
+            <a href="{{ route('admin.users.index') }}" class="small-box-footer">Gerenciar <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <!-- Orders -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>{{ $totalOrders }}</h3>
+                <p>Total de Pedidos</p>
+            </div>
+            <div class="icon"><i class="fas fa-shopping-bag"></i></div>
+            <a href="{{ route('admin.orders.index') }}" class="small-box-footer">Ver todos <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
 </div>
 
 <div class="row">
-    <section class="col-lg-7 connectedSortable">
+    <section class="col-lg-12">
         <div class="card">
-            <div class="card-header border-0"><h3 class="card-title"><i class="fas fa-chart-area me-2"></i>Sales</h3></div>
-            <div class="card-body">
-                <canvas id="salesChart" height="200"></canvas>
+            <div class="card-header border-0">
+                <div class="d-flex justify-content-between">
+                    <h3 class="card-title"><i class="fas fa-chart-line me-2"></i>Histórico de Vendas</h3>
+                </div>
             </div>
-        </div>
-        <div class="card">
-            <div class="card-header border-0"><h3 class="card-title"><i class="far fa-comments me-2"></i>Direct Chat</h3></div>
-            <div class="card-body" style="height:260px;">
-                <p class="text-muted">Área para chat ou avisos rápidos.</p>
+            <div class="card-body">
+                <canvas id="salesChart" height="100"></canvas>
             </div>
         </div>
     </section>
+</div>
 
+<div class="row">
     <section class="col-lg-5 connectedSortable">
-        <div class="card bg-gradient-info">
+        <!-- Calendar -->
+        <div class="card bg-gradient-success">
             <div class="card-header border-0">
-                <h3 class="card-title"><i class="fas fa-map-marker-alt me-2"></i>Visitors</h3>
+                <h3 class="card-title">
+                    <i class="far fa-calendar-alt"></i>
+                    Calendário
+                </h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-success btn-sm" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
-            <div class="card-body">
-                <div id="world-map" style="height:250px; width:100%;"></div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header border-0"><h3 class="card-title"><i class="fas fa-chart-pie me-2"></i>Sales Graph</h3></div>
-            <div class="card-body">
-                <input type="text" class="knob" value="80" data-width="90" data-height="90" data-fgColor="#3c8dbc" data-readonly="true">
+            <div class="card-body pt-0">
+                <div id="calendar" style="width: 100%"></div>
             </div>
         </div>
     </section>
 </div>
 @endsection
 
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.min.css">
+<style>
+    .fc-header-toolbar{font-size: 0.9em;}
+    .fc-toolbar.fc-header-toolbar {margin-bottom: 0.5em;}
+    .fc-button{padding: 0.2rem 0.5rem;}
+</style>
+@endpush
+
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/interaction/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/locales/pt-br.js"></script>
 <script>
 $(function(){
+    // Sales Chart
     const ctx = document.getElementById('salesChart').getContext('2d');
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'],
+            labels: {!! json_encode($months) !!},
             datasets: [{
-                label: 'Sales',
-                data: [30,45,40,65,70,60,80],
-                backgroundColor: 'rgba(60,141,188,0.2)',
-                borderColor: 'rgba(60,141,188,1)',
+                label: 'Vendas (R$)',
+                data: {!! json_encode($salesChartData) !!},
+                backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                borderColor: '#28a745',
                 borderWidth: 2,
                 tension: 0.3,
-                fill: true
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6
             }]
         },
-        options: {plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true, position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) { label += ': '; }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) { return 'R$ ' + value; }
+                    }
+                }
+            }
+        }
     });
 
-    $('#world-map').vectorMap({
-        map: 'world_en',
-        backgroundColor: 'transparent',
-        color: '#f4f4f4',
-        hoverOpacity: 0.7,
-        selectedColor: '#666666',
-        enableZoom: true,
-        showTooltip: true,
-        values: {BR: 25, US: 50, CA: 15, DE: 20, FR: 18},
-        scaleColors: ['#C8EEFF', '#006491'],
-        normalizeFunction: 'polynomial'
+    // Calendar Widget
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: [ 'dayGrid', 'interaction', 'bootstrap' ],
+        themeSystem: 'bootstrap',
+        locale: 'pt-br',
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth'
+        },
+        height: 350, // Widget Height
+        events: '{{ route("admin.events.index") }}',
+        editable: false // Read-only dashboard widget
     });
-
-    $('.knob').knob();
+    calendar.render();
 });
 </script>
 @endpush
-

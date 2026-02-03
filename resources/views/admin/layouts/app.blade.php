@@ -93,8 +93,15 @@
     .upload-box.dragover{border-color:#2563eb;background:#eef2ff;}
     .upload-box .upload-icon{font-size:32px;color:#2563eb;}
     .upload-preview{pointer-events:none;}
-    .upload-preview img{max-width:120px;max-height:120px;border-radius:10px;object-fit:cover;box-shadow:0 4px 12px rgba(0,0,0,.15);}
-    .upload-meta{font-size:12px;color:#475569; pointer-events:none;}
+    .upload-preview img{
+        max-width:100%;
+        max-height:180px; /* Bigger height */
+        border-radius:8px;
+        object-fit:contain; /* Correct proportion */
+        box-shadow:0 4px 6px rgba(0,0,0,.1);
+        background-color: #f0f0f0; /* See transparent images */
+    }
+    .upload-meta{font-size:12px;color:#475569; pointer-events:none; margin-top:5px;}
     .upload-help{font-size:12px;color:#6b7280; pointer-events:none;}
     .progress.upload-progress{width:100%;height:6px;}
     .upload-btn{pointer-events:auto;}
@@ -152,6 +159,7 @@
 <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-colorpicker@3.4.0/dist/js/bootstrap-colorpicker.min.js"></script>
+@include('admin.partials.notifications')
 @stack('scripts')
 <script>
     $(function(){

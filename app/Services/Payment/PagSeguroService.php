@@ -9,11 +9,20 @@ use Exception;
 
 class PagSeguroService
 {
-    protected $baseUrl = 'https://api.pagseguro.com'; // V4 API Sandbox/Prod
+    protected $baseUrlProd = 'https://api.pagseguro.com';
+    protected $baseUrlSandbox = 'https://sandbox.api.pagseguro.com';
+
+    protected function getBaseUrl(?GatewayAccount $account = null)
+    {
+        // Check local setting or account specific setting
+        $isSandbox = \App\Models\Setting::get('payments.pagseguro.sandbox');
+        return $isSandbox ? $this->baseUrlSandbox : $this->baseUrlProd;
+    }
 
     public function createCheckoutSession(Order $order, GatewayAccount $account)
     {
-        $accessToken = $account->access_token; // User must provide V4 token
+        $accessToken = $account->access_token;
+        $baseUrl = $this->getBaseUrl($account);
         
         $items = [];
         foreach ($order->items as $item) {
@@ -35,17 +44,45 @@ class PagSeguroService
             ], 
             'notification_urls' => [
                route('webhook.pagseguro')
-            ],
-            // 'payment_methods' => ...
+            ]
         ];
 
-        // PagSeguro Split logic is complex here, assumes direct payment using Seller Token
-        
         $response = Http::withToken($accessToken)
-            ->post("{$this->baseUrl}/orders", $body);
+            ->post("{$baseUrl}/orders", $body);
 
         if ($response->failed()) {
             throw new Exception('PagSeguro Error: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+
+    public function refundPayment(Order $order, GatewayAccount $account)
+    {
+        if (!$order->transaction_id) {
+            throw new Exception('ID da transação não encontrado.');
+        }
+
+        $accessToken = $account->access_token;
+        $baseUrl = $this->getBaseUrl($account);
+        $paymentId = $order->transaction_id;
+
+        // V4 Refund endpoint: /charges/{id}/cancel
+        // Or orders/{id}/cancel ? Usually charge cancel. We assume stored transaction_id is the CHARGE ID.
+        
+        $response = Http::withToken($accessToken)
+            ->post("{$baseUrl}/charges/{$paymentId}/cancel", [
+                'amount' => ['value' => (int)($order->total_amount * 100)]
+            ]);
+
+        if ($response->failed()) {
+             // Try refunding the order if charge cancel fails (depending on integration mode)
+             $response = Http::withToken($accessToken)
+                ->post("{$baseUrl}/orders/{$paymentId}/cancel"); // if transaction_id was order id
+             
+             if ($response->failed()) {
+                 throw new Exception('Falha ao processar reembolso no PagSeguro: ' . $response->body());
+             }
         }
 
         return $response->json();

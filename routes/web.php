@@ -161,6 +161,7 @@ Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMi
     Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)->names('plans');
 
     // Orders / Financeiro
+    Route::post('orders/{order}/refund', [\App\Http\Controllers\Admin\OrderController::class, 'refund'])->name('orders.refund');
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show'])->names('orders');
     
     // Social / Comunidade Moderação
