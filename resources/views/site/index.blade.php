@@ -244,6 +244,7 @@
             </div>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Ranking Loop -->
                 @forelse($topRankings as $rank)
                 <article class="bg-slate-50 rounded-3xl p-6 hover:shadow-lg transition relative overflow-hidden">
                     @if($loop->index == 0)

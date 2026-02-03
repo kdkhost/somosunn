@@ -105,12 +105,36 @@ class HomeController extends Controller
             $levelSummary = ['iniciante' => 1250, 'sucesso' => 380];
         }
 
+        // Demo data fallback for leaderboard
+        if ($overview['leaderboard']->isEmpty()) {
+            $overview['leaderboard'] = collect([
+                (object)[
+                    'user' => (object)['name' => 'Marcelo Silva', 'avatar' => null],
+                    'level' => 'Mentor',
+                    'interactions_count' => 234,
+                    'score' => 9850
+                ],
+                (object)[
+                    'user' => (object)['name' => 'Juliana Costa', 'avatar' => null],
+                    'level' => 'Empresário',
+                    'interactions_count' => 198,
+                    'score' => 8720
+                ],
+                (object)[
+                    'user' => (object)['name' => 'Fernando Alves', 'avatar' => null],
+                    'level' => 'Empresário',
+                    'interactions_count' => 176,
+                    'score' => 7650
+                ],
+            ]);
+        }
+
         return view('site.index', [
             'freeEvents' => $freeEvents,
             'paidMentorings' => $paidMentorings,
             'levelSummary' => $levelSummary,
             'topRankings' => $overview['leaderboard'],
-            'isDemo' => $freeEvents->first()->is_demo ?? false,
+            'isDemo' => ($freeEvents->first()->is_demo ?? false) || ($overview['leaderboard']->first()->score == 9850),
         ]);
     }
 
