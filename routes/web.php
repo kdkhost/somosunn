@@ -12,6 +12,10 @@ Route::get('/portal', [HomeController::class, 'portal'])->name('portal');
 Route::get('/premium', [HomeController::class, 'premium'])->name('premium');
 Route::redirect('/membros', '/portal')->name('membros');
 
+// Events
+Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
+Route::get('/eventos/{id}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
+
 // PWA static files to avoid 404 in production
 Route::get('/service-worker.js', function () {
     $path = public_path('service-worker.js');

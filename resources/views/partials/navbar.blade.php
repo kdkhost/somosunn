@@ -23,7 +23,7 @@
                 ['label' => 'Portal', 'href' => route('portal')],
                 ['label' => 'Feed Social', 'href' => route('social.feed'), 'setting_key' => 'feature_social'],
                 ['label' => 'Cursos', 'href' => route('courses.index'), 'setting_key' => 'feature_courses'],
-                ['label' => 'Eventos', 'href' => route('portal').'#eventos', 'setting_key' => 'feature_events'],
+                ['label' => 'Eventos', 'href' => route('events.index'), 'setting_key' => 'feature_events'],
                 ['label' => 'Membros', 'href' => url('/membros')],
             ],
         ],
