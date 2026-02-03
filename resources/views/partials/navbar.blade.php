@@ -4,42 +4,29 @@
     $logoSrc = $logoFront ? asset(ltrim($logoFront, '/')) : asset('img/logo.svg');
     $menuItems = [
         [
-            'label' => 'Sobre a UNN',
+            'label' => 'Institucional',
             'href' => route('home').'#sobre',
             'children' => [
+                ['label' => 'Sobre a UNN', 'href' => route('home').'#sobre'],
                 ['label' => 'Manifesto', 'href' => route('home').'#manifesto'],
                 ['label' => 'Quem somos', 'href' => route('home').'#quem-somos'],
+                ['label' => 'Como funciona', 'href' => route('home').'#como-funciona'],
+                ['label' => 'Valores', 'href' => route('home').'#valores'],
+                ['label' => 'Contato', 'href' => route('home').'#contato'],
             ],
         ],
         [
-            'label' => 'Como funciona',
-            'href' => route('home').'#como-funciona',
-            'children' => [
-                ['label' => 'Passos', 'href' => route('home').'#passos'],
-                ['label' => 'Mentorias', 'href' => route('premium').'#mentorias'],
-            ],
-        ],
-        ['label' => 'Valores', 'href' => route('home').'#valores'],
-        [
-            'label' => 'Eventos',
-            'href' => route('portal').'#eventos',
-            'children' => [
-                ['label' => 'Agenda', 'href' => route('portal').'#agenda'],
-                ['label' => 'Comunidade', 'href' => route('portal').'#comunidade'],
-            ],
-        ],
-        [
-            'label' => 'Portal',
+            'label' => 'Comunidade',
             'href' => route('portal'),
             'children' => [
+                ['label' => 'Portal', 'href' => route('portal')],
+                ['label' => 'Feed Social', 'href' => route('social.feed')],
+                ['label' => 'Cursos', 'href' => route('courses.index')],
+                ['label' => 'Eventos', 'href' => route('portal').'#eventos'],
                 ['label' => 'Membros', 'href' => url('/membros')],
-                ['label' => 'Dashboard', 'href' => route('portal').'#dashboard'],
             ],
         ],
-        ['label' => 'Cursos', 'href' => route('courses.index')],
-        ['label' => 'Comunidade', 'href' => route('social.feed')],
         ['label' => 'Premium', 'href' => route('premium')],
-        ['label' => 'Contato', 'href' => route('home').'#contato'],
     ];
     $cta = ['label' => 'Fazer parte', 'href' => route('register'), 'class' => 'bg-gradient-to-br from-[#1F5EDB] via-[#177FD6] to-[#1D3FC4] text-white shadow-[0_15px_30px_-10px_rgba(29,63,196,0.45)]'];
 @endphp
