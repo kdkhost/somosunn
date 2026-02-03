@@ -276,15 +276,55 @@
                 return;
             }
 
-            debounceTimer = setTimeout(function() {
-                var bias = '{{ $companyLocation ?? "" }}';
-                // Append company location to query if it looks like a simple street name and bias exists
-                var searchQuery = query;
-                if(bias && query.indexOf(',') === -1 && query.length < 15) {
-                    searchQuery = query + ', ' + bias;
+        // Live Geocoding with Autocomplete
+        let debounceTimer;
+        let companyViewbox = '';
+        
+        // Resolve Company Location to Viewbox on Load (Bias results)
+        var hasResolvedBias = false;
+        var biasLocation = '{{ $companyLocation ?? "" }}';
+        
+        if(biasLocation && !hasResolvedBias) {
+            fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(biasLocation) + '&limit=1')
+            .then(r => r.json())
+            .then(d => {
+                if(d && d.length > 0) {
+                    var lat = parseFloat(d[0].lat);
+                    var lon = parseFloat(d[0].lon);
+                    // Create ~30km bounding box (approx 0.3 degrees)
+                    var x1 = lon - 0.3;
+                    var y1 = lat - 0.3;
+                    var x2 = lon + 0.3;
+                    var y2 = lat + 0.3;
+                    companyViewbox = '&viewbox='+x1+','+y1+','+x2+','+y2+'&bounded=0'; // bounded=0 prefers but doesnt strictly force
+                    hasResolvedBias = true;
+                    console.log('Location bias set: ' + biasLocation);
                 }
+            });
+        }
 
-                fetch('https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=' + encodeURIComponent(searchQuery))
+        // Inject suggestions container if not exists
+        if($('#suggestions').length === 0) {
+            $('<ul id="suggestions" class="list-group" style="position:absolute; z-index:1000; width:95%; max-height:300px; overflow-y:auto; display:none;"></ul>').insertAfter('#address');
+        }
+
+        $('#address').on('input', function() {
+            clearTimeout(debounceTimer);
+            var query = $(this).val();
+            var suggestions = $('#suggestions');
+            
+            if (query.length < 3) {
+                suggestions.hide();
+                return;
+            }
+
+            debounceTimer = setTimeout(function() {
+                // Remove the manual appending of city name as viewbox is better
+                // But keep it as a fallback if viewbox failed? No, viewbox is cleaner.
+                
+                var url = 'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=' + encodeURIComponent(query) + '&limit=20' + companyViewbox;
+                
+                fetch(url)
                     .then(response => response.json())
                     .then(data => {
                         suggestions.empty();
