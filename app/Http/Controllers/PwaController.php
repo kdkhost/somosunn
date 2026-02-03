@@ -22,7 +22,9 @@ class PwaController extends Controller
         if($icon192) {
             $icons[] = ['src' => asset($icon192), 'sizes' => '192x192', 'type' => 'image/png'];
         } else {
-            $icons[] = ['src' => asset('img/logo.svg'), 'sizes' => 'any', 'type' => 'image/svg+xml'];
+            // Fallback: usar PNG copiado para garantir compatibilidade Chrome
+            $icons[] = ['src' => asset('img/pwa-icon-512.png'), 'sizes' => '512x512', 'type' => 'image/png'];
+            $icons[] = ['src' => asset('img/pwa-icon-512.png'), 'sizes' => '192x192', 'type' => 'image/png']; 
         }
 
         if($icon512) {
