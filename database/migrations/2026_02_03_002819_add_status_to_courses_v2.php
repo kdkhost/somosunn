@@ -11,11 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('courses', 'status')) {
-            Schema::table('courses', function (Blueprint $table) {
-                $table->enum('status', ['draft', 'published', 'archived'])->default('draft')->after('author_name');
-            });
-        }
+        // Skip this migration - fix is in fix_courses_table_missing_columns
     }
 
     /**

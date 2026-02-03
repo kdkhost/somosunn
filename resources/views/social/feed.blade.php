@@ -9,6 +9,7 @@
             <!-- Sidebar Left -->
             <div class="hidden md:block">
                 <div class="bg-white rounded-lg shadow p-4 sticky top-24">
+                    @auth
                     <div class="flex items-center gap-3 mb-6">
                         <div class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">
                             {{ substr(Auth::user()->name, 0, 1) }}
@@ -32,12 +33,19 @@
                             <i class="fas fa-graduation-cap w-6"></i> Cursos
                         </a>
                     </nav>
+                    @else
+                    <div class="text-center py-4">
+                        <p class="text-gray-600 mb-2">Faça login para participar</p>
+                        <a href="{{ route('login') }}" class="text-blue-600 hover:underline">Entrar</a>
+                    </div>
+                    @endauth
                 </div>
             </div>
 
             <!-- Main Feed -->
             <div class="md:col-span-2 space-y-6">
                 <!-- Composer -->
+                @auth
                 <div class="bg-white rounded-lg shadow p-4">
                     <form action="{{ route('social.post.store') }}" method="POST">
                         @csrf
@@ -64,6 +72,7 @@
                         </div>
                     </form>
                 </div>
+                @endauth
 
                 <!-- Posts -->
                 @forelse($posts as $post)
