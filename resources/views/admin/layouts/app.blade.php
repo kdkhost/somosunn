@@ -6,7 +6,7 @@
     if(!isset($settings)){
         try{
             $settings = \App\Models\Setting::all()->pluck('value','key')->toArray();
-        }catch(Exception $e){
+        }catch(\Throwable $e){
             $settings = [];
         }
     }
