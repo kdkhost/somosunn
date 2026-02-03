@@ -15,8 +15,7 @@ class CourseController extends Controller
      */
     public function index()
     {
-        $courses = Course::query() // where('status', 'published') -> Temporarily disabled due to missing column on production
-            ->with('creator')
+        $courses = Course::with('creator')
             ->latest()
             ->paginate(12);
 
