@@ -1,15 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="240" height="70" viewBox="0 0 240 70" role="img" aria-label="UNN Logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#5B21B6"/>
-      <stop offset="45%" stop-color="#D946EF"/>
-      <stop offset="100%" stop-color="#2563EB"/>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b2fd8"/>
+      <stop offset="50%" stop-color="#3d6be8"/>
+      <stop offset="100%" stop-color="#27a6ff"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d74ff"/>
+      <stop offset="100%" stop-color="#2a57d8"/>
     </linearGradient>
   </defs>
-  <rect width="100%" height="100%" fill="transparent"/>
-  <g transform="translate(12,10)">
-    <text x="0" y="28" font-family="Poppins, Inter, sans-serif" font-weight="800" font-size="28" fill="url(#g)">UNN</text>
-    <text x="0" y="52" font-family="Inter, sans-serif" font-weight="500" font-size="12" fill="#111827">Networking que gera resultados</text>
-  </g>
+  <rect width="512" height="512" rx="110" fill="white"/>
+  <text x="50%" y="95" text-anchor="middle" font-family="'Poppins',sans-serif" font-weight="700" font-size="72" fill="#2a75ff">SOMOS</text>
+  <path fill="url(#g)" d="M50 370 Q50 250 160 250 Q230 250 260 320 Q290 390 360 390 Q430 390 460 310 L460 440 Q440 470 360 470 Q310 470 270 445 Q230 420 190 420 Q120 420 100 470 L50 470 Z"/>
+  <path fill="url(#g2)" opacity="0.65" d="M120 270 Q150 230 200 230 Q250 230 280 280 T360 340 Q410 340 450 300 L450 350 Q420 380 360 380 Q310 380 270 350 Q220 310 170 320 Q130 330 110 360 Z"/>
+  <text x="50%" y="505" text-anchor="middle" font-family="'Poppins',sans-serif" font-weight="700" font-size="24" fill="#1e3a8a">UNIVERSIDADE DE NEGÓCIOS E NETWORKING</text>
 </svg>

@@ -1,0 +1,96 @@
+[31-Jan-2026 22:40:46 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/database.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/database.php on line 23
+[31-Jan-2026 22:40:46 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/mail.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/mail.php on line 21
+[31-Jan-2026 22:40:46 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/app.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/app.php on line 4
+[31-Jan-2026 22:40:46 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/services.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/services.php on line 5
+[31-Jan-2026 22:41:29 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/cache.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/cache.php on line 23
+[31-Jan-2026 22:43:26 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/auth.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/auth.php on line 22
+[31-Jan-2026 22:43:26 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/filesystems.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/filesystems.php on line 23
+[31-Jan-2026 22:43:26 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/queue.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/queue.php on line 21
+[31-Jan-2026 22:43:26 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/session.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/session.php on line 4
+[31-Jan-2026 22:43:26 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function resource_path() in /home/somosunn/public_html/config/view.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/view.php on line 5
+[31-Jan-2026 22:43:27 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/logging.php:25
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/logging.php on line 25
+[31-Jan-2026 22:43:27 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/broadcasting.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/broadcasting.php on line 21
+[01-Feb-2026 16:06:07 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/database.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/database.php on line 23
+[01-Feb-2026 16:06:07 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/mail.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/mail.php on line 21
+[01-Feb-2026 16:06:07 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/app.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/app.php on line 4
+[01-Feb-2026 16:06:07 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/services.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/services.php on line 5
+[01-Feb-2026 16:06:54 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/cache.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/cache.php on line 23
+[01-Feb-2026 16:08:51 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/auth.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/auth.php on line 22
+[01-Feb-2026 16:08:51 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/filesystems.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/filesystems.php on line 23
+[01-Feb-2026 16:08:51 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/queue.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/queue.php on line 21
+[01-Feb-2026 16:08:51 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/session.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/session.php on line 4
+[01-Feb-2026 16:08:51 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function resource_path() in /home/somosunn/public_html/config/view.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/view.php on line 5
+[01-Feb-2026 16:08:51 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/logging.php:25
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/logging.php on line 25
+[01-Feb-2026 16:08:51 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/somosunn/public_html/config/broadcasting.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/somosunn/public_html/config/broadcasting.php on line 21

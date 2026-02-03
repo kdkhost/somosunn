@@ -1,0 +1,152 @@
+
+<?php
+    $logoFront = \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
+    $logoSrc = $logoFront ? asset(ltrim($logoFront, '/')) : asset('img/logo.svg');
+    $menuItems = [
+        [
+            'label' => 'Sobre a UNN',
+            'href' => route('home').'#sobre',
+            'children' => [
+                ['label' => 'Manifesto', 'href' => route('home').'#manifesto'],
+                ['label' => 'Quem somos', 'href' => route('home').'#quem-somos'],
+            ],
+        ],
+        [
+            'label' => 'Como funciona',
+            'href' => route('home').'#como-funciona',
+            'children' => [
+                ['label' => 'Passos', 'href' => route('home').'#passos'],
+                ['label' => 'Mentorias', 'href' => route('premium').'#mentorias'],
+            ],
+        ],
+        ['label' => 'Valores', 'href' => route('home').'#valores'],
+        [
+            'label' => 'Eventos',
+            'href' => route('portal').'#eventos',
+            'children' => [
+                ['label' => 'Agenda', 'href' => route('portal').'#agenda'],
+                ['label' => 'Comunidade', 'href' => route('portal').'#comunidade'],
+            ],
+        ],
+        [
+            'label' => 'Portal',
+            'href' => route('portal'),
+            'children' => [
+                ['label' => 'Membros', 'href' => url('/membros')],
+                ['label' => 'Dashboard', 'href' => route('portal').'#dashboard'],
+            ],
+        ],
+        ['label' => 'Premium', 'href' => route('premium')],
+        ['label' => 'Contato', 'href' => route('home').'#contato'],
+    ];
+    $cta = ['label' => 'Fazer parte', 'href' => route('register'), 'class' => 'bg-gradient-to-br from-[#1F5EDB] via-[#177FD6] to-[#1D3FC4] text-white shadow-[0_15px_30px_-10px_rgba(29,63,196,0.45)]'];
+?>
+
+<nav class="fixed inset-x-0 top-0 z-30 bg-white shadow-xl border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-4 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-6">
+            <a href="<?php echo e(route('home')); ?>" class="flex items-center gap-3 shrink-0">
+                <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#1F5EDB] to-[#1D3FC4] text-white font-black tracking-wide text-xl shadow-lg overflow-hidden">
+                    <img src="<?php echo e($logoSrc); ?>" alt="UNN" class="h-10 w-10 object-contain" onerror="this.style.display='none';">
+                </span>
+                <div class="hidden sm:flex flex-col leading-tight">
+                    <span class="text-sm font-semibold text-gray-600">Networking que gera resultados</span>
+                    <span class="text-xs uppercase tracking-[0.35em] text-gray-400">Universidade de Negócios</span>
+                </div>
+            </a>
+
+            <div class="hidden lg:flex items-center gap-4 text-sm font-semibold text-gray-800">
+                <?php $__currentLoopData = $menuItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php if(isset($item['children'])): ?>
+                        <div class="relative group">
+                            <button type="button" class="inline-flex items-center gap-1 hover:text-[#1F5EDB] transition-colors">
+                                <?php echo e($item['label']); ?>
+
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div class="absolute left-0 top-full mt-3 hidden group-hover:block z-40">
+                                <div class="rounded-2xl bg-white shadow-2xl border border-slate-100 min-w-[220px] py-2">
+                                    <?php $__currentLoopData = $item['children']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $child): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <a href="<?php echo e($child['href']); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition">
+                                            <?php echo e($child['label']); ?>
+
+                                        </a>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <a href="<?php echo e($item['href']); ?>" class="hover:text-[#1F5EDB] transition-colors"><?php echo e($item['label']); ?></a>
+                    <?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+        </div>
+
+        <div class="ml-auto flex items-center gap-3 shrink-0">
+            <button id="mobile-menu-toggle" class="lg:hidden inline-flex items-center justify-center rounded-full border border-[#1F5EDB] px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
+                <span class="sr-only">Abrir menu</span>
+                <i class="fas fa-bars text-lg"></i>
+            </button>
+
+            <div class="hidden lg:flex items-center gap-3">
+                <?php if(auth()->guard()->guest()): ?>
+                    <a href="<?php echo e(route('login')); ?>" class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
+                        Entrar
+                    </a>
+                <?php else: ?>
+                    <a href="#" class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
+                        Meu perfil
+                    </a>
+                <?php endif; ?>
+                <a href="<?php echo e($cta['href']); ?>" class="inline-flex items-center gap-2 rounded-full <?php echo e($cta['class']); ?> px-7 py-3 text-sm font-bold">
+                    <?php echo e($cta['label']); ?>
+
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div id="mobile-menu" class="fixed inset-0 z-40 hidden" aria-hidden="true">
+    <div id="mobile-menu-overlay" class="absolute inset-0 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    <div id="mobile-menu-panel" class="relative z-10 w-4/5 max-w-sm h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-400 ease-out">
+        <div class="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+            <div class="flex items-center gap-3">
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#1F5EDB] to-[#1D3FC4] text-white font-black text-lg overflow-hidden">
+                    <img src="<?php echo e($logoSrc); ?>" alt="UNN" class="h-8 w-8 object-contain" onerror="this.style.display='none';">
+                </span>
+                <div>
+                    <p class="text-sm font-semibold text-gray-900">UNN</p>
+                    <p class="text-xs uppercase tracking-[0.4em] text-gray-400">Networking</p>
+                </div>
+            </div>
+            <button id="mobile-menu-close" class="text-gray-500 hover:text-gray-900 text-3xl leading-none">&times;</button>
+        </div>
+        <nav class="px-6 py-4 flex flex-col gap-2 text-gray-700">
+            <?php $__currentLoopData = $menuItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div>
+                    <a href="<?php echo e($item['href']); ?>" class="block rounded-2xl px-4 py-3 font-semibold hover:bg-slate-100 transition-colors">
+                        <?php echo e($item['label']); ?>
+
+                    </a>
+                    <?php if(isset($item['children'])): ?>
+                        <div class="pl-4 space-y-2">
+                            <?php $__currentLoopData = $item['children']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $child): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <a href="<?php echo e($child['href']); ?>" class="block rounded-xl px-3 py-2 text-sm text-gray-600 hover:bg-slate-100 transition-colors">
+                                    <?php echo e($child['label']); ?>
+
+                                </a>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </nav>
+        <div class="px-6 mt-4 mb-6">
+            <a href="<?php echo e($cta['href']); ?>" class="inline-flex w-full items-center justify-center rounded-full border border-[#1F5EDB] px-6 py-3 text-sm font-semibold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
+                <?php echo e($cta['label']); ?>
+
+            </a>
+        </div>
+    </div>
+</div><?php /**PATH /home/somosunn/public_html/resources/views/partials/navbar.blade.php ENDPATH**/ ?>

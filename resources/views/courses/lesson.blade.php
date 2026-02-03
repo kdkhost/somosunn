@@ -1,0 +1,81 @@
+@extends('layouts.app')
+
+@section('title', $lesson->title . ' - ' . $course->title)
+
+@section('content')
+<div class="flex flex-col lg:flex-row min-h-screen bg-gray-100">
+    <!-- Sidebar - Playlist -->
+    <div class="w-full lg:w-80 bg-white border-r border-gray-200 flex-shrink-0 h-auto lg:h-screen lg:sticky lg:top-0 overflow-y-auto z-10">
+        <div class="p-4 border-b border-gray-100">
+            <h2 class="font-bold text-gray-800 text-lg leading-tight">{{ $course->title }}</h2>
+            <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-green-500 h-2 rounded-full" style="width: 0%"></div> <!-- Progress Bar Placeholder -->
+            </div>
+            <p class="text-xs text-gray-500 mt-1">0% Concluído</p>
+        </div>
+        <div class="py-2">
+            @foreach($course->lessons()->orderBy('order')->get() as $l)
+                <a href="{{ route('courses.lessons.show', [$course->id, $l->id]) }}" 
+                   class="flex items-center p-4 hover:bg-gray-50 transition border-l-4 {{ $l->id == $lesson->id ? 'border-[#1F5EDB] bg-blue-50' : 'border-transparent' }}">
+                    <div class="mr-3">
+                        @if($l->id == $lesson->id)
+                            <i class="fas fa-play text-[#1F5EDB]"></i>
+                        @else
+                            <i class="far fa-circle text-gray-400"></i>
+                        @endif
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium {{ $l->id == $lesson->id ? 'text-[#1F5EDB]' : 'text-gray-700' }}">
+                            {{ $l->order }}. {{ $l->title }}
+                        </p>
+                    </div>
+                </a>
+            @endforeach
+        </div>
+    </div>
+
+    <!-- Main Content - Player -->
+    <div class="flex-1 p-6 md:p-10 overflow-y-auto">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ $lesson->title }}</h1>
+            
+            <div class="aspect-w-16 aspect-h-9 bg-black rounded-xl overflow-hidden shadow-2xl mb-8">
+                @if($lesson->video_url)
+                    <iframe src="{{ str_replace('youtu.be/', 'youtube.com/embed/', $lesson->video_url) }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full min-h-[400px]"></iframe>
+                @else
+                    <div class="flex items-center justify-center h-full text-white">
+                        <p>Nenhum vídeo disponível para esta aula.</p>
+                    </div>
+                @endif
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+                <h3 class="text-lg font-bold mb-4">Conteúdo da Aula</h3>
+                <div class="prose max-w-none text-gray-700">
+                    {!! nl2br(e($lesson->content)) !!}
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+                @if($previous)
+                    <a href="{{ route('courses.lessons.show', [$course->id, $previous->id]) }}" class="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition">
+                        <i class="fas fa-arrow-left mr-2"></i> Anterior
+                    </a>
+                @else
+                    <div></div>
+                @endif
+
+                @if($next)
+                    <a href="{{ route('courses.lessons.show', [$course->id, $next->id]) }}" class="px-5 py-2 bg-[#1F5EDB] text-white rounded-lg hover:bg-blue-700 font-medium transition">
+                        Próxima <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                @else
+                    <button class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition">
+                        Concluir Curso <i class="fas fa-check ml-2"></i>
+                    </button>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
