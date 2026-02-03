@@ -26,20 +26,29 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('payments', function (Blueprint $table) {
-            if (!Schema::hasColumn('payments', 'fee_amount')) {
+        if (!Schema::hasColumn('payments', 'fee_amount')) {
+            Schema::table('payments', function (Blueprint $table) {
                 $table->decimal('fee_amount', 10, 2)->default(0)->after('amount');
-            }
-            if (!Schema::hasColumn('payments', 'fee_percentage')) {
+            });
+        }
+
+        if (!Schema::hasColumn('payments', 'fee_percentage')) {
+            Schema::table('payments', function (Blueprint $table) {
                 $table->decimal('fee_percentage', 8, 2)->default(0)->after('fee_amount');
-            }
-            if (!Schema::hasColumn('payments', 'fee_passed')) {
+            });
+        }
+
+        if (!Schema::hasColumn('payments', 'fee_passed')) {
+            Schema::table('payments', function (Blueprint $table) {
                 $table->boolean('fee_passed')->default(false)->after('fee_percentage');
-            }
-            if (!Schema::hasColumn('payments', 'platform_fee_amount')) {
+            });
+        }
+
+        if (!Schema::hasColumn('payments', 'platform_fee_amount')) {
+            Schema::table('payments', function (Blueprint $table) {
                 $table->decimal('platform_fee_amount', 10, 2)->default(0)->after('fee_passed');
-            }
-        });
+            });
+        }
     }
 
     public function down()
