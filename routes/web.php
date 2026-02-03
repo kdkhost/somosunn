@@ -10,7 +10,17 @@ use App\Http\Controllers\SatisfactionController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portal', [HomeController::class, 'portal'])->name('portal');
 Route::get('/premium', [HomeController::class, 'premium'])->name('premium');
-Route::redirect('/membros', '/portal')->name('membros');
+
+// Institutional Pages
+Route::get('/sobre', fn() => view('site.institucional.sobre'))->name('sobre');
+Route::get('/manifesto', fn() => view('site.institucional.manifesto'))->name('manifesto');
+Route::get('/quem-somos', fn() => view('site.institucional.quem-somos'))->name('quem-somos');
+Route::get('/como-funciona', fn() => view('site.institucional.como-funciona'))->name('como-funciona');
+Route::get('/valores', fn() => view('site.institucional.valores'))->name('valores');
+Route::get('/contato', fn() => view('site.institucional.contato'))->name('contato');
+
+// Members
+Route::get('/membros', [\App\Http\Controllers\MemberController::class, 'index'])->name('membros');
 
 // Events
 Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
