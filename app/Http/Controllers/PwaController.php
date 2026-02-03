@@ -19,8 +19,15 @@ class PwaController extends Controller
         $icon512 = Setting::get('pwa_icon_512');
 
         $icons = [];
-        if($icon192) $icons[] = ['src' => asset($icon192), 'sizes' => '192x192', 'type' => 'image/png'];
-        if($icon512) $icons[] = ['src' => asset($icon512), 'sizes' => '512x512', 'type' => 'image/png'];
+        if($icon192) {
+            $icons[] = ['src' => asset($icon192), 'sizes' => '192x192', 'type' => 'image/png'];
+        } else {
+            $icons[] = ['src' => asset('img/logo.svg'), 'sizes' => 'any', 'type' => 'image/svg+xml'];
+        }
+
+        if($icon512) {
+            $icons[] = ['src' => asset($icon512), 'sizes' => '512x512', 'type' => 'image/png'];
+        }
 
         $manifest = [
             'name' => $name,

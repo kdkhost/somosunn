@@ -89,9 +89,7 @@ Route::get('/api/ranking', [RankingController::class, 'index'])->name('api.ranki
 Route::get('/manifest.webmanifest', [\App\Http\Controllers\PwaController::class, 'manifest'])->name('manifest');
 Route::get('/offline', fn() => view('offline'))->name('offline');
 
-// Admin templates / tests
-Route::get('/admin/mail-test', [MailTestController::class, 'showForm'])->name('admin.mailtest');
-Route::post('/admin/mail-test/send', [MailTestController::class, 'sendTest'])->name('admin.mailtest.send');
+
 
 // Public & Creator Course Routes
 Route::resource('courses', \App\Http\Controllers\CourseController::class);
@@ -141,7 +139,7 @@ Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMi
     // Permissões / Papéis
     Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class)->names('permissions');
 
-    Route::get('/upload-test', fn () => view('admin.upload_test'))->name('upload.test');
+
 
     // Courses CRUD
     Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class)->names('courses');
