@@ -3,105 +3,214 @@
 @section('title', 'Portal de Networking - UNN')
 
 @section('content')
-<section class="pt-32 pb-20 px-6 md:px-12 lg:px-24 hero-landing">
-    <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-20 animate-fadeInUp">
-            <h1 class="text-5xl lg:text-6xl font-900 leading-tight mb-6">Portal de <span class="text-gradient">Networking Digital</span></h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.</p>
+<div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- Hero Section -->
+    <section class="pt-24 pb-12 px-6 md:px-12 lg:px-24">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-5xl lg:text-6xl font-black leading-tight mb-6">
+                Portal de <span class="text-gradient">Networking</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.
+            </p>
         </div>
+    </section>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
-                <p class="text-4xl font-bold text-blue-600 mb-2">4</p>
-                <p class="text-gray-700 font-semibold">Palestras<br><span class="text-sm text-gray-500">Gratuitas</span></p>
-            </div>
-            <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
-                <p class="text-4xl font-bold text-green-600 mb-2">4</p>
-                <p class="text-gray-700 font-semibold">Mentorias<br><span class="text-sm text-gray-500">Premium</span></p>
-            </div>
-            <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
-                <p class="text-4xl font-bold text-purple-600 mb-2">4</p>
-                <p class="text-gray-700 font-semibold">Níveis de<br><span class="text-sm text-gray-500">Networking</span></p>
-            </div>
-            <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
-                <p class="text-4xl font-bold text-orange-600 mb-2">85%</p>
-                <p class="text-gray-700 font-semibold">Taxa de<br><span class="text-sm text-gray-500">Satisfação</span></p>
+    <!-- Stats -->
+    <section class="pb-12 px-6 md:px-12 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
+                    <p class="text-4xl font-black" style="color: var(--unn-azul-1)">120+</p>
+                    <p class="text-sm text-gray-500 mt-1">Palestras</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
+                    <p class="text-4xl font-black" style="color: var(--unn-azul-1)">50+</p>
+                    <p class="text-sm text-gray-500 mt-1">Mentorias</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
+                    <p class="text-4xl font-black" style="color: var(--unn-azul-1)">5.000+</p>
+                    <p class="text-sm text-gray-500 mt-1">Membros</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
+                    <p class="text-4xl font-black" style="color: var(--unn-azul-1)">95%</p>
+                    <p class="text-sm text-gray-500 mt-1">Satisfação</p>
+                </div>
             </div>
         </div>
+    </section>
 
-        <div class="mt-12 text-center">
-            <a href="#" class="btn-primary text-white px-10 py-4 rounded-lg font-semibold">Acessar todas as palestras</a>
+    <!-- Quick Access -->
+    <section class="py-12 px-6 md:px-12 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-black text-gray-900 mb-8">Acesso Rápido</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="{{ route('social.feed') }}" class="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition group">
+                    <div class="w-14 h-14 btn-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-newspaper text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Feed Social</h3>
+                    <p class="text-sm text-gray-500">Conecte-se com outros membros</p>
+                </a>
+                <a href="{{ route('courses.index') }}" class="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition group">
+                    <div class="w-14 h-14 btn-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Cursos</h3>
+                    <p class="text-sm text-gray-500">Aprenda com especialistas</p>
+                </a>
+                <a href="{{ route('events.index') }}" class="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition group">
+                    <div class="w-14 h-14 btn-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-calendar-alt text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Eventos</h3>
+                    <p class="text-sm text-gray-500">Participe de encontros</p>
+                </a>
+                <a href="{{ route('membros') }}" class="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition group">
+                    <div class="w-14 h-14 btn-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-users text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Membros</h3>
+                    <p class="text-sm text-gray-500">Conheça a comunidade</p>
+                </a>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="py-20 px-6 md:px-12 lg:px-24 bg-slate-50">
-    <div class="max-w-7xl mx-auto">
-        <div class="flex justify-between items-center mb-10">
-            <h2 class="section-title text-4xl lg:text-5xl font-900">Mentorias & encontros</h2>
-            <span class="text-sm uppercase text-gray-500 tracking-wide">Atualizado em tempo real</span>
-        </div>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @forelse($mentorings as $mentorship)
-                <article class="card bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
+    <!-- Mentorias Demo -->
+    <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-black text-gray-900">Mentorias Disponíveis</h2>
+                <span class="text-sm text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full font-semibold">
+                    <i class="fas fa-info-circle mr-1"></i> Dados Demo
+                </span>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @php
+                    $mentorings = $mentorings ?? collect([
+                        (object)['title' => 'Estratégias de Vendas B2B', 'mentor' => (object)['name' => 'Carlos Mendes'], 'description' => 'Aprenda técnicas avançadas de vendas para o mercado corporativo com resultados comprovados.', 'price' => 497, 'slots' => 5],
+                        (object)['title' => 'Marketing Digital 360°', 'mentor' => (object)['name' => 'Ana Paula Costa'], 'description' => 'Domine todas as vertentes do marketing digital: SEO, tráfego pago, redes sociais e conversão.', 'price' => 397, 'slots' => 8],
+                        (object)['title' => 'Gestão Financeira Empresarial', 'mentor' => (object)['name' => 'Roberto Almeida'], 'description' => 'Organize as finanças da sua empresa e tome decisões baseadas em dados reais.', 'price' => 597, 'slots' => 3],
+                    ]);
+                @endphp
+                
+                @foreach($mentorings as $mentorship)
+                <article class="bg-slate-50 rounded-3xl p-8 border border-gray-100">
                     <div class="flex justify-between items-center mb-3">
                         <p class="text-xs uppercase tracking-wide text-gray-500">{{ optional($mentorship->mentor)->name ?? 'Mentor UNN' }}</p>
-                        <span class="text-purple-600 font-bold">R$ {{ number_format($mentorship->price, 2, ',', '.') }}</span>
+                        <span class="font-bold" style="color: var(--unn-azul-1)">R$ {{ number_format($mentorship->price, 2, ',', '.') }}</span>
                     </div>
-                    <h3 class="text-2xl font-semibold text-gray-900 mb-2">{{ $mentorship->title }}</h3>
-                    <p class="text-gray-600 mb-4">{{ Str::limit($mentorship->description, 120) }}</p>
-                    <p class="text-sm text-gray-500 mb-6">Slots disponíveis: <strong>{{ $mentorship->slots }}</strong></p>
-                    <button class="btn-primary text-white px-6 py-3 rounded-full font-semibold">Ficha da mentoria</button>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $mentorship->title }}</h3>
+                    <p class="text-gray-600 text-sm mb-4">{{ Str::limit($mentorship->description, 100) }}</p>
+                    <p class="text-sm text-gray-500 mb-4">Vagas: <strong>{{ $mentorship->slots }}</strong></p>
+                    <button class="btn-primary text-white px-6 py-3 rounded-xl font-semibold w-full">
+                        Ver detalhes
+                    </button>
                 </article>
-            @empty
-                <div class="col-span-1 lg:col-span-3 text-center border border-dashed border-gray-300 rounded-3xl p-10 text-gray-500">
-                    <p>O portal precisa de mentorias cadastradas para mostrar essa sessão.</p>
-                </div>
-            @endforelse
-        </div>
-    </div>
-</section>
-
-<section class="py-20 px-6 md:px-12 lg:px-24 bg-white">
-    <div class="max-w-6xl mx-auto">
-        <h2 class="section-title text-4xl lg:text-5xl font-900 text-center mb-12">Comunidade segmentada</h2>
-        <div class="grid md:grid-cols-2 gap-8">
-            <div class="card rounded-3xl p-8 bg-slate-50 border border-gray-200 text-center">
-                <p class="text-sm uppercase font-semibold text-gray-500 mb-3">Iniciantes</p>
-                <p class="text-5xl font-bold text-blue-600">{{ $levelSummary['iniciante'] ?? 0 }}</p>
-                <p class="text-gray-600 mt-4">Interações restritas ao mesmo nível, garantindo acolhimento e aprendizado seguro.</p>
-            </div>
-            <div class="card rounded-3xl p-8 bg-slate-50 border border-gray-200 text-center">
-                <p class="text-sm uppercase font-semibold text-gray-500 mb-3">Empresários de sucesso</p>
-                <p class="text-5xl font-bold text-purple-600">{{ $levelSummary['sucesso'] ?? 0 }}</p>
-                <p class="text-gray-600 mt-4">Líderes e mentores conectando oportunidades premium e trocando insights estratégicos.</p>
+                @endforeach
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="py-20 px-6 md:px-12 lg:px-24 bg-slate-50">
-    <div class="max-w-7xl mx-auto">
-        <div class="flex items-center justify-between mb-8">
-            <h2 class="section-title text-4xl lg:text-5xl font-900">Ranking de conexões</h2>
-            <p class="text-sm text-gray-500">Notas calculadas após cada feedback recebido.</p>
-        </div>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @forelse($topRankings as $rank)
-                <article class="card bg-white rounded-3xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition">
-                    <p class="text-xs uppercase text-gray-500">{{ ucfirst($rank->level) }}</p>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ optional($rank->user)->name ?? 'Empreendedor' }}</h3>
-                    <p class="text-sm text-gray-500 mb-4">{{ $rank->interactions_count }} conexões avaliadas</p>
-                    <div class="text-lg font-bold text-blue-600">Score {{ number_format($rank->score, 2, ',', '.') }}</div>
-                    <p class="text-sm text-gray-600 mt-2">Média {{ number_format($rank->average_rating, 1, ',', '.') }}</p>
-                </article>
-            @empty
-                <div class="col-span-1 lg:col-span-3 border border-dashed border-gray-300 rounded-3xl p-10 text-center text-gray-500">
-                    <p>Registre conexões e pesquisas de satisfação para ver o ranking.</p>
+    <!-- Comunidade Segmentada -->
+    <section class="py-16 px-6 md:px-12 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">Níveis da Comunidade</h2>
+            
+            <div class="grid md:grid-cols-4 gap-6">
+                @php
+                    $levels = [
+                        ['name' => 'Iniciante', 'count' => 1200, 'icon' => 'seedling', 'color' => '#10B981', 'desc' => 'Começando a jornada'],
+                        ['name' => 'Empreendedor', 'count' => 2500, 'icon' => 'rocket', 'color' => '#3B82F6', 'desc' => 'Em crescimento'],
+                        ['name' => 'Empresário', 'count' => 800, 'icon' => 'building', 'color' => '#8B5CF6', 'desc' => 'Consolidado'],
+                        ['name' => 'Mentor', 'count' => 150, 'icon' => 'crown', 'color' => '#F59E0B', 'desc' => 'Elite da comunidade'],
+                    ];
+                @endphp
+                
+                @foreach($levels as $level)
+                <div class="bg-white rounded-3xl p-6 text-center shadow-lg">
+                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style="background: {{ $level['color'] }}20">
+                        <i class="fas fa-{{ $level['icon'] }} text-2xl" style="color: {{ $level['color'] }}"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-900 mb-1">{{ $level['name'] }}</h3>
+                    <p class="text-3xl font-black mb-2" style="color: {{ $level['color'] }}">{{ number_format($level['count'], 0, '', '.') }}</p>
+                    <p class="text-xs text-gray-500">{{ $level['desc'] }}</p>
                 </div>
-            @endforelse
+                @endforeach
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
+    <!-- Ranking -->
+    <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-black text-gray-900">Top Networkers</h2>
+                <span class="text-sm text-gray-500">Ranking baseado em conexões</span>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                @php
+                    $topRankers = [
+                        ['name' => 'Marcelo Silva', 'score' => 9850, 'connections' => 234, 'level' => 'Mentor', 'position' => 1],
+                        ['name' => 'Juliana Costa', 'score' => 8720, 'connections' => 198, 'level' => 'Empresário', 'position' => 2],
+                        ['name' => 'Fernando Alves', 'score' => 7650, 'connections' => 176, 'level' => 'Empresário', 'position' => 3],
+                    ];
+                @endphp
+                
+                @foreach($topRankers as $ranker)
+                <div class="bg-gradient-to-br from-slate-50 to-white rounded-3xl p-6 border border-gray-100 relative overflow-hidden">
+                    @if($ranker['position'] === 1)
+                    <div class="absolute top-4 right-4">
+                        <i class="fas fa-trophy text-2xl text-yellow-500"></i>
+                    </div>
+                    @endif
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-14 h-14 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl">
+                            {{ substr($ranker['name'], 0, 1) }}
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-900">{{ $ranker['name'] }}</h3>
+                            <p class="text-sm text-gray-500">{{ $ranker['level'] }}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div class="text-center p-3 bg-slate-50 rounded-xl">
+                            <p class="text-xl font-bold" style="color: var(--unn-azul-1)">{{ number_format($ranker['score'], 0, '', '.') }}</p>
+                            <p class="text-xs text-gray-500">Pontos</p>
+                        </div>
+                        <div class="text-center p-3 bg-slate-50 rounded-xl">
+                            <p class="text-xl font-bold" style="color: var(--unn-azul-1)">{{ $ranker['connections'] }}</p>
+                            <p class="text-xs text-gray-500">Conexões</p>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Premium -->
+    <section class="py-16 px-6 md:px-12 lg:px-24" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
+        <div class="max-w-4xl mx-auto text-center text-white">
+            <h2 class="text-3xl lg:text-4xl font-black mb-4">Desbloqueie todos os recursos</h2>
+            <p class="text-lg opacity-90 mb-8">Torne-se Premium e tenha acesso ilimitado a mentorias, cursos e eventos exclusivos.</p>
+            <a href="{{ route('premium') }}" class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition" style="color: var(--unn-azul-1)">
+                <i class="fas fa-crown"></i>
+                Conhecer planos Premium
+            </a>
+        </div>
+    </section>
+</div>
+
+<style>
+.text-gradient {
+    background: linear-gradient(135deg, var(--unn-azul-1) 0%, var(--unn-azul-3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+</style>
 @endsection
