@@ -86,6 +86,9 @@ Route::put('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonCon
 Route::delete('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'destroy'])->name('courses.lessons.destroy');
 Route::get('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'show'])->name('courses.lessons.show');
 
+// Public Events
+Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
+
 // Social / Community
 Route::get('/feed', [\App\Http\Controllers\SocialController::class, 'feed'])->name('social.feed');
 Route::get('/profile/{username}', [\App\Http\Controllers\SocialController::class, 'profile'])->name('social.profile');

@@ -14,7 +14,8 @@ class EventController extends Controller
             // FullCalendar event feed
             $events = Event::whereDate('start_at', '>=', $request->start)
                            ->whereDate('end_at', '<=', $request->end)
-                           ->get(['id', 'title', 'start_at as start', 'end_at as end', 'color', 'all_day']);
+                           ->whereDate('end_at', '<=', $request->end)
+                           ->get(['id', 'title', 'start_at as start', 'end_at as end', 'color', 'all_day', 'address', 'latitude', 'longitude', 'description', 'location']);
             return response()->json($events);
         }
         return view('admin.events.index');
@@ -38,7 +39,10 @@ class EventController extends Controller
             'end_at' => 'nullable|date|after_or_equal:start_at',
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string',
-            'location' => 'nullable|string'
+            'location' => 'nullable|string',
+            'address' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric'
         ]);
 
         $event = Event::create($validated);
@@ -53,10 +57,15 @@ class EventController extends Controller
     public function update(Request $request, Event $event)
     {
         $validated = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'start_at' => 'sometimes|required|date',
+            'title' => 'required|string|max:255',
+            'start_at' => 'required|date',
             'end_at' => 'nullable|date|after_or_equal:start_at',
-            'color' => 'nullable|string|max:7'
+            'color' => 'nullable|string|max:7',
+            'description' => 'nullable|string',
+            'location' => 'nullable|string',
+            'address' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric'
         ]);
 
         $event->update($validated);

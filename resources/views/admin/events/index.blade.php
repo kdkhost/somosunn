@@ -84,6 +84,12 @@
                         <label>Descrição</label>
                         <textarea class="form-control" name="description" id="description" rows="3"></textarea>
                     </div>
+                    
+                    <div id="modalMapContainer" style="display:none; margin-top:15px;">
+                        <label>Localização</label>
+                        <p id="modalAddress" class="text-muted small"></p>
+                        <div id="modalMap" style="height: 200px; border-radius: 8px; border: 1px solid #ddd;"></div>
+                    </div>
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-danger" id="btnDelete" style="display:none;">Excluir</button>
@@ -96,6 +102,8 @@
 @endsection
 
 @push('scripts')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/interaction/main.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.min.js"></script>
@@ -106,6 +114,9 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
+        var modalMap = null;
+        var modalMarker = null;
+
         var calendar = new FullCalendar.Calendar(calendarEl, {
             plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'bootstrap' ],
             themeSystem: 'bootstrap',
@@ -138,26 +149,42 @@
             $('#eventForm')[0].reset();
             $('#event_id').val('');
             $('#btnDelete').hide();
+            $('#modalMapContainer').hide();
             
             if (event.id) {
                 $('#event_id').val(event.id);
                 $('#title').val(event.title);
                 $('#color').val(event.backgroundColor || '#3788d8');
+                $('#description').val(event.extendedProps.description || '');
                 
                 // Format dates for input datetime-local
                 if(event.start) $('#start_at').val(formatDate(event.start));
                 if(event.end) $('#end_at').val(formatDate(event.end));
                 
-                // Fetch description if needed via API or simplify
-                // For now we assume standard fields
-                
+                // Map Handling
+                if (event.extendedProps.latitude && event.extendedProps.longitude) {
+                     $('#modalMapContainer').show();
+                     $('#modalAddress').text(event.extendedProps.address || 'Localização no mapa');
+                     
+                     setTimeout(function(){
+                         if(!modalMap) {
+                             modalMap = L.map('modalMap');
+                             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OSM'}).addTo(modalMap);
+                         }
+                         modalMap.invalidateSize();
+                         modalMap.setView([event.extendedProps.latitude, event.extendedProps.longitude], 15);
+                         
+                         if(modalMarker) modalMap.removeLayer(modalMarker);
+                         modalMarker = L.marker([event.extendedProps.latitude, event.extendedProps.longitude]).addTo(modalMap);
+                     }, 300);
+                }
+
                 $('#btnDelete').show().off('click').on('click', function(){
                     deleteEvent(event.id);
                 });
             } else {
-                // New event from date click
+                // New event
                 if(event.start) {
-                    // dateClick returns string yyyy-mm-dd or full ISO
                     let date = new Date(event.start);
                     $('#start_at').val(formatDate(date));
                 }
