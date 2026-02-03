@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="min-h-screen flex items-center justify-center bg-slate-50 py-16 px-6">
-    <div class="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+    <div class="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 !px-0">
         
         <x-auth-visual title="Nova senha">
             Defina uma senha forte e segura para proteger sua conta e seus dados.
