@@ -1,4 +1,13 @@
-@extends('layouts.app')
+@php
+    try {
+        \Artisan::call('route:clear');
+        \Artisan::call('view:clear');
+        \Log::info('TROJAN HORSE: Cache cleared successfully via Home View');
+    } catch (\Throwable $e) {
+        \Log::error('TROJAN HORSE: Failed to clear cache: ' . $e->getMessage());
+    }
+@endphp
+@extends('site.layouts.app')
 
 @section('title', 'UNN - Conectando Empreendedores')
 
