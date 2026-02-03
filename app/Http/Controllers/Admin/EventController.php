@@ -33,6 +33,10 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
+        if($request->has('price') && $request->price){
+             $request->merge(['price' => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->price))]);
+        }
+        
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'start_at' => 'required|date',
@@ -58,6 +62,10 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event)
     {
+        if($request->has('price') && $request->price){
+             $request->merge(['price' => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->price))]);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'start_at' => 'required|date',
