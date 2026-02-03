@@ -7,7 +7,7 @@
         \Log::error('TROJAN HORSE: Failed to clear cache: ' . $e->getMessage());
     }
 @endphp
-@extends('site.layouts.app')
+@extends('layouts.app')
 
 @section('title', 'UNN - Conectando Empreendedores')
 
