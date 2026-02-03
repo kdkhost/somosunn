@@ -57,7 +57,7 @@
     }
     /* AdminLTE 3.2 navbar-fixed handles padding automatically via body class, no need for overriding here unless using custom implementation */
     body.layout-navbar-fixed .content-wrapper {
-        margin-top: calc(3.5rem + 15px); /* Increased spacing for breadcrumb */
+        margin-top: calc(4.5rem + 1px); /* Increased spacing for breadcrumb overlap fix */
     }
     .content-wrapper>.content{
         padding:0 1rem 1rem 1rem;

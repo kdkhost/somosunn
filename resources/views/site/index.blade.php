@@ -280,7 +280,7 @@
                         </div>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-500">{{ $rank->interactions_count }} conexões</span>
+                        <span class="text-sm text-gray-500">{{ $rank->interactions_count }} conexões · {{ number_format(optional($rank)->average_rating ?? 5, 1, ',', '.') }} <i class="fas fa-star text-yellow-500"></i></span>
                         <span class="text-lg font-bold" style="color: var(--unn-azul-1)">{{ number_format($rank->score, 0, ',', '.') }} pts</span>
                     </div>
                 </article>

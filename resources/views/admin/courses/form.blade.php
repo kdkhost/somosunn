@@ -23,15 +23,13 @@
             <li class="nav-item">
                 <a class="nav-link active" id="info-tab" data-toggle="pill" href="#info" role="tab">Informações Básicas</a>
             </li>
-            @if($course->exists)
             <li class="nav-item">
-                <a class="nav-link" id="lessons-tab" data-toggle="pill" href="#lessons" role="tab">Conteúdo / Aulas</a>
+                @if($course->exists)
+                    <a class="nav-link" id="lessons-tab" data-toggle="pill" href="#lessons" role="tab">Conteúdo / Aulas</a>
+                @else
+                    <a class="nav-link disabled" href="#" title="Salve o curso primeiro">Conteúdo / Aulas <i class="fas fa-lock ml-1 text-muted"></i></a>
+                @endif
             </li>
-            @else
-            <li class="nav-item">
-                <a class="nav-link disabled" href="#" title="Salve o curso primeiro">Conteúdo / Aulas (Salve para liberar)</a>
-            </li>
-            @endif
         </ul>
     </div>
     <div class="card-body">
@@ -84,6 +82,12 @@
                                 </div>
                             </div>
                             <button class="btn btn-primary btn-block btn-lg">Salvar Informações</button>
+                            
+                            @if(!$course->exists)
+                            <p class="text-muted text-center mt-3 small">
+                                <i class="fas fa-info-circle"></i> Salve para liberar a aba de Aulas.
+                            </p>
+                            @endif
                         </div>
                     </div>
                 </form>

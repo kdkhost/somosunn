@@ -1,4 +1,6 @@
-<footer class="main-footer py-2">
-    <div class="float-right d-none d-sm-inline"><b>Versão</b> 0.1</div>
-    <strong>&copy; {{ date('Y') }} UNN</strong>
+<footer class="main-footer">
+    <div class="float-right d-none d-sm-block">
+        <b>Versão</b> 1.0
+    </div>
+    <strong>Copyright &copy; {{ date('Y') }} <a href="#">UNN</a>.</strong> Todos os direitos reservados.
 </footer>
