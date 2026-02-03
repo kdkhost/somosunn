@@ -11,18 +11,18 @@ $app = require_once __DIR__.'/../bootstrap/app.php';
 
 $kernel = $app->make(Kernel::class);
 
-$response = $kernel->handle(
-    $request = Request::capture()
-);
-
-// EMERGENCY FIX: FORCE CACHE CLEAR
-// Removeremos isso no proximo commit
+// EMERGENCY FIX: FORCE CACHE CLEAR BEFORE BOOT
+// Isso garante que o cache limpe ANTES de dar erro
 try {
-    \Illuminate\Support\Facades\Artisan::call('view:clear');
-    \Illuminate\Support\Facades\Artisan::call('route:clear');
+    $kernel->call('view:clear');
+    $kernel->call('route:clear');
 } catch (\Throwable $e) {
     // ignore
 }
+
+$response = $kernel->handle(
+    $request = Request::capture()
+);
 
 $response->send();
 
