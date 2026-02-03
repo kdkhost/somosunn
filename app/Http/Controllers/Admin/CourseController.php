@@ -31,7 +31,7 @@ class CourseController extends Controller
         
         $data['is_featured'] = $request->has('is_featured');
         $data['published'] = $request->has('published'); // Legacy support
-        $data['price'] = $data['price'] ?? 0;
+        $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
         
         Course::create($data + ['user_id' => auth()->id()]);
         
@@ -55,7 +55,7 @@ class CourseController extends Controller
 
         $data['is_featured'] = $request->has('is_featured');
         $data['published'] = $request->has('published');
-        $data['price'] = $data['price'] ?? 0;
+        $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
 
         $course->update($data);
         
