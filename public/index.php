@@ -11,14 +11,7 @@ $app = require_once __DIR__.'/../bootstrap/app.php';
 
 $kernel = $app->make(Kernel::class);
 
-// EMERGENCY FIX: FORCE CACHE CLEAR BEFORE BOOT
-// Isso garante que o cache limpe ANTES de dar erro
-try {
-    $kernel->call('view:clear');
-    $kernel->call('route:clear');
-} catch (\Throwable $e) {
-    // ignore
-}
+
 
 $response = $kernel->handle(
     $request = Request::capture()
