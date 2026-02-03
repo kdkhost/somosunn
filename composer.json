@@ -1,6 +1,6 @@
 {
   "name": "unn/community-platform",
-  "description": "Scaffold Laravel 12 para UNN - plataforma de networking",
+  "description": "Scaffold Laravel 12 para UNN - plataforma de networking e social login",
   "type": "project",
   "require": {
     "php": "^8.1|^8.2|^8.3|^8.4",
