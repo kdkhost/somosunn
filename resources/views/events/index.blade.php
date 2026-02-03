@@ -5,7 +5,7 @@
 @section('content')
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
-    <section class="pt-32 pb-16 px-6 md:px-12 lg:px-24">
+    <section class="pt-24 pb-8 px-6 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto text-center">
             <h1 class="text-5xl lg:text-6xl font-black leading-tight mb-6">
                 <span class="text-gradient">Eventos</span> UNN
@@ -101,21 +101,21 @@
                             @endif
 
                             <!-- Price and CTA -->
-                            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                                <div>
+                            <div class="pt-4 border-t border-gray-100">
+                                <div class="text-center mb-4">
                                     @if($event->price > 0)
-                                        <p class="text-2xl font-black text-gray-900">R$ {{ number_format($event->price, 2, ',', '.') }}</p>
-                                        <p class="text-xs text-gray-500">por pessoa</p>
+                                        <p class="text-3xl font-black text-gray-900">R$ {{ number_format($event->price, 2, ',', '.') }}</p>
+                                        <p class="text-sm text-gray-500">por pessoa</p>
                                     @else
-                                        <p class="text-2xl font-black text-green-600">Gratuito</p>
-                                        <p class="text-xs text-gray-500">entrada liberada</p>
+                                        <p class="text-3xl font-black text-green-600">Gratuito</p>
+                                        <p class="text-sm text-gray-500">entrada liberada</p>
                                     @endif
                                 </div>
                                 <a href="{{ $isDemo ? '#' : route('events.show', $event->id) }}" 
-                                   class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 {{ $isDemo ? 'opacity-75 cursor-not-allowed' : '' }}"
+                                   class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-[length:200%_100%] text-white px-6 py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl hover:bg-right transition-all duration-500 {{ $isDemo ? 'opacity-75 cursor-not-allowed' : '' }}"
                                    @if($isDemo) onclick="alert('Este é um evento de demonstração. Configure eventos reais no painel administrativo.'); return false;" @endif>
                                     <i class="fas fa-ticket-alt"></i>
-                                    Garantir Vaga
+                                    Garantir Minha Vaga
                                 </a>
                             </div>
 
