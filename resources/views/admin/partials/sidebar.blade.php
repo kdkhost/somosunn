@@ -3,7 +3,11 @@
     $open = fn($patterns) => request()->routeIs($patterns) ? 'menu-open' : '';
 @endphp
 @php
-    $brandLogo = asset('img/logo.svg');
+    // Tenta carregar logo específica do admin, se não tiver, usa a logo principal, senão usa o padrão
+    $logoAdmin = \App\Models\Setting::get('logo_admin');
+    $logoMain = \App\Models\Setting::get('logo_image');
+    
+    $brandLogo = $logoAdmin ? asset($logoAdmin) : ($logoMain ? asset($logoMain) : asset('img/logo.svg'));
     $brandFavicon = file_exists(public_path('favicon.ico')) ? asset('favicon.ico') : $brandLogo;
 @endphp
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
