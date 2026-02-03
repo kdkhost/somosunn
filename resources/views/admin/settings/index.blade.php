@@ -334,8 +334,6 @@
                     </div>
                 </div>
 
-                </div>
-
                 {{-- LOGIN SOCIAL --}}
                 <div class="tab-pane fade" id="tab-social" role="tabpanel">
                     <div class="alert alert-info">
