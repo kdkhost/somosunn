@@ -97,7 +97,7 @@
                     </ul>
                 </li>
 
-                <li class="nav-item"><a href="{{ route('admin.upload.test') }}" class="nav-link {{ $is('admin.upload.test') }}"><i class="nav-icon fas fa-upload"></i><p>Upload</p></a></li>
+                {{-- <li class="nav-item"><a href="{{ route('admin.upload.test') }}" class="nav-link {{ $is('admin.upload.test') }}"><i class="nav-icon fas fa-upload"></i><p>Upload</p></a></li> --}}
 
                 <li class="nav-item has-treeview {{ $open(['admin.mailtemplates.*','admin.mailtest']) }}">
                     <a href="#" class="nav-link {{ $is(['admin.mailtemplates.*','admin.mailtest']) }}">
@@ -106,7 +106,7 @@
                     </a>
                     <ul class="nav nav-treeview pl-4">
                         <li class="nav-item"><a href="{{ route('admin.mailtemplates.index') }}" class="nav-link {{ $is('admin.mailtemplates.index') }}"><i class="fas fa-table nav-icon"></i><p>Templates</p></a></li>
-                        <li class="nav-item"><a href="{{ route('admin.mailtest') }}" class="nav-link {{ $is('admin.mailtest') }}"><i class="fas fa-paper-plane nav-icon"></i><p>Enviar teste</p></a></li>
+                        {{-- <li class="nav-item"><a href="{{ route('admin.mailtest') }}" class="nav-link {{ $is('admin.mailtest') }}"><i class="fas fa-paper-plane nav-icon"></i><p>Enviar teste</p></a></li> --}}
                     </ul>
                 </li>
 

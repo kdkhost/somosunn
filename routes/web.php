@@ -129,60 +129,74 @@ Route::post('/webhook/mercadopago/{seller_id}', [\App\Http\Controllers\PaymentWe
 
 // Admin routes (simple scaffold)
 Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function(){
+    // Rotas de Membro (Comum a todos no painel)
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
-    Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
-    Route::post('/settings/test-smtp', [\App\Http\Controllers\Admin\SettingController::class, 'testSmtp'])->name('settings.test-smtp');
-
-    // Usuários
-    Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('users');
-    // Permissões / Papéis
-    Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class)->names('permissions');
-
-
-
-    // Courses CRUD
-    Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class)->names('courses');
-
-    // Events CRUD
-    Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');
-
-    // Points Rules
-    Route::resource('points-rules', \App\Http\Controllers\Admin\PointsRuleController::class)->names('points-rules');
-
-    // Mentorships CRUD
-    Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class)->names('mentorships');
-
-    // Certificates
-    Route::get('/certificates/create', [\App\Http\Controllers\Admin\CertificateController::class, 'createForm'])->name('certificates.create');
-    Route::post('/certificates/generate', [\App\Http\Controllers\Admin\CertificateController::class, 'generate'])->name('certificates.generate');
-    Route::get('/certificates/view/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'view'])->name('certificates.view');
-
-    // Ranking
-    Route::get('/ranking', [\App\Http\Controllers\Admin\RankingController::class, 'index'])->name('ranking');
-
-    // Chunked uploads
-    Route::post('/upload/chunk', [\App\Http\Controllers\UploadChunkController::class, 'storeChunk'])->name('upload.chunk');
-    Route::post('/upload/assemble', [\App\Http\Controllers\UploadChunkController::class, 'assemble'])->name('upload.assemble');
-
-    // Mail templates
-    Route::get('/mailtemplates', [\App\Http\Controllers\Admin\MailTemplateController::class, 'index'])->name('mailtemplates.index');
-    Route::get('/mailtemplates/create', [\App\Http\Controllers\Admin\MailTemplateController::class, 'create'])->name('mailtemplates.create');
-    Route::post('/mailtemplates', [\App\Http\Controllers\Admin\MailTemplateController::class, 'store'])->name('mailtemplates.store');
-    Route::get('/mailtemplates/{mailtemplate}/edit', [\App\Http\Controllers\Admin\MailTemplateController::class, 'edit'])->name('mailtemplates.edit');
-    Route::put('/mailtemplates/{mailtemplate}', [\App\Http\Controllers\Admin\MailTemplateController::class, 'update'])->name('mailtemplates.update');
-    Route::delete('/mailtemplates/{mailtemplate}', [\App\Http\Controllers\Admin\MailTemplateController::class, 'destroy'])->name('mailtemplates.destroy');
-    Route::get('/mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('mailtemplates.preview');
-    Route::post('/mailtemplates/{mailtemplate}/send-preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
-
-    // Plans
-    Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)->names('plans');
-
-    // Orders / Financeiro
-    Route::post('orders/{order}/refund', [\App\Http\Controllers\Admin\OrderController::class, 'refund'])->name('orders.refund');
-    Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show'])->names('orders');
     
-    // Social / Comunidade Moderação
-    Route::get('/social', [\App\Http\Controllers\Admin\SocialController::class, 'index'])->name('social.index');
-    Route::delete('/social/{post}', [\App\Http\Controllers\Admin\SocialController::class, 'destroy'])->name('social.destroy');
+    // Perfil (Acessível a membros para completar cadastro)
+    Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+
+    // Impersonate Stop (disponível se estiver impersonando, sessão controla)
+    Route::get('/stop-impersonating', [\App\Http\Controllers\Admin\ImpersonateController::class, 'stop'])->name('impersonate.stop');
+
+    // Rotas Restritas (Apenas Admin/Superadmin)
+    Route::middleware([\App\Http\Middleware\EnsureUserIsAdmin::class])->group(function () {
+        
+        // Impersonate Start (Apenas SuperAdmin)
+        Route::get('/users/{user}/impersonate', [\App\Http\Controllers\Admin\ImpersonateController::class, 'impersonate'])->name('users.impersonate');
+
+        Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
+        Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+        Route::post('/settings/test-smtp', [\App\Http\Controllers\Admin\SettingController::class, 'testSmtp'])->name('settings.test-smtp');
+    
+        // Usuários
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('users');
+        // Permissões / Papéis
+        Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class)->names('permissions');
+    
+        // Courses CRUD
+        Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class)->names('courses');
+    
+        // Events CRUD
+        Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');
+    
+        // Points Rules
+        Route::resource('points-rules', \App\Http\Controllers\Admin\PointsRuleController::class)->names('points-rules');
+    
+        // Mentorships CRUD
+        Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class)->names('mentorships');
+    
+        // Certificates
+        Route::get('/certificates/create', [\App\Http\Controllers\Admin\CertificateController::class, 'createForm'])->name('certificates.create');
+        Route::post('/certificates/generate', [\App\Http\Controllers\Admin\CertificateController::class, 'generate'])->name('certificates.generate');
+        Route::get('/certificates/view/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'view'])->name('certificates.view');
+    
+        // Ranking
+        Route::get('/ranking', [\App\Http\Controllers\Admin\RankingController::class, 'index'])->name('ranking');
+    
+        // Chunked uploads
+        Route::post('/upload/chunk', [\App\Http\Controllers\UploadChunkController::class, 'storeChunk'])->name('upload.chunk');
+        Route::post('/upload/assemble', [\App\Http\Controllers\UploadChunkController::class, 'assemble'])->name('upload.assemble');
+    
+        // Mail templates
+        Route::get('/mailtemplates', [\App\Http\Controllers\Admin\MailTemplateController::class, 'index'])->name('mailtemplates.index');
+        Route::get('/mailtemplates/create', [\App\Http\Controllers\Admin\MailTemplateController::class, 'create'])->name('mailtemplates.create');
+        Route::post('/mailtemplates', [\App\Http\Controllers\Admin\MailTemplateController::class, 'store'])->name('mailtemplates.store');
+        Route::get('/mailtemplates/{mailtemplate}/edit', [\App\Http\Controllers\Admin\MailTemplateController::class, 'edit'])->name('mailtemplates.edit');
+        Route::put('/mailtemplates/{mailtemplate}', [\App\Http\Controllers\Admin\MailTemplateController::class, 'update'])->name('mailtemplates.update');
+        Route::delete('/mailtemplates/{mailtemplate}', [\App\Http\Controllers\Admin\MailTemplateController::class, 'destroy'])->name('mailtemplates.destroy');
+        Route::get('/mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('mailtemplates.preview');
+        Route::post('/mailtemplates/{mailtemplate}/send-preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
+    
+        // Plans
+        Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)->names('plans');
+    
+        // Orders / Financeiro
+        Route::post('orders/{order}/refund', [\App\Http\Controllers\Admin\OrderController::class, 'refund'])->name('orders.refund');
+        Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show'])->names('orders');
+        
+        // Social / Comunidade Moderação
+        Route::get('/social', [\App\Http\Controllers\Admin\SocialController::class, 'index'])->name('social.index');
+        Route::delete('/social/{post}', [\App\Http\Controllers\Admin\SocialController::class, 'destroy'])->name('social.destroy');
+    });
 });

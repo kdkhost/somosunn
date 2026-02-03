@@ -34,6 +34,7 @@
         <div class="card-header p-0 border-bottom-0">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tab-geral" role="tab">Geral</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-appearance" role="tab">Aparência</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-pwa" role="tab">PWA</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-gateway" role="tab">Gateway</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-preloader" role="tab">Preloader</a></li>
@@ -171,6 +172,83 @@
                                 <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                {{-- APARÊNCIA (NOVO) --}}
+                <div class="tab-pane fade" id="tab-appearance" role="tabpanel">
+                    <h5 class="text-primary mb-3"><i class="fas fa-home mr-2"></i>Hero (Página Inicial)</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Título Principal</label>
+                                <input name="hero_title" class="form-control" value="{{ $settings['hero_title'] ?? 'Transforme sua carreira' }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Subtítulo</label>
+                                <textarea name="hero_subtitle" class="form-control" rows="3">{{ $settings['hero_subtitle'] ?? 'Junte-se a milhares de membros e aprenda com os melhores.' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Imagem de Fundo (Hero)</label>
+                            <input type="hidden" name="remove_hero_image" value="0">
+                            @php $heroUrl = $getUrl('hero_image'); @endphp
+                            <div class="upload-box" data-max-size="{{ 5*1024*1024 }}" data-existing-url="{{ $heroUrl }}" data-remove-input="[name='remove_hero_image']">
+                                <input type="file" name="hero_image" accept="image/*" class="d-none">
+                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
+                                <div class="upload-help text-muted small">Recomendado: 1920x1080px</div>
+                                <div class="upload-meta text-muted small"></div>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
+                                <div class="progress upload-progress d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
+                                <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="text-primary mb-3"><i class="fas fa-palette mr-2"></i>Cores e Identidade</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Cor Primária (Botões, Destaques)</label>
+                                <div class="input-group colorpicker-element">
+                                    <input name="site_color_primary" class="form-control" value="{{ $settings['site_color_primary'] ?? '#007bff' }}">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text"><i class="fas fa-square" style="color: {{ $settings['site_color_primary'] ?? '#007bff' }}"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Cor Secundária (Backgrounds, Detalhes)</label>
+                                <div class="input-group colorpicker-element">
+                                    <input name="site_color_secondary" class="form-control" value="{{ $settings['site_color_secondary'] ?? '#6c757d' }}">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text"><i class="fas fa-square" style="color: {{ $settings['site_color_secondary'] ?? '#6c757d' }}"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="text-primary mb-3"><i class="fas fa-shoe-prints mr-2"></i>Rodapé</h5>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Texto do Rodapé (Sobre)</label>
+                                <textarea name="footer_text" class="form-control" rows="3">{{ $settings['footer_text'] ?? '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3"><div class="form-group"><label><i class="fab fa-instagram mr-1"></i>Instagram URL</label><input name="social_instagram" class="form-control" value="{{ $settings['social_instagram'] ?? '' }}"></div></div>
+                        <div class="col-md-3"><div class="form-group"><label><i class="fab fa-facebook mr-1"></i>Facebook URL</label><input name="social_facebook" class="form-control" value="{{ $settings['social_facebook'] ?? '' }}"></div></div>
+                        <div class="col-md-3"><div class="form-group"><label><i class="fab fa-youtube mr-1"></i>Youtube URL</label><input name="social_youtube" class="form-control" value="{{ $settings['social_youtube'] ?? '' }}"></div></div>
+                        <div class="col-md-3"><div class="form-group"><label><i class="fab fa-linkedin mr-1"></i>LinkedIn URL</label><input name="social_linkedin" class="form-control" value="{{ $settings['social_linkedin'] ?? '' }}"></div></div>
                     </div>
                 </div>
 

@@ -11,14 +11,23 @@ use App\Models\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
+    
+    public function isAdmin()
+    {
+        return in_array($this->role, ['admin', 'superadmin']) || in_array($this->level, ['superadmin', 'sucesso']);
+    }
 
     protected $fillable = [
-        'name','email','password','doc','phone','cep','address','role','points','theme_pref','level'
+        'name','email','password','doc','phone','cep','address','role','points','theme_pref','level',
+        'photo', 'bio', 'social_links'
     ];
 
     protected $hidden = ['password','remember_token'];
 
-    protected $casts = ['email_verified_at' => 'datetime'];
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'social_links' => 'array'
+    ];
 
     public function courses()
     {

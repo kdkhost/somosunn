@@ -43,6 +43,8 @@ class SettingController extends Controller
             'remove_logo_auth',
             'remove_logo_front',
             'remove_watermark_image',
+            'hero_image',
+            'remove_hero_image',
         ]);
 
         $dirs = [
@@ -71,6 +73,7 @@ class SettingController extends Controller
             'logo_auth',
             'logo_front',
             'watermark_image',
+            'hero_image',
         ];
         foreach ($removals as $key) {
             if ($request->boolean('remove_' . $key)) {
@@ -110,6 +113,9 @@ class SettingController extends Controller
         }
         if ($request->hasFile('watermark_image')) {
             $this->replaceFile('watermark_image', $this->storePublic($request->file('watermark_image'), 'uploads/imagens/watermark'));
+        }
+        if ($request->hasFile('hero_image')) {
+            $this->replaceFile('hero_image', $this->storePublic($request->file('hero_image'), 'uploads/imagens/frontend'));
         }
 
         $bools = ['pwa_enabled', 'preloader_enabled'];
@@ -181,6 +187,7 @@ class SettingController extends Controller
             'pwa_icon_512',
             'pwa_splash',
             'pwa_banner',
+            'hero_image',
         ];
         $searchDirs = [
             'uploads/imagens/geral',

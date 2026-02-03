@@ -21,6 +21,9 @@
           <td>{{ $user->role ?? '-' }}</td>
           <td>{{ $user->level ?? '-' }}</td>
           <td class="text-right">
+            @if(auth()->user()->role === 'superadmin' && $user->id !== auth()->id())
+                <a href="{{ route('admin.users.impersonate', $user) }}" class="btn btn-sm btn-outline-warning" title="Acessar como usuário" data-pjax="false"><i class="fas fa-user-secret"></i></a>
+            @endif
             <a href="{{ route('admin.users.edit',$user) }}" class="btn btn-sm btn-outline-secondary" data-pjax="true"><i class="fas fa-edit"></i></a>
             <button class="btn btn-sm btn-outline-danger btn-delete" data-action="{{ route('admin.users.destroy',$user) }}"><i class="fas fa-trash"></i></button>
           </td>

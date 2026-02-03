@@ -7,6 +7,14 @@
         <li class="nav-item d-none d-sm-inline-block">
             <a href="{{ route('home') }}" class="nav-link" target="_blank" rel="noopener">Ver site</a>
         </li>
+        @if(session()->has('impersonator_id'))
+        <li class="nav-item ml-3">
+            <div class="bg-warning px-3 py-1 rounded d-flex align-items-center">
+                <span class="text-dark mr-2 font-weight-bold"><i class="fas fa-user-secret mr-1"></i> Acessando como: {{ auth()->user()->name }}</span>
+                <a href="{{ route('admin.impersonate.stop') }}" class="btn btn-xs btn-dark">Voltar ao Admin</a>
+            </div>
+        </li>
+        @endif
     </ul>
 
     <ul class="navbar-nav ml-auto align-items-center">
@@ -22,12 +30,21 @@
         @auth
         <li class="nav-item dropdown">
             <a class="nav-link d-flex align-items-center" data-toggle="dropdown" href="#" aria-expanded="false">
-                <i class="fas fa-user-circle mr-1"></i> {{ auth()->user()->name ?? 'Usuário' }}
+                @if(auth()->user()->photo)
+                    <img src="{{ asset('storage/'.auth()->user()->photo) }}" alt="User" class="img-circle mr-2" style="width:30px;height:30px;object-fit:cover;">
+                @else
+                    <i class="fas fa-user-circle mr-1" style="font-size: 1.5rem;"></i>
+                @endif
+                <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
             </a>
             <div class="dropdown-menu dropdown-menu-right">
-                <span class="dropdown-item-text text-muted text-sm">
-                    {{ (auth()->user()->role ?? 'user') === 'superadmin' ? 'Superadmin' : (auth()->user()->role ?? 'Usuário') }}
+                <span class="dropdown-item-text text-muted text-sm text-center font-weight-bold">
+                    {{ (auth()->user()->role ?? 'user') === 'superadmin' ? 'Superadmin' : (auth()->user()->role === 'admin' ? 'Admin' : 'Membro') }}
                 </span>
+                <div class="dropdown-divider"></div>
+                <a href="{{ route('admin.profile.edit') }}" class="dropdown-item">
+                    <i class="fas fa-id-card mr-2 text-primary"></i> Meu Perfil
+                </a>
                 <div class="dropdown-divider"></div>
                 <form method="POST" action="{{ route('logout') }}" class="m-0 p-0">
                     @csrf
