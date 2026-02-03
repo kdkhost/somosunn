@@ -4,16 +4,13 @@
 
 @section('content')
 @php
-    $logoAuth = \App\Models\Setting::get('logo_auth') ?: \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
-    $logoAuthSrc = $logoAuth ? asset(ltrim($logoAuth, '/')) : asset('img/logo.svg');
+    // Logic inside component
 @endphp
 <div class="min-h-screen flex items-center justify-center bg-slate-50 py-16 px-6">
     <div class="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
-        <div class="hidden md:flex flex-col items-center justify-center gap-6 p-12 bg-gradient-to-br from-[#7a5af8] via-[#6a40e6] to-[#4cc3ff] text-white">
-            <img src="{{ $logoAuthSrc }}" class="h-16" alt="UNN" onerror="this.style.display='none';">
-            <h2 class="text-2xl font-bold">Crie sua conta</h2>
-            <p class="max-w-xs text-sm text-white/90">Faça parte da comunidade e tenha acesso às mentorias e eventos.</p>
-        </div>
+        <x-auth-visual title="Crie sua conta">
+            Faça parte da comunidade e tenha acesso às mentorias e eventos exclusivos.
+        </x-auth-visual>
         <div class="p-10">
             <h3 class="text-3xl font-bold mb-8">Criar conta</h3>
             <form method="POST" action="{{ route('register') }}" class="space-y-5">

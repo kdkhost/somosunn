@@ -4,22 +4,14 @@
 
 @section('content')
 @php
-    $logoAuth = \App\Models\Setting::get('logo_auth') ?: \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
-    $logoAuthSrc = $logoAuth ? asset(ltrim($logoAuth, '/')) : asset('img/logo.svg');
+    // $logoAuth logic moved to component
 @endphp
 <div class="min-h-screen flex items-center justify-center bg-slate-50 py-16 px-6">
     <div class="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
         <!-- Coluna visual -->
-        <div class="hidden md:flex flex-col items-center justify-center gap-6 p-12 bg-gradient-to-br from-[#7a5af8] via-[#6a40e6] to-[#4cc3ff] text-white">
-            <img src="{{ $logoAuthSrc }}" class="h-16 mb-4" alt="UNN" onerror="this.style.display='none';">
-            <h2 class="text-2xl font-bold">Bem-vindo de volta!</h2>
-            <p class="max-w-xs text-sm text-white/90">Acesse seu painel, cursos, palestras e mentorias com as suas credenciais ou login social.</p>
-            <div class="flex gap-3 mt-4 text-sm font-semibold">
-                <a href="{{ route('social.redirect','google') }}" class="bg-white/15 px-4 py-2 rounded-xl hover:bg-white/25 transition">Google</a>
-                <a href="{{ route('social.redirect','facebook') }}" class="bg-white/15 px-4 py-2 rounded-xl hover:bg-white/25 transition">Facebook</a>
-                <a href="{{ route('social.redirect','linkedin') }}" class="bg-white/15 px-4 py-2 rounded-xl hover:bg-white/25 transition">LinkedIn</a>
-            </div>
-        </div>
+        <x-auth-visual title="Bem-vindo de volta!" :show-social="true">
+            Acesse seu painel, cursos, palestras e mentorias com as suas credenciais ou login social.
+        </x-auth-visual>
 
         <!-- Coluna formulário -->
         <div class="p-10">
