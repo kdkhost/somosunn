@@ -12,9 +12,14 @@ class EventController extends Controller
     {
         if ($request->ajax()) {
             // FullCalendar event feed
-            $events = Event::whereDate('start_at', '>=', $request->start)
-                           ->whereDate('end_at', '<=', $request->end)
-                           ->whereDate('end_at', '<=', $request->end)
+            // FullCalendar event feed
+            $events = Event::where(function($query) use ($request) {
+                                $query->whereDate('start_at', '<=', $request->end)
+                                      ->where(function($q) use ($request) {
+                                          $q->whereDate('end_at', '>=', $request->start)
+                                            ->orWhereNull('end_at');
+                                      });
+                            })
                            ->get(['id', 'title', 'start_at as start', 'end_at as end', 'color', 'all_day', 'address', 'latitude', 'longitude', 'description', 'location', 
                                   'price', 'capacity', 
                                   'batch_1_price', 'batch_1_deadline',
