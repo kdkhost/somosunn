@@ -36,9 +36,9 @@
     <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-4 flex items-center justify-between gap-4">
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0">
-            <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#1F5EDB] to-[#1D3FC4] text-white font-black tracking-wide text-xl shadow-lg overflow-hidden">
-                <img src="{{ $logoSrc }}" alt="UNN" class="h-10 w-10 object-contain" onerror="this.style.display='none';">
-            </span>
+            <div class="inline-flex h-16 w-auto items-center justify-center overflow-hidden">
+                <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain" onerror="this.style.display='none';">
+            </div>
             <div class="hidden xl:flex flex-col leading-tight">
                 <span class="text-sm font-semibold text-gray-600">Networking que gera resultados</span>
                 <span class="text-xs uppercase tracking-[0.35em] text-gray-400">Universidade de Negócios</span>
@@ -115,9 +115,9 @@
     <div id="mobile-menu-panel" class="relative z-10 w-4/5 max-w-sm h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-400 ease-out overflow-y-auto">
         <div class="flex items-center justify-between border-b border-slate-100 px-6 py-5">
             <div class="flex items-center gap-3">
-                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#1F5EDB] to-[#1D3FC4] text-white font-black text-lg overflow-hidden">
-                    <img src="{{ $logoSrc }}" alt="UNN" class="h-8 w-8 object-contain" onerror="this.style.display='none';">
-                </span>
+                <div class="inline-flex h-12 w-auto items-center justify-center overflow-hidden">
+                    <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain" onerror="this.style.display='none';">
+                </div>
                 <div>
                     <p class="text-sm font-semibold text-gray-900">UNN</p>
                     <p class="text-xs uppercase tracking-[0.4em] text-gray-400">Networking</p>
