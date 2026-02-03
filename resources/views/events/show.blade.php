@@ -68,9 +68,12 @@
                         <div class="h-2" style="background-color: {{ $eventColor }}"></div>
                         <div class="p-6">
                             <div class="text-center mb-6">
-                                @if($event->price > 0)
+                                @if($event->current_price > 0)
+                                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider mb-2">
+                                        {{ $event->current_batch_label }}
+                                    </span>
                                     <p class="text-sm text-gray-500 mb-1">Investimento</p>
-                                    <p class="text-4xl font-black text-gray-900">R$ {{ number_format($event->price, 2, ',', '.') }}</p>
+                                    <p class="text-4xl font-black text-gray-900">R$ {{ number_format($event->current_price, 2, ',', '.') }}</p>
                                     <p class="text-sm text-gray-500">por pessoa</p>
                                 @else
                                     <p class="text-sm text-gray-500 mb-1">Entrada</p>

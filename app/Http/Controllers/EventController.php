@@ -27,7 +27,7 @@ class EventController extends Controller
         // If no events exist, provide demo data
         if ($events->isEmpty()) {
             $events = collect([
-                (object)[
+                new Event([
                     'id' => 1,
                     'title' => 'Networking Premium - Edição São Paulo',
                     'speaker' => 'João Silva e Convidados',
@@ -39,12 +39,14 @@ class EventController extends Controller
                     'latitude' => -23.6230,
                     'longitude' => -46.6992,
                     'price' => 297.00,
+                    'batch_1_price' => 250.00,
+                    'batch_1_deadline' => now()->addDays(5),
+                    'batch_2_price' => 297.00,
                     'capacity' => 200,
                     'published' => true,
                     'color' => '#1F5EDB',
-                    'is_demo' => true,
-                ],
-                (object)[
+                ]),
+                new Event([
                     'id' => 2,
                     'title' => 'Masterclass: Vendas de Alto Impacto',
                     'speaker' => 'Maria Santos',
@@ -56,12 +58,12 @@ class EventController extends Controller
                     'latitude' => -23.5537,
                     'longitude' => -46.6523,
                     'price' => 497.00,
+                    'batch_1_price' => 397.00, // Expired example if I forced it, but for demo let's keep simple
                     'capacity' => 100,
                     'published' => true,
                     'color' => '#10B981',
-                    'is_demo' => true,
-                ],
-                (object)[
+                ]),
+                new Event([
                     'id' => 3,
                     'title' => 'Happy Hour Empresarial - Rio de Janeiro',
                     'speaker' => 'Equipe UNN',
@@ -76,9 +78,11 @@ class EventController extends Controller
                     'capacity' => 50,
                     'published' => true,
                     'color' => '#F59E0B',
-                    'is_demo' => true,
-                ],
+                ]),
             ]);
+            
+            // Add is_demo flag manually since it's not fillable
+            $events->each(function($e) { $e->is_demo = true; });
             
             return view('events.index', ['events' => $events, 'isDemo' => true]);
         }

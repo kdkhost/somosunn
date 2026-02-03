@@ -42,10 +42,17 @@ class EventController extends Controller
         if($request->has('price') && $request->price){
              $request->merge(['price' => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->price))]);
         }
-        // Sanitize batches
+        // Sanitize batches prices
         foreach(['batch_1_price', 'batch_2_price', 'batch_3_price'] as $field){
             if($request->has($field) && $request->$field){
                 $request->merge([$field => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->$field))]);
+            }
+        }
+        
+        // Sanitize dates (remove T)
+        foreach(['start_at', 'end_at', 'batch_1_deadline', 'batch_2_deadline', 'batch_3_deadline'] as $dateField){
+            if($request->has($dateField) && $request->$dateField){
+                $request->merge([$dateField => str_replace('T', ' ', $request->$dateField)]);
             }
         }
         
@@ -83,10 +90,17 @@ class EventController extends Controller
         if($request->has('price') && $request->price){
              $request->merge(['price' => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->price))]);
         }
-        // Sanitize batches
+        // Sanitize batches prices
         foreach(['batch_1_price', 'batch_2_price', 'batch_3_price'] as $field){
             if($request->has($field) && $request->$field){
                 $request->merge([$field => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->$field))]);
+            }
+        }
+        
+        // Sanitize dates (remove T from datetime-local)
+        foreach(['start_at', 'end_at', 'batch_1_deadline', 'batch_2_deadline', 'batch_3_deadline'] as $dateField){
+            if($request->has($dateField) && $request->$dateField){
+                $request->merge([$dateField => str_replace('T', ' ', $request->$dateField)]);
             }
         }
 

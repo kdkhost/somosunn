@@ -377,7 +377,16 @@
                     calendar.refetchEvents();
                 },
                 error: function(xhr) {
-                    toastr.error('Erro ao salvar evento');
+                    var errorMsg = 'Erro ao salvar evento';
+                    if(xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    if(xhr.responseJSON && xhr.responseJSON.errors) {
+                         // Show first validation error
+                         var keys = Object.keys(xhr.responseJSON.errors);
+                         if(keys.length > 0) errorMsg = xhr.responseJSON.errors[keys[0]][0];
+                    }
+                    toastr.error(errorMsg);
                 }
             });
         });

@@ -103,10 +103,16 @@
                             <!-- Price and CTA -->
                             <div class="pt-4 border-t border-gray-100">
                                 <div class="text-center mb-4">
-                                    @if($event->price > 0)
-                                        <p class="text-3xl font-black text-gray-900">R$ {{ number_format($event->price, 2, ',', '.') }}</p>
+                                    @if($event->current_price > 0)
+                                        <div class="mb-1">
+                                            <span class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider">
+                                                {{ $event->current_batch_label }}
+                                            </span>
+                                        </div>
+                                        <p class="text-3xl font-black text-gray-900">R$ {{ number_format($event->current_price, 2, ',', '.') }}</p>
                                         <p class="text-sm text-gray-500">por pessoa</p>
                                     @else
+                                        <div class="mb-1 h-6"></div> <!-- Spacer for alignment -->
                                         <p class="text-3xl font-black text-green-600">Gratuito</p>
                                         <p class="text-sm text-gray-500">entrada liberada</p>
                                     @endif

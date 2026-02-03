@@ -16,4 +16,46 @@ class Event extends Model
         'batch_2_price', 'batch_2_deadline',
         'batch_3_price', 'batch_3_deadline'
     ];
+
+    protected $casts = [
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
+        'batch_1_deadline' => 'datetime',
+        'batch_2_deadline' => 'datetime',
+        'batch_3_deadline' => 'datetime',
+        'all_day' => 'boolean',
+        'published' => 'boolean'
+    ];
+
+    public function getCurrentPriceAttribute()
+    {
+        $now = now();
+
+        // If Batch 1 is valid (no deadline OR deadline is future) AND it has a price
+        if ($this->batch_1_price && (!$this->batch_1_deadline || $now->lte($this->batch_1_deadline))) {
+            return $this->batch_1_price;
+        }
+
+        // If Batch 1 expired, check Batch 2
+        if ($this->batch_2_price && (!$this->batch_2_deadline || $now->lte($this->batch_2_deadline))) {
+            return $this->batch_2_price;
+        }
+
+        // If Batch 2 expired, check Batch 3
+        if ($this->batch_3_price) {
+            return $this->batch_3_price;
+        }
+
+        // Fallback to legacy price or 0
+        return $this->price ?? 0;
+    }
+
+    public function getCurrentBatchLabelAttribute()
+    {
+        $now = now();
+        if ($this->batch_1_price && (!$this->batch_1_deadline || $now->lte($this->batch_1_deadline))) return '1º Lote';
+        if ($this->batch_2_price && (!$this->batch_2_deadline || $now->lte($this->batch_2_deadline))) return '2º Lote';
+        if ($this->batch_3_price) return '3º Lote';
+        return 'Entrada';
+    }
 }
