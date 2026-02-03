@@ -87,6 +87,7 @@ Route::get('/api/ranking', [RankingController::class, 'index'])->name('api.ranki
 
 // PWA manifest (dynamic)
 Route::get('/manifest.webmanifest', [\App\Http\Controllers\PwaController::class, 'manifest'])->name('manifest');
+Route::get('/offline', fn() => view('offline'))->name('offline');
 
 // Admin templates / tests
 Route::get('/admin/mail-test', [MailTestController::class, 'showForm'])->name('admin.mailtest');

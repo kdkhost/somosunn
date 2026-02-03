@@ -1,8 +1,7 @@
 const CACHE_NAME = 'unn-v1';
 const URLS_TO_CACHE = [
   '/offline',
-  '/img/logo.svg',
-  '/img/logo-white.svg'
+  '/img/logo.svg'
 ];
 
 self.addEventListener('install', function(event) {
