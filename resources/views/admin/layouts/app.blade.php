@@ -48,8 +48,6 @@
     :root {
         --main-header-height: 3.5rem; /* 56px default AdminLTE */
     }
-    body{font-family:'Inter',sans-serif;}
-    /* layout espaçamentos padrão AdminLTE */
     /* layout espaçamentos padrão AdminLTE */
     .content-wrapper{
         background:#f4f6f9;
