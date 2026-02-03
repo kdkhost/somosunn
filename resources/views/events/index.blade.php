@@ -46,7 +46,7 @@
                         <div class="px-6 pt-6">
                             <div class="flex items-start justify-between">
                                 <div class="flex items-center gap-4">
-                                    <div class="bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-2xl p-4 text-center min-w-[80px]">
+                                    <div class="btn-primary text-white rounded-2xl p-4 text-center min-w-[80px]">
                                         <p class="text-2xl font-black">{{ $startDate->format('d') }}</p>
                                         <p class="text-xs uppercase tracking-wide">{{ $startDate->translatedFormat('M') }}</p>
                                     </div>
@@ -70,7 +70,7 @@
                         <!-- Event Content -->
                         <div class="p-6">
                             <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $event->title }}</h3>
-                            <p class="text-sm text-blue-600 font-medium mb-3">
+                            <p class="text-sm font-medium mb-3" style="color: var(--unn-azul-1)">
                                 <i class="fas fa-user-tie mr-1"></i> {{ $event->speaker }}
                             </p>
                             <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $event->description }}</p>
@@ -112,7 +112,7 @@
                                     @endif
                                 </div>
                                 <a href="{{ $isDemo ? '#' : route('events.show', $event->id) }}" 
-                                   class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-[length:200%_100%] text-white px-6 py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl hover:bg-right transition-all duration-500 {{ $isDemo ? 'opacity-75 cursor-not-allowed' : '' }}"
+                                   class="w-full flex items-center justify-center gap-2 btn-primary text-white px-6 py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 {{ $isDemo ? 'opacity-75 cursor-not-allowed' : '' }}"
                                    @if($isDemo) onclick="alert('Este é um evento de demonstração. Configure eventos reais no painel administrativo.'); return false;" @endif>
                                     <i class="fas fa-ticket-alt"></i>
                                     Garantir Minha Vaga
@@ -127,7 +127,7 @@
                                     <span class="font-semibold">{{ $event->capacity }} lugares</span>
                                 </div>
                                 <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                    <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" style="width: {{ rand(30, 80) }}%"></div>
+                                    <div class="h-full rounded-full" style="width: {{ rand(30, 80) }}%; background: linear-gradient(90deg, var(--unn-azul-1), var(--unn-azul-2))"></div>
                                 </div>
                             </div>
                             @endif
@@ -147,11 +147,11 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-r from-blue-600 to-purple-600">
+    <section class="py-16 px-6 md:px-12 lg:px-24" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
         <div class="max-w-4xl mx-auto text-center text-white">
             <h2 class="text-3xl lg:text-4xl font-black mb-4">Quer ser notificado sobre novos eventos?</h2>
             <p class="text-lg opacity-90 mb-8">Cadastre-se e receba em primeira mão informações sobre nossos encontros exclusivos.</p>
-            <a href="{{ route('register') }}" class="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition">
+            <a href="{{ route('register') }}" class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition" style="color: var(--unn-azul-1)">
                 <i class="fas fa-bell"></i>
                 Quero ser avisado
             </a>
@@ -161,7 +161,7 @@
 
 <style>
 .text-gradient {
-    background: linear-gradient(135deg, #1F5EDB 0%, #7C3AED 100%);
+    background: linear-gradient(135deg, var(--unn-azul-1) 0%, var(--unn-azul-3) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

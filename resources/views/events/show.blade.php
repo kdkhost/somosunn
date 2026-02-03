@@ -15,7 +15,7 @@
     <!-- Hero Section -->
     <section class="pt-28 pb-12 px-6 md:px-12 lg:px-24" style="background: linear-gradient(135deg, {{ $eventColor }}20 0%, {{ $eventColor }}05 100%);">
         <div class="max-w-7xl mx-auto">
-            <a href="{{ route('events.index') }}" class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6 transition">
+            <a href="{{ route('events.index') }}" class="inline-flex items-center gap-2 text-gray-600 mb-6 transition" style="--tw-text-opacity:1" onmouseover="this.style.color='var(--unn-azul-1)'" onmouseout="this.style.color=''">
                 <i class="fas fa-arrow-left"></i> Voltar para eventos
             </a>
             
@@ -29,8 +29,7 @@
                     @endif
                     
                     <h1 class="text-4xl lg:text-5xl font-black text-gray-900 mb-4">{{ $event->title }}</h1>
-                    
-                    <p class="text-xl text-blue-600 font-semibold mb-6">
+                    <p class="text-xl font-semibold mb-6" style="color: var(--unn-azul-1)">
                         <i class="fas fa-user-tie mr-2"></i> {{ $event->speaker }}
                     </p>
                     
@@ -40,7 +39,7 @@
                     <div class="grid sm:grid-cols-2 gap-4 mb-8">
                         <div class="bg-white rounded-2xl p-5 shadow-lg">
                             <div class="flex items-center gap-4">
-                                <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                                <div class="w-14 h-14 btn-primary rounded-xl flex items-center justify-center">
                                     <i class="fas fa-calendar-alt text-white text-xl"></i>
                                 </div>
                                 <div>
@@ -51,7 +50,7 @@
                         </div>
                         <div class="bg-white rounded-2xl p-5 shadow-lg">
                             <div class="flex items-center gap-4">
-                                <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center">
+                                <div class="w-14 h-14 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #10B981, #14B8A6)">
                                     <i class="fas fa-clock text-white text-xl"></i>
                                 </div>
                                 <div>
@@ -87,7 +86,7 @@
                                     <span class="font-bold text-gray-900">{{ $event->capacity }} lugares</span>
                                 </div>
                                 <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
-                                    <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500" style="width: {{ rand(30, 70) }}%"></div>
+                                    <div class="h-full rounded-full transition-all duration-500" style="width: {{ rand(30, 70) }}%; background: linear-gradient(90deg, var(--unn-azul-1), var(--unn-azul-2))"></div>
                                 </div>
                                 <p class="text-xs text-orange-600 mt-2 font-medium">
                                     <i class="fas fa-fire mr-1"></i> Últimas vagas!
@@ -96,7 +95,7 @@
                             @endif
 
                             <button 
-                                class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 {{ $isDemo ? 'opacity-75 cursor-not-allowed' : '' }}"
+                                class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 {{ $isDemo ? 'opacity-75 cursor-not-allowed' : '' }}"
                                 @if($isDemo) onclick="alert('Este é um evento de demonstração. Configure eventos reais no painel administrativo.');" @endif>
                                 <i class="fas fa-ticket-alt"></i>
                                 {{ $event->price > 0 ? 'Comprar Ingresso' : 'Garantir Minha Vaga' }}
@@ -129,7 +128,7 @@
                     <div class="space-y-3">
                         <a href="https://www.google.com/maps/dir/?api=1&destination={{ $event->latitude }},{{ $event->longitude }}" 
                            target="_blank"
-                           class="flex items-center gap-3 text-blue-600 hover:text-blue-700 font-medium transition">
+                           class="flex items-center gap-3 font-medium transition" style="color: var(--unn-azul-1)">
                             <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                                 <i class="fas fa-directions"></i>
                             </div>
@@ -176,7 +175,7 @@
 
             <div class="mt-12 grid sm:grid-cols-3 gap-6">
                 <div class="bg-slate-50 rounded-2xl p-6 text-center">
-                    <i class="fas fa-users text-3xl text-blue-500 mb-3"></i>
+                    <i class="fas fa-users text-3xl mb-3" style="color: var(--unn-azul-1)"></i>
                     <p class="text-2xl font-bold text-gray-900">{{ $event->capacity ?? '∞' }}</p>
                     <p class="text-sm text-gray-500">Participantes</p>
                 </div>
