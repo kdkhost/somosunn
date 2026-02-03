@@ -1,23 +1,23 @@
 {{-- /**
- * Sistema UNN - Instalador concluÃ­do
+ * Sistema UNN - Instalador concluído
  *
- * Autor: George Marcelo (KDKHOST SOLUÃ‡Ã•ES)
+ * Autor: George Marcelo (KDKHOST SOLUÇÕES)
  * Telefone: +55 (21) 98132-5441
  * Telegram: https://t.me/MARCELO_BRAD
  *
  * Copyright (c) 2026 Kdkhost Soluções. Todos os direitos reservados.
  *
  * AVISO LEGAL:
- * Este software e seu código-fonte sÃ£o propriedade intelectual de kdkhost soluções.
- * Ã‰ proibida a reproduçÃ£o, distribuiçÃ£o, modificaçÃ£o, engenharia reversa ou uso nÃ£o autorizado,
- * total ou parcial, sem autorizaçÃ£o prÃ©via e por escrito.
+ * Este software e seu código-fonte são propriedade intelectual de kdkhost soluções.
+ * É proibida a reprodução, distribuição, modificação, engenharia reversa ou uso não autorizado,
+ * total ou parcial, sem autorização prévia e por escrito.
  *
  * Contato: contato@kdkhost.com.br
  * Licenciamento: Uso restrito conforme contrato/termos aplicáveis.
  */ --}}
 @extends('layouts.app')
 
-@section('title','Instalação concluÃ­da - UNN')
+@section('title','Instalação concluída - UNN')
 
 @section('content')
 <section class="min-h-screen w-full bg-gradient-to-b from-slate-900 via-purple-900 to-black text-white overflow-hidden relative">
@@ -31,13 +31,13 @@
         <div class="text-center space-y-4">
             <p class="text-sm uppercase tracking-[0.5em] text-purple-300">Instalação completada</p>
             <h1 class="text-4xl md:text-5xl font-black leading-tight">Bem-vindo ao ecossistema UNN</h1>
-            <p class="text-gray-300">O portal agora compartilha o mesmo banco de dados do site, os rankings estáo prontos e o superadmin <strong>{{ $admin->email }}</strong> já tem acesso total.</p>
+            <p class="text-gray-300">O portal agora compartilha o mesmo banco de dados do site, os rankings estão prontos e o superadmin <strong>{{ $admin->email }}</strong> já tem acesso total.</p>
         </div>
 
         <div class="grid gap-6 md:grid-cols-3">
             @foreach([
-                ['title'=>'PrÃ©-verificações', 'detail'=>'Requisitos mÃ­nimos registrados e ambiente preparado.', 'icon'=>'fas fa-check-circle'],
-                ['title'=>'Superadmin ativo', 'detail'=>'Senha criptografada, nÃ­vel sucesso e acesso ao painel.', 'icon'=>'fas fa-user-shield'],
+                ['title'=>'Pré-verificações', 'detail'=>'Requisitos mínimos registrados e ambiente preparado.', 'icon'=>'fas fa-check-circle'],
+                ['title'=>'Superadmin ativo', 'detail'=>'Senha criptografada, nível sucesso e acesso ao painel.', 'icon'=>'fas fa-user-shield'],
                 ['title'=>'Ranking ligado', 'detail'=>'As pesquisas agora alimentam o leaderboard automaticamente.', 'icon'=>'fas fa-medal'],
             ] as $item)
                 <article class="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur shadow-2xl hover:border-purple-300 transition">
@@ -57,7 +57,7 @@
             <div class="grid md:grid-cols-3 gap-4 text-sm text-gray-300">
                 <div class="space-y-2">
                     <p class="font-semibold text-white">Dashboard</p>
-                    <p>Login com o superadmin e navegaçÃ£o pelos módulos de cursos, mentorias e pontos.</p>
+                    <p>Login com o superadmin e navegação pelos módulos de cursos, mentorias e pontos.</p>
                 </div>
                 <div class="space-y-2">
                     <p class="font-semibold text-white">Integrações</p>
@@ -77,9 +77,9 @@
         </div>
 
         <div class="rounded-3xl border border-white/20 bg-black/50 p-6 text-xs text-gray-400 space-y-2">
-            <p>Â© {{ date('Y') }} Kdkhost Soluções. Todos os direitos reservados.</p>
-            <p>Desenvolvido por George Marcelo (KDKHOST SOLUÃ‡Ã•ES) Â· Contato: <a href="mailto:contato@kdkhost.com.br" class="text-white underline">contato@kdkhost.com.br</a> Â· Telegram: <a href="https://t.me/MARCELO_BRAD" class="text-white underline">@MARCELO_BRAD</a></p>
-            <p>Uso restrito conforme contrato/termos aplicáveis. AVISO LEGAL: reproduçÃ£o ou engenharia reversa nÃ£o autorizada Ã© proibida.</p>
+            <p>© {{ date('Y') }} Kdkhost Soluções. Todos os direitos reservados.</p>
+            <p>Desenvolvido por George Marcelo (KDKHOST SOLUÇÕES) · Contato: <a href="mailto:contato@kdkhost.com.br" class="text-white underline">contato@kdkhost.com.br</a> · Telegram: <a href="https://t.me/MARCELO_BRAD" class="text-white underline">@MARCELO_BRAD</a></p>
+            <p>Uso restrito conforme contrato/termos aplicáveis. AVISO LEGAL: reprodução ou engenharia reversa não autorizada é proibida.</p>
         </div>
     </div>
 </section>
@@ -105,4 +105,3 @@
 </style>
 
 @endsection
-
