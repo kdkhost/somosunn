@@ -107,16 +107,19 @@ Route::get('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonCon
 // Public Events
 Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
 
-// Social / Community
-Route::get('/feed', [\App\Http\Controllers\SocialController::class, 'feed'])->name('social.feed');
-Route::get('/profile/{username}', [\App\Http\Controllers\SocialController::class, 'profile'])->name('social.profile');
-Route::post('/post', [\App\Http\Controllers\SocialController::class, 'storePost'])->name('social.post.store');
+// Auth Required Routes
+Route::middleware(['auth'])->group(function () {
+    // Social / Community
+    Route::get('/feed', [\App\Http\Controllers\SocialController::class, 'feed'])->name('social.feed');
+    Route::get('/profile/{username}', [\App\Http\Controllers\SocialController::class, 'profile'])->name('social.profile');
+    Route::post('/post', [\App\Http\Controllers\SocialController::class, 'storePost'])->name('social.post.store');
 
-// Chat
-Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
-Route::get('/chat/list', [\App\Http\Controllers\ChatController::class, 'list'])->name('chat.list');
-Route::get('/chat/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
-Route::post('/chat/{conversation}/message', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('chat.message.store');
+    // Chat
+    Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/list', [\App\Http\Controllers\ChatController::class, 'list'])->name('chat.list');
+    Route::get('/chat/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{conversation}/message', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('chat.message.store');
+});
 
 // Payments & Checkout
 Route::get('/settings/payment', [\App\Http\Controllers\GatewayAccountController::class, 'index'])->name('settings.payment');
