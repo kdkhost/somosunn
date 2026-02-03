@@ -23,6 +23,10 @@ Route::get('/contato', fn() => view('site.institucional.contato'))->name('contat
 Route::get('/membros', [\App\Http\Controllers\MemberController::class, 'index'])->name('membros');
 
 // Events
+Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('subscription.checkout');
+Route::post('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'process'])->name('subscription.process');
+Route::get('/assinar/sucesso/{order}', [\App\Http\Controllers\SubscriptionController::class, 'success'])->name('subscription.success');
+
 Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
 Route::get('/eventos/{id}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
 
