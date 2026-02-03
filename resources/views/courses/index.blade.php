@@ -25,26 +25,38 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($courses as $course)
-                <div class="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-300">
-                    <a href="{{ route('courses.show', $course->slug) }}">
+                @php
+                    $isDemo = $course->is_demo ?? false;
+                    $authorName = $isDemo ? ($course->creator->name ?? 'UNN Academy') : ($course->author_name ?? optional($course->creator)->name ?? 'Instrutor');
+                    $lessonsCount = $isDemo ? 0 : ($course->lessons ? $course->lessons->count() : 0);
+                    $courseSlug = $isDemo ? '#' : route('courses.show', $course->slug);
+                @endphp
+                <div class="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-300 {{ $isDemo ? 'opacity-90' : '' }}">
+                    <a href="{{ $courseSlug }}">
                         <div class="h-48 bg-gray-200 relative">
                             @if($course->thumbnail)
                                 <img src="{{ asset('storage/'.$course->thumbnail) }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
                             @else
-                                <div class="flex items-center justify-center h-full text-gray-400">
-                                    <i class="fas fa-image text-4xl"></i>
+                                <div class="flex items-center justify-center h-full text-gray-400 bg-gradient-to-br from-blue-100 to-purple-100">
+                                    <i class="fas fa-graduation-cap text-4xl text-blue-400"></i>
                                 </div>
                             @endif
                             <div class="absolute top-2 right-2 bg-white px-2 py-1 text-xs font-bold rounded shadow">
                                 {{ $course->price > 0 ? 'R$ ' . number_format($course->price, 2, ',', '.') : 'Grátis' }}
                             </div>
+                            @if($isDemo)
+                                <div class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 px-2 py-1 text-xs font-bold rounded shadow">
+                                    DEMONSTRAÇÃO
+                                </div>
+                            @endif
                         </div>
                         <div class="p-5">
                             <h3 class="text-lg font-bold text-gray-900 truncate">{{ $course->title }}</h3>
-                            <p class="text-sm text-gray-500 mt-1">{{ $course->author_name }}</p>
+                            <p class="text-sm text-gray-500 mt-1">{{ $authorName }}</p>
+                            <p class="text-sm text-gray-600 mt-2 line-clamp-2">{{ $course->short_description ?? '' }}</p>
                             <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
-                                <span><i class="far fa-clock mr-1"></i> {{ $course->duration }} min</span>
-                                <span><i class="fas fa-book-open mr-1"></i> {{ $course->lessons->count() }} aulas</span>
+                                <span><i class="far fa-clock mr-1"></i> {{ $course->duration ?? 0 }} min</span>
+                                <span><i class="fas fa-book-open mr-1"></i> {{ $lessonsCount }} aulas</span>
                             </div>
                         </div>
                     </a>
@@ -56,9 +68,11 @@
             @endforelse
         </div>
 
+        @if(method_exists($courses, 'links'))
         <div class="mt-6">
             {{ $courses->links() }}
         </div>
+        @endif
     </div>
 </div>
 @endsection
