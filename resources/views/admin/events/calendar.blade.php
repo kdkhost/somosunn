@@ -177,6 +177,7 @@
             $('#event_id').val('');
             $('#event_latitude').val('');
             $('#event_longitude').val('');
+            $('#suggestions').empty().hide(); // Clear suggestions
             $('#btnDelete').hide();
             $('#modalMapContainer').hide();
             
@@ -213,44 +214,99 @@
                 }
             }
             $('#eventModal').modal('show');
+            
+            // Fix map size when modal opens
+            setTimeout(function(){ 
+                if(modalMap) modalMap.invalidateSize(); 
+            }, 500);
         }
 
         function showMap(lat, lng, address) {
             $('#modalMapContainer').show();
-            $('#modalAddress').text(address || 'Localização aproximada');
+            $('#modalAddress').text(address || 'Localização selecionada');
+            
+            if(!modalMap) {
+                modalMap = L.map('modalMap');
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OSM'}).addTo(modalMap);
+                
+                // Click to move marker
+                modalMap.on('click', function(e) {
+                    updateMarker(e.latlng.lat, e.latlng.lng);
+                });
+            }
             
             setTimeout(function(){
-                if(!modalMap) {
-                    modalMap = L.map('modalMap');
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OSM'}).addTo(modalMap);
-                }
                 modalMap.invalidateSize();
-                modalMap.setView([lat, lng], 15);
-                
-                if(modalMarker) modalMap.removeLayer(modalMarker);
-                modalMarker = L.marker([lat, lng]).addTo(modalMap);
+                modalMap.setView([lat, lng], 16);
+                updateMarker(lat, lng);
             }, 300);
         }
 
-        // Live Geocoding
+        function updateMarker(lat, lng) {
+             if(modalMarker) modalMap.removeLayer(modalMarker);
+             
+             modalMarker = L.marker([lat, lng], {draggable: true}).addTo(modalMap);
+             
+             // Update hidden inputs
+             $('#event_latitude').val(lat);
+             $('#event_longitude').val(lng);
+             
+             // Drag event
+             modalMarker.on('dragend', function(e) {
+                 var position = modalMarker.getLatLng();
+                 $('#event_latitude').val(position.lat);
+                 $('#event_longitude').val(position.lng);
+             });
+        }
+
+        // Live Geocoding with Autocomplete
         let debounceTimer;
+        // Inject suggestions container if not exists
+        if($('#suggestions').length === 0) {
+            $('<ul id="suggestions" class="list-group" style="position:absolute; z-index:1000; width:95%; max-height:200px; overflow-y:auto; display:none;"></ul>').insertAfter('#address');
+        }
+
         $('#address').on('input', function() {
             clearTimeout(debounceTimer);
             var query = $(this).val();
-            if (query.length > 5) {
-                debounceTimer = setTimeout(function() {
-                    fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query))
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data && data.length > 0) {
-                                var lat = data[0].lat;
-                                var lon = data[0].lon;
-                                $('#event_latitude').val(lat);
-                                $('#event_longitude').val(lon);
-                                showMap(lat, lon, query);
-                            }
-                        });
-                }, 1000); // 1 sec delay
+            var suggestions = $('#suggestions');
+            
+            if (query.length < 3) {
+                suggestions.hide();
+                return;
+            }
+
+            debounceTimer = setTimeout(function() {
+                fetch('https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=' + encodeURIComponent(query))
+                    .then(response => response.json())
+                    .then(data => {
+                        suggestions.empty();
+                        if (data && data.length > 0) {
+                            data.forEach(function(item) {
+                                let display_name = item.display_name;
+                                // Simple list item
+                                let li = $('<li class="list-group-item list-group-item-action" style="cursor:pointer;">' + display_name + '</li>');
+                                li.on('click', function() {
+                                    $('#address').val(display_name);
+                                    $('#event_latitude').val(item.lat);
+                                    $('#event_longitude').val(item.lon);
+                                    suggestions.hide();
+                                    showMap(item.lat, item.lon, display_name);
+                                });
+                                suggestions.append(li);
+                            });
+                            suggestions.show();
+                        } else {
+                            suggestions.hide();
+                        }
+                    });
+            }, 500); // 500ms delay
+        });
+
+        // Hide suggestions when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('#address').length && !$(e.target).closest('#suggestions').length) {
+                $('#suggestions').hide();
             }
         });
 
