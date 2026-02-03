@@ -61,14 +61,14 @@
                 @foreach($menuItems as $item)
                     @if(isset($item['children']))
                         <div class="relative group">
-                            <button type="button" class="inline-flex items-center gap-1 hover:text-[#1F5EDB] transition-colors">
+                            <a href="{{ $item['href'] }}" class="inline-flex items-center gap-1 hover:text-[#1F5EDB] transition-colors py-2">
                                 {{ $item['label'] }}
-                                <i class="fas fa-chevron-down text-xs"></i>
-                            </button>
-                            <div class="absolute left-0 top-full mt-3 hidden group-hover:block z-40">
-                                <div class="rounded-2xl bg-white shadow-2xl border border-slate-100 min-w-[220px] py-2">
+                                <i class="fas fa-chevron-down text-xs ml-0.5 opacity-70"></i>
+                            </a>
+                            <div class="absolute left-0 top-full pt-2 hidden group-hover:block z-40">
+                                <div class="rounded-2xl bg-white shadow-xl border border-slate-100 min-w-[220px] py-2 overflow-hidden">
                                     @foreach($item['children'] as $child)
-                                        <a href="{{ $child['href'] }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition">
+                                        <a href="{{ $child['href'] }}" class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
                                             {{ $child['label'] }}
                                         </a>
                                     @endforeach
