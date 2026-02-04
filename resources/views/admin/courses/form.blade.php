@@ -268,7 +268,22 @@
             $('#lessonMethod').val('PUT');
             $('#lessonTitle').val(lesson.title);
             $('#lessonOrder').val(lesson.order);
-            $('#lessonVideo').val(lesson.video_url);
+            // Video Logic
+            const videoUrl = lesson.video_url || '';
+            if (videoUrl.includes('storage/') || videoUrl.includes('course-videos/')) {
+                // Local File
+                $('#lessonVideo').val(''); // Clear URL field
+                const fileName = videoUrl.split('/').pop();
+                $('#lessonVideoFileLabel').text('Arquivo atual: ' + fileName);
+                
+                // Switch tab to file
+                $('#pills-file-tab').tab('show');
+            } else {
+                // External URL
+                $('#lessonVideo').val(videoUrl);
+                $('#lessonVideoFileLabel').text('Escolher vídeo...');
+                $('#pills-url-tab').tab('show');
+            }
             
             // Lock Video Editing
             $('#lessonVideo').prop('disabled', true);
