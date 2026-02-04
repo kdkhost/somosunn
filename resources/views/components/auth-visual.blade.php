@@ -17,15 +17,21 @@
         
         @if(isset($showSocial) && $showSocial)
         <div class="flex gap-3 mt-8 animate-fade-in-up" style="animation-delay: 300ms">
+            @if(\App\Models\Setting::get('social_google_active'))
             <a href="{{ route('social.redirect','google') }}" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110" title="Google">
                 <i class="fab fa-google"></i>
             </a>
+            @endif
+            @if(\App\Models\Setting::get('social_facebook_active'))
             <a href="{{ route('social.redirect','facebook') }}" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110" title="Facebook">
                 <i class="fab fa-facebook-f"></i>
             </a>
+            @endif
+            @if(\App\Models\Setting::get('social_linkedin_active'))
             <a href="{{ route('social.redirect','linkedin') }}" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110" title="LinkedIn">
                 <i class="fab fa-linkedin-in"></i>
             </a>
+            @endif
         </div>
         @endif
         
