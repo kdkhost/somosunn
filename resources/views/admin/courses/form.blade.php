@@ -690,11 +690,17 @@
                     $btn.prop('disabled', false).text(originalText);
                     
                      if(xhr.responseJSON && xhr.responseJSON.errors) {
+                        // Validation errors
                         let msg = '';
                         $.each(xhr.responseJSON.errors, function(k,v){ msg += v[0]+'<br>'; });
                         toastr.error(msg);
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        // Server Exception (e.g. DB error)
+                        // Cut long messages if needed, but usually helpful to see
+                        toastr.error('Erro: ' + xhr.responseJSON.message);
                     } else {
-                        toastr.error('Erro ao salvar curso.');
+                        toastr.error('Erro ao salvar curso. Código: ' + xhr.status);
+                        console.error(xhr);
                     }
                 }
             });
