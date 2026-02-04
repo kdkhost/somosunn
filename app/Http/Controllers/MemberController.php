@@ -24,7 +24,26 @@ class MemberController extends Controller
         try {
             $members = User::latest()
                 ->take(12)
-                ->get();
+                ->get()
+                ->map(function($user) {
+                    return (object)[
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'bio' => $user->bio,
+                        'avatar' => $user->photo ? asset($user->photo) : null, // Mapeia photo → avatar
+                        'city' => trim(($user->city ?? '') . ($user->state ? ', ' . $user->state : '')),
+                        'linkedin' => $user->linkedin,
+                        'facebook' => $user->facebook,
+                        'instagram' => $user->instagram,
+                        'twitter' => $user->twitter,
+                        'youtube' => $user->youtube,
+                        'website' => $user->website,
+                        'level' => $user->level ?? 'Iniciante',
+                        'connections' => 0, // TODO: implementar sistema de conexões
+                        'is_demo' => false,
+                    ];
+                });
         } catch (\Throwable $e) {
             // Fallback to demo data on any DB error
         }

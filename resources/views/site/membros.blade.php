@@ -129,11 +129,24 @@
                                 </button>
                                 @endif
                                 
-                                @if(isset($member->linkedin))
-                                <a href="{{ $member->linkedin }}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-slate-100 text-gray-600 rounded-xl hover:bg-blue-100 transition" style="color: var(--unn-azul-1)">
-                                    <i class="fab fa-linkedin text-xl"></i>
+                                @php
+                                    $socialLinks = collect([
+                                        ['key' => 'linkedin', 'icon' => 'fab fa-linkedin', 'color' => '#0A66C2'],
+                                        ['key' => 'instagram', 'icon' => 'fab fa-instagram', 'color' => '#E4405F'],
+                                        ['key' => 'facebook', 'icon' => 'fab fa-facebook', 'color' => '#1877F2'],
+                                        ['key' => 'twitter', 'icon' => 'fab fa-twitter', 'color' => '#1DA1F2'],
+                                        ['key' => 'youtube', 'icon' => 'fab fa-youtube', 'color' => '#FF0000'],
+                                        ['key' => 'website', 'icon' => 'fas fa-globe', 'color' => '#10B981'],
+                                    ])->filter(fn($s) => isset($member->{$s['key']}) && $member->{$s['key']});
+                                @endphp
+                                
+                                @foreach($socialLinks as $social)
+                                <a href="{{ $member->{$social['key']} }}" target="_blank" rel="noopener" 
+                                   class="w-12 h-12 flex items-center justify-center bg-slate-100 rounded-xl hover:shadow-md transition" 
+                                   style="color: {{ $social['color'] }}" title="{{ ucfirst($social['key']) }}">
+                                    <i class="{{ $social['icon'] }} text-xl"></i>
                                 </a>
-                                @endif
+                                @endforeach
                             </div>
                         </div>
                     </article>
