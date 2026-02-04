@@ -373,6 +373,14 @@ $(document).ready(function() {
         
         const formData = new FormData(this);
         
+        // Debug: verifica se a foto está sendo enviada
+        if (formData.has('photo')) {
+            const photoFile = formData.get('photo');
+            console.log('Foto detectada:', photoFile.name, photoFile.size, 'bytes');
+        } else {
+            console.log('Nenhuma foto selecionada');
+        }
+        
         $.ajax({
             url: $(this).attr('action'),
             type: 'POST',
@@ -392,7 +400,19 @@ $(document).ready(function() {
             },
             success: function(response) {
                 toastr.success(response.message || 'Perfil atualizado com sucesso!');
-                setTimeout(() => location.reload(), 1000);
+                
+                // Atualiza a foto se foi enviada
+                if (response.photo_url) {
+                    if ($('#current-photo').is('img')) {
+                        $('#current-photo').attr('src', response.photo_url);
+                    } else {
+                        $('#profile-photo-preview').html(`
+                            <img class="profile-user-img img-fluid img-circle" src="${response.photo_url}" alt="Avatar" id="current-photo">
+                        `);
+                    }
+                }
+                
+                setTimeout(() => location.reload(), 1500);
             },
             error: function(xhr) {
                 $btn.prop('disabled', false).html(originalText);

@@ -56,12 +56,17 @@ class ProfileController extends Controller
         $data['show_phone_public'] = $request->has('show_phone_public');
         $data['show_address_public'] = $request->has('show_address_public');
 
-        if ($request->hasFile('photo')) {
+        // Upload de foto
+        if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
             // Remove foto antiga
-            if ($user->photo && Storage::exists('public/'.$user->photo)) {
-                Storage::delete('public/'.$user->photo);
+            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
             }
-            $path = $request->file('photo')->store('uploads/avatars', 'public');
+            
+            // Salva nova foto
+            $file = $request->file('photo');
+            $filename = 'avatar_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('uploads/avatars', $filename, 'public');
             $data['photo'] = $path;
         }
 
@@ -77,7 +82,8 @@ class ProfileController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Perfil atualizado com sucesso!'
+                'message' => 'Perfil atualizado com sucesso!',
+                'photo_url' => $user->photo ? asset('storage/'.$user->photo) : null
             ]);
         }
 
