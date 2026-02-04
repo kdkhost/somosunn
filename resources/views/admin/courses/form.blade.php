@@ -164,13 +164,32 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Vídeo URL (YouTube/Vimeo)</label>
-                        <input name="video_url" id="lessonVideo" class="form-control" placeholder="https://...">
+                        <label>Fonte do Vídeo</label>
+                        <ul class="nav nav-pills mb-2" id="video-source-tab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="pills-url-tab" data-toggle="pill" href="#pills-url" role="tab">Link Externo (YouTube/Vimeo)</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pills-file-tab" data-toggle="pill" href="#pills-file" role="tab">Upload de Arquivo (MP4)</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="video-source-content">
+                            <div class="tab-pane fade show active" id="pills-url" role="tabpanel">
+                                <input name="video_url" id="lessonVideo" class="form-control" placeholder="https://...">
+                            </div>
+                            <div class="tab-pane fade" id="pills-file" role="tabpanel">
+                                <div class="custom-file">
+                                    <input type="file" name="video_file" class="custom-file-input" id="lessonVideoFile" accept="video/mp4,video/x-m4v,video/*">
+                                    <label class="custom-file-label" for="lessonVideoFile" id="lessonVideoFileLabel">Escolher vídeo...</label>
+                                </div>
+                                <small class="text-muted">A duração será detectada automaticamente ao selecionar o arquivo.</small>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label>Conteúdo (Texto/HTML)</label>
-                        <textarea name="content" id="lessonContent" class="form-control" rows="3"></textarea>
+                        <textarea name="content" id="lessonContent" class="form-control summernote" rows="3"></textarea>
                     </div>
 
                     <div class="form-check mb-3">
@@ -220,9 +239,13 @@
         $('#lessonId').val('');
         $('#lessonMethod').val('POST');
         $('#lessonModalTitle').text('Nova Aula');
+        $('#lessonVideoFileLabel').text('Escolher vídeo...');
         $('#attachmentsSection').hide();
         $('#attachmentsWarning').show();
         $('#attachmentList').empty();
+        
+        // Reset Summernote
+        $('#lessonContent').summernote('reset');
 
         if (lesson) {
             // Edit Mode
@@ -232,7 +255,10 @@
             $('#lessonTitle').val(lesson.title);
             $('#lessonOrder').val(lesson.order);
             $('#lessonVideo').val(lesson.video_url);
-            $('#lessonContent').val(lesson.content);
+            
+            // Set Content
+            $('#lessonContent').summernote('code', lesson.content || '');
+            
             $('#lessonDuration').val(lesson.duration);
             if(lesson.is_free_preview) $('#lessonPreview').prop('checked', true);
 
@@ -247,6 +273,20 @@
         }
 
         $('#lessonModal').modal('show');
+        
+        // Ensure Summernote is visible/init
+        setTimeout(function(){
+            $('#lessonContent').summernote({
+                height: 150,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['view', ['fullscreen', 'codeview']]
+                ]
+            });
+        }, 200);
     }
 
     function updateDropzoneUrl(lessonId) {
@@ -357,25 +397,58 @@
             });
         });
 
+        // Detect Duration for Local File
+        $('#lessonVideoFile').change(function(e){
+            var file = e.target.files[0];
+            if(file){
+                $('#lessonVideoFileLabel').text(file.name);
+                var video = document.createElement('video');
+                video.preload = 'metadata';
+                video.onloadedmetadata = function() {
+                    window.URL.revokeObjectURL(video.src);
+                    var duration = Math.floor(video.duration);
+                    $('#lessonDuration').val(duration);
+                    toastr.info('Duração detectada: ' + duration + 's');
+                }
+                video.src = URL.createObjectURL(file);
+            }
+        });
+
         // Save Lesson Form
         $('#lessonForm').on('submit', function(e) {
             e.preventDefault();
             const id = $('#lessonId').val();
-            const method = $('#lessonMethod').val();
             let url = '/courses/{{ $course->id }}/lessons';
             if (id) url += '/' + id;
+            
+            // Sync Summernote if needed (usually auto, but safe to ignore if standard form submit)
+            // Use FormData for file upload support
+            var formData = new FormData(this);
 
+            // Laravel requires POST with _method for file uploads on PUT/PATCH
+            // The form has <input name="_method" value="PUT"> so FormData includes it.
+            // But we must send as POST via AJAX.
+            
             $.ajax({
                 url: url,
-                type: method,
-                data: $(this).serialize(),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function() {
                     $('#lessonModal').modal('hide');
                     toastr.success('Aula salva');
-                    location.reload(); // Simple reload to refresh list
+                    window.location.reload(); 
                 },
                 error: function(xhr) {
-                    toastr.error('Erro ao salvar aula');
+                    // Show validation errors if any
+                    if(xhr.responseJSON && xhr.responseJSON.errors) {
+                        let msg = '';
+                        $.each(xhr.responseJSON.errors, function(k,v){ msg += v[0]+'<br>'; });
+                        toastr.error(msg);
+                    } else {
+                        toastr.error('Erro ao salvar aula');
+                    }
                 }
             });
         });

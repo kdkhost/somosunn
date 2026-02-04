@@ -17,15 +17,23 @@ class LessonController extends Controller
             'title' => 'required|string|max:255',
             'order' => 'required|integer',
             'video_url' => 'nullable|url',
+            'video_file' => 'nullable|file|mimetypes:video/mp4,video/mpeg,video/quicktime,video/x-msvideo|max:512000', // 500MB
             'content' => 'nullable|string',
             'is_free_preview' => 'nullable|boolean',
             'duration' => 'nullable|integer',
         ]);
 
+        $videoUrl = $validated['video_url'] ?? null;
+
+        if ($request->hasFile('video_file')) {
+            $path = $request->file('video_file')->store('course-videos', 'public');
+            $videoUrl = 'storage/' . $path;
+        }
+
         $course->lessons()->create([
             'title' => $validated['title'],
             'order' => $validated['order'],
-            'video_url' => $validated['video_url'],
+            'video_url' => $videoUrl,
             'content' => $validated['content'],
             'is_free_preview' => $request->has('is_free_preview'),
             'duration' => $request->duration ?? 0,
