@@ -3,11 +3,6 @@
 @section('page_title','Fontes Personalizadas')
 @section('breadcrumb')<li class="breadcrumb-item active">Fontes</li>@endsection
 
-@push('head')
-<link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
-<link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
-@endpush
-
 @section('content')
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
