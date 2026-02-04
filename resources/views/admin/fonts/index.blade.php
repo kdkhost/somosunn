@@ -3,6 +3,11 @@
 @section('page_title','Fontes Personalizadas')
 @section('breadcrumb')<li class="breadcrumb-item active">Fontes</li>@endsection
 
+@push('head')
+<link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+<link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+@endpush
+
 @section('content')
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
@@ -20,32 +25,42 @@
             <i class="fas fa-info-circle"></i> 
             Gerencie as fontes disponíveis para uso nos certificados da plataforma. As fontes adicionadas ficam disponíveis globalmente para todos os cursos.
         </p>
-        <table class="table table-hover mb-0">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Família da Fonte</th>
-                    <th>Tipo</th>
-                    <th>Carregado por</th>
-                    <th>Data</th>
-                    <th class="text-right" style="width:100px;">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($fonts as $font)
-                <tr id="font-{{ $font->id }}">
-                    <td><strong>{{ $font->name }}</strong></td>
-                    <td><span style="font-family: {{ $font->font_family }};">{{ $font->font_family }}</span></td>
-                    <td>
-                        @if($font->type === 'google_link')
-                            <span class="badge badge-info"><i class="fab fa-google"></i> Google Fonts</span>
-                        @else
-                            <span class="badge badge-success"><i class="fas fa-file-upload"></i> Arquivo</span>
-                        @endif
-                    </td>
-                    <td>{{ optional($font->uploader)->name ?? 'Sistema' }}</td>
-                    <td>{{ $font->created_at->format('d/m/Y H:i') }}</td>
-                    <td class="text-right">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th class="d-none d-md-table-cell">Família da Fonte</th>
+                        <th class="d-none d-lg-table-cell">Tipo</th>
+                        <th class="d-none d-lg-table-cell">Carregado por</th>
+                        <th class="d-none d-md-table-cell">Data</th>
+                        <th class="text-right">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($fonts as $font)
+                    <tr id="font-{{ $font->id }}">
+                        <td>
+                            <strong>{{ $font->name }}</strong>
+                            <div class="d-md-none small text-muted">
+                                {{ $font->font_family }}
+                            </div>
+                        </td>
+                        <td class="d-none d-md-table-cell">
+                            <span style="font-family: {{ $font->font_family }};">{{ $font->font_family }}</span>
+                        </td>
+                        <td class="d-none d-lg-table-cell">
+                            @if($font->type === 'google_link')
+                                <span class="badge badge-info"><i class="fab fa-google"></i> Google</span>
+                            @else
+                                <span class="badge badge-success"><i class="fas fa-file"></i> Arquivo</span>
+                            @endif
+                        </td>
+                        <td class="d-none d-lg-table-cell">{{ optional($font->uploader)->name ?? 'Sistema' }}</td>
+                        <td class="d-none d-md-table-cell">
+                            <small>{{ $font->created_at->format('d/m/Y') }}</small>
+                        </td>
+                        <td class="text-right">
                         <button class="btn btn-sm btn-outline-danger btn-delete-font" 
                                 data-id="{{ $font->id }}" 
                                 data-name="{{ $font->name }}">
@@ -64,6 +79,7 @@
             </tbody>
         </table>
     </div>
+</div>
 </div>
 
 <!-- Modal -->
