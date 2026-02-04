@@ -290,7 +290,7 @@ class SettingController extends Controller
             }
 
             // System Colors
-            $primaryColor = Setting::where('key', 'color_primary')->value('value') ?? '#007bff';
+            $primaryColor = Setting::where('key', 'site_color_primary')->value('value') ?? '#007bff';
             
             // Wrap with layout
             $layout = '

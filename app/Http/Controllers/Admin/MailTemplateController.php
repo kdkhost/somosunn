@@ -147,8 +147,8 @@ class MailTemplateController extends Controller
         $content = strip_tags($rendered, $allowed);
 
         // System Colors
-        $primaryColor = \App\Models\Setting::where('key', 'color_primary')->value('value') ?? '#007bff';
-        $secondaryColor = \App\Models\Setting::where('key', 'color_secondary')->value('value') ?? '#6c757d';
+        $primaryColor = \App\Models\Setting::where('key', 'site_color_primary')->value('value') ?? '#007bff';
+        $secondaryColor = \App\Models\Setting::where('key', 'site_color_secondary')->value('value') ?? '#6c757d';
         
         // Wrap with layout
         $layout = '
