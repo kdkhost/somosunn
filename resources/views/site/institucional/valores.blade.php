@@ -5,12 +5,12 @@
 @section('content')
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
-    <section class="pt-24 pb-12 px-6 md:px-12 lg:px-24">
+    <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-5xl lg:text-6xl font-black leading-tight mb-6">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
                 Nossos <span class="text-gradient">Valores</span>
             </h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Os princípios que guiam tudo o que fazemos na UNN.
             </p>
         </div>
@@ -20,9 +20,9 @@
     <section class="py-16 px-6 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
             <div class="grid md:grid-cols-2 gap-8">
-                <!-- Valor 1 -->
-                <div class="bg-white rounded-3xl p-8 shadow-lg">
-                    <div class="flex items-start gap-6">
+                <!-- Valor -->
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
+                    <div class="flex items-start gap-4 md:gap-6">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center shrink-0">
                             <i class="fas fa-heart text-white text-2xl"></i>
                         </div>
@@ -40,8 +40,8 @@
                 </div>
 
                 <!-- Valor 2 -->
-                <div class="bg-white rounded-3xl p-8 shadow-lg">
-                    <div class="flex items-start gap-6">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
+                    <div class="flex items-start gap-4 md:gap-6">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center shrink-0">
                             <i class="fas fa-hands-helping text-white text-2xl"></i>
                         </div>
@@ -59,8 +59,8 @@
                 </div>
 
                 <!-- Valor 3 -->
-                <div class="bg-white rounded-3xl p-8 shadow-lg">
-                    <div class="flex items-start gap-6">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
+                    <div class="flex items-start gap-4 md:gap-6">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center shrink-0">
                             <i class="fas fa-lightbulb text-white text-2xl"></i>
                         </div>
@@ -78,8 +78,8 @@
                 </div>
 
                 <!-- Valor 4 -->
-                <div class="bg-white rounded-3xl p-8 shadow-lg">
-                    <div class="flex items-start gap-6">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
+                    <div class="flex items-start gap-4 md:gap-6">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center shrink-0">
                             <i class="fas fa-trophy text-white text-2xl"></i>
                         </div>
@@ -97,8 +97,8 @@
                 </div>
 
                 <!-- Valor 5 -->
-                <div class="bg-white rounded-3xl p-8 shadow-lg">
-                    <div class="flex items-start gap-6">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
+                    <div class="flex items-start gap-4 md:gap-6">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center shrink-0">
                             <i class="fas fa-user-shield text-white text-2xl"></i>
                         </div>
@@ -116,8 +116,8 @@
                 </div>
 
                 <!-- Valor 6 -->
-                <div class="bg-white rounded-3xl p-8 shadow-lg">
-                    <div class="flex items-start gap-6">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
+                    <div class="flex items-start gap-4 md:gap-6">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center shrink-0">
                             <i class="fas fa-users text-white text-2xl"></i>
                         </div>
