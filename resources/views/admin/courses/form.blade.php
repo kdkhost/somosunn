@@ -554,39 +554,12 @@
                     $btn.prop('disabled', false).text(originalText);
                     toastr.success('Aula salva com sucesso!');
 
-                    if (response.lesson) {
-                        // It was a Create action, switch to saved mode
-                        const lesson = response.lesson;
-                        
-                        // Switch to Edit Mode in UI
-                        $('#lessonId').val(lesson.id);
-                        $('#lessonMethod').val('PUT'); // Next saves are updates
-                        $('#lessonModalTitle').text('Editar Aula: ' + lesson.title);
-                        
-                        // Enable Attachments
-                        $('#attachmentsSection').show();
-                        $('#attachmentsWarning').hide();
-                        updateDropzoneUrl(lesson.id);
-
-                        // Lock Video
-                        $('#lessonVideo').prop('disabled', true);
-                        $('#lessonVideoFile').prop('disabled', true);
-                        $('#video-source-tab a').addClass('disabled');
-
-                        // Refresh the list in the background (optional, or just append)
-                        // For now, let's keep it simple. If they close, they see the list. 
-                        // To be perfect, we should append to #lessons-list. But reloading on modal close is safer for integrity.
-                        // Let's force a reload ONLY when the modal is closed if changes happened.
-                        $('#lessonModal').one('hidden.bs.modal', function () {
-                            window.location.reload();
-                        });
-
-                    } else {
-                        // Update action
-                         $('#lessonModal').one('hidden.bs.modal', function () {
-                            window.location.reload();
-                        });
-                    }
+                    // Close modal and reload page immediately usually creates a jarring effect
+                    // Better interaction: Close modal, then reload.
+                    $('#lessonModal').modal('hide');
+                    setTimeout(function(){
+                        window.location.reload();
+                    }, 500); // 0.5s delay to see success
                 },
                 error: function(xhr) {
                     $('#uploadProgressWrapper').hide();
