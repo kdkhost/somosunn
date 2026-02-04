@@ -156,19 +156,19 @@ class MailTemplateController extends Controller
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                     <td align="center">
-                        <div style="background-color: #ffffff; max-width: 600px; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <div style="background-color: #ffffff; max-width: 600px; padding: 0px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
                             <!-- Header -->
-                            <div style="text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid '.$primaryColor.';">
+                            <div style="background: linear-gradient(135deg, '.$primaryColor.' 0%, '.$secondaryColor.' 100%); padding: 30px 20px; text-align: center;">
                                 <img src="'.$data['site']['logo'].'" alt="{{site.name}}" style="max-height: 60px; max-width: 200px;">
                             </div>
                             
                             <!-- Body -->
-                            <div style="color: #333333; line-height: 1.6;">
+                            <div style="padding: 30px; color: #333333; line-height: 1.6;">
                                 '.$content.'
                             </div>
                             
                             <!-- Footer -->
-                            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eeeeee; text-align: center; color: #777777; font-size: 12px;">
+                            <div style="background-color: #f8f9fa; padding: 20px; text-align: center; color: #777777; font-size: 12px; border-top: 1px solid #eeeeee;">
                                 <p>&copy; '.date('Y').' '.$data['site']['name'].'. Todos os direitos reservados.</p>
                                 <p><a href="'.$data['site']['url'].'" style="color: '.$primaryColor.'; text-decoration: none;">Visite nosso site</a></p>
                             </div>
