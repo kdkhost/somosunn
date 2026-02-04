@@ -99,7 +99,7 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="card h-100">
+                <div class="card">
                     <div class="card-header"><strong>Preview em tempo real</strong></div>
                     <div class="card-body p-0" id="tpl_preview" style="min-height:200px; background:#f4f6f9;"></div>
                 </div>
@@ -165,14 +165,14 @@ $(function(){
         
         // Use the same layout structure as the backend, but scaled for sidebar
         $('#tpl_preview').html(`
-        <div style="background-color: #ffffff; width: 100%; font-family: sans-serif; height: 100%; box-sizing: border-box; display: flex; flex-direction: column;">
+        <div style="background-color: #ffffff; width: 100%; font-family: sans-serif; box-sizing: border-box; display: flex; flex-direction: column;">
             <!-- Header -->
             <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); padding: 25px 20px; text-align: center; flex-shrink: 0;">
                 <img src="${logo}" alt="${siteName}" style="max-height: 50px; max-width: 100%; height: auto;">
             </div>
             
             <!-- Body -->
-            <div style="padding: 25px 20px; color: #333333; line-height: 1.6; word-wrap: break-word; font-size: 14px; flex-grow: 1;">
+            <div style="padding: 25px 20px; color: #333333; line-height: 1.6; word-wrap: break-word; font-size: 14px;">
                 ${body}
             </div>
             
