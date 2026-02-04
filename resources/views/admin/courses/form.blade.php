@@ -414,21 +414,25 @@
             }
         });
 
-        // Save Lesson Form
-        $('#lessonForm').on('submit', function(e) {
+        // Save Lesson Button Click (Force Submit)
+        $('#btnSaveLesson').on('click', function(e) {
             e.preventDefault();
+            
+            // Visual Feedback
+            var $btn = $(this);
+            var originalText = $btn.text();
+            $btn.prop('disabled', true).text('Salvando...');
+
             const id = $('#lessonId').val();
             let url = '/courses/{{ $course->id }}/lessons';
             if (id) url += '/' + id;
             
-            // Sync Summernote if needed (usually auto, but safe to ignore if standard form submit)
-            // Use FormData for file upload support
-            var formData = new FormData(this);
-
-            // Laravel requires POST with _method for file uploads on PUT/PATCH
-            // The form has <input name="_method" value="PUT"> so FormData includes it.
-            // But we must send as POST via AJAX.
+            // Sync Summernote content manually to ensure it's captured
+            var content = $('#lessonContent').summernote('code');
             
+            var formData = new FormData($('#lessonForm')[0]);
+            formData.set('content', content); // Force override with summernote data
+
             $.ajax({
                 url: url,
                 type: 'POST',
@@ -437,17 +441,18 @@
                 contentType: false,
                 success: function() {
                     $('#lessonModal').modal('hide');
-                    toastr.success('Aula salva');
-                    window.location.reload(); 
+                    toastr.success('Aula salva com sucesso!');
+                    setTimeout(function(){ window.location.reload(); }, 1000);
                 },
                 error: function(xhr) {
-                    // Show validation errors if any
+                    $btn.prop('disabled', false).text(originalText);
                     if(xhr.responseJSON && xhr.responseJSON.errors) {
                         let msg = '';
                         $.each(xhr.responseJSON.errors, function(k,v){ msg += v[0]+'<br>'; });
                         toastr.error(msg);
                     } else {
-                        toastr.error('Erro ao salvar aula');
+                        toastr.error('Erro ao salvar. Verifique o console ou contate o suporte.');
+                        console.error(xhr);
                     }
                 }
             });
