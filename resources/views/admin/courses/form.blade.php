@@ -475,7 +475,14 @@
                     } else if(xhr.status === 413) {
                         toastr.error('O arquivo é muito grande para o servidor. Limite: 500MB.');
                     } else {
-                        toastr.error('Erro ao salvar. Verifique sua conexão e tente novamente.');
+                        // Advanced Debugging
+                        let errorText = 'Erro desconhecido';
+                        try {
+                            if(xhr.responseJSON && xhr.responseJSON.message) errorText = xhr.responseJSON.message;
+                            else if (xhr.responseText) errorText = xhr.responseText.substring(0, 100);
+                        } catch(e){}
+                        
+                        toastr.error('Erro ' + xhr.status + ': ' + errorText);
                         console.error(xhr);
                     }
                 }
