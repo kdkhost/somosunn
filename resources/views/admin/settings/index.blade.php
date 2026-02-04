@@ -341,31 +341,31 @@
                             <div class="form-group mt-3">
                                 <label>Ambiente</label>
                                 <div class="btn-group btn-group-toggle d-block" data-toggle="buttons">
-                                    <label class="btn btn-outline-success {{ ($settings['payments.mercadopago.env'] ?? 'sandbox') == 'sandbox' ? 'active' : '' }}">
-                                        <input type="radio" name="payments.mercadopago.env" class="gateway-env-toggle" data-gateway="mercadopago" value="sandbox" {{ ($settings['payments.mercadopago.env'] ?? 'sandbox') == 'sandbox' ? 'checked' : '' }}> Sandbox (Testes)
+                                    <label class="btn btn-outline-success {{ ($settings['payments_mercadopago_env'] ?? 'sandbox') == 'sandbox' ? 'active' : '' }}">
+                                        <input type="radio" name="payments_mercadopago_env" class="gateway-env-toggle" data-gateway="mercadopago" value="sandbox" {{ ($settings['payments_mercadopago_env'] ?? 'sandbox') == 'sandbox' ? 'checked' : '' }}> Sandbox (Testes)
                                     </label>
-                                    <label class="btn btn-outline-danger {{ ($settings['payments.mercadopago.env'] ?? '') == 'production' ? 'active' : '' }}">
-                                        <input type="radio" name="payments.mercadopago.env" class="gateway-env-toggle" data-gateway="mercadopago" value="production" {{ ($settings['payments.mercadopago.env'] ?? '') == 'production' ? 'checked' : '' }}> Produção
+                                    <label class="btn btn-outline-danger {{ ($settings['payments_mercadopago_env'] ?? '') == 'production' ? 'active' : '' }}">
+                                        <input type="radio" name="payments_mercadopago_env" class="gateway-env-toggle" data-gateway="mercadopago" value="production" {{ ($settings['payments_mercadopago_env'] ?? '') == 'production' ? 'checked' : '' }}> Produção
                                     </label>
                                 </div>
                             </div>
 
                             {{-- Sandbox Fields --}}
-                            <div class="card card-outline card-success env-section env-mercadopago-sandbox {{ ($settings['payments.mercadopago.env'] ?? 'sandbox') == 'sandbox' ? '' : 'd-none' }}">
+                            <div class="card card-outline card-success env-section env-mercadopago-sandbox {{ ($settings['payments_mercadopago_env'] ?? 'sandbox') == 'sandbox' ? '' : 'd-none' }}">
                                 <div class="card-header"><h3 class="card-title">Credenciais de Teste (Sandbox)</h3></div>
                                 <div class="card-body">
-                                    <div class="form-group"><label>Public Key (Teste)</label><input name="payments.mercadopago.sandbox.public_key" class="form-control" value="{{ $settings['payments.mercadopago.sandbox.public_key'] ?? '' }}"></div>
-                                    <div class="form-group"><label>Access Token (Teste)</label><input name="payments.mercadopago.sandbox.access_token" class="form-control" value="{{ $settings['payments.mercadopago.sandbox.access_token'] ?? '' }}"></div>
+                                    <div class="form-group"><label>Public Key (Teste)</label><input name="payments_mercadopago_sandbox_public_key" class="form-control" value="{{ $settings['payments_mercadopago_sandbox_public_key'] ?? '' }}"></div>
+                                    <div class="form-group"><label>Access Token (Teste)</label><input name="payments_mercadopago_sandbox_access_token" class="form-control" value="{{ $settings['payments_mercadopago_sandbox_access_token'] ?? '' }}"></div>
                                     <small class="text-muted"><i class="fas fa-info-circle"></i> Use estas credenciais para simular pagamentos sem cobrança real.</small>
                                 </div>
                             </div>
 
                             {{-- Production Fields --}}
-                            <div class="card card-outline card-danger env-section env-mercadopago-production {{ ($settings['payments.mercadopago.env'] ?? '') == 'production' ? '' : 'd-none' }}">
+                            <div class="card card-outline card-danger env-section env-mercadopago-production {{ ($settings['payments_mercadopago_env'] ?? '') == 'production' ? '' : 'd-none' }}">
                                 <div class="card-header"><h3 class="card-title">Credenciais de Produção</h3></div>
                                 <div class="card-body">
-                                    <div class="form-group"><label>Public Key (Produção)</label><input name="payments.mercadopago.production.public_key" class="form-control" value="{{ $settings['payments.mercadopago.production.public_key'] ?? '' }}"></div>
-                                    <div class="form-group"><label>Access Token (Produção)</label><input name="payments.mercadopago.production.access_token" class="form-control" value="{{ $settings['payments.mercadopago.production.access_token'] ?? '' }}"></div>
+                                    <div class="form-group"><label>Public Key (Produção)</label><input name="payments_mercadopago_production_public_key" class="form-control" value="{{ $settings['payments_mercadopago_production_public_key'] ?? '' }}"></div>
+                                    <div class="form-group"><label>Access Token (Produção)</label><input name="payments_mercadopago_production_access_token" class="form-control" value="{{ $settings['payments_mercadopago_production_access_token'] ?? '' }}"></div>
                                     <div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> Cuidado! Alterações aqui afetam pagamentos reais.</div>
                                 </div>
                             </div>
@@ -377,29 +377,29 @@
                                         <div class="card-body">
                                             <div class="form-group">
                                                 <label>Máximo de Parcelas (Geral)</label>
-                                                <select name="payments.mercadopago.max_installments" class="form-control">
+                                                <select name="payments_mercadopago_max_installments" class="form-control">
                                                     @foreach(range(1, 12) as $i)
-                                                        <option value="{{ $i }}" {{ ($settings['payments.mercadopago.max_installments'] ?? 12) == $i ? 'selected' : '' }}>{{ $i }}x</option>
+                                                        <option value="{{ $i }}" {{ ($settings['payments_mercadopago_max_installments'] ?? 12) == $i ? 'selected' : '' }}>{{ $i }}x</option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                             <div class="form-group">
                                                 <label>Parcelas para Comunidade (Associação)</label>
-                                                <select name="payments.mercadopago.community_installments" class="form-control">
+                                                <select name="payments_mercadopago_community_installments" class="form-control">
                                                     @foreach(range(1, 12) as $i)
-                                                        <option value="{{ $i }}" {{ ($settings['payments.mercadopago.community_installments'] ?? 1) == $i ? 'selected' : '' }}>{{ $i }}x</option>
+                                                        <option value="{{ $i }}" {{ ($settings['payments_mercadopago_community_installments'] ?? 1) == $i ? 'selected' : '' }}>{{ $i }}x</option>
                                                     @endforeach
                                                 </select>
                                                 <small class="text-muted">Defina em quantas vezes a anuidade da comunidade pode ser dividida.</small>
                                             </div>
                                             <div class="row">
-                                                <div class="col-md-6"><div class="form-group"><label>Taxa Gateway (%)</label><input name="payments.mercadopago.fee_percentage" class="form-control mask-money" value="{{ $settings['payments.mercadopago.fee_percentage'] ?? '' }}"></div></div>
-                                                <div class="col-md-6"><div class="form-group"><label>Taxa Fixa (R$)</label><input name="payments.mercadopago.fee_fixed" class="form-control mask-money" value="{{ $settings['payments.mercadopago.fee_fixed'] ?? '' }}"></div></div>
+                                                <div class="col-md-6"><div class="form-group"><label>Taxa Gateway (%)</label><input name="payments_mercadopago_fee_percentage" class="form-control mask-money" value="{{ $settings['payments_mercadopago_fee_percentage'] ?? '' }}"></div></div>
+                                                <div class="col-md-6"><div class="form-group"><label>Taxa Fixa (R$)</label><input name="payments_mercadopago_fee_fixed" class="form-control mask-money" value="{{ $settings['payments_mercadopago_fee_fixed'] ?? '' }}"></div></div>
                                             </div>
                                             <div class="form-group">
                                                 <div class="custom-control custom-switch">
-                                                    <input type="hidden" name="payments.mercadopago.pass_fee" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="mp_pass_fee" name="payments.mercadopago.pass_fee" value="1" {{ ($settings['payments.mercadopago.pass_fee'] ?? 0) ? 'checked' : '' }}>
+                                                    <input type="hidden" name="payments_mercadopago_pass_fee" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="mp_pass_fee" name="payments_mercadopago_pass_fee" value="1" {{ ($settings['payments_mercadopago_pass_fee'] ?? 0) ? 'checked' : '' }}>
                                                     <label class="custom-control-label" for="mp_pass_fee">Repassar custo da taxa ao cliente (Você recebe o valor cheio)</label>
                                                 </div>
                                             </div>
@@ -412,29 +412,29 @@
                                         <div class="card-body">
                                             <div class="form-group">
                                                 <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments.mercadopago.enable_credit" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="mp_credit" name="payments.mercadopago.enable_credit" value="1" {{ ($settings['payments.mercadopago.enable_credit'] ?? 1) ? 'checked' : '' }}>
+                                                    <input type="hidden" name="payments_mercadopago_enable_credit" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="mp_credit" name="payments_mercadopago_enable_credit" value="1" {{ ($settings['payments_mercadopago_enable_credit'] ?? 1) ? 'checked' : '' }}>
                                                     <label class="custom-control-label" for="mp_credit"><i class="fas fa-credit-card mr-2"></i>Cartão de Crédito</label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments.mercadopago.enable_debit" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="mp_debit" name="payments.mercadopago.enable_debit" value="1" {{ ($settings['payments.mercadopago.enable_debit'] ?? 0) ? 'checked' : '' }}>
+                                                    <input type="hidden" name="payments_mercadopago_enable_debit" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="mp_debit" name="payments_mercadopago_enable_debit" value="1" {{ ($settings['payments_mercadopago_enable_debit'] ?? 0) ? 'checked' : '' }}>
                                                     <label class="custom-control-label" for="mp_debit"><i class="far fa-credit-card mr-2"></i>Cartão de Débito</label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments.mercadopago.enable_pix" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="mp_pix" name="payments.mercadopago.enable_pix" value="1" {{ ($settings['payments.mercadopago.enable_pix'] ?? 1) ? 'checked' : '' }}>
+                                                    <input type="hidden" name="payments_mercadopago_enable_pix" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="mp_pix" name="payments_mercadopago_enable_pix" value="1" {{ ($settings['payments_mercadopago_enable_pix'] ?? 1) ? 'checked' : '' }}>
                                                     <label class="custom-control-label" for="mp_pix"><i class="fab fa-pix mr-2"></i>PIX (Aprovação Imediata)</label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments.mercadopago.enable_boleto" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="mp_boleto" name="payments.mercadopago.enable_boleto" value="1" {{ ($settings['payments.mercadopago.enable_boleto'] ?? 1) ? 'checked' : '' }}>
+                                                    <input type="hidden" name="payments_mercadopago_enable_boleto" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="mp_boleto" name="payments_mercadopago_enable_boleto" value="1" {{ ($settings['payments_mercadopago_enable_boleto'] ?? 1) ? 'checked' : '' }}>
                                                     <label class="custom-control-label" for="mp_boleto"><i class="fas fa-barcode mr-2"></i>Boleto Bancário</label>
                                                 </div>
                                             </div>
@@ -451,30 +451,30 @@
                             <div class="form-group mt-3">
                                 <label>Ambiente</label>
                                 <div class="btn-group btn-group-toggle d-block" data-toggle="buttons">
-                                    <label class="btn btn-outline-success {{ ($settings['payments.pagseguro.env'] ?? 'sandbox') == 'sandbox' ? 'active' : '' }}">
-                                        <input type="radio" name="payments.pagseguro.env" class="gateway-env-toggle" data-gateway="pagseguro" value="sandbox" {{ ($settings['payments.pagseguro.env'] ?? 'sandbox') == 'sandbox' ? 'checked' : '' }}> Sandbox (Testes)
+                                    <label class="btn btn-outline-success {{ ($settings['payments_pagseguro_env'] ?? 'sandbox') == 'sandbox' ? 'active' : '' }}">
+                                        <input type="radio" name="payments_pagseguro_env" class="gateway-env-toggle" data-gateway="pagseguro" value="sandbox" {{ ($settings['payments_pagseguro_env'] ?? 'sandbox') == 'sandbox' ? 'checked' : '' }}> Sandbox (Testes)
                                     </label>
-                                    <label class="btn btn-outline-danger {{ ($settings['payments.pagseguro.env'] ?? '') == 'production' ? 'active' : '' }}">
-                                        <input type="radio" name="payments.pagseguro.env" class="gateway-env-toggle" data-gateway="pagseguro" value="production" {{ ($settings['payments.pagseguro.env'] ?? '') == 'production' ? 'checked' : '' }}> Produção
+                                    <label class="btn btn-outline-danger {{ ($settings['payments_pagseguro_env'] ?? '') == 'production' ? 'active' : '' }}">
+                                        <input type="radio" name="payments_pagseguro_env" class="gateway-env-toggle" data-gateway="pagseguro" value="production" {{ ($settings['payments_pagseguro_env'] ?? '') == 'production' ? 'checked' : '' }}> Produção
                                     </label>
                                 </div>
                             </div>
 
                             {{-- Sandbox Fields --}}
-                            <div class="card card-outline card-success env-section env-pagseguro-sandbox {{ ($settings['payments.pagseguro.env'] ?? 'sandbox') == 'sandbox' ? '' : 'd-none' }}">
+                            <div class="card card-outline card-success env-section env-pagseguro-sandbox {{ ($settings['payments_pagseguro_env'] ?? 'sandbox') == 'sandbox' ? '' : 'd-none' }}">
                                 <div class="card-header"><h3 class="card-title">Credenciais de Teste (Sandbox)</h3></div>
                                 <div class="card-body">
-                                    <div class="form-group"><label>E-mail (Teste)</label><input name="payments.pagseguro.sandbox.email" class="form-control" value="{{ $settings['payments.pagseguro.sandbox.email'] ?? '' }}"></div>
-                                    <div class="form-group"><label>Token (Teste)</label><input name="payments.pagseguro.sandbox.token" class="form-control" value="{{ $settings['payments.pagseguro.sandbox.token'] ?? '' }}"></div>
+                                    <div class="form-group"><label>E-mail (Teste)</label><input name="payments_pagseguro_sandbox_email" class="form-control" value="{{ $settings['payments_pagseguro_sandbox_email'] ?? '' }}"></div>
+                                    <div class="form-group"><label>Token (Teste)</label><input name="payments_pagseguro_sandbox_token" class="form-control" value="{{ $settings['payments_pagseguro_sandbox_token'] ?? '' }}"></div>
                                 </div>
                             </div>
 
                             {{-- Production Fields --}}
-                            <div class="card card-outline card-danger env-section env-pagseguro-production {{ ($settings['payments.pagseguro.env'] ?? '') == 'production' ? '' : 'd-none' }}">
+                            <div class="card card-outline card-danger env-section env-pagseguro-production {{ ($settings['payments_pagseguro_env'] ?? '') == 'production' ? '' : 'd-none' }}">
                                 <div class="card-header"><h3 class="card-title">Credenciais de Produção</h3></div>
                                 <div class="card-body">
-                                    <div class="form-group"><label>E-mail (Produção)</label><input name="payments.pagseguro.production.email" class="form-control" value="{{ $settings['payments.pagseguro.production.email'] ?? '' }}"></div>
-                                    <div class="form-group"><label>Token (Produção)</label><input name="payments.pagseguro.production.token" class="form-control" value="{{ $settings['payments.pagseguro.production.token'] ?? '' }}"></div>
+                                    <div class="form-group"><label>E-mail (Produção)</label><input name="payments_pagseguro_production_email" class="form-control" value="{{ $settings['payments_pagseguro_production_email'] ?? '' }}"></div>
+                                    <div class="form-group"><label>Token (Produção)</label><input name="payments_pagseguro_production_token" class="form-control" value="{{ $settings['payments_pagseguro_production_token'] ?? '' }}"></div>
                                 </div>
                             </div>
 
@@ -485,28 +485,28 @@
                                         <div class="card-body">
                                             <div class="form-group">
                                                 <label>Máximo de Parcelas (Geral)</label>
-                                                <select name="payments.pagseguro.max_installments" class="form-control">
+                                                <select name="payments_pagseguro_max_installments" class="form-control">
                                                     @foreach(range(1, 12) as $i)
-                                                        <option value="{{ $i }}" {{ ($settings['payments.pagseguro.max_installments'] ?? 12) == $i ? 'selected' : '' }}>{{ $i }}x</option>
+                                                        <option value="{{ $i }}" {{ ($settings['payments_pagseguro_max_installments'] ?? 12) == $i ? 'selected' : '' }}>{{ $i }}x</option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                             <div class="form-group">
                                                 <label>Parcelas para Comunidade (Associação)</label>
-                                                <select name="payments.pagseguro.community_installments" class="form-control">
+                                                <select name="payments_pagseguro_community_installments" class="form-control">
                                                     @foreach(range(1, 12) as $i)
-                                                        <option value="{{ $i }}" {{ ($settings['payments.pagseguro.community_installments'] ?? 1) == $i ? 'selected' : '' }}>{{ $i }}x</option>
+                                                        <option value="{{ $i }}" {{ ($settings['payments_pagseguro_community_installments'] ?? 1) == $i ? 'selected' : '' }}>{{ $i }}x</option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                             <div class="row">
-                                                <div class="col-md-6"><div class="form-group"><label>Taxa Gateway (%)</label><input name="payments.pagseguro.fee_percentage" class="form-control mask-money" value="{{ $settings['payments.pagseguro.fee_percentage'] ?? '' }}"></div></div>
-                                                <div class="col-md-6"><div class="form-group"><label>Taxa Fixa (R$)</label><input name="payments.pagseguro.fee_fixed" class="form-control mask-money" value="{{ $settings['payments.pagseguro.fee_fixed'] ?? '' }}"></div></div>
+                                                <div class="col-md-6"><div class="form-group"><label>Taxa Gateway (%)</label><input name="payments_pagseguro_fee_percentage" class="form-control mask-money" value="{{ $settings['payments_pagseguro_fee_percentage'] ?? '' }}"></div></div>
+                                                <div class="col-md-6"><div class="form-group"><label>Taxa Fixa (R$)</label><input name="payments_pagseguro_fee_fixed" class="form-control mask-money" value="{{ $settings['payments_pagseguro_fee_fixed'] ?? '' }}"></div></div>
                                             </div>
                                             <div class="form-group">
                                                 <div class="custom-control custom-switch">
-                                                    <input type="hidden" name="payments.pagseguro.pass_fee" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="ps_pass_fee" name="payments.pagseguro.pass_fee" value="1" {{ ($settings['payments.pagseguro.pass_fee'] ?? 0) ? 'checked' : '' }}>
+                                                    <input type="hidden" name="payments_pagseguro_pass_fee" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="ps_pass_fee" name="payments_pagseguro_pass_fee" value="1" {{ ($settings['payments_pagseguro_pass_fee'] ?? 0) ? 'checked' : '' }}>
                                                     <label class="custom-control-label" for="ps_pass_fee">Repassar custo da taxa ao cliente</label>
                                                 </div>
                                             </div>
@@ -519,29 +519,29 @@
                                         <div class="card-body">
                                             <div class="form-group">
                                                 <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments.pagseguro.enable_credit" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="ps_credit" name="payments.pagseguro.enable_credit" value="1" {{ ($settings['payments.pagseguro.enable_credit'] ?? 1) ? 'checked' : '' }}>
+                                                    <input type="hidden" name="payments_pagseguro_enable_credit" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="ps_credit" name="payments_pagseguro_enable_credit" value="1" {{ ($settings['payments_pagseguro_enable_credit'] ?? 1) ? 'checked' : '' }}>
                                                     <label class="custom-control-label" for="ps_credit">Cartão de Crédito</label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments.pagseguro.enable_debit" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="ps_debit" name="payments.pagseguro.enable_debit" value="1" {{ ($settings['payments.pagseguro.enable_debit'] ?? 0) ? 'checked' : '' }}>
+                                                    <input type="hidden" name="payments_pagseguro_enable_debit" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="ps_debit" name="payments_pagseguro_enable_debit" value="1" {{ ($settings['payments_pagseguro_enable_debit'] ?? 0) ? 'checked' : '' }}>
                                                     <label class="custom-control-label" for="ps_debit">Cartão de Débito</label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments.pagseguro.enable_pix" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="ps_pix" name="payments.pagseguro.enable_pix" value="1" {{ ($settings['payments.pagseguro.enable_pix'] ?? 1) ? 'checked' : '' }}>
+                                                    <input type="hidden" name="payments_pagseguro_enable_pix" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="ps_pix" name="payments_pagseguro_enable_pix" value="1" {{ ($settings['payments_pagseguro_enable_pix'] ?? 1) ? 'checked' : '' }}>
                                                     <label class="custom-control-label" for="ps_pix">PIX</label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments.pagseguro.enable_boleto" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="ps_boleto" name="payments.pagseguro.enable_boleto" value="1" {{ ($settings['payments.pagseguro.enable_boleto'] ?? 1) ? 'checked' : '' }}>
+                                                    <input type="hidden" name="payments_pagseguro_enable_boleto" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="ps_boleto" name="payments_pagseguro_enable_boleto" value="1" {{ ($settings['payments_pagseguro_enable_boleto'] ?? 1) ? 'checked' : '' }}>
                                                     <label class="custom-control-label" for="ps_boleto">Boleto Bancário</label>
                                                 </div>
                                             </div>
