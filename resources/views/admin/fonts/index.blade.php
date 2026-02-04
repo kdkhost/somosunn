@@ -7,11 +7,13 @@
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
 <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="card-title mb-0"><i class="fas fa-font mr-2"></i>Gerenciar Fontes</h3>
-        <button class="btn btn-primary" data-toggle="modal" data-target="#fontModal">
-            <i class="fas fa-plus mr-1"></i>Nova Fonte
-        </button>
+    <div class="card-header">
+        <h3 class="card-title">Gerenciar Fontes</h3>
+        <div class="card-tools">
+            <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#fontModal">
+                <i class="fas fa-plus"></i> Nova Fonte
+            </button>
+        </div>
     </div>
     <div class="card-body">
         <p class="text-muted mb-3">
