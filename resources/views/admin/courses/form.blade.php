@@ -123,15 +123,7 @@
                                 <div class="card-header">Configurações</div>
                                 <div class="card-body">
                                     
-                                    <h6 class="font-weight-bold">Certificado</h6>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" name="is_certificate_enabled" value="1" class="form-check-input" id="is_certificate_enabled" {{ $course->is_certificate_enabled ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_certificate_enabled">Habilitar Certificado</label>
-                                    </div>
-                                    <small class="text-muted d-block mb-3">O aluno receberá um certificado automático ao concluir 100% das aulas.</small>
-
                                     @if($course->exists && $course->slug)
-                                        <hr>
                                         <h6 class="font-weight-bold">Link do Curso</h6>
                                         <div class="input-group mb-2">
                                             <input type="text" class="form-control" id="courseLink" value="{{ route('courses.show', $course->slug) }}" readonly>
@@ -228,6 +220,11 @@
                                 <div class="card-header bg-dark text-white">Configurações</div>
                                 <div class="card-body">
                                     
+                                    <div class="form-check mb-3">
+                                        <input type="checkbox" name="is_certificate_enabled" value="1" class="form-check-input" id="is_certificate_enabled_tab" {{ $course->is_certificate_enabled ? 'checked' : '' }}>
+                                        <label class="form-check-label font-weight-bold" for="is_certificate_enabled_tab">Habilitar Certificado</label>
+                                    </div>
+
                                     <div class="form-group">
                                         <label>Imagem de Fundo (A4 Paisagem)</label>
                                         <div class="custom-file">
@@ -268,6 +265,12 @@
                                                 <label class="custom-control-label" for="toggle-code">Código de Validação</label>
                                             </div>
                                         </div>
+                                        <div class="list-group-item p-2 bg-light">
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input cert-toggle" id="toggle-logo" data-tag="platform_logo" checked>
+                                                <label class="custom-control-label font-weight-bold" for="toggle-logo">Logo da Plataforma</label>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <hr>
@@ -275,6 +278,21 @@
                                     <!-- Styling Controls for Selected Element -->
                                     <div id="cert-style-controls" style="display:none;">
                                         <h6>Estilo: <span id="selected-elem-name" class="text-primary font-weight-bold"></span></h6>
+                                        
+                                        <div class="form-group mb-2" id="font-family-control">
+                                            <label class="small mb-1">Fonte</label>
+                                            <select id="style-font-family" class="form-control form-control-sm">
+                                                <option value="Arial, sans-serif">Arial</option>
+                                                <option value="'Times New Roman', serif">Times New Roman</option>
+                                                <option value="'Courier New', monospace">Courier New</option>
+                                                <option value="Georgia, serif">Georgia</option>
+                                                <!-- Custom fonts will be loaded here via JS -->
+                                            </select>
+                                            <a href="{{ route('admin.fonts.index') }}" target="_blank" class="btn btn-sm btn-outline-secondary btn-block mt-2">
+                                                <i class="fas fa-plus"></i> Gerenciar Fontes
+                                            </a>
+                                        </div>
+                                        
                                         <div class="form-group mb-2">
                                             <label class="small mb-1">Tamanho da Fonte (px)</label>
                                             <input type="number" id="style-font-size" class="form-control form-control-sm" value="20">
@@ -875,24 +893,49 @@
         // Initial Settings from DB (or defaults)
         let certSettings = {!! $course->certificate_settings ? json_encode($course->certificate_settings) : '{}' !!};
         
-        // Defaults if empty
+        // Default Tags
         const defaultTags = {
-            'student_name': { x: 50, y: 40, text: '[Nome do Aluno]', fontSize: 30, color: '#000000', fontWeight: 'bold' },
-            'course_name': { x: 50, y: 55, text: '[Nome do Curso]', fontSize: 24, color: '#333333', fontWeight: 'bold' },
-            'completion_date': { x: 50, y: 65, text: 'Concluído em: 01/01/2024', fontSize: 16, color: '#555555', fontWeight: 'normal' },
-            'certificate_code': { x: 50, y: 85, text: 'Validação: ABC-123', fontSize: 12, color: '#999999', fontWeight: 'normal' }
+            'student_name': { x: 50, y: 40, text: '[Nome do Aluno]', fontSize: 30, color: '#000000', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' },
+            'course_name': { x: 50, y: 55, text: '[Nome do Curso]', fontSize: 24, color: '#333333', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' },
+            'completion_date': { x: 50, y: 65, text: 'Concluído em: 01/01/2024', fontSize: 16, color: '#555555', fontWeight: 'normal', fontFamily: 'Arial, sans-serif' },
+            'certificate_code': { x: 50, y: 85, text: 'Validação: ABC-123', fontSize: 12, color: '#999999', fontWeight: 'normal', fontFamily: 'Arial, sans-serif' },
+            'platform_logo': { x: 50, y: 10, text: 'LOGO UNN', fontSize: 36, color: '#0066cc', fontWeight: 'bold', fontFamily: 'Georgia, serif' }
         };
 
         // Merge defaults
         $.each(defaultTags, function(key, val) {
             if (!certSettings[key]) {
                 certSettings[key] = val;
-                // Default hidden logic: if new course, maybe hide? For now show all.
             }
         });
 
         const $canvas = $('#cert-elements-layer');
         let activeElementId = null;
+        let customFonts = [];
+
+        // Load Custom Fonts
+        $.ajax({
+            url: '{{ route("admin.fonts.api.active") }}',
+            type: 'GET',
+            success: function(fonts) {
+                customFonts = fonts;
+                // Add to selector
+                fonts.forEach(font => {
+                    $('#style-font-family').append(`<option value="${font.font_family}">${font.name}</option>`);
+                    
+                    // If it's a Google Font link, inject it
+                    if(font.type === 'google_link' && font.google_font_url) {
+                        $('head').append(`<link href="${font.google_font_url}" rel="stylesheet">`);
+                    }
+                    // If it's a file upload, inject @font-face
+                    else if(font.type === 'file' && font.file_path) {
+                        const fontUrl = '{{ asset('')}}' + font.file_path;
+                        $('head').append(`<style>@font-face { font-family: '${font.font_family}'; src: url('${fontUrl}'); }</style>`);
+                    }
+                });
+            }
+        });
+
 
         // Render Elements
         function renderElements() {
@@ -917,6 +960,7 @@
                         fontSize: data.fontSize + 'px',
                         color: data.color,
                         fontWeight: data.fontWeight,
+                        fontFamily: data.fontFamily || 'Arial, sans-serif',
                         cursor: 'move',
                         whiteSpace: 'nowrap',
                         border: '1px dashed transparent',
@@ -935,6 +979,7 @@
                      $('#style-font-size').val(data.fontSize);
                      $('#style-color').val(data.color);
                      $('#style-font-weight').val(data.fontWeight);
+                     $('#style-font-family').val(data.fontFamily || 'Arial, sans-serif');
                      $('#cert-style-controls').show();
                      
                      e.stopPropagation();
@@ -1029,6 +1074,14 @@
                 $('#el-'+activeElementId).css('font-weight', val);
             }
         });
+        
+        $('#style-font-family').on('change', function(){
+             if(activeElementId) {
+                let val = $(this).val();
+                certSettings[activeElementId].fontFamily = val;
+                $('#el-'+activeElementId).css('font-family', val);
+            }
+        });
 
         // Toggle Visibility
         $('.cert-toggle').on('change', function() {
@@ -1041,9 +1094,40 @@
             }
         });
 
-        // Sync Settings on Submit
-        $('#certForm').on('submit', function() {
+        // Sync Settings on Submit (AJAX)
+        $('#certForm').on('submit', function(e) {
+            e.preventDefault();
             $('#certificate_settings_input').val(JSON.stringify(certSettings));
+            
+            var formData = new FormData(this);
+            var $btn = $('#btn-save-cert');
+            var originalText = $btn.text();
+            
+            $btn.prop('disabled', true).text('Salvando...');
+            
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                     toastr.success('Configurações do Certificado salvas!');
+                     $btn.prop('disabled', false).text(originalText);
+                },
+                error: function(xhr) {
+                    $btn.prop('disabled', false).text(originalText);
+                    if(xhr.responseJSON && xhr.responseJSON.errors) {
+                         let msg = '';
+                         $.each(xhr.responseJSON.errors, function(k,v){ msg += v[0]+'<br>'; });
+                         toastr.error(msg);
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        toastr.error(xhr.responseJSON.message);
+                    } else {
+                        toastr.error('Erro ao salvar. Código: ' + xhr.status);
+                    }
+                }
+            });
         });
     });
 

@@ -92,13 +92,15 @@ class CourseController extends Controller
         }
 
         $data = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'sometimes|required|string|max:255',
             'short_description' => 'nullable|string|max:500',
             'full_description' => 'nullable|string',
             'price' => 'nullable|numeric',
             'author_name' => 'nullable|string|max:255',
-            'status' => 'required|in:draft,published,archived,paused',
+            'status' => 'sometimes|required|in:draft,published,archived,paused',
             'thumbnail' => 'nullable|image|max:10240', // 10MB Max
+            'certificate_bg' => 'nullable|image|max:5120',
+            'certificate_settings' => 'nullable|json',
         ]);
 
         $data['is_featured'] = $request->has('is_featured');
@@ -115,11 +117,7 @@ class CourseController extends Controller
         $data['published'] = ($data['status'] === 'published');
         $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
 
-        // Validation for new fields
-        $request->validate([
-             'certificate_bg' => 'nullable|image|max:5120',
-             'certificate_settings' => 'nullable|json',
-        ]);
+
 
         if ($request->hasFile('certificate_bg')) {
              if($course->certificate_bg && file_exists(public_path($course->certificate_bg))){

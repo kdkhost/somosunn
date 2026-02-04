@@ -205,6 +205,12 @@ Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMi
     
         // Courses CRUD
         Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class)->names('courses');
+        
+        // Custom Fonts
+        Route::get('/fonts', [\App\Http\Controllers\Admin\CustomFontController::class, 'index'])->name('fonts.index');
+        Route::post('/fonts', [\App\Http\Controllers\Admin\CustomFontController::class, 'store'])->name('fonts.store');
+        Route::delete('/fonts/{font}', [\App\Http\Controllers\Admin\CustomFontController::class, 'destroy'])->name('fonts.destroy');
+        Route::get('/fonts/api/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])->name('fonts.api.active');
     
         // Events CRUD
         Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');
