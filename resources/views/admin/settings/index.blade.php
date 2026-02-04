@@ -632,13 +632,23 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            <div class="alert alert-light border-danger">
+                                <h5><i class="icon fas fa-info-circle text-danger"></i> Configuração Google</h5>
+                                <ol class="pl-3 mb-0 text-muted small">
+                                    <li>Acesse o <a href="https://console.cloud.google.com/" target="_blank" class="text-danger">Google Cloud Console</a>.</li>
+                                    <li>Crie um projeto e vá em <strong>APIs & Services > Credentials</strong>.</li>
+                                    <li>Crie uma credencial <strong>OAuth Client ID</strong> (Web Application).</li>
+                                    <li>Em <strong>Authorized redirect URIs</strong>, adicione: <code class="user-select-all bg-white p-1 rounded border">{{ url('/auth/callback/google') }}</code></li>
+                                    <li>Copie o <strong>Client ID</strong> e <strong>Client Secret</strong> abaixo.</li>
+                                </ol>
+                            </div>
                             <div class="form-group">
                                 <label>Client ID</label>
-                                <input name="social_google_client_id" class="form-control" value="{{ $settings['social_google_client_id'] ?? '' }}">
+                                <input name="social_google_client_id" class="form-control" value="{{ $settings['social_google_client_id'] ?? '' }}" placeholder="ex: 123456789-abc...apps.googleusercontent.com">
                             </div>
                             <div class="form-group">
                                 <label>Client Secret</label>
-                                <input name="social_google_client_secret" class="form-control" value="{{ $settings['social_google_client_secret'] ?? '' }}">
+                                <input name="social_google_client_secret" class="form-control" value="{{ $settings['social_google_client_secret'] ?? '' }}" placeholder="ex: GOCSPX-...">
                             </div>
                         </div>
                     </div>
@@ -657,6 +667,15 @@
                             </div>
                         </div>
                         <div class="card-body" style="display: none;">
+                            <div class="alert alert-light border-primary">
+                                <h5><i class="icon fas fa-info-circle text-primary"></i> Configuração Facebook</h5>
+                                <ol class="pl-3 mb-0 text-muted small">
+                                    <li>Acesse o <a href="https://developers.facebook.com/" target="_blank" class="text-primary">Facebook for Developers</a>.</li>
+                                    <li>Crie um App (Tipo: Consumidor ou Nenhum) e vá em <strong>Configurações > Básico</strong>.</li>
+                                    <li>Adicione o produto <strong>Login do Facebook</strong>.</li>
+                                    <li>Nas configurações do Login, em <strong>Valid OAuth Redirect URIs</strong>, adicione: <code class="user-select-all bg-white p-1 rounded border">{{ url('/auth/callback/facebook') }}</code></li>
+                                </ol>
+                            </div>
                             <div class="form-group">
                                 <label>App ID</label>
                                 <input name="social_facebook_client_id" class="form-control" value="{{ $settings['social_facebook_client_id'] ?? '' }}">
@@ -682,6 +701,15 @@
                             </div>
                         </div>
                         <div class="card-body" style="display: none;">
+                            <div class="alert alert-light border-info">
+                                <h5><i class="icon fas fa-info-circle text-info"></i> Configuração LinkedIn</h5>
+                                <ol class="pl-3 mb-0 text-muted small">
+                                    <li>Acesse o <a href="https://www.linkedin.com/developers/" target="_blank" class="text-info">LinkedIn Developers</a>.</li>
+                                    <li>Crie um App e vá em <strong>Auth</strong>.</li>
+                                    <li>Em <strong>Authorized redirect URLs for your app</strong>, adicione: <code class="user-select-all bg-white p-1 rounded border">{{ url('/auth/callback/linkedin') }}</code></li>
+                                    <li>Certifique-se de ter o produto <strong>Sign In with LinkedIn</strong> habilitado.</li>
+                                </ol>
+                            </div>
                             <div class="form-group">
                                 <label>Client ID</label>
                                 <input name="social_linkedin_client_id" class="form-control" value="{{ $settings['social_linkedin_client_id'] ?? '' }}">
@@ -692,7 +720,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
