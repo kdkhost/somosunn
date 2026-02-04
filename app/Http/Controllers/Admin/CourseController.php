@@ -44,8 +44,10 @@ class CourseController extends Controller
         $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
 
         if ($request->hasFile('thumbnail')) {
-            $path = $request->file('thumbnail')->store('course-thumbs', 'public');
-            $data['thumbnail'] = 'storage/' . $path;
+            $file = $request->file('thumbnail');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/course-thumbs'), $fileName);
+            $data['thumbnail'] = 'uploads/course-thumbs/' . $fileName;
         }
         
         Course::create($data + ['user_id' => auth()->id()]);
@@ -81,8 +83,10 @@ class CourseController extends Controller
         $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
 
         if ($request->hasFile('thumbnail')) {
-            $path = $request->file('thumbnail')->store('course-thumbs', 'public');
-            $data['thumbnail'] = 'storage/' . $path;
+            $file = $request->file('thumbnail');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/course-thumbs'), $fileName);
+            $data['thumbnail'] = 'uploads/course-thumbs/' . $fileName;
         }
 
         $course->update($data);
