@@ -21,6 +21,15 @@ class CourseController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->has('price')) {
+            $price = $request->price;
+            // Remove R$, whitespace, and dots (thousand separators)
+            $price = str_replace(['R$', ' ', '.'], '', $price);
+            // Replace comma with dot
+            $price = str_replace(',', '.', $price);
+            $request->merge(['price' => $price]);
+        }
+
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -45,6 +54,13 @@ class CourseController extends Controller
 
     public function update(Request $request, Course $course)
     {
+        if ($request->has('price')) {
+            $price = $request->price;
+            $price = str_replace(['R$', ' ', '.'], '', $price);
+            $price = str_replace(',', '.', $price);
+            $request->merge(['price' => $price]);
+        }
+
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
