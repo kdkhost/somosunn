@@ -3,80 +3,112 @@
 @section('title', 'Cursos - UNN')
 
 @section('content')
-<div class="bg-gray-50 min-h-screen py-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Cursos</h1>
-                <p class="mt-1 text-sm text-gray-500">Aprenda e ensine na nossa comunidade.</p>
-            </div>
-            @auth
-                <a href="{{ route('courses.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-                    <i class="fas fa-plus mr-2"></i> Criar Curso
-                </a>
-            @endauth
+<div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- Hero Section -->
+    <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
+                <span class="text-gradient">Cursos</span> UNN
+            </h1>
+            <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Aprenda e ensine na nossa comunidade. Conhecimento que gera resultados.
+            </p>
         </div>
+    </section>
 
-        @if(session('success'))
-            <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @forelse($courses as $course)
-                @php
-                    $isDemo = $course->is_demo ?? false;
-                    $authorName = $isDemo ? ($course->creator->name ?? 'UNN Academy') : ($course->author_name ?? optional($course->creator)->name ?? 'Instrutor');
-                    $lessonsCount = $isDemo ? 0 : ($course->lessons ? $course->lessons->count() : 0);
-                    $courseSlug = ($isDemo || empty($course->slug)) ? '#' : route('courses.show', $course->slug);
-                @endphp
-                <div class="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-300 {{ $isDemo ? 'opacity-90' : '' }}">
-                    <a href="{{ $courseSlug }}">
-                        <div class="h-48 bg-gray-200 relative">
-                            @if($course->thumbnail)
-                                <img src="{{ asset($course->thumbnail) }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
-                            @else
-                                <div class="flex items-center justify-center h-full text-gray-400 bg-gradient-to-br from-blue-100 to-purple-100">
-                                    <i class="fas fa-graduation-cap text-4xl text-blue-400"></i>
-                                </div>
-                            @endif
-                            <div class="absolute top-2 right-2 bg-white px-2 py-1 text-xs font-bold rounded shadow">
-                                {{ $course->price > 0 ? 'R$ ' . number_format($course->price, 2, ',', '.') : 'Grátis' }}
-                            </div>
-                            @if($isDemo)
-                                <div class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 px-2 py-1 text-xs font-bold rounded shadow">
-                                    DEMONSTRAÇÃO
-                                </div>
-                            @elseif($course->is_featured)
-                                <div class="absolute top-2 left-2 bg-purple-600 text-white px-2 py-1 text-xs font-bold rounded shadow">
-                                    DESTAQUE
-                                </div>
-                            @endif
-                        </div>
-                        <div class="p-5">
-                            <h3 class="text-lg font-bold text-gray-900 truncate">{{ $course->title }}</h3>
-                            <p class="text-sm text-gray-500 mt-1">{{ $authorName }}</p>
-                            <p class="text-sm text-gray-600 mt-2 line-clamp-2">{{ $course->short_description ?? '' }}</p>
-                            <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
-                                <span><i class="far fa-clock mr-1"></i> {{ $course->duration ?? 0 }} min</span>
-                                <span><i class="fas fa-book-open mr-1"></i> {{ $lessonsCount }} aulas</span>
-                            </div>
-                        </div>
-                    </a>
+    <!-- Courses Grid -->
+    <section class="pb-24 px-4 md:px-12 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            
+            @if(session('success'))
+                <div class="mb-8 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-sm" role="alert">
+                    <p>{{ session('success') }}</p>
                 </div>
-            @empty
-                <div class="col-span-full text-center py-12">
-                    <p class="text-gray-500 text-lg">Nenhum curso disponível no momento.</p>
-                </div>
-            @endforelse
-        </div>
+            @endif
 
-        @if(method_exists($courses, 'links'))
-        <div class="mt-6">
-            {{ $courses->links() }}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @forelse($courses as $course)
+                    @php
+                        $isDemo = $course->is_demo ?? false;
+                        $authorName = $isDemo ? ($course->creator->name ?? 'UNN Academy') : ($course->author_name ?? optional($course->creator)->name ?? 'Instrutor');
+                        $lessonsCount = $isDemo ? 0 : ($course->lessons ? $course->lessons->count() : 0);
+                        // Fallback click URL
+                        $courseSlug = (!$isDemo && $course->slug) ? route('courses.show', $course->slug) : '#';
+                        $courseImage = $course->thumbnail ? asset($course->thumbnail) : null;
+                    @endphp
+                    <div class="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 transform hover:-translate-y-1 {{ $isDemo ? 'opacity-90' : '' }}">
+                        <a href="{{ $courseSlug }}" class="block h-full flex flex-col">
+                            <!-- Image Container -->
+                            <div class="h-56 bg-gray-100 relative overflow-hidden">
+                                @if($courseImage)
+                                    <img src="{{ $courseImage }}" alt="{{ $course->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                @else
+                                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-blue-100 to-indigo-50">
+                                        <i class="fas fa-graduation-cap text-5xl text-blue-300"></i>
+                                    </div>
+                                @endif
+                                
+                                <!-- Badges -->
+                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 text-xs font-bold rounded-full shadow-sm" style="color: var(--unn-azul-1)">
+                                    {{ $course->price > 0 ? 'R$ ' . number_format($course->price, 2, ',', '.') : 'Grátis' }}
+                                </div>
+
+                                @if($isDemo)
+                                    <div class="absolute top-4 left-4 bg-yellow-400 text-yellow-900 px-3 py-1 text-xs font-bold rounded-full shadow-sm">
+                                        DEMONSTRAÇÃO
+                                    </div>
+                                @elseif($course->is_featured)
+                                    <div class="absolute top-4 left-4 bg-purple-600 text-white px-3 py-1 text-xs font-bold rounded-full shadow-sm">
+                                        DESTAQUE
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Content -->
+                            <div class="p-8 flex-1 flex flex-col">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">{{ $course->title }}</h3>
+                                
+                                <p class="text-sm font-medium mb-4 flex items-center gap-2" style="color: var(--unn-azul-2)">
+                                    <i class="fas fa-user-circle"></i> {{ $authorName }}
+                                </p>
+                                
+                                <p class="text-gray-500 text-sm line-clamp-3 mb-6 flex-1 leadinig-relaxed">
+                                    {{ $course->short_description ?? 'Sem descrição curta definida.' }}
+                                </p>
+
+                                <div class="pt-6 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                                    <span class="flex items-center gap-1"><i class="far fa-clock"></i> {{ $course->duration ?? 0 }} min</span>
+                                    <span class="flex items-center gap-1"><i class="fas fa-book-reader"></i> {{ $lessonsCount }} aulas</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                @empty
+                    <div class="col-span-full py-20 text-center">
+                        <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-chalkboard-teacher text-3xl text-blue-300"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Nenhum curso disponível</h3>
+                        <p class="text-gray-500">Volte em breve para conferir novos conteúdos.</p>
+                    </div>
+                @endforelse
+            </div>
+
+            @if(method_exists($courses, 'links'))
+            <div class="mt-12">
+                {{ $courses->links() }}
+            </div>
+            @endif
         </div>
-        @endif
-    </div>
+    </section>
 </div>
+
+<style>
+.text-gradient {
+    background: linear-gradient(135deg, var(--unn-azul-1) 0%, var(--unn-azul-3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+</style>
 @endsection
