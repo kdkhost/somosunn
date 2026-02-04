@@ -25,7 +25,7 @@
                     <h2 class="text-3xl font-black text-gray-900 mb-8">Informações de Contato</h2>
                     
                     <div class="space-y-6">
-                        <div class="bg-white rounded-2xl p-6 shadow-lg flex items-start gap-4">
+                        <div class="bg-white rounded-2xl p-6 shadow-lg flex flex-col md:flex-row items-center md:items-start gap-4 text-center md:text-left">
                             <div class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center shrink-0">
                                 <i class="fas fa-envelope text-white text-xl"></i>
                             </div>
@@ -36,7 +36,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-2xl p-6 shadow-lg flex items-start gap-4">
+                        <div class="bg-white rounded-2xl p-6 shadow-lg flex flex-col md:flex-row items-center md:items-start gap-4 text-center md:text-left">
                             <div class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center shrink-0">
                                 <i class="fab fa-whatsapp text-white text-xl"></i>
                             </div>
@@ -47,7 +47,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-2xl p-6 shadow-lg flex items-start gap-4">
+                        <div class="bg-white rounded-2xl p-6 shadow-lg flex flex-col md:flex-row items-center md:items-start gap-4 text-center md:text-left">
                             <div class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center shrink-0">
                                 <i class="fas fa-map-marker-alt text-white text-xl"></i>
                             </div>
@@ -61,9 +61,9 @@
                     </div>
 
                     <!-- Social Media -->
-                    <div class="mt-8 bg-white rounded-2xl p-6 shadow-lg">
+                    <div class="mt-8 bg-white rounded-2xl p-6 shadow-lg text-center md:text-left">
                         <h3 class="font-bold text-gray-900 mb-4">Redes Sociais</h3>
-                        <div class="flex gap-4 justify-start flex-wrap">
+                        <div class="flex gap-4 justify-center md:justify-start flex-wrap">
                             <a href="#" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
                                 <i class="fab fa-instagram text-xl"></i>
                             </a>
