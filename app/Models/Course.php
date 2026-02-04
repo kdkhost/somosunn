@@ -35,6 +35,7 @@ class Course extends Model
         'author_name',
         'status',
         'is_featured',
+        'certificate_bg',
         'certificate_settings',
         'published', // Legacy
     ];

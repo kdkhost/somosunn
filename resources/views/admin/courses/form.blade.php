@@ -35,6 +35,13 @@
                     <a class="nav-link disabled" href="#" title="Salve o curso primeiro">Conteúdo / Aulas <i class="fas fa-lock ml-1 text-muted"></i></a>
                 @endif
             </li>
+            <li class="nav-item">
+                @if($course->exists)
+                    <a class="nav-link" id="cert-tab" data-toggle="pill" href="#certificate" role="tab">Certificado</a>
+                @else
+                    <a class="nav-link disabled" href="#" title="Salve o curso primeiro">Certificado <i class="fas fa-lock ml-1 text-muted"></i></a>
+                @endif
+            </li>
         </ul>
     </div>
     <div class="card-body">
@@ -182,6 +189,116 @@
                         <div class="text-center text-muted py-5">Nenhuma aula cadastrada ainda.</div>
                     @endforelse
                 </div>
+            </div>
+            
+            <!-- CERTIFICATE TAB -->
+            <div class="tab-pane fade" id="certificate" role="tabpanel">
+                <form id="certForm" method="POST" action="{{ route('admin.courses.update', $course) }}" enctype="multipart/form-data">
+                    @csrf 
+                    @method('PUT')
+                    
+                    <div class="row">
+                        <div class="col-md-9">
+                            <!-- CANVAS AREA (A4 Landscape aspect ratio) -->
+                            <div class="card">
+                                <div class="card-body bg-secondary d-flex justify-content-center align-items-center" style="min-height: 500px; overflow: hidden;">
+                                    
+                                    <div id="cert-canvas" style="position: relative; width: 842px; height: 595px; background-color: white; box-shadow: 0 0 20px rgba(0,0,0,0.5); overflow: hidden;">
+                                        @if($course->certificate_bg)
+                                            <img src="{{ asset($course->certificate_bg) }}" id="cert-bg-img" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;">
+                                        @else
+                                            <div id="cert-bg-placeholder" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc; z-index: 1; position: absolute;">
+                                                <h3>Sem imagem de fundo</h3>
+                                            </div>
+                                        @endif
+                                        
+                                        <!-- Draggable Container z-index 10 -->
+                                        <div id="cert-elements-layer" style="position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10;">
+                                            <!-- Elements will be injected here via JS -->
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <!-- TOOLS PANEL -->
+                            <div class="card">
+                                <div class="card-header bg-dark text-white">Configurações</div>
+                                <div class="card-body">
+                                    
+                                    <div class="form-group">
+                                        <label>Imagem de Fundo (A4 Paisagem)</label>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" name="certificate_bg" accept="image/*" onchange="previewCertBg(this)">
+                                            <label class="custom-file-label">Escolher arquivo</label>
+                                        </div>
+                                        <small class="text-muted">Recomendado: 1920x1080px ou tamanho proporcional A4 (3508x2480px para alta qualidade).</small>
+                                    </div>
+
+                                    <hr>
+
+                                    <h6>Elementos Visíveis</h6>
+                                    <p class="small text-muted">Arraste os elementos no canvas.</p>
+                                    
+                                    <div class="list-group mb-3" id="cert-available-tags">
+                                        <!-- Checkboxes to toggle visibility of elements -->
+                                        <div class="list-group-item p-2">
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input cert-toggle" id="toggle-student" data-tag="student_name" checked>
+                                                <label class="custom-control-label" for="toggle-student">Nome do Aluno</label>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item p-2">
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input cert-toggle" id="toggle-course" data-tag="course_name" checked>
+                                                <label class="custom-control-label" for="toggle-course">Nome do Curso</label>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item p-2">
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input cert-toggle" id="toggle-date" data-tag="completion_date" checked>
+                                                <label class="custom-control-label" for="toggle-date">Data de Conclusão</label>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item p-2">
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input cert-toggle" id="toggle-code" data-tag="certificate_code" checked>
+                                                <label class="custom-control-label" for="toggle-code">Código de Validação</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <!-- Styling Controls for Selected Element -->
+                                    <div id="cert-style-controls" style="display:none;">
+                                        <h6>Estilo: <span id="selected-elem-name" class="text-primary font-weight-bold"></span></h6>
+                                        <div class="form-group mb-2">
+                                            <label class="small mb-1">Tamanho da Fonte (px)</label>
+                                            <input type="number" id="style-font-size" class="form-control form-control-sm" value="20">
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small mb-1">Cor</label>
+                                            <input type="color" id="style-color" class="form-control form-control-sm" value="#000000">
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small mb-1">Peso da Fonte</label>
+                                            <select id="style-font-weight" class="form-control form-control-sm">
+                                                <option value="normal">Normal</option>
+                                                <option value="bold">Negrito</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="hidden" name="certificate_settings" id="certificate_settings_input">
+                                    <button type="submit" class="btn btn-primary btn-block mt-4" id="btn-save-cert">Salvar Certificado</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
             @endif
         </div>
@@ -745,6 +862,204 @@
         copyText.setSelectionRange(0, 99999);
         document.execCommand("copy");
         toastr.success('Link copiado!');
+    }
+</script>
+
+<!-- jQuery UI for Draggable -->
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+<script>
+    // Certificate Editor Logic
+    $(document).ready(function() {
+        // Initial Settings from DB (or defaults)
+        let certSettings = {!! $course->certificate_settings ? json_encode($course->certificate_settings) : '{}' !!};
+        
+        // Defaults if empty
+        const defaultTags = {
+            'student_name': { x: 50, y: 40, text: '[Nome do Aluno]', fontSize: 30, color: '#000000', fontWeight: 'bold' },
+            'course_name': { x: 50, y: 55, text: '[Nome do Curso]', fontSize: 24, color: '#333333', fontWeight: 'bold' },
+            'completion_date': { x: 50, y: 65, text: 'Concluído em: 01/01/2024', fontSize: 16, color: '#555555', fontWeight: 'normal' },
+            'certificate_code': { x: 50, y: 85, text: 'Validação: ABC-123', fontSize: 12, color: '#999999', fontWeight: 'normal' }
+        };
+
+        // Merge defaults
+        $.each(defaultTags, function(key, val) {
+            if (!certSettings[key]) {
+                certSettings[key] = val;
+                // Default hidden logic: if new course, maybe hide? For now show all.
+            }
+        });
+
+        const $canvas = $('#cert-elements-layer');
+        let activeElementId = null;
+
+        // Render Elements
+        function renderElements() {
+            $canvas.empty();
+            $.each(certSettings, function(key, data) {
+                 // Check visibility based on toggle switch
+                 if(!$('#toggle-'+key.split('_')[1]).is(':checked') && !$('#toggle-'+key.split('_')[0]).is(':checked')) {
+                    // This is a rough check, let's rely on the toggle state map if we had one.
+                    // Actually, let's check the DOM toggle switch
+                 }
+                 
+                 // Create Element
+                 let $el = $('<div>')
+                    .addClass('cert-element')
+                    .attr('id', 'el-' + key)
+                    .attr('data-tag', key)
+                    .css({
+                        position: 'absolute',
+                        left: data.x + '%',
+                        top: data.y + '%',
+                        transform: 'translate(-50%, -50%)', // Center based on coords
+                        fontSize: data.fontSize + 'px',
+                        color: data.color,
+                        fontWeight: data.fontWeight,
+                        cursor: 'move',
+                        whiteSpace: 'nowrap',
+                        border: '1px dashed transparent',
+                        padding: '5px'
+                    })
+                    .text(data.text);
+                 
+                 // Click to Select
+                 $el.on('mousedown', function(e) {
+                     $('.cert-element').css('border-color', 'transparent');
+                     $(this).css('border-color', '#007bff');
+                     activeElementId = key;
+                     
+                     // Populate Tools
+                     $('#selected-elem-name').text(data.text);
+                     $('#style-font-size').val(data.fontSize);
+                     $('#style-color').val(data.color);
+                     $('#style-font-weight').val(data.fontWeight);
+                     $('#cert-style-controls').show();
+                     
+                     e.stopPropagation();
+                 });
+
+                 $canvas.append($el);
+            });
+
+            // Init Draggable
+            $('.cert-element').draggable({
+                containment: "#cert-canvas",
+                stop: function(event, ui) {
+                    let key = $(this).data('tag');
+                    // Calculate % based on parent size
+                    let parentWidth = $('#cert-canvas').width();
+                    let parentHeight = $('#cert-canvas').height();
+                    let left = parseFloat($(this).css('left'));
+                    let top = parseFloat($(this).css('top'));
+                    
+                    // Convert back to percentage
+                    let pLeft = (left / parentWidth) * 100; // Draggable sets absolute pixels usually?
+                    // jQuery UI draggable sets style.left/top in pixels relative to parent
+                    // But we used translate(-50%, -50%) for centering.
+                    // Visual position (center) = left pos + width/2. 
+                    // Let's simplify: We simply store the new css left/top as % if possible, or px -> %
+                    
+                    // Actually, let's just get the position relative to parent
+                    // var pos = $(this).position(); 
+                    // pos.left is px.
+                    
+                    // We want to store % to be responsive if canvas scales (though fixed px for A4 is fine too)
+                    // Let's stick to % for center point.
+                    
+                    // Re-calculate %
+                     let finalX = (ui.position.left / parentWidth) * 100; // Left edge
+                     let finalY = (ui.position.top / parentHeight) * 100; // Top edge
+                     
+                     // Since we do translate(-50%,-50%), the visual center is what we want? 
+                     // No, if we use translate, left:50% means center.
+                     // jQuery changes left to px value of the FILE.
+                     // The transform remains.
+                     
+                     // We need to adjust for the transform offset? jQuery UI Draggable might interfere with transform.
+                     // Let's assume standard left/top corner drag for simplicity, remove transform!
+                }
+            });
+            
+            // Re-apply Draggable with better config
+             $('.cert-element').draggable({
+                containment: "#cert-canvas",
+                scroll: false,
+                stop: function(event, ui) {
+                     let key = $(this).data('tag');
+                     let parentW = $('#cert-canvas').width();
+                     let parentH = $('#cert-canvas').height();
+                     
+                     // Get current position (Top-Left corner of element)
+                     let leftPx = ui.position.left;
+                     let topPx = ui.position.top;
+                     
+                     // Convert to %
+                     certSettings[key].x = (leftPx / parentW) * 100;
+                     certSettings[key].y = (topPx / parentH) * 100;
+                }
+            });
+            
+            // Remove transform for easier drag math
+            $('.cert-element').css('transform', 'none'); 
+        }
+
+        renderElements();
+
+        // Style Change Listeners
+        $('#style-font-size').on('input', function(){
+            if(activeElementId) {
+                let val = $(this).val();
+                certSettings[activeElementId].fontSize = val;
+                $('#el-'+activeElementId).css('font-size', val+'px');
+            }
+        });
+        $('#style-color').on('input', function(){
+             if(activeElementId) {
+                let val = $(this).val();
+                certSettings[activeElementId].color = val;
+                $('#el-'+activeElementId).css('color', val);
+            }
+        });
+         $('#style-font-weight').on('change', function(){
+             if(activeElementId) {
+                let val = $(this).val();
+                certSettings[activeElementId].fontWeight = val;
+                $('#el-'+activeElementId).css('font-weight', val);
+            }
+        });
+
+        // Toggle Visibility
+        $('.cert-toggle').on('change', function() {
+            let key = $(this).data('tag');
+            if($(this).is(':checked')) {
+                // If exists in settings, show, else reset
+                $('#el-'+key).show();
+            } else {
+                $('#el-'+key).hide();
+            }
+        });
+
+        // Sync Settings on Submit
+        $('#certForm').on('submit', function() {
+            $('#certificate_settings_input').val(JSON.stringify(certSettings));
+        });
+    });
+
+    // Preview Background
+    window.previewCertBg = function(input) {
+         if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                if($('#cert-bg-img').length){
+                    $('#cert-bg-img').attr('src', e.target.result);
+                } else {
+                    $('#cert-bg-placeholder').replaceWith('<img src="'+e.target.result+'" id="cert-bg-img" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;">');
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 </script>
 @endpush
