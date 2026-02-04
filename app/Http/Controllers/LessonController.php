@@ -94,6 +94,14 @@ class LessonController extends Controller
         
         $lesson->update($validated + ['is_free_preview' => $request->has('is_free_preview')]);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Aula atualizada com sucesso',
+                'lesson' => $lesson
+            ]);
+        }
+
         return back()->with('success', 'Aula atualizada.');
     }
 
