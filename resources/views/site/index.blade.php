@@ -53,24 +53,25 @@
     </section>
 
     <!-- Stats Bar -->
-    <section class="py-8 px-6 md:px-12 lg:px-24">
+    <!-- Stats Bar -->
+    <section class="py-6 md:py-8 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
-                    <p class="text-4xl font-black" style="color: var(--unn-azul-1)">5.000+</p>
-                    <p class="text-sm text-gray-500 mt-1">Empreendedores</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">5.000+</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Empreendedores</p>
                 </div>
-                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
-                    <p class="text-4xl font-black" style="color: var(--unn-azul-1)">R$ 50M+</p>
-                    <p class="text-sm text-gray-500 mt-1">Em negócios gerados</p>
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">R$ 50M+</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Em negócios gerados</p>
                 </div>
-                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
-                    <p class="text-4xl font-black" style="color: var(--unn-azul-1)">200+</p>
-                    <p class="text-sm text-gray-500 mt-1">Eventos realizados</p>
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">200+</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Eventos realizados</p>
                 </div>
-                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
-                    <p class="text-4xl font-black" style="color: var(--unn-azul-1)">27</p>
-                    <p class="text-sm text-gray-500 mt-1">Estados</p>
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">27</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Estados</p>
                 </div>
             </div>
         </div>
