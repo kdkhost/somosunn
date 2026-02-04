@@ -127,7 +127,11 @@
                         <h1 class="m-0 h4">@yield('page_title')</h1>
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" data-pjax>Home</a></li>
-                            @yield('breadcrumb')
+                            @hasSection('breadcrumb_items')
+                                @yield('breadcrumb_items')
+                            @else
+                                <li class="breadcrumb-item active">@yield('page_title')</li>
+                            @endif
                         </ol>
                     </div>
                 </div>

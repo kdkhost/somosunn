@@ -1,6 +1,10 @@
 @extends('admin.layouts.app')
 
-@section('page_title', $course->exists ? 'Editar Curso: ' . $course->title : 'Novo Curso')
+@section('page_title', $course->exists ? 'Editar Curso' : 'Novo Curso')
+@section('breadcrumb_items')
+    <li class="breadcrumb-item"><a href="{{ route('admin.courses.index') }}">Cursos</a></li>
+    <li class="breadcrumb-item active">{{ $course->exists ? 'Editar' : 'Novo' }}</li>
+@endsection
 
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />

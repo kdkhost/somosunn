@@ -1,6 +1,9 @@
 @extends('admin.layouts.app')
 
 @section('page_title','Cursos')
+@section('breadcrumb_items')
+    <li class="breadcrumb-item active">Cursos</li>
+@endsection
 
 @section('content')
 
