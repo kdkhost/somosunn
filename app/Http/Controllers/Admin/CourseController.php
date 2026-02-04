@@ -32,6 +32,7 @@ class CourseController extends Controller
 
         $data = $request->validate([
             'title' => 'required|string|max:255',
+            'short_description' => 'nullable|string|max:500',
             'full_description' => 'nullable|string',
             'price' => 'nullable|numeric',
             'author_name' => 'nullable|string|max:255',
@@ -72,6 +73,7 @@ class CourseController extends Controller
 
         $data = $request->validate([
             'title' => 'required|string|max:255',
+            'short_description' => 'nullable|string|max:500',
             'full_description' => 'nullable|string',
             'price' => 'nullable|numeric',
             'author_name' => 'nullable|string|max:255',

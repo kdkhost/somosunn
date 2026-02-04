@@ -52,6 +52,11 @@
                                 <input name="title" class="form-control form-control-lg" value="{{ old('title',$course->title) }}" required placeholder="Ex: Curso Completo de Laravel">
                             </div>
                             <div class="form-group mb-3">
+                                <label>Descrição Curta (Resumo)</label>
+                                <textarea name="short_description" class="form-control" rows="3" placeholder="Breve resumo para exibição nos cards..." maxlength="500">{{ old('short_description',$course->short_description) }}</textarea>
+                                <small class="text-muted">Máximo 500 caracteres.</small>
+                            </div>
+                            <div class="form-group mb-3">
                                 <label>Descrição Completa</label>
                                 <textarea name="full_description" id="fullDescription" class="form-control summernote">{{ old('full_description',$course->full_description) }}</textarea>
                             </div>
@@ -105,6 +110,37 @@
 
                                 </div>
                             </div>
+
+                            <!-- CONFIGURAÇÕES EXTRAS -->
+                            <div class="card bg-light mb-3">
+                                <div class="card-header">Configurações</div>
+                                <div class="card-body">
+                                    
+                                    <h6 class="font-weight-bold">Certificado</h6>
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" name="is_certificate_enabled" value="1" class="form-check-input" id="is_certificate_enabled" {{ $course->is_certificate_enabled ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="is_certificate_enabled">Habilitar Certificado</label>
+                                    </div>
+                                    <small class="text-muted d-block mb-3">O aluno receberá um certificado automático ao concluir 100% das aulas.</small>
+
+                                    @if($course->exists && $course->slug)
+                                        <hr>
+                                        <h6 class="font-weight-bold">Link do Curso</h6>
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control" id="courseLink" value="{{ route('courses.show', $course->slug) }}" readonly>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="copyLink()">
+                                                    <i class="fas fa-copy"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <a href="{{ route('courses.show', $course->slug) }}" target="_blank" class="btn btn-sm btn-outline-primary btn-block">
+                                            <i class="fas fa-external-link-alt"></i> Visualizar Página
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                             <button class="btn btn-primary btn-block btn-lg" data-toggle="tooltip" title="Salvar todas as alterações do curso">Salvar Informações</button>
                             
                             @if(!$course->exists)
@@ -703,5 +739,12 @@
             });
         });
     });
+    function copyLink() {
+        var copyText = document.getElementById("courseLink");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        toastr.success('Link copiado!');
+    }
 </script>
 @endpush
