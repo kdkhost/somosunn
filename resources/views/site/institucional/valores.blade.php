@@ -22,7 +22,7 @@
             <div class="grid md:grid-cols-2 gap-8">
                 <!-- Valor -->
                 <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
-                    <div class="flex items-start gap-4 md:gap-6">
+                    <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-center md:text-left">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center shrink-0">
                             <i class="fas fa-heart text-white text-2xl"></i>
                         </div>
@@ -41,7 +41,7 @@
 
                 <!-- Valor 2 -->
                 <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
-                    <div class="flex items-start gap-4 md:gap-6">
+                    <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-center md:text-left">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center shrink-0">
                             <i class="fas fa-hands-helping text-white text-2xl"></i>
                         </div>
@@ -60,7 +60,7 @@
 
                 <!-- Valor 3 -->
                 <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
-                    <div class="flex items-start gap-4 md:gap-6">
+                    <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-center md:text-left">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center shrink-0">
                             <i class="fas fa-lightbulb text-white text-2xl"></i>
                         </div>
@@ -79,7 +79,7 @@
 
                 <!-- Valor 4 -->
                 <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
-                    <div class="flex items-start gap-4 md:gap-6">
+                    <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-center md:text-left">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center shrink-0">
                             <i class="fas fa-trophy text-white text-2xl"></i>
                         </div>
@@ -98,7 +98,7 @@
 
                 <!-- Valor 5 -->
                 <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
-                    <div class="flex items-start gap-4 md:gap-6">
+                    <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-center md:text-left">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center shrink-0">
                             <i class="fas fa-user-shield text-white text-2xl"></i>
                         </div>
@@ -117,7 +117,7 @@
 
                 <!-- Valor 6 -->
                 <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
-                    <div class="flex items-start gap-4 md:gap-6">
+                    <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-center md:text-left">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center shrink-0">
                             <i class="fas fa-users text-white text-2xl"></i>
                         </div>
