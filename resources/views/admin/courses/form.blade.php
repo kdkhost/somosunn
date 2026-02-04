@@ -252,6 +252,11 @@
         $('#attachmentsWarning').show();
         $('#attachmentList').empty();
         
+        // Reset Video Inputs
+        $('#lessonVideo').prop('disabled', false);
+        $('#lessonVideoFile').prop('disabled', false);
+        $('#video-source-tab a').removeClass('disabled');
+        
         // Reset Summernote
         $('#lessonContent').summernote('reset');
 
@@ -263,6 +268,11 @@
             $('#lessonTitle').val(lesson.title);
             $('#lessonOrder').val(lesson.order);
             $('#lessonVideo').val(lesson.video_url);
+            
+            // Lock Video Editing
+            $('#lessonVideo').prop('disabled', true);
+            $('#lessonVideoFile').prop('disabled', true);
+            $('#video-source-tab a').addClass('disabled'); // Disable tab switching
             
             // Set Content
             $('#lessonContent').summernote('code', lesson.content || '');
@@ -380,17 +390,52 @@
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 maxFilesize: 50, // MB
                 acceptedFiles: null,
-                success: function(file, response) {
-                    if(response.success) {
-                        toastr.success('Arquivo enviado!');
-                        const lessonId = $('#lessonId').val();
-                        fetchLessonDetails(lessonId);
+                autoProcessQueue: false, // Wait for name
+                addRemoveLinks: true,
+                dictRemoveFile: "Cancelar",
+                
+                init: function() {
+                    this.on("addedfile", function(file) {
+                        // Prompt for name immediately
+                        Swal.fire({
+                            title: 'Nome do arquivo',
+                            input: 'text',
+                            inputValue: file.name,
+                            showCancelButton: true,
+                            confirmButtonText: 'Enviar',
+                            cancelButtonText: 'Cancelar Upload',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                file.customName = result.value;
+                                myDropzone.processQueue();
+                            } else {
+                                myDropzone.removeFile(file);
+                            }
+                        });
+                    });
+
+                    this.on("sending", function(file, xhr, formData) {
+                        if(file.customName) {
+                            formData.append("name", file.customName);
+                        }
+                    });
+
+                    this.on("success", function(file, response) {
+                        if(response.success) {
+                            toastr.success('Arquivo enviado!');
+                            const lessonId = $('#lessonId').val();
+                            fetchLessonDetails(lessonId);
+                            this.removeFile(file);
+                        }
+                    });
+
+                    this.on("error", function(file, message) {
+                        // If manually removed (canceled), don't show error
+                        if(file.accepted === false) return; 
+                        toastr.error(message || 'Erro no upload');
                         this.removeFile(file);
-                    }
-                },
-                error: function(file, message) {
-                    toastr.error(message || 'Erro no upload');
-                    this.removeFile(file);
+                    });
                 }
             });
         }
@@ -452,6 +497,7 @@
                 data: formData,
                 processData: false,
                 contentType: false,
+                dataType: 'json', // Expect JSON
                 xhr: function() {
                     var xhr = new window.XMLHttpRequest();
                     xhr.upload.addEventListener("progress", function(evt) {
@@ -463,10 +509,44 @@
                     }, false);
                     return xhr;
                 },
-                success: function() {
-                    $('#lessonModal').modal('hide');
+                success: function(response) {
+                    $('#uploadProgressWrapper').hide();
+                    $btn.prop('disabled', false).text(originalText);
                     toastr.success('Aula salva com sucesso!');
-                    setTimeout(function(){ window.location.reload(); }, 1000);
+
+                    if (response.lesson) {
+                        // It was a Create action, switch to saved mode
+                        const lesson = response.lesson;
+                        
+                        // Switch to Edit Mode in UI
+                        $('#lessonId').val(lesson.id);
+                        $('#lessonMethod').val('PUT'); // Next saves are updates
+                        $('#lessonModalTitle').text('Editar Aula: ' + lesson.title);
+                        
+                        // Enable Attachments
+                        $('#attachmentsSection').show();
+                        $('#attachmentsWarning').hide();
+                        updateDropzoneUrl(lesson.id);
+
+                        // Lock Video
+                        $('#lessonVideo').prop('disabled', true);
+                        $('#lessonVideoFile').prop('disabled', true);
+                        $('#video-source-tab a').addClass('disabled');
+
+                        // Refresh the list in the background (optional, or just append)
+                        // For now, let's keep it simple. If they close, they see the list. 
+                        // To be perfect, we should append to #lessons-list. But reloading on modal close is safer for integrity.
+                        // Let's force a reload ONLY when the modal is closed if changes happened.
+                        $('#lessonModal').one('hidden.bs.modal', function () {
+                            window.location.reload();
+                        });
+
+                    } else {
+                        // Update action
+                         $('#lessonModal').one('hidden.bs.modal', function () {
+                            window.location.reload();
+                        });
+                    }
                 },
                 error: function(xhr) {
                     $('#uploadProgressWrapper').hide();
@@ -478,15 +558,10 @@
                         toastr.error(msg);
                     } else if(xhr.status === 413) {
                         toastr.error('O arquivo é muito grande para o servidor. Limite: 500MB.');
+                    } else if(xhr.status === 403) {
+                         toastr.error('Não autorizado. Verifique suas permissões.');
                     } else {
-                        // Advanced Debugging
-                        let errorText = 'Erro desconhecido';
-                        try {
-                            if(xhr.responseJSON && xhr.responseJSON.message) errorText = xhr.responseJSON.message;
-                            else if (xhr.responseText) errorText = xhr.responseText.substring(0, 100);
-                        } catch(e){}
-                        
-                        toastr.error('Erro ' + xhr.status + ': ' + errorText);
+                        toastr.error('Erro ao salvar.');
                         console.error(xhr);
                     }
                 }

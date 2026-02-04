@@ -30,7 +30,7 @@ class LessonController extends Controller
             $videoUrl = 'storage/' . $path;
         }
 
-        $course->lessons()->create([
+        $lesson = $course->lessons()->create([
             'title' => $validated['title'],
             'order' => $validated['order'],
             'video_url' => $videoUrl,
@@ -38,6 +38,14 @@ class LessonController extends Controller
             'is_free_preview' => $request->has('is_free_preview'),
             'duration' => $request->duration ?? 0,
         ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Aula criada com sucesso',
+                'lesson' => $lesson
+            ]);
+        }
 
         return back()->with('success', 'Aula adicionada.');
     }
@@ -108,7 +116,7 @@ class LessonController extends Controller
         
         $attachment = $lesson->attachments()->create([
             'file_path' => $path,
-            'file_name' => $file->getClientOriginalName(), // Default name
+            'file_name' => $request->input('name', $file->getClientOriginalName()),
             'file_type' => $file->getClientOriginalExtension(),
             'file_size' => $file->getSize()
         ]);
