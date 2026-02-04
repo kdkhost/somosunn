@@ -45,10 +45,7 @@ class ProfileController extends Controller
             'linkedin' => 'nullable|url|max:255',
             'youtube' => 'nullable|url|max:255',
             
-            // Privacidade
-            'show_email_public' => 'nullable|boolean',
-            'show_phone_public' => 'nullable|boolean',
-            'show_address_public' => 'nullable|boolean',
+            // Privacidade - SEM validação boolean (checkboxes não enviam quando desmarcados)
         ]);
 
         // Converte checkboxes para boolean
