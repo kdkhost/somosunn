@@ -25,24 +25,24 @@
                         </a>
                     </div>
                 </div>
-                <div class="relative">
-                    <div class="bg-white rounded-3xl shadow-2xl p-8">
-                        <div class="grid grid-cols-2 gap-6">
-                            <div class="text-center p-6 bg-slate-50 rounded-2xl">
-                                <p class="text-4xl font-black" style="color: var(--unn-azul-1)">5.000+</p>
-                                <p class="text-sm text-gray-500 mt-1">Empreendedores</p>
+                <div class="relative mt-8 lg:mt-0">
+                    <div class="bg-white rounded-3xl shadow-2xl p-4 md:p-8">
+                        <div class="grid grid-cols-2 gap-3 md:gap-6">
+                            <div class="text-center p-3 md:p-6 bg-slate-50 rounded-2xl">
+                                <p class="text-2xl sm:text-3xl lg:text-4xl font-black" style="color: var(--unn-azul-1)">5k+</p>
+                                <p class="text-xs md:text-sm text-gray-500 mt-1">Empreendedores</p>
                             </div>
-                            <div class="text-center p-6 bg-slate-50 rounded-2xl">
-                                <p class="text-4xl font-black" style="color: var(--unn-azul-1)">27</p>
-                                <p class="text-sm text-gray-500 mt-1">Estados</p>
+                            <div class="text-center p-3 md:p-6 bg-slate-50 rounded-2xl">
+                                <p class="text-2xl sm:text-3xl lg:text-4xl font-black" style="color: var(--unn-azul-1)">27</p>
+                                <p class="text-xs md:text-sm text-gray-500 mt-1">Estados</p>
                             </div>
-                            <div class="text-center p-6 bg-slate-50 rounded-2xl">
-                                <p class="text-4xl font-black" style="color: var(--unn-azul-1)">R$ 50M+</p>
-                                <p class="text-sm text-gray-500 mt-1">Em negócios gerados</p>
+                            <div class="text-center p-3 md:p-6 bg-slate-50 rounded-2xl">
+                                <p class="text-2xl sm:text-3xl lg:text-4xl font-black break-words" style="color: var(--unn-azul-1)">R$ 50M+</p>
+                                <p class="text-xs md:text-sm text-gray-500 mt-1">Negócios gerados</p>
                             </div>
-                            <div class="text-center p-6 bg-slate-50 rounded-2xl">
-                                <p class="text-4xl font-black" style="color: var(--unn-azul-1)">200+</p>
-                                <p class="text-sm text-gray-500 mt-1">Eventos realizados</p>
+                            <div class="text-center p-3 md:p-6 bg-slate-50 rounded-2xl">
+                                <p class="text-2xl sm:text-3xl lg:text-4xl font-black" style="color: var(--unn-azul-1)">200+</p>
+                                <p class="text-xs md:text-sm text-gray-500 mt-1">Eventos realizados</p>
                             </div>
                         </div>
                     </div>
