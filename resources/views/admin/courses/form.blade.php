@@ -41,7 +41,7 @@
         <div class="tab-content" id="courseTabsContent">
             <!-- INFO TAB -->
             <div class="tab-pane fade show active" id="info" role="tabpanel">
-                <form method="POST" action="{{ $course->exists ? route('admin.courses.update',$course) : route('admin.courses.store') }}">
+                <form method="POST" action="{{ $course->exists ? route('admin.courses.update',$course) : route('admin.courses.store') }}" enctype="multipart/form-data">
                     @csrf
                     @if($course->exists) @method('PUT') @endif
                     
@@ -57,6 +57,24 @@
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <div class="card bg-light mb-3">
+                                <div class="card-header">Imagem de Capa</div>
+                                <div class="card-body text-center">
+                                    @if($course->thumbnail)
+                                        <img src="{{ asset($course->thumbnail) }}" class="img-fluid rounded mb-2" style="max-height: 150px;">
+                                    @else
+                                        <div class="bg-secondary rounded mb-2 d-flex align-items-center justify-content-center" style="height: 150px;">
+                                            <i class="fas fa-image fa-3x text-white"></i>
+                                        </div>
+                                    @endif
+                                    <div class="custom-file text-left">
+                                        <input type="file" name="thumbnail" class="custom-file-input" id="courseThumbnail" accept="image/*">
+                                        <label class="custom-file-label" for="courseThumbnail" data-browse="Buscar">Escolher arquivo</label>
+                                    </div>
+                                    <small class="text-muted d-block mt-1">Recomendado: 1280x720px (JPG/PNG)</small>
+                                </div>
+                            </div>
+
                             <div class="card bg-light">
                                 <div class="card-body">
                                     <div class="form-group mb-3">

@@ -36,11 +36,17 @@ class CourseController extends Controller
             'price' => 'nullable|numeric',
             'author_name' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published,archived,paused',
+            'thumbnail' => 'nullable|image|max:5120', // 5MB Max
         ]);
         
         $data['is_featured'] = $request->has('is_featured');
         $data['published'] = $request->has('published'); // Legacy support
         $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
+
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('course-thumbs', 'public');
+            $data['thumbnail'] = 'storage/' . $path;
+        }
         
         Course::create($data + ['user_id' => auth()->id()]);
         
@@ -67,11 +73,17 @@ class CourseController extends Controller
             'price' => 'nullable|numeric',
             'author_name' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published,archived,paused',
+            'thumbnail' => 'nullable|image|max:5120', // 5MB Max
         ]);
 
         $data['is_featured'] = $request->has('is_featured');
         $data['published'] = $request->has('published');
         $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
+
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('course-thumbs', 'public');
+            $data['thumbnail'] = 'storage/' . $path;
+        }
 
         $course->update($data);
         
