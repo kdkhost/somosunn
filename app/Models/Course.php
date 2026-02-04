@@ -23,6 +23,7 @@ class Course extends Model
         'status',
         'is_featured',
         'certificate_settings',
+        'published', // Legacy
     ];
 
     protected $casts = [

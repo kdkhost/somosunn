@@ -32,7 +32,7 @@ class CourseController extends Controller
 
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'full_description' => 'nullable|string',
             'price' => 'nullable|numeric',
             'author_name' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published,archived,paused',
@@ -52,7 +52,7 @@ class CourseController extends Controller
         
         Course::create($data + ['user_id' => auth()->id()]);
         
-        return redirect()->route('admin.courses.index')->with('success','Curso criado com sucesso');
+        return response()->json(['success' => true]); 
     }
 
     public function edit(Course $course)
@@ -71,7 +71,7 @@ class CourseController extends Controller
 
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'full_description' => 'nullable|string',
             'price' => 'nullable|numeric',
             'author_name' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published,archived,paused',
@@ -91,7 +91,7 @@ class CourseController extends Controller
 
         $course->update($data);
         
-        return redirect()->route('admin.courses.index')->with('success','Curso atualizado com sucesso');
+        return response()->json(['success' => true]);
     }
 
     public function destroy(Course $course)

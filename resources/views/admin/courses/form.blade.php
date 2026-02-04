@@ -53,7 +53,7 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label>Descrição Completa</label>
-                                <textarea name="description" class="form-control summernote">{{ old('description',$course->description) }}</textarea>
+                                <textarea name="full_description" id="fullDescription" class="form-control summernote">{{ old('full_description',$course->full_description) }}</textarea>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -655,6 +655,9 @@
             if(hasFile) {
                 $('#thumbnailProgressWrapper').show();
             }
+
+            // FORCE SYNC SUMMERNOTE
+            $('#fullDescription').val($('#fullDescription').summernote('code'));
 
             $btn.prop('disabled', true).text('Salvando...');
 
