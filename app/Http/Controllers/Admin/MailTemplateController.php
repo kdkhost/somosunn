@@ -86,9 +86,9 @@ class MailTemplateController extends Controller
 
     protected function sampleData($email = 'preview@example.com')
     {
-        $logo = \App\Models\Setting::where('key', 'logo_image')->value('value');
-        if(!$logo) $logo = \App\Models\Setting::where('key', 'logo_admin')->value('value');
-        if(!$logo) $logo = \App\Models\Setting::where('key', 'logo_auth')->value('value');
+        $logo = \App\Models\Setting::where('key', 'logo_admin')->value('value');
+        if(!$logo) $logo = \App\Models\Setting::where('key', 'logo_front')->value('value');
+        if(!$logo) $logo = \App\Models\Setting::where('key', 'logo_image')->value('value');
         $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
 
         return [

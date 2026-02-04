@@ -266,11 +266,10 @@ class SettingController extends Controller
                 ]
             );
 
-            $logo = Setting::where('key', 'logo_image')->value('value');
-            
-            // Fallback logos if main logo not set
-            if(!$logo) $logo = Setting::where('key', 'logo_admin')->value('value');
-            if(!$logo) $logo = Setting::where('key', 'logo_auth')->value('value');
+            // Prioritize Admin Logo (Sidebar/Header) for Emails
+            $logo = Setting::where('key', 'logo_admin')->value('value');
+            if(!$logo) $logo = Setting::where('key', 'logo_front')->value('value');
+            if(!$logo) $logo = Setting::where('key', 'logo_image')->value('value');
             
             $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
 
