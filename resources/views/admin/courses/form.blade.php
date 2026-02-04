@@ -86,7 +86,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button class="btn btn-primary btn-block btn-lg">Salvar Informações</button>
+                            <button class="btn btn-primary btn-block btn-lg" data-toggle="tooltip" title="Salvar todas as alterações do curso">Salvar Informações</button>
                             
                             @if(!$course->exists)
                             <p class="text-muted text-center mt-3 small">
@@ -103,7 +103,7 @@
             <div class="tab-pane fade" id="lessons" role="tabpanel">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4>Grade Curricular</h4>
-                    <button class="btn btn-success" onclick="openLessonModal()"><i class="fas fa-plus"></i> Nova Aula</button>
+                    <button class="btn btn-success" onclick="openLessonModal()" data-toggle="tooltip" title="Adicionar uma nova aula"><i class="fas fa-plus"></i> Nova Aula</button>
                 </div>
 
                 <div id="lessons-list">
@@ -116,10 +116,10 @@
                                 @if($lesson->is_free_preview) <span class="badge badge-info">Preview</span> @endif
                             </div>
                             <div>
-                                <button class="btn btn-sm btn-info btn-edit-lesson" data-id="{{ $lesson->id }}"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-info btn-edit-lesson" data-id="{{ $lesson->id }}" data-toggle="tooltip" title="Editar Aula"><i class="fas fa-edit"></i></button>
                                 <form action="{{ route('courses.lessons.destroy', [$course, $lesson]) }}" method="POST" class="d-inline ajax-delete">
                                     @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                    <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Excluir Aula"><i class="fas fa-trash"></i></button>
                                 </form>
                             </div>
                         </div>
@@ -207,7 +207,7 @@
                     </div>
 
                     <div class="text-right mt-3">
-                        <button type="button" class="btn btn-primary" id="btnSaveLesson">Salvar Dados da Aula</button>
+                        <button type="button" class="btn btn-primary" id="btnSaveLesson" data-toggle="tooltip" title="Salvar e fechar modal">Salvar Dados da Aula</button>
                     </div>
                 </form>
 
@@ -350,8 +350,8 @@
                         </div>
                     </div>
                     <div>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')"><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})"><i class="fas fa-trash"></i></button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
                     </div>
                 </li>
             `;
@@ -589,6 +589,9 @@
                 location.reload();
             });
         });
+
+        // Initialize Tooltips
+        $('[data-toggle="tooltip"]').tooltip();
     });
 </script>
 @endpush
