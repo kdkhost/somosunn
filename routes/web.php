@@ -11,6 +11,11 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portal', [HomeController::class, 'portal'])->name('portal');
 Route::get('/premium', [HomeController::class, 'premium'])->name('premium');
 
+// Rota de Emergência para Diagnóstico
+Route::get('/debug-test', function() {
+    return "<h1>Laravel is Running!</h1> PHP Version: " . phpversion();
+});
+
 // Rota de Emergência para Limpeza de Cache (Brute Force)
 Route::get('/limpar-cache', function() {
     $log = [];
