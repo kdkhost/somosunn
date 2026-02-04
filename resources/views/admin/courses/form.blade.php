@@ -411,9 +411,9 @@
                 dictRemoveFile: "Cancelar",
                 dictDefaultMessage: "Arraste arquivos aqui ou clique para enviar",
                 dictFallbackMessage: "Seu navegador não suporta upload arrastar e soltar.",
-                dictFileTooBig: "Arquivo muito grande ({{filesize}}MiB). Máximo: {{maxFilesize}}MiB.",
+                dictFileTooBig: "Arquivo muito grande (@{{filesize}}MiB). Máximo: @{{maxFilesize}}MiB.",
                 dictInvalidFileType: "Você não pode enviar arquivos deste tipo.",
-                dictResponseError: "Servidor respondeu com código {{statusCode}}.",
+                dictResponseError: "Servidor respondeu com código @{{statusCode}}.",
                 dictCancelUpload: "Cancelar upload",
                 dictUploadCanceled: "Upload cancelado.",
                 
