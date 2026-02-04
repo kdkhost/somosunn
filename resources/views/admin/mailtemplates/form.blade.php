@@ -165,25 +165,25 @@ $(function(){
         
         // Use the same layout structure as the backend
         $('#tpl_preview').html(`
-        <div style="background-color: #f4f6f9; padding: 20px; font-family: sans-serif; min-height: 100%;">
+        <div style="background-color: #f4f6f9; padding: 10px; font-family: sans-serif; min-height: 100%;">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                     <td align="center">
-                        <div style="background-color: #ffffff; max-width: 600px; padding: 0px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
+                        <div style="background-color: #ffffff; width: 100%; max-width: 600px; padding: 0px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
                             <!-- Header -->
-                            <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); padding: 30px 20px; text-align: center;">
-                                <img src="${logo}" alt="${siteName}" style="max-height: 60px; max-width: 200px;">
+                            <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); padding: 20px 10px; text-align: center;">
+                                <img src="${logo}" alt="${siteName}" style="max-height: 50px; max-width: 100%; height: auto;">
                             </div>
                             
                             <!-- Body -->
-                            <div style="padding: 30px; color: #333333; line-height: 1.6;">
+                            <div style="padding: 20px; color: #333333; line-height: 1.6; word-wrap: break-word;">
                                 ${body}
                             </div>
                             
                             <!-- Footer -->
-                            <div style="background-color: #f8f9fa; padding: 20px; text-align: center; color: #777777; font-size: 12px; border-top: 1px solid #eeeeee;">
-                                <p>&copy; ${year} ${siteName}. Todos os direitos reservados.</p>
-                                <p><a href="${siteUrl}" style="color: ${primaryColor}; text-decoration: none;">Visite nosso site</a></p>
+                            <div style="background-color: #f8f9fa; padding: 15px; text-align: center; color: #777777; font-size: 11px; border-top: 1px solid #eeeeee;">
+                                <p style="margin: 5px 0;">&copy; ${year} ${siteName}. Todos os direitos reservados.</p>
+                                <p style="margin: 5px 0;"><a href="${siteUrl}" style="color: ${primaryColor}; text-decoration: none;">Visite nosso site</a></p>
                             </div>
                         </div>
                     </td>
