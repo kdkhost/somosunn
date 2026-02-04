@@ -5,9 +5,9 @@
 @section('content')
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
-    <section class="pt-24 pb-12 px-6 md:px-12 lg:px-24">
+    <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-5xl lg:text-6xl font-black leading-tight mb-6">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
                 <span class="text-gradient">Como</span> Funciona
             </h1>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -21,11 +21,11 @@
         <div class="max-w-5xl mx-auto">
             <div class="space-y-12">
                 <!-- Step 1 -->
-                <div class="flex flex-col md:flex-row gap-8 items-center">
-                    <div class="w-24 h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-4xl font-black shrink-0">
+                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
+                    <div class="w-16 h-16 md:w-24 md:h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-2xl md:text-4xl font-black shrink-0">
                         1
                     </div>
-                    <div class="flex-1 bg-white rounded-3xl p-8 shadow-lg">
+                    <div class="flex-1 bg-white rounded-3xl p-6 md:p-8 shadow-lg">
                         <h3 class="text-2xl font-bold text-gray-900 mb-3">Cadastre-se na Plataforma</h3>
                         <p class="text-gray-600 mb-4">
                             Crie sua conta gratuitamente e preencha seu perfil completo. Quanto mais informações você compartilhar, 
@@ -40,11 +40,11 @@
                 </div>
 
                 <!-- Step 2 -->
-                <div class="flex flex-col md:flex-row-reverse gap-8 items-center">
-                    <div class="w-24 h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-4xl font-black shrink-0">
+                <div class="flex flex-col md:flex-row-reverse gap-6 md:gap-8 items-center">
+                    <div class="w-16 h-16 md:w-24 md:h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-2xl md:text-4xl font-black shrink-0">
                         2
                     </div>
-                    <div class="flex-1 bg-white rounded-3xl p-8 shadow-lg">
+                    <div class="flex-1 bg-white rounded-3xl p-6 md:p-8 shadow-lg">
                         <h3 class="text-2xl font-bold text-gray-900 mb-3">Conecte-se com Outros Membros</h3>
                         <p class="text-gray-600 mb-4">
                             Navegue pela comunidade, encontre empreendedores com interesses similares e inicie conversas. 
@@ -59,11 +59,11 @@
                 </div>
 
                 <!-- Step 3 -->
-                <div class="flex flex-col md:flex-row gap-8 items-center">
-                    <div class="w-24 h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-4xl font-black shrink-0">
+                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
+                    <div class="w-16 h-16 md:w-24 md:h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-2xl md:text-4xl font-black shrink-0">
                         3
                     </div>
-                    <div class="flex-1 bg-white rounded-3xl p-8 shadow-lg">
+                    <div class="flex-1 bg-white rounded-3xl p-6 md:p-8 shadow-lg">
                         <h3 class="text-2xl font-bold text-gray-900 mb-3">Participe de Eventos</h3>
                         <p class="text-gray-600 mb-4">
                             Compareça aos nossos eventos presenciais e online. Networking acontece de verdade quando 
@@ -78,11 +78,11 @@
                 </div>
 
                 <!-- Step 4 -->
-                <div class="flex flex-col md:flex-row-reverse gap-8 items-center">
-                    <div class="w-24 h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-4xl font-black shrink-0">
+                <div class="flex flex-col md:flex-row-reverse gap-6 md:gap-8 items-center">
+                    <div class="w-16 h-16 md:w-24 md:h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-2xl md:text-4xl font-black shrink-0">
                         4
                     </div>
-                    <div class="flex-1 bg-white rounded-3xl p-8 shadow-lg">
+                    <div class="flex-1 bg-white rounded-3xl p-6 md:p-8 shadow-lg">
                         <h3 class="text-2xl font-bold text-gray-900 mb-3">Feche Negócios</h3>
                         <p class="text-gray-600 mb-4">
                             Transforme conexões em parcerias e negócios reais. Membros da UNN já geraram mais de R$ 50 milhões 
@@ -109,7 +109,7 @@
             
             <div class="grid md:grid-cols-3 gap-8">
                 <!-- Free -->
-                <div class="bg-slate-50 rounded-3xl p-8 text-center">
+                <div class="bg-slate-50 rounded-3xl p-6 md:p-8 text-center">
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Gratuito</h3>
                     <p class="text-4xl font-black text-gray-900 mb-4">R$ 0</p>
                     <p class="text-gray-500 mb-6">Para começar</p>
@@ -130,7 +130,7 @@
                 </div>
 
                 <!-- Premium -->
-                <div class="bg-white rounded-3xl p-8 text-center shadow-2xl ring-2 relative" style="--tw-ring-color: var(--unn-azul-1)">
+                <div class="bg-white rounded-3xl p-6 md:p-8 text-center shadow-2xl ring-2 relative" style="--tw-ring-color: var(--unn-azul-1)">
                     <span class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 btn-primary text-white text-sm font-bold rounded-full">
                         POPULAR
                     </span>
@@ -157,7 +157,7 @@
                 </div>
 
                 <!-- Business -->
-                <div class="bg-slate-50 rounded-3xl p-8 text-center">
+                <div class="bg-slate-50 rounded-3xl p-6 md:p-8 text-center">
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Business</h3>
                     <p class="text-4xl font-black text-gray-900 mb-4">R$ 297<span class="text-lg text-gray-500">/mês</span></p>
                     <p class="text-gray-500 mb-6">Para empresas</p>
