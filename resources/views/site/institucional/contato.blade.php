@@ -17,9 +17,9 @@
     </section>
 
     <!-- Contact Section -->
-    <section class="py-16 px-6 md:px-12 lg:px-24">
+    <section class="py-12 md:py-16 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
-            <div class="grid lg:grid-cols-2 gap-12">
+            <div class="grid lg:grid-cols-2 gap-8 md:gap-12">
                 <!-- Contact Info -->
                 <div>
                     <h2 class="text-3xl font-black text-gray-900 mb-8">Informações de Contato</h2>
@@ -61,9 +61,9 @@
                     </div>
 
                     <!-- Social Media -->
-                    <div class="mt-8">
+                    <div class="mt-8 bg-white rounded-2xl p-6 shadow-lg">
                         <h3 class="font-bold text-gray-900 mb-4">Redes Sociais</h3>
-                        <div class="flex gap-4">
+                        <div class="flex gap-4 justify-start flex-wrap">
                             <a href="#" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
                                 <i class="fab fa-instagram text-xl"></i>
                             </a>
@@ -81,7 +81,7 @@
                 </div>
 
                 <!-- Contact Form -->
-                <div class="bg-white rounded-3xl p-8 shadow-2xl">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-2xl">
                     <h2 class="text-2xl font-black text-gray-900 mb-6">Envie uma mensagem</h2>
                     
                     <form action="#" method="POST" class="space-y-6">
