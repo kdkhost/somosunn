@@ -24,18 +24,18 @@
         <div class="max-w-7xl mx-auto">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div>
-                    <h1 class="text-5xl lg:text-6xl font-black leading-tight mb-6">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
                         {{ $heroTitle }}<br />
                         <span class="text-gradient">{{ $heroSubtitle }}</span>
                     </h1>
-                    <p class="text-lg text-gray-600 mb-8 leading-relaxed max-w-xl">
+                    <p class="text-base sm:text-lg text-gray-600 mb-6 md:mb-8 leading-relaxed max-w-xl">
                         {{ $heroText }}
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="{{ route('register') }}" class="btn-primary text-white px-10 py-4 rounded-xl font-bold text-lg inline-flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition">
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                        <a href="{{ route('register') }}" class="btn-primary text-white px-6 py-3 md:px-10 md:py-4 rounded-xl font-bold text-base md:text-lg inline-flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition">
                             Quero fazer parte <i class="fas fa-arrow-right"></i>
                         </a>
-                        <a href="{{ route('sobre') }}" class="bg-white text-gray-700 px-10 py-4 rounded-xl font-bold border-2 border-gray-200 hover:border-blue-500 transition inline-flex items-center justify-center gap-2">
+                        <a href="{{ route('sobre') }}" class="bg-white text-gray-700 px-6 py-3 md:px-10 md:py-4 rounded-xl font-bold border-2 border-gray-200 hover:border-blue-500 transition inline-flex items-center justify-center gap-2 text-base md:text-lg">
                             <i class="fas fa-play-circle"></i> Conhecer a UNN
                         </a>
                     </div>
