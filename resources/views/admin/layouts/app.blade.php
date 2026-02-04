@@ -116,7 +116,7 @@
         </div>
     @endif
 
-    {{-- @include('admin.partials.navbar') --}}
+    @include('admin.partials.navbar')
     {{-- @include('admin.partials.sidebar') --}}
 
     <div class="content-wrapper">
@@ -140,7 +140,7 @@
         </section>
     </div>
 
-    {{-- @include('admin.partials.footer') --}}
+    @include('admin.partials.footer')
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
