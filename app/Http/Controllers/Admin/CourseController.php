@@ -36,7 +36,7 @@ class CourseController extends Controller
             'price' => 'nullable|numeric',
             'author_name' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published,archived,paused',
-            'thumbnail' => 'nullable|image|max:5120', // 5MB Max
+            'thumbnail' => 'nullable|image|max:10240', // 10MB Max
         ]);
         
         $data['is_featured'] = $request->has('is_featured');
@@ -73,7 +73,7 @@ class CourseController extends Controller
             'price' => 'nullable|numeric',
             'author_name' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published,archived,paused',
-            'thumbnail' => 'nullable|image|max:5120', // 5MB Max
+            'thumbnail' => 'nullable|image|max:10240', // 10MB Max
         ]);
 
         $data['is_featured'] = $request->has('is_featured');
