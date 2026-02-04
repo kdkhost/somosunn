@@ -67,18 +67,18 @@ class ProfileController extends Controller
                 \Log::info('Foto antiga removida: ' . $user->photo);
             }
             
-            // Salva nova foto DIRETAMENTE em public/storage
+            // Salva nova foto DIRETAMENTE em public/uploads/imagens/avatars
             $file = $request->file('photo');
             $filename = 'avatar_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
             
             // Garante que o diretório existe
-            $directory = public_path('storage/uploads/avatars');
+            $directory = public_path('uploads/imagens/avatars');
             if (!file_exists($directory)) {
                 mkdir($directory, 0755, true);
             }
             
-            // Move o arquivo diretamente para public/storage
-            $path = 'storage/uploads/avatars/' . $filename;
+            // Move o arquivo diretamente para public/uploads/imagens/avatars
+            $path = 'uploads/imagens/avatars/' . $filename;
             $file->move($directory, $filename);
             
             // Verifica se o arquivo foi realmente salvo
