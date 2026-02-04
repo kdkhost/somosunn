@@ -84,7 +84,65 @@
                     </ul>
                 </li> 
 
-                <!-- DEBUG: Remaining items hidden (Certificates, Emails, Points, Permissions, Sales, Community) -->
+                <li class="nav-item has-treeview {{ $open('admin.certificates.*') }}">
+                    <a href="#" class="nav-link {{ $is('admin.certificates.*') }}">
+                        <i class="nav-icon fas fa-certificate"></i>
+                        <p>Certificados<i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview pl-4">
+                        <li class="nav-item"><a href="{{ route('admin.certificates.create') }}" class="nav-link {{ $is('admin.certificates.create') }}"><i class="fas fa-file-signature nav-icon"></i><p>Gerar</p></a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item has-treeview {{ $open(['admin.mailtemplates.*','admin.mailtest']) }}">
+                    <a href="#" class="nav-link {{ $is(['admin.mailtemplates.*','admin.mailtest']) }}">
+                        <i class="nav-icon fas fa-envelope"></i>
+                        <p>E-mails<i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview pl-4">
+                        <li class="nav-item"><a href="{{ route('admin.mailtemplates.index') }}" class="nav-link {{ $is('admin.mailtemplates.index') }}"><i class="fas fa-table nav-icon"></i><p>Templates</p></a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item has-treeview {{ $open(['admin.points-rules.*','admin.ranking']) }}">
+                    <a href="#" class="nav-link {{ $is(['admin.points-rules.*','admin.ranking']) }}">
+                        <i class="nav-icon fas fa-star"></i>
+                        <p>Pontuação<i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview pl-4">
+                        <li class="nav-item"><a href="{{ route('admin.points-rules.index') }}" class="nav-link {{ $is('admin.points-rules.index') }}"><i class="fas fa-sliders-h nav-icon"></i><p>Regras</p></a></li>
+                        <li class="nav-item"><a href="{{ route('admin.ranking') }}" class="nav-link {{ $is('admin.ranking') }}"><i class="fas fa-trophy nav-icon"></i><p>Ranking</p></a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item has-treeview {{ $open('admin.permissions.*') }}">
+                    <a href="#" class="nav-link {{ $is('admin.permissions.*') }}">
+                        <i class="nav-icon fas fa-user-shield"></i>
+                        <p>Permissões<i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview pl-4">
+                        <li class="nav-item"><a href="{{ route('admin.permissions.index') }}" class="nav-link {{ $is('admin.permissions.index') }}"><i class="fas fa-list nav-icon"></i><p>Listar</p></a></li>
+                        <li class="nav-item"><a href="{{ route('admin.permissions.create') }}" class="nav-link {{ $is('admin.permissions.create') }}"><i class="fas fa-plus nav-icon"></i><p>Novo</p></a></li>
+                    </ul>
+                </li>
+
+                <!-- Financeiro / Vendas -->
+                <li class="nav-item">
+                    <a href="{{ route('admin.orders.index') }}" class="nav-link {{ $is('admin.orders.*') }}">
+                        <i class="nav-icon fas fa-shopping-cart"></i>
+                        <p>Vendas</p>
+                    </a>
+                </li>
+
+                <!-- Comunidade -->
+                <li class="nav-item">
+                    <a href="{{ route('admin.social.index') }}" class="nav-link {{ $is('admin.social.*') }}">
+                        <i class="nav-icon fas fa-comments"></i>
+                        <p>Comunidade</p>
+                    </a>
+                </li>
+                
+                <li class="nav-item"><a href="{{ route('admin.settings') }}" class="nav-link {{ $is('admin.settings') }}"><i class="nav-icon fas fa-cogs"></i><p>Configurações</p></a></li>
             </ul>
         </nav>
     </div>
