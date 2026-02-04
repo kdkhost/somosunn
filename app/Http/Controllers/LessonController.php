@@ -108,7 +108,7 @@ class LessonController extends Controller
         $this->authorize('update', $course);
         
         $request->validate([
-            'file' => 'required|file|max:51200' // 50MB max
+            'file' => 'required|file|max:512000' // 500MB max
         ]);
 
         $file = $request->file('file');

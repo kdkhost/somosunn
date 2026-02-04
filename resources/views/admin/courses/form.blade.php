@@ -404,13 +404,24 @@
              myDropzone = new Dropzone("#filesDropzone", {
                 url: "/dummy", // Set dynamically
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                maxFilesize: 50, // MB
+                maxFilesize: 500, // 500 MB
                 acceptedFiles: null,
                 autoProcessQueue: false, // Wait for name
                 addRemoveLinks: true,
                 dictRemoveFile: "Cancelar",
+                dictDefaultMessage: "Arraste arquivos aqui ou clique para enviar",
+                dictFallbackMessage: "Seu navegador não suporta upload arrastar e soltar.",
+                dictFileTooBig: "Arquivo muito grande ({{filesize}}MiB). Máximo: {{maxFilesize}}MiB.",
+                dictInvalidFileType: "Você não pode enviar arquivos deste tipo.",
+                dictResponseError: "Servidor respondeu com código {{statusCode}}.",
+                dictCancelUpload: "Cancelar upload",
+                dictUploadCanceled: "Upload cancelado.",
                 
                 init: function() {
+                    // Fix SweetAlert2 focus inside Bootstrap Modal
+                    // This kills the 'enforceFocus' feature of Bootstrap which fights with SweetAlert2
+                    $.fn.modal.Constructor.prototype._enforceFocus = function() {};
+
                     this.on("addedfile", function(file) {
                         // Prompt for name immediately
                         Swal.fire({
@@ -421,8 +432,12 @@
                             confirmButtonText: 'Enviar',
                             cancelButtonText: 'Cancelar Upload',
                             allowOutsideClick: false,
+                            returnFocus: false, // Prevent Swal from trying to return focus to dropzone immediately
                             didOpen: () => {
-                                Swal.getInput().focus();
+                                const input = Swal.getInput();
+                                input.focus();
+                                // Double check focus after a minimal delay
+                                setTimeout(() => input.focus(), 50);
                             }
                         }).then((result) => {
                             if (result.isConfirmed) {
@@ -452,7 +467,12 @@
                     this.on("error", function(file, message) {
                         // If manually removed (canceled), don't show error
                         if(file.accepted === false) return; 
-                        toastr.error(message || 'Erro no upload');
+                        
+                        // Handle Dropzone error message objects or strings
+                        let msg = message;
+                        if(typeof message === 'object' && message.error) msg = message.error;
+                        
+                        toastr.error(msg || 'Erro no upload');
                         this.removeFile(file);
                     });
                 }
