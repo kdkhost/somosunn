@@ -80,26 +80,26 @@
     </section>
 
     <!-- Números -->
-    <section class="py-16 px-6 md:px-12 lg:px-24">
+    <section class="py-16 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl font-black text-gray-900 mb-12 text-center">UNN em Números</h2>
+            <h2 class="text-3xl font-black text-gray-900 mb-8 md:mb-12 text-center">UNN em Números</h2>
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div class="bg-white rounded-2xl p-8 text-center shadow-lg">
-                    <p class="text-5xl font-black" style="color: var(--unn-azul-1)">15</p>
-                    <p class="text-gray-500 mt-2">Colaboradores</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                <div class="bg-white rounded-2xl p-4 md:p-8 text-center shadow-lg">
+                    <p class="text-3xl md:text-5xl font-black" style="color: var(--unn-azul-1)">15</p>
+                    <p class="text-xs md:text-base text-gray-500 mt-2">Colaboradores</p>
                 </div>
-                <div class="bg-white rounded-2xl p-8 text-center shadow-lg">
-                    <p class="text-5xl font-black" style="color: var(--unn-azul-1)">4</p>
-                    <p class="text-gray-500 mt-2">Anos de história</p>
+                <div class="bg-white rounded-2xl p-4 md:p-8 text-center shadow-lg">
+                    <p class="text-3xl md:text-5xl font-black" style="color: var(--unn-azul-1)">4</p>
+                    <p class="text-xs md:text-base text-gray-500 mt-2">Anos de história</p>
                 </div>
-                <div class="bg-white rounded-2xl p-8 text-center shadow-lg">
-                    <p class="text-5xl font-black" style="color: var(--unn-azul-1)">5k+</p>
-                    <p class="text-gray-500 mt-2">Membros atendidos</p>
+                <div class="bg-white rounded-2xl p-4 md:p-8 text-center shadow-lg">
+                    <p class="text-3xl md:text-5xl font-black" style="color: var(--unn-azul-1)">5k+</p>
+                    <p class="text-xs md:text-base text-gray-500 mt-2">Membros atendidos</p>
                 </div>
-                <div class="bg-white rounded-2xl p-8 text-center shadow-lg">
-                    <p class="text-5xl font-black" style="color: var(--unn-azul-1)">100%</p>
-                    <p class="text-gray-500 mt-2">Dedicação</p>
+                <div class="bg-white rounded-2xl p-4 md:p-8 text-center shadow-lg">
+                    <p class="text-3xl md:text-5xl font-black truncate" style="color: var(--unn-azul-1)">100%</p>
+                    <p class="text-xs md:text-base text-gray-500 mt-2">Dedicação</p>
                 </div>
             </div>
         </div>
