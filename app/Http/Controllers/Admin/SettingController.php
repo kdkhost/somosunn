@@ -283,14 +283,44 @@ class SettingController extends Controller
             ];
 
             // Render logic simple for test
-            $body = $template->body;
+            $rendered = $template->body;
             foreach ($data as $key => $values) {
                 foreach ($values as $k => $v) {
-                    $body = str_replace('{{'.$key.'.'.$k.'}}', $v, $body);
+                    $rendered = str_replace('{{'.$key.'.'.$k.'}}', $v, $rendered);
                 }
             }
 
-            \Mail::html($body, function ($message) use ($request, $template) {
+            // System Colors
+            $primaryColor = Setting::where('key', 'color_primary')->value('value') ?? '#007bff';
+            
+            // Wrap with layout
+            $layout = '
+            <div style="background-color: #f4f6f9; padding: 20px; font-family: sans-serif; min-height: 100%;">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td align="center">
+                            <div style="background-color: #ffffff; max-width: 600px; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                <!-- Header -->
+                                <div style="text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid '.$primaryColor.';">
+                                    <img src="'.$logoUrl.'" alt="'.$data['site']['name'].'" style="max-height: 60px; max-width: 200px;">
+                                </div>
+                                
+                                <!-- Body -->
+                                <div style="color: #333333; line-height: 1.6;">
+                                    '.$rendered.'
+                                </div>
+                                
+                                <!-- Footer -->
+                                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eeeeee; text-align: center; color: #777777; font-size: 12px;">
+                                    <p>&copy; '.date('Y').' '.$data['site']['name'].'. Todos os direitos reservados.</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>';
+
+            \Mail::html($layout, function ($message) use ($request, $template) {
                 $message->to($request->smtp_test_email)
                         ->subject($template->subject ?? 'Teste SMTP');
             });

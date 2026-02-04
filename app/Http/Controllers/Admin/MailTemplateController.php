@@ -86,6 +86,11 @@ class MailTemplateController extends Controller
 
     protected function sampleData($email = 'preview@example.com')
     {
+        $logo = \App\Models\Setting::where('key', 'logo_image')->value('value');
+        if(!$logo) $logo = \App\Models\Setting::where('key', 'logo_admin')->value('value');
+        if(!$logo) $logo = \App\Models\Setting::where('key', 'logo_auth')->value('value');
+        $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
+
         return [
             'user' => [
                 'name' => 'Usuário Exemplo',
@@ -98,7 +103,7 @@ class MailTemplateController extends Controller
                 'name' => config('app.name'),
                 'url' => url('/'),
                 'support_email' => config('mail.from.address'),
-                'logo' => asset('img/logo.svg')
+                'logo' => $logoUrl
             ],
             'order' => [
                 'id' => 'PED-12345',
@@ -136,7 +141,43 @@ class MailTemplateController extends Controller
                 }
             }
         }
-        $allowed = '<p><a><strong><em><ul><ol><li><br><img><table><tr><td><th><tbody><thead><h1><h2><h3><h4><h5><span><div>'; 
-        return strip_tags($rendered, $allowed);
+        
+        // Allowed tags
+        $allowed = '<p><a><strong><em><ul><ol><li><br><img><table><tr><td><th><tbody><thead><h1><h2><h3><h4><h5><span><div><style><center>'; 
+        $content = strip_tags($rendered, $allowed);
+
+        // System Colors
+        $primaryColor = \App\Models\Setting::where('key', 'color_primary')->value('value') ?? '#007bff';
+        $secondaryColor = \App\Models\Setting::where('key', 'color_secondary')->value('value') ?? '#6c757d';
+        
+        // Wrap with layout
+        $layout = '
+        <div style="background-color: #f4f6f9; padding: 20px; font-family: sans-serif; min-height: 100%;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="center">
+                        <div style="background-color: #ffffff; max-width: 600px; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <!-- Header -->
+                            <div style="text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid '.$primaryColor.';">
+                                <img src="'.$data['site']['logo'].'" alt="{{site.name}}" style="max-height: 60px; max-width: 200px;">
+                            </div>
+                            
+                            <!-- Body -->
+                            <div style="color: #333333; line-height: 1.6;">
+                                '.$content.'
+                            </div>
+                            
+                            <!-- Footer -->
+                            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eeeeee; text-align: center; color: #777777; font-size: 12px;">
+                                <p>&copy; '.date('Y').' '.$data['site']['name'].'. Todos os direitos reservados.</p>
+                                <p><a href="'.$data['site']['url'].'" style="color: '.$primaryColor.'; text-decoration: none;">Visite nosso site</a></p>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>';
+
+        return $layout;
     }
 }
