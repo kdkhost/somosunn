@@ -9,8 +9,12 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        return "<h1>DASHBOARD CONTROLLER REACHED</h1>If you see this, the Middleware is fine. The error is in the View/Blade.";
+        
+        /*
         try {
-            $totalRevenue = \App\Models\Order::where('status', 'paid')->sum('total_amount');
+            // ... (original logic disabled)
+
             $refundedAmount = \App\Models\Order::where('status', 'refunded')->sum('total_amount');
             $totalOrders = \App\Models\Order::count();
             $totalUsers = \App\Models\User::count();
