@@ -18,8 +18,13 @@ class User extends Authenticatable
     }
 
     protected $fillable = [
-        'name','email','password','doc','phone','cep','address','role','points','theme_pref','level',
-        'photo', 'bio', 'social_links'
+        'name', 'email', 'password', 'doc', 'phone', 'bio', 'photo', 'role', 'points', 'theme_pref', 'level',
+        // Endereço
+        'cep', 'street', 'number', 'complement', 'neighborhood', 'city', 'state', 'address',
+        // Redes Sociais
+        'website', 'facebook', 'instagram', 'twitter', 'linkedin', 'youtube',
+        // Privacidade
+        'show_email_public', 'show_phone_public', 'show_address_public'
     ];
 
     protected $hidden = ['password','remember_token'];

@@ -25,22 +25,44 @@ class ProfileController extends Controller
             'password' => 'nullable|min:6|confirmed',
             'phone' => 'nullable|string|max:20',
             'doc' => 'nullable|string|max:20',
-            'cep' => 'nullable|string|max:9',
-            'address' => 'nullable|string',
-            'bio' => 'nullable|string|max:500', // Assumindo que criaremos migration pra bio depois ou usamos um campo existente
+            'bio' => 'nullable|string|max:500',
             'photo' => 'nullable|image|max:2048',
+            
+            // Endereço
+            'cep' => 'nullable|string|max:9',
+            'street' => 'nullable|string|max:255',
+            'number' => 'nullable|string|max:10',
+            'complement' => 'nullable|string|max:100',
+            'neighborhood' => 'nullable|string|max:100',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:2',
+            
+            // Redes Sociais
+            'website' => 'nullable|url|max:255',
+            'facebook' => 'nullable|string|max:255',
+            'instagram' => 'nullable|string|max:255',
+            'twitter' => 'nullable|string|max:255',
+            'linkedin' => 'nullable|url|max:255',
+            'youtube' => 'nullable|url|max:255',
+            
+            // Privacidade
+            'show_email_public' => 'nullable|boolean',
+            'show_phone_public' => 'nullable|boolean',
+            'show_address_public' => 'nullable|boolean',
         ]);
 
+        // Converte checkboxes para boolean
+        $data['show_email_public'] = $request->has('show_email_public');
+        $data['show_phone_public'] = $request->has('show_phone_public');
+        $data['show_address_public'] = $request->has('show_address_public');
+
         if ($request->hasFile('photo')) {
-            // Remove antiga se existir e não for padrão
+            // Remove foto antiga
             if ($user->photo && Storage::exists('public/'.$user->photo)) {
                 Storage::delete('public/'.$user->photo);
             }
             $path = $request->file('photo')->store('uploads/avatars', 'public');
-            $data['photo'] = $path; // Ajustar conforme campo no banco (photo ou avatar?) User tem 'photo' no migration? Verifiquei no User.php não tem 'photo' no fillable, mas tem 'image' ou algo assim?
-            // User.php fillable: 'name','email','password','doc','phone','cep','address','role','points','theme_pref','level'
-            // Vou verificar se existe coluna 'photo' ou 'avatar' no banco. Por segurança, vou assumir 'photo' e adicionar ao fillable se necessário ou usar forceFill.
-            // O User model não tem 'photo' no fillable visto anteriormente.
+            $data['photo'] = $path;
         }
 
         if (!empty($data['password'])) {
@@ -49,11 +71,15 @@ class ProfileController extends Controller
             unset($data['password']);
         }
 
-        // Lidar com campos json se existirem para redes sociais, ou criar migration depois.
-        // Por enquanto, foco nos dados básicos que já existem.
-
         $user->fill($data);
         $user->save();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Perfil atualizado com sucesso!'
+            ]);
+        }
 
         return redirect()->route('admin.profile.edit')->with('success', 'Perfil atualizado com sucesso!');
     }
