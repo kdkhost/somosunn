@@ -57,6 +57,7 @@ class ProfileController extends Controller
         $data['show_address_public'] = $request->has('show_address_public');
 
         // Upload de foto
+        $uploadedPhotoPath = null;
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
             \Log::info('Upload de foto iniciado para user ' . $user->id);
             
@@ -70,9 +71,21 @@ class ProfileController extends Controller
             $file = $request->file('photo');
             $filename = 'avatar_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('uploads/avatars', $filename, 'public');
-            $data['photo'] = $path;
             
-            \Log::info('Nova foto salva: ' . $path);
+            // Verifica se o arquivo foi realmente salvo
+            if ($path && Storage::disk('public')->exists($path)) {
+                $uploadedPhotoPath = $path;
+                $data['photo'] = $path;
+                \Log::info('Nova foto salva com sucesso: ' . $path);
+            } else {
+                \Log::error('Falha ao salvar arquivo de foto no storage');
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Erro ao salvar arquivo da foto. Tente novamente.'
+                    ], 500);
+                }
+            }
         } else {
             \Log::info('Nenhum arquivo de foto válido enviado');
         }
@@ -83,10 +96,15 @@ class ProfileController extends Controller
             unset($data['password']);
         }
 
+        // Salva os dados
         $user->fill($data);
-        $user->save();
+        $saved = $user->save();
         
-        \Log::info('User atualizado. Photo no banco: ' . $user->photo);
+        // Força refresh do modelo para pegar dados do banco
+        $user->refresh();
+        
+        \Log::info('User save result: ' . ($saved ? 'true' : 'false'));
+        \Log::info('Photo no banco após save: ' . ($user->photo ?? 'NULL'));
 
         if ($request->ajax()) {
             return response()->json([
@@ -95,7 +113,9 @@ class ProfileController extends Controller
                 'photo_url' => $user->photo ? asset('storage/'.$user->photo) : null,
                 'debug' => [
                     'photo_path' => $user->photo,
-                    'full_url' => $user->photo ? asset('storage/'.$user->photo) : null
+                    'full_url' => $user->photo ? asset('storage/'.$user->photo) : null,
+                    'file_exists' => $user->photo ? Storage::disk('public')->exists($user->photo) : false,
+                    'save_result' => $saved
                 ]
             ]);
         }

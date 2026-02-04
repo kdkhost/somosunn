@@ -399,27 +399,38 @@ $(document).ready(function() {
                 return xhr;
             },
             success: function(response) {
-                console.log('Resposta do servidor:', response);
+                console.log('========== RESPOSTA DO SERVIDOR ==========');
+                console.log('Resposta completa:', response);
                 
                 if (response.debug) {
-                    console.log('Debug - Caminho da foto:', response.debug.photo_path);
-                    console.log('Debug - URL completa:', response.debug.full_url);
+                    console.log('--- DEBUG INFO ---');
+                    console.log('Caminho da foto no banco:', response.debug.photo_path);
+                    console.log('URL completa:', response.debug.full_url);
+                    console.log('Arquivo existe no storage?', response.debug.file_exists);
+                    console.log('Save no banco bem sucedido?', response.debug.save_result);
+                    console.log('------------------');
                 }
                 
                 toastr.success(response.message || 'Perfil atualizado com sucesso!');
                 
                 // Atualiza a foto se foi enviada
                 if (response.photo_url) {
-                    console.log('Atualizando foto para:', response.photo_url);
+                    console.log('✅ Atualizando foto para:', response.photo_url);
                     
                     if ($('#current-photo').is('img')) {
                         $('#current-photo').attr('src', response.photo_url);
+                        console.log('✅ Foto atualizada no elemento IMG existente');
                     } else {
                         $('#profile-photo-preview').html(`
                             <img class="profile-user-img img-fluid img-circle" src="${response.photo_url}" alt="Avatar" id="current-photo">
                         `);
+                        console.log('✅ Foto inserida como novo elemento IMG');
                     }
+                } else {
+                    console.log('⚠️ Nenhuma URL de foto retornada pelo servidor');
                 }
+                
+                console.log('==========================================');
                 
                 setTimeout(() => location.reload(), 1500);
             },
