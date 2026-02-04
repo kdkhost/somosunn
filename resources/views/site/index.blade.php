@@ -20,7 +20,7 @@
 
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
-    <section class="pt-24 pb-16 px-6 md:px-12 lg:px-24">
+    <section class="pt-10 md:pt-24 pb-12 md:pb-16 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div>
