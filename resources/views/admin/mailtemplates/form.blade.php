@@ -143,15 +143,51 @@ $(function(){
     @endif
 
     function renderPreview(){
-        const logo = '{{ asset('img/logo.svg') }}';
+        @php
+            // Fetch dynamic settings for JS preview
+            $logo = \App\Models\Setting::where('key', 'logo_admin')->value('value');
+            if(!$logo) $logo = \App\Models\Setting::where('key', 'logo_front')->value('value');
+            if(!$logo) $logo = \App\Models\Setting::where('key', 'logo_image')->value('value');
+            $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
+            
+            $primaryColor = \App\Models\Setting::where('key', 'site_color_primary')->value('value') ?? '#007bff';
+        @endphp
+
+        const logo = '{{ $logoUrl }}';
+        const primaryColor = '{{ $primaryColor }}';
+        const siteName = '{{ config('app.name') }}';
+        const siteUrl = '{{ url('/') }}';
+        const year = '{{ date('Y') }}';
+        
         const body = $('#bodyEditor').summernote('code');
+        
+        // Use the same layout structure as the backend
         $('#tpl_preview').html(`
-            <table style="width:100%;max-width:720px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;background:#ffffff;border:1px solid #e5e7eb;">
-                <tr><td style="background:#0f172a;padding:16px;text-align:center;">
-                    <img src="${logo}" alt="UNN" style="max-height:60px;">
-                </td></tr>
-                <tr><td style="padding:18px;">${body}</td></tr>
+        <div style="background-color: #f4f6f9; padding: 20px; font-family: sans-serif; min-height: 100%;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="center">
+                        <div style="background-color: #ffffff; max-width: 600px; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <!-- Header -->
+                            <div style="text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid ${primaryColor};">
+                                <img src="${logo}" alt="${siteName}" style="max-height: 60px; max-width: 200px;">
+                            </div>
+                            
+                            <!-- Body -->
+                            <div style="color: #333333; line-height: 1.6;">
+                                ${body}
+                            </div>
+                            
+                            <!-- Footer -->
+                            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eeeeee; text-align: center; color: #777777; font-size: 12px;">
+                                <p>&copy; ${year} ${siteName}. Todos os direitos reservados.</p>
+                                <p><a href="${siteUrl}" style="color: ${primaryColor}; text-decoration: none;">Visite nosso site</a></p>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
             </table>
+        </div>
         `);
     }
     renderPreview();
