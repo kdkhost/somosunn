@@ -45,6 +45,7 @@ class SettingController extends Controller
             'remove_watermark_image',
             'hero_image',
             'remove_hero_image',
+            'smtp_test_email', // Não salvar e-mail de teste
         ]);
 
         $dirs = [
