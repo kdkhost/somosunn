@@ -5,9 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Support\Str;
+
 class Course extends Model
 {
     use HasFactory;
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($course) {
+            if (empty($course->slug)) {
+                $course->slug = Str::slug($course->title) . '-' . uniqid();
+            }
+        });
+    }
 
     protected $fillable = [
         'user_id',

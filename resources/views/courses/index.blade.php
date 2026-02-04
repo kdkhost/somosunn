@@ -29,7 +29,7 @@
                     $isDemo = $course->is_demo ?? false;
                     $authorName = $isDemo ? ($course->creator->name ?? 'UNN Academy') : ($course->author_name ?? optional($course->creator)->name ?? 'Instrutor');
                     $lessonsCount = $isDemo ? 0 : ($course->lessons ? $course->lessons->count() : 0);
-                    $courseSlug = $isDemo ? '#' : route('courses.show', $course->slug);
+                    $courseSlug = ($isDemo || empty($course->slug)) ? '#' : route('courses.show', $course->slug);
                 @endphp
                 <div class="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-300 {{ $isDemo ? 'opacity-90' : '' }}">
                     <a href="{{ $courseSlug }}">
