@@ -237,19 +237,22 @@ class SettingController extends Controller
             'smtp_test_email' => 'required|email',
         ]);
 
+        $encryption = $request->smtp_encryption;
+        if($encryption === 'null' || $encryption === '') $encryption = null;
+
         $config = [
             'transport' => 'smtp',
-            'host'       => $request->smtp_host,
-            'port'       => $request->smtp_port,
-            'username'   => $request->smtp_username,
-            'password'   => $request->smtp_password,
-            'encryption' => $request->smtp_encryption,
+            'host'       => trim($request->smtp_host),
+            'port'       => trim($request->smtp_port),
+            'username'   => trim($request->smtp_username),
+            'password'   => trim($request->smtp_password),
+            'encryption' => $encryption,
             'timeout'    => null,
             'auth_mode'  => null,
         ];
 
         \Config::set('mail.mailers.smtp', $config);
-        \Config::set('mail.from.address', $request->smtp_from_email);
+        \Config::set('mail.from.address', trim($request->smtp_from_email));
         \Config::set('mail.from.name', $request->smtp_from_name ?? config('app.name'));
 
         try {
