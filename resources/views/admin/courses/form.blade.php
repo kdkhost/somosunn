@@ -17,6 +17,7 @@
     .attachment-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-bottom: 1px solid #eee; }
     .attachment-item:last-child { border-bottom: none; }
     .attachment-icon { margin-right: 10px; font-size: 1.2em; color: #666; }
+    .swal2-container { z-index: 2000 !important; }
 </style>
 @endpush
 
@@ -133,7 +134,7 @@
 </div>
 
 <!-- Modal Aula -->
-<div class="modal fade" id="lessonModal" role="dialog">
+<div class="modal fade" id="lessonModal" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
