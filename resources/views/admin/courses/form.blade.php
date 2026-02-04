@@ -102,10 +102,7 @@
                                         <input type="checkbox" name="is_featured" value="1" class="form-check-input" id="is_featured" {{ $course->is_featured ? 'checked' : '' }}>
                                         <label class="form-check-label" for="is_featured">Destaque na Home</label>
                                     </div>
-                                    <div class="form-check mb-3">
-                                        <input type="checkbox" name="published" value="1" class="form-check-input" id="published" {{ $course->status === 'published' ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="published">Publicado (Legacy)</label>
-                                    </div>
+
                                 </div>
                             </div>
                             <button class="btn btn-primary btn-block btn-lg" data-toggle="tooltip" title="Salvar todas as alterações do curso">Salvar Informações</button>

@@ -40,7 +40,8 @@ class CourseController extends Controller
         ]);
         
         $data['is_featured'] = $request->has('is_featured');
-        $data['published'] = $request->has('published'); // Legacy support
+        // Legacy support automation
+        $data['published'] = ($data['status'] === 'published');
         $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
 
         if ($request->hasFile('thumbnail')) {
@@ -79,7 +80,8 @@ class CourseController extends Controller
         ]);
 
         $data['is_featured'] = $request->has('is_featured');
-        $data['published'] = $request->has('published');
+        // Legacy support automation
+        $data['published'] = ($data['status'] === 'published');
         $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
 
         if ($request->hasFile('thumbnail')) {
