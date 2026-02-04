@@ -163,32 +163,26 @@ $(function(){
         
         const body = $('#bodyEditor').summernote('code');
         
-        // Use the same layout structure as the backend
+        // Use the same layout structure as the backend, but scaled for sidebar
         $('#tpl_preview').html(`
-        <div style="background-color: #f4f6f9; padding: 10px; font-family: sans-serif; min-height: 100%;">
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td align="center">
-                        <div style="background-color: #ffffff; width: 100%; max-width: 600px; padding: 0px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
-                            <!-- Header -->
-                            <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); padding: 20px 10px; text-align: center;">
-                                <img src="${logo}" alt="${siteName}" style="max-height: 50px; max-width: 100%; height: auto;">
-                            </div>
-                            
-                            <!-- Body -->
-                            <div style="padding: 20px; color: #333333; line-height: 1.6; word-wrap: break-word;">
-                                ${body}
-                            </div>
-                            
-                            <!-- Footer -->
-                            <div style="background-color: #f8f9fa; padding: 15px; text-align: center; color: #777777; font-size: 11px; border-top: 1px solid #eeeeee;">
-                                <p style="margin: 5px 0;">&copy; ${year} ${siteName}. Todos os direitos reservados.</p>
-                                <p style="margin: 5px 0;"><a href="${siteUrl}" style="color: ${primaryColor}; text-decoration: none;">Visite nosso site</a></p>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
+        <div style="background-color: #f4f6f9; padding: 10px; font-family: sans-serif; height: 100%; box-sizing: border-box; display: flex; justify-content: center;">
+            <div style="background-color: #ffffff; width: 100%; max-width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column;">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); padding: 15px 10px; text-align: center; flex-shrink: 0;">
+                    <img src="${logo}" alt="${siteName}" style="max-height: 40px; max-width: 100%; height: auto;">
+                </div>
+                
+                <!-- Body -->
+                <div style="padding: 15px; color: #333333; line-height: 1.5; word-wrap: break-word; font-size: 13px; flex-grow: 1;">
+                    ${body}
+                </div>
+                
+                <!-- Footer -->
+                <div style="background-color: #f8f9fa; padding: 10px; text-align: center; color: #777777; font-size: 10px; border-top: 1px solid #eeeeee; flex-shrink: 0;">
+                    <p style="margin: 2px 0;">&copy; ${year} ${siteName}.</p>
+                    <p style="margin: 2px 0;"><a href="${siteUrl}" style="color: ${primaryColor}; text-decoration: none;">Visite nosso site</a></p>
+                </div>
+            </div>
         </div>
         `);
     }
