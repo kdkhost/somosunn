@@ -325,46 +325,230 @@
 
                 {{-- GATEWAY --}}
                 <div class="tab-pane fade" id="tab-gateway" role="tabpanel">
-                    <h5 class="mb-3 text-primary"><i class="fas fa-credit-card mr-2"></i>MercadoPago</h5>
-                    <div class="row">
-                        <div class="form-group col-md-6">
-                            <label>Public Key</label>
-                            <input name="payments.mercadopago.public_key" class="form-control" value="{{ $settings['payments.mercadopago.public_key'] ?? '' }}">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label>Access Token</label>
-                            <input name="payments.mercadopago.access_token" class="form-control" value="{{ $settings['payments.mercadopago.access_token'] ?? '' }}">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-md-4"><label>Taxa (%)</label><input name="payments.mercadopago.fee_percentage" class="form-control mask-money" value="{{ $settings['payments.mercadopago.fee_percentage'] ?? '' }}"></div>
-                        <div class="form-group col-md-4"><label>Taxa fixa</label><input name="payments.mercadopago.fee_fixed" class="form-control mask-money" value="{{ $settings['payments.mercadopago.fee_fixed'] ?? '' }}"></div>
-                        <div class="form-group col-md-4"><label>Repassar taxa ao comprador</label><select name="payments.mercadopago.pass_fee" class="form-control"><option value="1" {{ (isset($settings['payments.mercadopago.pass_fee']) && $settings['payments.mercadopago.pass_fee']) ? 'selected' : '' }}>Sim</option><option value="0">Não</option></select></div>
-                    </div>
+                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="pills-mp-tab" data-toggle="pill" href="#pills-mp" role="tab">MercadoPago</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="pills-ps-tab" data-toggle="pill" href="#pills-ps" role="tab">PagSeguro</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="pills-tabContent">
+                        {{-- MERCADO PAGO --}}
+                        <div class="tab-pane fade show active" id="pills-mp" role="tabpanel">
+                            <h5 class="text-primary"><i class="fas fa-credit-card mr-2"></i>Configurações MercadoPago</h5>
+                            
+                            <div class="form-group mt-3">
+                                <label>Ambiente</label>
+                                <div class="btn-group btn-group-toggle d-block" data-toggle="buttons">
+                                    <label class="btn btn-outline-success {{ ($settings['payments.mercadopago.env'] ?? 'sandbox') == 'sandbox' ? 'active' : '' }}">
+                                        <input type="radio" name="payments.mercadopago.env" class="gateway-env-toggle" data-gateway="mercadopago" value="sandbox" {{ ($settings['payments.mercadopago.env'] ?? 'sandbox') == 'sandbox' ? 'checked' : '' }}> Sandbox (Testes)
+                                    </label>
+                                    <label class="btn btn-outline-danger {{ ($settings['payments.mercadopago.env'] ?? '') == 'production' ? 'active' : '' }}">
+                                        <input type="radio" name="payments.mercadopago.env" class="gateway-env-toggle" data-gateway="mercadopago" value="production" {{ ($settings['payments.mercadopago.env'] ?? '') == 'production' ? 'checked' : '' }}> Produção
+                                    </label>
+                                </div>
+                            </div>
 
-                    <hr>
+                            {{-- Sandbox Fields --}}
+                            <div class="card card-outline card-success env-section env-mercadopago-sandbox {{ ($settings['payments.mercadopago.env'] ?? 'sandbox') == 'sandbox' ? '' : 'd-none' }}">
+                                <div class="card-header"><h3 class="card-title">Credenciais de Teste (Sandbox)</h3></div>
+                                <div class="card-body">
+                                    <div class="form-group"><label>Public Key (Teste)</label><input name="payments.mercadopago.sandbox.public_key" class="form-control" value="{{ $settings['payments.mercadopago.sandbox.public_key'] ?? '' }}"></div>
+                                    <div class="form-group"><label>Access Token (Teste)</label><input name="payments.mercadopago.sandbox.access_token" class="form-control" value="{{ $settings['payments.mercadopago.sandbox.access_token'] ?? '' }}"></div>
+                                    <small class="text-muted"><i class="fas fa-info-circle"></i> Use estas credenciais para simular pagamentos sem cobrança real.</small>
+                                </div>
+                            </div>
 
-                    <h5 class="mb-3 mt-4 text-primary"><i class="fas fa-money-bill-wave mr-2"></i>PagSeguro</h5>
-                    <div class="row">
-                        <div class="form-group col-md-6">
-                            <label>E-mail</label>
-                            <input name="payments.pagseguro.email" class="form-control" value="{{ $settings['payments.pagseguro.email'] ?? '' }}">
+                            {{-- Production Fields --}}
+                            <div class="card card-outline card-danger env-section env-mercadopago-production {{ ($settings['payments.mercadopago.env'] ?? '') == 'production' ? '' : 'd-none' }}">
+                                <div class="card-header"><h3 class="card-title">Credenciais de Produção</h3></div>
+                                <div class="card-body">
+                                    <div class="form-group"><label>Public Key (Produção)</label><input name="payments.mercadopago.production.public_key" class="form-control" value="{{ $settings['payments.mercadopago.production.public_key'] ?? '' }}"></div>
+                                    <div class="form-group"><label>Access Token (Produção)</label><input name="payments.mercadopago.production.access_token" class="form-control" value="{{ $settings['payments.mercadopago.production.access_token'] ?? '' }}"></div>
+                                    <div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> Cuidado! Alterações aqui afetam pagamentos reais.</div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header bg-light">Taxas e Parcelamento</div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <label>Máximo de Parcelas (Geral)</label>
+                                                <select name="payments.mercadopago.max_installments" class="form-control">
+                                                    @foreach(range(1, 12) as $i)
+                                                        <option value="{{ $i }}" {{ ($settings['payments.mercadopago.max_installments'] ?? 12) == $i ? 'selected' : '' }}>{{ $i }}x</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Parcelas para Comunidade (Associação)</label>
+                                                <select name="payments.mercadopago.community_installments" class="form-control">
+                                                    @foreach(range(1, 12) as $i)
+                                                        <option value="{{ $i }}" {{ ($settings['payments.mercadopago.community_installments'] ?? 1) == $i ? 'selected' : '' }}>{{ $i }}x</option>
+                                                    @endforeach
+                                                </select>
+                                                <small class="text-muted">Defina em quantas vezes a anuidade da comunidade pode ser dividida.</small>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6"><div class="form-group"><label>Taxa Gateway (%)</label><input name="payments.mercadopago.fee_percentage" class="form-control mask-money" value="{{ $settings['payments.mercadopago.fee_percentage'] ?? '' }}"></div></div>
+                                                <div class="col-md-6"><div class="form-group"><label>Taxa Fixa (R$)</label><input name="payments.mercadopago.fee_fixed" class="form-control mask-money" value="{{ $settings['payments.mercadopago.fee_fixed'] ?? '' }}"></div></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-switch">
+                                                    <input type="hidden" name="payments.mercadopago.pass_fee" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="mp_pass_fee" name="payments.mercadopago.pass_fee" value="1" {{ ($settings['payments.mercadopago.pass_fee'] ?? 0) ? 'checked' : '' }}>
+                                                    <label class="custom-control-label" for="mp_pass_fee">Repassar custo da taxa ao cliente (Você recebe o valor cheio)</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header bg-light">Métodos de Pagamento</div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                                    <input type="hidden" name="payments.mercadopago.enable_credit" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="mp_credit" name="payments.mercadopago.enable_credit" value="1" {{ ($settings['payments.mercadopago.enable_credit'] ?? 1) ? 'checked' : '' }}>
+                                                    <label class="custom-control-label" for="mp_credit"><i class="fas fa-credit-card mr-2"></i>Cartão de Crédito</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                                    <input type="hidden" name="payments.mercadopago.enable_debit" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="mp_debit" name="payments.mercadopago.enable_debit" value="1" {{ ($settings['payments.mercadopago.enable_debit'] ?? 0) ? 'checked' : '' }}>
+                                                    <label class="custom-control-label" for="mp_debit"><i class="far fa-credit-card mr-2"></i>Cartão de Débito</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                                    <input type="hidden" name="payments.mercadopago.enable_pix" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="mp_pix" name="payments.mercadopago.enable_pix" value="1" {{ ($settings['payments.mercadopago.enable_pix'] ?? 1) ? 'checked' : '' }}>
+                                                    <label class="custom-control-label" for="mp_pix"><i class="fab fa-pix mr-2"></i>PIX (Aprovação Imediata)</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                                    <input type="hidden" name="payments.mercadopago.enable_boleto" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="mp_boleto" name="payments.mercadopago.enable_boleto" value="1" {{ ($settings['payments.mercadopago.enable_boleto'] ?? 1) ? 'checked' : '' }}>
+                                                    <label class="custom-control-label" for="mp_boleto"><i class="fas fa-barcode mr-2"></i>Boleto Bancário</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group col-md-6">
-                            <label>Token</label>
-                            <input name="payments.pagseguro.token" class="form-control" value="{{ $settings['payments.pagseguro.token'] ?? '' }}">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-md-4"><label>Taxa (%)</label><input name="payments.pagseguro.fee_percentage" class="form-control mask-money" value="{{ $settings['payments.pagseguro.fee_percentage'] ?? '' }}"></div>
-                        <div class="form-group col-md-4"><label>Taxa fixa</label><input name="payments.pagseguro.fee_fixed" class="form-control mask-money" value="{{ $settings['payments.pagseguro.fee_fixed'] ?? '' }}"></div>
-                        <div class="form-group col-md-4"><label>Repassar taxa ao comprador</label><select name="payments.pagseguro.pass_fee" class="form-control"><option value="1" {{ (isset($settings['payments.pagseguro.pass_fee']) && $settings['payments.pagseguro.pass_fee']) ? 'selected' : '' }}>Sim</option><option value="0">Não</option></select></div>
-                    </div>
-                    <div class="form-group mt-2">
-                        <div class="custom-control custom-switch">
-                            <input type="hidden" name="payments.pagseguro.sandbox" value="0">
-                            <input type="checkbox" class="custom-control-input" id="ps_sandbox" name="payments.pagseguro.sandbox" value="1" {{ ($settings['payments.pagseguro.sandbox'] ?? 0) ? 'checked' : '' }}>
-                            <label class="custom-control-label" for="ps_sandbox">Modo Sandbox (Testes)</label>
+
+                        {{-- PAGSEGURO --}}
+                        <div class="tab-pane fade" id="pills-ps" role="tabpanel">
+                            <h5 class="text-primary"><i class="fas fa-money-bill-wave mr-2"></i>Configurações PagSeguro</h5>
+
+                            <div class="form-group mt-3">
+                                <label>Ambiente</label>
+                                <div class="btn-group btn-group-toggle d-block" data-toggle="buttons">
+                                    <label class="btn btn-outline-success {{ ($settings['payments.pagseguro.env'] ?? 'sandbox') == 'sandbox' ? 'active' : '' }}">
+                                        <input type="radio" name="payments.pagseguro.env" class="gateway-env-toggle" data-gateway="pagseguro" value="sandbox" {{ ($settings['payments.pagseguro.env'] ?? 'sandbox') == 'sandbox' ? 'checked' : '' }}> Sandbox (Testes)
+                                    </label>
+                                    <label class="btn btn-outline-danger {{ ($settings['payments.pagseguro.env'] ?? '') == 'production' ? 'active' : '' }}">
+                                        <input type="radio" name="payments.pagseguro.env" class="gateway-env-toggle" data-gateway="pagseguro" value="production" {{ ($settings['payments.pagseguro.env'] ?? '') == 'production' ? 'checked' : '' }}> Produção
+                                    </label>
+                                </div>
+                            </div>
+
+                            {{-- Sandbox Fields --}}
+                            <div class="card card-outline card-success env-section env-pagseguro-sandbox {{ ($settings['payments.pagseguro.env'] ?? 'sandbox') == 'sandbox' ? '' : 'd-none' }}">
+                                <div class="card-header"><h3 class="card-title">Credenciais de Teste (Sandbox)</h3></div>
+                                <div class="card-body">
+                                    <div class="form-group"><label>E-mail (Teste)</label><input name="payments.pagseguro.sandbox.email" class="form-control" value="{{ $settings['payments.pagseguro.sandbox.email'] ?? '' }}"></div>
+                                    <div class="form-group"><label>Token (Teste)</label><input name="payments.pagseguro.sandbox.token" class="form-control" value="{{ $settings['payments.pagseguro.sandbox.token'] ?? '' }}"></div>
+                                </div>
+                            </div>
+
+                            {{-- Production Fields --}}
+                            <div class="card card-outline card-danger env-section env-pagseguro-production {{ ($settings['payments.pagseguro.env'] ?? '') == 'production' ? '' : 'd-none' }}">
+                                <div class="card-header"><h3 class="card-title">Credenciais de Produção</h3></div>
+                                <div class="card-body">
+                                    <div class="form-group"><label>E-mail (Produção)</label><input name="payments.pagseguro.production.email" class="form-control" value="{{ $settings['payments.pagseguro.production.email'] ?? '' }}"></div>
+                                    <div class="form-group"><label>Token (Produção)</label><input name="payments.pagseguro.production.token" class="form-control" value="{{ $settings['payments.pagseguro.production.token'] ?? '' }}"></div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header bg-light">Taxas e Parcelamento</div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <label>Máximo de Parcelas (Geral)</label>
+                                                <select name="payments.pagseguro.max_installments" class="form-control">
+                                                    @foreach(range(1, 12) as $i)
+                                                        <option value="{{ $i }}" {{ ($settings['payments.pagseguro.max_installments'] ?? 12) == $i ? 'selected' : '' }}>{{ $i }}x</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Parcelas para Comunidade (Associação)</label>
+                                                <select name="payments.pagseguro.community_installments" class="form-control">
+                                                    @foreach(range(1, 12) as $i)
+                                                        <option value="{{ $i }}" {{ ($settings['payments.pagseguro.community_installments'] ?? 1) == $i ? 'selected' : '' }}>{{ $i }}x</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6"><div class="form-group"><label>Taxa Gateway (%)</label><input name="payments.pagseguro.fee_percentage" class="form-control mask-money" value="{{ $settings['payments.pagseguro.fee_percentage'] ?? '' }}"></div></div>
+                                                <div class="col-md-6"><div class="form-group"><label>Taxa Fixa (R$)</label><input name="payments.pagseguro.fee_fixed" class="form-control mask-money" value="{{ $settings['payments.pagseguro.fee_fixed'] ?? '' }}"></div></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-switch">
+                                                    <input type="hidden" name="payments.pagseguro.pass_fee" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="ps_pass_fee" name="payments.pagseguro.pass_fee" value="1" {{ ($settings['payments.pagseguro.pass_fee'] ?? 0) ? 'checked' : '' }}>
+                                                    <label class="custom-control-label" for="ps_pass_fee">Repassar custo da taxa ao cliente</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header bg-light">Métodos de Pagamento</div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                                    <input type="hidden" name="payments.pagseguro.enable_credit" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="ps_credit" name="payments.pagseguro.enable_credit" value="1" {{ ($settings['payments.pagseguro.enable_credit'] ?? 1) ? 'checked' : '' }}>
+                                                    <label class="custom-control-label" for="ps_credit">Cartão de Crédito</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                                    <input type="hidden" name="payments.pagseguro.enable_debit" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="ps_debit" name="payments.pagseguro.enable_debit" value="1" {{ ($settings['payments.pagseguro.enable_debit'] ?? 0) ? 'checked' : '' }}>
+                                                    <label class="custom-control-label" for="ps_debit">Cartão de Débito</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                                    <input type="hidden" name="payments.pagseguro.enable_pix" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="ps_pix" name="payments.pagseguro.enable_pix" value="1" {{ ($settings['payments.pagseguro.enable_pix'] ?? 1) ? 'checked' : '' }}>
+                                                    <label class="custom-control-label" for="ps_pix">PIX</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                                    <input type="hidden" name="payments.pagseguro.enable_boleto" value="0">
+                                                    <input type="checkbox" class="custom-control-input" id="ps_boleto" name="payments.pagseguro.enable_boleto" value="1" {{ ($settings['payments.pagseguro.enable_boleto'] ?? 1) ? 'checked' : '' }}>
+                                                    <label class="custom-control-label" for="ps_boleto">Boleto Bancário</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -407,8 +591,22 @@
                         <div class="form-group col-md-6"><label>From e-mail</label><input name="smtp_from_email" class="form-control" value="{{ $settings['smtp_from_email'] ?? '' }}"></div>
                     </div>
                     <div class="form-row align-items-end">
-                        <div class="form-group col-md-6"><label>Enviar teste para</label><input name="smtp_test_email" class="form-control" value="{{ auth()->user()->email ?? '' }}"></div>
-                        <div class="form-group col-md-3"><button type="button" class="btn btn-secondary mt-4" id="btnTestSmtp">Enviar teste</button></div>
+                        <div class="form-group col-md-4">
+                            <label>Enviar teste para</label>
+                            <input name="smtp_test_email" class="form-control" value="{{ auth()->user()->email ?? '' }}">
+                        </div>
+                        <div class="form-group col-md-6 d-flex align-items-end gap-2">
+                            <button type="button" class="btn btn-secondary mr-2" id="btnTestSmtp"><i class="fas fa-paper-plane"></i> Enviar teste</button>
+                            
+                            @php
+                                $smtpTemplate = \App\Models\MailTemplate::where('slug', 'smtp_test')->first();
+                            @endphp
+                            @if($smtpTemplate)
+                                <a href="{{ route('admin.mailtemplates.edit', $smtpTemplate->id) }}" class="btn btn-outline-info"><i class="fas fa-edit"></i> Editar Template de Teste</a>
+                            @else
+                                <span class="text-muted text-sm">(Salve uma vez para criar o template)</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
 
@@ -502,3 +700,68 @@
     </div>
 </form>
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        // Toggle Gateway Environment Fields
+        $('.gateway-env-toggle').on('change', function() {
+            var gateway = $(this).data('gateway');
+            var env = $(this).val();
+            
+            // Hide all env sections for this gateway
+            $('.env-' + gateway + '-sandbox').addClass('d-none');
+            $('.env-' + gateway + '-production').addClass('d-none');
+            
+            // Show selected
+            $('.env-' + gateway + '-' + env).removeClass('d-none');
+        });
+
+        // Test SMTP
+        $('#btnTestSmtp').click(function() {
+            var btn = $(this);
+            var originalText = btn.html();
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Enviando...');
+
+            var data = {
+                _token: '{{ csrf_token() }}',
+                smtp_host: $('[name="smtp_host"]').val(),
+                smtp_port: $('[name="smtp_port"]').val(),
+                smtp_username: $('[name="smtp_username"]').val(),
+                smtp_password: $('[name="smtp_password"]').val(),
+                smtp_encryption: $('[name="smtp_encryption"]').val(),
+                smtp_from_email: $('[name="smtp_from_email"]').val(),
+                smtp_from_name: $('[name="smtp_from_name"]').val(),
+                smtp_test_email: $('[name="smtp_test_email"]').val()
+            };
+
+            $.ajax({
+                url: '{{ route("admin.settings.test-smtp") }}',
+                method: 'POST',
+                data: data,
+                success: function(resp) {
+                    if (resp.success) {
+                        toastr.success(resp.message);
+                        // Refresh page after 2 seconds to show the edit button if it was created
+                        if(resp.message.indexOf('sucesso') !== -1 && !$('a[href*="mailtemplates"]').length){
+                             setTimeout(function(){ location.reload(); }, 2000);
+                        }
+                    } else {
+                        toastr.error(resp.message);
+                    }
+                },
+                error: function(xhr) {
+                    var msg = 'Erro ao enviar.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    toastr.error(msg);
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html(originalText);
+                }
+            });
+        });
+    });
+</script>
+@endpush

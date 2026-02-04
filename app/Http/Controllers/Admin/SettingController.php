@@ -224,4 +224,68 @@ class SettingController extends Controller
         }
         return $settings;
     }
+
+    public function testSmtp(Request $request)
+    {
+        $request->validate([
+            'smtp_host' => 'required',
+            'smtp_port' => 'required',
+            'smtp_username' => 'required',
+            'smtp_password' => 'required',
+            'smtp_from_email' => 'required|email',
+            'smtp_test_email' => 'required|email',
+        ]);
+
+        $config = [
+            'transport' => 'smtp',
+            'host'       => $request->smtp_host,
+            'port'       => $request->smtp_port,
+            'username'   => $request->smtp_username,
+            'password'   => $request->smtp_password,
+            'encryption' => $request->smtp_encryption,
+            'timeout'    => null,
+            'auth_mode'  => null,
+        ];
+
+        \Config::set('mail.mailers.smtp', $config);
+        \Config::set('mail.from.address', $request->smtp_from_email);
+        \Config::set('mail.from.name', $request->smtp_from_name ?? config('app.name'));
+
+        try {
+            // Find or create the template
+            $template = \App\Models\MailTemplate::firstOrCreate(
+                ['slug' => 'smtp_test'],
+                [
+                    'name' => 'Teste de Configuração SMTP',
+                    'category' => 'sistema',
+                    'subject' => 'Teste de Envio SMTP - {{site.name}}',
+                    'body' => '<h1>Olá, {{user.name}}!</h1><p>Este é um e-mail de teste para validar as configurações de SMTP do sistema <strong>{{site.name}}</strong>.</p><p>Se você recebeu esta mensagem, significa que seu servidor de e-mail está configurado corretamente.</p><br><p>Atenciosamente,<br>Equipe {{site.name}}</p>',
+                    'is_active' => true,
+                    'locale' => 'pt-BR'
+                ]
+            );
+
+            $data = [
+                'user' => ['name' => 'Administrador'],
+                'site' => ['name' => config('app.name')],
+            ];
+
+            // Render logic simple for test
+            $body = $template->body;
+            foreach ($data as $key => $values) {
+                foreach ($values as $k => $v) {
+                    $body = str_replace('{{'.$key.'.'.$k.'}}', $v, $body);
+                }
+            }
+
+            \Mail::html($body, function ($message) use ($request, $template) {
+                $message->to($request->smtp_test_email)
+                        ->subject($template->subject ?? 'Teste SMTP');
+            });
+
+            return response()->json(['success' => true, 'message' => 'E-mail de teste enviado com sucesso!']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erro ao enviar e-mail: ' . $e->getMessage()], 500);
+        }
+    }
 }
