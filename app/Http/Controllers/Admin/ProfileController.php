@@ -58,9 +58,12 @@ class ProfileController extends Controller
 
         // Upload de foto
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+            \Log::info('Upload de foto iniciado para user ' . $user->id);
+            
             // Remove foto antiga
             if ($user->photo && Storage::disk('public')->exists($user->photo)) {
                 Storage::disk('public')->delete($user->photo);
+                \Log::info('Foto antiga removida: ' . $user->photo);
             }
             
             // Salva nova foto
@@ -68,6 +71,10 @@ class ProfileController extends Controller
             $filename = 'avatar_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('uploads/avatars', $filename, 'public');
             $data['photo'] = $path;
+            
+            \Log::info('Nova foto salva: ' . $path);
+        } else {
+            \Log::info('Nenhum arquivo de foto válido enviado');
         }
 
         if (!empty($data['password'])) {
@@ -78,12 +85,18 @@ class ProfileController extends Controller
 
         $user->fill($data);
         $user->save();
+        
+        \Log::info('User atualizado. Photo no banco: ' . $user->photo);
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Perfil atualizado com sucesso!',
-                'photo_url' => $user->photo ? asset('storage/'.$user->photo) : null
+                'photo_url' => $user->photo ? asset('storage/'.$user->photo) : null,
+                'debug' => [
+                    'photo_path' => $user->photo,
+                    'full_url' => $user->photo ? asset('storage/'.$user->photo) : null
+                ]
             ]);
         }
 

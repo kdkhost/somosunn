@@ -399,10 +399,19 @@ $(document).ready(function() {
                 return xhr;
             },
             success: function(response) {
+                console.log('Resposta do servidor:', response);
+                
+                if (response.debug) {
+                    console.log('Debug - Caminho da foto:', response.debug.photo_path);
+                    console.log('Debug - URL completa:', response.debug.full_url);
+                }
+                
                 toastr.success(response.message || 'Perfil atualizado com sucesso!');
                 
                 // Atualiza a foto se foi enviada
                 if (response.photo_url) {
+                    console.log('Atualizando foto para:', response.photo_url);
+                    
                     if ($('#current-photo').is('img')) {
                         $('#current-photo').attr('src', response.photo_url);
                     } else {
