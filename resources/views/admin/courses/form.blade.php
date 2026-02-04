@@ -68,10 +68,14 @@
                                         </div>
                                     @endif
                                     <div class="custom-file text-left">
-                                        <input type="file" name="thumbnail" class="custom-file-input" id="courseThumbnail" accept="image/*">
+                                        <input type="file" name="thumbnail" class="custom-file-input" id="courseThumbnail" accept="image/png, image/jpeg, image/jpg">
                                         <label class="custom-file-label" for="courseThumbnail" data-browse="Buscar">Escolher arquivo</label>
                                     </div>
                                     <small class="text-muted d-block mt-1">Recomendado: 1280x720px (JPG/PNG)</small>
+                                    
+                                    <div class="progress mt-2" id="thumbnailProgressWrapper" style="display:none; height: 10px;">
+                                        <div class="progress-bar bg-success" role="progressbar" id="thumbnailProgressBar" style="width: 0%"></div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -636,6 +640,61 @@
                 }
                 reader.readAsDataURL(file);
             }
+        });
+
+        // Main Course Form AJAX Submit (to show progress)
+        $('form[enctype="multipart/form-data"]').on('submit', function(e) {
+            e.preventDefault();
+            
+            var $form = $(this);
+            var $btn = $form.find('button[type="submit"], button.btn-primary.btn-block');
+            var originalText = $btn.text();
+            
+            // Check if file is selected for progress bar
+            var hasFile = $('#courseThumbnail')[0].files.length > 0;
+            if(hasFile) {
+                $('#thumbnailProgressWrapper').show();
+            }
+
+            $btn.prop('disabled', true).text('Salvando...');
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable && hasFile) {
+                            var percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                            $('#thumbnailProgressBar').css('width', percentComplete + '%');
+                        }
+                    }, false);
+                    return xhr;
+                },
+                success: function(response) {
+                    toastr.success('Curso salvo com sucesso!');
+                    setTimeout(function(){
+                         window.location.href = "{{ route('admin.courses.index') }}";
+                    }, 500);
+                },
+                error: function(xhr) {
+                    $('#thumbnailProgressWrapper').hide();
+                    $btn.prop('disabled', false).text(originalText);
+                    
+                     if(xhr.responseJSON && xhr.responseJSON.errors) {
+                        let msg = '';
+                        $.each(xhr.responseJSON.errors, function(k,v){ msg += v[0]+'<br>'; });
+                        toastr.error(msg);
+                    } else {
+                        toastr.error('Erro ao salvar curso.');
+                    }
+                }
+            });
         });
     });
 </script>

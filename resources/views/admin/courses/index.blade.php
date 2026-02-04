@@ -32,9 +32,11 @@
                     <tr>
                         <td>
                             @if($c->thumbnail)
-                                <img src="{{ asset($c->thumbnail) }}" alt="Capa" class="img-thumbnail" style="max-height: 50px;">
+                                <img src="{{ asset($c->thumbnail) }}" alt="Capa" class="img-circle elevation-2" style="width: 50px; height: 50px; object-fit: cover;">
                             @else
-                                <span class="badge badge-secondary">Sem imagem</span>
+                                <div class="img-circle elevation-2 d-flex align-items-center justify-content-center bg-secondary" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-image text-white"></i>
+                                </div>
                             @endif
                         </td>
                         <td>{{ $c->title }}</td>
