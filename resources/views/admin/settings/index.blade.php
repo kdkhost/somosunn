@@ -593,7 +593,7 @@
                     <div class="form-row align-items-end">
                         <div class="form-group col-md-4">
                             <label>Enviar teste para</label>
-                            <input name="smtp_test_email" class="form-control" value="{{ auth()->user()->email ?? '' }}">
+                            <input name="smtp_test_email" class="form-control" value="">
                         </div>
                         <div class="form-group col-md-6 d-flex align-items-end gap-2">
                             <button type="button" class="btn btn-secondary mr-2" id="btnTestSmtp"><i class="fas fa-paper-plane"></i> Enviar teste</button>

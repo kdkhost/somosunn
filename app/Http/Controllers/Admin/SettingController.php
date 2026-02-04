@@ -266,9 +266,20 @@ class SettingController extends Controller
                 ]
             );
 
+            $logo = Setting::where('key', 'logo_image')->value('value');
+            
+            // Fallback logos if main logo not set
+            if(!$logo) $logo = Setting::where('key', 'logo_admin')->value('value');
+            if(!$logo) $logo = Setting::where('key', 'logo_auth')->value('value');
+            
+            $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
+
             $data = [
                 'user' => ['name' => 'Administrador'],
-                'site' => ['name' => config('app.name')],
+                'site' => [
+                    'name' => config('app.name'),
+                    'logo' => $logoUrl
+                ],
             ];
 
             // Render logic simple for test
