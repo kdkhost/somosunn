@@ -69,3 +69,18 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
   - `POST /api/satisfactions` grava a pesquisa de satisfação com `interaction_id`, `rating` (1-5) e comentário, atualizando automaticamente o ranking.
   - `GET /api/ranking` mostra os primeiros colocados e o resumo por nível para alimentar dashboards ou widgets externos.
 - O serviço `App\Services\RankingService` recalcula média, contagem e score baseado nos feedbacks e armazena em `rankings`, garantindo que o ranking do portal sempre reflita o histórico real das conexões.
+
+## Atualizações de Design e Responsividade (Fevereiro 2026)
+
+- **Landing Page (Home):** Otimização da seção Hero e Stats para dispositivos móveis (redução de padding e fontes).
+- **Portal de Networking:** Ajustes de layout no cabeçalho e grids de estatísticas para melhor visualização em celulares.
+- **Eventos:** Correção de espaçamentos no cabeçalho e listagem de eventos. Detalhes do evento agora totalmente responsivos.
+- **Página de Membros:** Otimização dos cards de membros e cabeçalho.
+- **Páginas Institucionais:**
+  - **Sobre Nós:** Ajustes de tipografia e espaçamento no mobile.
+  - **Contato:** Layout otimizado para formulário e informações de contato em telas pequenas.
+  - **Como Funciona:** Redesign da seção de passos e cards de preços para mobile.
+  - **Manifesto:** Melhoria na legibilidade do texto e citações em dispositivos móveis.
+  - **Quem Somos:** Ajustes na seção de equipe e fundadores.
+  - **Valores:** Otimização do grid de valores e espaçamentos.
+- **Geral:** Padronização de classes utilitárias (`pt-10 md:pt-24`, fontes responsivas) em todo o frontend para garantir uma experiência consistente em qualquer dispositivo.
