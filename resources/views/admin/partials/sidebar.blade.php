@@ -15,7 +15,7 @@
     }
 @endphp
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center justify-content-center p-0" style="height:60px; overflow:hidden; background: #fff;">
+    <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center justify-content-center p-0" style="height:60px; overflow:hidden;">
         <img src="{{ $brandLogo }}" alt="UNN" class="brand-logo-img" style="max-height: 50px; width: auto; max-width: 90%; object-fit: contain;">
         <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img" style="max-height: 50px; width: auto; max-width: 90%; object-fit: contain; display: none;">
     </a>
