@@ -13,27 +13,27 @@
 
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
-    <section class="pt-28 pb-12 px-6 md:px-12 lg:px-24" style="background: linear-gradient(135deg, {{ $eventColor }}20 0%, {{ $eventColor }}05 100%);">
+    <section class="pt-24 md:pt-28 pb-6 md:pb-12 px-4 md:px-12 lg:px-24" style="background: linear-gradient(135deg, {{ $eventColor }}20 0%, {{ $eventColor }}05 100%);">
         <div class="max-w-7xl mx-auto">
-            <a href="{{ route('events.index') }}" class="inline-flex items-center gap-2 text-gray-600 mb-6 transition" style="--tw-text-opacity:1" onmouseover="this.style.color='var(--unn-azul-1)'" onmouseout="this.style.color=''">
+            <a href="{{ route('events.index') }}" class="inline-flex items-center gap-2 text-gray-600 mb-4 md:mb-6 transition" style="--tw-text-opacity:1" onmouseover="this.style.color='var(--unn-azul-1)'" onmouseout="this.style.color=''">
                 <i class="fas fa-arrow-left"></i> Voltar para eventos
             </a>
             
-            <div class="flex flex-col lg:flex-row gap-8 items-start">
+            <div class="flex flex-col lg:flex-row gap-6 md:gap-8 items-start">
                 <!-- Event Info -->
                 <div class="flex-1">
                     @if($isDemo)
-                    <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold mb-4">
+                    <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs sm:text-sm font-semibold mb-4">
                         <i class="fas fa-info-circle"></i> Evento de Demonstração
                     </span>
                     @endif
                     
-                    <h1 class="text-4xl lg:text-5xl font-black text-gray-900 mb-4">{{ $event->title }}</h1>
-                    <p class="text-xl font-semibold mb-6" style="color: var(--unn-azul-1)">
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-3 md:mb-4">{{ $event->title }}</h1>
+                    <p class="text-lg sm:text-xl font-semibold mb-4 md:mb-6" style="color: var(--unn-azul-1)">
                         <i class="fas fa-user-tie mr-2"></i> {{ $event->speaker }}
                     </p>
                     
-                    <p class="text-lg text-gray-600 leading-relaxed mb-8">{{ $event->description }}</p>
+                    <p class="text-base sm:text-lg text-gray-600 leading-relaxed mb-6 md:mb-8">{{ $event->description }}</p>
 
                     <!-- Date & Time Cards -->
                     <div class="grid sm:grid-cols-2 gap-4 mb-8">
