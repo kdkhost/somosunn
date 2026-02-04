@@ -62,23 +62,32 @@ class ProfileController extends Controller
             \Log::info('Upload de foto iniciado para user ' . $user->id);
             
             // Remove foto antiga
-            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
-                Storage::disk('public')->delete($user->photo);
+            if ($user->photo && file_exists(public_path($user->photo))) {
+                unlink(public_path($user->photo));
                 \Log::info('Foto antiga removida: ' . $user->photo);
             }
             
-            // Salva nova foto
+            // Salva nova foto DIRETAMENTE em public/storage
             $file = $request->file('photo');
             $filename = 'avatar_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('uploads/avatars', $filename, 'public');
+            
+            // Garante que o diretório existe
+            $directory = public_path('storage/uploads/avatars');
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+            
+            // Move o arquivo diretamente para public/storage
+            $path = 'storage/uploads/avatars/' . $filename;
+            $file->move($directory, $filename);
             
             // Verifica se o arquivo foi realmente salvo
-            if ($path && Storage::disk('public')->exists($path)) {
+            if (file_exists(public_path($path))) {
                 $uploadedPhotoPath = $path;
                 $data['photo'] = $path;
-                \Log::info('Nova foto salva com sucesso: ' . $path);
+                \Log::info('Nova foto salva com sucesso em: ' . $path);
             } else {
-                \Log::error('Falha ao salvar arquivo de foto no storage');
+                \Log::error('Falha ao salvar arquivo de foto');
                 if ($request->ajax()) {
                     return response()->json([
                         'success' => false,
@@ -110,11 +119,11 @@ class ProfileController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Perfil atualizado com sucesso!',
-                'photo_url' => $user->photo ? asset('storage/'.$user->photo) : null,
+                'photo_url' => $user->photo ? asset($user->photo) : null,
                 'debug' => [
                     'photo_path' => $user->photo,
-                    'full_url' => $user->photo ? asset('storage/'.$user->photo) : null,
-                    'file_exists' => $user->photo ? Storage::disk('public')->exists($user->photo) : false,
+                    'full_url' => $user->photo ? asset($user->photo) : null,
+                    'file_exists' => $user->photo ? file_exists(public_path($user->photo)) : false,
                     'save_result' => $saved
                 ]
             ]);

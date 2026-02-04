@@ -13,7 +13,7 @@
             <div class="card-body box-profile">
                 <div class="text-center mb-3" id="profile-photo-preview">
                     @if($user->photo)
-                        <img class="profile-user-img img-fluid img-circle" src="{{ asset('storage/'.$user->photo) }}" alt="Avatar" id="current-photo">
+                        <img class="profile-user-img img-fluid img-circle" src="{{ asset($user->photo) }}" alt="Avatar" id="current-photo">
                     @else
                         <div class="profile-user-img img-fluid img-circle d-flex align-items-center justify-content-center bg-light text-primary font-weight-bold" 
                              style="width:100px;height:100px;font-size:2rem;margin:0 auto;border:3px solid #adb5bd;" id="current-photo">
