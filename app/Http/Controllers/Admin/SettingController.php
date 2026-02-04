@@ -286,9 +286,13 @@ class SettingController extends Controller
 
             // Render logic simple for test
             $rendered = $template->body;
+            $subject = $template->subject ?? 'Teste SMTP';
+            
             foreach ($data as $key => $values) {
                 foreach ($values as $k => $v) {
-                    $rendered = str_replace('{{'.$key.'.'.$k.'}}', $v, $rendered);
+                    $pattern = '/\{\{\s*' . $key . '\.' . $k . '\s*\}\}/';
+                    $rendered = preg_replace($pattern, $v, $rendered);
+                    $subject = preg_replace($pattern, $v, $subject);
                 }
             }
 
@@ -323,9 +327,9 @@ class SettingController extends Controller
                 </table>
             </div>';
 
-            \Mail::html($layout, function ($message) use ($request, $template) {
+            \Mail::html($layout, function ($message) use ($request, $subject) {
                 $message->to($request->smtp_test_email)
-                        ->subject($template->subject ?? 'Teste SMTP');
+                        ->subject($subject);
             });
 
             return response()->json(['success' => true, 'message' => 'E-mail de teste enviado com sucesso!']);
