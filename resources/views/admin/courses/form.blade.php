@@ -405,6 +405,7 @@
                 url: "/dummy", // Set dynamically
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 maxFilesize: 500, // 500 MB
+                timeout: 0, // No timeout
                 acceptedFiles: null,
                 autoProcessQueue: false, // Wait for name
                 addRemoveLinks: true,
