@@ -38,7 +38,7 @@ return [
         Illuminate\Routing\RoutingServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\AppServiceProvider::class,
-        // Laravel\Socialite\SocialiteServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
     ],
     'aliases' => [
         'App' => Illuminate\Support\Facades\App::class,
@@ -76,6 +76,6 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-        // 'Socialite' => Laravel\Socialite\Facades\Socialite::class,
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class,
     ],
 ];
