@@ -16,9 +16,24 @@
 @endphp
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center justify-content-center p-0" style="height:60px; overflow:hidden;">
+        {{-- Logo Grande (Padrão) --}}
         <img src="{{ $brandLogo }}" alt="UNN" class="brand-logo-img" style="max-height: 50px; width: auto; max-width: 90%; object-fit: contain;">
-        <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img" style="max-height: 50px; width: auto; max-width: 90%; object-fit: contain; display: none;">
+        {{-- Favicon (Mini) --}}
+        <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img" style="max-height: 50px; width: auto; max-width: 90%; object-fit: contain;">
     </a>
+    <style>
+        /* Estado Padrão (Aberto): Logo Visível, Favicon Oculto */
+        .brand-link .brand-logo-img { display: block; }
+        .brand-link .brand-favicon-img { display: none; }
+
+        /* Estado Fechado (.sidebar-collapse no body): Logo Oculto, Favicon Visível */
+        body.sidebar-collapse .brand-link .brand-logo-img { display: none !important; }
+        body.sidebar-collapse .brand-link .brand-favicon-img { display: block !important; }
+
+        /* Estado Hover no Mini (Passar mouse quando fechado): Logo Volta, Favicon Some */
+        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link .brand-logo-img { display: block !important; }
+        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link .brand-favicon-img { display: none !important; }
+    </style>
     <div class="sidebar">
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" data-accordion="true" id="sidebar-tree" role="menu">
