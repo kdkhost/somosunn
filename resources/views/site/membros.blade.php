@@ -28,24 +28,24 @@
     @endif
 
     <!-- Stats -->
-    <section class="pb-8 px-6 md:px-12 lg:px-24">
+    <section class="pb-8 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
-                    <p class="text-3xl font-black" style="color: var(--unn-azul-1)">500+</p>
-                    <p class="text-sm text-gray-500">Empreendedores</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">500+</p>
+                    <p class="text-xs sm:text-sm text-gray-500 break-words">Empreendedores</p>
                 </div>
-                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
-                    <p class="text-3xl font-black" style="color: var(--unn-azul-1)">50+</p>
-                    <p class="text-sm text-gray-500">Mentores</p>
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">50+</p>
+                    <p class="text-xs sm:text-sm text-gray-500">Mentores</p>
                 </div>
-                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
-                    <p class="text-3xl font-black" style="color: var(--unn-azul-1)">27</p>
-                    <p class="text-sm text-gray-500">Estados</p>
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">27</p>
+                    <p class="text-xs sm:text-sm text-gray-500">Estados</p>
                 </div>
-                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
-                    <p class="text-3xl font-black" style="color: var(--unn-azul-1)">1.2k+</p>
-                    <p class="text-sm text-gray-500">Conexões feitas</p>
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">1.2k+</p>
+                    <p class="text-xs sm:text-sm text-gray-500">Conexões feitas</p>
                 </div>
             </div>
         </div>
