@@ -35,7 +35,7 @@
                     <a href="{{ $courseSlug }}">
                         <div class="h-48 bg-gray-200 relative">
                             @if($course->thumbnail)
-                                <img src="{{ asset('storage/'.$course->thumbnail) }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
+                                <img src="{{ asset($course->thumbnail) }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
                             @else
                                 <div class="flex items-center justify-center h-full text-gray-400 bg-gradient-to-br from-blue-100 to-purple-100">
                                     <i class="fas fa-graduation-cap text-4xl text-blue-400"></i>
