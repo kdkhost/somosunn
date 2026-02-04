@@ -5,36 +5,36 @@
 @section('content')
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
-    <section class="pt-24 pb-12 px-6 md:px-12 lg:px-24">
+    <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-5xl lg:text-6xl font-black leading-tight mb-6">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
                 Portal de <span class="text-gradient">Networking</span>
             </h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.
             </p>
         </div>
     </section>
 
     <!-- Stats -->
-    <section class="pb-12 px-6 md:px-12 lg:px-24">
+    <section class="pb-12 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
-                    <p class="text-4xl font-black" style="color: var(--unn-azul-1)">120+</p>
-                    <p class="text-sm text-gray-500 mt-1">Palestras</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">120+</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Palestras</p>
                 </div>
-                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
-                    <p class="text-4xl font-black" style="color: var(--unn-azul-1)">50+</p>
-                    <p class="text-sm text-gray-500 mt-1">Mentorias</p>
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">50+</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Mentorias</p>
                 </div>
-                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
-                    <p class="text-4xl font-black" style="color: var(--unn-azul-1)">5.000+</p>
-                    <p class="text-sm text-gray-500 mt-1">Membros</p>
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">5.000+</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Membros</p>
                 </div>
-                <div class="bg-white rounded-2xl p-6 text-center shadow-lg">
-                    <p class="text-4xl font-black" style="color: var(--unn-azul-1)">95%</p>
-                    <p class="text-sm text-gray-500 mt-1">Satisfação</p>
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">95%</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Satisfação</p>
                 </div>
             </div>
         </div>

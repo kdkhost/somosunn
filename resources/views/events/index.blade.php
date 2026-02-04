@@ -5,12 +5,12 @@
 @section('content')
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
-    <section class="pt-24 pb-8 px-6 md:px-12 lg:px-24">
+    <section class="pt-10 md:pt-24 pb-8 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-5xl lg:text-6xl font-black leading-tight mb-6">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
                 <span class="text-gradient">Eventos</span> UNN
             </h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Encontros presenciais e online para conectar você com os melhores empreendedores do Brasil.
             </p>
         </div>

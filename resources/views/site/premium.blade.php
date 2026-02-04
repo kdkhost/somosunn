@@ -5,14 +5,14 @@
 @section('content')
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
-    <section class="pt-24 pb-16 px-6 md:px-12 lg:px-24">
+    <section class="pt-10 md:pt-24 pb-12 md:pb-16 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div>
-                    <span class="inline-block px-4 py-2 rounded-full text-sm font-bold mb-6" style="background: var(--unn-azul-1); color: white">
+                    <span class="inline-block px-4 py-2 rounded-full text-sm font-bold mb-4 md:mb-6" style="background: var(--unn-azul-1); color: white">
                         <i class="fas fa-crown mr-2"></i> Associação Premium
                     </span>
-                    <h1 class="text-5xl lg:text-6xl font-black leading-tight mb-6">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
                         Invista no seu <span class="text-gradient">crescimento</span>
                     </h1>
                     <p class="text-xl text-gray-600 leading-relaxed mb-8">
@@ -48,7 +48,7 @@
             
             <div class="grid md:grid-cols-3 gap-8">
                 <!-- Plano Gratuito -->
-                <div class="bg-white rounded-3xl p-8 shadow-lg">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Comunidade</h3>
                     <div class="mb-6">
                         <span class="text-5xl font-black text-gray-900">Grátis</span>
@@ -88,7 +88,7 @@
                 </div>
 
                 <!-- Plano Premium (Destaque) -->
-                <div class="bg-white rounded-3xl p-8 shadow-2xl ring-2 relative" style="--tw-ring-color: var(--unn-azul-1)">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-2xl ring-2 relative" style="--tw-ring-color: var(--unn-azul-1)">
                     <span class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 btn-primary text-white text-sm font-bold rounded-full">
                         MAIS POPULAR
                     </span>
@@ -133,7 +133,7 @@
                 </div>
 
                 <!-- Plano Business -->
-                <div class="bg-white rounded-3xl p-8 shadow-lg">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg">
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Business</h3>
                     <div class="mb-2">
                         <span class="text-5xl font-black text-gray-900">R$ 297</span>
