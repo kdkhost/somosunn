@@ -197,8 +197,12 @@
                         <label class="form-check-label" for="lessonPreview">Aula Gratuita (Preview)</label>
                     </div>
 
-                    <div class="text-right">
-                        <button type="submit" class="btn btn-primary" id="btnSaveLesson">Salvar Dados da Aula</button>
+                    <div class="progress mt-3" id="uploadProgressWrapper" style="display:none;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" id="uploadProgressBar" style="width: 0%">0%</div>
+                    </div>
+
+                    <div class="text-right mt-3">
+                        <button type="button" class="btn btn-primary" id="btnSaveLesson">Salvar Dados da Aula</button>
                     </div>
                 </form>
 
@@ -433,25 +437,45 @@
             var formData = new FormData($('#lessonForm')[0]);
             formData.set('content', content); // Force override with summernote data
 
+            // Reset and Show Progress
+            $('#uploadProgressWrapper').show();
+            var $progressBar = $('#uploadProgressBar');
+            $progressBar.css('width', '0%').text('0%');
+
             $.ajax({
                 url: url,
                 type: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                            $progressBar.css('width', percentComplete + '%');
+                            $progressBar.text(percentComplete + '%');
+                        }
+                    }, false);
+                    return xhr;
+                },
                 success: function() {
                     $('#lessonModal').modal('hide');
                     toastr.success('Aula salva com sucesso!');
                     setTimeout(function(){ window.location.reload(); }, 1000);
                 },
                 error: function(xhr) {
+                    $('#uploadProgressWrapper').hide();
                     $btn.prop('disabled', false).text(originalText);
+                    
                     if(xhr.responseJSON && xhr.responseJSON.errors) {
                         let msg = '';
                         $.each(xhr.responseJSON.errors, function(k,v){ msg += v[0]+'<br>'; });
                         toastr.error(msg);
+                    } else if(xhr.status === 413) {
+                        toastr.error('O arquivo é muito grande para o servidor. Limite: 500MB.');
                     } else {
-                        toastr.error('Erro ao salvar. Verifique o console ou contate o suporte.');
+                        toastr.error('Erro ao salvar. Verifique sua conexão e tente novamente.');
                         console.error(xhr);
                     }
                 }
