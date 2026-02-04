@@ -133,7 +133,7 @@
 </div>
 
 <!-- Modal Aula -->
-<div class="modal fade" id="lessonModal" tabindex="-1" role="dialog">
+<div class="modal fade" id="lessonModal" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -404,7 +404,10 @@
                             showCancelButton: true,
                             confirmButtonText: 'Enviar',
                             cancelButtonText: 'Cancelar Upload',
-                            allowOutsideClick: false
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.getInput().focus();
+                            }
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 file.customName = result.value;
