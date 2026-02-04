@@ -610,6 +610,33 @@
 
         // Initialize Tooltips
         $('[data-toggle="tooltip"]').tooltip();
+
+        // Image Preview Logic
+        $('#courseThumbnail').on('change', function(event) {
+            var file = event.target.files[0];
+            if (file) {
+                // Update Label
+                $(this).next('.custom-file-label').html(file.name);
+                
+                // Show Preview
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    // Find or create img element
+                    var container = $(event.target).closest('.card-body');
+                    var img = container.find('img');
+                    
+                    if (img.length) {
+                        img.attr('src', e.target.result);
+                    } else {
+                        // Create img if replacing icon
+                        var wrapper = container.find('.bg-secondary');
+                        if (wrapper.length) wrapper.replaceWith('<img src="'+e.target.result+'" class="img-fluid rounded mb-2" style="max-height: 150px;">');
+                        else container.prepend('<img src="'+e.target.result+'" class="img-fluid rounded mb-2" style="max-height: 150px;">');
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        });
     });
 </script>
 @endpush
