@@ -101,7 +101,7 @@
             <div class="col-lg-4">
                 <div class="card h-100">
                     <div class="card-header"><strong>Preview em tempo real</strong></div>
-                    <div class="card-body" id="tpl_preview" style="min-height:200px; background:#f8fafc;"></div>
+                    <div class="card-body p-0" id="tpl_preview" style="min-height:200px; background:#f4f6f9;"></div>
                 </div>
             </div>
         </div>
@@ -165,23 +165,21 @@ $(function(){
         
         // Use the same layout structure as the backend, but scaled for sidebar
         $('#tpl_preview').html(`
-        <div style="background-color: #f4f6f9; padding: 10px; font-family: sans-serif; height: 100%; box-sizing: border-box; display: flex; justify-content: center;">
-            <div style="background-color: #ffffff; width: 100%; max-width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column;">
-                <!-- Header -->
-                <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); padding: 15px 10px; text-align: center; flex-shrink: 0;">
-                    <img src="${logo}" alt="${siteName}" style="max-height: 40px; max-width: 100%; height: auto;">
-                </div>
-                
-                <!-- Body -->
-                <div style="padding: 15px; color: #333333; line-height: 1.5; word-wrap: break-word; font-size: 13px; flex-grow: 1;">
-                    ${body}
-                </div>
-                
-                <!-- Footer -->
-                <div style="background-color: #f8f9fa; padding: 10px; text-align: center; color: #777777; font-size: 10px; border-top: 1px solid #eeeeee; flex-shrink: 0;">
-                    <p style="margin: 2px 0;">&copy; ${year} ${siteName}.</p>
-                    <p style="margin: 2px 0;"><a href="${siteUrl}" style="color: ${primaryColor}; text-decoration: none;">Visite nosso site</a></p>
-                </div>
+        <div style="background-color: #ffffff; width: 100%; font-family: sans-serif; height: 100%; box-sizing: border-box; display: flex; flex-direction: column;">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); padding: 25px 20px; text-align: center; flex-shrink: 0;">
+                <img src="${logo}" alt="${siteName}" style="max-height: 50px; max-width: 100%; height: auto;">
+            </div>
+            
+            <!-- Body -->
+            <div style="padding: 25px 20px; color: #333333; line-height: 1.6; word-wrap: break-word; font-size: 14px; flex-grow: 1;">
+                ${body}
+            </div>
+            
+            <!-- Footer -->
+            <div style="background-color: #f8f9fa; padding: 15px; text-align: center; color: #777777; font-size: 11px; border-top: 1px solid #eeeeee; flex-shrink: 0;">
+                <p style="margin: 2px 0;">&copy; ${year} ${siteName}.</p>
+                <p style="margin: 2px 0;"><a href="${siteUrl}" style="color: ${primaryColor}; text-decoration: none;">Visite nosso site</a></p>
             </div>
         </div>
         `);
