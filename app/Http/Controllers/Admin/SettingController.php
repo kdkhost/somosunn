@@ -276,10 +276,15 @@ class SettingController extends Controller
             
             $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
 
+            // Fetch Site Name from Database
+            $siteName = Setting::where('key', 'app_name')->value('value');
+            if(!$siteName) $siteName = Setting::where('key', 'company_name')->value('value');
+            if(!$siteName) $siteName = config('app.name');
+
             $data = [
                 'user' => ['name' => 'Administrador'],
                 'site' => [
-                    'name' => config('app.name'),
+                    'name' => $siteName,
                     'logo' => $logoUrl
                 ],
             ];
