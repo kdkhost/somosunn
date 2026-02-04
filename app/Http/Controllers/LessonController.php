@@ -12,6 +12,9 @@ class LessonController extends Controller
     public function store(Request $request, Course $course)
     {
         $this->authorize('update', $course);
+        set_time_limit(0);
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 0);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -106,6 +109,9 @@ class LessonController extends Controller
     public function uploadAttachment(Request $request, Course $course, Lesson $lesson)
     {
         $this->authorize('update', $course);
+        set_time_limit(0);
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 0);
         
         $request->validate([
             'file' => 'required|file|max:512000' // 500MB max
