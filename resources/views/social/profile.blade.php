@@ -90,7 +90,8 @@
                                     class="bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-bold hover:bg-gray-300 transition shadow flex items-center gap-2">
                                     <i class="fas fa-user-check text-green-600"></i> Conectado
                                 </button>
-                                <button onclick="openChatBox({{ $user->id }}, '{{ $user->name }}', '{{ $user->photo ? asset($user->photo) : '' }}')"
+                                <button
+                                    onclick="openChatBox({{ $user->id }}, '{{ $user->name }}', '{{ $user->photo ? asset($user->photo) : '' }}')"
                                     class="bg-[#1F5EDB] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center gap-2">
                                     <i class="fas fa-comment-dots"></i> Mensagem
                                 </button>
@@ -279,9 +280,12 @@
     </div>
 
     <!-- Floating Chat Box (Facebook-style) -->
-    <div id="chatBox" class="fixed bottom-0 right-4 w-full sm:w-96 bg-white rounded-t-xl shadow-2xl border border-gray-200 transition-all duration-300 transform translate-y-full z-50" style="display: none;">
+    <div id="chatBox"
+        class="fixed bottom-0 right-4 w-full sm:w-96 bg-white rounded-t-xl shadow-2xl border border-gray-200 transition-all duration-300 transform translate-y-full z-50"
+        style="display: none;">
         <!-- Chat Header -->
-        <div class="bg-[#1F5EDB] text-white px-4 py-3 rounded-t-xl flex items-center justify-between cursor-pointer" onclick="toggleMinimizeChat()">
+        <div class="bg-[#1F5EDB] text-white px-4 py-3 rounded-t-xl flex items-center justify-between cursor-pointer"
+            onclick="toggleMinimizeChat()">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden">
                     <img id="chatUserAvatar" src="" alt="Avatar" class="w-full h-full object-cover hidden">
@@ -293,10 +297,12 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="event.stopPropagation(); toggleMinimizeChat();" class="hover:bg-blue-600 p-2 rounded-full transition">
+                <button onclick="event.stopPropagation(); toggleMinimizeChat();"
+                    class="hover:bg-blue-600 p-2 rounded-full transition">
                     <i id="chatMinimizeIcon" class="fas fa-minus text-sm"></i>
                 </button>
-                <button onclick="event.stopPropagation(); closeChatBox();" class="hover:bg-blue-600 p-2 rounded-full transition">
+                <button onclick="event.stopPropagation(); closeChatBox();"
+                    class="hover:bg-blue-600 p-2 rounded-full transition">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
@@ -314,12 +320,16 @@
         <div id="chatFooter" class="border-t border-gray-200 p-3 bg-white rounded-b-xl">
             <form id="chatForm" onsubmit="sendMessage(event);" class="flex gap-2">
                 <input type="hidden" id="chatUserId" value="">
-                <input type="text" id="chatInput" placeholder="Digite sua mensagem..." 
+                <input type="text" id="chatInput" placeholder="Digite sua mensagem..."
                     class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-[#1F5EDB] focus:ring-1 focus:ring-[#1F5EDB]">
-                <button type="submit" class="bg-[#1F5EDB] text-white px-5 py-2 rounded-full hover:bg-blue-700 transition font-medium">
+                <button type="submit"
+                    class="bg-[#1F5EDB] text-white px-5 py-2 rounded-full hover:bg-blue-700 transition font-medium">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </form>
         </div>
     </div>
+
+    <!-- Floating Chat Script -->
+    <script src="{{ asset('js/floating-chat.js') }}"></script>
 @endsection
