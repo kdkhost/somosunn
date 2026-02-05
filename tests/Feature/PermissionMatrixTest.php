@@ -5,16 +5,22 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\Plan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Hash;
+use Tests\TestCase;
 
-class PermissionMatrixTest extends BaseTestCase
+class PermissionMatrixTest extends TestCase
 {
     use RefreshDatabase;
 
     /** @test */
     public function an_admin_can_access_any_feature()
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+        ]);
 
         $this->assertTrue($admin->canAccessFeature('any_feature'));
         $this->assertTrue($admin->canAccessFeature('whatsapp'));
@@ -25,10 +31,14 @@ class PermissionMatrixTest extends BaseTestCase
     {
         $plan = Plan::create([
             'name' => 'Basic',
+            'slug' => 'basic',
             'permissions' => ['courses', 'events']
         ]);
 
-        $user = User::factory()->create([
+        $user = User::create([
+            'name' => 'Member',
+            'email' => 'member@example.com',
+            'password' => Hash::make('password'),
             'role' => 'member',
             'plan_id' => $plan->id
         ]);
@@ -44,10 +54,14 @@ class PermissionMatrixTest extends BaseTestCase
     {
         $plan = Plan::create([
             'name' => 'Basic',
+            'slug' => 'basic-expired',
             'permissions' => ['courses']
         ]);
 
-        $user = User::factory()->create([
+        $user = User::create([
+            'name' => 'Member Expired',
+            'email' => 'member-expired@example.com',
+            'password' => Hash::make('password'),
             'role' => 'member',
             'plan_id' => $plan->id,
             'plan_expires_at' => now()->subDay()
@@ -61,10 +75,14 @@ class PermissionMatrixTest extends BaseTestCase
     {
         $plan = Plan::create([
             'name' => 'Basic',
+            'slug' => 'basic-routes',
             'permissions' => ['courses']
         ]);
 
-        $user = User::factory()->create([
+        $user = User::create([
+            'name' => 'Member Routes',
+            'email' => 'member-routes@example.com',
+            'password' => Hash::make('password'),
             'role' => 'member',
             'plan_id' => $plan->id
         ]);

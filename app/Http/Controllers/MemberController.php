@@ -12,6 +12,8 @@ class MemberController extends Controller
      */
     public function index()
     {
+        $demoMode = (bool) config('app.demo_mode');
+
         // Check if members feature is enabled
         $isEnabled = \App\Models\Setting::get('feature_members', '1') === '1';
 
@@ -31,6 +33,8 @@ class MemberController extends Controller
                 $q->where('requester_id', auth()->id())->orWhere('requested_id', auth()->id());
             })->where('status', 'accepted')->pluck('requester_id', 'requested_id')->flatten()->unique()->toArray();
         }
+
+        $members = collect();
 
         try {
             $query = User::where('role', '!=', 'superadmin')
@@ -69,11 +73,11 @@ class MemberController extends Controller
                     ];
                 });
         } catch (\Throwable $e) {
-            // Fallback to demo data on any DB error
+            \Log::warning('Falha ao carregar membros: ' . $e->getMessage());
         }
 
         // If no members exist, provide demo data
-        if ($members->isEmpty()) {
+        if ($demoMode && $members->isEmpty()) {
             $members = collect([
                 (object) [
                     'id' => 1,

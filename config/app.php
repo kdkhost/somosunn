@@ -4,6 +4,7 @@ return [
     'name' => env('APP_NAME', 'UNN'),
     'env' => env('APP_ENV', 'production'),
     'debug' => (bool) env('APP_DEBUG', false),
+    'demo_mode' => (bool) env('DEMO_MODE', false),
     'url' => env('APP_URL', 'http://localhost'),
     'asset_url' => env('ASSET_URL'),
     'timezone' => 'America/Sao_Paulo',

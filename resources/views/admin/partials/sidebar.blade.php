@@ -107,27 +107,21 @@
                     </li>
                 @endif
 
-                @if(auth()->user()->canAccessFeature('events'))
+                @if(auth()->user()->isAdmin() && auth()->user()->canAccessFeature('events'))
                     <li class="nav-item has-treeview {{ $open('admin.events.*') }}">
                         <a href="#" class="nav-link {{ $is('admin.events.*') }}">
                             <i class="nav-icon fas fa-calendar"></i>
                             <p>Eventos<i class="right fas fa-angle-left"></i></p>
                         </a>
                         <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('events.index') }}" class="nav-link"><i
+                            <li class="nav-item"><a href="{{ route('admin.events.index') }}" class="nav-link {{ $is('admin.events.index') }}"><i
                                         class="fas fa-calendar-alt nav-icon"></i>
                                     <p>Calendário</p>
                                 </a></li>
-                            @if(auth()->user()->isAdmin())
-                                <li class="nav-item"><a href="{{ route('admin.events.index') }}"
-                                        class="nav-link {{ $is('admin.events.index') }}"><i class="fas fa-cog nav-icon"></i>
-                                        <p>Gerenciar</p>
-                                    </a></li>
-                                <li class="nav-item"><a href="{{ route('admin.events.create') }}"
-                                        class="nav-link {{ $is('admin.events.create') }}"><i class="fas fa-plus nav-icon"></i>
-                                        <p>Novo</p>
-                                    </a></li>
-                            @endif
+                            <li class="nav-item"><a href="{{ route('admin.events.create') }}"
+                                    class="nav-link {{ $is('admin.events.create') }}"><i class="fas fa-plus nav-icon"></i>
+                                    <p>Novo</p>
+                                </a></li>
                         </ul>
                     </li>
                 @endif

@@ -14,6 +14,8 @@ class HomeController extends Controller
 {
     public function index()
     {
+        $demoMode = (bool) config('app.demo_mode');
+
         $freeEvents = collect();
         $paidMentorings = collect();
 
@@ -34,7 +36,7 @@ class HomeController extends Controller
         }
 
         // Demo data fallback for mentorships
-        if ($paidMentorings->isEmpty()) {
+        if ($demoMode && $paidMentorings->isEmpty()) {
             $paidMentorings = collect([
                 (object) [
                     'id' => 1,
@@ -70,12 +72,12 @@ class HomeController extends Controller
 
         // Demo data for levels if empty
         $levelSummary = $overview['levelSummary'];
-        if (empty($levelSummary) || (($levelSummary['iniciante'] ?? 0) == 0 && ($levelSummary['sucesso'] ?? 0) == 0)) {
+        if ($demoMode && (empty($levelSummary) || (($levelSummary['iniciante'] ?? 0) == 0 && ($levelSummary['sucesso'] ?? 0) == 0))) {
             $levelSummary = ['iniciante' => 1250, 'sucesso' => 380];
         }
 
         // Demo data fallback for leaderboard
-        if ($overview['leaderboard']->isEmpty()) {
+        if ($demoMode && $overview['leaderboard']->isEmpty()) {
             $overview['leaderboard'] = collect([
                 (object) [
                     'user' => (object) ['name' => 'Marcelo Silva', 'avatar' => null],
@@ -106,7 +108,7 @@ class HomeController extends Controller
             'paidMentorings' => $paidMentorings,
             'levelSummary' => $levelSummary,
             'topRankings' => $overview['leaderboard'],
-            'isDemo' => ($freeEvents->first()->is_demo ?? false) || ($overview['leaderboard']->first()->score == 9850),
+            'isDemo' => $demoMode && (($freeEvents->first()->is_demo ?? false) || (data_get($overview['leaderboard']->first(), 'score') == 9850)),
         ]);
     }
 

@@ -70,10 +70,15 @@ Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::cla
 Route::post('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'process'])->name('subscription.process');
 Route::get('/assinar/sucesso/{order}', [\App\Http\Controllers\SubscriptionController::class, 'success'])->name('subscription.success');
 
-Route::middleware(['check.feature:events'])->group(function () {
-    Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
-});
-Route::get('/eventos/{id}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show'); // Show might need to be public? Keeping consistency.
+// Public Events (Site)
+Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
+Route::get('/eventos/{event}/checkout', [\App\Http\Controllers\EventReservationController::class, 'checkout'])->name('events.checkout');
+Route::post('/eventos/{event}/reservar', [\App\Http\Controllers\EventReservationController::class, 'reserve'])->name('events.reserve');
+Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
+
+Route::get('/eventos/pagamento/sucesso/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentSuccess'])->name('events.payment.success');
+Route::get('/eventos/pagamento/pendente/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentPending'])->name('events.payment.pending');
+Route::get('/eventos/pagamento/falha/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentFailure'])->name('events.payment.failure');
 
 // PWA static files to avoid 404 in production
 Route::get('/service-worker.js', function () {
@@ -156,12 +161,7 @@ Route::delete('courses/{course}/lessons/{lesson}/attachments/{attachment}', [\Ap
 Route::put('courses/{course}/lessons/{lesson}/attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'renameAttachment'])->name('courses.lessons.attachments.rename');
 Route::get('courses/{course}/lessons/{lesson}/details', [\App\Http\Controllers\LessonController::class, 'getDetails'])->name('courses.lessons.details');
 
-// Public Events
-// Feature: Events
-Route::middleware(['check.feature:events'])->group(function () {
-    Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
-    // Note: 'events.index' is defined earlier at line 73. I should probably move it here or wrap it too.
-});
+// (events.show/events.index defined above as public routes)
 
 // Auth Required Routes
 Route::middleware(['auth', 'check.plan'])->group(function () {
@@ -250,6 +250,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         Route::get('/fonts/api/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])->name('fonts.api.active');
 
         // Events CRUD
+        Route::get('events/feed', [\App\Http\Controllers\Admin\EventController::class, 'feed'])->name('events.feed');
         Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');
 
         // Points Rules

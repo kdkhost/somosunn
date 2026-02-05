@@ -34,10 +34,19 @@ class EventController extends Controller
     /**
      * Display a single event.
      */
-    public function show($id)
+    public function show(Event $event)
     {
-        $event = Event::findOrFail($id);
+        // Check if events feature is enabled
+        $isEnabled = \App\Models\Setting::get('feature_events', '1') === '1';
+
+        if (!$isEnabled) {
+            abort(404);
+        }
+
+        if (!$event->published) {
+            abort(404);
+        }
+
         return view('events.show', compact('event'));
     }
 }
-

@@ -113,7 +113,7 @@ class MercadoPagoService
         if (!$account->access_token) {
             // Em dev/demo, podemos usar credenciais de teste se não configurado
             // Mas em prod deve falhar
-            $account->access_token = config('services.mercadopago.access_token');
+            $account->access_token = config('payments.mercadopago.access_token');
         }
     }
     

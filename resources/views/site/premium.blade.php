@@ -88,7 +88,7 @@
                                 @endforeach
                             </ul>
 
-                            <a href="{{ auth()->check() ? '#' : route('register') }}"
+                            <a href="{{ $plan->price > 0 ? route('subscription.checkout', $plan) : route('register') }}"
                                 class="block w-full text-center py-4 rounded-xl font-bold transition {{ $plan->highlight ? 'btn-primary text-white shadow-lg hover:shadow-xl' : 'border-2 hover:bg-slate-50' }}"
                                 style="{{ !$plan->highlight ? 'border-color: var(--unn-azul-1); color: var(--unn-azul-1)' : '' }}">
                                 {{ $plan->price > 0 ? 'Assinar ' . ($plan->name) : 'Começar grátis' }}
@@ -276,12 +276,30 @@
                 <h2 class="text-3xl lg:text-4xl font-black mb-4">Pronto para acelerar seu crescimento?</h2>
                 <p class="text-lg opacity-90 mb-8">Junte-se a milhares de empreendedores que já transformaram seus negócios.
                 </p>
+
+                @php
+                    $ctaPlan = ($plans ?? collect())->firstWhere('highlight', true)
+                        ?? ($plans ?? collect())->first(fn($p) => (float) $p->price > 0)
+                        ?? ($plans ?? collect())->first();
+
+                    $ctaHref = $ctaPlan && (float) $ctaPlan->price > 0
+                        ? route('subscription.checkout', $ctaPlan)
+                        : route('register');
+                @endphp
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{{ route('register') }}"
+                    <a href="{{ $ctaHref }}"
                         class="inline-flex items-center justify-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition"
                         style="color: var(--unn-azul-1)">
                         <i class="fas fa-crown"></i>
-                        Assinar Premium - R$ 97/mês
+                        @if($ctaPlan)
+                            @if((float) $ctaPlan->price > 0)
+                                Assinar {{ $ctaPlan->name }} - R$ {{ number_format($ctaPlan->price, 0, ',', '.') }}/{{ $ctaPlan->period }}
+                            @else
+                                Começar grátis
+                            @endif
+                        @else
+                            Criar conta
+                        @endif
                     </a>
                     <a href="#planos"
                         class="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white/10 transition">

@@ -71,4 +71,37 @@ class Event extends Model
         if ($this->batch_3_price) return '3º Lote';
         return 'Entrada';
     }
+
+    public function registrations()
+    {
+        return $this->hasMany(EventRegistration::class);
+    }
+
+    public function paidOrConfirmedRegistrations()
+    {
+        return $this->registrations()->whereIn('status', EventRegistration::COUNTED_STATUSES);
+    }
+
+    public function getConfirmedSeatsAttribute()
+    {
+        return (int) $this->paidOrConfirmedRegistrations()->sum('quantity');
+    }
+
+    public function getRemainingSeatsAttribute()
+    {
+        if (!$this->capacity) {
+            return null;
+        }
+
+        return max(0, (int) $this->capacity - (int) $this->confirmed_seats);
+    }
+
+    public function hasCapacityFor(int $quantity): bool
+    {
+        if (!$this->capacity) {
+            return true;
+        }
+
+        return ((int) $this->confirmed_seats + $quantity) <= (int) $this->capacity;
+    }
 }

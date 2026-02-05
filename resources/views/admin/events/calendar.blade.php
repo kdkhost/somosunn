@@ -179,7 +179,7 @@
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
-            events: '{{ route("admin.events.index") }}',
+            events: '{{ route("admin.events.feed") }}',
             editable: true,
             droppable: true,
             eventClick: function(info) {
@@ -397,8 +397,9 @@
                 type: 'PUT',
                 data: {
                     _token: '{{ csrf_token() }}',
-                    start_at: event.start.toISOString(),
-                    end_at: event.end ? event.end.toISOString() : null
+                    title: event.title,
+                    start_at: event.start ? formatDate(event.start) : null,
+                    end_at: event.end ? formatDate(event.end) : null
                 },
                 success: function(response) {
                     toastr.success('Evento atualizado');

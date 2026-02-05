@@ -64,6 +64,13 @@
                         </div>
                     @endif
 
+                    @if(($plan->price ?? 0) > 0 && !($paymentConfigured ?? false))
+                        <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6">
+                            <i class="fas fa-triangle-exclamation mr-2"></i>
+                            Pagamento indisponível no momento. Configure as credenciais do MercadoPago no painel para habilitar assinaturas.
+                        </div>
+                    @endif
+
                     @guest
                     <!-- Passo 1: Identificação -->
                     <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-8">
@@ -166,7 +173,9 @@
                             <p class="text-gray-600 max-w-sm mx-auto">Ao finalizar, será gerado um QR Code para pagamento. Seu acesso será liberado imediatamente após a confirmação.</p>
                         </div>
 
-                        <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg mt-8 shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
+                        <button type="submit"
+                            class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg mt-8 shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                            {{ (($plan->price ?? 0) > 0 && !($paymentConfigured ?? false)) ? 'disabled' : '' }}>
                             <i class="fas fa-lock"></i> Finalizar Pagamento
                         </button>
                     </div>
@@ -177,9 +186,10 @@
 </div>
 
 @push('scripts')
+@if(($paymentConfigured ?? false) && ($plan->price ?? 0) > 0)
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 <script>
-    const mp = new MercadoPago("{{ config('services.mercadopago.public_key', 'TEST-0000000000000000000000000000000000000') }}");
+    const mp = new MercadoPago("{{ $publicKey }}");
     
     // Toggle Payment Methods
     const radios = document.querySelectorAll('input[name="payment_method"]');
@@ -253,5 +263,6 @@
     // Only render brick if card is selected (default)
     renderCardPaymentBrick(bricksBuilder);
 </script>
+@endif
 @endpush
 @endsection

@@ -15,6 +15,8 @@ class CourseController extends Controller
      */
     public function index()
     {
+        $demoMode = (bool) config('app.demo_mode');
+
         // Check if courses feature is enabled in settings
         $isEnabled = \App\Models\Setting::get('feature_courses', '1') === '1';
 
@@ -27,7 +29,7 @@ class CourseController extends Controller
             ->paginate(12);
 
         // If no courses exist, provide demo data
-        if ($courses->isEmpty()) {
+        if ($demoMode && $courses->isEmpty()) {
             $demoCourses = collect([
                 (object) [
                     'id' => 1,

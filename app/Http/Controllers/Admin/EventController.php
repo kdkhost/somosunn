@@ -10,53 +10,63 @@ class EventController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            // FullCalendar event feed
-            // FullCalendar event feed
-            $start = \Carbon\Carbon::parse($request->start);
-            $end = \Carbon\Carbon::parse($request->end);
-
-            $events = Event::where(function($query) use ($start, $end) {
-                                $query->where('start_at', '<', $end)
-                                      ->where(function($q) use ($start) {
-                                          $q->where('end_at', '>', $start)
-                                            ->orWhereNull('end_at');
-                                      });
-                            })->get();
-
-            $formattedEvents = $events->map(function ($event) {
-                return [
-                    'id' => $event->id,
-                    'title' => $event->title,
-                    'start' => $event->start, // Uses Model Accessor (ISO8601)
-                    'end' => $event->end,     // Uses Model Accessor (ISO8601)
-                    'backgroundColor' => $event->color,
-                    'borderColor' => $event->color,
-                    'textColor' => '#ffffff',
-                    'allDay' => (bool)$event->all_day,
-                    'extendedProps' => [
-                        'description' => $event->description,
-                        'address' => $event->address,
-                        'location' => $event->location,
-                        'capacity' => $event->capacity,
-                        'price' => $event->price,
-                        'latitude' => $event->latitude,
-                        'longitude' => $event->longitude,
-                        'batch_1_price' => $event->batch_1_price,
-                        'batch_1_deadline' => $event->batch_1_deadline ? \Carbon\Carbon::parse($event->batch_1_deadline)->toIso8601String() : null,
-                        'batch_2_price' => $event->batch_2_price,
-                        'batch_2_deadline' => $event->batch_2_deadline ? \Carbon\Carbon::parse($event->batch_2_deadline)->toIso8601String() : null,
-                        'batch_3_price' => $event->batch_3_price,
-                        'batch_3_deadline' => $event->batch_3_deadline ? \Carbon\Carbon::parse($event->batch_3_deadline)->toIso8601String() : null,
-                    ]
-                ];
-            });
-
-            return response()->json($formattedEvents);
+        if ($request->ajax() || $request->wantsJson()) {
+            return $this->feed($request);
         }
         $settings = \App\Models\Setting::whereIn('key', ['company_city', 'company_state'])->pluck('value', 'key');
         $companyLocation = ($settings['company_city'] ?? '') . ' ' . ($settings['company_state'] ?? '');
         return view('admin.events.calendar', compact('companyLocation'));
+    }
+
+    public function feed(Request $request)
+    {
+        $startRaw = $request->query('start', $request->input('start'));
+        $endRaw = $request->query('end', $request->input('end'));
+
+        try {
+            $start = $startRaw ? \Carbon\Carbon::parse($startRaw) : now()->startOfMonth()->subMonth();
+            $end = $endRaw ? \Carbon\Carbon::parse($endRaw) : now()->endOfMonth()->addMonth();
+        } catch (\Throwable $e) {
+            return response()->json(['message' => 'Intervalo inválido para o feed de eventos.'], 422);
+        }
+
+        $events = Event::where(function ($query) use ($start, $end) {
+            $query->where('start_at', '<', $end)
+                ->where(function ($q) use ($start) {
+                    $q->where('end_at', '>', $start)
+                        ->orWhereNull('end_at');
+                });
+        })->get();
+
+        $formattedEvents = $events->map(function ($event) {
+            return [
+                'id' => $event->id,
+                'title' => $event->title,
+                'start' => $event->start, // Uses Model Accessor (ISO8601)
+                'end' => $event->end,     // Uses Model Accessor (ISO8601)
+                'backgroundColor' => $event->color,
+                'borderColor' => $event->color,
+                'textColor' => '#ffffff',
+                'allDay' => (bool) $event->all_day,
+                'extendedProps' => [
+                    'description' => $event->description,
+                    'address' => $event->address,
+                    'location' => $event->location,
+                    'capacity' => $event->capacity,
+                    'price' => $event->price,
+                    'latitude' => $event->latitude,
+                    'longitude' => $event->longitude,
+                    'batch_1_price' => $event->batch_1_price,
+                    'batch_1_deadline' => $event->batch_1_deadline ? \Carbon\Carbon::parse($event->batch_1_deadline)->toIso8601String() : null,
+                    'batch_2_price' => $event->batch_2_price,
+                    'batch_2_deadline' => $event->batch_2_deadline ? \Carbon\Carbon::parse($event->batch_2_deadline)->toIso8601String() : null,
+                    'batch_3_price' => $event->batch_3_price,
+                    'batch_3_deadline' => $event->batch_3_deadline ? \Carbon\Carbon::parse($event->batch_3_deadline)->toIso8601String() : null,
+                ],
+            ];
+        });
+
+        return response()->json($formattedEvents);
     }
 
     public function create()

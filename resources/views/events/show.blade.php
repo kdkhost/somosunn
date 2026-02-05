@@ -9,6 +9,8 @@
     $endDate = is_string($event->end_at) ? \Carbon\Carbon::parse($event->end_at) : $event->end_at;
     $eventColor = $event->color ?? '#1F5EDB';
     $mapQuery = urlencode($event->address);
+    $confirmedSeats = $event->confirmed_seats;
+    $remainingSeats = $event->remaining_seats;
 @endphp
 
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
@@ -86,23 +88,48 @@
                             <div class="mb-6">
                                 <div class="flex items-center justify-between text-sm mb-2">
                                     <span class="text-gray-500">Vagas disponíveis</span>
-                                    <span class="font-bold text-gray-900">{{ $event->capacity }} lugares</span>
+                                    <span class="font-bold {{ $remainingSeats === 0 ? 'text-red-600' : 'text-gray-900' }}">
+                                        {{ $remainingSeats }} / {{ (int) $event->capacity }}
+                                    </span>
                                 </div>
                                 <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
-                                    <div class="h-full rounded-full transition-all duration-500" style="width: {{ rand(30, 70) }}%; background: linear-gradient(90deg, var(--unn-azul-1), var(--unn-azul-2))"></div>
+                                    @php
+                                        $capacity = max(1, (int) $event->capacity);
+                                        $percent = min(100, max(0, (int) round(($confirmedSeats / $capacity) * 100)));
+                                    @endphp
+                                    <div class="h-full rounded-full transition-all duration-500" style="width: {{ $percent }}%; background: linear-gradient(90deg, var(--unn-azul-1), var(--unn-azul-2))"></div>
                                 </div>
-                                <p class="text-xs text-orange-600 mt-2 font-medium">
-                                    <i class="fas fa-fire mr-1"></i> Últimas vagas!
-                                </p>
+                                @if($remainingSeats === 0)
+                                    <p class="text-xs text-red-600 mt-2 font-medium">
+                                        <i class="fas fa-ban mr-1"></i> Esgotado
+                                    </p>
+                                @elseif($remainingSeats !== null && $remainingSeats <= 5)
+                                    <p class="text-xs text-orange-600 mt-2 font-medium">
+                                        <i class="fas fa-fire mr-1"></i> Últimas vagas!
+                                    </p>
+                                @endif
                             </div>
                             @endif
 
-                            <button 
-                                class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 {{ $isDemo ? 'opacity-75 cursor-not-allowed' : '' }}"
-                                @if($isDemo) onclick="alert('Este é um evento de demonstração. Configure eventos reais no painel administrativo.');" @endif>
-                                <i class="fas fa-ticket-alt"></i>
-                                {{ $event->price > 0 ? 'Comprar Ingresso' : 'Garantir Minha Vaga' }}
-                            </button>
+                            @if($isDemo)
+                                <button
+                                    class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg opacity-75 cursor-not-allowed flex items-center justify-center gap-2"
+                                    onclick="alert('Este é um evento de demonstração. Configure eventos reais no painel administrativo.');">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    {{ $event->current_price > 0 ? 'Comprar Ingresso' : 'Garantir Minha Vaga' }}
+                                </button>
+                            @elseif($event->capacity && $remainingSeats === 0)
+                                <button class="w-full bg-gray-200 text-gray-700 py-4 rounded-2xl font-bold text-lg cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                                    <i class="fas fa-ban"></i> Esgotado
+                                </button>
+                            @else
+                                <a
+                                    href="{{ route('events.checkout', $event) }}"
+                                    class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    {{ $event->current_price > 0 ? 'Comprar Ingresso' : 'Garantir Minha Vaga' }}
+                                </a>
+                            @endif
 
                             <div class="mt-4 flex items-center justify-center gap-4 text-sm text-gray-500">
                                 <span><i class="fas fa-lock mr-1"></i> Pagamento seguro</span>

@@ -12,6 +12,8 @@ class SocialController extends Controller
 {
     public function feed()
     {
+        $demoMode = (bool) config('app.demo_mode');
+
         // Check if social feature is enabled
         $isEnabled = \App\Models\Setting::get('feature_social', '1') === '1';
 
@@ -29,7 +31,7 @@ class SocialController extends Controller
             ->paginate(10);
 
         // If no posts exist, provide demo data
-        if ($posts->isEmpty()) {
+        if ($demoMode && $posts->isEmpty()) {
             $demoPosts = collect([
                 (object) [
                     'id' => 1,

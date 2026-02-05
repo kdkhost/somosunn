@@ -11,9 +11,15 @@ class Plan extends Model
 
     protected $fillable = [
         'name',
+        'slug',
         'price',
         'period',
+        'billing_cycle',
+        'prorata',
+        'description',
         'image',
+        'is_featured',
+        'highlight_legacy',
         'highlight',
         'coupons_enabled',
         'benefits',
@@ -22,9 +28,12 @@ class Plan extends Model
     ];
 
     protected $casts = [
+        'is_featured' => 'boolean',
+        'highlight_legacy' => 'boolean',
         'highlight' => 'boolean',
         'coupons_enabled' => 'boolean',
         'is_active' => 'boolean',
+        'prorata' => 'boolean',
         'benefits' => 'array',
         'permissions' => 'array',
         'price' => 'decimal:2'

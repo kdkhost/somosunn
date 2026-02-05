@@ -34,6 +34,18 @@
 
             <div class="form-row">
                 <div class="form-group col-md-4">
+                    <label>Slug (URL)</label>
+                    <input name="slug" class="form-control" value="{{ old('slug',$plan->slug) }}" placeholder="ex: pro, elite">
+                    <small class="text-muted">Se vazio, serÃ¡ gerado automaticamente.</small>
+                </div>
+                <div class="form-group col-md-8">
+                    <label>DescriÃ§Ã£o</label>
+                    <textarea name="description" class="form-control" rows="2" placeholder="Resumo do plano (aparece no site)">{{ old('description',$plan->description) }}</textarea>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-4">
                     <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-4">
                         <input type="hidden" name="highlight" value="0">
                         <input type="checkbox" class="custom-control-input" id="highlight" name="highlight" value="1" {{ old('highlight',$plan->highlight) ? 'checked' : '' }}>

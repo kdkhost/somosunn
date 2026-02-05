@@ -44,12 +44,13 @@ class DashboardController extends Controller
             // Calendar Events (Unified for all)
             $calendarEvents = \App\Models\Event::where('published', true)
                 ->get()
-                ->map(function ($event) {
+                ->map(function ($event) use ($isAdmin) {
                     return [
+                        'id' => $event->id,
                         'title' => $event->title,
                         'start' => $event->start_at->toIso8601String(),
                         'end' => $event->end_at ? $event->end_at->toIso8601String() : null,
-                        'url' => route('events.show', $event->id),
+                        'url' => $isAdmin ? route('admin.events.edit', $event->id) : null,
                         'backgroundColor' => $event->color ?? '#28a745',
                         'borderColor' => $event->color ?? '#28a745',
                         'allDay' => $event->all_day
