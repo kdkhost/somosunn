@@ -83,6 +83,7 @@
                                 $isConnected = auth()->user()->isConnectedWith($user->id);
                                 $pendingConnection = auth()->user()->hasPendingConnectionWith($user->id);
                                 $isRequester = $pendingConnection && $pendingConnection->requester_id === auth()->id();
+                                $canMessage = auth()->user()->canMessageUser($user);
                             @endphp
 
                             @if($isConnected)
@@ -90,12 +91,17 @@
                                     class="bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-bold hover:bg-gray-300 transition shadow flex items-center gap-2">
                                     <i class="fas fa-user-check text-green-600"></i> Conectado
                                 </button>
+                            @endif
+
+                            @if($canMessage)
                                 <button
                                     onclick="openChatBox({{ $user->id }}, '{{ $user->name }}', '{{ $user->photo ? asset($user->photo) : '' }}')"
                                     class="bg-[#1F5EDB] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center gap-2">
                                     <i class="fas fa-comment-dots"></i> Mensagem
                                 </button>
-                            @elseif($pendingConnection)
+                            @endif
+
+                            @if($pendingConnection)
                                 @if($isRequester)
                                     <button
                                         class="bg-gray-200 text-gray-500 px-8 py-3 rounded-full font-bold cursor-not-allowed shadow flex items-center gap-2">
@@ -107,7 +113,7 @@
                                         <i class="fas fa-check"></i> Aceitar
                                     </button>
                                 @endif
-                            @else
+                            @elseif(!$isConnected)
                                 <button onclick="requestConnection({{ $user->id }})"
                                     class="bg-[#1F5EDB] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center gap-2"
                                     id="btn-connect-{{ $user->id }}">

@@ -11,23 +11,50 @@ use App\Models\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
-    
+
     public function isAdmin()
     {
         return in_array($this->role, ['admin', 'superadmin']) || in_array($this->level, ['superadmin', 'sucesso']);
     }
 
     protected $fillable = [
-        'name', 'email', 'password', 'doc', 'phone', 'bio', 'occupation', 'company', 'photo', 'cover_photo', 'role', 'points', 'theme_pref', 'level',
+        'name',
+        'email',
+        'password',
+        'doc',
+        'phone',
+        'bio',
+        'occupation',
+        'company',
+        'photo',
+        'cover_photo',
+        'role',
+        'points',
+        'theme_pref',
+        'level',
         // Endereço
-        'cep', 'street', 'number', 'complement', 'neighborhood', 'city', 'state', 'address',
+        'cep',
+        'street',
+        'number',
+        'complement',
+        'neighborhood',
+        'city',
+        'state',
+        'address',
         // Redes Sociais
-        'website', 'facebook', 'instagram', 'twitter', 'linkedin', 'youtube',
+        'website',
+        'facebook',
+        'instagram',
+        'twitter',
+        'linkedin',
+        'youtube',
         // Privacidade
-        'show_email_public', 'show_phone_public', 'show_address_public'
+        'show_email_public',
+        'show_phone_public',
+        'show_address_public'
     ];
 
-    protected $hidden = ['password','remember_token'];
+    protected $hidden = ['password', 'remember_token'];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
@@ -55,28 +82,67 @@ class User extends Authenticatable
     }
 
     // Relacionamentos de Conexão
-    public function sentConnections() {
+    public function sentConnections()
+    {
         return $this->hasMany(Connection::class, 'requester_id');
     }
 
-    public function receivedConnections() {
+    public function receivedConnections()
+    {
         return $this->hasMany(Connection::class, 'requested_id');
     }
 
     // Verifica se já são conectados (aceito)
-    public function isConnectedWith($userId) {
-        return Connection::where(function($q) use ($userId) {
+    public function isConnectedWith($userId)
+    {
+        return Connection::where(function ($q) use ($userId) {
             $q->where('requester_id', $this->id)->where('requested_id', $userId);
-        })->orWhere(function($q) use ($userId) {
+        })->orWhere(function ($q) use ($userId) {
             $q->where('requester_id', $userId)->where('requested_id', $this->id);
         })->where('status', 'accepted')->exists();
     }
 
+    /**
+     * Verifica se o usuário atual pode enviar mensagem para outro usuário
+     * 
+     * Regras:
+     * - Admin/Superadmin podem mensagear qualquer um
+     * - Membros só podem mensagear admin/superadmin se tiverem conexão com eles
+     * - Membros podem responder se admin/superadmin mandou primeiro
+     * - Membro para membro: obrigatória conexão ativa
+     */
+    public function canMessageUser($otherUser)
+    {
+        // Se o usuário logado é admin ou superadmin, pode mensagear qualquer um
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        // Se o outro usuário é admin/superadmin
+        if ($otherUser->isAdmin()) {
+            // Verifica se tem conexão
+            if ($this->isConnectedWith($otherUser->id)) {
+                return true;
+            }
+
+            // Verifica se o admin já iniciou conversa (enviou mensagem primeiro)
+            $hasReceivedFromAdmin = \App\Models\Message::where('sender_id', $otherUser->id)
+                ->where('receiver_id', $this->id)
+                ->exists();
+
+            return $hasReceivedFromAdmin;
+        }
+
+        // Membro para membro: obrigatória conexão ativa
+        return $this->isConnectedWith($otherUser->id);
+    }
+
     // Verifica se tem solicitação pendente (enviada ou recebida)
-    public function hasPendingConnectionWith($userId) {
-        return Connection::where(function($q) use ($userId) {
+    public function hasPendingConnectionWith($userId)
+    {
+        return Connection::where(function ($q) use ($userId) {
             $q->where('requester_id', $this->id)->where('requested_id', $userId);
-        })->orWhere(function($q) use ($userId) {
+        })->orWhere(function ($q) use ($userId) {
             $q->where('requester_id', $userId)->where('requested_id', $this->id);
         })->where('status', 'pending')->first();
     }

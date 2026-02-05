@@ -14,7 +14,7 @@ function openChatBox(userId, userName, userPhoto) {
     if (userPhoto) {
         chatUserAvatar.src = userPhoto;
         chatUserAvatar.classList.remove('hidden');
-        chatUser Initial.classList.add('hidden');
+        chatUserInitial.classList.add('hidden');
     }
     
     // Show and animate chat box
