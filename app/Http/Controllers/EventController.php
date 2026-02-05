@@ -19,16 +19,24 @@ class EventController extends Controller
             abort(404, 'Eventos temporariamente indisponível');
         }
 
+        $now = now();
+
+        // Public listing: upcoming events and events that haven't ended yet (ongoing).
         $events = Event::where('published', true)
-            ->where('start_at', '>=', now())
+            ->whereNotNull('start_at')
+            ->where(function ($query) use ($now) {
+                $query->where('start_at', '>=', $now)
+                    ->orWhere(function ($q) use ($now) {
+                        $q->whereNotNull('end_at')->where('end_at', '>=', $now);
+                    });
+            })
             ->orderBy('start_at')
             ->get();
 
-        if ($events->isEmpty()) {
-            return view('events.index', ['events' => collect(), 'isDemo' => false]);
-        }
+        $featuredEvent = $events->first();
+        $otherEvents = $featuredEvent ? $events->slice(1)->values() : collect();
 
-        return view('events.index', compact('events'));
+        return view('events.index', compact('events', 'featuredEvent', 'otherEvents'));
     }
 
     /**
