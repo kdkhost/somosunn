@@ -18,7 +18,7 @@ class User extends Authenticatable
     }
 
     protected $fillable = [
-        'name', 'email', 'password', 'doc', 'phone', 'bio', 'photo', 'cover_photo', 'role', 'points', 'theme_pref', 'level',
+        'name', 'email', 'password', 'doc', 'phone', 'bio', 'occupation', 'company', 'photo', 'cover_photo', 'role', 'points', 'theme_pref', 'level',
         // Endereço
         'cep', 'street', 'number', 'complement', 'neighborhood', 'city', 'state', 'address',
         // Redes Sociais
@@ -52,6 +52,38 @@ class User extends Authenticatable
     public function interactions()
     {
         return $this->hasMany(Interaction::class, 'user_from_id');
+    }
+
+    // Relacionamentos de Conexão
+    public function sentConnections() {
+        return $this->hasMany(Connection::class, 'requester_id');
+    }
+
+    public function receivedConnections() {
+        return $this->hasMany(Connection::class, 'requested_id');
+    }
+
+    // Verifica se já são conectados (aceito)
+    public function isConnectedWith($userId) {
+        return Connection::where(function($q) use ($userId) {
+            $q->where('requester_id', $this->id)->where('requested_id', $userId);
+        })->orWhere(function($q) use ($userId) {
+            $q->where('requester_id', $userId)->where('requested_id', $this->id);
+        })->where('status', 'accepted')->exists();
+    }
+
+    // Verifica se tem solicitação pendente (enviada ou recebida)
+    public function hasPendingConnectionWith($userId) {
+        return Connection::where(function($q) use ($userId) {
+            $q->where('requester_id', $this->id)->where('requested_id', $userId);
+        })->orWhere(function($q) use ($userId) {
+            $q->where('requester_id', $userId)->where('requested_id', $this->id);
+        })->where('status', 'pending')->first();
+    }
+
+    public function conversations()
+    {
+        return $this->belongsToMany(Conversation::class, 'conversation_user')->withPivot('role', 'joined_at');
     }
 
     public function receivedInteractions()

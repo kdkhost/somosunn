@@ -11,32 +11,39 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Add professional fields to users
+        // Add professional fields to users if not exist
         Schema::table('users', function (Blueprint $table) {
-            $table->string('occupation')->nullable()->after('bio'); // Cargo/Função
-            $table->string('company')->nullable()->after('occupation'); // Empresa
+            if (!Schema::hasColumn('users', 'occupation')) {
+                $table->string('occupation')->nullable()->after('bio');
+            }
+            if (!Schema::hasColumn('users', 'company')) {
+                $table->string('company')->nullable()->after('occupation');
+            }
         });
 
-        // Create connections table
-        Schema::create('connections', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('requester_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('requested_id')->constrained('users')->onDelete('cascade');
-            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
-            $table->timestamps();
+        // Create connections table only if not exists
+        if (!Schema::hasTable('connections')) {
+            Schema::create('connections', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('requester_id')->constrained('users')->onDelete('cascade');
+                $table->foreignId('requested_id')->constrained('users')->onDelete('cascade');
+                $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+                $table->timestamps();
 
-            // Prevent duplicate connections (A->B is same as B->A logic will be handled in app, 
-            // but unique constraint helps A->B)
-            $table->unique(['requester_id', 'requested_id']);
-        });
+                $table->unique(['requester_id', 'requested_id']);
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('connections');
-
+        // Don't drop table if it might be shared or created by other migrations
+        // keeping it safe
+        
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['occupation', 'company']);
+            if (Schema::hasColumn('users', 'occupation')) {
+                $table->dropColumn(['occupation', 'company']);
+            }
         });
     }
 };
