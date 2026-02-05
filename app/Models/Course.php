@@ -48,6 +48,25 @@ class Course extends Model
         'price' => 'decimal:2',
     ];
 
+    /**
+     * Calculate total course hours from lesson durations.
+     * Lesson duration is stored in seconds.
+     */
+    public function getTotalHoursAttribute()
+    {
+        $totalSeconds = $this->lessons()->sum('duration');
+        // Convert seconds to hours, rounded to 1 decimal place
+        return $totalSeconds > 0 ? round($totalSeconds / 3600, 1) : 0;
+    }
+
+    /**
+     * Auto-generate presentation text based on course title.
+     */
+    public function getDefaultPresentationTextAttribute()
+    {
+        return "This certificate is proudly presented to recognize the successful completion of {$this->title}";
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'user_id');

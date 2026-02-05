@@ -400,12 +400,19 @@
 
                                                     <div class="form-group">
                                                         <label class="small text-muted text-uppercase font-weight-bold">Carga
-                                                            Horária (horas)</label>
-                                                        <input type="number" class="form-control" name="workload_hours"
-                                                            id="workload_hours" min="1" max="1000"
-                                                            value="{{ $course->certificate_settings['workload_hours'] ?? '' }}"
-                                                            placeholder="Ex: 40">
-                                                        <small class="text-muted">Total de horas do curso</small>
+                                                            Horária (automática)</label>
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control bg-light"
+                                                                value="{{ $course->total_hours > 0 ? $course->total_hours . 'h' : 'Adicione aulas para calcular' }}"
+                                                                readonly>
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text bg-info text-white">
+                                                                    <i class="fas fa-calculator"></i>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <small class="text-muted">Calculado automaticamente pela soma das
+                                                            durações das aulas</small>
                                                     </div>
 
                                                     <div class="form-group">
@@ -449,8 +456,9 @@
                                                             Apresentação</label>
                                                         <textarea class="form-control" name="presentation_text"
                                                             id="presentation_text" rows="2"
-                                                            placeholder="This certificate is proudly present to">{{ $course->certificate_settings['presentation_text'] ?? '' }}</textarea>
-                                                        <small class="text-muted">Texto acima do nome do aluno</small>
+                                                            placeholder="This certificate is proudly present to">{{ $course->certificate_settings['presentation_text'] ?? $course->default_presentation_text }}</textarea>
+                                                        <small class="text-muted">Texto acima do nome do aluno (gerado
+                                                            automaticamente)</small>
                                                     </div>
 
                                                     <hr>
@@ -489,6 +497,22 @@
                                                                     id="toggle-code" data-tag="certificate_code" checked>
                                                                 <label class="custom-control-label" for="toggle-code">Código de
                                                                     Validação</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="list-group-item p-2 border-0">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input cert-toggle"
+                                                                    id="toggle-author" data-tag="author_name" checked>
+                                                                <label class="custom-control-label" for="toggle-author">Nome do
+                                                                    Autor</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="list-group-item p-2 border-0">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input cert-toggle"
+                                                                    id="toggle-workload" data-tag="workload_hours" checked>
+                                                                <label class="custom-control-label" for="toggle-workload">Carga
+                                                                    Horária</label>
                                                             </div>
                                                         </div>
                                                         <div class="list-group-item p-2 border-0 bg-warning rounded mt-2">
@@ -809,20 +833,20 @@
             attachments.forEach(att => {
                 const size = (att.file_size / 1024 / 1024).toFixed(2) + ' MB';
                 const item = `
-                                <li class="attachment-item" id="att-${att.id}">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-file attachment-icon"></i>
-                                        <div>
-                                            <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
-                                            <small class="text-muted">${size}</small>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </li>
-                            `;
+                                            <li class="attachment-item" id="att-${att.id}">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-file attachment-icon"></i>
+                                                    <div>
+                                                        <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
+                                                        <small class="text-muted">${size}</small>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                </div>
+                                            </li>
+                                        `;
                 list.append(item);
             });
         }
@@ -1092,23 +1116,23 @@
                     reader.readAsDataURL(file);
                 }
             });
-            
+
             // Signature Preview Function
             function previewSignature(input) {
                 if (input.files && input.files[0]) {
                     // Update label
                     $(input).next('.custom-file-label').html(input.files[0].name);
-                    
+
                     // Show preview
                     var reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         $('#signaturePreview').attr('src', e.target.result);
                         $('#signaturePreviewWrapper').show();
                     };
                     reader.readAsDataURL(input.files[0]);
                 }
             }
-            
+
             // Certificate Background Preview
             function previewCertBg(input) {
                 if (input.files && input.files[0]) {
@@ -1218,12 +1242,14 @@
             // Initial Settings from DB (or defaults)
             let certSettings = {!! $course->certificate_settings ? json_encode($course->certificate_settings) : '{}' !!};
 
-            // Default Tags (with mandatory logo)
+            // Default Tags (with mandatory logo and auto-populated fields)
             const defaultTags = {
                 'student_name': { x: 50, y: 40, text: '[Nome do Aluno]', fontSize: 30, color: '#000000', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' },
                 'course_name': { x: 50, y: 55, text: '[Nome do Curso]', fontSize: 24, color: '#333333', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' },
                 'completion_date': { x: 50, y: 65, text: 'Concluído em: 01/01/2024', fontSize: 16, color: '#555555', fontWeight: 'normal', fontFamily: 'Arial, sans-serif' },
                 'certificate_code': { x: 50, y: 85, text: 'Validação: ABC-123', fontSize: 12, color: '#999999', fontWeight: 'normal', fontFamily: 'Arial, sans-serif' },
+                'author_name': { x: 30, y: 90, text: '{{ $course->author_name ?? "Instrutor" }}', fontSize: 18, color: '#333333', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' },
+                'workload_hours': { x: 70, y: 90, text: 'Carga Horária: {{ $course->total_hours }}h', fontSize: 14, color: '#666666', fontWeight: 'normal', fontFamily: 'Arial, sans-serif' },
                 'platform_logo': { x: 50, y: 10, text: 'LOGO UNN', fontSize: 36, color: '#0066cc', fontWeight: 'bold', fontFamily: 'Georgia, serif', width: 120, height: 60, mandatory: true }
             };
 

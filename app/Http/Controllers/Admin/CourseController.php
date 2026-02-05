@@ -102,7 +102,6 @@ class CourseController extends Controller
             'certificate_bg' => 'nullable|image|max:5120',
             'instructor_signature' => 'nullable|image|max:2048|mimes:png,jpg,jpeg',
             'certificate_settings' => 'nullable|json',
-            'workload_hours' => 'nullable|integer|min:1|max:1000',
             'certificate_title' => 'nullable|string|max:255',
             'presentation_text' => 'nullable|string|max:500',
         ]);
@@ -159,9 +158,7 @@ class CourseController extends Controller
             $data['certificate_settings'] = $course->certificate_settings ?? [];
         }
 
-        if ($request->filled('workload_hours')) {
-            $data['certificate_settings']['workload_hours'] = $request->workload_hours;
-        }
+        // Note: workload_hours is now auto-calculated from lessons, no manual input
         if ($request->filled('certificate_title')) {
             $data['certificate_settings']['title'] = $request->certificate_title;
         }
