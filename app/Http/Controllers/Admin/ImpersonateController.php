@@ -11,30 +11,35 @@ class ImpersonateController extends Controller
 {
     public function impersonate($id)
     {
-        // Verifica se quem está tentando logar é SuperAdmin
+        // Verifica se quem está tentando logar é Admin ou SuperAdmin
         $currentUser = Auth::user();
-        
-        // Lógica simples de verificação (pode ser movida para Gate/Policy)
-        $isSuper = in_array($currentUser->role, ['superadmin']) || in_array($currentUser->level, ['superadmin','sucesso']);
 
-        if (!$isSuper) {
-            return redirect()->back()->with('error', 'Apenas Super Administradores podem acessar outras contas.');
+        // Permite admin e superadmin
+        if (!$currentUser->isAdmin()) {
+            return redirect()->back()->with('error', 'Apenas Administradores podem acessar outras contas.');
         }
 
         $userToImpersonate = User::findOrFail($id);
 
-        // Previne impersonar outro superadmin (segurança opcional, mas recomendada)
-        if ($userToImpersonate->role === 'superadmin' && $currentUser->id !== $userToImpersonate->id) {
-            // return redirect()->back()->with('error', 'Não é possível acessar conta de outro Super Admin.');
+        // Previne impersonar outro admin/superadmin (apenas superadmin pode)
+        if ($userToImpersonate->isAdmin()) {
+            if ($currentUser->role !== 'superadmin') {
+                return redirect()->back()->with('error', 'Apenas Super Administradores podem acessar contas de outros admins.');
+            }
+
+            // Superadmin não pode impersonate outro superadmin
+            if ($userToImpersonate->role === 'superadmin' && $currentUser->id !== $userToImpersonate->id) {
+                return redirect()->back()->with('error', 'Não é possível acessar conta de outro Super Admin.');
+            }
         }
 
         // Guarda o ID original na sessão
         session()->put('impersonator_id', $currentUser->id);
-        
+
         // Loga como o novo usuário
         Auth::login($userToImpersonate);
 
-        return redirect()->route('admin.dashboard')->with('success', "Você está acessando como {$userToImpersonate->name}");
+        return redirect()->route('portal')->with('success', "Você está acessando como {$userToImpersonate->name}");
     }
 
     public function stop()
