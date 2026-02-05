@@ -5,25 +5,81 @@
 @section('content')
 <div class="bg-gray-100 min-h-screen">
     <!-- Cover & Info -->
-    <div class="bg-white shadow">
-        <div class="h-48 bg-gradient-to-r from-blue-500 to-indigo-600 w-full"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative pb-6">
-            <div class="flex flex-col md:flex-row items-end -mt-12 mb-4 gap-6">
-                <div class="w-32 h-32 bg-white rounded-full p-1 shadow-lg z-10">
-                    <div class="w-full h-full bg-gray-200 rounded-full flex items-center justify-center text-4xl text-gray-500 font-bold overflow-hidden">
-                        {{ substr($user->name, 0, 1) }}
+    <!-- Cover & Info -->
+    <div class="bg-white shadow relative">
+        <!-- Capa -->
+        <div class="h-64 sm:h-80 w-full bg-gray-200 overflow-hidden relative group">
+            @if(isset($user->cover_photo) && $user->cover_photo)
+                <img src="{{ asset($user->cover_photo) }}" alt="Capa" class="w-full h-full object-cover">
+            @else
+                <div class="w-full h-full bg-gradient-to-r from-[#1F5EDB] to-[#0d3b96]"></div>
+            @endif
+        </div>
+
+        <!-- Info do Perfil -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative pb-8">
+            <div class="flex flex-col md:flex-row items-end -mt-20 sm:-mt-24 mb-4 gap-6 relative">
+                
+                <!-- Avatar -->
+                <div class="flex-shrink-0 relative">
+                    <div class="w-40 h-40 sm:w-48 sm:h-48 bg-white rounded-full p-1.5 shadow-xl">
+                        @if(isset($user->photo) && $user->photo)
+                            <img src="{{ asset($user->photo) }}" class="w-full h-full rounded-full object-cover border-4 border-white">
+                        @else
+                            <div class="w-full h-full bg-[#1F5EDB] rounded-full flex items-center justify-center text-5xl text-white font-bold border-4 border-white">
+                                {{ substr($user->name, 0, 1) }}
+                            </div>
+                        @endif
                     </div>
                 </div>
-                <div class="flex-1 pb-2">
-                    <h1 class="text-3xl font-bold text-gray-900">{{ $user->name }}</h1>
-                    <p class="text-gray-600">Membro desde {{ $user->created_at->format('M Y') }}</p>
+
+                <!-- Detalhes -->
+                <div class="flex-1 pb-2 w-full text-center md:text-left pt-16 md:pt-0">
+                    <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-1">{{ $user->name }}</h1>
+                    
+                    <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 text-gray-600 mb-4">
+                        <span class="flex items-center gap-1">
+                            <i class="fas fa-calendar-alt text-[#1F5EDB]"></i> Membro desde {{ $user->created_at->format('M Y') }}
+                        </span>
+                        @if(isset($user->city) && $user->city)
+                        <span class="flex items-center gap-1">
+                            <i class="fas fa-map-marker-alt text-[#1F5EDB]"></i> {{ $user->city }}
+                        </span>
+                        @endif
+                    </div>
+
+                    <!-- Redes Sociais -->
+                    @php
+                        $socialLinks = collect([
+                            ['key' => 'linkedin', 'icon' => 'fab fa-linkedin', 'color' => '#0A66C2'],
+                            ['key' => 'instagram', 'icon' => 'fab fa-instagram', 'color' => '#E4405F'],
+                            ['key' => 'facebook', 'icon' => 'fab fa-facebook', 'color' => '#1877F2'],
+                            ['key' => 'twitter', 'icon' => 'fab fa-twitter', 'color' => '#1DA1F2'],
+                            ['key' => 'youtube', 'icon' => 'fab fa-youtube', 'color' => '#FF0000'],
+                            ['key' => 'website', 'icon' => 'fas fa-globe', 'color' => '#10B981'],
+                        ])->filter(fn($s) => isset($user->{$s['key']}) && $user->{$s['key']});
+                    @endphp
+                    
+                    @if($socialLinks->isNotEmpty())
+                    <div class="flex items-center justify-center md:justify-start gap-3 mt-2">
+                        @foreach($socialLinks as $social)
+                        <a href="{{ $user->{$social['key']} }}" target="_blank" rel="noopener" 
+                           class="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-full hover:shadow-md transition transform hover:-translate-y-1" 
+                           style="color: {{ $social['color'] }}" title="{{ ucfirst($social['key']) }}">
+                            <i class="{{ $social['icon'] }} text-xl"></i>
+                        </a>
+                        @endforeach
+                    </div>
+                    @endif
                 </div>
-                <div class="flex gap-3 pb-4">
-                    <button class="bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition shadow">
-                        <i class="fas fa-user-plus mr-1"></i> Conectar
+
+                <!-- Ações -->
+                <div class="flex gap-3 pb-4 w-full md:w-auto justify-center md:justify-end">
+                    <button class="bg-[#1F5EDB] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center gap-2">
+                        <i class="fas fa-user-plus"></i> Conectar
                     </button>
-                    <a href="{{ route('chat.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full font-medium hover:bg-gray-200 transition">
-                        <i class="fas fa-comment"></i>
+                    <a href="{{ route('chat.index') }}" class="bg-white border border-gray-200 text-gray-700 px-6 py-3 rounded-full font-bold hover:bg-gray-50 transition shadow hover:shadow-md flex items-center gap-2">
+                        <i class="fas fa-comment-dots"></i> Mensagem
                     </a>
                 </div>
             </div>

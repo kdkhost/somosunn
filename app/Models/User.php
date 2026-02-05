@@ -18,7 +18,7 @@ class User extends Authenticatable
     }
 
     protected $fillable = [
-        'name', 'email', 'password', 'doc', 'phone', 'bio', 'photo', 'role', 'points', 'theme_pref', 'level',
+        'name', 'email', 'password', 'doc', 'phone', 'bio', 'photo', 'cover_photo', 'role', 'points', 'theme_pref', 'level',
         // Endereço
         'cep', 'street', 'number', 'complement', 'neighborhood', 'city', 'state', 'address',
         // Redes Sociais

@@ -104,6 +104,23 @@
                                         <img src="" class="img-thumbnail" style="max-height: 150px;">
                                     </div>
                                 </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Foto de Capa</label>
+                                <div class="col-sm-9">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="cover-upload" name="cover_photo" accept="image/*">
+                                        <label class="custom-file-label" for="cover-upload">Escolher capa...</label>
+                                    </div>
+                                    <small class="text-muted d-block mt-1">Recomendado: 1200x300px (JPG/PNG)</small>
+                                    
+                                    <!-- Preview Capa -->
+                                    <div id="cover-preview" class="mt-2" style="display: none;">
+                                        <img src="" class="img-fluid rounded" style="max-height: 150px;">
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="form-group row">
@@ -332,6 +349,24 @@ $(document).ready(function() {
                         <img class="profile-user-img img-fluid img-circle" src="${e.target.result}" alt="Preview" id="current-photo">
                     `);
                 }
+            };
+            reader.readAsDataURL(file);
+        }
+        }
+    });
+
+    // Preview de capa
+    $('#cover-upload').on('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Atualiza label
+            $(this).siblings('.custom-file-label').html(file.name);
+            
+            // Preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#cover-preview img').attr('src', e.target.result);
+                $('#cover-preview').fadeIn();
             };
             reader.readAsDataURL(file);
         }

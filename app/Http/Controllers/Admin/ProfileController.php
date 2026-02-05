@@ -27,6 +27,7 @@ class ProfileController extends Controller
             'doc' => 'nullable|string|max:20',
             'bio' => 'nullable|string|max:500',
             'photo' => 'nullable|image|max:2048',
+            'cover_photo' => 'nullable|image|max:4096', // Capa pode ser maior (4MB)
             
             // Endereço
             'cep' => 'nullable|string|max:9',
@@ -53,47 +54,54 @@ class ProfileController extends Controller
         $data['show_phone_public'] = $request->has('show_phone_public');
         $data['show_address_public'] = $request->has('show_address_public');
 
-        // Upload de foto
+        // Upload de foto de perfil
         $uploadedPhotoPath = null;
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
             \Log::info('Upload de foto iniciado para user ' . $user->id);
             
-            // Remove foto antiga
             if ($user->photo && file_exists(public_path($user->photo))) {
                 unlink(public_path($user->photo));
-                \Log::info('Foto antiga removida: ' . $user->photo);
             }
             
-            // Salva nova foto DIRETAMENTE em public/uploads/imagens/avatars
             $file = $request->file('photo');
             $filename = 'avatar_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            
-            // Garante que o diretório existe
             $directory = public_path('uploads/imagens/avatars');
+            
             if (!file_exists($directory)) {
                 mkdir($directory, 0755, true);
             }
             
-            // Move o arquivo diretamente para public/uploads/imagens/avatars
             $path = 'uploads/imagens/avatars/' . $filename;
             $file->move($directory, $filename);
             
-            // Verifica se o arquivo foi realmente salvo
             if (file_exists(public_path($path))) {
                 $uploadedPhotoPath = $path;
                 $data['photo'] = $path;
-                \Log::info('Nova foto salva com sucesso em: ' . $path);
-            } else {
-                \Log::error('Falha ao salvar arquivo de foto');
-                if ($request->ajax()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Erro ao salvar arquivo da foto. Tente novamente.'
-                    ], 500);
-                }
             }
-        } else {
-            \Log::info('Nenhum arquivo de foto válido enviado');
+        }
+
+        // Upload de foto de capa
+        if ($request->hasFile('cover_photo') && $request->file('cover_photo')->isValid()) {
+            \Log::info('Upload de capa iniciado para user ' . $user->id);
+            
+            if ($user->cover_photo && file_exists(public_path($user->cover_photo))) {
+                unlink(public_path($user->cover_photo));
+            }
+            
+            $file = $request->file('cover_photo');
+            $filename = 'cover_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $directory = public_path('uploads/imagens/covers');
+            
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+            
+            $path = 'uploads/imagens/covers/' . $filename;
+            $file->move($directory, $filename);
+            
+            if (file_exists(public_path($path))) {
+                $data['cover_photo'] = $path;
+            }
         }
 
         if (!empty($data['password'])) {
@@ -106,19 +114,18 @@ class ProfileController extends Controller
         $user->fill($data);
         $saved = $user->save();
         
-        // Força refresh do modelo para pegar dados do banco
+        // Força refresh do modelo
         $user->refresh();
-        
-        \Log::info('User save result: ' . ($saved ? 'true' : 'false'));
-        \Log::info('Photo no banco após save: ' . ($user->photo ?? 'NULL'));
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Perfil atualizado com sucesso!',
                 'photo_url' => $user->photo ? asset($user->photo) : null,
+                'cover_url' => $user->cover_photo ? asset($user->cover_photo) : null,
                 'debug' => [
                     'photo_path' => $user->photo,
+                    'cover_path' => $user->cover_photo,
                     'full_url' => $user->photo ? asset($user->photo) : null,
                     'file_exists' => $user->photo ? file_exists(public_path($user->photo)) : false,
                     'save_result' => $saved
