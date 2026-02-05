@@ -51,21 +51,21 @@ Uploads
 Recursos incluídos no scaffold:
 - Rotas básicas
 - Controller `HomeController` com views: `index`, `portal`, `premium`
-- PWA manifest e service-worker placeholders
+- PWA com manifest dinâmico e service-worker
 - Arquivos de autenticação (esqueleto) e página administrativa a integrar (AdminLTE)
 
 Próximo passo sugerido: rodar `composer install` e executar o `artisan` para validar o scaffold.
 
 ## Instalação resiliente
 
-- O `.htaccess` de raiz do repositório serve o `index.html` mesmo se o banco não estiver acessível; as requisições que usam `backend` são encaminhadas para `backend/public`.
-- O `.htaccess` dentro de `backend/public` garante que futuras rotas Laravel caiam no front controller (mesmo que esse front controller ainda esteja sendo finalizado).
+- O `.htaccess` na raiz encaminha as rotas para `public/index.php` e expõe assets sem `/public` (ex.: `/img`, `/uploads`, `/service-worker.js`, `/manifest.webmanifest`).
+- O `.htaccess` dentro de `public/` segue o padrão do Laravel para quando a hospedagem aponta o DocumentRoot diretamente para `public/`.
 - Enquanto o banco estiver offline, o layout público (e o painel admin) exibem um aviso em amarelo, e o `AppServiceProvider` registra `Banco de dados indisponível` nos logs.
 - Depois que o banco estiver disponível, rode `php artisan migrate --force` e `php artisan db:seed` para restaurar os dados e habilitar a interface administrativa.
 
 ## Próximos passos recomendados
 
-1. Conferir se `backend/public/storage` e `storage/logs` existem e têm permissão de escrita; copie `public/service-worker.js`, `public/manifest.webmanifest` e demais assets para o servidor.
+1. Conferir se `public/storage` (symlink do `storage/app/public`) e `storage/logs` existem e têm permissão de escrita; valide `public/service-worker.js` e demais assets no servidor.
 2. Atualizar `.env` com `APP_URL`, credenciais de pagamentos e as variáveis do PHPMailer.
 3. Testar rotas de webhook e o instalador (`/install`) antes de abrir o admin.
 
