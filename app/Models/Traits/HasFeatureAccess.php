@@ -44,22 +44,29 @@ trait HasFeatureAccess
 
     /**
      * Get the active plan for the user.
-     * Checks plan_id and expiration date.
+     * Checks manual plan_id first, then subscriptions table.
      *
      * @return Plan|null
      */
     public function activePlan()
     {
-        if (!$this->plan_id) {
-            return null;
+        // 1. Check manual assignment (plan_id on users table)
+        if ($this->plan_id) {
+            if (!$this->plan_expires_at || $this->plan_expires_at->isFuture()) {
+                return $this->plan;
+            }
         }
 
-        // If plan_expires_at is null, assume lifetime or indefinite? 
-        // Let's assume strict expiration if set.
-        if ($this->plan_expires_at && $this->plan_expires_at->isPast()) {
-            return null;
-        }
+        // 2. Check subscriptions table
+        $subscription = $this->subscriptions()
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('ends_at')
+                    ->orWhere('ends_at', '>', now());
+            })
+            ->latest()
+            ->first();
 
-        return $this->plan; // Relationship defined in User model
+        return $subscription ? $subscription->plan : null;
     }
 }

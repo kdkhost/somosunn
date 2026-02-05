@@ -26,6 +26,11 @@
                                     </h4>
                                     <p class="text-xs text-gray-500 truncate">Ver conversa</p>
                                 </div>
+                                @if($conv->unread_count > 0)
+                                    <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full">
+                                        {{ $conv->unread_count }}
+                                    </span>
+                                @endif
                             </div>
                         </a>
                     @endforeach
@@ -88,78 +93,102 @@
             </div>
         </div>
     </div>
+        @push('scripts')
+            <script>
+                document.getElementById('chat-form').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const input = document.getElementById('message-input');
+                    const body = input.value;
+                    if (!body.trim()) return;
 
-    <script>
-        document.getElementById('chat-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const input = document.getElementById('message-input');
-            const body = input.value;
-            if (!body.trim()) return;
-
-            // Optimistic UI
-            const container = document.getElementById('messages-container');
-            const div = document.createElement('div');
-            div.className = 'flex justify-end';
-            div.innerHTML = `<div class="max-w-[75%] rounded-2xl px-4 py-2 shadow-sm text-sm bg-blue-600 text-white rounded-br-none"><p>${body}</p></div>`;
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
-            input.value = '';
-
-            // Ajax send
-            fetch('{{ route("chat.message.store", $conversation->id) }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ body: body })
-            });
-        });
-
-        // Scroll to bottom
-        const c = document.getElementById('messages-container');
-        if (c) c.scrollTop = c.scrollHeight;
-
-        // Polling logic
-        let lastPollTime = Date.now();
-        let isTabActive = true;
-
-        document.addEventListener('visibilitychange', () => {
-            isTabActive = !document.hidden;
-        });
-
-        setInterval(() => {
-            if (!isTabActive) return;
-
-            fetch('{{ route("chat.messages", $conversation->id) }}')
-                .then(response => response.json())
-                .then(messages => {
+                    // Optimistic UI
                     const container = document.getElementById('messages-container');
-                    // Simple implementation: Replace if new messages found
-                    // For a more robust one, we'd only append new ones
-                    // But given the task "sem necessidade de atualizar página", 
-                    // this polling is the standard solution for shared hosting.
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-end';
+                    div.innerHTML = `<div class="max-w-[75%] rounded-2xl px-4 py-2 shadow-sm text-sm bg-blue-600 text-white rounded-br-none"><p>${body}</p></div>`;
+                    container.appendChild(div);
+                    container.scrollTop = container.scrollHeight;
+                    input.value = '';
 
-                    // Let's do a basic append if count changed
-                    const currentCount = container.querySelectorAll('.flex').length;
-                    if (messages.length > currentCount) {
-                        container.innerHTML = '';
-                        messages.reverse().forEach(msg => {
-                            const isMe = msg.user_id == {{ Auth::id() }};
-                            const div = document.createElement('div');
-                            div.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
-                            div.innerHTML = `
-                                <div class="max-w-[75%] rounded-2xl px-4 py-2 shadow-sm text-sm ${isMe ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white text-gray-800 rounded-bl-none border border-gray-100'}">
-                                    <p>${msg.body}</p>
-                                    <div class="text-[10px] mt-1 opacity-70 ${isMe ? 'text-blue-100' : 'text-gray-400'} text-right">
-                                        ${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </div>
-                                </div>
-                            `;
-                            container.appendChild(div);
-                        });
-                        container.scrollTop = container.scrollHeight;
-                    }
+                    // Ajax send
+                    fetch('{{ route("chat.message.store", $conversation->id) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ body: body })
+                    });
                 });
-        }, 4000); // 4 seconds poll for cPanel stability
+
+                // Scroll to bottom
+                const c = document.getElementById('messages-container');
+                if (c) c.scrollTop = c.scrollHeight;
+
+                // Polling logic
+                let lastPollTime = Date.now();
+                let isTabActive = true;
+
+                document.addEventListener('visibilitychange', () => {
+                    isTabActive = !document.hidden;
+                });
+
+                setInterval(() => {
+                    if (!isTabActive) return;
+
+                    fetch('{{ route("chat.messages", $conversation->id) }}')
+                        .then(response => response.json())
+                        .then(messages => {
+                            const container = document.getElementById('messages-container');
+                            const currentCount = container.querySelectorAll('.flex').length;
+                            if (messages.length > currentCount) {
+                                container.innerHTML = '';
+                                messages.reverse().forEach(msg => {
+                                    const isMe = msg.user_id == {{ Auth::id() }};
+                                    const div = document.createElement('div');
+                                    div.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
+                                    div.innerHTML = `
+                                                        <div class="max-w-[75%] rounded-2xl px-4 py-2 shadow-sm text-sm ${isMe ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white text-gray-800 rounded-bl-none border border-gray-100'}">
+                                                            <p>${msg.body}</p>
+                                                            <div class="text-[10px] mt-1 opacity-70 ${isMe ? 'text-blue-100' : 'text-gray-400'} text-right">
+                                                                ${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            </div>
+                                                        </div>
+                                                    `;
+                                    container.appendChild(div);
+                                });
+                                container.scrollTop = container.scrollHeight;
+
+                                // Force refresh global notification badge since messages were marked read
+                                if (window.refreshNotifications) window.refreshNotifications();
+                            }
+                        });
+
+                    // Poll conversation list for sidebar badges
+                    fetch('{{ route("chat.list") }}')
+                        .then(r => r.json())
+                        .then(conversations => {
+                            conversations.forEach(conv => {
+                                const badgeContainer = document.querySelector(`a[href*="/chat/show/${conv.id}"] .flex.items-center`);
+                                if (badgeContainer) {
+                                    let badge = badgeContainer.querySelector('span.bg-blue-600');
+                                    if (conv.unread_count > 0) {
+                                        if (!badge) {
+                                            badge = document.createElement('span');
+                                            badge.className = 'bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full';
+                                            badgeContainer.appendChild(badge);
+                                        }
+                                        badge.textContent = conv.unread_count;
+                                    } else if (badge) {
+                                        badge.remove();
+                                    }
+                                }
+                            });
+                        });
+                }, 4000);
+
+                // Immediate refresh on load since backend marked this conversation as read
+                if (window.refreshNotifications) window.refreshNotifications();
+            </script>
+        @endpush
 @endsection

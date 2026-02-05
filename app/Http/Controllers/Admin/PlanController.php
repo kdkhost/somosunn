@@ -18,60 +18,65 @@ class PlanController extends Controller
     public function create()
     {
         $permissions = Permission::all();
-        return view('admin.plans.form', ['plan'=>new Plan(),'permissions'=>$permissions]);
+        return view('admin.plans.form', ['plan' => new Plan(), 'permissions' => $permissions]);
     }
 
     public function store(Request $request)
     {
         $data = $this->validateData($request);
-        if($request->hasFile('image')){
-            $data['image'] = $request->file('image')->store('plan-images','public');
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('plan-images', 'public');
         }
         Plan::create($data);
-        return redirect()->route('admin.plans.index')->with('success','Plano criado');
+        return redirect()->route('admin.plans.index')->with('success', 'Plano criado');
     }
 
     public function edit(Plan $plan)
     {
         $permissions = Permission::all();
-        return view('admin.plans.form', compact('plan','permissions'));
+        return view('admin.plans.form', compact('plan', 'permissions'));
     }
 
     public function update(Request $request, Plan $plan)
     {
         $data = $this->validateData($request, $plan->id);
-        if($request->hasFile('image')){
-            $data['image'] = $request->file('image')->store('plan-images','public');
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('plan-images', 'public');
         }
         $plan->update($data);
-        return redirect()->route('admin.plans.index')->with('success','Plano atualizado');
+        return redirect()->route('admin.plans.index')->with('success', 'Plano atualizado');
     }
 
     public function destroy(Plan $plan)
     {
         $plan->delete();
-        return redirect()->route('admin.plans.index')->with('success','Plano removido');
+        return redirect()->route('admin.plans.index')->with('success', 'Plano removido');
     }
 
-    protected function validateData(Request $request, $id=null)
+    protected function validateData(Request $request, $id = null)
     {
         $data = $request->validate([
-            'name'=>'required|string|max:120',
-            'price'=>'required|numeric|min:0',
-            'period'=>'required|string|max:50',
-            'highlight'=>'nullable|boolean',
-            'coupons_enabled'=>'nullable|boolean',
-            'benefits'=>'nullable|array',
-            'benefits.*'=>'nullable|string',
-            'permissions'=>'nullable|array',
-            'permissions.*'=>'integer',
-            'is_active'=>'nullable|boolean',
+            'name' => 'required|string|max:120',
+            'price' => 'required|numeric|min:0',
+            'period' => 'required|string|max:50',
+            'highlight' => 'nullable|boolean',
+            'coupons_enabled' => 'nullable|boolean',
+            'benefits' => 'nullable|string',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'string',
+            'is_active' => 'nullable|boolean',
         ]);
+
         $data['highlight'] = $request->boolean('highlight');
         $data['coupons_enabled'] = $request->boolean('coupons_enabled');
         $data['is_active'] = $request->boolean('is_active', true);
-        $data['benefits'] = array_values($request->input('benefits', []));
+
+        // Handle benefits from textarea
+        $benefitsRaw = $request->input('benefits', '');
+        $data['benefits'] = array_filter(array_map('trim', explode("\n", str_replace("\r", "", $benefitsRaw))));
+
         $data['permissions'] = $request->input('permissions', []);
+
         return $data;
     }
 }

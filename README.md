@@ -178,3 +178,20 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
   - **Sincronização via Polling:** Atualização instantânea de mensagens sem recarregar a página, compatível com qualquer hospedagem PHP/MySQL.
   - **Gestão de Sessão:** Detecção de aba ativa para reduzir o consumo de recursos do servidor.
   - **Notificações em Tempo Real:** Contador de convites pendentes no cabeçalho atualizado dinamicamente.
+
+## Gestão de Planos e Controle de Acesso (Fevereiro 2026)
+
+- **Paywall e Middleware de Acesso:**
+  - **Middleware `EnsureUserHasActivePlan`**: Implementação de bloqueio automático para usuários autenticados sem plano ativo, com redirecionamento para a vitrine de planos.
+  - **Whitelist de Rotas**: Acesso garantido a Perfil, Checkout e Logout mesmo para usuários inadimplentes ou sem plano.
+  - **Onboarding Otimizado**: O fluxo de registro agora direciona novos membros diretamente para a página `/premium` para escolha do plano.
+
+- **Administração de Planos (CRUD):**
+  - **Gestor de Planos**: Interface administrativa para criação e edição de planos (nome, preço, periodicidade e destaque).
+  - **Sistema de Benefícios**: Armazenamento flexível de benefícios por plano para exibição dinâmica no frontend.
+  - **Atribuição Manual**: Admins podem conceder acesso manualmente a usuários através do campo `plan_id` e definir data de expiração personalizada no formulário de edição de usuário.
+
+- **Vitrine e Conteúdo Real:**
+  - **Vitrine Dinâmica**: A página `/premium` agora renderiza os planos diretamente do banco de dados, respeitando o status de destaque ("Mais Popular").
+  - **Fim dos Dados de Demonstração**: Os controladores de Eventos e Home agora carregam exclusivamente dados reais do banco de dados, removendo os fallbacks estáticos (mock data).
+  - **Sincronização FullCalendar**: O calendário de eventos agora consome o feed real em formato ISO8601, garantindo precisão nas datas e interatividade.

@@ -164,8 +164,7 @@ Route::middleware(['check.feature:events'])->group(function () {
 });
 
 // Auth Required Routes
-// Auth Required Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'check.plan'])->group(function () {
 
     // Social / Community (Feature: community)
     Route::middleware(['check.feature:community'])->group(function () {
@@ -188,8 +187,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/chat/start/{user}', [\App\Http\Controllers\ChatController::class, 'start'])->name('chat.start');
         Route::get('/chat/list', [\App\Http\Controllers\ChatController::class, 'list'])->name('chat.list');
         Route::get('/chat/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
-        Route::get('/chat/{conversation}/messages', [\App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
-        Route::post('/chat/{conversation}/message', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('chat.message.store');
+        Route::get('/chat/messages', [\App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
+        Route::post('/chat/message', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('chat.message.store');
+
+        // Floating Chat Routes
+        Route::get('/chat/with/{user}', [\App\Http\Controllers\ChatController::class, 'withUser'])->name('chat.with.user');
+        Route::post('/chat/with/{user}/message', [\App\Http\Controllers\ChatController::class, 'storeMessageWithUser'])->name('chat.with.user.message');
     });
 });
 
@@ -206,7 +209,7 @@ Route::get('/checkout/pending/{order}', fn() => view('checkout.pending'))->name(
 Route::post('/webhook/mercadopago/{seller_id}', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])->name('webhook.mercadopago');
 
 // Admin routes (simple scaffold)
-Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class, 'check.plan'])->group(function () {
     // Rotas de Membro (Comum a todos no painel)
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/portal', [\App\Http\Controllers\Admin\MemberController::class, 'portal'])->name('portal.index');
@@ -233,6 +236,9 @@ Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMi
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('users');
         // Permissões / Papéis
         Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class)->names('permissions');
+
+        // Plans CRUD
+        Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)->names('plans');
 
         // Courses CRUD
         Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class)->names('courses');
@@ -281,9 +287,6 @@ Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMi
         Route::post('/mailtemplates/{mailtemplate}/send-preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
 
         // Plans
-        Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)->names('plans');
-
-        // Orders / Financeiro
         Route::post('orders/{order}/refund', [\App\Http\Controllers\Admin\OrderController::class, 'refund'])->name('orders.refund');
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show'])->names('orders');
 

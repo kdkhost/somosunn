@@ -66,15 +66,14 @@ function sendMessage(event) {
     // Get CSRF token from meta tag
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     
-    // Send to server
-    fetch('/messages/send', {
+// Send to server
+    fetch(`/chat/with/${userId}/message`, {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': csrfToken,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            receiver_id: userId,
             message: message
         })
     })
@@ -91,17 +90,21 @@ function sendMessage(event) {
 }
 
 function loadMessages(userId) {
-    fetch(`/messages/${userId}`)
+    fetch(`/chat/with/${userId}`)
         .then(r => r.json())
         .then(data => {
             const chatBody = document.getElementById('chatBody');
             chatBody.innerHTML = '';
             
             if (data.messages && data.messages.length > 0) {
-                data.messages.forEach(msg => {
+                // Since they are latest, reverse to append in order
+                data.messages.reverse().forEach(msg => {
                     appendMessage(msg.content, msg.is_mine, false);
                 });
                 scrollChatToBottom();
+                
+                // Refresh global notifications because messages were marked as read
+                if (window.refreshNotifications) window.refreshNotifications();
             } else {
                 chatBody.innerHTML = `
                     <div class="text-center text-gray-500 text-sm py-8">

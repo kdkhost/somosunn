@@ -14,7 +14,7 @@ class UserController extends Controller
         $query = User::latest();
 
         // Se não for super admin, não pode ver super admin
-        if(auth()->check() && auth()->user()->role !== 'superadmin'){
+        if (auth()->check() && auth()->user()->role !== 'superadmin') {
             $query->where('role', '!=', 'superadmin');
         }
 
@@ -36,10 +36,12 @@ class UserController extends Controller
             'password' => 'required|min:6',
             'role' => 'nullable|string',
             'level' => 'nullable|string',
+            'plan_id' => 'nullable|exists:plans,id',
+            'plan_expires_at' => 'nullable|date',
         ]);
         $data['password'] = Hash::make($data['password']);
         User::create($data);
-        return redirect()->route('admin.users.index')->with('success','Usuário criado.');
+        return redirect()->route('admin.users.index')->with('success', 'Usuário criado.');
     }
 
     public function edit(User $user)
@@ -51,26 +53,28 @@ class UserController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:120',
-            'email' => 'required|email|unique:users,email,'.$user->id,
+            'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6',
             'role' => 'nullable|string',
             'level' => 'nullable|string',
+            'plan_id' => 'nullable|exists:plans,id',
+            'plan_expires_at' => 'nullable|date',
         ]);
-        if(!empty($data['password'])){
+        if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         } else {
             unset($data['password']);
         }
         $user->update($data);
-        return redirect()->route('admin.users.index')->with('success','Usuário atualizado.');
+        return redirect()->route('admin.users.index')->with('success', 'Usuário atualizado.');
     }
 
     public function destroy(User $user)
     {
-        if($user->role === 'superadmin' && auth()->user()->role !== 'superadmin'){
-             return response()->json(['message' => 'Você não pode excluir um Super Admin.'], 403);
+        if ($user->role === 'superadmin' && auth()->user()->role !== 'superadmin') {
+            return response()->json(['message' => 'Você não pode excluir um Super Admin.'], 403);
         }
         $user->delete();
-        return response()->json(['ok'=>true]);
+        return response()->json(['ok' => true]);
     }
 }

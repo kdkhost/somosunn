@@ -71,8 +71,11 @@
                 </div>
                 <div class="form-group col-md-6">
                     <label>Benefícios (um por linha)</label>
-                    @php $benefits = old('benefits',$plan->benefits ?? []); @endphp
-                    <textarea name="benefits[]" class="form-control" rows="8" placeholder="Ex: Acesso ao portal&#10;Mentorias semanais&#10;Grupo VIP">{{ implode("\n", $benefits) }}</textarea>
+                    @php 
+                        $benefits = old('benefits', $plan->benefits ?? []);
+                        $benefitsText = is_array($benefits) ? implode("\n", $benefits) : $benefits;
+                    @endphp
+                    <textarea name="benefits" class="form-control" rows="8" placeholder="Ex: Acesso ao portal&#10;Mentorias semanais&#10;Grupo VIP">{{ $benefitsText }}</textarea>
                     <small class="text-muted">Use uma linha por benefício. Permissões abaixo complementam o acesso.</small>
                 </div>
             </div>
@@ -83,8 +86,8 @@
                     @foreach($permissions as $perm)
                         <div class="col-md-4 col-lg-3">
                             <div class="custom-control custom-checkbox mb-2">
-                                <input type="checkbox" class="custom-control-input" id="perm-{{ $perm->id }}" name="permissions[]" value="{{ $perm->id }}" {{ in_array($perm->id, old('permissions',$plan->permissions ?? [])) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="perm-{{ $perm->id }}">{{ $perm->name }}</label>
+                                <input type="checkbox" class="custom-control-input" id="perm-{{ $perm->id }}" name="permissions[]" value="{{ $perm->name }}" {{ in_array($perm->name, old('permissions',$plan->permissions ?? [])) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="perm-{{ $perm->id }}">{{ $perm->label ?: $perm->name }}</label>
                             </div>
                         </div>
                     @endforeach

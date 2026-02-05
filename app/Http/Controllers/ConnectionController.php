@@ -117,10 +117,23 @@ class ConnectionController extends Controller
      */
     public function notifications()
     {
-        $count = Connection::where('requested_id', Auth::id())
+        $connectionsCount = Connection::where('requested_id', Auth::id())
             ->where('status', 'pending')
             ->count();
 
-        return response()->json(['count' => $count]);
+        $messagesCount = \App\Models\Message::where('user_id', '!=', Auth::id())
+            ->whereHas('conversation', function ($q) {
+                $q->whereHas('users', function ($uq) {
+                    $uq->where('users.id', Auth::id());
+                });
+            })
+            ->whereNull('read_at')
+            ->count();
+
+        return response()->json([
+            'count' => $connectionsCount + $messagesCount,
+            'connections' => $connectionsCount,
+            'messages' => $messagesCount
+        ]);
     }
 }

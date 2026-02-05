@@ -32,5 +32,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'check.feature' => \App\Http\Middleware\CheckFeature::class,
         'check.connection' => \App\Http\Middleware\EnsureConnectionIsAccepted::class,
+        'check.plan' => \App\Http\Middleware\EnsureUserHasActivePlan::class,
     ];
 }

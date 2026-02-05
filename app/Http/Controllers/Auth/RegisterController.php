@@ -36,9 +36,12 @@ class RegisterController extends Controller
         try {
             $ps = new \App\Services\PointsService();
             $ps->award($user, 'signup');
-        } catch (\Throwable $e) { \Log::error('Points award error: '.$e->getMessage()); }
+        } catch (\Throwable $e) {
+            \Log::error('Points award error: ' . $e->getMessage());
+        }
 
         Auth::login($user);
-        return redirect()->intended('/');
+        return redirect()->route('premium')
+            ->with('success', 'Seja bem-vindo à SOMOS UNN! Escolha um plano para começar sua jornada.');
     }
 }

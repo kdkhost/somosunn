@@ -2,51 +2,90 @@
 
 @section('page_title', $user->exists ? 'Editar usuário' : 'Novo usuário')
 @section('breadcrumb')
-<li class="breadcrumb-item"><a href="{{ route('admin.users.index') }}">Usuários</a></li>
-<li class="breadcrumb-item active">{{ $user->exists ? 'Editar' : 'Novo' }}</li>
+    <li class="breadcrumb-item"><a href="{{ route('admin.users.index') }}">Usuários</a></li>
+    <li class="breadcrumb-item active">{{ $user->exists ? 'Editar' : 'Novo' }}</li>
 @endsection
 
 @section('content')
-<div class="card">
-  <div class="card-body">
-    <form method="POST" action="{{ $user->exists ? route('admin.users.update',$user) : route('admin.users.store') }}" class="ajax-form">
-        @csrf
-        @if($user->exists) @method('PUT') @endif
-        <div class="form-group mb-3"><label>Nome</label><input name="name" class="form-control" value="{{ old('name',$user->name) }}" required></div>
-        <div class="form-group mb-3"><label>E-mail</label><input name="email" type="email" class="form-control" value="{{ old('email',$user->email) }}" required></div>
-        <div class="form-row">
-            <div class="form-group col-md-6"><label>Senha @if($user->exists)<small class="text-muted">(deixe em branco para não alterar)</small>@endif</label><input name="password" type="password" class="form-control"></div>
-            
-            {{-- Lógica de visibilidade: Não exibir papel/nível se estiver editando o próprio perfil --}}
-            @if(auth()->id() !== $user->id)
-                <div class="form-group col-md-3">
-                    <label>Papel</label>
-                    <select name="role" class="form-control">
-                        <option value="member" {{ (old('role', $user->role) ?? 'member') == 'member' ? 'selected' : '' }}>Membro</option>
-                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Administrador</option>
-                        {{-- Apenas Super Admin pode atribuir papel de Super Admin --}}
-                        @if(auth()->user()->role === 'superadmin')
-                        <option value="superadmin" {{ old('role', $user->role) == 'superadmin' ? 'selected' : '' }}>Super Admin</option>
-                        @endif
-                    </select>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST"
+                action="{{ $user->exists ? route('admin.users.update', $user) : route('admin.users.store') }}"
+                class="ajax-form">
+                @csrf
+                @if($user->exists) @method('PUT') @endif
+                <div class="form-group mb-3"><label>Nome</label><input name="name" class="form-control"
+                        value="{{ old('name', $user->name) }}" required></div>
+                <div class="form-group mb-3"><label>E-mail</label><input name="email" type="email" class="form-control"
+                        value="{{ old('email', $user->email) }}" required></div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Senha @if($user->exists)<small class="text-muted">(deixe em branco para não alterar)</small>@endif</label>
+                        <input name="password" type="password" class="form-control">
+                    </div>
+                    
+                    @if(auth()->id() !== $user->id)
+                        <div class="form-group col-md-3">
+                            <label>Papel</label>
+                            <select name="role" class="form-control">
+                                <option value="member" {{ (old('role', $user->role) ?? 'member') == 'member' ? 'selected' : '' }}>Membro</option>
+                                <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Administrador</option>
+                                @if(auth()->user()->role === 'superadmin')
+                                <option value="superadmin" {{ old('role', $user->role) == 'superadmin' ? 'selected' : '' }}>Super Admin</option>
+                                @endif
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Nível</label>
+                            <select name="level" class="form-control">
+                                @foreach(['iniciante', 'intermediario', 'avancado', 'sucesso', 'superadmin'] as $lvl)
+                                    <option value="{{ $lvl }}" {{ (old('level', $user->level) ?? 'iniciante') == $lvl ? 'selected' : '' }}>{{ ucfirst($lvl) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @else
+                        <div class="form-group col-md-6 d-flex align-items-center mt-4">
+                            <p class="text-muted mb-0"><i class="fas fa-info-circle mr-1"></i> Papel e Nível não podem ser alterados no próprio perfil.</p>
+                        </div>
+                    @endif
                 </div>
-                <div class="form-group col-md-3">
-                    <label>Nível</label>
-                    <select name="level" class="form-control">
-                        @foreach(['iniciante', 'intermediario', 'avancado', 'sucesso', 'superadmin'] as $lvl)
-                            <option value="{{ $lvl }}" {{ (old('level', $user->level) ?? 'iniciante') == $lvl ? 'selected' : '' }}>{{ ucfirst($lvl) }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            @else
-                <div class="form-group col-md-6 d-flex align-items-center mt-4">
-                    <p class="text-muted mb-0"><i class="fas fa-info-circle mr-1"></i> Papel e Nível não podem ser alterados no próprio perfil.</p>
-                </div>
-            @endif
         </div>
-        <button class="btn btn-primary">Salvar</button>
-        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary" data-pjax="true">Voltar</a>
-    </form>
-  </div>
-</div>
+
+        @if(auth()->user()->isAdmin())
+            <div class="card mt-4 border-info">
+                <div class="card-header bg-info text-white">
+                    <h3 class="card-title"><i class="fas fa-crown mr-1"></i> Gestão de Plano Manual</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Plano Atribuído</label>
+                            <select name="plan_id" class="form-control">
+                                <option value="">Nenhum plano (Usar assinaturas)</option>
+                                @foreach(\App\Models\Plan::orderBy('price')->get() as $p)
+                                    <option value="{{ $p->id }}" {{ old('plan_id', $user->plan_id) == $p->id ? 'selected' : '' }}>
+                                        {{ $p->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Expiração do Acesso</label>
+                            <input type="date" name="plan_expires_at" class="form-control"
+                                value="{{ old('plan_expires_at', $user->plan_expires_at ? $user->plan_expires_at->format('Y-m-d') : '') }}">
+                            <small class="text-muted">Deixe vazio para acesso ilimitado.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="mt-4">
+            <button class="btn btn-primary btn-lg px-5">Salvar Alterações</button>
+            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary btn-lg" data-pjax="true">Cancelar</a>
+        </div>
+        </form>
+    </div>
+    </div>
 @endsection

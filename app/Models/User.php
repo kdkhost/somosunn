@@ -169,4 +169,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Ranking::class);
     }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
 }

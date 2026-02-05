@@ -12,7 +12,15 @@ class ChatController extends Controller
 {
     public function index()
     {
-        $conversations = Auth::user()->conversations()->with('users')->get();
+        $conversations = Auth::user()->conversations()
+            ->with(['users'])
+            ->withCount([
+                'messages as unread_count' => function ($q) {
+                    $q->where('user_id', '!=', Auth::id())->whereNull('read_at');
+                }
+            ])
+            ->latest()
+            ->get();
         return view('chat.index', compact('conversations'));
     }
 
@@ -25,10 +33,6 @@ class ChatController extends Controller
             return redirect()->route('chat.index')->with('error', 'Você não pode conversar com você mesmo.');
         }
 
-        // Tenta encontrar conversa existente (privada)
-        // Lógica simplificada: encontrar conversa onde ambos estão e é tipo 'private' (se existir tipo)
-        // Ou apenas onde ambos estão e apenas eles
-
         $conversation = $me->conversations()->whereHas('users', function ($q) use ($targetUser) {
             $q->where('users.id', $targetUser->id);
         })->get()->filter(function ($c) {
@@ -39,10 +43,9 @@ class ChatController extends Controller
             return redirect()->route('chat.show', $conversation->id);
         }
 
-        // Cria nova
         $conversation = Conversation::create([
             'type' => 'private',
-            'title' => $targetUser->name // Titulo inicial
+            'title' => $targetUser->name
         ]);
 
         $conversation->users()->attach([$me->id, $targetUser->id]);
@@ -52,27 +55,45 @@ class ChatController extends Controller
 
     public function show(Conversation $conversation)
     {
-        // Verifica se usuário pertence à conversa
         if (!$conversation->users->contains(Auth::id())) {
             abort(403);
         }
 
-        $messages = $conversation->messages()->with('user')->latest()->limit(50)->get(); // Limit for perf
-        $conversations = Auth::user()->conversations()->with('users')->latest()->get();
+        // Mark messages as read
+        $conversation->messages()
+            ->where('user_id', '!=', Auth::id())
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        $messages = $conversation->messages()->with('user')->latest()->limit(50)->get();
+        $conversations = Auth::user()->conversations()
+            ->with(['users'])
+            ->withCount([
+                'messages as unread_count' => function ($q) {
+                    $q->where('user_id', '!=', Auth::id())->whereNull('read_at');
+                }
+            ])
+            ->latest()
+            ->get();
 
         return view('chat.show', compact('conversation', 'messages', 'conversations'));
     }
 
     public function list()
     {
-        // ... (mantido)
         $userId = Auth::id();
         $conversations = Auth::user()->conversations()->with([
             'users',
             'messages' => function ($q) {
                 $q->latest()->limit(1);
             }
-        ])->get();
+        ])
+            ->withCount([
+                'messages as unread_count' => function ($q) {
+                    $q->where('user_id', '!=', Auth::id())->whereNull('read_at');
+                }
+            ])
+            ->get();
         return response()->json($conversations);
     }
 
@@ -99,7 +120,85 @@ class ChatController extends Controller
             abort(403);
         }
 
+        // Mark messages as read if polling while in the active chat
+        $conversation->messages()
+            ->where('user_id', '!=', Auth::id())
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
         $messages = $conversation->messages()->with('user')->latest()->limit(50)->get();
         return response()->json($messages);
+    }
+
+    /**
+     * Floating Chat: Get or start conversation and load messages.
+     */
+    public function withUser(User $user)
+    {
+        $me = Auth::user();
+
+        $conversation = $me->conversations()->whereHas('users', function ($q) use ($user) {
+            $q->where('users.id', $user->id);
+        })->get()->filter(function ($c) {
+            return $c->users()->count() == 2;
+        })->first();
+
+        if (!$conversation) {
+            $conversation = Conversation::create([
+                'type' => 'private',
+                'title' => $user->name
+            ]);
+            $conversation->users()->attach([$me->id, $user->id]);
+        }
+
+        // Mark as read
+        $conversation->messages()
+            ->where('user_id', '!=', Auth::id())
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        $messages = $conversation->messages()
+            ->with('user')
+            ->latest()
+            ->limit(30)
+            ->get();
+
+        return response()->json([
+            'conversation' => $conversation,
+            'messages' => $messages->map(fn($m) => [
+                'id' => $m->id,
+                'content' => $m->body,
+                'is_mine' => $m->user_id === $me->id,
+                'created_at' => $m->created_at
+            ])
+        ]);
+    }
+
+    /**
+     * Floating Chat: Send message by user_id.
+     */
+    public function storeMessageWithUser(Request $request, User $user)
+    {
+        $me = Auth::user();
+
+        $conversation = $me->conversations()->whereHas('users', function ($q) use ($user) {
+            $q->where('users.id', $user->id);
+        })->get()->filter(function ($c) {
+            return $c->users()->count() == 2;
+        })->first();
+
+        if (!$conversation) {
+            return response()->json(['success' => false, 'message' => 'Conversa não iniciada.']);
+        }
+
+        $request->validate(['message' => 'required']);
+
+        $msg = $conversation->messages()->create([
+            'user_id' => $me->id,
+            'body' => $request->input('message'),
+            'type' => 'text'
+        ]);
+
+        return response()->json(['success' => true, 'message' => $msg]);
     }
 }

@@ -73,14 +73,20 @@ class PermissionsSeeder extends Seeder
             'permissions.assign' => 'Atribuir permissões',
             'permissions.sync' => 'Sincronizar permissões',
             'roles.manage' => 'Gerenciar papéis',
+            // Funcionalidades de Planos
+            'chat' => 'Recurso: Chat',
+            'community' => 'Recurso: Comunidade/Feed',
+            'events' => 'Recurso: Eventos',
+            'mentorships' => 'Recurso: Mentorias',
+            'courses' => 'Recurso: Cursos',
         ];
 
         $roles = [
             'superadmin' => 'Super Administrador',
-            'admin'      => 'Administrador',
-            'gestor'     => 'Gestor de conteúdo',
-            'suporte'    => 'Suporte',
-            'membro'     => 'Membro',
+            'admin' => 'Administrador',
+            'gestor' => 'Gestor de conteúdo',
+            'suporte' => 'Suporte',
+            'membro' => 'Membro',
         ];
 
         // Insere permissões
@@ -103,32 +109,57 @@ class PermissionsSeeder extends Seeder
         $roleIds = DB::table('roles')->pluck('id', 'name');
 
         $giveAll = $permIds->values()->all();
-        $subset = function(array $names) use ($permIds) {
+        $subset = function (array $names) use ($permIds) {
             return $permIds->only($names)->values()->all();
         };
 
         $rolePerms = [
             'superadmin' => $giveAll,
-            'admin'      => $giveAll, // se quiser limitar, troque a lista
-            'gestor'     => $subset([
+            'admin' => $giveAll, // se quiser limitar, troque a lista
+            'gestor' => $subset([
                 'dashboard.view',
-                'courses.view','courses.create','courses.edit','courses.delete','courses.publish',
-                'mentorships.view','mentorships.create','mentorships.edit','mentorships.delete','mentorships.schedule',
-                'events.view','events.create','events.edit','events.delete','events.publish','events.ticket.manage',
-                'plans.view','plans.edit','plans.feature.toggle','plans.discount.manage',
-                'certificates.generate','certificates.view',
-                'ranking.view','ranking.edit',
-                'mailtemplates.view','mailtemplates.create','mailtemplates.edit','mail.sendtest',
+                'courses.view',
+                'courses.create',
+                'courses.edit',
+                'courses.delete',
+                'courses.publish',
+                'mentorships.view',
+                'mentorships.create',
+                'mentorships.edit',
+                'mentorships.delete',
+                'mentorships.schedule',
+                'events.view',
+                'events.create',
+                'events.edit',
+                'events.delete',
+                'events.publish',
+                'events.ticket.manage',
+                'plans.view',
+                'plans.edit',
+                'plans.feature.toggle',
+                'plans.discount.manage',
+                'certificates.generate',
+                'certificates.view',
+                'ranking.view',
+                'ranking.edit',
+                'mailtemplates.view',
+                'mailtemplates.create',
+                'mailtemplates.edit',
+                'mail.sendtest',
                 'uploads.manage'
             ]),
-            'suporte'    => $subset([
+            'suporte' => $subset([
                 'dashboard.view',
-                'users.view','users.edit',
-                'mailtemplates.view','mail.sendtest',
+                'users.view',
+                'users.edit',
+                'mailtemplates.view',
+                'mail.sendtest',
                 'uploads.manage',
-                'events.view','mentorships.view','courses.view'
+                'events.view',
+                'mentorships.view',
+                'courses.view'
             ]),
-            'membro'     => $subset([
+            'membro' => $subset([
                 'dashboard.view',
                 'events.view',
                 'courses.view',
@@ -143,17 +174,18 @@ class PermissionsSeeder extends Seeder
 
         foreach ($rolePerms as $roleName => $permIdList) {
             $roleId = $roleIds[$roleName] ?? null;
-            if(!$roleId) continue;
-            $rows = array_map(fn($pid)=>['role_id'=>$roleId,'permission_id'=>$pid], $permIdList);
+            if (!$roleId)
+                continue;
+            $rows = array_map(fn($pid) => ['role_id' => $roleId, 'permission_id' => $pid], $permIdList);
             DB::table('permission_role')->insert($rows);
         }
 
         // atribui superadmin ao primeiro usuário, se existir
         $userId = DB::table('users')->min('id');
-        if($userId && isset($roleIds['superadmin'])){
+        if ($userId && isset($roleIds['superadmin'])) {
             DB::table('role_user')->updateOrInsert(
-                ['role_id'=>$roleIds['superadmin'], 'user_id'=>$userId],
-                ['role_id'=>$roleIds['superadmin'], 'user_id'=>$userId]
+                ['role_id' => $roleIds['superadmin'], 'user_id' => $userId],
+                ['role_id' => $roleIds['superadmin'], 'user_id' => $userId]
             );
         }
     }

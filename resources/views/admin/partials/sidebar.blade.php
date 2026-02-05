@@ -263,7 +263,6 @@
                         </ul>
                     </li>
 
-                    <!-- Financeiro / Vendas -->
                     <li class="nav-item">
                         <a href="{{ route('admin.orders.index') }}" class="nav-link {{ $is('admin.orders.*') }}">
                             <i class="nav-icon fas fa-shopping-cart"></i>
@@ -271,6 +270,15 @@
                         </a>
                     </li>
                 @endif
+
+                <li class="nav-header">PERSONALIZAÇÃO</li>
+
+                <li class="nav-item">
+                    <a href="{{ route('admin.profile.edit') }}" class="nav-link {{ $is('admin.profile.*') }}">
+                        <i class="nav-icon fas fa-id-card"></i>
+                        <p>Meu Perfil</p>
+                    </a>
+                </li>
 
                 <!-- Comunidade -->
                 @if(auth()->user()->canAccessFeature('community'))
