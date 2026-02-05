@@ -146,5 +146,17 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
 
 - **Segurança:**
   - `AdminMiddleware` usa `isAdmin()` do model User para validação robusta.
-  - `RedirectMembersFromAdmin` middleware registrado como backup.
-  - Bloqueio efetivo de rotas `/admin` para não-administradores.
+
+## Controle de Acesso e Experiência Unificada (Fevereiro 2026)
+
+- **Controle Estrito de Conteúdo (Courses):**
+  - **Validação de Matrícula/Compra:** Membros só conseguem acessar ("Assistir") cursos que possuem matrícula ativa ou pedido pago (`HasPackageAccess`). Caso contrário, são convidados a "Adquirir".
+  - **Proteção de Rotas:** Tentativas de acesso direto a URLs de cursos não comprados retornam 403 Forbidden para membros.
+
+- **Admin Bypass Global:**
+  - **Correção de Permissões:** Administradores agora possuem bypass global (`isAdmin()`) nas Policies e Traits (`HasRoles`), permitindo inspeção de contas de alunos sem erros de "Acesso Negado".
+  - **Visualização de Membro:** Ao inspecionar um aluno, o Admin vê exatamente o que o aluno tem (ou não tem) acesso, sem ser bloqueado pelo sistema.
+
+- **Dashboard Unificado & Impersonation Seguro:**
+  - **Interface Adaptável:** O `dashboard.blade.php` foi unificado. Widgets administrativos (Financeiro) aparecem apenas para Admins. Widgets de usuário (Meus Cursos) aparecem para todos.
+  - **Impersonation Seguro:** A função "Acessar como usuário" agora redireciona explicitamente para o Dashboard Seguro, evitando loops de redirecionamento ou erros de permissão em rotas protegidas.

@@ -39,7 +39,7 @@ class ImpersonateController extends Controller
         // Loga como o novo usuário
         Auth::login($userToImpersonate);
 
-        return redirect()->route('portal')->with('success', "Você está acessando como {$userToImpersonate->name}");
+        return redirect()->route('admin.dashboard')->with('success', "Você está acessando como {$userToImpersonate->name}");
     }
 
     public function stop()

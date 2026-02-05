@@ -6,8 +6,8 @@
 @endsection
 
 @section('content')
-    @if($isAdmin)
-        <div class="row">
+    <div class="row">
+        @if($isAdmin)
             <!-- Balance -->
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-success">
@@ -59,8 +59,44 @@
                             class="fas fa-arrow-circle-right"></i></a>
                 </div>
             </div>
+        @endif
+
+        {{-- Widgets Comuns (Membros + Admin) --}}
+        <div class="col-md-4">
+            <div class="info-box mb-3 bg-gradient-primary">
+                <span class="info-box-icon"><i class="fas fa-graduation-cap"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Meus Cursos</span>
+                    <span class="info-box-number">Acessar</span>
+                </div>
+                <a href="{{ route('courses.index') }}" class="stretched-link"></a>
+            </div>
         </div>
 
+        <div class="col-md-4">
+            <div class="info-box mb-3 bg-gradient-success">
+                <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Mentorias</span>
+                    <span class="info-box-number">Ver Disponíveis</span>
+                </div>
+                <a href="{{ route('mentorships.index') }}" class="stretched-link"></a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="info-box mb-3 bg-gradient-warning">
+                <span class="info-box-icon"><i class="fas fa-calendar-alt"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Eventos</span>
+                    <span class="info-box-number">Calendário</span>
+                </div>
+                <a href="{{ route('events.index') }}" class="stretched-link"></a>
+            </div>
+        </div>
+    </div>
+
+    @if($isAdmin)
         <div class="row">
             <section class="col-lg-12">
                 <div class="card">
@@ -74,45 +110,6 @@
                     </div>
                 </div>
             </section>
-        </div>
-    @else
-        {{-- DASHBOARD DE MEMBRO --}}
-        <div class="row">
-            {{-- Banner Removido --}}
-
-            <div class="col-md-4">
-                <div class="info-box mb-3 bg-gradient-primary">
-                    <span class="info-box-icon"><i class="fas fa-graduation-cap"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Meus Cursos</span>
-                        <span class="info-box-number">Acessar</span>
-                    </div>
-                    <!-- /.info-box-content -->
-                    <a href="{{ route('courses.index') }}" class="stretched-link"></a>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="info-box mb-3 bg-gradient-success">
-                    <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Mentorias</span>
-                        <span class="info-box-number">Ver Disponíveis</span>
-                    </div>
-                    <a href="{{ route('mentorships.index') }}" class="stretched-link"></a>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="info-box mb-3 bg-gradient-warning">
-                    <span class="info-box-icon"><i class="fas fa-calendar-alt"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Eventos</span>
-                        <span class="info-box-number">Calendário</span>
-                    </div>
-                    <a href="{{ route('events.index') }}" class="stretched-link"></a>
-                </div>
-            </div>
         </div>
     @endif
 
