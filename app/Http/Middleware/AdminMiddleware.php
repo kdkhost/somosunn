@@ -38,15 +38,11 @@ class AdminMiddleware
             }
         }
 
-        // Usa o método isAdmin() do modelo User para verificação confiável
+        // Acesso unificado: Membros podem acessar, mas terão visão restrita no dashboard
+        // O controle fino de permissões é feito nas rotas e views
         if (!$user->isAdmin()) {
-            // Permite rota de stop impersonating
-            if ($request->routeIs('admin.impersonate.stop')) {
-                return $next($request);
-            }
-
-            // Não é admin, redireciona para portal
-            return redirect()->route('portal')->with('info', 'Área restrita a administradores.');
+            // Permite rota de stop impersonating e dashboard básica
+            // A proteção de rotas sensíveis é feita pelo EnsureUserIsAdmin
         }
 
         // É admin, permite acesso

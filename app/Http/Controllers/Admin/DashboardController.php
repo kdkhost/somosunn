@@ -9,10 +9,8 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Redireciona membros para o portal
-        if (!auth()->user()->isAdmin()) {
-            return redirect()->route('portal')->with('info', 'Bem-vindo ao seu portal!');
-        }
+        // Membros e Admins acessam, mas a view filtra o conteúdo
+        $isAdmin = auth()->user()->isAdmin();
 
         try {
             $totalRevenue = \App\Models\Order::where('status', 'paid')->sum('total_amount');
