@@ -109,3 +109,8 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
   - Filtros automáticos: Usuários com nível `superadmin` são ocultados da lista para administradores comuns.
   - Segurança aprimorada contra alterações não autorizadas em contas críticas.
 
+- **Formulário Inteligente:**
+  - Padronização de campos `Papel` e `Nível` com menus de seleção (Dropdowns).
+  - Lógica de permissão: Opção `Super Admin` restrita a quem já possui o cargo.
+  - Bloqueio de auto-edição: Usuários não podem alterar seu próprio nível de acesso.
+
