@@ -7,7 +7,7 @@
         <li class="nav-item d-none d-sm-inline-block">
             <a href="{{ route('home') }}" class="nav-link" target="_blank" rel="noopener">Ver site</a>
         </li>
-        @if(session()->has('impersonator_id'))
+        @if(session()->has('impersonator_id') && auth()->user()->isAdmin())
             <li class="nav-item ml-3">
                 <div class="bg-warning px-3 py-1 rounded d-flex align-items-center">
                     <span class="text-dark mr-2 font-weight-bold"><i class="fas fa-user-secret mr-1"></i> Acessando como:

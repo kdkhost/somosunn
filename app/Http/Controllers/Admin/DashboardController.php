@@ -9,6 +9,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // Redireciona membros para o portal
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('portal')->with('info', 'Bem-vindo ao seu portal!');
+        }
+
         try {
             $totalRevenue = \App\Models\Order::where('status', 'paid')->sum('total_amount');
             $refundedAmount = \App\Models\Order::where('status', 'refunded')->sum('total_amount');
@@ -29,7 +34,10 @@ class DashboardController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Erro ao carregar dashboard: ' . $e->getMessage());
             // Fallback data
-            $totalRevenue = 0; $refundedAmount = 0; $totalOrders = 0; $totalUsers = 0;
+            $totalRevenue = 0;
+            $refundedAmount = 0;
+            $totalOrders = 0;
+            $totalUsers = 0;
             $salesChartData = array_fill(0, 6, 0);
             $months = collect(range(0, 5))->map(fn($i) => now()->subMonths($i)->format('M/Y'))->reverse()->values()->toArray();
         }

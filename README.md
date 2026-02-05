@@ -122,3 +122,29 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
   - Exibição de dados reais: Biografia, Localização e Cargo agora são puxados diretamente do cadastro.
   - Integração visual completa com o feed de atividades do usuário.
 
+## Impersonation e Dashboards Personalizados (Fevereiro 2026)
+
+- **Admin Impersonation (Acessar como Usuário):**
+  - **Permissões:** Admins podem acessar contas de membros; SuperAdmins podem acessar admins e membros.
+  - **Proteção:** SuperAdmins não podem impersonate outros superadmins.
+  - **Funcionalidade:** Botão "Acessar como usuário" (🕵️) na listagem de usuários permite suporte e testes.
+  - **Retorno:** Botão "Voltar ao Admin" permite retornar à sessão original do administrador.
+
+- **Separação de Dashboards:**
+  - **Dashboard Admin:** Analytics, vendas, reembolsos, usuários registrados, gráficos de performance (restrito a admins).
+  - **Portal do Membro:** Eventos, cursos, mentorias disponíveis, ranking da comunidade, grupos WhatsApp (para todos).
+  - **Redirecionamento Automático:** Membros que tentam acessar `/admin` são redirecionados automaticamente para `/portal`.
+
+- **Sidebar Dinâmica:**
+  - **Para Membros:** Dashboard (portal), Comunidade, Chat, Cursos (Meus Cursos), Eventos (Calendário), Mentorias (Disponíveis).
+  - **Para Admins:** Todos os itens de membros + Seção "ADMINISTRAÇÃO" com Usuários, Configurações, Planos, Vendas, etc.
+  - **Menu Híbrido:** Cursos, Eventos e Mentorias têm submenus diferentes: membros veem "Meus Cursos", admins veem "Gerenciar" e "Novo".
+
+- **Navbar Admin:**
+  - **Banner de Impersonation:** Só visível para admins (oculto para membros mesmo durante impersonate).
+  - **Feedback Visual:** Barra amarela com "Acessando como: [Nome]" e botão de retorno.
+
+- **Segurança:**
+  - `AdminMiddleware` redireciona membros para portal antes de chegar no controller.
+  - `DashboardController` tem verificação adicional por camada de proteção.
+  - `RedirectMembersFromAdmin` middleware registrado como backup para rotas específicas.

@@ -17,7 +17,7 @@ class AdminMiddleware
         $level = $user->level ?? null;
 
         // Flags de permissão
-        $isSuper = in_array($role, ['superadmin']) || in_array($level, ['superadmin','sucesso'], true);
+        $isSuper = in_array($role, ['superadmin']) || in_array($level, ['superadmin', 'sucesso'], true);
         $isAdmin = $isSuper || in_array($role, ['admin'], true);
         $isMember = !$isAdmin; // Por padrão, qualquer outro logado é membro com acesso restrito
 
@@ -28,8 +28,8 @@ class AdminMiddleware
 
         // Se nenhum admin existir ainda, promove o primeiro usuário autenticado para superadmin
         if (!$isAdmin && !$isMember) {
-            $hasAdmin = \App\Models\User::whereIn('role',['admin','superadmin'])
-                ->orWhereIn('level',['superadmin','sucesso'])->exists();
+            $hasAdmin = \App\Models\User::whereIn('role', ['admin', 'superadmin'])
+                ->orWhereIn('level', ['superadmin', 'sucesso'])->exists();
             if (!$hasAdmin) {
                 $user->role = 'superadmin';
                 $user->save();
@@ -37,13 +37,13 @@ class AdminMiddleware
                 $isMember = false;
             }
         }
-        
-        // Permite acesso se for admin ou membro
-        // (A proteção de rotas específicas será feita no web.php ou controllers)
-        if (auth()->check()) {
-            return $next($request);
+
+        // Redireciona membros para o portal
+        if ($isMember || !$isAdmin) {
+            return redirect()->route('portal')->with('info', 'Área restrita a administradores.');
         }
 
-        return redirect()->route('login')->with('error', 'Acesso restrito.');
+        // Permite acesso apenas para admins
+        return $next($request);
     }
 }
