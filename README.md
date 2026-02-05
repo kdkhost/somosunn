@@ -118,3 +118,7 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
   - **Upload de Perfil:** Barra de progresso visual para foto de capa e perfil.
   - **Feedback Instantâneo:** Preview de imagens atualizado via AJAX sem necessidade de recarregar a página.
 
+- **Perfil Público Dinâmico:**
+  - Exibição de dados reais: Biografia, Localização e Cargo agora são puxados diretamente do cadastro.
+  - Integração visual completa com o feed de atividades do usuário.
+

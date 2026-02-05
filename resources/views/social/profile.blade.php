@@ -190,16 +190,28 @@
         <div class="space-y-6">
             <div class="bg-white rounded-lg shadow p-6">
                 <h3 class="font-bold text-gray-900 mb-4">Sobre</h3>
-                <p class="text-gray-600 text-sm">Sem descrição.</p>
+                <p class="text-gray-600 text-sm">
+                    {{ $user->bio ?? 'Sem descrição.' }}
+                </p>
                 
                 <hr class="my-4">
                 
                 <div class="space-y-2 text-sm text-gray-600">
                     <div class="flex items-center gap-2">
-                        <i class="fas fa-map-marker-alt w-5 text-gray-400"></i> Localização não informada
+                        <i class="fas fa-map-marker-alt w-5 text-gray-400"></i> 
+                        @if($user->city || $user->state)
+                            {{ $user->city }}{{ $user->city && $user->state ? ', ' : '' }}{{ $user->state }}
+                        @else
+                            Localização não informada
+                        @endif
                     </div>
                     <div class="flex items-center gap-2">
-                        <i class="fas fa-briefcase w-5 text-gray-400"></i> Cargo não informado
+                        <i class="fas fa-briefcase w-5 text-gray-400"></i>
+                        @if($user->occupation || $user->company)
+                            {{ $user->occupation }}{{ $user->occupation && $user->company ? ' em ' : '' }}{{ $user->company }}
+                        @else
+                            Cargo não informado
+                        @endif
                     </div>
                 </div>
             </div>
