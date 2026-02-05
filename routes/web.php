@@ -155,10 +155,17 @@ Route::middleware(['auth'])->group(function () {
     // Social / Community
     Route::get('/feed', [\App\Http\Controllers\SocialController::class, 'feed'])->name('social.feed');
     Route::get('/profile/{username}', [\App\Http\Controllers\SocialController::class, 'profile'])->name('social.profile');
+    
+    // Connections
+    Route::post('/connect/{user}', [\App\Http\Controllers\ConnectionController::class, 'connect'])->name('connection.connect');
+    Route::post('/connection/accept/{user}', [\App\Http\Controllers\ConnectionController::class, 'accept'])->name('connection.accept');
+    Route::post('/connection/remove/{user}', [\App\Http\Controllers\ConnectionController::class, 'remove'])->name('connection.remove');
+    
     Route::post('/post', [\App\Http\Controllers\SocialController::class, 'storePost'])->name('social.post.store');
 
     // Chat
     Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/start/{user}', [\App\Http\Controllers\ChatController::class, 'start'])->name('chat.start');
     Route::get('/chat/list', [\App\Http\Controllers\ChatController::class, 'list'])->name('chat.list');
     Route::get('/chat/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
     Route::post('/chat/{conversation}/message', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('chat.message.store');
