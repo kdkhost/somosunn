@@ -90,10 +90,10 @@
                                     class="bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-bold hover:bg-gray-300 transition shadow flex items-center gap-2">
                                     <i class="fas fa-user-check text-green-600"></i> Conectado
                                 </button>
-                                <a href="{{ route('chat.start', $user->id) }}"
+                                <button onclick="openChatBox({{ $user->id }}, '{{ $user->name }}', '{{ $user->photo ? asset($user->photo) : '' }}')"
                                     class="bg-[#1F5EDB] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center gap-2">
                                     <i class="fas fa-comment-dots"></i> Mensagem
-                                </a>
+                                </button>
                             @elseif($pendingConnection)
                                 @if($isRequester)
                                     <button
@@ -121,34 +121,54 @@
         @push('scripts')
             <script>
                 function requestConnection(userId) {
-                    const btn = document.getElementById(`btn-connect-${userId}`);
-                    const originalContent = btn.innerHTML;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    btn.disabled = true;
+                    Swal.fire({
+                        title: 'Conectar com este usuário?',
+                        text: "Você enviará uma solicitação de conexão.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#1F5EDB',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sim, conectar!',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const btn = document.getElementById(`btn-connect-${userId}`);
+                            const originalContent = btn.innerHTML;
+                            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                            btn.disabled = true;
 
-                    fetch(`/connect/${userId}`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
+                            fetch(`/connect/${userId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                                .then(r => r.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire({
+                                            title: 'Solicitação enviada!',
+                                            text: data.message,
+                                            icon: 'success',
+                                            timer: 2000,
+                                            showConfirmButton: false
+                                        }).then(() => {
+                                            location.reload();
+                                        });
+                                    } else {
+                                        toastr.error(data.message);
+                                        btn.innerHTML = originalContent;
+                                        btn.disabled = false;
+                                    }
+                                })
+                                .catch(() => {
+                                    toastr.error('Erro ao conectar.');
+                                    btn.innerHTML = originalContent;
+                                    btn.disabled = false;
+                                });
                         }
-                    })
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.success) {
-                                toastr.success(data.message);
-                                location.reload();
-                            } else {
-                                toastr.error(data.message);
-                                btn.innerHTML = originalContent;
-                                btn.disabled = false;
-                            }
-                        })
-                        .catch(() => {
-                            toastr.error('Erro ao conectar.');
-                            btn.innerHTML = originalContent;
-                            btn.disabled = false;
-                        });
+                    });
                 }
 
                 function acceptConnection(userId) {
@@ -255,6 +275,51 @@
                     </div>
                 @endforelse
             </div>
+        </div>
+    </div>
+
+    <!-- Floating Chat Box (Facebook-style) -->
+    <div id="chatBox" class="fixed bottom-0 right-4 w-full sm:w-96 bg-white rounded-t-xl shadow-2xl border border-gray-200 transition-all duration-300 transform translate-y-full z-50" style="display: none;">
+        <!-- Chat Header -->
+        <div class="bg-[#1F5EDB] text-white px-4 py-3 rounded-t-xl flex items-center justify-between cursor-pointer" onclick="toggleMinimizeChat()">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden">
+                    <img id="chatUserAvatar" src="" alt="Avatar" class="w-full h-full object-cover hidden">
+                    <span id="chatUserInitial" class="text-[#1F5EDB] font-bold text-lg"></span>
+                </div>
+                <div>
+                    <h3 id="chatUserName" class="font-bold text-sm">Carregando...</h3>
+                    <p class="text-xs opacity-80">Online</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="event.stopPropagation(); toggleMinimizeChat();" class="hover:bg-blue-600 p-2 rounded-full transition">
+                    <i id="chatMinimizeIcon" class="fas fa-minus text-sm"></i>
+                </button>
+                <button onclick="event.stopPropagation(); closeChatBox();" class="hover:bg-blue-600 p-2 rounded-full transition">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Body -->
+        <div id="chatBody" class="h-96 overflow-y-auto p-4 bg-gray-50 space-y-3">
+            <div class="text-center text-gray-500 text-sm py-8">
+                <i class="fas fa-comment-dots text-4xl mb-2 opacity-50"></i>
+                <p>Inicie uma conversa!</p>
+            </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div id="chatFooter" class="border-t border-gray-200 p-3 bg-white rounded-b-xl">
+            <form id="chatForm" onsubmit="sendMessage(event);" class="flex gap-2">
+                <input type="hidden" id="chatUserId" value="">
+                <input type="text" id="chatInput" placeholder="Digite sua mensagem..." 
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-[#1F5EDB] focus:ring-1 focus:ring-[#1F5EDB]">
+                <button type="submit" class="bg-[#1F5EDB] text-white px-5 py-2 rounded-full hover:bg-blue-700 transition font-medium">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
         </div>
     </div>
 @endsection
