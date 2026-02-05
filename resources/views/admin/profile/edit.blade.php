@@ -131,8 +131,8 @@
                                     </div>
                                     
                                     <!-- Preview -->
-                                    <div id="photo-preview" class="mt-2" style="display: none;">
-                                        <img src="" class="img-thumbnail" style="max-height: 150px;">
+                                    <div id="photo-preview" class="mt-2" style="{{ $user->photo ? '' : 'display: none;' }}">
+                                        <img src="{{ $user->photo ? asset($user->photo) : '' }}" class="img-thumbnail" style="max-height: 150px;">
                                     </div>
                                 </div>
                             </div>
@@ -147,8 +147,8 @@
                                     <small class="text-muted d-block mt-1">Recomendado: 1200x300px (JPG/PNG)</small>
                                     
                                     <!-- Preview Capa -->
-                                    <div id="cover-preview" class="mt-2" style="display: none;">
-                                        <img src="" class="img-fluid rounded" style="max-height: 150px;">
+                                    <div id="cover-preview" class="mt-2" style="{{ $user->cover_photo ? '' : 'display: none;' }}">
+                                        <img src="{{ $user->cover_photo ? asset($user->cover_photo) : '' }}" class="img-fluid rounded" style="max-height: 150px;">
                                     </div>
                                 </div>
                             </div>

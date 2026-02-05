@@ -84,3 +84,18 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
   - **Quem Somos:** Ajustes na seção de equipe e fundadores.
   - **Valores:** Otimização do grid de valores e espaçamentos.
 - **Geral:** Padronização de classes utilitárias (`pt-10 md:pt-24`, fontes responsivas) em todo o frontend para garantir uma experiência consistente em qualquer dispositivo.
+
+## Sistema de Permissões e Networking (Fevereiro 2026)
+
+- **Permissões Granulares:**
+  - Sidebar dinâmica: Membros comuns veem apenas Dashboard, Comunidade e Chat. Painéis administrativos (Financeiro, Cursos, Usuários) restritos a Administradores.
+  - Segurança de Rotas: Middleware garante que usuários comuns não acessem áreas restritas via URL direta.
+
+- **Conexões Inteligentes:**
+  - **Auto-conexão:** Novos membros conectam-se automaticamente a todos os administradores ao se registrar, facilitando o onboarding.
+  - **Isolamento de Super Admin:** O Super Administrador permanece invisível nas listas de conexão e seu perfil é privado, atuando estritamente como gestor.
+
+- **Chat & Comunidade:**
+  - Integração direta entre perfil e chat privado.
+  - Botões de ação dinâmicos (Conectar, Aceitar, Mensagem) baseados no status da relação entre usuários.
+

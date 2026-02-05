@@ -59,6 +59,7 @@
                     </a>
                 </li>
 
+                @if(auth()->user()->isAdmin())
                 <li class="nav-item has-treeview {{ $open('admin.courses.*') }}">
                     <a href="#" class="nav-link {{ $is('admin.courses.*') }}">
                         <i class="nav-icon fas fa-graduation-cap"></i>
@@ -163,17 +164,26 @@
                         <p>Vendas</p>
                     </a>
                 </li>
-
+                @endif
+                
                 <!-- Comunidade -->
                 <li class="nav-item">
-                    <a href="{{ route('admin.social.index') }}" class="nav-link {{ $is('admin.social.*') }}">
+                    <a href="{{ route('admin.social.index') }}" class="nav-link {{ $is(['admin.social.*', 'chat.*']) }}">
                         <i class="nav-icon fas fa-comments"></i>
                         <p>Comunidade</p>
                     </a>
                 </li>
                 
+                <li class="nav-item">
+                    <a href="{{ route('chat.index') }}" class="nav-link {{ $is('chat.*') }}">
+                        <i class="nav-icon fas fa-comment-dots"></i>
+                        <p>Chat</p>
+                    </a>
+                </li>
+
+                @if(auth()->user()->isAdmin())
                 <li class="nav-item"><a href="{{ route('admin.settings') }}" class="nav-link {{ $is('admin.settings') }}"><i class="nav-icon fas fa-cogs"></i><p>Configurações</p></a></li>
-            </ul>
+                @endif
         </nav>
     </div>
 </aside>

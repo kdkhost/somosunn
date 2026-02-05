@@ -64,6 +64,10 @@ class SocialController extends Controller
         // We'll use ID for now or check if username exists.
         
         $user = User::findOrFail($username); // Using ID for scaffold.
+        
+        if ($user->role === 'superadmin') {
+            abort(404);
+        }
         $posts = Post::where('user_id', $user->id)->latest()->paginate(10);
         
         return view('social.profile', compact('user', 'posts'));

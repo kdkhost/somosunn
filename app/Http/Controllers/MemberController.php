@@ -22,7 +22,8 @@ class MemberController extends Controller
         $members = collect();
         
         try {
-            $members = User::latest()
+            $members = User::where('role', '!=', 'superadmin')
+                ->latest()
                 ->take(12)
                 ->get()
                 ->map(function($user) {

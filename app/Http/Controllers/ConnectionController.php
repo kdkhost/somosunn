@@ -21,6 +21,11 @@ class ConnectionController extends Controller
                 return response()->json(['success' => false, 'message' => 'Ação inválida.']);
             }
 
+            $targetUser = User::find($userId);
+            if (!$targetUser || $targetUser->role === 'superadmin') {
+                return response()->json(['success' => false, 'message' => 'Usuário não disponível para conexão.'], 404);
+            }
+
             // Check if connection exists
             $existing = Connection::where(function($q) use ($user, $userId) {
                 $q->where('requester_id', $user->id)->where('requested_id', $userId);
