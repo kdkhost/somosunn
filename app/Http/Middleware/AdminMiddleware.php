@@ -40,6 +40,11 @@ class AdminMiddleware
 
         // Usa o método isAdmin() do modelo User para verificação confiável
         if (!$user->isAdmin()) {
+            // Permite rota de stop impersonating
+            if ($request->routeIs('admin.impersonate.stop')) {
+                return $next($request);
+            }
+
             // Não é admin, redireciona para portal
             return redirect()->route('portal')->with('info', 'Área restrita a administradores.');
         }

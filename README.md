@@ -140,9 +140,9 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
   - **Para Admins:** Todos os itens de membros + Seção "ADMINISTRAÇÃO" com Usuários, Configurações, Planos, Vendas, etc.
   - **Menu Híbrido:** Cursos, Eventos e Mentorias têm submenus diferentes: membros veem "Meus Cursos", admins veem "Gerenciar" e "Novo".
 
-- **Navbar Admin:**
-  - **Banner de Impersonation:** Só visível para admins (oculto para membros mesmo durante impersonate).
-  - **Feedback Visual:** Barra amarela com "Acessando como: [Nome]" e botão de retorno.
+- **Navbar e Layout:**
+  - **Banner Admin:** Oculto para membros.
+  - **Banner Portal:** Adicionado banner amarelo no topo do site (`layout.app`) quando em modo impersonate, permitindo retorno rápido ao painel admin.
 
 - **Segurança:**
   - `AdminMiddleware` usa `isAdmin()` do model User para validação robusta.
