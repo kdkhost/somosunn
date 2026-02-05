@@ -12,22 +12,50 @@
             }
         }
         $siteTheme = $settings['site_theme'] ?? 'light';
-        $preloaderImage = $settings['preloader_image'] ?? null;
-        if ($preloaderImage && !Str::startsWith($preloaderImage, ['http://', 'https://'])) {
-            $candidate = public_path($preloaderImage);
-            $preloaderImage = file_exists($candidate) ? asset($preloaderImage) : null;
-        }
-        if (!$preloaderImage) {
-            $preloaderImage = asset('img/logo.svg');
-        }
+
+        $resolvePublicAsset = function (?string $value) {
+            if (!$value) {
+                return null;
+            }
+
+            $value = trim((string) $value);
+            if ($value === '') {
+                return null;
+            }
+
+            if (Str::startsWith($value, ['http://', 'https://'])) {
+                return $value;
+            }
+
+            $value = str_replace('\\', '/', $value);
+            $value = preg_replace('/[?#].*$/', '', $value);
+
+            $publicRoot = str_replace('\\', '/', public_path());
+            if (Str::startsWith($value, $publicRoot)) {
+                $value = ltrim(substr($value, strlen($publicRoot)), '/');
+            }
+
+            $value = ltrim($value, '/');
+
+            if (Str::startsWith($value, 'public/')) {
+                $value = substr($value, strlen('public/'));
+            }
+
+            if (Str::startsWith($value, 'storage/app/public/')) {
+                $value = 'storage/' . substr($value, strlen('storage/app/public/'));
+            }
+
+            $candidate = public_path($value);
+            if (file_exists($candidate)) {
+                return asset($value);
+            }
+
+            return null;
+        };
+
+        $preloaderImage = $resolvePublicAsset($settings['preloader_image'] ?? null) ?? asset('img/logo.svg');
         $preloaderEnabled = (bool) ($settings['preloader_enabled'] ?? 1);
-        $favicon = $settings['favicon_image'] ?? 'favicon.ico';
-        if ($favicon && !Str::startsWith($favicon, ['http://', 'https://'])) {
-            $faviconPath = public_path($favicon);
-            $faviconUrl = file_exists($faviconPath) ? asset($favicon) : asset('favicon.ico');
-        } else {
-            $faviconUrl = $favicon ?: asset('favicon.ico');
-        }
+        $faviconUrl = $resolvePublicAsset($settings['favicon_image'] ?? null) ?? asset('favicon.ico');
     @endphp
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">

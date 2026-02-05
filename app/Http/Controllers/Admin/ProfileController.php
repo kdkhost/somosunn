@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\PointsLog;
+use App\Services\PointsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +20,7 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = auth()->user();
+        $wasProfileComplete = method_exists($user, 'isProfileComplete') ? $user->isProfileComplete() : false;
 
         $data = $request->validate([
             'name' => 'required|string|max:120',
@@ -118,6 +121,23 @@ class ProfileController extends Controller
         
         // Força refresh do modelo
         $user->refresh();
+
+        // Gamificação: pontuar completar perfil (apenas 1x)
+        try {
+            $isProfileComplete = method_exists($user, 'isProfileComplete') ? $user->isProfileComplete() : false;
+            if ($isProfileComplete && !$wasProfileComplete) {
+                $alreadyAwarded = PointsLog::query()
+                    ->where('user_id', $user->id)
+                    ->where('action_key', 'complete_profile')
+                    ->exists();
+
+                if (!$alreadyAwarded) {
+                    (new PointsService())->award($user, 'complete_profile');
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao pontuar completar perfil: ' . $e->getMessage());
+        }
 
         if ($request->ajax()) {
             return response()->json([

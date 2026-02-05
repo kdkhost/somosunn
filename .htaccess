@@ -25,7 +25,10 @@ AddDefaultCharset UTF-8
     RewriteRule ^uploads/(.*)$ public/uploads/$1 [L,NC]
     RewriteRule ^img/(.*)$ public/img/$1 [L,NC]
     RewriteRule ^service-worker\.js$ public/service-worker.js [L,NC]
-    RewriteRule ^manifest\.webmanifest$ public/manifest.webmanifest [L,NC]
+
+    # PWA manifest é servido dinamicamente pelo Laravel em /manifest.webmanifest
+    # (mantemos a URL na raiz para o escopo correto do PWA)
+    RewriteRule ^manifest\.webmanifest$ public/index.php [L,NC]
 
     # enviar tudo para o front controller
     RewriteCond %{REQUEST_FILENAME} !-f

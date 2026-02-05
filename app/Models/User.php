@@ -179,4 +179,30 @@ class User extends Authenticatable
     {
         return $this->hasMany(Subscription::class);
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function isProfileComplete(): bool
+    {
+        $requiredValues = [
+            $this->phone,
+            $this->occupation,
+            $this->company,
+            $this->bio,
+            $this->city,
+            $this->state,
+            $this->photo,
+        ];
+
+        foreach ($requiredValues as $value) {
+            if (blank($value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

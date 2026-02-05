@@ -6,7 +6,10 @@
 @php
     $isDemo = $event->is_demo ?? false;
     $startDate = is_string($event->start_at) ? \Carbon\Carbon::parse($event->start_at) : $event->start_at;
-    $endDate = is_string($event->end_at) ? \Carbon\Carbon::parse($event->end_at) : $event->end_at;
+    $endDate = null;
+    if ($event->end_at) {
+        $endDate = is_string($event->end_at) ? \Carbon\Carbon::parse($event->end_at) : $event->end_at;
+    }
     $eventColor = $event->color ?? '#1F5EDB';
     $mapQuery = urlencode($event->address);
     $confirmedSeats = $event->confirmed_seats;
@@ -57,7 +60,10 @@
                                 </div>
                                 <div>
                                     <p class="text-sm text-gray-500">Horário</p>
-                                    <p class="text-lg font-bold text-gray-900">{{ $startDate->format('H:i') }} às {{ $endDate->format('H:i') }}</p>
+                                    <p class="text-lg font-bold text-gray-900">
+                                        {{ $startDate->format('H:i') }}
+                                        @if($endDate) às {{ $endDate->format('H:i') }} @endif
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -211,7 +217,13 @@
                 </div>
                 <div class="bg-slate-50 rounded-2xl p-6 text-center">
                     <i class="fas fa-hourglass-half text-3xl text-green-500 mb-3"></i>
-                    <p class="text-2xl font-bold text-gray-900">{{ $startDate->diffInHours($endDate) }}h</p>
+                    <p class="text-2xl font-bold text-gray-900">
+                        @if($endDate)
+                            {{ $startDate->diffInHours($endDate) }}h
+                        @else
+                            —
+                        @endif
+                    </p>
                     <p class="text-sm text-gray-500">Duração</p>
                 </div>
                 <div class="bg-slate-50 rounded-2xl p-6 text-center">

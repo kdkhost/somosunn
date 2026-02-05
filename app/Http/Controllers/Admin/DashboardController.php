@@ -42,13 +42,18 @@ class DashboardController extends Controller
             }
 
             // Calendar Events (Unified for all)
-            $calendarEvents = \App\Models\Event::where('published', true)
+            $eventsQuery = \App\Models\Event::query();
+            if (!$isAdmin) {
+                $eventsQuery->where('published', true);
+            }
+
+            $calendarEvents = $eventsQuery
                 ->get()
                 ->map(function ($event) use ($isAdmin) {
                     return [
                         'id' => $event->id,
                         'title' => $event->title,
-                        'start' => $event->start_at->toIso8601String(),
+                        'start' => $event->start_at ? $event->start_at->toIso8601String() : null,
                         'end' => $event->end_at ? $event->end_at->toIso8601String() : null,
                         'url' => $isAdmin ? route('admin.events.edit', $event->id) : null,
                         'backgroundColor' => $event->color ?? '#28a745',

@@ -16,7 +16,11 @@
                 <div class="form-group mb-2"><label>Endereço Completo</label><div class="input-group"><input name="address" id="addressInput" class="form-control" value="{{ old('address',$event->address) }}"><div class="input-group-append"><button type="button" class="btn btn-secondary" id="searchBtn"><i class="fas fa-search"></i> Buscar</button></div></div></div>
                 <div class="form-group mb-2"><label>Latitude</label><input name="latitude" id="latInput" class="form-control" value="{{ old('latitude',$event->latitude) }}" readonly></div>
                 <div class="form-group mb-2"><label>Longitude</label><input name="longitude" id="lngInput" class="form-control" value="{{ old('longitude',$event->longitude) }}" readonly></div>
-                <div class="form-check mb-2"><input type="checkbox" name="published" value="1" class="form-check-input" {{ $event->published ? 'checked' : '' }}><label class="form-check-label">Publicado</label></div>
+                <input type="hidden" name="published" value="0">
+                <div class="form-check mb-2">
+                    <input type="checkbox" name="published" value="1" class="form-check-input" {{ old('published', $event->published) ? 'checked' : '' }}>
+                    <label class="form-check-label">Publicado</label>
+                </div>
             </div>
             <div class="col-md-6">
                 <label>Mapa (Clique para marcar)</label>

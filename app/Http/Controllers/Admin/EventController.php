@@ -18,6 +18,11 @@ class EventController extends Controller
         return view('admin.events.calendar', compact('companyLocation'));
     }
 
+    public function show(Event $event)
+    {
+        return redirect()->route('admin.events.edit', $event);
+    }
+
     public function feed(Request $request)
     {
         $startRaw = $request->query('start', $request->input('start'));
@@ -54,6 +59,7 @@ class EventController extends Controller
                     'location' => $event->location,
                     'capacity' => $event->capacity,
                     'price' => $event->price,
+                    'published' => (bool) $event->published,
                     'latitude' => $event->latitude,
                     'longitude' => $event->longitude,
                     'batch_1_price' => $event->batch_1_price,
@@ -110,6 +116,8 @@ class EventController extends Controller
             'longitude' => 'nullable|numeric',
             'price' => 'nullable|numeric|min:0',
             'capacity' => 'nullable|integer|min:0',
+            'published' => 'nullable|boolean',
+            'all_day' => 'nullable|boolean',
             'batch_1_price' => 'nullable|numeric|min:0',
             'batch_1_deadline' => 'nullable|date',
             'batch_2_price' => 'nullable|numeric|min:0',
@@ -117,6 +125,14 @@ class EventController extends Controller
             'batch_3_price' => 'nullable|numeric|min:0',
             'batch_3_deadline' => 'nullable|date',
         ]);
+
+        $validated['published'] = $request->has('published')
+            ? $request->boolean('published')
+            : true;
+
+        if ($request->has('all_day')) {
+            $validated['all_day'] = $request->boolean('all_day');
+        }
 
         $event = Event::create($validated);
 
@@ -158,6 +174,8 @@ class EventController extends Controller
             'longitude' => 'nullable|numeric',
             'price' => 'nullable|numeric|min:0',
             'capacity' => 'nullable|integer|min:0',
+            'published' => 'nullable|boolean',
+            'all_day' => 'nullable|boolean',
             'batch_1_price' => 'nullable|numeric|min:0',
             'batch_1_deadline' => 'nullable|date',
             'batch_2_price' => 'nullable|numeric|min:0',
@@ -165,6 +183,14 @@ class EventController extends Controller
             'batch_3_price' => 'nullable|numeric|min:0',
             'batch_3_deadline' => 'nullable|date',
         ]);
+
+        if ($request->has('published')) {
+            $validated['published'] = $request->boolean('published');
+        }
+
+        if ($request->has('all_day')) {
+            $validated['all_day'] = $request->boolean('all_day');
+        }
 
         $event->update($validated);
 

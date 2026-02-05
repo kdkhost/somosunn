@@ -8,7 +8,7 @@ use App\Http\Controllers\RankingController;
 use App\Http\Controllers\SatisfactionController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/portal', [HomeController::class, 'portal'])->name('portal');
+Route::get('/portal', fn() => redirect()->route('admin.dashboard'))->name('portal');
 Route::get('/premium', [HomeController::class, 'premium'])->name('premium');
 
 // Rota de Emergência para Diagnóstico

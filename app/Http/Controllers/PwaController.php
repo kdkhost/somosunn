@@ -9,18 +9,35 @@ class PwaController extends Controller
 {
     public function manifest()
     {
-        $enabled = Setting::get('pwa_enabled', '1');
+        $enabled = (string) Setting::get('pwa_enabled', '1');
+        if ($enabled !== '1') {
+            abort(404);
+        }
+
         $name = Setting::get('pwa_name', 'UNN');
         $short = Setting::get('pwa_short_name', 'UNN');
         $desc = Setting::get('pwa_description', 'Comunidade UNN');
-        $theme = Setting::get('pwa_theme_color', '#5B21B6');
-        $bg = Setting::get('pwa_bg_color', '#ffffff');
+        $theme = Setting::get('pwa_theme_color', '#1F5EDB');
+        $bg = Setting::get('pwa_background_color');
+        if (!$bg) {
+            $bg = Setting::get('pwa_bg_color', '#ffffff');
+        }
         $icon192 = Setting::get('pwa_icon_192');
         $icon512 = Setting::get('pwa_icon_512');
 
+        foreach (['icon192', 'icon512'] as $var) {
+            if (!$$var) {
+                continue;
+            }
+            $$var = str_replace('\\', '/', ltrim((string) $$var, '/'));
+            if (str_starts_with($$var, 'public/')) {
+                $$var = substr($$var, strlen('public/'));
+            }
+        }
+
         $icons = [];
         if($icon192) {
-            $icons[] = ['src' => asset($icon192), 'sizes' => '192x192', 'type' => 'image/png'];
+            $icons[] = ['src' => asset(ltrim($icon192, '/')), 'sizes' => '192x192', 'type' => 'image/png'];
         } else {
             // Fallback: usar PNG copiado para garantir compatibilidade Chrome
             $icons[] = ['src' => asset('img/pwa-icon-512.png'), 'sizes' => '512x512', 'type' => 'image/png'];
@@ -28,7 +45,7 @@ class PwaController extends Controller
         }
 
         if($icon512) {
-            $icons[] = ['src' => asset($icon512), 'sizes' => '512x512', 'type' => 'image/png'];
+            $icons[] = ['src' => asset(ltrim($icon512, '/')), 'sizes' => '512x512', 'type' => 'image/png'];
         }
 
         $manifest = [

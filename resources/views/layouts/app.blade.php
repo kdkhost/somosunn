@@ -32,7 +32,9 @@
     @endphp
     <link rel="icon" href="{{ $favicon }}" type="image/x-icon">
     <link rel="apple-touch-icon" href="{{ $logo }}">
-    <link rel="manifest" href="{{ route('manifest') }}">
+    @if ($pwaEnabled)
+        <link rel="manifest" href="{{ route('manifest') }}">
+    @endif
     <meta name="theme-color" content="{{ $pwaTheme }}">
 
     <!-- Fonts & Icons -->
@@ -252,7 +254,6 @@
     @stack('scripts')
 
     @if ($pwaEnabled)
-        <link rel="manifest" href="/manifest.webmanifest">
         <script>
                     if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/service-worker.js')
@@ -318,6 +319,8 @@
                     setTimeout(() => modal.remove(), 300);
                 }
             };
+
+            window.showInstallModal = showInstallModal;
 
             window.addEventListener('beforeinstallprompt', (e) => {
                 // Impede que o Chrome mostre o prompt nativo automaticamente (para mobile principalmente)

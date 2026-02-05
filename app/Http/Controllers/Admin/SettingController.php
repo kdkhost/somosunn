@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class SettingController extends Controller
 {
@@ -176,42 +177,57 @@ class SettingController extends Controller
 
     private function normalizeFileSettings(array $settings): array
     {
-        $fileKeys = [
-            'preloader_image',
-            'logo_image',
-            'favicon_image',
-            'logo_admin',
-            'logo_auth',
-            'logo_front',
-            'watermark_image',
-            'pwa_icon_192',
-            'pwa_icon_512',
-            'pwa_splash',
-            'pwa_banner',
-            'hero_image',
+        $keyDirs = [
+            'preloader_image' => ['uploads/imagens/preloader', 'uploads/imagens/geral', 'uploads/imagens'],
+            'logo_image' => ['uploads/imagens/geral', 'uploads/imagens'],
+            'favicon_image' => ['uploads/imagens/geral', 'uploads/imagens'],
+            'logo_admin' => ['uploads/imagens/administrativo', 'uploads/imagens'],
+            'logo_auth' => ['uploads/imagens/logins', 'uploads/imagens'],
+            'logo_front' => ['uploads/imagens/frontend', 'uploads/imagens'],
+            'watermark_image' => ['uploads/imagens/watermark', 'uploads/imagens'],
+            'pwa_icon_192' => ['uploads/imagens/pwa', 'uploads/imagens'],
+            'pwa_icon_512' => ['uploads/imagens/pwa', 'uploads/imagens'],
+            'pwa_splash' => ['uploads/imagens/pwa', 'uploads/imagens'],
+            'pwa_banner' => ['uploads/imagens/pwa', 'uploads/imagens'],
+            'hero_image' => ['uploads/imagens/frontend', 'uploads/imagens'],
         ];
-        $searchDirs = [
-            'uploads/imagens/geral',
-            'uploads/imagens/administrativo',
-            'uploads/imagens/logins',
-            'uploads/imagens/frontend',
-            'uploads/imagens/pwa',
-            'uploads/imagens/preloader',
-            'uploads/imagens/watermark',
-            'uploads/imagens',
-        ];
-        foreach ($fileKeys as $key) {
+
+        foreach ($keyDirs as $key => $searchDirs) {
             $value = $settings[$key] ?? '';
             if (!$value) {
                 continue;
             }
-            $value = ltrim($value, '/');
-            if (file_exists(public_path($value))) {
+
+            $value = trim((string) $value);
+            if ($value === '') {
                 continue;
             }
+
+            if (Str::startsWith($value, ['http://', 'https://'])) {
+                continue;
+            }
+
+            $value = str_replace('\\', '/', $value);
+            $value = preg_replace('/[?#].*$/', '', $value);
+
+            $publicRoot = str_replace('\\', '/', public_path());
+            if (Str::startsWith($value, $publicRoot)) {
+                $value = ltrim(substr($value, strlen($publicRoot)), '/');
+            }
+
+            $value = ltrim($value, '/');
+            if (Str::startsWith($value, 'public/')) {
+                $value = substr($value, strlen('public/'));
+            }
+
+            if (file_exists(public_path($value))) {
+                $settings[$key] = $value;
+                continue;
+            }
+
             $basename = basename($value);
             $resolved = '';
-            foreach ($searchDirs as $dir) {
+            foreach ((array) $searchDirs as $dir) {
                 $candidate = $dir . '/' . $basename;
                 if (file_exists(public_path($candidate))) {
                     $resolved = $candidate;

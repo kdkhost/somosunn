@@ -145,9 +145,11 @@
             <a href="{{ $cta['href'] }}" class="inline-flex w-full items-center justify-center rounded-full border border-[#1F5EDB] px-6 py-3 text-sm font-semibold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
                 {{ $cta['label'] }}
             </a>
-            <button onclick="showInstallModal()" class="w-full mt-3 inline-flex items-center justify-center rounded-full bg-slate-100 px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">
-                <i class="fas fa-download mr-2"></i> Instalar App
-            </button>
+            @if(!empty($pwaEnabled))
+                <button onclick="showInstallModal()" class="w-full mt-3 inline-flex items-center justify-center rounded-full bg-slate-100 px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">
+                    <i class="fas fa-download mr-2"></i> Instalar App
+                </button>
+            @endif
         </div>
     </div>
 </div>

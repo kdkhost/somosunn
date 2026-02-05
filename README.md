@@ -12,6 +12,13 @@ Principais instruções rápidas:
    - `php artisan migrate --seed`
    - `php artisan storage:link`
 
+## Deploy em hospedagem compartilhada (cPanel)
+
+Resumo (leia o guia completo em `DEPLOY_CPANEL.md`):
+- Use filas em banco: `QUEUE_CONNECTION=database` (e rode migrations para `jobs`, `failed_jobs`, `job_batches`).
+- Configure Cron no cPanel para processar filas sem daemon: `queue:work --stop-when-empty` a cada 1 minuto.
+- Após deploy, rode `php artisan optimize` (e, se necessário, `php artisan optimize:clear` + `optimize`).
+
 PHPMailer
 - Instale `composer require phpmailer/phpmailer` (already listed in composer.json)
 - Configure `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS` in .env
@@ -26,6 +33,7 @@ Payments (MercadoPago / PagSeguro)
 PWA
 - Ative/desative pelo painel administrativo em Configurações → PWA
 - Upload de ícones no painel atualiza `manifest.webmanifest` dinamicamente
+- O manifest dinâmico é servido em `GET /manifest.webmanifest` e respeita a flag `pwa_enabled`
 
 Instalador Web
 - Acesse `/install` em ambiente sem `APP_INSTALLED=true` para executar migrations, seeders e criar o administrador inicial via formulário web.
@@ -133,7 +141,7 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
 - **Separação de Dashboards:**
   - **Dashboard Admin:** Analytics, vendas, reembolsos, usuários registrados, gráficos de performance (restrito a admins).
   - **Portal do Membro:** Eventos, cursos, mentorias disponíveis, ranking da comunidade, grupos WhatsApp (para todos).
-  - **Redirecionamento Automático:** Membros que tentam acessar `/admin` são redirecionados automaticamente para `/portal`.
+  - **Acesso Unificado:** Todo acesso ao painel é via `/admin` (membro/admin). A rota `/portal` é um alias e redireciona para o dashboard do painel.
 
 - **Sidebar Dinâmica:**
   - **Para Membros:** Dashboard (portal), Comunidade, Chat, Cursos (Meus Cursos), Eventos (Calendário), Mentorias (Disponíveis).

@@ -109,6 +109,13 @@ class SocialController extends Controller
             'visibility' => 'public',
         ]);
 
+        // Gamificação: pontuar publicação (se regra existir)
+        try {
+            (new \App\Services\PointsService())->award(Auth::user(), 'publish', ['post_id' => $post->id]);
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao pontuar publicação: ' . $e->getMessage());
+        }
+
         return back()->with('success', 'Post publicado!');
     }
 }

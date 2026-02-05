@@ -6,16 +6,42 @@
         if (!$value) {
             return '';
         }
-        if (Str::startsWith($value, ['http://','https://'])) {
-            return $value;
-        }
-        $value = ltrim($value, '/');
-        if (Str::startsWith($value, ['tmp/','/tmp'])) {
+
+        $value = trim((string) $value);
+        if ($value === '') {
             return '';
         }
+
+        if (Str::startsWith($value, ['http://', 'https://'])) {
+            return $value;
+        }
+
+        $value = str_replace('\\', '/', $value);
+        $value = preg_replace('/[?#].*$/', '', $value);
+
+        // If stored as absolute path inside /public, make it relative again
+        $publicRoot = str_replace('\\', '/', public_path());
+        if (Str::startsWith($value, $publicRoot)) {
+            $value = ltrim(substr($value, strlen($publicRoot)), '/');
+        }
+
+        $value = ltrim($value, '/');
+        if (Str::startsWith($value, 'tmp/')) {
+            return '';
+        }
+
+        // Legacy prefixes sometimes end up stored in DB
+        if (Str::startsWith($value, 'public/')) {
+            $value = substr($value, strlen('public/'));
+        }
+        if (Str::startsWith($value, 'storage/app/public/')) {
+            $value = 'storage/' . substr($value, strlen('storage/app/public/'));
+        }
+
         if (file_exists(public_path($value))) {
             return asset($value);
         }
+
         return '';
     };
     $pwa192   = $getUrl('pwa_icon_192');
@@ -256,7 +282,7 @@
                 <div class="tab-pane fade" id="tab-pwa" role="tabpanel">
                     <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
                         <input type="hidden" name="pwa_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input" id="pwa_enabled" name="pwa_enabled" value="1" {{ ($settings['pwa_enabled'] ?? 0) ? 'checked' : '' }}>
+                        <input type="checkbox" class="custom-control-input" id="pwa_enabled" name="pwa_enabled" value="1" {{ ($settings['pwa_enabled'] ?? 1) ? 'checked' : '' }}>
                         <label class="custom-control-label" for="pwa_enabled">PWA habilitado</label>
                     </div>
                     <div class="row">

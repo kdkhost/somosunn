@@ -60,6 +60,11 @@
                         <label>Título</label>
                         <input type="text" class="form-control" name="title" id="title" required>
                     </div>
+                    <input type="hidden" name="published" value="0">
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" name="published" id="published" value="1" checked>
+                        <label class="form-check-label" for="published">Publicado no Site</label>
+                    </div>
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
@@ -186,7 +191,7 @@
                 openModal(info.event);
             },
             dateClick: function(info) {
-                openModal({start: info.dateStr});
+                openModal({start: info.date});
             },
             eventDrop: function(info) {
                 updateEvent(info.event);
@@ -201,6 +206,7 @@
         function openModal(event) {
             $('#eventForm')[0].reset();
             $('#event_id').val('');
+            $('#published').prop('checked', true);
             $('#event_latitude').val('');
             $('#event_longitude').val('');
             $('#suggestions').empty().hide(); // Clear suggestions
@@ -221,6 +227,7 @@
                 $('#address').val(event.extendedProps.address || '');
                 $('#capacity').val(event.extendedProps.capacity || '');
                 $('#price').val(event.extendedProps.price || '');
+                $('#published').prop('checked', !!event.extendedProps.published);
                 
                 // Batches
                 $('#batch_1_price').val(event.extendedProps.batch_1_price || '');
