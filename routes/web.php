@@ -70,8 +70,10 @@ Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::cla
 Route::post('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'process'])->name('subscription.process');
 Route::get('/assinar/sucesso/{order}', [\App\Http\Controllers\SubscriptionController::class, 'success'])->name('subscription.success');
 
-Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
-Route::get('/eventos/{id}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
+Route::middleware(['check.feature:events'])->group(function () {
+    Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
+});
+Route::get('/eventos/{id}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show'); // Show might need to be public? Keeping consistency.
 
 // PWA static files to avoid 404 in production
 Route::get('/service-worker.js', function () {
@@ -135,8 +137,14 @@ Route::get('/offline', fn() => view('offline'))->name('offline');
 
 
 // Public & Creator Course Routes
+// Public & Creator Course Routes
 Route::resource('courses', \App\Http\Controllers\CourseController::class);
-Route::resource('mentorships', \App\Http\Controllers\MentorshipController::class)->only(['index', 'show']);
+
+// Feature: Mentorships
+Route::middleware(['check.feature:mentorships'])->group(function () {
+    Route::resource('mentorships', \App\Http\Controllers\MentorshipController::class)->only(['index', 'show']);
+});
+
 Route::post('courses/{course}/lessons', [\App\Http\Controllers\LessonController::class, 'store'])->name('courses.lessons.store');
 Route::put('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'update'])->name('courses.lessons.update');
 Route::delete('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'destroy'])->name('courses.lessons.destroy');
@@ -149,29 +157,39 @@ Route::put('courses/{course}/lessons/{lesson}/attachments/{attachment}', [\App\H
 Route::get('courses/{course}/lessons/{lesson}/details', [\App\Http\Controllers\LessonController::class, 'getDetails'])->name('courses.lessons.details');
 
 // Public Events
-Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
+// Feature: Events
+Route::middleware(['check.feature:events'])->group(function () {
+    Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
+    // Note: 'events.index' is defined earlier at line 73. I should probably move it here or wrap it too.
+});
 
 // Auth Required Routes
+// Auth Required Routes
 Route::middleware(['auth'])->group(function () {
-    // Social / Community
-    Route::get('/feed', [\App\Http\Controllers\SocialController::class, 'feed'])->name('social.feed');
-    Route::get('/profile/{username}', [\App\Http\Controllers\SocialController::class, 'profile'])->name('social.profile');
 
-    // Connections
-    Route::post('/connect/{user}', [\App\Http\Controllers\ConnectionController::class, 'connect'])->name('connection.connect');
-    Route::post('/connection/accept/{user}', [\App\Http\Controllers\ConnectionController::class, 'accept'])->name('connection.accept');
-    Route::post('/connection/remove/{user}', [\App\Http\Controllers\ConnectionController::class, 'remove'])->name('connection.remove');
-    Route::post('/connection/block/{user}', [\App\Http\Controllers\ConnectionController::class, 'block'])->name('connection.block');
+    // Social / Community (Feature: community)
+    Route::middleware(['check.feature:community'])->group(function () {
+        Route::get('/feed', [\App\Http\Controllers\SocialController::class, 'feed'])->name('social.feed');
+        Route::get('/profile/{username}', [\App\Http\Controllers\SocialController::class, 'profile'])->name('social.profile');
 
-    Route::post('/post', [\App\Http\Controllers\SocialController::class, 'storePost'])->name('social.post.store');
+        // Connections
+        Route::post('/connect/{user}', [\App\Http\Controllers\ConnectionController::class, 'connect'])->name('connection.connect');
+        Route::post('/connection/accept/{user}', [\App\Http\Controllers\ConnectionController::class, 'accept'])->name('connection.accept');
+        Route::post('/connection/remove/{user}', [\App\Http\Controllers\ConnectionController::class, 'remove'])->name('connection.remove');
+        Route::post('/connection/block/{user}', [\App\Http\Controllers\ConnectionController::class, 'block'])->name('connection.block');
 
-    // Chat
-    Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
-    Route::get('/chat/start/{user}', [\App\Http\Controllers\ChatController::class, 'start'])->name('chat.start');
-    Route::get('/chat/list', [\App\Http\Controllers\ChatController::class, 'list'])->name('chat.list');
-    Route::get('/chat/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
-    Route::get('/chat/{conversation}/messages', [\App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
-    Route::post('/chat/{conversation}/message', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('chat.message.store');
+        Route::post('/post', [\App\Http\Controllers\SocialController::class, 'storePost'])->name('social.post.store');
+    });
+
+    // Chat (Feature: chat)
+    Route::middleware(['check.feature:chat'])->group(function () {
+        Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
+        Route::get('/chat/start/{user}', [\App\Http\Controllers\ChatController::class, 'start'])->name('chat.start');
+        Route::get('/chat/list', [\App\Http\Controllers\ChatController::class, 'list'])->name('chat.list');
+        Route::get('/chat/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
+        Route::get('/chat/{conversation}/messages', [\App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
+        Route::post('/chat/{conversation}/message', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('chat.message.store');
+    });
 });
 
 // Payments & Checkout

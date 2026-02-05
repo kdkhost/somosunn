@@ -82,76 +82,82 @@
                 {{-- Menu para Membros (Removido: Portal e Comunidade) --}}
 
                 {{-- Itens disponíveis para todos (Membros e Admins) --}}
-                <li class="nav-item has-treeview {{ $open('admin.courses.*') }}">
-                    <a href="#" class="nav-link {{ $is('admin.courses.*') }}">
-                        <i class="nav-icon fas fa-graduation-cap"></i>
-                        <p>Cursos<i class="right fas fa-angle-left"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview pl-4">
-                        <li class="nav-item"><a href="{{ route('courses.index') }}" class="nav-link"><i
-                                    class="fas fa-list nav-icon"></i>
-                                <p>Meus Cursos</p>
-                            </a></li>
-                        @if(auth()->user()->isAdmin())
-                            <li class="nav-item"><a href="{{ route('admin.courses.index') }}"
-                                    class="nav-link {{ $is('admin.courses.index') }}"><i class="fas fa-cog nav-icon"></i>
-                                    <p>Gerenciar</p>
+                @if(auth()->user()->canAccessFeature('courses'))
+                    <li class="nav-item has-treeview {{ $open('admin.courses.*') }}">
+                        <a href="#" class="nav-link {{ $is('admin.courses.*') }}">
+                            <i class="nav-icon fas fa-graduation-cap"></i>
+                            <p>Cursos<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item"><a href="{{ route('courses.index') }}" class="nav-link"><i
+                                        class="fas fa-list nav-icon"></i>
+                                    <p>Meus Cursos</p>
                                 </a></li>
-                            <li class="nav-item"><a href="{{ route('admin.courses.create') }}"
-                                    class="nav-link {{ $is('admin.courses.create') }}"><i class="fas fa-plus nav-icon"></i>
-                                    <p>Novo</p>
-                                </a></li>
-                        @endif
-                    </ul>
-                </li>
+                            @if(auth()->user()->isAdmin())
+                                <li class="nav-item"><a href="{{ route('admin.courses.index') }}"
+                                        class="nav-link {{ $is('admin.courses.index') }}"><i class="fas fa-cog nav-icon"></i>
+                                        <p>Gerenciar</p>
+                                    </a></li>
+                                <li class="nav-item"><a href="{{ route('admin.courses.create') }}"
+                                        class="nav-link {{ $is('admin.courses.create') }}"><i class="fas fa-plus nav-icon"></i>
+                                        <p>Novo</p>
+                                    </a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
 
-                <li class="nav-item has-treeview {{ $open('admin.events.*') }}">
-                    <a href="#" class="nav-link {{ $is('admin.events.*') }}">
-                        <i class="nav-icon fas fa-calendar"></i>
-                        <p>Eventos<i class="right fas fa-angle-left"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview pl-4">
-                        <li class="nav-item"><a href="{{ route('events.index') }}" class="nav-link"><i
-                                    class="fas fa-calendar-alt nav-icon"></i>
-                                <p>Calendário</p>
-                            </a></li>
-                        @if(auth()->user()->isAdmin())
-                            <li class="nav-item"><a href="{{ route('admin.events.index') }}"
-                                    class="nav-link {{ $is('admin.events.index') }}"><i class="fas fa-cog nav-icon"></i>
-                                    <p>Gerenciar</p>
+                @if(auth()->user()->canAccessFeature('events'))
+                    <li class="nav-item has-treeview {{ $open('admin.events.*') }}">
+                        <a href="#" class="nav-link {{ $is('admin.events.*') }}">
+                            <i class="nav-icon fas fa-calendar"></i>
+                            <p>Eventos<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item"><a href="{{ route('events.index') }}" class="nav-link"><i
+                                        class="fas fa-calendar-alt nav-icon"></i>
+                                    <p>Calendário</p>
                                 </a></li>
-                            <li class="nav-item"><a href="{{ route('admin.events.create') }}"
-                                    class="nav-link {{ $is('admin.events.create') }}"><i class="fas fa-plus nav-icon"></i>
-                                    <p>Novo</p>
-                                </a></li>
-                        @endif
-                    </ul>
-                </li>
+                            @if(auth()->user()->isAdmin())
+                                <li class="nav-item"><a href="{{ route('admin.events.index') }}"
+                                        class="nav-link {{ $is('admin.events.index') }}"><i class="fas fa-cog nav-icon"></i>
+                                        <p>Gerenciar</p>
+                                    </a></li>
+                                <li class="nav-item"><a href="{{ route('admin.events.create') }}"
+                                        class="nav-link {{ $is('admin.events.create') }}"><i class="fas fa-plus nav-icon"></i>
+                                        <p>Novo</p>
+                                    </a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
 
-                <li class="nav-item has-treeview {{ $open('admin.mentorships.*') }}">
-                    <a href="#" class="nav-link {{ $is('admin.mentorships.*') }}">
-                        <i class="nav-icon fas fa-chalkboard-teacher"></i>
-                        <p>Mentorias<i class="right fas fa-angle-left"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview pl-4">
-                        <li class="nav-item"><a href="{{ route('mentorships.index') }}" class="nav-link"><i
-                                    class="fas fa-list nav-icon"></i>
-                                <p>Disponíveis</p>
-                            </a></li>
-                        @if(auth()->user()->isAdmin())
-                            <li class="nav-item"><a href="{{ route('admin.mentorships.index') }}"
-                                    class="nav-link {{ $is('admin.mentorships.index') }}"><i
-                                        class="fas fa-cog nav-icon"></i>
-                                    <p>Gerenciar</p>
+                @if(auth()->user()->canAccessFeature('mentorships'))
+                    <li class="nav-item has-treeview {{ $open('admin.mentorships.*') }}">
+                        <a href="#" class="nav-link {{ $is('admin.mentorships.*') }}">
+                            <i class="nav-icon fas fa-chalkboard-teacher"></i>
+                            <p>Mentorias<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item"><a href="{{ route('mentorships.index') }}" class="nav-link"><i
+                                        class="fas fa-list nav-icon"></i>
+                                    <p>Disponíveis</p>
                                 </a></li>
-                            <li class="nav-item"><a href="{{ route('admin.mentorships.create') }}"
-                                    class="nav-link {{ $is('admin.mentorships.create') }}"><i
-                                        class="fas fa-plus nav-icon"></i>
-                                    <p>Novo</p>
-                                </a></li>
-                        @endif
-                    </ul>
-                </li>
+                            @if(auth()->user()->isAdmin())
+                                <li class="nav-item"><a href="{{ route('admin.mentorships.index') }}"
+                                        class="nav-link {{ $is('admin.mentorships.index') }}"><i
+                                            class="fas fa-cog nav-icon"></i>
+                                        <p>Gerenciar</p>
+                                    </a></li>
+                                <li class="nav-item"><a href="{{ route('admin.mentorships.create') }}"
+                                        class="nav-link {{ $is('admin.mentorships.create') }}"><i
+                                            class="fas fa-plus nav-icon"></i>
+                                        <p>Novo</p>
+                                    </a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
 
                 {{-- Itens exclusivos de Admin --}}
                 @if(auth()->user()->isAdmin())
@@ -267,20 +273,25 @@
                 @endif
 
                 <!-- Comunidade -->
-                <li class="nav-item">
-                    <a href="{{ route('admin.social.index') }}"
-                        class="nav-link {{ $is(['admin.social.*', 'chat.*']) }}">
-                        <i class="nav-icon fas fa-comments"></i>
-                        <p>Comunidade</p>
-                    </a>
-                </li>
+                @if(auth()->user()->canAccessFeature('community'))
+                    <li class="nav-item">
+                        {{-- Usa rota do feed se disponível, senão admin.social --}}
+                        <a href="{{ Route::has('social.feed') ? route('social.feed') : route('admin.social.index') }}"
+                            class="nav-link {{ $is(['admin.social.*', 'social.*']) }}">
+                            <i class="nav-icon fas fa-comments"></i>
+                            <p>Comunidade</p>
+                        </a>
+                    </li>
+                @endif
 
-                <li class="nav-item">
-                    <a href="{{ route('chat.index') }}" class="nav-link {{ $is('chat.*') }}">
-                        <i class="nav-icon fas fa-comment-dots"></i>
-                        <p>Chat</p>
-                    </a>
-                </li>
+                @if(auth()->user()->canAccessFeature('chat'))
+                    <li class="nav-item">
+                        <a href="{{ route('chat.index') }}" class="nav-link {{ $is('chat.*') }}">
+                            <i class="nav-icon fas fa-comment-dots"></i>
+                            <p>Chat</p>
+                        </a>
+                    </li>
+                @endif
 
                 @if(auth()->user()->isAdmin())
                     <li class="nav-item"><a href="{{ route('admin.settings') }}"

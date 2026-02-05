@@ -10,7 +10,7 @@ use App\Models\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles, Traits\HasPackageAccess;
+    use HasFactory, Notifiable, HasRoles, Traits\HasFeatureAccess;
 
     public function isAdmin()
     {
@@ -32,6 +32,8 @@ class User extends Authenticatable
         'points',
         'theme_pref',
         'level',
+        'plan_id',
+        'plan_expires_at',
         // Endereço
         'cep',
         'street',
@@ -58,8 +60,14 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'plan_expires_at' => 'datetime',
         'social_links' => 'array'
     ];
+
+    public function plan()
+    {
+        return $this->belongsTo(\App\Models\Plan::class);
+    }
 
     public function courses()
     {

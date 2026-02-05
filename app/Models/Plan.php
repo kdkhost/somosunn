@@ -10,7 +10,15 @@ class Plan extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name','price','period','image','highlight','coupons_enabled','benefits','permissions','is_active'
+        'name',
+        'price',
+        'period',
+        'image',
+        'highlight',
+        'coupons_enabled',
+        'benefits',
+        'permissions',
+        'is_active'
     ];
 
     protected $casts = [
@@ -21,4 +29,13 @@ class Plan extends Model
         'permissions' => 'array',
         'price' => 'decimal:2'
     ];
+
+    public function hasFeature($feature)
+    {
+        $features = $this->permissions ?? [];
+        if (!is_array($features)) {
+            return false;
+        }
+        return in_array($feature, $features) || in_array('*', $features);
+    }
 }
