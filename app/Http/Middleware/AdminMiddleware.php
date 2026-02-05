@@ -38,12 +38,13 @@ class AdminMiddleware
             }
         }
 
-        // Redireciona membros para o portal
-        if ($isMember || !$isAdmin) {
+        // Usa o método isAdmin() do modelo User para verificação confiável
+        if (!$user->isAdmin()) {
+            // Não é admin, redireciona para portal
             return redirect()->route('portal')->with('info', 'Área restrita a administradores.');
         }
 
-        // Permite acesso apenas para admins
+        // É admin, permite acesso
         return $next($request);
     }
 }

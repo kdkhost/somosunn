@@ -145,6 +145,6 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
   - **Feedback Visual:** Barra amarela com "Acessando como: [Nome]" e botão de retorno.
 
 - **Segurança:**
-  - `AdminMiddleware` redireciona membros para portal antes de chegar no controller.
-  - `DashboardController` tem verificação adicional por camada de proteção.
-  - `RedirectMembersFromAdmin` middleware registrado como backup para rotas específicas.
+  - `AdminMiddleware` usa `isAdmin()` do model User para validação robusta.
+  - `RedirectMembersFromAdmin` middleware registrado como backup.
+  - Bloqueio efetivo de rotas `/admin` para não-administradores.
