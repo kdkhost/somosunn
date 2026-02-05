@@ -10,7 +10,7 @@ use App\Models\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, Traits\HasPackageAccess;
 
     public function isAdmin()
     {

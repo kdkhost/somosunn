@@ -75,9 +75,17 @@
                                     <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                                         <span class="small text-muted"><i class="far fa-clock mr-1"></i>
                                             {{ $course->duration ?? 0 }} min</span>
-                                        <a href="{{ $courseSlug }}" class="btn btn-primary btn-sm shadow-sm rounded-pill px-3">
-                                            Acessar Aula
-                                        </a>
+
+                                        @can('view', $course)
+                                            <a href="{{ $courseSlug }}" class="btn btn-primary btn-sm shadow-sm rounded-pill px-3">
+                                                Acessar Aula
+                                            </a>
+                                        @else
+                                            <a href="{{ route('checkout.show', $course->id) }}"
+                                                class="btn btn-outline-success btn-sm shadow-sm rounded-pill px-3">
+                                                <i class="fas fa-shopping-cart mr-1"></i> Adquirir
+                                            </a>
+                                        @endcan
                                     </div>
                                 </div>
                             </div>

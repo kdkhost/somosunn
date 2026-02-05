@@ -17,7 +17,7 @@ class CourseController extends Controller
     {
         // Check if courses feature is enabled in settings
         $isEnabled = \App\Models\Setting::get('feature_courses', '1') === '1';
-        
+
         if (!$isEnabled) {
             abort(404, 'Cursos temporariamente indisponível');
         }
@@ -29,7 +29,7 @@ class CourseController extends Controller
         // If no courses exist, provide demo data
         if ($courses->isEmpty()) {
             $demoCourses = collect([
-                (object)[
+                (object) [
                     'id' => 1,
                     'title' => 'Networking Estratégico',
                     'slug' => 'networking-estrategico-demo',
@@ -37,10 +37,10 @@ class CourseController extends Controller
                     'price' => 297.00,
                     'duration' => 480,
                     'thumbnail' => null,
-                    'creator' => (object)['name' => 'UNN Academy'],
+                    'creator' => (object) ['name' => 'UNN Academy'],
                     'is_demo' => true,
                 ],
-                (object)[
+                (object) [
                     'id' => 2,
                     'title' => 'Vendas de Alto Impacto',
                     'slug' => 'vendas-alto-impacto-demo',
@@ -48,10 +48,10 @@ class CourseController extends Controller
                     'price' => 497.00,
                     'duration' => 600,
                     'thumbnail' => null,
-                    'creator' => (object)['name' => 'UNN Academy'],
+                    'creator' => (object) ['name' => 'UNN Academy'],
                     'is_demo' => true,
                 ],
-                (object)[
+                (object) [
                     'id' => 3,
                     'title' => 'Liderança e Gestão de Equipes',
                     'slug' => 'lideranca-gestao-demo',
@@ -59,11 +59,11 @@ class CourseController extends Controller
                     'price' => 397.00,
                     'duration' => 540,
                     'thumbnail' => null,
-                    'creator' => (object)['name' => 'UNN Academy'],
+                    'creator' => (object) ['name' => 'UNN Academy'],
                     'is_demo' => true,
                 ],
             ]);
-            
+
             return view('courses.index', ['courses' => $demoCourses, 'isDemo' => true]);
         }
 
@@ -94,7 +94,7 @@ class CourseController extends Controller
         ]);
 
         $slug = Str::slug($validated['title']) . '-' . uniqid();
-        
+
         $path = null;
         if ($request->hasFile('thumbnail')) {
             $path = $request->file('thumbnail')->store('courses', 'public');
@@ -123,17 +123,20 @@ class CourseController extends Controller
     public function show($slug)
     {
         $course = Course::where('slug', $slug)
-            ->with(['lessons' => function($q) {
-                // Determine if user can see full content logic here if needed
-                $q->orderBy('order');
-            }])
+            ->with([
+                'lessons' => function ($q) {
+                    // Determine if user can see full content logic here if needed
+                    $q->orderBy('order');
+                }
+            ])
             ->firstOrFail();
 
-        // Check enrollment
-        $isEnrolled = false; 
-        if(Auth::check()){
-            $isEnrolled = $course->enrollments()->where('user_id', Auth::id())->exists() || $course->user_id == Auth::id();
-        }
+        // Strict access check
+        $this->authorize('view', $course);
+
+        // $isEnrolled is now implicitly true if authorized by policy (for Members)
+        // Check for specific 'enrolled' status for UI nuances if needed, but 'view' policy covers access.
+        $isEnrolled = true;
 
         return view('courses.show', compact('course', 'isEnrolled'));
     }
