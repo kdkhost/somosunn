@@ -75,16 +75,114 @@
 
                 <!-- Ações -->
                 <div class="flex gap-3 pb-4 w-full md:w-auto justify-center md:justify-end">
-                    <button class="bg-[#1F5EDB] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center gap-2">
-                        <i class="fas fa-user-plus"></i> Conectar
-                    </button>
-                    <a href="{{ route('chat.index') }}" class="bg-white border border-gray-200 text-gray-700 px-6 py-3 rounded-full font-bold hover:bg-gray-50 transition shadow hover:shadow-md flex items-center gap-2">
-                        <i class="fas fa-comment-dots"></i> Mensagem
-                    </a>
+                    @if(auth()->check() && auth()->id() !== $user->id)
+                        @php
+                            $isConnected = auth()->user()->isConnectedWith($user->id);
+                            $pendingConnection = auth()->user()->hasPendingConnectionWith($user->id);
+                            $isRequester = $pendingConnection && $pendingConnection->requester_id === auth()->id();
+                        @endphp
+
+                        @if($isConnected)
+                            <button onclick="removeConnection({{ $user->id }})" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-bold hover:bg-gray-300 transition shadow flex items-center gap-2">
+                                <i class="fas fa-user-check text-green-600"></i> Conectado
+                            </button>
+                            <a href="{{ route('chat.start', $user->id) }}" class="bg-[#1F5EDB] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center gap-2">
+                                <i class="fas fa-comment-dots"></i> Mensagem
+                            </a>
+                        @elseif($pendingConnection)
+                            @if($isRequester)
+                                <button class="bg-gray-200 text-gray-500 px-8 py-3 rounded-full font-bold cursor-not-allowed shadow flex items-center gap-2">
+                                    <i class="fas fa-clock"></i> Pendente
+                                </button>
+                            @else
+                                <button onclick="acceptConnection({{ $user->id }})" class="bg-green-600 text-white px-8 py-3 rounded-full font-bold hover:bg-green-700 transition shadow-lg flex items-center gap-2">
+                                    <i class="fas fa-check"></i> Aceitar
+                                </button>
+                            @endif
+                        @else
+                            <button onclick="requestConnection({{ $user->id }})" class="bg-[#1F5EDB] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center gap-2" id="btn-connect-{{ $user->id }}">
+                                <i class="fas fa-user-plus"></i> Conectar
+                            </button>
+                        @endif
+                    @endif
                 </div>
             </div>
         </div>
     </div>
+    @push('scripts')
+    <script>
+        function requestConnection(userId) {
+            const btn = document.getElementById(`btn-connect-${userId}`);
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            fetch(`/connect/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    toastr.success(data.message);
+                    location.reload();
+                } else {
+                    toastr.error(data.message);
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }
+            })
+            .catch(() => {
+                toastr.error('Erro ao conectar.');
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            });
+        }
+
+        function acceptConnection(userId) {
+            fetch(`/connection/accept/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    toastr.success(data.message);
+                    location.reload();
+                } else {
+                    toastr.error(data.message);
+                }
+            });
+        }
+
+        function removeConnection(userId) {
+            if(!confirm('Tem certeza que deseja desfazer a conexão?')) return;
+            
+            fetch(`/connection/remove/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    toastr.success(data.message);
+                    location.reload();
+                } else {
+                    toastr.error(data.message);
+                }
+            });
+        }
+    </script>
+    @endpush
 
     <!-- Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
