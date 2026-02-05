@@ -31,7 +31,7 @@
         <li class="nav-item dropdown">
             <a class="nav-link d-flex align-items-center" data-toggle="dropdown" href="#" aria-expanded="false">
                 @if(auth()->user()->photo)
-                    <img src="{{ asset('storage/'.auth()->user()->photo) }}" alt="User" class="img-circle mr-2" style="width:30px;height:30px;object-fit:cover;">
+                    <img src="{{ asset(auth()->user()->photo) }}" alt="User" class="img-circle mr-2" style="width:30px;height:30px;object-fit:cover;">
                 @else
                     <i class="fas fa-user-circle mr-1" style="font-size: 1.5rem;"></i>
                 @endif
