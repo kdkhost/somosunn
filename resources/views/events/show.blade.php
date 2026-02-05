@@ -14,6 +14,13 @@
     $mapQuery = urlencode($event->address);
     $confirmedSeats = $event->confirmed_seats;
     $remainingSeats = $event->remaining_seats;
+    $now = now();
+    $isClosed = false;
+    if ($endDate) {
+        $isClosed = $endDate->lt($now);
+    } elseif ($startDate) {
+        $isClosed = $startDate->lt($now->copy()->startOfDay());
+    }
 @endphp
 
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
@@ -23,6 +30,17 @@
             <a href="{{ route('events.index') }}" class="inline-flex items-center gap-2 text-gray-600 mb-4 md:mb-6 transition" style="--tw-text-opacity:1" onmouseover="this.style.color='var(--unn-azul-1)'" onmouseout="this.style.color=''">
                 <i class="fas fa-arrow-left"></i> Voltar para eventos
             </a>
+
+            @if(session('error'))
+                <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6">
+                    <i class="fas fa-triangle-exclamation mr-2"></i>{{ session('error') }}
+                </div>
+            @endif
+            @if(session('success'))
+                <div class="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mb-6">
+                    <i class="fas fa-circle-check mr-2"></i>{{ session('success') }}
+                </div>
+            @endif
             
             <div class="flex flex-col lg:flex-row gap-6 md:gap-8 items-start">
                 <!-- Event Info -->
@@ -31,6 +49,12 @@
                     <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs sm:text-sm font-semibold mb-4">
                         <i class="fas fa-info-circle"></i> Evento de Demonstração
                     </span>
+                    @endif
+
+                    @if($isClosed)
+                        <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs sm:text-sm font-semibold mb-4">
+                            <i class="fas fa-flag-checkered"></i> Evento encerrado
+                        </span>
                     @endif
                     
                     <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-3 md:mb-4">{{ $event->title }}</h1>
@@ -117,7 +141,12 @@
                             </div>
                             @endif
 
-                            @if($isDemo)
+                            @if($isClosed)
+                                <a href="{{ route('events.index') }}"
+                                    class="w-full bg-gray-200 text-gray-700 py-4 rounded-2xl font-bold text-lg hover:bg-gray-300 transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-calendar-check"></i> Ver próximos eventos
+                                </a>
+                            @elseif($isDemo)
                                 <button
                                     class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg opacity-75 cursor-not-allowed flex items-center justify-center gap-2"
                                     onclick="alert('Este é um evento de demonstração. Configure eventos reais no painel administrativo.');">

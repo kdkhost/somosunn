@@ -20,6 +20,10 @@ class EventReservationController extends Controller
     {
         $this->abortIfDisabledOrUnpublished($event);
 
+        if ($this->isEventClosed($event)) {
+            return redirect()->route('events.show', $event)->with('error', 'Este evento já encerrou.');
+        }
+
         $registration = null;
         if (Auth::check()) {
             $registration = EventRegistration::where('event_id', $event->id)
@@ -33,6 +37,10 @@ class EventReservationController extends Controller
     public function reserve(Request $request, Event $event)
     {
         $this->abortIfDisabledOrUnpublished($event);
+
+        if ($this->isEventClosed($event)) {
+            return redirect()->route('events.show', $event)->with('error', 'Este evento já encerrou.');
+        }
 
         if (($event->is_demo ?? false) === true) {
             return redirect()->route('events.show', $event)->with('error', 'Este é um evento de demonstração.');
@@ -288,6 +296,21 @@ class EventReservationController extends Controller
         if (!$isEnabled || !$event->published) {
             abort(404);
         }
+    }
+
+    private function isEventClosed(Event $event): bool
+    {
+        $now = now();
+
+        $start = $event->start_at ? \Carbon\Carbon::parse($event->start_at) : null;
+        $end = $event->end_at ? \Carbon\Carbon::parse($event->end_at) : null;
+
+        if ($end) {
+            return $end->lt($now);
+        }
+
+        // If there's no end_at, consider the event closed only after the day has passed.
+        return $start ? $start->lt($now->copy()->startOfDay()) : false;
     }
 
     private function resolveEventsGatewayAccount(): ?GatewayAccount

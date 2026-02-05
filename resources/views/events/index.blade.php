@@ -8,7 +8,7 @@
             background:
                 radial-gradient(1200px circle at 15% 20%, rgba(255, 255, 255, 0.18) 0%, transparent 55%),
                 radial-gradient(900px circle at 85% 0%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
-                linear-gradient(120deg, #2563eb 0%, #6d28d9 48%, #c026d3 100%);
+                linear-gradient(180deg, var(--unn-azul-3) 0%, var(--unn-azul-1) 55%, var(--unn-azul-3) 100%);
         }
 
         .unn-events-hero::before {
@@ -23,6 +23,10 @@
             opacity: 0.28;
             pointer-events: none;
         }
+
+        .unn-events-cta {
+            background: linear-gradient(180deg, var(--unn-azul-3) 0%, var(--unn-azul-1) 55%, var(--unn-azul-3) 100%);
+        }
     </style>
 @endpush
 
@@ -30,6 +34,7 @@
     @php
         $events = $events ?? collect();
         $featuredEvent = $featuredEvent ?? ($events->first() ?: null);
+        $pastEvents = $pastEvents ?? collect();
         $isDemo = (bool) ($isDemo ?? false);
 
         $featuredImageSetting =
@@ -120,8 +125,8 @@
                                             </div>
 
                                             <div class="flex items-start gap-4">
-                                                <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center shrink-0">
-                                                    <i class="fas fa-clock text-purple-600"></i>
+                                                <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0">
+                                                    <i class="fas fa-clock text-blue-600"></i>
                                                 </div>
                                                 <div>
                                                     <div class="font-bold text-slate-900">
@@ -140,8 +145,8 @@
                                             </div>
 
                                             <div class="flex items-start gap-4">
-                                                <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center shrink-0">
-                                                    <i class="fas fa-map-marker-alt text-indigo-600"></i>
+                                                <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0">
+                                                    <i class="fas fa-map-marker-alt text-blue-600"></i>
                                                 </div>
                                                 <div>
                                                     <div class="font-bold text-slate-900">{{ $locationName }}</div>
@@ -194,36 +199,42 @@
             </div>
         </section>
 
-        @if($events->isNotEmpty())
-            <section class="bg-gradient-to-br from-slate-50 to-blue-50 py-12 md:py-16 px-4 md:px-12 lg:px-24">
-                <div class="max-w-7xl mx-auto">
-                    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
-                        <div>
-                            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold"
-                                style="background: var(--unn-azul-1); color: white">
-                                <i class="fas fa-calendar-check"></i> Agenda
-                            </span>
-                            <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 mt-4">Agenda de Eventos</h2>
-                            <p class="text-gray-600 mt-2 max-w-2xl">
-                                Visualização é pública. A confirmação de vaga pode exigir pagamento conforme o evento.
-                            </p>
-                        </div>
-
-                        <a href="{{ route('premium') }}"
-                            class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-bold bg-white border hover:bg-slate-50 transition"
-                            style="border-color: var(--unn-azul-1); color: var(--unn-azul-1)">
-                            <i class="fas fa-crown"></i> Ver planos Premium
-                        </a>
+        <section class="bg-gradient-to-br from-slate-50 to-blue-50 py-12 md:py-16 px-4 md:px-12 lg:px-24">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+                    <div>
+                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold"
+                            style="background: var(--unn-azul-1); color: white">
+                            <i class="fas fa-calendar-check"></i> Agenda
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 mt-4">Agenda de Eventos</h2>
+                        <p class="text-gray-600 mt-2 max-w-2xl">
+                            Visualização é pública. A confirmação de vaga pode exigir pagamento conforme o evento.
+                        </p>
                     </div>
 
-                    <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
-                        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-gray-900">Todos os eventos</h3>
-                            <span class="text-sm text-gray-500">
-                                {{ $events->count() }} {{ $events->count() === 1 ? 'evento' : 'eventos' }}
-                            </span>
-                        </div>
+                    <a href="{{ route('premium') }}"
+                        class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-bold bg-white border hover:bg-slate-50 transition"
+                        style="border-color: var(--unn-azul-1); color: var(--unn-azul-1)">
+                        <i class="fas fa-crown"></i> Ver planos Premium
+                    </a>
+                </div>
 
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-gray-900">Próximos eventos</h3>
+                        <span class="text-sm text-gray-500">
+                            {{ $events->count() }} {{ $events->count() === 1 ? 'evento' : 'eventos' }}
+                        </span>
+                    </div>
+
+                    @if($events->isEmpty())
+                        <div class="p-10 text-center">
+                            <div class="text-slate-400 mb-4"><i class="fas fa-calendar-times text-4xl"></i></div>
+                            <h4 class="text-xl font-black text-slate-900 mb-2">Nenhum próximo evento encontrado</h4>
+                            <p class="text-slate-600">Confira os últimos eventos abaixo e fique atento às próximas datas.</p>
+                        </div>
+                    @else
                         <div class="overflow-x-auto">
                             <table class="min-w-full">
                                 <thead class="bg-slate-50">
@@ -291,9 +302,169 @@
                                 </tbody>
                             </table>
                         </div>
+                    @endif
+                </div>
+            </div>
+        </section>
+
+        <section class="py-12 md:py-16 px-4 md:px-12 lg:px-24 bg-white">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-10">
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold"
+                        style="background: var(--unn-azul-1); color: white">
+                        <i class="fas fa-info-circle"></i> Informações
+                    </span>
+                    <h2 class="mt-4 text-3xl sm:text-4xl font-black text-slate-900">Como funcionam os eventos</h2>
+                    <p class="mt-2 text-slate-600 max-w-3xl mx-auto">
+                        A agenda é pública. Para garantir vaga, o sistema pode exigir pagamento da taxa/consumação conforme o evento.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm">
+                        <div class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center">
+                            <i class="fas fa-globe text-white"></i>
+                        </div>
+                        <h3 class="mt-4 text-lg font-black text-slate-900">Visualização pública</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+                            Qualquer pessoa pode ver os próximos eventos e acessar os detalhes — sem precisar de login.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm">
+                        <div class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center">
+                            <i class="fas fa-ticket-alt text-white"></i>
+                        </div>
+                        <h3 class="mt-4 text-lg font-black text-slate-900">Reserva de vaga</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+                            Ao clicar em <span class="font-bold">Inscreva-se</span>, você confirma sua participação (e a quantidade de vagas, quando aplicável).
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm">
+                        <div class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center">
+                            <i class="fas fa-credit-card text-white"></i>
+                        </div>
+                        <h3 class="mt-4 text-lg font-black text-slate-900">Pagamento e confirmação</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+                            Se houver taxa, o pagamento é processado com segurança e sua reserva é confirmada automaticamente após a aprovação.
+                        </p>
                     </div>
                 </div>
-            </section>
-        @endif
+            </div>
+        </section>
+
+        <section class="bg-gradient-to-br from-slate-50 to-blue-50 py-12 md:py-16 px-4 md:px-12 lg:px-24">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+                    <div>
+                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-white border"
+                            style="border-color: var(--unn-azul-1); color: var(--unn-azul-1)">
+                            <i class="fas fa-history"></i> Histórico
+                        </span>
+                        <h2 class="mt-4 text-3xl sm:text-4xl font-black text-slate-900">Últimos eventos</h2>
+                        <p class="mt-2 text-slate-600 max-w-2xl">
+                            Confira os 6 eventos mais recentes que já aconteceram.
+                        </p>
+                    </div>
+                </div>
+
+                @if($pastEvents->isEmpty())
+                    <div class="bg-white rounded-3xl shadow-xl p-10 text-center">
+                        <div class="text-slate-400 mb-4"><i class="fas fa-calendar-minus text-4xl"></i></div>
+                        <h3 class="text-xl font-black text-slate-900 mb-2">Ainda não há eventos passados</h3>
+                        <p class="text-slate-600">Assim que os primeiros eventos acontecerem, eles aparecerão aqui automaticamente.</p>
+                    </div>
+                @else
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @foreach($pastEvents as $event)
+                            @php
+                                $startDate = is_string($event->start_at) ? \Carbon\Carbon::parse($event->start_at) : $event->start_at;
+                                $endDate = $event->end_at ? (is_string($event->end_at) ? \Carbon\Carbon::parse($event->end_at) : $event->end_at) : null;
+                                $locationLine = $event->location ?: ($event->address ? 'Local do evento' : 'A confirmar');
+                            @endphp
+                            <div class="bg-white rounded-3xl p-7 shadow-lg border border-slate-100">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                        <div class="text-sm font-bold text-slate-500">
+                                            {{ $startDate ? $startDate->translatedFormat('d \\d\\e M, Y') : 'Data a confirmar' }}
+                                        </div>
+                                        <div class="mt-1 text-xl font-black text-slate-900 leading-snug">
+                                            {{ $event->title }}
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">
+                                        Encerrado
+                                    </span>
+                                </div>
+
+                                <div class="mt-4 space-y-2 text-sm text-slate-600">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-map-marker-alt text-red-500"></i>
+                                        <span class="truncate">{{ $locationLine }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="far fa-clock text-slate-400"></i>
+                                        <span>
+                                            @if($startDate)
+                                                {{ $startDate->format('H:i') }}
+                                                @if($endDate) às {{ $endDate->format('H:i') }} @endif
+                                            @else
+                                                Horário a confirmar
+                                            @endif
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="mt-6 flex items-center justify-between gap-4">
+                                    <div>
+                                        @if($event->current_price > 0 || $event->price > 0)
+                                            <div class="font-black text-slate-900">R$ {{ number_format($event->current_price ?: $event->price, 2, ',', '.') }}</div>
+                                            <div class="text-xs text-slate-500 mt-0.5">{{ $event->current_batch_label ?? 'Ingresso' }}</div>
+                                        @else
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">GRÁTIS</span>
+                                        @endif
+                                    </div>
+                                    <a href="{{ $isDemo ? '#' : route('events.show', $event) }}"
+                                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-white btn-primary shadow-md hover:shadow-lg transition {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
+                                        Ver detalhes <i class="fas fa-arrow-right text-sm"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </section>
+
+        <section class="py-12 md:py-16 px-4 md:px-12 lg:px-24 bg-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="unn-events-cta rounded-[32px] px-6 md:px-14 py-14 md:py-16 text-center shadow-2xl relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-20"
+                        style="background-image: radial-gradient(rgba(255,255,255,0.45) 1px, transparent 1px); background-size: 42px 42px;"></div>
+
+                    <div class="relative">
+                        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-white">
+                            Pronto para transformar sua rede?
+                        </h2>
+                        <p class="mt-4 text-white/80 text-lg sm:text-xl">
+                            Junte-se a milhares de empreendedores que já estão crescendo juntos.
+                        </p>
+
+                        <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <a href="{{ route('register') }}"
+                                class="inline-flex items-center justify-center gap-3 px-10 py-4 rounded-full font-black bg-white shadow-lg hover:shadow-xl transition"
+                                style="color: var(--unn-azul-1)">
+                                <i class="fas fa-rocket"></i> Começar agora - É grátis
+                            </a>
+                            <a href="{{ route('premium') }}"
+                                class="inline-flex items-center justify-center gap-3 px-10 py-4 rounded-full font-black border-2 border-white text-white bg-white/10 hover:bg-white/15 transition">
+                                <i class="fas fa-crown"></i> Ver planos Premium
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 @endsection

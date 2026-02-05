@@ -26,8 +26,10 @@ class EventController extends Controller
             ->whereNotNull('start_at')
             ->where(function ($query) use ($now) {
                 $query->where('start_at', '>=', $now)
+                    ->orWhere('end_at', '>=', $now)
+                    // If end_at is empty, keep today's events visible even after the start time (common in quick-create).
                     ->orWhere(function ($q) use ($now) {
-                        $q->whereNotNull('end_at')->where('end_at', '>=', $now);
+                        $q->whereNull('end_at')->whereDate('start_at', $now->toDateString());
                     });
             })
             ->orderBy('start_at')
@@ -36,7 +38,19 @@ class EventController extends Controller
         $featuredEvent = $events->first();
         $otherEvents = $featuredEvent ? $events->slice(1)->values() : collect();
 
-        return view('events.index', compact('events', 'featuredEvent', 'otherEvents'));
+        $pastEvents = Event::where('published', true)
+            ->whereNotNull('start_at')
+            ->where(function ($query) use ($now) {
+                $query->where('end_at', '<', $now)
+                    ->orWhere(function ($q) use ($now) {
+                        $q->whereNull('end_at')->where('start_at', '<', $now);
+                    });
+            })
+            ->orderByDesc('start_at')
+            ->limit(6)
+            ->get();
+
+        return view('events.index', compact('events', 'featuredEvent', 'otherEvents', 'pastEvents'));
     }
 
     /**
