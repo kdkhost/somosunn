@@ -833,20 +833,20 @@
             attachments.forEach(att => {
                 const size = (att.file_size / 1024 / 1024).toFixed(2) + ' MB';
                 const item = `
-                                            <li class="attachment-item" id="att-${att.id}">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-file attachment-icon"></i>
-                                                    <div>
-                                                        <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
-                                                        <small class="text-muted">${size}</small>
+                                                <li class="attachment-item" id="att-${att.id}">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fas fa-file attachment-icon"></i>
+                                                        <div>
+                                                            <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
+                                                            <small class="text-muted">${size}</small>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div>
-                                                    <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
-                                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
-                                                </div>
-                                            </li>
-                                        `;
+                                                    <div>
+                                                        <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
+                                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                    </div>
+                                                </li>
+                                            `;
                 list.append(item);
             });
         }
@@ -1076,9 +1076,33 @@
             // Ajax Delete Lesson
             $('.ajax-delete').on('submit', function (e) {
                 e.preventDefault();
-                if (!confirm('Excluir aula?')) return;
-                $.post($(this).attr('action'), $(this).serialize(), function () {
-                    location.reload();
+                const form = $(this);
+
+                Swal.fire({
+                    title: 'Excluir aula?',
+                    text: "Esta ação não poderá ser desfeita!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sim, excluir!',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.post(form.attr('action'), form.serialize(), function () {
+                            Swal.fire({
+                                title: 'Excluído!',
+                                text: 'A aula foi removida com sucesso.',
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }).fail(function () {
+                            Swal.fire('Erro!', 'Não foi possível excluir a aula.', 'error');
+                        });
+                    }
                 });
             });
 
