@@ -233,7 +233,8 @@
                     right: 'dayGridMonth'
                 },
                 height: 350, // Widget Height
-                events: '{{ route("admin.events.index") }}',
+                height: 350, // Widget Height
+                events: {!! json_encode($calendarEvents ?? []) !!},
                 editable: false // Read-only dashboard widget
             });
             calendar.render();

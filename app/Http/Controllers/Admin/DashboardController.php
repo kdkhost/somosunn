@@ -29,6 +29,22 @@ class DashboardController extends Controller
                     ->whereYear('created_at', $date->year)
                     ->sum('total_amount');
             }
+
+            // Calendar Events (Unified for all)
+            $calendarEvents = \App\Models\Event::where('published', true)
+                ->get()
+                ->map(function ($event) {
+                    return [
+                        'title' => $event->title,
+                        'start' => $event->start_at->toIso8601String(),
+                        'end' => $event->end_at ? $event->end_at->toIso8601String() : null,
+                        'url' => route('events.show', $event->id),
+                        'backgroundColor' => $event->color ?? '#28a745',
+                        'borderColor' => $event->color ?? '#28a745',
+                        'allDay' => $event->all_day
+                    ];
+                });
+
         } catch (\Throwable $e) {
             \Log::error('Erro ao carregar dashboard: ' . $e->getMessage());
             // Fallback data
@@ -38,8 +54,9 @@ class DashboardController extends Controller
             $totalUsers = 0;
             $salesChartData = array_fill(0, 6, 0);
             $months = collect(range(0, 5))->map(fn($i) => now()->subMonths($i)->format('M/Y'))->reverse()->values()->toArray();
+            $calendarEvents = [];
         }
 
-        return view('admin.dashboard', compact('totalRevenue', 'refundedAmount', 'totalOrders', 'totalUsers', 'salesChartData', 'months'));
+        return view('admin.dashboard', compact('totalRevenue', 'refundedAmount', 'totalOrders', 'totalUsers', 'salesChartData', 'months', 'calendarEvents'));
     }
 }
