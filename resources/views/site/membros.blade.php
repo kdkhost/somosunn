@@ -60,51 +60,52 @@
                         $isDemo = $member->is_demo ?? false;
                         $initials = collect(explode(' ', $member->name))->take(2)->map(fn($n) => strtoupper(substr($n, 0, 1)))->join('');
                     @endphp
-                    <article class="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 {{ $isDemo ? 'ring-2 ring-yellow-400' : '' }}">
-                        <!-- Header with Gradient (mais baixo para não cortar a foto) -->
-                        <div class="h-24 btn-primary relative">
+                    <article class="bg-white rounded-[2rem] shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 {{ $isDemo ? 'ring-2 ring-yellow-400' : '' }}">
+                        <!-- Header Azul Sólido -->
+                        <div class="h-28 bg-[#1F5EDB] relative">
                             @if($isDemo)
-                                <span class="absolute top-3 right-3 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-semibold">DEMO</span>
+                                <span class="absolute top-4 right-4 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-semibold">DEMO</span>
                             @endif
                         </div>
                         
-                        <!-- Avatar (maior e melhor posicionado) -->
-                        <div class="flex justify-center -mt-16">
-                            @if(isset($member->avatar) && $member->avatar)
-                                <img src="{{ $member->avatar }}" alt="{{ $member->name }}" class="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover">
-                            @else
-                                <div class="w-32 h-32 rounded-full border-4 border-white shadow-lg btn-primary flex items-center justify-center text-white text-3xl font-bold">
-                                    {{ $initials }}
-                                </div>
-                            @endif
+                        <!-- Avatar Centralizado e Sobreposto -->
+                        <div class="flex justify-center -mt-16 px-4">
+                            <div class="p-1 bg-white rounded-full">
+                                @if(isset($member->avatar) && $member->avatar)
+                                    <img src="{{ $member->avatar }}" alt="{{ $member->name }}" class="w-32 h-32 rounded-full border-4 border-white object-cover">
+                                @else
+                                    <div class="w-32 h-32 rounded-full border-4 border-white bg-[#1F5EDB] flex items-center justify-center text-white text-3xl font-bold">
+                                        {{ $initials }}
+                                    </div>
+                                @endif
+                            </div>
                         </div>
 
                         <!-- Content -->
-                        <div class="p-6 text-center">
-                            <h3 class="text-xl font-bold text-gray-900 mb-1">{{ $member->name }}</h3>
+                        <div class="pt-4 pb-8 px-6 text-center">
+                            <!-- Nome -->
+                            <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ $member->name }}</h3>
                             
-                            @if(isset($member->bio))
-                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $member->bio }}</p>
-                            @endif
-
+                            <!-- Localização -->
                             @if(isset($member->city) && $member->city)
-                            <p class="text-sm text-gray-500 mb-4">
-                                <i class="fas fa-map-marker-alt mr-1" style="color: var(--unn-azul-1)"></i>
+                            <p class="text-gray-500 mb-6 flex items-center justify-center gap-1.5">
+                                <i class="fas fa-map-marker-alt text-[#1F5EDB]"></i>
                                 {{ $member->city }}
                             </p>
                             @endif
 
-                            <!-- Stats -->
-                            <div class="flex justify-center gap-6 py-4 border-t border-gray-100">
-                                <div class="text-center">
-                                    <p class="text-lg font-bold text-gray-900">{{ $member->connections ?? 0 }}</p>
-                                    <p class="text-xs text-gray-500">Conexões</p>
-                                </div>
+                            <!-- Linha Divisória -->
+                            <div class="border-t border-gray-100 w-full mb-6"></div>
+
+                            <!-- Conexões -->
+                            <div class="mb-6">
+                                <p class="text-2xl font-bold text-gray-900">{{ $member->connections ?? 0 }}</p>
+                                <p class="text-sm text-gray-500">Conexões</p>
                             </div>
 
-                            <!-- Action Button (largura total, sem ícones ao lado) -->
+                            <!-- Botão Ver Perfil -->
                             @if(!$isDemo)
-                            <a href="{{ route('social.profile', $member->id) }}" class="block w-full btn-primary text-white py-3 rounded-xl font-semibold text-center transition hover:shadow-lg">
+                            <a href="{{ route('social.profile', $member->id) }}" class="block w-full bg-[#1F5EDB] hover:bg-blue-700 text-white py-3.5 rounded-xl font-bold text-center transition shadow-md hover:shadow-lg">
                                 Ver Perfil
                             </a>
                             @else
@@ -113,7 +114,7 @@
                                 text: 'Este é um perfil de demonstração.',
                                 icon: 'info',
                                 confirmButtonColor: '#1F5EDB'
-                            })" class="block w-full btn-primary text-white py-3 rounded-xl font-semibold opacity-75 cursor-not-allowed">
+                            })" class="block w-full bg-[#1F5EDB] text-white py-3.5 rounded-xl font-bold opacity-75 cursor-not-allowed">
                                 Ver Perfil
                             </button>
                             @endif
