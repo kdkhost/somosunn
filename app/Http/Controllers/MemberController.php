@@ -14,25 +14,46 @@ class MemberController extends Controller
     {
         // Check if members feature is enabled
         $isEnabled = \App\Models\Setting::get('feature_members', '1') === '1';
-        
+
         if (!$isEnabled) {
             abort(404, 'Membros temporariamente indisponível');
         }
 
-        $members = collect();
-        
+        $blockedUserIds = [];
+        $connectedUserIds = [];
+
+        if (auth()->check()) {
+            $blockedUserIds = \App\Models\Connection::where(function ($q) {
+                $q->where('requester_id', auth()->id())->orWhere('requested_id', auth()->id());
+            })->where('status', 'blocked')->pluck('requester_id', 'requested_id')->flatten()->unique()->toArray();
+
+            $connectedUserIds = \App\Models\Connection::where(function ($q) {
+                $q->where('requester_id', auth()->id())->orWhere('requested_id', auth()->id());
+            })->where('status', 'accepted')->pluck('requester_id', 'requested_id')->flatten()->unique()->toArray();
+        }
+
         try {
-            $members = User::where('role', '!=', 'superadmin')
-                ->latest()
+            $query = User::where('role', '!=', 'superadmin')
+                ->whereNotIn('id', $blockedUserIds);
+
+            // Hide private profiles if not connected and not admin
+            if (!auth()->user()?->isAdmin()) {
+                $query->where(function ($q) use ($connectedUserIds) {
+                    $q->where('hide_profile', false)
+                        ->orWhereIn('id', $connectedUserIds);
+                });
+            }
+
+            $members = $query->latest()
                 ->take(12)
                 ->get()
-                ->map(function($user) {
-                    return (object)[
+                ->map(function ($user) {
+                    return (object) [
                         'id' => $user->id,
                         'name' => $user->name,
                         'email' => $user->email,
                         'bio' => $user->bio,
-                        'avatar' => $user->photo ? asset($user->photo) : null, // Mapeia photo → avatar
+                        'avatar' => $user->photo ? asset($user->photo) : null,
                         'city' => trim(($user->city ?? '') . ($user->state ? ', ' . $user->state : '')),
                         'linkedin' => $user->linkedin,
                         'facebook' => $user->facebook,
@@ -41,7 +62,9 @@ class MemberController extends Controller
                         'youtube' => $user->youtube,
                         'website' => $user->website,
                         'level' => $user->level ?? 'Iniciante',
-                        'connections' => 0, // TODO: implementar sistema de conexões
+                        'connections' => \App\Models\Connection::where(function ($q) use ($user) {
+                            $q->where('requester_id', $user->id)->orWhere('requested_id', $user->id);
+                        })->where('status', 'accepted')->count(),
                         'is_demo' => false,
                     ];
                 });
@@ -52,7 +75,7 @@ class MemberController extends Controller
         // If no members exist, provide demo data
         if ($members->isEmpty()) {
             $members = collect([
-                (object)[
+                (object) [
                     'id' => 1,
                     'name' => 'Carlos Eduardo Silva',
                     'email' => 'carlos@demo.com',
@@ -66,7 +89,7 @@ class MemberController extends Controller
                     'avatar' => null,
                     'is_demo' => true,
                 ],
-                (object)[
+                (object) [
                     'id' => 2,
                     'name' => 'Ana Paula Costa',
                     'email' => 'ana@demo.com',
@@ -80,7 +103,7 @@ class MemberController extends Controller
                     'avatar' => null,
                     'is_demo' => true,
                 ],
-                (object)[
+                (object) [
                     'id' => 3,
                     'name' => 'Roberto Mendes',
                     'email' => 'roberto@demo.com',
@@ -94,7 +117,7 @@ class MemberController extends Controller
                     'avatar' => null,
                     'is_demo' => true,
                 ],
-                (object)[
+                (object) [
                     'id' => 4,
                     'name' => 'Juliana Ferreira',
                     'email' => 'juliana@demo.com',
@@ -108,7 +131,7 @@ class MemberController extends Controller
                     'avatar' => null,
                     'is_demo' => true,
                 ],
-                (object)[
+                (object) [
                     'id' => 5,
                     'name' => 'Fernando Oliveira',
                     'email' => 'fernando@demo.com',
@@ -122,7 +145,7 @@ class MemberController extends Controller
                     'avatar' => null,
                     'is_demo' => true,
                 ],
-                (object)[
+                (object) [
                     'id' => 6,
                     'name' => 'Mariana Santos',
                     'email' => 'mariana@demo.com',
@@ -137,7 +160,7 @@ class MemberController extends Controller
                     'is_demo' => true,
                 ],
             ]);
-            
+
             return view('site.membros', ['members' => $members, 'isDemo' => true]);
         }
 

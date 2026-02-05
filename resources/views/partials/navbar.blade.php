@@ -94,7 +94,13 @@
                         Entrar
                     </a>
                 @else
-                    <a href="#" class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
+                    <div class="relative group mr-2" id="connection-notifications-bubble">
+                        <a href="{{ route('social.feed') }}" class="text-gray-500 hover:text-blue-600 transition relative">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span id="connection-notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1 rounded-full hidden">0</span>
+                        </a>
+                    </div>
+                    <a href="{{ route('social.profile', Auth::id()) }}" class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
                         Meu perfil
                     </a>
                 @endguest

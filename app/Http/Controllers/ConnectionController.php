@@ -10,129 +10,117 @@ use Illuminate\Support\Facades\Auth;
 class ConnectionController extends Controller
 {
     /**
-     * Send connection request
+     * Enviar solicitação de conexão.
      */
-    public function connect($userId)
+    public function connect(User $user)
     {
-        try {
-            $user = Auth::user();
-            
-            if ($user->id == $userId) {
-                return response()->json(['success' => false, 'message' => 'Ação inválida.']);
-            }
+        $requesterId = Auth::id();
+        $requestedId = $user->id;
 
-            $targetUser = User::find($userId);
-            if (!$targetUser || $targetUser->role === 'superadmin') {
-                return response()->json(['success' => false, 'message' => 'Usuário não disponível para conexão.'], 404);
-            }
-
-            // Check if connection exists
-            $existing = Connection::where(function($q) use ($user, $userId) {
-                $q->where('requester_id', $user->id)->where('requested_id', $userId);
-            })->orWhere(function($q) use ($user, $userId) {
-                $q->where('requester_id', $userId)->where('requested_id', $user->id);
-            })->first();
-
-            if ($existing) {
-                if ($existing->status == 'accepted') {
-                    return response()->json(['success' => false, 'message' => 'Vocês já são conectados.'], 400);
-                }
-                if ($existing->status == 'pending') {
-                    return response()->json(['success' => false, 'message' => 'Solicitação já existente.'], 400);
-                }
-                if ($existing->status == 'rejected') {
-                    // Update to pending again
-                    $existing->update([
-                        'requester_id' => $user->id,
-                        'requested_id' => $userId,
-                        'status' => 'pending'
-                    ]);
-                    return response()->json(['success' => true, 'message' => 'Nova solicitação enviada!']);
-                }
-            }
-
-            Connection::create([
-                'requester_id' => $user->id,
-                'requested_id' => $userId,
-                'status' => 'pending'
-            ]);
-
-            return response()->json(['success' => true, 'message' => 'Solicitação enviada!', 'status' => 'pending']);
-
-        } catch (\Exception $e) {
-            \Log::error('Connection error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Erro ao conectar.'], 500);
+        if ($requesterId === $requestedId) {
+            return response()->json(['success' => false, 'message' => 'Você não pode se conectar consigo mesmo.']);
         }
+
+        // Verifica se já existe solicitação ou conexão
+        $existing = Connection::where(function ($q) use ($requesterId, $requestedId) {
+            $q->where('requester_id', $requesterId)->where('requested_id', $requestedId);
+        })->orWhere(function ($q) use ($requesterId, $requestedId) {
+            $q->where('requester_id', $requestedId)->where('requested_id', $requesterId);
+        })->first();
+
+        if ($existing) {
+            return response()->json(['success' => false, 'message' => 'Já existe uma solicitação ou conexão ativa.']);
+        }
+
+        Connection::create([
+            'requester_id' => $requesterId,
+            'requested_id' => $requestedId,
+            'status' => 'pending'
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Solicitação de conexão enviada!']);
     }
-    
+
     /**
-     * Accept connection request
+     * Aceitar solicitação de conexão.
      */
-    public function accept($userId)
+    public function accept(User $user)
     {
-        $user = Auth::user();
-        
-        $connection = Connection::where('requester_id', $userId)
-            ->where('requested_id', $user->id)
+        $connection = Connection::where('requester_id', $user->id)
+            ->where('requested_id', Auth::id())
             ->where('status', 'pending')
-            ->first();
+            ->firstOrFail();
 
-        if ($connection) {
-            $connection->update(['status' => 'accepted']);
-            return response()->json(['success' => true, 'message' => 'Conexão aceita!']);
-        }
-        
-        return response()->json(['success' => false, 'message' => 'Solicitação não encontrada.'], 404);
+        $connection->update([
+            'status' => 'accepted',
+            'responded_at' => now()
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Conexão aceita! Agora vocês podem conversar.']);
     }
 
     /**
-     * Remove/Reject connection
+     * Remover conexão ou recusar solicitação.
      */
-    public function remove($userId)
+    public function remove(User $user)
     {
-        $user = Auth::user();
-        
-        $connection = Connection::where(function($q) use ($user, $userId) {
-            $q->where('requester_id', $user->id)->where('requested_id', $userId);
-        })->orWhere(function($q) use ($user, $userId) {
-            $q->where('requester_id', $userId)->where('requested_id', $user->id);
+        $requesterId = Auth::id();
+        $requestedId = $user->id;
+
+        $connection = Connection::where(function ($q) use ($requesterId, $requestedId) {
+            $q->where('requester_id', $requesterId)->where('requested_id', $requestedId);
+        })->orWhere(function ($q) use ($requesterId, $requestedId) {
+            $q->where('requester_id', $requestedId)->where('requested_id', $requesterId);
         })->first();
 
         if ($connection) {
             $connection->delete();
             return response()->json(['success' => true, 'message' => 'Conexão removida.']);
         }
-        
-        return response()->json(['success' => false, 'message' => 'Conexão não encontrada.'], 404);
+
+        return response()->json(['success' => false, 'message' => 'Conexão não encontrada.']);
     }
 
     /**
-     * Block user
+     * Bloquear um usuário.
      */
-    public function block($userId)
+    public function block(User $user)
     {
-        $user = Auth::user();
-        
-        $connection = Connection::where(function($q) use ($user, $userId) {
-            $q->where('requester_id', $user->id)->where('requested_id', $userId);
-        })->orWhere(function($q) use ($user, $userId) {
-            $q->where('requester_id', $userId)->where('requested_id', $user->id);
+        $requesterId = Auth::id();
+        $requestedId = $user->id;
+
+        $connection = Connection::where(function ($q) use ($requesterId, $requestedId) {
+            $q->where('requester_id', $requesterId)->where('requested_id', $requestedId);
+        })->orWhere(function ($q) use ($requesterId, $requestedId) {
+            $q->where('requester_id', $requestedId)->where('requested_id', $requesterId);
         })->first();
 
         if ($connection) {
             $connection->update([
-                'requester_id' => $user->id,
-                'requested_id' => $userId,
-                'status' => 'blocked'
+                'status' => 'blocked',
+                'responded_at' => now()
             ]);
         } else {
             Connection::create([
-                'requester_id' => $user->id,
-                'requested_id' => $userId,
-                'status' => 'blocked'
+                'requester_id' => $requesterId,
+                'requested_id' => $requestedId,
+                'status' => 'blocked',
+                'responded_at' => now()
             ]);
         }
-        
+
         return response()->json(['success' => true, 'message' => 'Usuário bloqueado.']);
+    }
+
+    /**
+     * Get pending notifications count.
+     */
+    public function notifications()
+    {
+        $count = Connection::where('requested_id', Auth::id())
+            ->where('status', 'pending')
+            ->count();
+
+        return response()->json(['count' => $count]);
     }
 }

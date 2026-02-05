@@ -226,6 +226,25 @@
                 mobileOverlay.addEventListener('click', closeMenu);
             }
         });
+
+        // Global Notifications Polling
+        @auth
+            setInterval(() => {
+                fetch('{{ route("connection.notifications") }}')
+                    .then(r => r.json())
+                    .then(data => {
+                        const badge = document.getElementById('connection-notification-count');
+                        if (badge) {
+                            if (data.count > 0) {
+                                badge.textContent = data.count;
+                                badge.classList.remove('hidden');
+                            } else {
+                                badge.classList.add('hidden');
+                            }
+                        }
+                    });
+            }, 15000); // Check every 15s for global notifications
+        @endauth
     </script>
 
     @stack('scripts')
@@ -233,7 +252,7 @@
     @if ($pwaEnabled)
         <link rel="manifest" href="/manifest.webmanifest">
         <script>
-            if ('serviceWorker' in navigator) {
+                if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(function () { console.log('Service Worker registrado'); })
                     .catch(function (err) { console.error('SW erro:', err); });
@@ -249,26 +268,26 @@
                 modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-fade-in';
 
                 modal.innerHTML = `
-                        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center relative transform transition-all scale-100">
-                            <div class="flex justify-center mb-6">
-                                <img src="{{ $logo }}" alt="Logo" class="h-16 object-contain">
-                            </div>
+                            <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center relative transform transition-all scale-100">
+                                <div class="flex justify-center mb-6">
+                                    <img src="{{ $logo }}" alt="Logo" class="h-16 object-contain">
+                                </div>
 
-                            <h3 class="text-xl font-bold text-slate-900 mb-3">Instale nosso aplicativo!</h3>
-                            <p class="text-slate-600 text-sm mb-8 leading-relaxed">
-                                Tenha acesso mais rápido e use mesmo offline! Instale nosso app diretamente na sua tela inicial.
-                            </p>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3">Instale nosso aplicativo!</h3>
+                                <p class="text-slate-600 text-sm mb-8 leading-relaxed">
+                                    Tenha acesso mais rápido e use mesmo offline! Instale nosso app diretamente na sua tela inicial.
+                                </p>
 
-                            <div class="flex flex-col gap-3">
-                                <button id="pwa-install-btn" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all">
-                                    Instalar Agora
-                                </button>
-                                <button id="pwa-dismiss-btn" class="w-full py-3 px-4 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-colors">
-                                    Mais tarde
-                                </button>
+                                <div class="flex flex-col gap-3">
+                                    <button id="pwa-install-btn" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all">
+                                        Instalar Agora
+                                    </button>
+                                    <button id="pwa-dismiss-btn" class="w-full py-3 px-4 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-colors">
+                                        Mais tarde
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
 
                 document.body.appendChild(modal);
 

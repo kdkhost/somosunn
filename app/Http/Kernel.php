@@ -31,5 +31,6 @@ class Kernel extends HttpKernel
         'redirect.members.admin' => \App\Http\Middleware\RedirectMembersFromAdmin::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'check.feature' => \App\Http\Middleware\CheckFeature::class,
+        'check.connection' => \App\Http\Middleware\EnsureConnectionIsAccepted::class,
     ];
 }

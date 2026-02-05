@@ -177,12 +177,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/connection/accept/{user}', [\App\Http\Controllers\ConnectionController::class, 'accept'])->name('connection.accept');
         Route::post('/connection/remove/{user}', [\App\Http\Controllers\ConnectionController::class, 'remove'])->name('connection.remove');
         Route::post('/connection/block/{user}', [\App\Http\Controllers\ConnectionController::class, 'block'])->name('connection.block');
+        Route::get('/connection/notifications', [\App\Http\Controllers\ConnectionController::class, 'notifications'])->name('connection.notifications');
 
         Route::post('/post', [\App\Http\Controllers\SocialController::class, 'storePost'])->name('social.post.store');
     });
 
     // Chat (Feature: chat)
-    Route::middleware(['check.feature:chat'])->group(function () {
+    Route::middleware(['check.feature:chat', 'check.connection'])->group(function () {
         Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
         Route::get('/chat/start/{user}', [\App\Http\Controllers\ChatController::class, 'start'])->name('chat.start');
         Route::get('/chat/list', [\App\Http\Controllers\ChatController::class, 'list'])->name('chat.list');

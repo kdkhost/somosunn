@@ -160,3 +160,21 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
 - **Dashboard Unificado & Impersonation Seguro:**
   - **Interface Adaptável:** O `dashboard.blade.php` foi unificado. Widgets administrativos (Financeiro) aparecem apenas para Admins. Widgets de usuário (Meus Cursos) aparecem para todos.
   - **Impersonation Seguro:** A função "Acessar como usuário" agora redireciona explicitamente para o Dashboard Seguro, evitando loops de redirecionamento ou erros de permissão em rotas protegidas.
+
+## Sistema RBAC Multi-Tenant e Chat em Tempo Real (Fevereiro 2026)
+
+- **RBAC Multi-Tenant Avançado:**
+  - **Trait `HasFeatureAccess`:** Controle centralizado de acesso a funcionalidades baseado em planos.
+  - **Middleware `CheckFeature`:** Bloqueio dinâmico de rotas conforme a assinatura do membro.
+  - **Planos Dinâmicos:** Permissões de JSON injetadas diretamente nos planos (Eventos, Mentoria, Chat, Cursos).
+  - **Segurança Admin:** Bypass global para administradores em todas as verificações de feature.
+
+- **Sistema de Conexões e Privacidade:**
+  - **Fluxo de Convites:** Solicitação de conexão necessária para comunicação entre membros.
+  - **Privacidade de Perfil:** Opção de ocultar perfil para não-conectados, permitindo apenas a visualização de nome e foto básica.
+  - **Controle de Bloqueio:** Usuários bloqueados são filtrados do feed social e da lista de membros.
+
+- **Chat Real-Time Otimizado (cPanel Friendly):**
+  - **Sincronização via Polling:** Atualização instantânea de mensagens sem recarregar a página, compatível com qualquer hospedagem PHP/MySQL.
+  - **Gestão de Sessão:** Detecção de aba ativa para reduzir o consumo de recursos do servidor.
+  - **Notificações em Tempo Real:** Contador de convites pendentes no cabeçalho atualizado dinamicamente.
