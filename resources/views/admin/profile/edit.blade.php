@@ -146,9 +146,15 @@
                                     </div>
                                     <small class="text-muted d-block mt-1">Recomendado: 1200x300px (JPG/PNG)</small>
                                     
+                                    <!-- Progress Bar Capa -->
+                                    <div class="progress mt-2" id="cover-upload-progress" style="height: 4px; display: none;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                                             role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    
                                     <!-- Preview Capa -->
                                     <div id="cover-preview" class="mt-2" style="{{ $user->cover_photo ? '' : 'display: none;' }}">
-                                        <img src="{{ $user->cover_photo ? asset($user->cover_photo) : '' }}" class="img-fluid rounded" style="max-height: 150px;">
+                                        <img src="{{ $user->cover_photo ? asset($user->cover_photo) : '' }}" class="img-fluid rounded" style="max-height: 150px; width: 100%; object-fit: cover;">
                                     </div>
                                 </div>
                             </div>
@@ -407,8 +413,8 @@ $(document).ready(function() {
     $('#inputCep').on('blur', function() {
         const cep = $(this).val().replace(/\D/g, '');
         if (cep.length === 8) {
-            $('#upload-progress').show();
-            $('#upload-progress .progress-bar').css('width', '50%');
+            // Usa apenas a barra de progresso do endereço ou global se houvesse, aqui usamos a de perfil como fallback
+            toastr.info('Buscando endereço...');
             
             $.getJSON(`https://viacep.com.br/ws/${cep}/json/`, function(data) {
                 if (!data.erro) {
@@ -416,15 +422,12 @@ $(document).ready(function() {
                     $('#inputNeighborhood').val(data.bairro);
                     $('#inputCity').val(data.localidade);
                     $('#inputState').val(data.uf);
-                    toastr.success('CEP encontrado!');
+                    toastr.success('Endereço encontrado!');
                 } else {
                     toastr.error('CEP não encontrado.');
                 }
             }).fail(function() {
                 toastr.error('Erro ao buscar CEP.');
-            }).always(function() {
-                $('#upload-progress .progress-bar').css('width', '100%');
-                setTimeout(() => $('#upload-progress').fadeOut(), 500);
             });
         }
     });
@@ -438,7 +441,9 @@ $(document).ready(function() {
         $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Salvando...');
         
         const formData = new FormData(this);
-        
+        const hasPhoto = $('#photo-upload').get(0).files.length > 0;
+        const hasCover = $('#cover-upload').get(0).files.length > 0;
+
         $.ajax({
             url: $(this).attr('action'),
             type: 'POST',
@@ -450,14 +455,24 @@ $(document).ready(function() {
                 xhr.upload.addEventListener('progress', function(e) {
                     if (e.lengthComputable) {
                         const percentComplete = (e.loaded / e.total) * 100;
-                        $('#upload-progress').show();
-                        $('#upload-progress .progress-bar').css('width', percentComplete + '%');
+                        
+                        // Atualiza barras de progresso relevantes
+                        if (hasPhoto) {
+                            $('#upload-progress').show();
+                            $('#upload-progress .progress-bar').css('width', percentComplete + '%');
+                        }
+                        if (hasCover) {
+                            $('#cover-upload-progress').show();
+                            $('#cover-upload-progress .progress-bar').css('width', percentComplete + '%');
+                        }
                     }
                 }, false);
                 return xhr;
             },
             success: function(response) {
                 toastr.success(response.message || 'Perfil atualizado com sucesso!');
+                
+                // Atualiza Avataa
                 if(response.photo_url) {
                     if ($('#current-photo').is('img')) {
                         $('#current-photo').attr('src', response.photo_url);
@@ -465,6 +480,13 @@ $(document).ready(function() {
                        $('#profile-photo-preview').html(`<img class="profile-user-img img-fluid img-circle" src="${response.photo_url}" alt="Avatar" id="current-photo" style="width: 100px; height: 100px; object-fit: cover;">`);
                     }
                 }
+
+                // Atualiza Capa
+                if(response.cover_url) {
+                     $('#cover-preview img').attr('src', response.cover_url);
+                     $('#cover-preview').show();
+                }
+
                 setTimeout(() => location.reload(), 1500);
             },
             error: function(xhr) {
@@ -478,7 +500,10 @@ $(document).ready(function() {
                 }
             },
             complete: function() {
-                setTimeout(() => $('#upload-progress').fadeOut(), 500);
+                setTimeout(() => {
+                    $('#upload-progress').fadeOut();
+                    $('#cover-upload-progress').fadeOut();
+                }, 500);
             }
         });
     });

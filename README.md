@@ -114,3 +114,7 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
   - Lógica de permissão: Opção `Super Admin` restrita a quem já possui o cargo.
   - Bloqueio de auto-edição: Usuários não podem alterar seu próprio nível de acesso.
 
+- **Correções de UI/UX:**
+  - **Upload de Perfil:** Barra de progresso visual para foto de capa e perfil.
+  - **Feedback Instantâneo:** Preview de imagens atualizado via AJAX sem necessidade de recarregar a página.
+
