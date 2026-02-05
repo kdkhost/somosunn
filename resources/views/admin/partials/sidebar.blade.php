@@ -81,14 +81,14 @@
                 {{-- Menu para Membros --}}
                 @if(!auth()->user()->isAdmin())
                     <li class="nav-item">
-                        <a href="{{ route('social.feed') }}" class="nav-link {{ $is('social.*') }}">
+                        <a href="{{ route('admin.social.feed.internal') }}" class="nav-link {{ $is('admin.social.*') }}">
                             <i class="nav-icon fas fa-users"></i>
                             <p>Comunidade</p>
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="{{ route('portal') }}" class="nav-link">
+                        <a href="{{ route('admin.portal.index') }}" class="nav-link {{ $is('admin.portal.*') }}">
                             <i class="nav-icon fas fa-home"></i>
                             <p>Portal</p>
                         </a>

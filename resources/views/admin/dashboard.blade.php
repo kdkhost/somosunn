@@ -78,12 +78,7 @@
     @else
         {{-- DASHBOARD DE MEMBRO --}}
         <div class="row">
-            <div class="col-12">
-                <div class="alert alert-info">
-                    <h5><i class="icon fas fa-info"></i> Bem-vindo(a), {{ auth()->user()->name }}!</h5>
-                    Acesse seus cursos, mentorias e eventos através do menu lateral.
-                </div>
-            </div>
+            {{-- Banner Removido --}}
 
             <div class="col-md-4">
                 <div class="info-box mb-3 bg-gradient-primary">

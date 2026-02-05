@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends($extends ?? 'layouts.app')
 
 @section('title', 'Portal de Networking - UNN')
 

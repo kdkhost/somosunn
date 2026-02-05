@@ -170,6 +170,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/chat/start/{user}', [\App\Http\Controllers\ChatController::class, 'start'])->name('chat.start');
     Route::get('/chat/list', [\App\Http\Controllers\ChatController::class, 'list'])->name('chat.list');
     Route::get('/chat/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
+    Route::get('/chat/{conversation}/messages', [\App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
     Route::post('/chat/{conversation}/message', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('chat.message.store');
 });
 
@@ -189,6 +190,8 @@ Route::post('/webhook/mercadopago/{seller_id}', [\App\Http\Controllers\PaymentWe
 Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
     // Rotas de Membro (Comum a todos no painel)
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/portal', [\App\Http\Controllers\Admin\MemberController::class, 'portal'])->name('portal.index');
+    Route::get('/comunidade', [\App\Http\Controllers\Admin\MemberController::class, 'socialFeed'])->name('social.feed.internal');
 
     // Perfil (Acessível a membros para completar cadastro)
     Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
