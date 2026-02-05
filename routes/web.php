@@ -12,14 +12,14 @@ Route::get('/portal', [HomeController::class, 'portal'])->name('portal');
 Route::get('/premium', [HomeController::class, 'premium'])->name('premium');
 
 // Rota de Emergência para Diagnóstico
-Route::get('/debug-test', function() {
+Route::get('/debug-test', function () {
     return "<h1>Laravel is Running!</h1> PHP Version: " . phpversion();
 });
 
 // Rota de Emergência para Limpeza de Cache (Brute Force)
-Route::get('/limpar-cache', function() {
+Route::get('/limpar-cache', function () {
     $log = [];
-    
+
     // 1. View Cache
     $viewPath = storage_path('framework/views');
     $files = glob("$viewPath/*.php");
@@ -81,7 +81,7 @@ Route::get('/service-worker.js', function () {
 });
 Route::get('/favicon.ico', function () {
     $custom = \App\Models\Setting::get('favicon_image');
-    if($custom && file_exists(public_path($custom))){
+    if ($custom && file_exists(public_path($custom))) {
         return response()->file(public_path($custom));
     }
     $default = public_path('img/logo.svg');
@@ -90,18 +90,18 @@ Route::get('/favicon.ico', function () {
 });
 
 // Auth scaffold (simplificado)
-Route::get('/login', fn () => view('auth.login'))->name('login');
+Route::get('/login', fn() => view('auth.login'))->name('login');
 Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'authenticate']);
 Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
-Route::get('/register', fn () => view('auth.register'))->name('register');
+Route::get('/register', fn() => view('auth.register'))->name('register');
 Route::post('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'store']);
 
 // Password reset (feedback visual simples)
-Route::get('/password/forgot', fn () => view('auth.passwords.email'))->name('password.request');
-Route::post('/password/email', fn () => back()->with('status','Link de redefinição enviado (simulado).'))->name('password.email');
-Route::get('/password/reset/{token?}', fn ($token = null) => view('auth.passwords.reset', ['token' => $token]))->name('password.reset');
-Route::post('/password/reset', fn (\Illuminate\Http\Request $request) => redirect()->route('login')->with('status','Senha redefinida com sucesso (simulado).'))->name('password.update');
+Route::get('/password/forgot', fn() => view('auth.passwords.email'))->name('password.request');
+Route::post('/password/email', fn() => back()->with('status', 'Link de redefinição enviado (simulado).'))->name('password.email');
+Route::get('/password/reset/{token?}', fn($token = null) => view('auth.passwords.reset', ['token' => $token]))->name('password.reset');
+Route::post('/password/reset', fn(\Illuminate\Http\Request $request) => redirect()->route('login')->with('status', 'Senha redefinida com sucesso (simulado).'))->name('password.update');
 
 // Social Auth
 Route::get('/auth/redirect/{provider}', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])->name('social.redirect');
@@ -118,11 +118,11 @@ Route::post('/webhook/pagseguro', [\App\Http\Controllers\PaymentWebhookControlle
 Route::get('/install', [\App\Http\Controllers\InstallController::class, 'index'])->name('install.index');
 Route::post('/install/run', [\App\Http\Controllers\InstallController::class, 'run'])->name('install.run');
 Route::post('/install/test-connection', [\App\Http\Controllers\InstallController::class, 'testConnection'])->name('install.test-connection');
-Route::get('/install/run', fn () => redirect()->route('install.index'));
+Route::get('/install/run', fn() => redirect()->route('install.index'));
 Route::get('/backend/install', [\App\Http\Controllers\InstallController::class, 'index'])->name('install.index.legacy');
 Route::post('/backend/install/run', [\App\Http\Controllers\InstallController::class, 'run'])->name('install.run.legacy');
 Route::post('/backend/install/test-connection', [\App\Http\Controllers\InstallController::class, 'testConnection'])->name('install.test-connection.legacy');
-Route::get('/backend/install/run', fn () => redirect()->route('install.index.legacy'));
+Route::get('/backend/install/run', fn() => redirect()->route('install.index.legacy'));
 
 Route::post('/api/interactions', [InteractionController::class, 'store'])->name('api.interactions.store');
 Route::post('/api/satisfactions', [SatisfactionController::class, 'store'])->name('api.satisfactions.store');
@@ -136,6 +136,7 @@ Route::get('/offline', fn() => view('offline'))->name('offline');
 
 // Public & Creator Course Routes
 Route::resource('courses', \App\Http\Controllers\CourseController::class);
+Route::resource('mentorships', \App\Http\Controllers\MentorshipController::class)->only(['index', 'show']);
 Route::post('courses/{course}/lessons', [\App\Http\Controllers\LessonController::class, 'store'])->name('courses.lessons.store');
 Route::put('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'update'])->name('courses.lessons.update');
 Route::delete('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'destroy'])->name('courses.lessons.destroy');
@@ -155,13 +156,13 @@ Route::middleware(['auth'])->group(function () {
     // Social / Community
     Route::get('/feed', [\App\Http\Controllers\SocialController::class, 'feed'])->name('social.feed');
     Route::get('/profile/{username}', [\App\Http\Controllers\SocialController::class, 'profile'])->name('social.profile');
-    
+
     // Connections
     Route::post('/connect/{user}', [\App\Http\Controllers\ConnectionController::class, 'connect'])->name('connection.connect');
     Route::post('/connection/accept/{user}', [\App\Http\Controllers\ConnectionController::class, 'accept'])->name('connection.accept');
     Route::post('/connection/remove/{user}', [\App\Http\Controllers\ConnectionController::class, 'remove'])->name('connection.remove');
     Route::post('/connection/block/{user}', [\App\Http\Controllers\ConnectionController::class, 'block'])->name('connection.block');
-    
+
     Route::post('/post', [\App\Http\Controllers\SocialController::class, 'storePost'])->name('social.post.store');
 
     // Chat
@@ -178,17 +179,17 @@ Route::post('/settings/payment', [\App\Http\Controllers\GatewayAccountController
 
 Route::get('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show');
 Route::post('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
-Route::get('/checkout/success/{order}', fn () => view('checkout.success'))->name('checkout.success');
-Route::get('/checkout/failure/{order}', fn () => view('checkout.failure'))->name('checkout.failure');
-Route::get('/checkout/pending/{order}', fn () => view('checkout.pending'))->name('checkout.pending');
+Route::get('/checkout/success/{order}', fn() => view('checkout.success'))->name('checkout.success');
+Route::get('/checkout/failure/{order}', fn() => view('checkout.failure'))->name('checkout.failure');
+Route::get('/checkout/pending/{order}', fn() => view('checkout.pending'))->name('checkout.pending');
 
 Route::post('/webhook/mercadopago/{seller_id}', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])->name('webhook.mercadopago');
 
 // Admin routes (simple scaffold)
-Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function(){
+Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
     // Rotas de Membro (Comum a todos no painel)
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Perfil (Acessível a membros para completar cadastro)
     Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
@@ -198,45 +199,45 @@ Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMi
 
     // Rotas Restritas (Apenas Admin/Superadmin)
     Route::middleware([\App\Http\Middleware\EnsureUserIsAdmin::class])->group(function () {
-        
+
         // Impersonate Start (Apenas SuperAdmin)
         Route::get('/users/{user}/impersonate', [\App\Http\Controllers\Admin\ImpersonateController::class, 'impersonate'])->name('users.impersonate');
 
         Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
         Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
         Route::post('/settings/test-smtp', [\App\Http\Controllers\Admin\SettingController::class, 'testSmtp'])->name('settings.test-smtp');
-    
+
         // Usuários
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('users');
         // Permissões / Papéis
         Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class)->names('permissions');
-    
+
         // Courses CRUD
         Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class)->names('courses');
-        
+
         // Custom Fonts
         Route::get('/fonts', [\App\Http\Controllers\Admin\CustomFontController::class, 'index'])->name('fonts.index');
         Route::post('/fonts', [\App\Http\Controllers\Admin\CustomFontController::class, 'store'])->name('fonts.store');
         Route::delete('/fonts/{font}', [\App\Http\Controllers\Admin\CustomFontController::class, 'destroy'])->name('fonts.destroy');
         Route::get('/fonts/api/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])->name('fonts.api.active');
-    
+
         // Events CRUD
         Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');
-    
+
         // Points Rules
         Route::resource('points-rules', \App\Http\Controllers\Admin\PointsRuleController::class)->names('points-rules');
-    
+
         // Mentorships CRUD
         Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class)->names('mentorships');
-    
+
         // Certificates
         Route::get('/certificates/create', [\App\Http\Controllers\Admin\CertificateController::class, 'createForm'])->name('certificates.create');
         Route::post('/certificates/generate', [\App\Http\Controllers\Admin\CertificateController::class, 'generate'])->name('certificates.generate');
         Route::get('/certificates/view/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'view'])->name('certificates.view');
-    
+
         // Ranking
         Route::get('/ranking', [\App\Http\Controllers\Admin\RankingController::class, 'index'])->name('ranking');
-    
+
 
         // FAILSAFE ROUTES (DO NOT REMOVE)
         // Essas rotas existem para prevenir erros de cache em produção
@@ -246,7 +247,7 @@ Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMi
         // Chunked uploads
         Route::post('/upload/chunk', [\App\Http\Controllers\UploadChunkController::class, 'storeChunk'])->name('upload.chunk');
         Route::post('/upload/assemble', [\App\Http\Controllers\UploadChunkController::class, 'assemble'])->name('upload.assemble');
-    
+
         // Mail templates
         Route::get('/mailtemplates', [\App\Http\Controllers\Admin\MailTemplateController::class, 'index'])->name('mailtemplates.index');
         Route::get('/mailtemplates/create', [\App\Http\Controllers\Admin\MailTemplateController::class, 'create'])->name('mailtemplates.create');
@@ -256,14 +257,14 @@ Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\AdminMi
         Route::delete('/mailtemplates/{mailtemplate}', [\App\Http\Controllers\Admin\MailTemplateController::class, 'destroy'])->name('mailtemplates.destroy');
         Route::get('/mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('mailtemplates.preview');
         Route::post('/mailtemplates/{mailtemplate}/send-preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
-    
+
         // Plans
         Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)->names('plans');
-    
+
         // Orders / Financeiro
         Route::post('orders/{order}/refund', [\App\Http\Controllers\Admin\OrderController::class, 'refund'])->name('orders.refund');
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show'])->names('orders');
-        
+
         // Social / Comunidade Moderação
         Route::get('/social', [\App\Http\Controllers\Admin\SocialController::class, 'index'])->name('social.index');
         Route::delete('/social/{post}', [\App\Http\Controllers\Admin\SocialController::class, 'destroy'])->name('social.destroy');
