@@ -160,6 +160,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/connect/{user}', [\App\Http\Controllers\ConnectionController::class, 'connect'])->name('connection.connect');
     Route::post('/connection/accept/{user}', [\App\Http\Controllers\ConnectionController::class, 'accept'])->name('connection.accept');
     Route::post('/connection/remove/{user}', [\App\Http\Controllers\ConnectionController::class, 'remove'])->name('connection.remove');
+    Route::post('/connection/block/{user}', [\App\Http\Controllers\ConnectionController::class, 'block'])->name('connection.block');
     
     Route::post('/post', [\App\Http\Controllers\SocialController::class, 'storePost'])->name('social.post.store');
 

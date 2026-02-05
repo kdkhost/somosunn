@@ -9,7 +9,11 @@ class Message extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['conversation_id', 'user_id', 'body', 'type', 'media_path'];
+    protected $fillable = ['conversation_id', 'user_id', 'body', 'type', 'media_path', 'read_at'];
+
+    protected $casts = [
+        'read_at' => 'datetime',
+    ];
 
     public function user()
     {

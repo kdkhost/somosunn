@@ -105,4 +105,34 @@ class ConnectionController extends Controller
         
         return response()->json(['success' => false, 'message' => 'Conexão não encontrada.'], 404);
     }
+
+    /**
+     * Block user
+     */
+    public function block($userId)
+    {
+        $user = Auth::user();
+        
+        $connection = Connection::where(function($q) use ($user, $userId) {
+            $q->where('requester_id', $user->id)->where('requested_id', $userId);
+        })->orWhere(function($q) use ($user, $userId) {
+            $q->where('requester_id', $userId)->where('requested_id', $user->id);
+        })->first();
+
+        if ($connection) {
+            $connection->update([
+                'requester_id' => $user->id,
+                'requested_id' => $userId,
+                'status' => 'blocked'
+            ]);
+        } else {
+            Connection::create([
+                'requester_id' => $user->id,
+                'requested_id' => $userId,
+                'status' => 'blocked'
+            ]);
+        }
+        
+        return response()->json(['success' => true, 'message' => 'Usuário bloqueado.']);
+    }
 }

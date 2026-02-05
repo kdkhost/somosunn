@@ -18,6 +18,79 @@
     </ul>
 
     <ul class="navbar-nav ml-auto align-items-center">
+        <!-- Chat Icon -->
+        <li class="nav-item dropdown mr-2">
+            <a class="nav-link" data-toggle="dropdown" href="#">
+                <i class="far fa-comments"></i>
+                @if(isset($unreadMessagesCount) && $unreadMessagesCount > 0)
+                    <span class="badge badge-danger navbar-badge">{{ $unreadMessagesCount }}</span>
+                @endif
+            </a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <span class="dropdown-item dropdown-header">{{ $unreadMessagesCount ?? 0 }} Mensagens</span>
+                <div class="dropdown-divider"></div>
+                @if(isset($unreadMessagesGroups) && $unreadMessagesGroups->isNotEmpty())
+                    @foreach($unreadMessagesGroups as $group)
+                        <a href="{{ route('chat.start', $group->user->id) }}" class="dropdown-item">
+                            <div class="media">
+                                <img src="{{ $group->user->photo ? asset($group->user->photo) : asset('img/default-user.png') }}" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title">
+                                        {{ $group->user->name }}
+                                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                    </h3>
+                                    <p class="text-sm">{{ $group->count }} nova(s) mensagem(ns)</p>
+                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> {{ $group->latest->created_at->diffForHumans() }}</p>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                    @endforeach
+                @else
+                    <a href="#" class="dropdown-item">Nenhuma mensagem nova</a>
+                @endif
+                <div class="dropdown-divider"></div>
+                <a href="{{ route('chat.index') }}" class="dropdown-item dropdown-footer">Ver Todas as Mensagens</a>
+            </div>
+        </li>
+
+        <!-- Bell Icon (Notifications) -->
+        <li class="nav-item dropdown mr-2">
+            <a class="nav-link" data-toggle="dropdown" href="#">
+                <i class="far fa-bell"></i>
+                @if(isset($pendingConnectionsCount) && $pendingConnectionsCount > 0)
+                    <span class="badge badge-warning navbar-badge">{{ $pendingConnectionsCount }}</span>
+                @endif
+            </a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <span class="dropdown-item dropdown-header">{{ $pendingConnectionsCount ?? 0 }} Notificações</span>
+                <div class="dropdown-divider"></div>
+                @if(isset($pendingConnections) && $pendingConnections->isNotEmpty())
+                    @foreach($pendingConnections as $conn)
+                    <div class="dropdown-item">
+                        <div class="media">
+                             <img src="{{ $conn->requester->photo ? asset($conn->requester->photo) : asset('img/default-user.png') }}" class="img-size-50 mr-3 img-circle">
+                             <div class="media-body">
+                                 <h3 class="dropdown-item-title">
+                                     {{ \Illuminate\Support\Str::limit($conn->requester->name, 15) }}
+                                 </h3>
+                                 <p class="text-sm">Solicitou conexão</p>
+                                 <div class="mt-2 text-right">
+                                    <button onclick="acceptConnection({{ $conn->requester_id }})" class="btn btn-xs btn-success" title="Aceitar"><i class="fas fa-check"></i></button>
+                                    <button onclick="removeConnection({{ $conn->requester_id }})" class="btn btn-xs btn-secondary" title="Recusar"><i class="fas fa-times"></i></button>
+                                    <button onclick="blockConnection({{ $conn->requester_id }})" class="btn btn-xs btn-danger" title="Bloquear"><i class="fas fa-ban"></i></button>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    @endforeach
+                @else
+                    <span class="dropdown-item text-center text-muted">Sem novas notificações</span>
+                @endif
+            </div>
+        </li>
+        
         <li class="nav-item mr-2 d-flex align-items-center">
             <form method="POST" action="{{ route('admin.settings.update') }}" id="themeToggleForm" class="m-0 p-0">
                 @csrf
@@ -56,4 +129,34 @@
         </li>
         @endauth
     </ul>
+    @push('scripts')
+    <script>
+        function acceptConnection(userId) {
+            fetch(`/connection/accept/${userId}`, { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' } })
+            .then(r => r.json())
+            .then(data => { 
+                if(data.success) { toastr.success(data.message); location.reload(); } 
+                else { toastr.error(data.message); }
+            });
+        }
+        function removeConnection(userId) {
+            if(!confirm('Recusar conexão?')) return;
+            fetch(`/connection/remove/${userId}`, { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' } })
+            .then(r => r.json())
+            .then(data => { 
+                if(data.success) { toastr.info(data.message); location.reload(); } 
+                else { toastr.error(data.message); }
+            });
+        }
+        function blockConnection(userId) {
+            if(!confirm('Bloquear usuário? Ele não poderá mais solicitar conexão.')) return;
+            fetch(`/connection/block/${userId}`, { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' } })
+            .then(r => r.json())
+            .then(data => { 
+                if(data.success) { toastr.warning(data.message); location.reload(); } 
+                else { toastr.error(data.message); }
+            });
+        }
+    </script>
+    @endpush
 </nav>
