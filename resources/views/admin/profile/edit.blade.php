@@ -13,7 +13,7 @@
             <div class="card-body box-profile">
                 <div class="text-center mb-3" id="profile-photo-preview">
                     @if($user->photo)
-                        <img class="profile-user-img img-fluid img-circle" src="{{ asset($user->photo) }}" alt="Avatar" id="current-photo">
+                        <img class="profile-user-img img-fluid img-circle" src="{{ asset($user->photo) }}" alt="Avatar" id="current-photo" style="width: 100px; height: 100px; object-fit: cover;">
                     @else
                         <div class="profile-user-img img-fluid img-circle d-flex align-items-center justify-content-center bg-light text-primary font-weight-bold" 
                              style="width:100px;height:100px;font-size:2rem;margin:0 auto;border:3px solid #adb5bd;" id="current-photo">
@@ -43,19 +43,36 @@
     <div class="col-md-9">
         <div class="card">
             <div class="card-header p-2">
-                <ul class="nav nav-pills">
-                    <li class="nav-item"><a class="nav-link active" href="#personal" data-toggle="tab"><i class="fas fa-user mr-1"></i>Dados Pessoais</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#address" data-toggle="tab"><i class="fas fa-map-marker-alt mr-1"></i>Endereço</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#social" data-toggle="tab"><i class="fas fa-share-alt mr-1"></i>Redes Sociais</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#privacy" data-toggle="tab"><i class="fas fa-lock mr-1"></i>Privacidade</a></li>
+                <ul class="nav nav-pills" id="profileTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="personal-tab" data-toggle="pill" href="#personal" role="tab" aria-controls="personal" aria-selected="true">
+                            <i class="fas fa-user mr-1"></i> Dados Pessoais
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="address-tab" data-toggle="pill" href="#address" role="tab" aria-controls="address" aria-selected="false">
+                            <i class="fas fa-map-marker-alt mr-1"></i> Endereço
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="social-tab" data-toggle="pill" href="#social" role="tab" aria-controls="social" aria-selected="false">
+                            <i class="fas fa-share-alt mr-1"></i> Redes Sociais
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="privacy-tab" data-toggle="pill" href="#privacy" role="tab" aria-controls="privacy" aria-selected="false">
+                            <i class="fas fa-lock mr-1"></i> Privacidade
+                        </a>
+                    </li>
                 </ul>
             </div>
             <div class="card-body">
                 <form class="ajax-form" method="POST" action="{{ route('admin.profile.update') }}" enctype="multipart/form-data" id="profile-form">
                     @csrf
-                    <div class="tab-content">
+                    <div class="tab-content" id="profileTabsContent">
+                        
                         <!-- Dados Pessoais Tab -->
-                        <div class="active tab-pane" id="personal">
+                        <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
                             <div class="form-group row">
                                 <label for="inputName" class="col-sm-3 col-form-label">Nome Completo <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
@@ -85,6 +102,20 @@
                             </div>
 
                             <div class="form-group row">
+                                <label for="inputOccupation" class="col-sm-3 col-form-label">Cargo/Função</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="inputOccupation" name="occupation" value="{{ $user->occupation ?? '' }}" placeholder="Ex: CEO, Desenvolvedor...">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="inputCompany" class="col-sm-3 col-form-label">Empresa</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="inputCompany" name="company" value="{{ $user->company ?? '' }}" placeholder="Nome da sua empresa">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Foto de Perfil</label>
                                 <div class="col-sm-9">
                                     <div class="custom-file">
@@ -103,7 +134,6 @@
                                     <div id="photo-preview" class="mt-2" style="display: none;">
                                         <img src="" class="img-thumbnail" style="max-height: 150px;">
                                     </div>
-                                </div>
                                 </div>
                             </div>
 
@@ -153,7 +183,7 @@
                         </div>
 
                         <!-- Endereço Tab -->
-                        <div class="tab-pane" id="address">
+                        <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
                             <div class="form-group row">
                                 <label for="inputCep" class="col-sm-3 col-form-label">CEP</label>
                                 <div class="col-sm-9">
@@ -200,7 +230,7 @@
                         </div>
 
                         <!-- Redes Sociais Tab -->
-                        <div class="tab-pane" id="social">
+                        <div class="tab-pane fade" id="social" role="tabpanel" aria-labelledby="social-tab">
                             <p class="text-muted mb-3">
                                 <i class="fas fa-info-circle"></i> 
                                 Adicione seus perfis nas redes sociais para que outros membros possam te encontrar.
@@ -250,7 +280,7 @@
                         </div>
 
                         <!-- Privacidade Tab -->
-                        <div class="tab-pane" id="privacy">
+                        <div class="tab-pane fade" id="privacy" role="tabpanel" aria-labelledby="privacy-tab">
                             <p class="text-muted mb-3">
                                 <i class="fas fa-shield-alt"></i> 
                                 Escolha quais informações outros membros podem ver no seu perfil público.
@@ -316,6 +346,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script>
 $(document).ready(function() {
+    // Inicialização da aba padrão (caso Bootstrap não pegue sozinho)
+    // $('#profileTabs a:first').tab('show');
+
     // Máscaras
     $('.mask-phone').mask('(00) 00000-0000');
     $('.mask-cep').mask('00000-000');
@@ -328,14 +361,16 @@ $(document).ready(function() {
         }
     }).trigger('input');
 
+    // Custom File Label Input
+    $('.custom-file-input').on('change', function() {
+        var fileName = $(this).val().split('\\').pop();
+        $(this).next('.custom-file-label').addClass("selected").html(fileName);
+    });
+
     // Preview de foto
     $('#photo-upload').on('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            // Atualiza label
-            $(this).siblings('.custom-file-label').html(file.name);
-            
-            // Preview
             const reader = new FileReader();
             reader.onload = function(e) {
                 $('#photo-preview img').attr('src', e.target.result);
@@ -345,13 +380,13 @@ $(document).ready(function() {
                 if ($('#current-photo').is('img')) {
                     $('#current-photo').attr('src', e.target.result);
                 } else {
-                    $('#profile-photo-preview').html(`
-                        <img class="profile-user-img img-fluid img-circle" src="${e.target.result}" alt="Preview" id="current-photo">
-                    `);
+                    // Update div to img
+                    const src = e.target.result;
+                    const container = $('#profile-photo-preview');
+                    container.html(`<img class="profile-user-img img-fluid img-circle" src="${src}" alt="Avatar" id="current-photo" style="width: 100px; height: 100px; object-fit: cover;">`);
                 }
             };
             reader.readAsDataURL(file);
-        }
         }
     });
 
@@ -359,10 +394,6 @@ $(document).ready(function() {
     $('#cover-upload').on('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            // Atualiza label
-            $(this).siblings('.custom-file-label').html(file.name);
-            
-            // Preview
             const reader = new FileReader();
             reader.onload = function(e) {
                 $('#cover-preview img').attr('src', e.target.result);
@@ -389,11 +420,11 @@ $(document).ready(function() {
                 } else {
                     toastr.error('CEP não encontrado.');
                 }
-                $('#upload-progress .progress-bar').css('width', '100%');
-                setTimeout(() => $('#upload-progress').fadeOut(), 500);
             }).fail(function() {
                 toastr.error('Erro ao buscar CEP.');
-                $('#upload-progress').fadeOut();
+            }).always(function() {
+                $('#upload-progress .progress-bar').css('width', '100%');
+                setTimeout(() => $('#upload-progress').fadeOut(), 500);
             });
         }
     });
@@ -407,14 +438,6 @@ $(document).ready(function() {
         $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Salvando...');
         
         const formData = new FormData(this);
-        
-        // Debug: verifica se a foto está sendo enviada
-        if (formData.has('photo')) {
-            const photoFile = formData.get('photo');
-            console.log('Foto detectada:', photoFile.name, photoFile.size, 'bytes');
-        } else {
-            console.log('Nenhuma foto selecionada');
-        }
         
         $.ajax({
             url: $(this).attr('action'),
@@ -434,39 +457,14 @@ $(document).ready(function() {
                 return xhr;
             },
             success: function(response) {
-                console.log('========== RESPOSTA DO SERVIDOR ==========');
-                console.log('Resposta completa:', response);
-                
-                if (response.debug) {
-                    console.log('--- DEBUG INFO ---');
-                    console.log('Caminho da foto no banco:', response.debug.photo_path);
-                    console.log('URL completa:', response.debug.full_url);
-                    console.log('Arquivo existe no storage?', response.debug.file_exists);
-                    console.log('Save no banco bem sucedido?', response.debug.save_result);
-                    console.log('------------------');
-                }
-                
                 toastr.success(response.message || 'Perfil atualizado com sucesso!');
-                
-                // Atualiza a foto se foi enviada
-                if (response.photo_url) {
-                    console.log('✅ Atualizando foto para:', response.photo_url);
-                    
+                if(response.photo_url) {
                     if ($('#current-photo').is('img')) {
                         $('#current-photo').attr('src', response.photo_url);
-                        console.log('✅ Foto atualizada no elemento IMG existente');
                     } else {
-                        $('#profile-photo-preview').html(`
-                            <img class="profile-user-img img-fluid img-circle" src="${response.photo_url}" alt="Avatar" id="current-photo">
-                        `);
-                        console.log('✅ Foto inserida como novo elemento IMG');
+                       $('#profile-photo-preview').html(`<img class="profile-user-img img-fluid img-circle" src="${response.photo_url}" alt="Avatar" id="current-photo" style="width: 100px; height: 100px; object-fit: cover;">`);
                     }
-                } else {
-                    console.log('⚠️ Nenhuma URL de foto retornada pelo servidor');
                 }
-                
-                console.log('==========================================');
-                
                 setTimeout(() => location.reload(), 1500);
             },
             error: function(xhr) {
