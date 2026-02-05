@@ -42,7 +42,7 @@
                     </td>
                     <td>{{ ucfirst($user->level ?? 'Iniciante') }}</td>
                     <td class="text-right">
-                        @if(auth()->user()->role === 'superadmin' && $user->id !== auth()->id())
+                        @if(auth()->user()->role === 'superadmin' && $user->id !== auth()->id() && !session()->has('impersonator_id'))
                             <a href="{{ route('admin.users.impersonate', $user) }}" class="btn btn-sm btn-outline-warning" title="Acessar como usuário" data-pjax="false"><i class="fas fa-user-secret"></i></a>
                         @endif
                         <a href="{{ route('admin.users.edit',$user) }}" class="btn btn-sm btn-info" title="Editar" data-pjax="true"><i class="fas fa-edit"></i></a>
