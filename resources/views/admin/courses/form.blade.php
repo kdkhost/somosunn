@@ -436,12 +436,38 @@
                                                                     Validação</label>
                                                             </div>
                                                         </div>
-                                                        <div class="list-group-item p-2 border-0 bg-light rounded mt-2">
-                                                            <div class="custom-control custom-checkbox">
-                                                                <input type="checkbox" class="custom-control-input cert-toggle"
-                                                                    id="toggle-logo" data-tag="platform_logo" checked>
-                                                                <label class="custom-control-label font-weight-bold"
-                                                                    for="toggle-logo">Logo da Plataforma</label>
+                                                        <div class="list-group-item p-2 border-0 bg-warning rounded mt-2">
+                                                            <div class="d-flex align-items-center justify-content-between">
+                                                                <div>
+                                                                    <i class="fas fa-lock mr-2 text-dark"></i>
+                                                                    <span class="font-weight-bold text-dark">Logo da
+                                                                        Plataforma</span>
+                                                                </div>
+                                                                <small class="badge badge-dark">OBRIGATÓRIO</small>
+                                                            </div>
+                                                            <small class="text-dark d-block mt-1"><i
+                                                                    class="fas fa-info-circle"></i> A logo não pode ser removida
+                                                                do certificado</small>
+
+                                                            <div class="mt-3">
+                                                                <label class="small text-dark mb-1 font-weight-bold">Tamanho da
+                                                                    Logo</label>
+                                                                <div class="row">
+                                                                    <div class="col-6">
+                                                                        <label class="small text-muted mb-0">Largura
+                                                                            (px)</label>
+                                                                        <input type="number" id="logo-width"
+                                                                            class="form-control form-control-sm" min="50"
+                                                                            max="400" value="120" placeholder="120">
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="small text-muted mb-0">Altura (px)</label>
+                                                                        <input type="number" id="logo-height"
+                                                                            class="form-control form-control-sm" min="30"
+                                                                            max="200" value="60" placeholder="60">
+                                                                    </div>
+                                                                </div>
+                                                                <small class="text-muted">Min: 50x30px | Máx: 400x200px</small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -449,7 +475,8 @@
                                                     <div id="cert-style-controls" style="display:none;"
                                                         class="bg-light p-3 rounded border">
                                                         <h6 class="font-weight-bold mb-3" style="font-size: 0.9rem;">Editar:
-                                                            <span id="selected-elem-name" class="text-primary"></span></h6>
+                                                            <span id="selected-elem-name" class="text-primary"></span>
+                                                        </h6>
 
                                                         <div class="form-group mb-2">
                                                             <label class="small text-muted mb-0">Fonte</label>
@@ -727,20 +754,20 @@
             attachments.forEach(att => {
                 const size = (att.file_size / 1024 / 1024).toFixed(2) + ' MB';
                 const item = `
-                    <li class="attachment-item" id="att-${att.id}">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-file attachment-icon"></i>
-                            <div>
-                                <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
-                                <small class="text-muted">${size}</small>
-                            </div>
-                        </div>
-                        <div>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </li>
-                `;
+                            <li class="attachment-item" id="att-${att.id}">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-file attachment-icon"></i>
+                                    <div>
+                                        <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
+                                        <small class="text-muted">${size}</small>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </li>
+                        `;
                 list.append(item);
             });
         }
@@ -1111,13 +1138,13 @@
             // Initial Settings from DB (or defaults)
             let certSettings = {!! $course->certificate_settings ? json_encode($course->certificate_settings) : '{}' !!};
 
-            // Default Tags
+            // Default Tags (with mandatory logo)
             const defaultTags = {
                 'student_name': { x: 50, y: 40, text: '[Nome do Aluno]', fontSize: 30, color: '#000000', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' },
                 'course_name': { x: 50, y: 55, text: '[Nome do Curso]', fontSize: 24, color: '#333333', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' },
                 'completion_date': { x: 50, y: 65, text: 'Concluído em: 01/01/2024', fontSize: 16, color: '#555555', fontWeight: 'normal', fontFamily: 'Arial, sans-serif' },
                 'certificate_code': { x: 50, y: 85, text: 'Validação: ABC-123', fontSize: 12, color: '#999999', fontWeight: 'normal', fontFamily: 'Arial, sans-serif' },
-                'platform_logo': { x: 50, y: 10, text: 'LOGO UNN', fontSize: 36, color: '#0066cc', fontWeight: 'bold', fontFamily: 'Georgia, serif' }
+                'platform_logo': { x: 50, y: 10, text: 'LOGO UNN', fontSize: 36, color: '#0066cc', fontWeight: 'bold', fontFamily: 'Georgia, serif', width: 120, height: 60, mandatory: true }
             };
 
             // Merge defaults
@@ -1228,11 +1255,23 @@
                 // Remove transform for easier drag math in jQuery UI
                 $('.cert-element').css('transform', 'none');
 
-                // Apply visibility
+                // Apply visibility (except mandatory logo)
                 $('.cert-toggle').each(function () {
                     let key = $(this).data('tag');
-                    if (!$(this).is(':checked')) $('#el-' + key).hide();
+                    // Platform logo is mandatory and cannot be hidden
+                    if (key !== 'platform_logo' && !$(this).is(':checked')) {
+                        $('#el-' + key).hide();
+                    }
                 });
+
+                // Ensure logo is ALWAYS visible
+                $('#el-platform_logo').show();
+
+                // Load logo size from settings
+                if (certSettings['platform_logo']) {
+                    $('#logo-width').val(certSettings['platform_logo'].width || 120);
+                    $('#logo-height').val(certSettings['platform_logo'].height || 60);
+                }
             }
 
             renderElements();
@@ -1267,10 +1306,36 @@
                     $('#el-' + activeElementId).css('font-family', val);
                 }
             });
+            
+            // Logo Size Controls
+            $('#logo-width').on('input', function() {
+                let val = parseInt($(this).val()) || 120;
+                // Clamp between min and max
+                val = Math.max(50, Math.min(400, val));
+                certSettings['platform_logo'].width = val;
+                // Visual feedback - update element size
+                toastr.info('Largura da logo atualizada: ' + val + 'px');
+            });
+            
+            $('#logo-height').on('input', function() {
+                let val = parseInt($(this).val()) || 60;
+                // Clamp between min and max
+                val = Math.max(30, Math.min(200, val));
+                certSettings['platform_logo'].height = val;
+                toastr.info('Altura da logo atualizada: ' + val + 'px');
+            });
 
-            // Toggle Visibility
+            // Toggle Visibility (logo is MANDATORY and cannot be hidden)
             $('.cert-toggle').on('change', function () {
                 let key = $(this).data('tag');
+                
+                // Prevent logo from being hidden
+                if(key === 'platform_logo') {
+                    $(this).prop('checked', true); // Force checked
+                    toastr.warning('A logo da plataforma é obrigatória e não pode ser removida.');
+                    return;
+                }
+                
                 if ($(this).is(':checked')) {
                     $('#el-' + key).show();
                 } else {

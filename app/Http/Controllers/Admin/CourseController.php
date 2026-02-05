@@ -39,30 +39,30 @@ class CourseController extends Controller
             'status' => 'required|in:draft,published,archived,paused',
             'thumbnail' => 'nullable|image|max:10240', // 10MB Max
         ]);
-        
+
         $data['is_featured'] = $request->has('is_featured');
         $data['is_certificate_enabled'] = $request->has('is_certificate_enabled');
-        
+
         // Handle Certificate Settings
-        if($request->has('certificate_settings')){
+        if ($request->has('certificate_settings')) {
             $data['certificate_settings'] = json_decode($request->certificate_settings, true);
         }
 
         // Legacy support automation
         $data['published'] = ($data['status'] === 'published');
         $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
-        
+
         // Validation for new fields
         $request->validate([
-             'certificate_bg' => 'nullable|image|max:5120', // 5MB
-             'certificate_settings' => 'nullable|json',
+            'certificate_bg' => 'nullable|image|max:5120', // 5MB
+            'certificate_settings' => 'nullable|json',
         ]);
 
         if ($request->hasFile('certificate_bg')) {
-             $file = $request->file('certificate_bg');
-             $fileName = 'cert_bg_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-             $file->move(public_path('uploads/certificates'), $fileName);
-             $data['certificate_bg'] = 'uploads/certificates/' . $fileName;
+            $file = $request->file('certificate_bg');
+            $fileName = 'cert_bg_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/certificates'), $fileName);
+            $data['certificate_bg'] = 'uploads/certificates/' . $fileName;
         }
 
         if ($request->hasFile('thumbnail')) {
@@ -71,10 +71,10 @@ class CourseController extends Controller
             $file->move(public_path('uploads/course-thumbs'), $fileName);
             $data['thumbnail'] = 'uploads/course-thumbs/' . $fileName;
         }
-        
+
         Course::create($data + ['user_id' => auth()->id()]);
-        
-        return response()->json(['success' => true]); 
+
+        return response()->json(['success' => true]);
     }
 
     public function edit(Course $course)
@@ -105,28 +105,31 @@ class CourseController extends Controller
 
         $data['is_featured'] = $request->has('is_featured');
         $data['is_certificate_enabled'] = $request->has('is_certificate_enabled');
-        
+
         // Handle Certificate Settings
-        if($request->has('certificate_settings')){
+        if ($request->has('certificate_settings')) {
             // Depending on frontend, it might come as string JSON or array if not processed by JS.
             // Assuming string from hidden input
-             $data['certificate_settings'] = json_decode($request->certificate_settings, true);
+            $decoded = json_decode($request->certificate_settings, true);
+            if ($decoded !== null) {
+                $data['certificate_settings'] = $decoded;
+            }
         }
 
-        // Legacy support automation
-        $data['published'] = ($data['status'] === 'published');
+        // Legacy support automation - Use null coalescing to prevent undefined key errors
+        $data['published'] = (isset($data['status']) && $data['status'] === 'published');
         $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
 
 
 
         if ($request->hasFile('certificate_bg')) {
-             if($course->certificate_bg && file_exists(public_path($course->certificate_bg))){
-                 @unlink(public_path($course->certificate_bg));
-             }
-             $file = $request->file('certificate_bg');
-             $fileName = 'cert_bg_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-             $file->move(public_path('uploads/certificates'), $fileName);
-             $data['certificate_bg'] = 'uploads/certificates/' . $fileName;
+            if ($course->certificate_bg && file_exists(public_path($course->certificate_bg))) {
+                @unlink(public_path($course->certificate_bg));
+            }
+            $file = $request->file('certificate_bg');
+            $fileName = 'cert_bg_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/certificates'), $fileName);
+            $data['certificate_bg'] = 'uploads/certificates/' . $fileName;
         }
 
         if ($request->hasFile('thumbnail')) {
@@ -137,13 +140,13 @@ class CourseController extends Controller
         }
 
         $course->update($data);
-        
+
         return response()->json(['success' => true]);
     }
 
     public function destroy(Course $course)
     {
         $course->delete();
-        return redirect()->route('admin.courses.index')->with('success','Curso removido');
+        return redirect()->route('admin.courses.index')->with('success', 'Curso removido');
     }
 }
