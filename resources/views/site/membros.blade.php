@@ -60,21 +60,21 @@
                         $isDemo = $member->is_demo ?? false;
                         $initials = collect(explode(' ', $member->name))->take(2)->map(fn($n) => strtoupper(substr($n, 0, 1)))->join('');
                     @endphp
-                    <article class="bg-white rounded-[2rem] shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 {{ $isDemo ? 'ring-2 ring-yellow-400' : '' }}">
+                    <article class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 {{ $isDemo ? 'ring-2 ring-yellow-400' : '' }}">
                         <!-- Header Azul Sólido -->
-                        <div class="h-28 bg-[#1F5EDB] relative">
+                        <div class="h-20 bg-[#1F5EDB] relative">
                             @if($isDemo)
-                                <span class="absolute top-4 right-4 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-semibold">DEMO</span>
+                                <span class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-[10px] px-2 py-0.5 rounded-full font-semibold">DEMO</span>
                             @endif
                         </div>
                         
                         <!-- Avatar Centralizado e Sobreposto -->
-                        <div class="flex justify-center -mt-16 px-4">
-                            <div class="p-1 bg-white rounded-full">
+                        <div class="flex justify-center -mt-12 px-4 relative z-10">
+                            <div class="p-1 bg-white rounded-full shadow-sm">
                                 @if(isset($member->avatar) && $member->avatar)
-                                    <img src="{{ $member->avatar }}" alt="{{ $member->name }}" class="w-32 h-32 rounded-full border-4 border-white object-cover">
+                                    <img src="{{ $member->avatar }}" alt="{{ $member->name }}" class="w-24 h-24 rounded-full border-4 border-white object-cover">
                                 @else
-                                    <div class="w-32 h-32 rounded-full border-4 border-white bg-[#1F5EDB] flex items-center justify-center text-white text-3xl font-bold">
+                                    <div class="w-24 h-24 rounded-full border-4 border-white bg-[#1F5EDB] flex items-center justify-center text-white text-2xl font-bold">
                                         {{ $initials }}
                                     </div>
                                 @endif
@@ -82,30 +82,30 @@
                         </div>
 
                         <!-- Content -->
-                        <div class="pt-4 pb-8 px-6 text-center">
+                        <div class="pt-3 pb-5 px-4 text-center">
                             <!-- Nome -->
-                            <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ $member->name }}</h3>
+                            <h3 class="text-lg font-bold text-gray-900 mb-0.5">{{ $member->name }}</h3>
                             
                             <!-- Localização -->
                             @if(isset($member->city) && $member->city)
-                            <p class="text-gray-500 mb-6 flex items-center justify-center gap-1.5">
+                            <p class="text-xs text-gray-500 mb-4 flex items-center justify-center gap-1">
                                 <i class="fas fa-map-marker-alt text-[#1F5EDB]"></i>
                                 {{ $member->city }}
                             </p>
                             @endif
 
                             <!-- Linha Divisória -->
-                            <div class="border-t border-gray-100 w-full mb-6"></div>
+                            <div class="border-t border-gray-100 w-full mb-3"></div>
 
                             <!-- Conexões -->
-                            <div class="mb-6">
-                                <p class="text-2xl font-bold text-gray-900">{{ $member->connections ?? 0 }}</p>
-                                <p class="text-sm text-gray-500">Conexões</p>
+                            <div class="mb-4">
+                                <p class="text-xl font-bold text-gray-900">{{ $member->connections ?? 0 }}</p>
+                                <p class="text-[10px] uppercase tracking-wide text-gray-400 font-bold">Conexões</p>
                             </div>
 
                             <!-- Botão Ver Perfil -->
                             @if(!$isDemo)
-                            <a href="{{ route('social.profile', $member->id) }}" class="block w-full bg-[#1F5EDB] hover:bg-blue-700 text-white py-3.5 rounded-xl font-bold text-center transition shadow-md hover:shadow-lg">
+                            <a href="{{ route('social.profile', $member->id) }}" class="block w-full bg-[#1F5EDB] hover:bg-blue-700 text-white py-2.5 rounded-lg font-bold text-sm text-center transition shadow hover:shadow-md">
                                 Ver Perfil
                             </a>
                             @else
@@ -114,7 +114,7 @@
                                 text: 'Este é um perfil de demonstração.',
                                 icon: 'info',
                                 confirmButtonColor: '#1F5EDB'
-                            })" class="block w-full bg-[#1F5EDB] text-white py-3.5 rounded-xl font-bold opacity-75 cursor-not-allowed">
+                            })" class="block w-full bg-[#1F5EDB] text-white py-2.5 rounded-lg font-bold text-sm opacity-75 cursor-not-allowed">
                                 Ver Perfil
                             </button>
                             @endif
