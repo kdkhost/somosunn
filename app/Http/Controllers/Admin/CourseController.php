@@ -100,7 +100,11 @@ class CourseController extends Controller
             'status' => 'sometimes|required|in:draft,published,archived,paused',
             'thumbnail' => 'nullable|image|max:10240', // 10MB Max
             'certificate_bg' => 'nullable|image|max:5120',
+            'instructor_signature' => 'nullable|image|max:2048|mimes:png,jpg,jpeg',
             'certificate_settings' => 'nullable|json',
+            'workload_hours' => 'nullable|integer|min:1|max:1000',
+            'certificate_title' => 'nullable|string|max:255',
+            'presentation_text' => 'nullable|string|max:500',
         ]);
 
         $data['is_featured'] = $request->has('is_featured');
@@ -137,6 +141,32 @@ class CourseController extends Controller
             $fileName = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/course-thumbs'), $fileName);
             $data['thumbnail'] = 'uploads/course-thumbs/' . $fileName;
+        }
+
+        // Handle Instructor Signature Upload
+        if ($request->hasFile('instructor_signature')) {
+            if ($course->instructor_signature && file_exists(public_path($course->instructor_signature))) {
+                @unlink(public_path($course->instructor_signature));
+            }
+            $file = $request->file('instructor_signature');
+            $fileName = 'sig_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/signatures'), $fileName);
+            $data['instructor_signature'] = 'uploads/signatures/' . $fileName;
+        }
+
+        // Merge additional certificate fields into certificate_settings if provided
+        if (!isset($data['certificate_settings'])) {
+            $data['certificate_settings'] = $course->certificate_settings ?? [];
+        }
+
+        if ($request->filled('workload_hours')) {
+            $data['certificate_settings']['workload_hours'] = $request->workload_hours;
+        }
+        if ($request->filled('certificate_title')) {
+            $data['certificate_settings']['title'] = $request->certificate_title;
+        }
+        if ($request->filled('presentation_text')) {
+            $data['certificate_settings']['presentation_text'] = $request->presentation_text;
         }
 
         $course->update($data);

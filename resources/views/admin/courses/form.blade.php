@@ -398,6 +398,61 @@
                                                         <small class="text-muted">Recomendado: 1920x1080px (PNG/JPG)</small>
                                                     </div>
 
+                                                    <div class="form-group">
+                                                        <label class="small text-muted text-uppercase font-weight-bold">Carga
+                                                            Horária (horas)</label>
+                                                        <input type="number" class="form-control" name="workload_hours"
+                                                            id="workload_hours" min="1" max="1000"
+                                                            value="{{ $course->certificate_settings['workload_hours'] ?? '' }}"
+                                                            placeholder="Ex: 40">
+                                                        <small class="text-muted">Total de horas do curso</small>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label
+                                                            class="small text-muted text-uppercase font-weight-bold">Assinatura
+                                                            do Instrutor</label>
+                                                        <div class="custom-file">
+                                                            <input type="file" class="custom-file-input"
+                                                                name="instructor_signature" id="instructor_signature"
+                                                                accept="image/png,image/jpeg,image/jpg"
+                                                                onchange="previewSignature(this)">
+                                                            <label class="custom-file-label">Escolher arquivo</label>
+                                                        </div>
+                                                        <small class="text-muted">Recomendado: 300x100px PNG
+                                                            transparente</small>
+                                                        @if($course->instructor_signature)
+                                                            <div class="mt-2">
+                                                                <img src="{{ asset($course->instructor_signature) }}"
+                                                                    id="signaturePreview" class="img-thumbnail"
+                                                                    style="max-width: 150px; background: #f8f9fa;">
+                                                            </div>
+                                                        @else
+                                                            <div class="mt-2" id="signaturePreviewWrapper" style="display:none;">
+                                                                <img id="signaturePreview" class="img-thumbnail"
+                                                                    style="max-width: 150px; background: #f8f9fa;">
+                                                            </div>
+                                                        @endif
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="small text-muted text-uppercase font-weight-bold">Título
+                                                            do Certificado</label>
+                                                        <input type="text" class="form-control" name="certificate_title"
+                                                            id="certificate_title"
+                                                            value="{{ $course->certificate_settings['title'] ?? 'CERTIFICATE OF ACHIEVEMENT' }}"
+                                                            placeholder="CERTIFICATE OF ACHIEVEMENT">
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="small text-muted text-uppercase font-weight-bold">Texto de
+                                                            Apresentação</label>
+                                                        <textarea class="form-control" name="presentation_text"
+                                                            id="presentation_text" rows="2"
+                                                            placeholder="This certificate is proudly present to">{{ $course->certificate_settings['presentation_text'] ?? '' }}</textarea>
+                                                        <small class="text-muted">Texto acima do nome do aluno</small>
+                                                    </div>
+
                                                     <hr>
 
                                                     <h6 class="small text-muted text-uppercase font-weight-bold mb-3">Elementos
@@ -754,20 +809,20 @@
             attachments.forEach(att => {
                 const size = (att.file_size / 1024 / 1024).toFixed(2) + ' MB';
                 const item = `
-                            <li class="attachment-item" id="att-${att.id}">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-file attachment-icon"></i>
-                                    <div>
-                                        <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
-                                        <small class="text-muted">${size}</small>
+                                <li class="attachment-item" id="att-${att.id}">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-file attachment-icon"></i>
+                                        <div>
+                                            <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
+                                            <small class="text-muted">${size}</small>
+                                        </div>
                                     </div>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
-                                </div>
-                            </li>
-                        `;
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </li>
+                            `;
                 list.append(item);
             });
         }
@@ -1037,6 +1092,31 @@
                     reader.readAsDataURL(file);
                 }
             });
+            
+            // Signature Preview Function
+            function previewSignature(input) {
+                if (input.files && input.files[0]) {
+                    // Update label
+                    $(input).next('.custom-file-label').html(input.files[0].name);
+                    
+                    // Show preview
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#signaturePreview').attr('src', e.target.result);
+                        $('#signaturePreviewWrapper').show();
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+            
+            // Certificate Background Preview
+            function previewCertBg(input) {
+                if (input.files && input.files[0]) {
+                    $(input).next('.custom-file-label').html(input.files[0].name);
+                    // Optionally, you could preview the background on the certificate canvas
+                    // For now, just update the label
+                }
+            }
 
             // Main Course Form AJAX Submit (to show progress)
             $('form[enctype="multipart/form-data"]').on('submit', function (e) {
@@ -1306,9 +1386,9 @@
                     $('#el-' + activeElementId).css('font-family', val);
                 }
             });
-            
+
             // Logo Size Controls
-            $('#logo-width').on('input', function() {
+            $('#logo-width').on('input', function () {
                 let val = parseInt($(this).val()) || 120;
                 // Clamp between min and max
                 val = Math.max(50, Math.min(400, val));
@@ -1316,8 +1396,8 @@
                 // Visual feedback - update element size
                 toastr.info('Largura da logo atualizada: ' + val + 'px');
             });
-            
-            $('#logo-height').on('input', function() {
+
+            $('#logo-height').on('input', function () {
                 let val = parseInt($(this).val()) || 60;
                 // Clamp between min and max
                 val = Math.max(30, Math.min(200, val));
@@ -1328,14 +1408,14 @@
             // Toggle Visibility (logo is MANDATORY and cannot be hidden)
             $('.cert-toggle').on('change', function () {
                 let key = $(this).data('tag');
-                
+
                 // Prevent logo from being hidden
-                if(key === 'platform_logo') {
+                if (key === 'platform_logo') {
                     $(this).prop('checked', true); // Force checked
                     toastr.warning('A logo da plataforma é obrigatória e não pode ser removida.');
                     return;
                 }
-                
+
                 if ($(this).is(':checked')) {
                     $('#el-' + key).show();
                 } else {
