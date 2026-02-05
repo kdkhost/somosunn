@@ -11,7 +11,14 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::orderBy('created_at','desc')->paginate(15);
+        $query = User::latest();
+
+        // Se não for super admin, não pode ver super admin
+        if(auth()->check() && auth()->user()->role !== 'superadmin'){
+            $query->where('role', '!=', 'superadmin');
+        }
+
+        $users = $query->get();
         return view('admin.users.index', compact('users'));
     }
 
@@ -60,6 +67,9 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        if($user->role === 'superadmin' && auth()->user()->role !== 'superadmin'){
+             return response()->json(['message' => 'Você não pode excluir um Super Admin.'], 403);
+        }
         $user->delete();
         return response()->json(['ok'=>true]);
     }

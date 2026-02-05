@@ -99,3 +99,13 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
   - Integração direta entre perfil e chat privado.
   - Botões de ação dinâmicos (Conectar, Aceitar, Mensagem) baseados no status da relação entre usuários.
 
+## Refinamento da Gestão de Usuários (Melhorias de UI/UX)
+
+- **Listagem Avançada:**
+  - Implementação de `DataTables` para listagem de usuários com busca instantânea, ordenação e paginação.
+  - Otimização do carregamento de dados e interface responsiva.
+
+- **Controle de Visibilidade:**
+  - Filtros automáticos: Usuários com nível `superadmin` são ocultados da lista para administradores comuns.
+  - Segurança aprimorada contra alterações não autorizadas em contas críticas.
+
