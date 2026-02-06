@@ -24,7 +24,22 @@ AddDefaultCharset UTF-8
     # expor arquivos do public sem /public na URL
     RewriteRule ^uploads/(.*)$ public/uploads/$1 [L,NC]
     RewriteRule ^img/(.*)$ public/img/$1 [L,NC]
+
+    # /storage: evita depender de symlink e serve uploads tanto do public/storage
+    # quanto do storage/app/public (Laravel padrÃ£o) quando existirem.
+    # Bloqueia path traversal (..)
+    RewriteCond %{REQUEST_URI} ^/storage/.*\.\. [NC]
+    RewriteRule ^storage/ - [F,L]
+
+    # 1) PreferÃªncia: public/storage (sem symlink)
+    RewriteCond %{REQUEST_URI} ^/storage/(.*)$
+    RewriteCond %{DOCUMENT_ROOT}/public/storage/%1 -f
     RewriteRule ^storage/(.*)$ public/storage/$1 [L,NC]
+
+    # 2) Fallback: storage/app/public (quando arquivos foram gravados no padrÃ£o do Laravel)
+    RewriteCond %{REQUEST_URI} ^/storage/(.*)$
+    RewriteCond %{DOCUMENT_ROOT}/storage/app/public/%1 -f
+    RewriteRule ^storage/(.*)$ storage/app/public/$1 [L,NC]
     RewriteRule ^service-worker\.js$ public/service-worker.js [L,NC]
 
     # PWA manifest é servido dinamicamente pelo Laravel em /manifest.webmanifest

@@ -33,7 +33,12 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
+            // Compatibilidade com hospedagem compartilhada (cPanel) sem depender de symlink:
+            // se existir public/storage (diretório real), gravamos direto nele.
+            // caso contrário, usamos o padrão do Laravel (storage/app/public) + storage:link.
+            'root' => is_dir(public_path('storage'))
+                ? public_path('storage')
+                : storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,

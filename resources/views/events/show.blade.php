@@ -11,6 +11,26 @@
         $endDate = is_string($event->end_at) ? \Carbon\Carbon::parse($event->end_at) : $event->end_at;
     }
     $eventColor = $event->color ?? '#1F5EDB';
+
+    $resolveImageUrl = function (?string $path): ?string {
+        $path = trim((string) $path);
+        if ($path === '') {
+            return null;
+        }
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+        if (str_starts_with($path, 'storage/')) {
+            return asset($path);
+        }
+        if (str_starts_with($path, 'uploads/')) {
+            return asset($path);
+        }
+
+        return asset('storage/' . ltrim($path, '/'));
+    };
+
+    $eventImageUrl = $resolveImageUrl($event->image ?? null);
     $mapQuery = urlencode($event->address);
     $confirmedSeats = $event->confirmed_seats;
     $remainingSeats = $event->remaining_seats;
@@ -25,8 +45,16 @@
 
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
-    <section class="pt-24 md:pt-28 pb-6 md:pb-12 px-4 md:px-12 lg:px-24" style="background: linear-gradient(135deg, {{ $eventColor }}20 0%, {{ $eventColor }}05 100%);">
-        <div class="max-w-7xl mx-auto">
+    <section class="pt-24 md:pt-28 pb-6 md:pb-12 px-4 md:px-12 lg:px-24 relative overflow-hidden" style="background: linear-gradient(135deg, {{ $eventColor }}20 0%, {{ $eventColor }}05 100%);">
+        @if($eventImageUrl)
+            <div class="absolute inset-0 pointer-events-none">
+                <img src="{{ $eventImageUrl }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-30" loading="lazy" aria-hidden="true">
+                <div class="absolute inset-0" style="background: linear-gradient(135deg, {{ $eventColor }}35 0%, {{ $eventColor }}08 100%);"></div>
+                <div class="absolute inset-0 bg-gradient-to-b from-white/70 via-white/55 to-white/80"></div>
+            </div>
+        @endif
+
+        <div class="max-w-7xl mx-auto relative">
             <a href="{{ route('events.index') }}" class="inline-flex items-center gap-2 text-gray-600 mb-4 md:mb-6 transition" style="--tw-text-opacity:1" onmouseover="this.style.color='var(--unn-azul-1)'" onmouseout="this.style.color=''">
                 <i class="fas fa-arrow-left"></i> Voltar para eventos
             </a>
@@ -97,9 +125,9 @@
                 <!-- Ticket Card -->
                 <div class="w-full lg:w-96 shrink-0">
                     <div class="bg-white rounded-3xl shadow-2xl overflow-hidden sticky top-28">
-                        @if($event->image)
+                        @if($eventImageUrl)
                             <div class="relative h-44">
-                                <img src="{{ asset('storage/' . $event->image) }}" alt="Imagem do evento" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
+                                <img src="{{ $eventImageUrl }}" alt="Imagem do evento" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
                                 <div class="absolute inset-x-0 top-0 h-2" style="background-color: {{ $eventColor }}"></div>
                             </div>
                         @else
