@@ -59,10 +59,27 @@
                         <option value="mentorship" {{ old('applies_to',$coupon->applies_to)=='mentorship'?'selected':'' }}>Somente mentorias</option>
                     </select>
                 </div>
-                <div class="form-group col-md-4">
-                    <label>ID do item (opcional)</label>
-                    <input name="applies_to_id" class="form-control" value="{{ old('applies_to_id',$coupon->applies_to_id) }}" placeholder="Ex: ID do evento/curso/mentoria">
-                    <small class="text-muted">Deixe em branco para aplicar a todos do escopo.</small>
+                <div class="form-group col-md-4" data-coupon-item-wrap>
+                    <label>Item (opcional)</label>
+                    <select name="applies_to_id" class="form-control" id="coupon_applies_to_id">
+                        <option value="">Aplicar a todos do escopo</option>
+                        @foreach(($events ?? collect()) as $event)
+                            <option value="{{ $event->id }}" data-scope="event" {{ (string) old('applies_to_id', $coupon->applies_to_id) === (string) $event->id ? 'selected' : '' }}>
+                                Evento #{{ $event->id }} — {{ $event->title }}@if($event->start_at) ({{ $event->start_at->format('d/m/Y') }})@endif
+                            </option>
+                        @endforeach
+                        @foreach(($courses ?? collect()) as $course)
+                            <option value="{{ $course->id }}" data-scope="course" {{ (string) old('applies_to_id', $coupon->applies_to_id) === (string) $course->id ? 'selected' : '' }}>
+                                Curso #{{ $course->id }} — {{ $course->title }}
+                            </option>
+                        @endforeach
+                        @foreach(($mentorships ?? collect()) as $mentorship)
+                            <option value="{{ $mentorship->id }}" data-scope="mentorship" {{ (string) old('applies_to_id', $coupon->applies_to_id) === (string) $mentorship->id ? 'selected' : '' }}>
+                                Mentoria #{{ $mentorship->id }} — {{ $mentorship->title }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <small class="text-muted" data-coupon-item-help>Selecione o item para criar uma promoção direcionada (opcional).</small>
                 </div>
                 <div class="form-group col-md-4">
                     <label>Status</label>
@@ -88,18 +105,18 @@
                 </div>
                 <div class="form-group col-md-3">
                     <label>Início (opcional)</label>
-                    <input name="starts_at" class="form-control" value="{{ old('starts_at', optional($coupon->starts_at)->format('Y-m-d H:i')) }}" placeholder="AAAA-MM-DD HH:MM">
+                    <input name="starts_at" class="form-control" data-datetime-picker value="{{ old('starts_at', optional($coupon->starts_at)->format('Y-m-d H:i')) }}" placeholder="AAAA-MM-DD HH:MM" autocomplete="off">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col-md-3">
                     <label>Término (opcional)</label>
-                    <input name="ends_at" class="form-control" value="{{ old('ends_at', optional($coupon->ends_at)->format('Y-m-d H:i')) }}" placeholder="AAAA-MM-DD HH:MM">
+                    <input name="ends_at" class="form-control" data-datetime-picker value="{{ old('ends_at', optional($coupon->ends_at)->format('Y-m-d H:i')) }}" placeholder="AAAA-MM-DD HH:MM" autocomplete="off">
                 </div>
                 <div class="form-group col-md-9">
                     <div class="alert alert-info mb-0 mt-4">
-                        Dica: para Black Friday, use escopo "Geral" e desconto percentual. Para promoção direcionada, defina o escopo (evento/curso/mentoria) e informe o ID do item.
+                        Dica: para Black Friday, use escopo "Geral" e desconto percentual. Para promoção direcionada, defina o escopo (evento/curso/mentoria) e selecione o item.
                     </div>
                 </div>
             </div>
@@ -111,22 +128,4 @@
         </form>
     </div>
 </div>
-
-@push('scripts')
-<script>
-    (function () {
-        const btn = document.getElementById('btnGenCode');
-        if (!btn) return;
-        btn.addEventListener('click', function () {
-            const input = document.querySelector('input[name="code"]');
-            if (!input) return;
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let out = '';
-            for (let i = 0; i < 12; i++) out += chars[Math.floor(Math.random() * chars.length)];
-            input.value = out;
-        });
-    })();
-</script>
-@endpush
 @endsection
-

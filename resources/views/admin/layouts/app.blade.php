@@ -71,6 +71,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -252,6 +253,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap-colorpicker@3.4.0/dist/js/bootstrap-colorpicker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
     @include('admin.partials.notifications')
     @include('admin.partials.chat-widget')
     @stack('scripts')
@@ -269,11 +272,15 @@
                 initUploadWidgets();
                 initMasks();
                 initColorPickers();
+                initDateTimePickers();
+                initCouponFormEnhancements();
             });
             $('.summernote').summernote({ height: 180 });
             initUploadWidgets();
             initMasks();
             initColorPickers();
+            initDateTimePickers();
+            initCouponFormEnhancements();
 
             toastr.options = { positionClass: 'toast-top-right', timeOut: 3500, progressBar: true };
 
@@ -407,6 +414,97 @@
                     }
                 });
                 $('.mask-cpf-cnpj').inputmask({ mask: ['999.999.999-99', '99.999.999/9999-99'], keepStatic: true, placeholder: '_' });
+            }
+
+            function initDateTimePickers() {
+                if (typeof flatpickr === 'undefined') return;
+
+                try {
+                    if (flatpickr.l10ns && flatpickr.l10ns.pt) {
+                        flatpickr.localize(flatpickr.l10ns.pt);
+                    }
+                } catch (e) { /* ignore */ }
+
+                $('[data-datetime-picker]').each(function () {
+                    if (this._flatpickr) return;
+                    flatpickr(this, {
+                        enableTime: true,
+                        time_24hr: true,
+                        allowInput: true,
+                        dateFormat: 'Y-m-d H:i'
+                    });
+                });
+            }
+
+            function initCouponFormEnhancements() {
+                const form = $('form.ajax-form').filter(function () {
+                    return String($(this).attr('action') || '').includes('/admin/coupons');
+                }).first();
+
+                if (!form.length) return;
+
+                // Gerar código (fallback global para PJAX)
+                const btnGen = document.getElementById('btnGenCode');
+                if (btnGen && !btnGen.dataset.bound) {
+                    btnGen.dataset.bound = '1';
+                    btnGen.addEventListener('click', function () {
+                        const input = form.find('input[name="code"]').get(0);
+                        if (!input) return;
+                        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                        let out = '';
+                        for (let i = 0; i < 12; i++) out += chars[Math.floor(Math.random() * chars.length)];
+                        input.value = out;
+                    });
+                }
+
+                const scopeSelect = form.find('select[name="applies_to"]');
+                const itemWrap = form.find('[data-coupon-item-wrap]');
+                const itemSelect = form.find('select[name="applies_to_id"]');
+                const itemHelp = form.find('[data-coupon-item-help]');
+
+                if (!scopeSelect.length || !itemSelect.length) return;
+
+                if (form.data('couponUiInit')) return;
+                form.data('couponUiInit', true);
+
+                function filterItemOptions(scope) {
+                    itemSelect.find('option').each(function () {
+                        const optScope = $(this).data('scope');
+                        if (!optScope) {
+                            $(this).prop('hidden', false);
+                            return;
+                        }
+                        $(this).prop('hidden', optScope !== scope);
+                    });
+                }
+
+                function applyScope() {
+                    const scope = String(scopeSelect.val() || 'all');
+
+                    if (scope === 'all') {
+                        itemSelect.val('');
+                        itemSelect.prop('disabled', true);
+                        itemWrap.addClass('d-none');
+                        return;
+                    }
+
+                    itemWrap.removeClass('d-none');
+                    itemSelect.prop('disabled', false);
+                    filterItemOptions(scope);
+
+                    const selected = itemSelect.find('option:selected');
+                    if (selected.length && selected.prop('hidden')) {
+                        itemSelect.val('');
+                    }
+
+                    if (itemHelp.length) {
+                        const label = scope === 'event' ? 'evento' : (scope === 'course' ? 'curso' : 'mentoria');
+                        itemHelp.text('Selecione o ' + label + ' para criar uma promoção direcionada (opcional).');
+                    }
+                }
+
+                scopeSelect.on('change.couponui', applyScope);
+                applyScope();
             }
 
             function initUploadWidgets() {

@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
+use App\Models\Course;
+use App\Models\Event;
+use App\Models\Mentorship;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -18,7 +21,14 @@ class CouponController extends Controller
 
     public function create()
     {
-        return view('admin.coupons.form', ['coupon' => new Coupon()]);
+        [$events, $courses, $mentorships] = $this->loadAppliesToOptions();
+
+        return view('admin.coupons.form', [
+            'coupon' => new Coupon(),
+            'events' => $events,
+            'courses' => $courses,
+            'mentorships' => $mentorships,
+        ]);
     }
 
     public function store(Request $request)
@@ -33,7 +43,9 @@ class CouponController extends Controller
 
     public function edit(Coupon $coupon)
     {
-        return view('admin.coupons.form', compact('coupon'));
+        [$events, $courses, $mentorships] = $this->loadAppliesToOptions();
+
+        return view('admin.coupons.form', compact('coupon', 'events', 'courses', 'mentorships'));
     }
 
     public function update(Request $request, Coupon $coupon)
@@ -88,5 +100,40 @@ class CouponController extends Controller
         $data['is_active'] = $request->boolean('is_active', true);
 
         return $data;
+    }
+
+    private function loadAppliesToOptions(): array
+    {
+        $events = collect();
+        $courses = collect();
+        $mentorships = collect();
+
+        if (!view()->shared('unnDbAvailable')) {
+            return [$events, $courses, $mentorships];
+        }
+
+        try {
+            $events = Event::query()
+                ->select(['id', 'title', 'start_at'])
+                ->orderByDesc('start_at')
+                ->limit(200)
+                ->get();
+
+            $courses = Course::query()
+                ->select(['id', 'title'])
+                ->orderByDesc('id')
+                ->limit(200)
+                ->get();
+
+            $mentorships = Mentorship::query()
+                ->select(['id', 'title'])
+                ->orderByDesc('id')
+                ->limit(200)
+                ->get();
+        } catch (\Throwable $e) {
+            // opcional: em caso de tabela faltando ou banco instável, mantém listas vazias
+        }
+
+        return [$events, $courses, $mentorships];
     }
 }
