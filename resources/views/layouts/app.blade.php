@@ -50,6 +50,113 @@
         $trackingHead = (string) (\App\Models\Setting::get('tracking_head') ?: '');
         $trackingBody = (string) (\App\Models\Setting::get('tracking_body') ?: '');
 
+        // Video player (Plyr) - global config
+        $videoPlayerEnabled = (string) \App\Models\Setting::get('video_player_enabled', '1') === '1';
+        $videoPlyrColor = (string) (\App\Models\Setting::get('video_plyr_color') ?: (\App\Models\Setting::get('site_color_primary') ?: '#1F5EDB'));
+        if (!preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $videoPlyrColor)) {
+            $videoPlyrColor = '#1F5EDB';
+        }
+
+        $videoPlyrControlsRaw = (string) (\App\Models\Setting::get('video_plyr_controls') ?: 'play,progress,current-time,mute,volume,settings,fullscreen');
+        $videoPlyrControls = array_values(array_filter(array_map('trim', explode(',', $videoPlyrControlsRaw))));
+
+        $videoPlyrSettingsRaw = (string) (\App\Models\Setting::get('video_plyr_settings') ?: 'captions,quality,speed,loop');
+        $videoPlyrSettings = array_values(array_filter(array_map('trim', explode(',', $videoPlyrSettingsRaw))));
+
+        $videoPlyrSpeedOptionsRaw = (string) (\App\Models\Setting::get('video_plyr_speed_options') ?: '0.5,0.75,1,1.25,1.5,2');
+        $videoPlyrSpeedOptions = array_values(array_filter(array_map(function ($value) {
+            $value = trim((string) $value);
+            if ($value === '') {
+                return null;
+            }
+            $value = str_replace(',', '.', $value);
+            return (float) $value;
+        }, explode(',', $videoPlyrSpeedOptionsRaw))));
+        $videoPlyrSpeedSelected = (float) str_replace(',', '.', (string) (\App\Models\Setting::get('video_plyr_speed_selected') ?: '1'));
+
+        $videoPlyrSeekTime = (int) (\App\Models\Setting::get('video_plyr_seek_time') ?: 10);
+
+        $videoPlyrVolumeRaw = trim((string) (\App\Models\Setting::get('video_plyr_volume') ?: ''));
+        $videoPlyrVolumeValue = $videoPlyrVolumeRaw !== '' ? (float) str_replace(',', '.', $videoPlyrVolumeRaw) : null;
+
+        $videoPlyrAutoplay = (string) \App\Models\Setting::get('video_plyr_autoplay', '0') === '1';
+        $videoPlyrMuted = (string) \App\Models\Setting::get('video_plyr_muted', '0') === '1';
+        $videoPlyrClickToPlay = (string) \App\Models\Setting::get('video_plyr_click_to_play', '1') === '1';
+        $videoPlyrDisableContextMenu = (string) \App\Models\Setting::get('video_plyr_disable_context_menu', '1') === '1';
+
+        $videoPlyrOptionsJson = trim((string) (\App\Models\Setting::get('video_plyr_options_json') ?: ''));
+        $videoPlyrOptionsCustom = null;
+        if ($videoPlyrOptionsJson !== '') {
+            $decoded = json_decode($videoPlyrOptionsJson, true);
+            if (is_array($decoded)) {
+                $videoPlyrOptionsCustom = $decoded;
+            }
+        }
+
+        $videoWatermarkEnabled = (string) \App\Models\Setting::get('video_watermark_enabled', '0') === '1';
+        $videoWatermarkTextEnabled = (string) \App\Models\Setting::get('video_watermark_text_enabled', '0') === '1';
+        $videoWatermarkTextTemplate = (string) (\App\Models\Setting::get('video_watermark_text_template') ?: '{name}');
+
+        $watermarkImageValue = (string) (\App\Models\Setting::get('watermark_image') ?: '');
+        $watermarkImageUrl = $watermarkImageValue !== '' ? asset(ltrim($watermarkImageValue, '/')) : '';
+
+        $videoWatermarkOpacityRaw = (string) (\App\Models\Setting::get('video_watermark_opacity') ?: '0.15');
+        $videoWatermarkOpacity = (float) str_replace(',', '.', $videoWatermarkOpacityRaw);
+        $videoWatermarkOpacity = max(0.0, min(1.0, $videoWatermarkOpacity));
+
+        $videoWatermarkSize = (int) (\App\Models\Setting::get('video_watermark_size_percent') ?: 18);
+        $videoWatermarkSize = max(1, min(100, $videoWatermarkSize));
+
+        $videoWatermarkPosition = (string) (\App\Models\Setting::get('video_watermark_position') ?: 'top-right');
+
+        $videoWatermarkMargin = (int) (\App\Models\Setting::get('video_watermark_margin') ?: 16);
+        $videoWatermarkMargin = max(0, min(200, $videoWatermarkMargin));
+
+        $videoWatermarkRotate = (int) (\App\Models\Setting::get('video_watermark_rotate') ?: 0);
+        $videoWatermarkRotate = max(-180, min(180, $videoWatermarkRotate));
+
+        $videoWatermarkBlend = (string) (\App\Models\Setting::get('video_watermark_blend') ?: 'normal');
+        $videoWatermarkAnimate = (string) \App\Models\Setting::get('video_watermark_animate', '0') === '1';
+
+        $videoWatermarkText = '';
+        if ($videoWatermarkTextEnabled && auth()->check()) {
+            $replacements = [
+                '{id}' => (string) auth()->id(),
+                '{name}' => (string) auth()->user()->name,
+                '{email}' => (string) auth()->user()->email,
+            ];
+            $videoWatermarkText = trim(str_replace(array_keys($replacements), array_values($replacements), $videoWatermarkTextTemplate));
+        }
+
+        $videoPlayerConfig = [
+            'enabled' => $videoPlayerEnabled,
+            'plyr' => [
+                'autoplay' => $videoPlyrAutoplay,
+                'muted' => $videoPlyrMuted,
+                'clickToPlay' => $videoPlyrClickToPlay,
+                'disableContextMenu' => $videoPlyrDisableContextMenu,
+                'seekTime' => $videoPlyrSeekTime,
+                'volume' => $videoPlyrVolumeValue,
+                'controls' => $videoPlyrControls,
+                'settings' => $videoPlyrSettings,
+                'speedOptions' => $videoPlyrSpeedOptions,
+                'speedSelected' => $videoPlyrSpeedSelected,
+                'customOptions' => $videoPlyrOptionsCustom,
+            ],
+            'watermark' => [
+                'enabled' => $videoWatermarkEnabled,
+                'imageUrl' => $watermarkImageUrl,
+                'text' => $videoWatermarkText,
+                'opacity' => $videoWatermarkOpacity,
+                'sizePercent' => $videoWatermarkSize,
+                'position' => $videoWatermarkPosition,
+                'margin' => $videoWatermarkMargin,
+                'rotate' => $videoWatermarkRotate,
+                'blend' => $videoWatermarkBlend,
+                'animate' => $videoWatermarkAnimate,
+            ],
+        ];
+
         $pageTitle = trim($__env->yieldContent('title'));
         if ($pageTitle === '') {
             $pageTitle = $seoDefaultTitle;
@@ -136,6 +243,9 @@
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @if($videoPlayerEnabled)
+        <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+    @endif
 
     @stack('styles')
 
@@ -153,6 +263,10 @@
             /* escuro */
             --unn-card: #ffffff;
             --unn-text: #0f172a;
+            @if($videoPlayerEnabled)
+                --plyr-color-main: {{ $videoPlyrColor }};
+                --plyr-font-family: 'Inter', sans-serif;
+            @endif
         }
 
         .btn-primary {
@@ -214,6 +328,92 @@
                 overflow-x: auto;
             }
         }
+
+        @if($videoPlayerEnabled)
+            .unn-video-player {
+                position: relative;
+            }
+
+            .unn-video-player .plyr {
+                border-radius: 0.75rem;
+            }
+
+            .unn-video-watermark {
+                position: absolute;
+                z-index: 6;
+                pointer-events: none;
+                user-select: none;
+                opacity: var(--unn-wm-opacity, 0.15);
+                width: var(--unn-wm-size, 18%);
+                max-width: 280px;
+                min-width: 96px;
+                mix-blend-mode: var(--unn-wm-blend, normal);
+            }
+
+            .unn-video-watermark-inner {
+                width: 100%;
+                transform: rotate(var(--unn-wm-rotate, 0deg));
+            }
+
+            .unn-video-watermark img {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+
+            .unn-video-watermark-text {
+                margin-top: 6px;
+                font-size: 12px;
+                font-weight: 800;
+                letter-spacing: 0.02em;
+                color: rgba(255, 255, 255, 0.92);
+                text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+                line-height: 1.1;
+                word-break: break-word;
+            }
+
+            .unn-video-watermark--top-left {
+                top: var(--unn-wm-margin, 16px);
+                left: var(--unn-wm-margin, 16px);
+            }
+
+            .unn-video-watermark--top-right {
+                top: var(--unn-wm-margin, 16px);
+                right: var(--unn-wm-margin, 16px);
+            }
+
+            .unn-video-watermark--bottom-left {
+                bottom: var(--unn-wm-margin, 16px);
+                left: var(--unn-wm-margin, 16px);
+            }
+
+            .unn-video-watermark--bottom-right {
+                bottom: var(--unn-wm-margin, 16px);
+                right: var(--unn-wm-margin, 16px);
+            }
+
+            .unn-video-watermark--center {
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            @keyframes unnWatermarkDrift {
+                0% {
+                    transform: translate(0, 0) rotate(var(--unn-wm-rotate, 0deg));
+                }
+                50% {
+                    transform: translate(-8px, 8px) rotate(var(--unn-wm-rotate, 0deg));
+                }
+                100% {
+                    transform: translate(0, 0) rotate(var(--unn-wm-rotate, 0deg));
+                }
+            }
+
+            .unn-video-watermark--animate .unn-video-watermark-inner {
+                animation: unnWatermarkDrift 11s ease-in-out infinite;
+            }
+        @endif
     </style>
 </head>
 
@@ -346,6 +546,231 @@
             window.refreshNotifications();
         @endauth
     </script>
+
+    @if($videoPlayerEnabled)
+        <script>
+            window.UNN = window.UNN || {};
+            window.UNN.videoPlayer = @json($videoPlayerConfig);
+        </script>
+        <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+        <script>
+            (function () {
+                const config = (window.UNN && window.UNN.videoPlayer) ? window.UNN.videoPlayer : null;
+                if (!config || !config.enabled || typeof Plyr === 'undefined') return;
+
+                function deepMerge(target, source) {
+                    if (!source || typeof source !== 'object') return target;
+
+                    for (const key of Object.keys(source)) {
+                        const value = source[key];
+                        if (value && typeof value === 'object' && !Array.isArray(value)) {
+                            if (!target[key] || typeof target[key] !== 'object' || Array.isArray(target[key])) {
+                                target[key] = {};
+                            }
+                            deepMerge(target[key], value);
+                            continue;
+                        }
+                        target[key] = value;
+                    }
+                    return target;
+                }
+
+                function buildPlyrOptions() {
+                    const plyr = (config && config.plyr) ? config.plyr : {};
+
+                    const base = {
+                        autoplay: !!plyr.autoplay,
+                        muted: !!plyr.muted,
+                        clickToPlay: plyr.clickToPlay !== false,
+                        disableContextMenu: plyr.disableContextMenu !== false,
+                        seekTime: Number.isFinite(plyr.seekTime) ? plyr.seekTime : 10,
+                    };
+
+                    if (Array.isArray(plyr.controls) && plyr.controls.length) {
+                        base.controls = plyr.controls;
+                    }
+                    if (Array.isArray(plyr.settings) && plyr.settings.length) {
+                        base.settings = plyr.settings;
+                    }
+                    if (Number.isFinite(plyr.volume)) {
+                        base.volume = Math.max(0, Math.min(1, Number(plyr.volume)));
+                    }
+                    if (Array.isArray(plyr.speedOptions) && plyr.speedOptions.length) {
+                        const selected = Number.isFinite(plyr.speedSelected) ? Number(plyr.speedSelected) : 1;
+                        base.speed = {
+                            selected: selected,
+                            options: plyr.speedOptions.map(n => Number(n)).filter(n => Number.isFinite(n))
+                        };
+                    }
+
+                    const custom = plyr.customOptions && typeof plyr.customOptions === 'object'
+                        ? plyr.customOptions
+                        : null;
+
+                    return deepMerge(base, custom || {});
+                }
+
+                function extractYouTubeId(url) {
+                    if (!url) return null;
+                    const patterns = [
+                        /youtu\.be\/([^?&#/]+)/i,
+                        /youtube\.com\/watch\?v=([^?&#/]+)/i,
+                        /youtube\.com\/embed\/([^?&#/]+)/i,
+                        /youtube\.com\/shorts\/([^?&#/]+)/i,
+                    ];
+                    for (const pattern of patterns) {
+                        const match = String(url).match(pattern);
+                        if (match && match[1]) return match[1];
+                    }
+
+                    try {
+                        const parsed = new URL(String(url));
+                        const v = parsed.searchParams.get('v');
+                        if (v) return v;
+                    } catch (e) { /* ignore */ }
+
+                    return null;
+                }
+
+                function extractVimeoId(url) {
+                    if (!url) return null;
+                    const patterns = [
+                        /vimeo\.com\/(\d+)/i,
+                        /player\.vimeo\.com\/video\/(\d+)/i,
+                    ];
+                    for (const pattern of patterns) {
+                        const match = String(url).match(pattern);
+                        if (match && match[1]) return match[1];
+                    }
+                    return null;
+                }
+
+                function isDirectVideo(url) {
+                    if (!url) return false;
+                    const cleaned = String(url).split('#')[0].split('?')[0].toLowerCase();
+                    return (
+                        cleaned.endsWith('.mp4') ||
+                        cleaned.endsWith('.webm') ||
+                        cleaned.endsWith('.ogg') ||
+                        cleaned.endsWith('.m4v')
+                    );
+                }
+
+                function guessMimeType(url) {
+                    const cleaned = String(url).split('#')[0].split('?')[0].toLowerCase();
+                    if (cleaned.endsWith('.webm')) return 'video/webm';
+                    if (cleaned.endsWith('.ogg')) return 'video/ogg';
+                    return 'video/mp4';
+                }
+
+                function applyWatermark(player) {
+                    const wm = config.watermark || {};
+                    if (!wm.enabled) return;
+                    if (!wm.imageUrl && !wm.text) return;
+
+                    const container = (player && player.elements) ? player.elements.container : null;
+                    if (!container) return;
+                    if (container.querySelector('.unn-video-watermark')) return;
+
+                    const outer = document.createElement('div');
+                    const position = wm.position || 'top-right';
+                    outer.className = [
+                        'unn-video-watermark',
+                        'unn-video-watermark--' + position,
+                        wm.animate ? 'unn-video-watermark--animate' : '',
+                    ].filter(Boolean).join(' ');
+
+                    outer.style.setProperty('--unn-wm-opacity', Number.isFinite(wm.opacity) ? String(wm.opacity) : '0.15');
+                    outer.style.setProperty('--unn-wm-size', (Number.isFinite(wm.sizePercent) ? wm.sizePercent : 18) + '%');
+                    outer.style.setProperty('--unn-wm-margin', (Number.isFinite(wm.margin) ? wm.margin : 16) + 'px');
+                    outer.style.setProperty('--unn-wm-rotate', (Number.isFinite(wm.rotate) ? wm.rotate : 0) + 'deg');
+                    outer.style.setProperty('--unn-wm-blend', wm.blend || 'normal');
+
+                    const inner = document.createElement('div');
+                    inner.className = 'unn-video-watermark-inner';
+
+                    if (wm.imageUrl) {
+                        const img = document.createElement('img');
+                        img.src = wm.imageUrl;
+                        img.alt = 'Marca d\\'água';
+                        img.loading = 'lazy';
+                        inner.appendChild(img);
+                    }
+
+                    if (wm.text) {
+                        const text = document.createElement('div');
+                        text.className = 'unn-video-watermark-text';
+                        text.textContent = String(wm.text);
+                        inner.appendChild(text);
+                    }
+
+                    outer.appendChild(inner);
+                    container.appendChild(outer);
+                }
+
+                function initOne(wrapper) {
+                    if (!wrapper || wrapper.dataset.unnVideoPlayerInit === '1') return;
+                    wrapper.dataset.unnVideoPlayerInit = '1';
+
+                    const url = wrapper.dataset.videoUrl || wrapper.getAttribute('data-video-url') || '';
+                    if (!url) return;
+
+                    const youtubeId = extractYouTubeId(url);
+                    const vimeoId = youtubeId ? null : extractVimeoId(url);
+                    const options = buildPlyrOptions();
+
+                    wrapper.classList.add('unn-video-player');
+                    wrapper.innerHTML = '';
+
+                    let target;
+                    if (youtubeId) {
+                        target = document.createElement('div');
+                        target.setAttribute('data-plyr-provider', 'youtube');
+                        target.setAttribute('data-plyr-embed-id', youtubeId);
+                        wrapper.appendChild(target);
+                    } else if (vimeoId) {
+                        target = document.createElement('div');
+                        target.setAttribute('data-plyr-provider', 'vimeo');
+                        target.setAttribute('data-plyr-embed-id', vimeoId);
+                        wrapper.appendChild(target);
+                    } else if (isDirectVideo(url)) {
+                        target = document.createElement('video');
+                        target.setAttribute('playsinline', '');
+                        target.setAttribute('controls', '');
+
+                        const source = document.createElement('source');
+                        source.src = String(url);
+                        source.type = guessMimeType(url);
+                        target.appendChild(source);
+
+                        wrapper.appendChild(target);
+                    } else {
+                        const link = document.createElement('a');
+                        link.href = String(url);
+                        link.target = '_blank';
+                        link.rel = 'noopener';
+                        link.className = 'text-white underline';
+                        link.textContent = 'Abrir vídeo';
+                        wrapper.appendChild(link);
+                        return;
+                    }
+
+                    const player = new Plyr(target, options);
+                    applyWatermark(player);
+                }
+
+                function initAll() {
+                    document.querySelectorAll('[data-unn-video-player]').forEach(initOne);
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initAll);
+                } else {
+                    initAll();
+                }
+            })();
+        </script>
+    @endif
 
     @stack('scripts')
 

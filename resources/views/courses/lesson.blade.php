@@ -32,7 +32,7 @@
                         <p class="text-xs text-gray-400 mt-1">
                             <i class="far fa-clock mr-1"></i> {{ gmdate("H:i", $l->duration) }}
                         </p>
-                        @endif>
+                        @endif
                     </div>
                 </a>
             @endforeach
@@ -46,7 +46,12 @@
             
             <div class="aspect-w-16 aspect-h-9 bg-black rounded-xl overflow-hidden shadow-2xl mb-8">
                 @if($lesson->video_url)
-                    <iframe src="{{ str_replace('youtu.be/', 'youtube.com/embed/', $lesson->video_url) }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full min-h-[400px]"></iframe>
+                    @php $usePlyr = (string) \App\Models\Setting::get('video_player_enabled', '1') === '1'; @endphp
+                    @if($usePlyr)
+                        <div class="w-full h-full min-h-[400px]" data-unn-video-player data-video-url="{{ $lesson->video_url }}"></div>
+                    @else
+                        <iframe src="{{ str_replace('youtu.be/', 'youtube.com/embed/', $lesson->video_url) }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full min-h-[400px]"></iframe>
+                    @endif
                 @else
                     <div class="flex items-center justify-center h-full text-white">
                         <p>Nenhum vídeo disponível para esta aula.</p>

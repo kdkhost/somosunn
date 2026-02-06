@@ -111,6 +111,15 @@ class SettingController extends Controller
             return redirect()->back()->withInput()->with('error', 'A imagem do Twitter precisa ter pelo menos 1200×628px.');
         }
 
+        $plyrOptionsJson = trim((string) $request->input('video_plyr_options_json', ''));
+        if ($plyrOptionsJson !== '') {
+            try {
+                json_decode($plyrOptionsJson, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\Throwable $e) {
+                return redirect()->back()->withInput()->with('error', 'Opções avançadas do Plyr: JSON inválido.');
+            }
+        }
+
         $dirs = [
             'uploads/imagens',
             'uploads/imagens/administrativo',
@@ -194,6 +203,75 @@ class SettingController extends Controller
         $bools = ['pwa_enabled', 'preloader_enabled'];
         foreach ($bools as $b) {
             $data[$b] = $request->boolean($b) ? 1 : 0;
+        }
+
+        $videoBools = [
+            'video_player_enabled',
+            'video_plyr_autoplay',
+            'video_plyr_muted',
+            'video_plyr_click_to_play',
+            'video_plyr_disable_context_menu',
+            'video_watermark_enabled',
+            'video_watermark_text_enabled',
+            'video_watermark_animate',
+        ];
+        foreach ($videoBools as $b) {
+            if ($request->has($b)) {
+                $data[$b] = $request->boolean($b) ? 1 : 0;
+            }
+        }
+
+        $data['video_plyr_options_json'] = $plyrOptionsJson;
+
+        foreach ([
+            'video_plyr_seek_time' => ['min' => 0, 'max' => 120],
+            'video_plyr_speed_selected' => ['min' => 0, 'max' => 10],
+            'video_watermark_size_percent' => ['min' => 1, 'max' => 100],
+            'video_watermark_margin' => ['min' => 0, 'max' => 200],
+            'video_watermark_rotate' => ['min' => -180, 'max' => 180],
+        ] as $key => $limits) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+
+            $raw = trim((string) $data[$key]);
+            if ($raw === '') {
+                $data[$key] = '';
+                continue;
+            }
+
+            $value = (int) $raw;
+            $value = max((int) $limits['min'], min((int) $limits['max'], $value));
+            $data[$key] = (string) $value;
+        }
+
+        foreach (['video_plyr_volume', 'video_watermark_opacity'] as $key) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+
+            $raw = trim((string) $data[$key]);
+            if ($raw === '') {
+                $data[$key] = '';
+                continue;
+            }
+
+            $raw = str_replace(',', '.', $raw);
+            $value = (float) $raw;
+            $value = max(0.0, min(1.0, $value));
+            $data[$key] = rtrim(rtrim(number_format($value, 2, '.', ''), '0'), '.');
+        }
+
+        if (array_key_exists('video_watermark_position', $data)) {
+            $allowed = ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center'];
+            $value = trim((string) $data['video_watermark_position']);
+            $data['video_watermark_position'] = in_array($value, $allowed, true) ? $value : 'top-right';
+        }
+
+        if (array_key_exists('video_watermark_blend', $data)) {
+            $allowed = ['normal', 'multiply', 'screen', 'overlay', 'lighten', 'darken'];
+            $value = trim((string) $data['video_watermark_blend']);
+            $data['video_watermark_blend'] = in_array($value, $allowed, true) ? $value : 'normal';
         }
 
         foreach ($data as $key => $value) {
