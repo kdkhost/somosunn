@@ -342,9 +342,17 @@
                     <p class="text-sm text-gray-500">Duração</p>
                 </div>
                 <div class="bg-slate-50 rounded-2xl p-6 text-center">
-                    <i class="fas fa-certificate text-3xl text-purple-500 mb-3"></i>
-                    <p class="text-2xl font-bold text-gray-900">Sim</p>
-                    <p class="text-sm text-gray-500">Certificado</p>
+                    <i class="fas fa-ticket-alt text-3xl mb-3" style="color: var(--unn-azul-3)"></i>
+                    <p class="text-2xl font-bold text-gray-900">
+                        @if($isClosed)
+                            Encerrado
+                        @elseif($event->capacity && $remainingSeats === 0)
+                            Esgotado
+                        @else
+                            Aberto
+                        @endif
+                    </p>
+                    <p class="text-sm text-gray-500">Inscrições</p>
                 </div>
             </div>
         </div>

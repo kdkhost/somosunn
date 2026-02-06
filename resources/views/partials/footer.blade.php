@@ -17,7 +17,13 @@
             © {{ date('Y') }} UNN.
         </div>
         <div class="text-xs text-center sm:text-right hidden md:block">
-            Sistema UNN · contato@kdkhost.com.br
+            Desenvolvido por:
+            <a href="https://kdkhost.com.br" target="_blank" rel="noopener"
+                class="font-semibold hover:underline"
+                style="color: var(--unn-azul-1)">
+                Marcelo Brad RJ
+            </a>
+            · site kdkhost.com.br
         </div>
     </div>
 </footer>
