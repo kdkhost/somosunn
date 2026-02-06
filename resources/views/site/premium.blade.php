@@ -2,7 +2,14 @@
 
 @section('title', 'Planos Premium - UNN')
 
+@php
+    $testimonialsCarouselEnabled = (string) \App\Models\Setting::get('testimonials_carousel_enabled', '1') === '1';
+@endphp
+
 @push('styles')
+    @if($testimonialsCarouselEnabled)
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    @endif
     <style>
         .unn-star-rating {
             display: inline-flex;
@@ -27,6 +34,35 @@
         .unn-star-rating label:hover,
         .unn-star-rating label:hover~label {
             color: #f59e0b; /* amber-500 */
+        }
+
+        .unn-testimonials-swiper {
+            padding-bottom: 42px;
+        }
+
+        .unn-testimonials-swiper .swiper-pagination-bullet {
+            background: var(--unn-azul-1);
+            opacity: 0.25;
+        }
+
+        .unn-testimonials-swiper .swiper-pagination-bullet-active {
+            opacity: 1;
+        }
+
+        .unn-testimonials-swiper .swiper-button-prev,
+        .unn-testimonials-swiper .swiper-button-next {
+            width: 44px;
+            height: 44px;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--unn-azul-1);
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+        }
+
+        .unn-testimonials-swiper .swiper-button-prev::after,
+        .unn-testimonials-swiper .swiper-button-next::after {
+            font-size: 16px;
+            font-weight: 900;
         }
     </style>
 @endpush
@@ -315,50 +351,168 @@
                     $displayTestimonials = $approvedTestimonials->isNotEmpty()
                         ? $approvedTestimonials
                         : $fallbackTestimonials;
+
+                    $carouselEnabled = $testimonialsCarouselEnabled;
+                    $carouselEffect = (string) \App\Models\Setting::get('testimonials_carousel_effect', 'slide');
+                    $carouselEffect = in_array($carouselEffect, ['slide', 'fade'], true) ? $carouselEffect : 'slide';
+
+                    $carouselShowArrows = (string) \App\Models\Setting::get('testimonials_carousel_show_arrows', '1') === '1';
+                    $carouselShowDots = (string) \App\Models\Setting::get('testimonials_carousel_show_dots', '1') === '1';
+                    $carouselAutoplay = (string) \App\Models\Setting::get('testimonials_carousel_autoplay', '1') === '1';
+                    $carouselPauseOnHover = (string) \App\Models\Setting::get('testimonials_carousel_pause_on_hover', '1') === '1';
+                    $carouselLoop = (string) \App\Models\Setting::get('testimonials_carousel_loop', '1') === '1';
+                    $carouselCentered = (string) \App\Models\Setting::get('testimonials_carousel_centered', '0') === '1';
+
+                    $delayMs = (int) \App\Models\Setting::get('testimonials_carousel_delay_ms', 4500);
+                    $delayMs = max(1000, min(30000, $delayMs));
+
+                    $speedMs = (int) \App\Models\Setting::get('testimonials_carousel_speed_ms', 600);
+                    $speedMs = max(100, min(5000, $speedMs));
+
+                    $spaceBetween = (int) \App\Models\Setting::get('testimonials_carousel_space_between', 24);
+                    $spaceBetween = max(0, min(120, $spaceBetween));
+
+                    $slidesMobile = (int) \App\Models\Setting::get('testimonials_carousel_slides_mobile', 1);
+                    $slidesTablet = (int) \App\Models\Setting::get('testimonials_carousel_slides_tablet', 2);
+                    $slidesDesktop = (int) \App\Models\Setting::get('testimonials_carousel_slides_desktop', 3);
+
+                    $slidesMobile = max(1, min(3, $slidesMobile));
+                    $slidesTablet = max(1, min(3, $slidesTablet));
+                    $slidesDesktop = max(1, min(4, $slidesDesktop));
+
+                    if ($carouselEffect === 'fade') {
+                        $slidesMobile = 1;
+                        $slidesTablet = 1;
+                        $slidesDesktop = 1;
+                    }
+
+                    $maxSlidesPerView = max($slidesMobile, $slidesTablet, $slidesDesktop);
+                    $hasEnoughSlidesForLoop = $displayTestimonials->count() > $maxSlidesPerView;
+
+                    $carouselConfig = [
+                        'effect' => $carouselEffect,
+                        'loop' => $carouselLoop && $hasEnoughSlidesForLoop,
+                        'speed' => $speedMs,
+                        'spaceBetween' => $spaceBetween,
+                        'centeredSlides' => $carouselCentered,
+                        'grabCursor' => true,
+                        'watchOverflow' => true,
+                        'slidesPerView' => $slidesMobile,
+                        'breakpoints' => [
+                            768 => ['slidesPerView' => $slidesTablet],
+                            1024 => ['slidesPerView' => $slidesDesktop],
+                        ],
+                        'autoplay' => $carouselAutoplay ? [
+                            'delay' => $delayMs,
+                            'disableOnInteraction' => false,
+                            'pauseOnMouseEnter' => $carouselPauseOnHover,
+                        ] : false,
+                        'keyboard' => ['enabled' => true],
+                        'pagination' => $carouselShowDots ? ['clickable' => true] : false,
+                        'navigation' => $carouselShowArrows,
+                    ];
                 @endphp
 
-                <div class="grid md:grid-cols-3 gap-8">
-                    @foreach($displayTestimonials as $testimonial)
-                        @php
-                            $name = data_get($testimonial, 'author_name') ?? data_get($testimonial, 'name') ?? 'Membro UNN';
-                            $role = data_get($testimonial, 'author_title') ?? data_get($testimonial, 'role') ?? null;
-                            $text = data_get($testimonial, 'content') ?? data_get($testimonial, 'text') ?? '';
-                            $rating = data_get($testimonial, 'rating');
-                            $isFeatured = (bool) data_get($testimonial, 'is_featured', false);
+                @if($carouselEnabled)
+                    <div class="unn-testimonials-swiper swiper" data-unn-testimonials-carousel='@json($carouselConfig)'>
+                        <div class="swiper-wrapper">
+                            @foreach($displayTestimonials as $testimonial)
+                                @php
+                                    $name = data_get($testimonial, 'author_name') ?? data_get($testimonial, 'name') ?? 'Membro UNN';
+                                    $role = data_get($testimonial, 'author_title') ?? data_get($testimonial, 'role') ?? null;
+                                    $text = data_get($testimonial, 'content') ?? data_get($testimonial, 'text') ?? '';
+                                    $rating = data_get($testimonial, 'rating');
+                                    $isFeatured = (bool) data_get($testimonial, 'is_featured', false);
 
-                            if ($rating !== null) {
-                                $rating = (int) $rating;
-                                $rating = max(1, min(5, $rating));
-                            }
-                        @endphp
-                        <div class="bg-slate-50 rounded-3xl p-8 relative">
-                            @if($isFeatured)
-                                <span class="absolute top-5 right-5 text-xs font-bold px-3 py-1 rounded-full text-white"
-                                    style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
-                                    Em destaque
-                                </span>
-                            @endif
+                                    if ($rating !== null) {
+                                        $rating = (int) $rating;
+                                        $rating = max(1, min(5, $rating));
+                                    }
+                                @endphp
 
-                            <div class="flex gap-1 mb-4">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <i class="fas fa-star {{ ($rating !== null && $i <= $rating) ? 'text-yellow-500' : 'text-slate-300' }}"></i>
-                                @endfor
-                            </div>
-                            <p class="text-gray-600 mb-6 italic">"{{ $text }}"</p>
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 btn-primary rounded-full flex items-center justify-center text-white font-bold">
-                                    {{ mb_substr($name, 0, 1) }}
+                                <div class="swiper-slide">
+                                    <div class="bg-slate-50 rounded-3xl p-8 relative h-full flex flex-col">
+                                        @if($isFeatured)
+                                            <span class="absolute top-5 right-5 text-xs font-bold px-3 py-1 rounded-full text-white"
+                                                style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
+                                                Em destaque
+                                            </span>
+                                        @endif
+
+                                        <div class="flex gap-1 mb-4">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <i class="fas fa-star {{ ($rating !== null && $i <= $rating) ? 'text-yellow-500' : 'text-slate-300' }}"></i>
+                                            @endfor
+                                        </div>
+                                        <p class="text-gray-600 mb-6 italic">"{{ $text }}"</p>
+                                        <div class="flex items-center gap-4 mt-auto">
+                                            <div class="w-12 h-12 btn-primary rounded-full flex items-center justify-center text-white font-bold">
+                                                {{ mb_substr($name, 0, 1) }}
+                                            </div>
+                                            <div>
+                                                <p class="font-bold text-gray-900">{{ $name }}</p>
+                                                @if($role)
+                                                    <p class="text-sm text-gray-500">{{ $role }}</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="font-bold text-gray-900">{{ $name }}</p>
-                                    @if($role)
-                                        <p class="text-sm text-gray-500">{{ $role }}</p>
-                                    @endif
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
-                    @endforeach
-                </div>
+
+                        @if($carouselShowDots)
+                            <div class="swiper-pagination"></div>
+                        @endif
+                        @if($carouselShowArrows)
+                            <div class="swiper-button-prev" aria-label="Anterior"></div>
+                            <div class="swiper-button-next" aria-label="Próximo"></div>
+                        @endif
+                    </div>
+                @else
+                    <div class="grid md:grid-cols-3 gap-8">
+                        @foreach($displayTestimonials as $testimonial)
+                            @php
+                                $name = data_get($testimonial, 'author_name') ?? data_get($testimonial, 'name') ?? 'Membro UNN';
+                                $role = data_get($testimonial, 'author_title') ?? data_get($testimonial, 'role') ?? null;
+                                $text = data_get($testimonial, 'content') ?? data_get($testimonial, 'text') ?? '';
+                                $rating = data_get($testimonial, 'rating');
+                                $isFeatured = (bool) data_get($testimonial, 'is_featured', false);
+
+                                if ($rating !== null) {
+                                    $rating = (int) $rating;
+                                    $rating = max(1, min(5, $rating));
+                                }
+                            @endphp
+                            <div class="bg-slate-50 rounded-3xl p-8 relative">
+                                @if($isFeatured)
+                                    <span class="absolute top-5 right-5 text-xs font-bold px-3 py-1 rounded-full text-white"
+                                        style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
+                                        Em destaque
+                                    </span>
+                                @endif
+
+                                <div class="flex gap-1 mb-4">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star {{ ($rating !== null && $i <= $rating) ? 'text-yellow-500' : 'text-slate-300' }}"></i>
+                                    @endfor
+                                </div>
+                                <p class="text-gray-600 mb-6 italic">"{{ $text }}"</p>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 btn-primary rounded-full flex items-center justify-center text-white font-bold">
+                                        {{ mb_substr($name, 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900">{{ $name }}</p>
+                                        @if($role)
+                                            <p class="text-sm text-gray-500">{{ $role }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
 
                 <div class="max-w-3xl mx-auto mt-10 bg-white rounded-3xl shadow-lg p-8 border border-slate-100">
                     <div class="flex items-start justify-between gap-6 flex-wrap">
@@ -507,3 +661,53 @@
         }
     </style>
 @endsection
+
+@push('scripts')
+    @if($testimonialsCarouselEnabled)
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+        <script>
+            (function () {
+                function initOne(el) {
+                    if (!el || el._unnSwiper) return;
+                    if (typeof Swiper === 'undefined') return;
+
+                    let config = {};
+                    try {
+                        config = JSON.parse(el.getAttribute('data-unn-testimonials-carousel') || '{}') || {};
+                    } catch (e) {
+                        config = {};
+                    }
+
+                    if (config && config.navigation) {
+                        config.navigation = {
+                            nextEl: el.querySelector('.swiper-button-next'),
+                            prevEl: el.querySelector('.swiper-button-prev')
+                        };
+                    } else {
+                        delete config.navigation;
+                    }
+
+                    if (config && config.pagination) {
+                        config.pagination = Object.assign({}, config.pagination, {
+                            el: el.querySelector('.swiper-pagination')
+                        });
+                    } else {
+                        delete config.pagination;
+                    }
+
+                    el._unnSwiper = new Swiper(el, config);
+                }
+
+                function initAll() {
+                    document.querySelectorAll('[data-unn-testimonials-carousel]').forEach(initOne);
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initAll);
+                } else {
+                    initAll();
+                }
+            })();
+        </script>
+    @endif
+@endpush

@@ -458,6 +458,118 @@
                         <div class="col-md-3"><div class="form-group"><label><i class="fab fa-youtube mr-1"></i>Youtube URL</label><input name="social_youtube" class="form-control" value="{{ $settings['social_youtube'] ?? '' }}"></div></div>
                         <div class="col-md-3"><div class="form-group"><label><i class="fab fa-linkedin mr-1"></i>LinkedIn URL</label><input name="social_linkedin" class="form-control" value="{{ $settings['social_linkedin'] ?? '' }}"></div></div>
                     </div>
+
+                    <hr>
+
+                    <h5 class="text-primary mb-3"><i class="fas fa-quote-left mr-2"></i>Depoimentos (Carrossel)</h5>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                                <input type="hidden" name="testimonials_carousel_enabled" value="0">
+                                <input type="checkbox" class="custom-control-input" id="testimonials_carousel_enabled" name="testimonials_carousel_enabled" value="1" {{ ($settings['testimonials_carousel_enabled'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="testimonials_carousel_enabled">Ativar carrossel no site</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                                <input type="hidden" name="testimonials_carousel_show_arrows" value="0">
+                                <input type="checkbox" class="custom-control-input" id="testimonials_carousel_show_arrows" name="testimonials_carousel_show_arrows" value="1" {{ ($settings['testimonials_carousel_show_arrows'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="testimonials_carousel_show_arrows">Exibir setas</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                                <input type="hidden" name="testimonials_carousel_show_dots" value="0">
+                                <input type="checkbox" class="custom-control-input" id="testimonials_carousel_show_dots" name="testimonials_carousel_show_dots" value="1" {{ ($settings['testimonials_carousel_show_dots'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="testimonials_carousel_show_dots">Exibir bolinhas</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                                <input type="hidden" name="testimonials_carousel_autoplay" value="0">
+                                <input type="checkbox" class="custom-control-input" id="testimonials_carousel_autoplay" name="testimonials_carousel_autoplay" value="1" {{ ($settings['testimonials_carousel_autoplay'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="testimonials_carousel_autoplay">Autoplay</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                                <input type="hidden" name="testimonials_carousel_pause_on_hover" value="0">
+                                <input type="checkbox" class="custom-control-input" id="testimonials_carousel_pause_on_hover" name="testimonials_carousel_pause_on_hover" value="1" {{ ($settings['testimonials_carousel_pause_on_hover'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="testimonials_carousel_pause_on_hover">Pausar ao passar o mouse</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                                <input type="hidden" name="testimonials_carousel_loop" value="0">
+                                <input type="checkbox" class="custom-control-input" id="testimonials_carousel_loop" name="testimonials_carousel_loop" value="1" {{ ($settings['testimonials_carousel_loop'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="testimonials_carousel_loop">Loop infinito</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                                <input type="hidden" name="testimonials_carousel_centered" value="0">
+                                <input type="checkbox" class="custom-control-input" id="testimonials_carousel_centered" name="testimonials_carousel_centered" value="1" {{ ($settings['testimonials_carousel_centered'] ?? 0) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="testimonials_carousel_centered">Centralizar slides</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Efeito</label>
+                                <select name="testimonials_carousel_effect" class="form-control">
+                                    @php($effect = $settings['testimonials_carousel_effect'] ?? 'slide')
+                                    <option value="slide" {{ $effect === 'slide' ? 'selected' : '' }}>Slide</option>
+                                    <option value="fade" {{ $effect === 'fade' ? 'selected' : '' }}>Fade (1 por vez)</option>
+                                </select>
+                                <small class="text-muted">No modo Fade, o carrossel exibe 1 card por vez.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Velocidade (ms)</label>
+                                <input name="testimonials_carousel_speed_ms" type="number" min="100" max="5000" class="form-control" value="{{ $settings['testimonials_carousel_speed_ms'] ?? 600 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Delay autoplay (ms)</label>
+                                <input name="testimonials_carousel_delay_ms" type="number" min="1000" max="30000" class="form-control" value="{{ $settings['testimonials_carousel_delay_ms'] ?? 4500 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Espaçamento (px)</label>
+                                <input name="testimonials_carousel_space_between" type="number" min="0" max="120" class="form-control" value="{{ $settings['testimonials_carousel_space_between'] ?? 24 }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Slides por vez (mobile)</label>
+                                <input name="testimonials_carousel_slides_mobile" type="number" min="1" max="3" class="form-control" value="{{ $settings['testimonials_carousel_slides_mobile'] ?? 1 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Slides por vez (tablet)</label>
+                                <input name="testimonials_carousel_slides_tablet" type="number" min="1" max="3" class="form-control" value="{{ $settings['testimonials_carousel_slides_tablet'] ?? 2 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Slides por vez (desktop)</label>
+                                <input name="testimonials_carousel_slides_desktop" type="number" min="1" max="4" class="form-control" value="{{ $settings['testimonials_carousel_slides_desktop'] ?? 3 }}">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- VÍDEO PLAYER (PLYR) --}}

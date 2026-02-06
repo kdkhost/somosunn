@@ -8,8 +8,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('coupons')) {
-            return;
+        try {
+            if (Schema::hasTable('coupons')) {
+                return;
+            }
+        } catch (\Throwable $e) {
+            // Shared hosting pode bloquear queries em information_schema.
+            // Seguimos e deixamos o create() tratar o "already exists" sem quebrar o migrate.
         }
 
         try {
@@ -43,8 +48,18 @@ return new class extends Migration
         } catch (\Throwable $e) {
             // Shared hosting/legacy DB: table may already exist even if Schema::hasTable() can't detect it.
             // If so, ignore and let the ensure migration add/normalize columns.
-            $message = $e->getMessage();
-            if (str_contains($message, 'already exists') || str_contains($message, 'Base table or view already exists')) {
+            $message = (string) $e->getMessage();
+            $errorInfo = property_exists($e, 'errorInfo') ? $e->errorInfo : null;
+            $sqlState = is_array($errorInfo) && isset($errorInfo[0]) ? (string) $errorInfo[0] : null;
+            $driverCode = is_array($errorInfo) && isset($errorInfo[1]) ? (string) $errorInfo[1] : null;
+
+            $alreadyExists =
+                $sqlState === '42S01'
+                || $driverCode === '1050'
+                || strpos($message, 'already exists') !== false
+                || strpos($message, 'Base table or view already exists') !== false;
+
+            if ($alreadyExists) {
                 return;
             }
 
