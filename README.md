@@ -217,3 +217,4 @@ Próximo passo sugerido: rodar `composer install` e executar o `artisan` para va
   - **Vitrine Dinâmica**: A página `/premium` agora renderiza os planos diretamente do banco de dados, respeitando o status de destaque ("Mais Popular").
   - **Fim dos Dados de Demonstração**: Os controladores de Eventos e Home agora carregam exclusivamente dados reais do banco de dados, removendo os fallbacks estáticos (mock data).
   - **Sincronização FullCalendar**: O calendário de eventos agora consome o feed real em formato ISO8601, garantindo precisão nas datas e interatividade.
+  - **Imagem do Evento**: Upload de imagem no Admin (calendário e formulário) e exibição no destaque de `/eventos` e no card da página do evento.

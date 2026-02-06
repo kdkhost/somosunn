@@ -4,12 +4,24 @@
 
 @section('content')
 <div class="card"><div class="card-body">
-    <form method="POST" action="{{ $event->exists ? route('admin.events.update',$event) : route('admin.events.store') }}">
+    <form method="POST" enctype="multipart/form-data" action="{{ $event->exists ? route('admin.events.update',$event) : route('admin.events.store') }}">
         @csrf
         @if($event->exists) @method('PUT') @endif
         <div class="form-group mb-2"><label>Título</label><input name="title" class="form-control" value="{{ old('title',$event->title) }}" required></div>
         <div class="form-group mb-2"><label>Início</label><input name="start_at" type="datetime-local" class="form-control" value="{{ old('start_at',$event->start_at) }}"></div>
-        <div class="form-group mb-2"><label>Preço</label><input name="price" class="form-control" value="{{ old('price',$event->price) }}"></div>
+        <div class="form-group mb-2"><label>Preço</label><input name="price" class="form-control mask-money" value="{{ old('price',$event->price) }}"></div>
+        <div class="form-group mb-2">
+            <label>Imagem do evento</label>
+            <input type="hidden" name="remove_image" value="0">
+            <div class="upload-box" data-max-size="5242880" data-existing-url="{{ $event->image ? asset('storage/'.$event->image) : '' }}" data-remove-input="[name='remove_image']">
+                <input type="file" name="image" accept="image/*" class="d-none">
+                <div class="upload-preview mb-2"></div>
+                <div class="upload-meta text-muted"></div>
+                <small class="text-muted upload-help"></small>
+                <div class="progress upload-progress progress-sm d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
+                <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group mb-2"><label>Local (Nome do Local)</label><input name="location" class="form-control" value="{{ old('location',$event->location) }}"></div>

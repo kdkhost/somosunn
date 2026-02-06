@@ -97,7 +97,14 @@
                 <!-- Ticket Card -->
                 <div class="w-full lg:w-96 shrink-0">
                     <div class="bg-white rounded-3xl shadow-2xl overflow-hidden sticky top-28">
-                        <div class="h-2" style="background-color: {{ $eventColor }}"></div>
+                        @if($event->image)
+                            <div class="relative h-44">
+                                <img src="{{ asset('storage/' . $event->image) }}" alt="Imagem do evento" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
+                                <div class="absolute inset-x-0 top-0 h-2" style="background-color: {{ $eventColor }}"></div>
+                            </div>
+                        @else
+                            <div class="h-2" style="background-color: {{ $eventColor }}"></div>
+                        @endif
                         <div class="p-6">
                             <div class="text-center mb-6">
                                 @if($event->current_price > 0)

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Event;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
@@ -55,6 +56,7 @@ class EventController extends Controller
                 'allDay' => (bool) $event->all_day,
                 'extendedProps' => [
                     'description' => $event->description,
+                    'image_url' => $event->image ? asset('storage/' . $event->image) : null,
                     'address' => $event->address,
                     'location' => $event->location,
                     'capacity' => $event->capacity,
@@ -87,14 +89,12 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
-        if($request->has('price') && $request->price){
-             $request->merge(['price' => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->price))]);
-        }
-        // Sanitize batches prices
-        foreach(['batch_1_price', 'batch_2_price', 'batch_3_price'] as $field){
-            if($request->has($field) && $request->$field){
-                $request->merge([$field => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->$field))]);
+        foreach (['price', 'batch_1_price', 'batch_2_price', 'batch_3_price'] as $field) {
+            if (!$request->has($field)) {
+                continue;
             }
+
+            $request->merge([$field => $this->normalizeMoneyInput($request->input($field))]);
         }
         
         // Sanitize dates (remove T)
@@ -110,6 +110,8 @@ class EventController extends Controller
             'end_at' => 'nullable|date|after_or_equal:start_at',
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|max:5120',
+            'remove_image' => 'nullable|boolean',
             'location' => 'nullable|string',
             'address' => 'nullable|string',
             'latitude' => 'nullable|numeric',
@@ -134,25 +136,31 @@ class EventController extends Controller
             $validated['all_day'] = $request->boolean('all_day');
         }
 
+        if (array_key_exists('price', $validated) && $validated['price'] === null) {
+            $validated['price'] = 0;
+        }
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('event-images', 'public');
+        }
+
         $event = Event::create($validated);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Evento criado com sucesso',
-            'event' => $event
-        ]);
+        if (!$request->ajax() && !$request->wantsJson() && !$request->expectsJson()) {
+            return redirect()->route('admin.events.index')->with('success', 'Evento criado com sucesso');
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Evento criado com sucesso', 'event' => $event]);
     }
 
     public function update(Request $request, Event $event)
     {
-        if($request->has('price') && $request->price){
-             $request->merge(['price' => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->price))]);
-        }
-        // Sanitize batches prices
-        foreach(['batch_1_price', 'batch_2_price', 'batch_3_price'] as $field){
-            if($request->has($field) && $request->$field){
-                $request->merge([$field => str_replace(',', '.', str_replace(['R$ ', '.'], '', $request->$field))]);
+        foreach (['price', 'batch_1_price', 'batch_2_price', 'batch_3_price'] as $field) {
+            if (!$request->has($field)) {
+                continue;
             }
+
+            $request->merge([$field => $this->normalizeMoneyInput($request->input($field))]);
         }
         
         // Sanitize dates (remove T from datetime-local)
@@ -168,6 +176,8 @@ class EventController extends Controller
             'end_at' => 'nullable|date|after_or_equal:start_at',
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|max:5120',
+            'remove_image' => 'nullable|boolean',
             'location' => 'nullable|string',
             'address' => 'nullable|string',
             'latitude' => 'nullable|numeric',
@@ -192,18 +202,70 @@ class EventController extends Controller
             $validated['all_day'] = $request->boolean('all_day');
         }
 
+        if (array_key_exists('price', $validated) && $validated['price'] === null) {
+            $validated['price'] = 0;
+        }
+
+        $removeImage = $request->boolean('remove_image');
+        if ($removeImage) {
+            $this->deleteEventImageIfExists($event);
+            $validated['image'] = null;
+        }
+
+        if ($request->hasFile('image')) {
+            $this->deleteEventImageIfExists($event);
+            $validated['image'] = $request->file('image')->store('event-images', 'public');
+        }
+
         $event->update($validated);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Evento atualizado',
-            'event' => $event
-        ]);
+        if (!$request->ajax() && !$request->wantsJson() && !$request->expectsJson()) {
+            return redirect()->route('admin.events.index')->with('success', 'Evento atualizado');
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Evento atualizado', 'event' => $event]);
     }
 
     public function destroy(Event $event)
     {
+        $this->deleteEventImageIfExists($event);
         $event->delete();
+
+        if (!request()->ajax() && !request()->wantsJson() && !request()->expectsJson()) {
+            return redirect()->route('admin.events.index')->with('success', 'Evento removido');
+        }
+
         return response()->json(['status' => 'success', 'message' => 'Evento removido']);
+    }
+
+    protected function normalizeMoneyInput($value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        $value = str_replace(['R$', ' ', "\u{00A0}"], '', $value);
+
+        // Brazilian format: 1.234,56 -> 1234.56
+        if (str_contains($value, ',')) {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        }
+
+        return $value;
+    }
+
+    protected function deleteEventImageIfExists(Event $event): void
+    {
+        if (!$event->image) {
+            return;
+        }
+
+        Storage::disk('public')->delete($event->image);
     }
 }

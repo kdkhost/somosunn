@@ -48,5 +48,5 @@
 ## 7. QA / validação final
 
 - [ ] 7.1 Validar fluxo Admin → Site: marcar destaque no Admin e confirmar que `/premium` reflete na próxima atualização
-- [ ] 7.2 Validar calendário Admin: eventos existentes aparecem; criar/editar/mover evento reflete sem drift de horário
+- [x] 7.2 Validar calendário Admin: eventos existentes aparecem; criar/editar/mover evento reflete sem drift de horário
 - [ ] 7.3 Validar Site: lista de eventos usa layout do Site; “Detalhes” mantém usuário no Site; reserva/compra confirma vaga corretamente

@@ -52,7 +52,7 @@
                 <h5 class="modal-title">Gerenciar Evento</h5>
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
             </div>
-            <form id="eventForm">
+            <form id="eventForm" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" id="event_id" name="id">
                 <div class="modal-body">
@@ -79,14 +79,31 @@
                             </div>
                         </div>
                     </div>
+
+                    <input type="hidden" name="all_day" value="0">
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" name="all_day" id="all_day" value="1">
+                        <label class="form-check-label" for="all_day">Dia inteiro</label>
+                    </div>
+
                     <div class="form-group">
-                        <label>Endereço / Local</label>
+                        <label>Local (nome)</label>
+                        <input type="text" class="form-control" name="location" id="location" placeholder="Ex: Centro de Convenções UNN">
+                    </div>
+                    <div class="form-group">
+                        <label>Endereço completo</label>
                         <input type="text" class="form-control" name="address" id="address" placeholder="Ex: Av. Paulista, 1000 - SP">
                     </div>
-                    
+                     
                     <div class="form-group">
                         <label>Vagas (0 = ilimitado)</label>
                         <input type="number" class="form-control" name="capacity" id="capacity" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preço base (entrada)</label>
+                        <input type="text" class="form-control mask-money" name="price" id="price" placeholder="R$ 0,00">
+                        <small class="text-muted">Se os lotes estiverem vazios, este valor será usado como entrada.</small>
                     </div>
 
                     <div class="card card-secondary">
@@ -140,6 +157,19 @@
                         <label>Descrição</label>
                         <textarea class="form-control" name="description" id="description" rows="3"></textarea>
                     </div>
+
+                    <div class="form-group">
+                        <label>Imagem do evento</label>
+                        <input type="hidden" name="remove_image" value="0">
+                        <div class="upload-box" id="eventImageBox" data-max-size="5242880" data-existing-url="" data-remove-input="[name='remove_image']">
+                            <input type="file" name="image" id="image" accept="image/*" class="d-none">
+                            <div class="upload-preview mb-2"></div>
+                            <div class="upload-meta text-muted"></div>
+                            <small class="text-muted upload-help"></small>
+                            <div class="progress upload-progress progress-sm d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
+                            <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                        </div>
+                    </div>
                     
                     <div id="modalMapContainer" style="display:none; margin-top:15px;">
                         <label>Localização</label>
@@ -187,11 +217,17 @@
             events: '{{ route("admin.events.feed") }}',
             editable: true,
             droppable: true,
+            selectable: true,
+            selectMirror: true,
             eventClick: function(info) {
                 openModal(info.event);
             },
             dateClick: function(info) {
-                openModal({start: info.date});
+                openModal({start: info.date, allDay: info.allDay});
+            },
+            select: function(info) {
+                openModal({start: info.start, end: info.end, allDay: info.allDay});
+                calendar.unselect();
             },
             eventDrop: function(info) {
                 updateEvent(info.event);
@@ -207,38 +243,45 @@
             $('#eventForm')[0].reset();
             $('#event_id').val('');
             $('#published').prop('checked', true);
+            $('#all_day').prop('checked', false);
             $('#event_latitude').val('');
             $('#event_longitude').val('');
             $('#suggestions').empty().hide(); // Clear suggestions
             $('#btnDelete').hide();
             $('#modalMapContainer').hide();
-            
+
+            setEventImageExisting(null);
+             
             if (event.id) {
                 $('#event_id').val(event.id);
                 $('#title').val(event.title);
                 $('#color').val(event.backgroundColor || '#3788d8');
                 $('#description').val(event.extendedProps.description || '');
-                
+                $('#location').val(event.extendedProps.location || '');
+                $('#all_day').prop('checked', !!event.allDay);
+                 
                 // Format dates for input datetime-local
                 if(event.start) $('#start_at').val(formatDate(event.start));
                 if(event.end) $('#end_at').val(formatDate(event.end));
-                
+                 
                 // New Fields
                 $('#address').val(event.extendedProps.address || '');
-                $('#capacity').val(event.extendedProps.capacity || '');
-                $('#price').val(event.extendedProps.price || '');
+                $('#capacity').val(event.extendedProps.capacity === null || event.extendedProps.capacity === undefined ? '' : event.extendedProps.capacity);
+                setMoneyValue($('#price'), event.extendedProps.price);
                 $('#published').prop('checked', !!event.extendedProps.published);
-                
+                 
                 // Batches
-                $('#batch_1_price').val(event.extendedProps.batch_1_price || '');
+                setMoneyValue($('#batch_1_price'), event.extendedProps.batch_1_price);
                 if(event.extendedProps.batch_1_deadline) $('#batch_1_deadline').val(formatDate(new Date(event.extendedProps.batch_1_deadline)));
-                
-                $('#batch_2_price').val(event.extendedProps.batch_2_price || '');
+                 
+                setMoneyValue($('#batch_2_price'), event.extendedProps.batch_2_price);
                 if(event.extendedProps.batch_2_deadline) $('#batch_2_deadline').val(formatDate(new Date(event.extendedProps.batch_2_deadline)));
-                
-                $('#batch_3_price').val(event.extendedProps.batch_3_price || '');
+                 
+                setMoneyValue($('#batch_3_price'), event.extendedProps.batch_3_price);
                 if(event.extendedProps.batch_3_deadline) $('#batch_3_deadline').val(formatDate(new Date(event.extendedProps.batch_3_deadline)));
-                
+
+                setEventImageExisting(event.extendedProps.image_url || null);
+                 
                 // Map Handling
                 if (event.extendedProps.latitude && event.extendedProps.longitude) {
                      $('#event_latitude').val(event.extendedProps.latitude);
@@ -251,10 +294,9 @@
                 });
             } else {
                 // New event
-                if(event.start) {
-                    let date = new Date(event.start);
-                    $('#start_at').val(formatDate(date));
-                }
+                if (event.start) $('#start_at').val(formatDate(new Date(event.start)));
+                if (event.end) $('#end_at').val(formatDate(new Date(event.end)));
+                if (event.allDay !== undefined) $('#all_day').prop('checked', !!event.allDay);
             }
             $('#eventModal').modal('show');
             
@@ -370,14 +412,19 @@
         // CRUD AJAX
         $('#eventForm').on('submit', function(e) {
             e.preventDefault();
-            let id = $('#event_id').val();
-            let url = id ? '/admin/events/' + id : '{{ route("admin.events.store") }}';
-            let method = id ? 'PUT' : 'POST';
+            const id = $('#event_id').val();
+            const url = id ? '/admin/events/' + id : '{{ route("admin.events.store") }}';
+            const formData = new FormData(this);
+            if (id) {
+                formData.append('_method', 'PUT');
+            }
             
             $.ajax({
                 url: url,
-                type: method,
-                data: $(this).serialize(),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function(response) {
                     $('#eventModal').modal('hide');
                     toastr.success(response.message);
@@ -406,7 +453,8 @@
                     _token: '{{ csrf_token() }}',
                     title: event.title,
                     start_at: event.start ? formatDate(event.start) : null,
-                    end_at: event.end ? formatDate(event.end) : null
+                    end_at: event.end ? formatDate(event.end) : null,
+                    all_day: event.allDay ? 1 : 0
                 },
                 success: function(response) {
                     toastr.success('Evento atualizado');
@@ -435,10 +483,59 @@
                             $('#eventModal').modal('hide');
                             toastr.success(response.message);
                             calendar.refetchEvents();
-                        }
+                         },
+                         error: function() {
+                             toastr.error('Erro ao excluir evento');
+                         }
                     });
                 }
             });
+        }
+
+        function normalizeMoneyForMask(value) {
+            if (value === null || value === undefined) return '';
+            let str = String(value).trim();
+            if (!str) return '';
+            str = str.replace(/^R\\$\\s?/, '').trim();
+            if (str.includes(',')) return str;
+            if (/^\\d+(\\.\\d{1,2})$/.test(str)) return str.replace('.', ',');
+            return str;
+        }
+
+        function setMoneyValue($input, value) {
+            const normalized = normalizeMoneyForMask(value);
+            if (!normalized && normalized !== '0') {
+                $input.val('');
+                return;
+            }
+
+            if (typeof $input.inputmask === 'function') {
+                $input.inputmask('setvalue', normalized);
+            } else {
+                $input.val(normalized);
+            }
+        }
+
+        function setEventImageExisting(url) {
+            const box = $('#eventImageBox');
+            const preview = box.find('.upload-preview');
+            const meta = box.find('.upload-meta');
+            const removeBtn = box.find('.upload-remove');
+            const fileInput = box.find('input[type=file]');
+
+            fileInput.val('');
+            $('[name=\"remove_image\"]').val('0');
+
+            if (!url) {
+                preview.html('<i class=\"upload-icon fas fa-cloud-upload-alt\"></i><div class=\"text-muted small\">Clique ou arraste para enviar</div>');
+                meta.text('');
+                removeBtn.addClass('d-none');
+                return;
+            }
+
+            preview.html('<img src=\"' + url + '\" alt=\"imagem\">');
+            meta.text('Arquivo atual');
+            removeBtn.removeClass('d-none');
         }
     });
 </script>

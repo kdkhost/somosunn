@@ -45,6 +45,10 @@
         $featuredImage = $featuredImageSetting
             ? asset(ltrim($featuredImageSetting, '/'))
             : 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1400';
+
+        $featuredEventImage = $featuredEvent && $featuredEvent->image
+            ? asset('storage/' . $featuredEvent->image)
+            : $featuredImage;
     @endphp
 
     <div class="min-h-screen">
@@ -94,7 +98,7 @@
                             <div class="rounded-[32px] overflow-hidden border border-white/20 bg-white/10 backdrop-blur shadow-[0_40px_120px_-60px_rgba(0,0,0,0.65)]">
                                 <div class="grid lg:grid-cols-2">
                                     <div class="relative min-h-[260px] lg:min-h-[460px]">
-                                        <img src="{{ $featuredImage }}" alt="Evento UNN" class="absolute inset-0 w-full h-full object-cover">
+                                        <img src="{{ $featuredEventImage }}" alt="Evento UNN" class="absolute inset-0 w-full h-full object-cover">
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-black/0"></div>
 
                                         @if($featuredEvent->capacity)
