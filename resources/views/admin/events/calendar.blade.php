@@ -1,9 +1,78 @@
-﻿@extends('admin.layouts.app')
+@extends('admin.layouts.app')
 @section('title', 'Eventos e Reuniões')
 @section('page_title', 'Calendário de Eventos')
 @section('breadcrumb')
     <li class="breadcrumb-item active">Eventos</li>
 @endsection
+
+@php
+    $calendarSettings = is_array($calendarSettings ?? null) ? $calendarSettings : [];
+
+    $sanitizeHex = function ($value, string $default): string {
+        $value = strtoupper(trim((string) $value));
+        return preg_match('/^#[0-9A-F]{6}$/', $value) ? $value : $default;
+    };
+
+    $darkenHex = function (string $hexColor, float $factor = 0.82): string {
+        $hexColor = ltrim($hexColor, '#');
+        if (strlen($hexColor) !== 6) {
+            return '#184BB0';
+        }
+
+        $r = (int) round(hexdec(substr($hexColor, 0, 2)) * $factor);
+        $g = (int) round(hexdec(substr($hexColor, 2, 2)) * $factor);
+        $b = (int) round(hexdec(substr($hexColor, 4, 2)) * $factor);
+
+        $r = max(0, min(255, $r));
+        $g = max(0, min(255, $g));
+        $b = max(0, min(255, $b));
+
+        return sprintf('#%02X%02X%02X', $r, $g, $b);
+    };
+
+    $buttonColor = $sanitizeHex($calendarSettings['button_color'] ?? '', '#1F5EDB');
+    $buttonColorHover = $darkenHex($buttonColor, 0.82);
+    $eventTextColor = $sanitizeHex($calendarSettings['event_text_color'] ?? '', '#FFFFFF');
+
+    $allowedViews = ['dayGridMonth', 'timeGridWeek', 'timeGridDay'];
+    $initialView = (string) ($calendarSettings['initial_view'] ?? 'dayGridMonth');
+    if (!in_array($initialView, $allowedViews, true)) {
+        $initialView = 'dayGridMonth';
+    }
+
+    $firstDay = (int) ($calendarSettings['first_day'] ?? 0);
+    $firstDay = max(0, min(6, $firstDay));
+
+    $weekends = (bool) ($calendarSettings['weekends'] ?? true);
+    $weekNumbers = (bool) ($calendarSettings['week_numbers'] ?? false);
+    $recentLimit = (int) ($calendarSettings['recent_limit'] ?? 6);
+    $recentLimit = max(1, min(20, $recentLimit));
+    $defaultRemoveAfterDrop = (bool) ($calendarSettings['default_remove_after_drop'] ?? false);
+
+    $calendarTemplates = $calendarSettings['templates'] ?? [];
+    if (!is_array($calendarTemplates) || count($calendarTemplates) === 0) {
+        $calendarTemplates = [
+            ['title' => 'Almoço de Negócios', 'color' => '#28A745'],
+            ['title' => 'Reunião com Parceiros', 'color' => '#FFC107'],
+            ['title' => 'Mentoria VIP', 'color' => '#17A2B8'],
+            ['title' => 'Workshop', 'color' => '#007BFF'],
+            ['title' => 'Networking', 'color' => '#DC3545'],
+        ];
+    }
+    $calendarTemplates = array_values(array_filter(array_map(function ($tpl) use ($sanitizeHex) {
+        $title = trim((string) ($tpl['title'] ?? ''));
+        $color = $sanitizeHex($tpl['color'] ?? '', '#1F5EDB');
+        return $title !== '' ? ['title' => $title, 'color' => $color] : null;
+    }, $calendarTemplates)));
+
+    $calendarQuickColors = $calendarSettings['quick_colors'] ?? [];
+    if (!is_array($calendarQuickColors) || count($calendarQuickColors) === 0) {
+        $calendarQuickColors = ['#007BFF', '#28A745', '#17A2B8', '#FFC107', '#DC3545', '#6F42C1'];
+    }
+    $calendarQuickColors = array_values(array_unique(array_filter(array_map(function ($color) use ($sanitizeHex) {
+        return $sanitizeHex($color ?? '', '#007BFF');
+    }, $calendarQuickColors))));
+@endphp
 
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.min.css">
@@ -12,11 +81,15 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.min.css">
 <style>
     .getError{color:#dc3545; font-size: 80%;}
+    :root {
+        --unn-calendar-primary: {{ $buttonColor }};
+        --unn-calendar-primary-hover: {{ $buttonColorHover }};
+    }
     .fc .fc-toolbar.fc-header-toolbar { margin-bottom: 1.25rem; }
     .fc .fc-toolbar-title { font-size: 1.4rem; font-weight: 700; text-transform: lowercase; }
     .fc .fc-button { border-radius: 6px; box-shadow: none; }
-    .fc .fc-button-primary { background: #1f5edb; border-color: #1f5edb; }
-    .fc .fc-button-primary:not(:disabled):hover { background: #184bb0; border-color: #184bb0; }
+    .fc .fc-button-primary { background: var(--unn-calendar-primary); border-color: var(--unn-calendar-primary); }
+    .fc .fc-button-primary:not(:disabled):hover { background: var(--unn-calendar-primary-hover); border-color: var(--unn-calendar-primary-hover); }
     .fc .fc-button-primary:disabled { background: #8bb1ff; border-color: #8bb1ff; }
     .external-events { min-height: 120px; }
     .external-event {
@@ -34,7 +107,7 @@
         border: 2px solid transparent;
     }
     .color-chooser .color-item.active { border-color: #111827; }
-    .calendar-card { border-top: 3px solid #1f5edb; }
+    .calendar-card { border-top: 3px solid var(--unn-calendar-primary); }
 </style>
 @endpush
 
@@ -53,14 +126,14 @@
             <div class="card-header"><h3 class="card-title">Eventos Arrastáveis</h3></div>
             <div class="card-body">
                 <div id="external-events" class="external-events">
-                    <div class="external-event" data-title="Almoço de Negócios" data-color="#28a745" style="background:#28a745;">Almoço de Negócios</div>
-                    <div class="external-event" data-title="Reunião com Parceiros" data-color="#ffc107" style="background:#ffc107;">Reunião com Parceiros</div>
-                    <div class="external-event" data-title="Mentoria VIP" data-color="#17a2b8" style="background:#17a2b8;">Mentoria VIP</div>
-                    <div class="external-event" data-title="Workshop" data-color="#007bff" style="background:#007bff;">Workshop</div>
-                    <div class="external-event" data-title="Networking" data-color="#dc3545" style="background:#dc3545;">Networking</div>
+                    @foreach($calendarTemplates as $tpl)
+                        <div class="external-event" data-title="{{ $tpl['title'] }}" data-color="{{ $tpl['color'] }}" style="background:{{ $tpl['color'] }};">
+                            {{ $tpl['title'] }}
+                        </div>
+                    @endforeach
                 </div>
                 <div class="form-check mt-2">
-                    <input type="checkbox" class="form-check-input" id="drop-remove">
+                    <input type="checkbox" class="form-check-input" id="drop-remove" {{ $defaultRemoveAfterDrop ? 'checked' : '' }}>
                     <label class="form-check-label" for="drop-remove">Remover após soltar</label>
                 </div>
             </div>
@@ -72,12 +145,9 @@
                      <input type="text" class="form-control" id="new-event-title" placeholder="Título do evento">
                  </div>
                  <div class="color-chooser mb-3" id="new-event-colors">
-                     <span class="color-item active" data-color="#007bff" style="background:#007bff;"></span>
-                     <span class="color-item" data-color="#28a745" style="background:#28a745;"></span>
-                     <span class="color-item" data-color="#17a2b8" style="background:#17a2b8;"></span>
-                     <span class="color-item" data-color="#ffc107" style="background:#ffc107;"></span>
-                     <span class="color-item" data-color="#dc3545" style="background:#dc3545;"></span>
-                     <span class="color-item" data-color="#6f42c1" style="background:#6f42c1;"></span>
+                     @foreach($calendarQuickColors as $idx => $color)
+                         <span class="color-item {{ $idx === 0 ? 'active' : '' }}" data-color="{{ $color }}" style="background:{{ $color }};"></span>
+                     @endforeach
                  </div>
                  <button id="add-new-event" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Adicionar</button>
                  <button class="btn btn-outline-secondary btn-block mt-2" data-toggle="modal" data-target="#eventModal">
@@ -88,6 +158,12 @@
     </div>
     <div class="col-md-9">
         <div class="card calendar-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title m-0">Calendário</h3>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#calendarSettingsModal">
+                    <i class="fas fa-sliders-h"></i> Personalizar
+                </button>
+            </div>
             <div class="card-body p-0">
                 <div id="calendar"></div>
             </div>
@@ -238,6 +314,149 @@
         </div>
     </div>
 </div>
+
+<!-- Calendar Settings Modal -->
+<div class="modal fade" id="calendarSettingsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Personalizar calendário</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <form id="calendarSettingsForm" action="{{ route('admin.events.calendar.settings') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Visualização inicial</label>
+                                <select name="initial_view" class="form-control">
+                                    <option value="dayGridMonth" {{ $initialView === 'dayGridMonth' ? 'selected' : '' }}>Mês</option>
+                                    <option value="timeGridWeek" {{ $initialView === 'timeGridWeek' ? 'selected' : '' }}>Semana</option>
+                                    <option value="timeGridDay" {{ $initialView === 'timeGridDay' ? 'selected' : '' }}>Dia</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Primeiro dia da semana</label>
+                                <select name="first_day" class="form-control">
+                                    <option value="0" {{ $firstDay === 0 ? 'selected' : '' }}>Domingo</option>
+                                    <option value="1" {{ $firstDay === 1 ? 'selected' : '' }}>Segunda</option>
+                                    <option value="2" {{ $firstDay === 2 ? 'selected' : '' }}>Terça</option>
+                                    <option value="3" {{ $firstDay === 3 ? 'selected' : '' }}>Quarta</option>
+                                    <option value="4" {{ $firstDay === 4 ? 'selected' : '' }}>Quinta</option>
+                                    <option value="5" {{ $firstDay === 5 ? 'selected' : '' }}>Sexta</option>
+                                    <option value="6" {{ $firstDay === 6 ? 'selected' : '' }}>Sábado</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Eventos recentes (quantidade)</label>
+                                <input type="number" name="recent_limit" class="form-control" min="1" max="20" value="{{ $recentLimit }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Cor dos botões</label>
+                                <input type="color" name="button_color" class="form-control" value="{{ $buttonColor }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Cor do texto do evento</label>
+                                <input type="color" name="event_text_color" class="form-control" value="{{ $eventTextColor }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Remover após soltar (padrão)</label>
+                                <select name="default_remove_after_drop" class="form-control">
+                                    <option value="0" {{ !$defaultRemoveAfterDrop ? 'selected' : '' }}>Não</option>
+                                    <option value="1" {{ $defaultRemoveAfterDrop ? 'selected' : '' }}>Sim</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-0">
+                                <label class="d-block">Opções</label>
+                                <input type="hidden" name="weekends" value="0">
+                                <div class="custom-control custom-checkbox d-inline-block mr-3">
+                                    <input type="checkbox" class="custom-control-input" id="cal-weekends" name="weekends" value="1" {{ $weekends ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="cal-weekends">Mostrar fins de semana</label>
+                                </div>
+
+                                <input type="hidden" name="week_numbers" value="0">
+                                <div class="custom-control custom-checkbox d-inline-block">
+                                    <input type="checkbox" class="custom-control-input" id="cal-weeknumbers" name="week_numbers" value="1" {{ $weekNumbers ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="cal-weeknumbers">Mostrar número da semana</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-2">Paleta de cores (criação rápida)</h6>
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddQuickColor"><i class="fas fa-plus"></i> Adicionar cor</button>
+                            </div>
+                            <div id="quickColorsList">
+                                @foreach($calendarQuickColors as $idx => $color)
+                                    <div class="form-row align-items-center mb-2 calendar-color-row">
+                                        <div class="col-10">
+                                            <input type="color" class="form-control" name="quick_colors[{{ $idx }}]" value="{{ $color }}">
+                                        </div>
+                                        <div class="col-2 text-right">
+                                            <button type="button" class="btn btn-sm btn-outline-danger btnRemoveQuickColor"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <small class="text-muted">Essas cores aparecem no “Criar Evento Rápido”.</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-2">Modelos de eventos arrastáveis</h6>
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddTemplate"><i class="fas fa-plus"></i> Adicionar modelo</button>
+                            </div>
+                            <div id="templatesList">
+                                @foreach($calendarTemplates as $idx => $tpl)
+                                    <div class="form-row align-items-center mb-2 calendar-template-row">
+                                        <div class="col-7">
+                                            <input type="text" class="form-control" name="templates[{{ $idx }}][title]" value="{{ $tpl['title'] }}" placeholder="Título">
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="color" class="form-control" name="templates[{{ $idx }}][color]" value="{{ $tpl['color'] }}">
+                                        </div>
+                                        <div class="col-2 text-right">
+                                            <button type="button" class="btn btn-sm btn-outline-danger btnRemoveTemplate"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <small class="text-muted">Arraste um modelo para o calendário para criar rápido.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -258,7 +477,9 @@
         var tempExternalEvent = null;
         var tempExternalSaved = false;
         var pendingExternalDrop = null;
-        var selectedQuickColor = '#007bff';
+        var selectedQuickColor = '{{ $calendarQuickColors[0] ?? '#007BFF' }}';
+        var eventTextColor = '{{ $eventTextColor }}';
+        var recentLimit = {{ $recentLimit }};
         var feedUrl = '{{ route("admin.events.feed") }}';
 
         // External draggable events
@@ -267,12 +488,12 @@
             itemSelector: '.external-event',
             eventData: function(eventEl) {
                 var title = eventEl.getAttribute('data-title') || eventEl.innerText.trim();
-                var color = eventEl.getAttribute('data-color') || '#1f5edb';
+                var color = eventEl.getAttribute('data-color') || '{{ $buttonColor }}';
                 return {
                     title: title,
                     backgroundColor: color,
                     borderColor: color,
-                    textColor: '#ffffff'
+                    textColor: eventTextColor
                 };
             }
         });
@@ -292,6 +513,10 @@
                 week: 'Semana',
                 day: 'Dia'
             },
+            defaultView: '{{ $initialView }}',
+            firstDay: {{ $firstDay }},
+            weekends: {{ $weekends ? 'true' : 'false' }},
+            weekNumbers: {{ $weekNumbers ? 'true' : 'false' }},
             events: feedUrl,
             editable: true,
             droppable: true,
@@ -672,7 +897,7 @@
                         return;
                     }
                     var html = '<ul class="list-unstyled mb-0">';
-                    items.slice(0, 6).forEach(function(ev) {
+                    items.slice(0, recentLimit).forEach(function(ev) {
                         var when = ev.start ? new Date(ev.start).toLocaleDateString('pt-BR') : '';
                         html += '<li class="mb-2"><span class="badge badge-light mr-2">' + when + '</span>' + ev.title + '</li>';
                     });
@@ -683,6 +908,69 @@
                     $('#recent-events').html('<span class="text-muted">Não foi possível carregar.</span>');
                 });
         }
+
+        // Calendar settings (admin)
+        var templateIndex = $('#templatesList .calendar-template-row').length;
+        var quickColorIndex = $('#quickColorsList .calendar-color-row').length;
+
+        $('#btnAddTemplate').on('click', function() {
+            var idx = templateIndex++;
+            var row = $(
+                '<div class="form-row align-items-center mb-2 calendar-template-row">' +
+                    '<div class="col-7"><input type="text" class="form-control" name="templates[' + idx + '][title]" placeholder="Título"></div>' +
+                    '<div class="col-3"><input type="color" class="form-control" name="templates[' + idx + '][color]" value="{{ $buttonColor }}"></div>' +
+                    '<div class="col-2 text-right"><button type="button" class="btn btn-sm btn-outline-danger btnRemoveTemplate"><i class="fas fa-times"></i></button></div>' +
+                '</div>'
+            );
+            $('#templatesList').append(row);
+        });
+
+        $('#btnAddQuickColor').on('click', function() {
+            var idx = quickColorIndex++;
+            var row = $(
+                '<div class="form-row align-items-center mb-2 calendar-color-row">' +
+                    '<div class="col-10"><input type="color" class="form-control" name="quick_colors[' + idx + ']" value="{{ $buttonColor }}"></div>' +
+                    '<div class="col-2 text-right"><button type="button" class="btn btn-sm btn-outline-danger btnRemoveQuickColor"><i class="fas fa-times"></i></button></div>' +
+                '</div>'
+            );
+            $('#quickColorsList').append(row);
+        });
+
+        $(document).on('click', '.btnRemoveTemplate', function() {
+            $(this).closest('.calendar-template-row').remove();
+        });
+
+        $(document).on('click', '.btnRemoveQuickColor', function() {
+            $(this).closest('.calendar-color-row').remove();
+        });
+
+        $('#calendarSettingsForm').on('submit', function(e) {
+            e.preventDefault();
+            var $form = $(this);
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(resp) {
+                    toastr.success((resp && resp.message) ? resp.message : 'Configurações salvas');
+                    $('#calendarSettingsModal').modal('hide');
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 350);
+                },
+                error: function(xhr) {
+                    var msg = 'Erro ao salvar configurações';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    toastr.error(msg);
+                }
+            });
+        });
     });
 </script>
 @endpush

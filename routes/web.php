@@ -278,6 +278,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
 
         // Events CRUD
         Route::get('events/feed', [\App\Http\Controllers\Admin\EventController::class, 'feed'])->name('events.feed');
+        Route::post('events/calendar/settings', [\App\Http\Controllers\Admin\EventController::class, 'updateCalendarSettings'])->name('events.calendar.settings');
         Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');
 
         // Points Rules
