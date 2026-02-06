@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\Event;
 use App\Models\Mentorship;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -33,6 +34,10 @@ class CouponController extends Controller
 
     public function store(Request $request)
     {
+        if ($schemaError = $this->validateSchema()) {
+            return $schemaError;
+        }
+
         $data = $this->validateData($request);
         $coupon = new Coupon($data);
         $coupon->normalizeCode();
@@ -50,6 +55,10 @@ class CouponController extends Controller
 
     public function update(Request $request, Coupon $coupon)
     {
+        if ($schemaError = $this->validateSchema()) {
+            return $schemaError;
+        }
+
         $data = $this->validateData($request, $coupon->id);
         $coupon->fill($data);
         $coupon->normalizeCode();
@@ -135,5 +144,42 @@ class CouponController extends Controller
         }
 
         return [$events, $courses, $mentorships];
+    }
+
+    private function validateSchema(): ?\Illuminate\Http\JsonResponse
+    {
+        try {
+            $requiredColumns = [
+                'code',
+                'name',
+                'description',
+                'discount_type',
+                'discount_value',
+                'is_active',
+                'applies_to',
+                'applies_to_id',
+                'min_amount',
+                'max_uses',
+                'max_uses_per_user',
+                'starts_at',
+                'ends_at',
+            ];
+
+            foreach ($requiredColumns as $column) {
+                if (!Schema::hasColumn('coupons', $column)) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Seu banco de dados está desatualizado para cupons. Rode: php artisan migrate',
+                    ], 422);
+                }
+            }
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Não foi possível validar a estrutura de cupons no banco. Rode: php artisan migrate',
+            ], 422);
+        }
+
+        return null;
     }
 }
