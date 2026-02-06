@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
 use App\Mail\PaymentConfirmedMail;
+use App\Services\InvoiceService;
 use Illuminate\Support\Str;
 
 class SubscriptionController extends Controller
@@ -150,11 +151,11 @@ class SubscriptionController extends Controller
                 ], $gatewayAccount);
             }
 
-            if (($paymentResult['status'] ?? '') === 'approved') {
-                $order->update([
-                    'status' => 'paid',
-                    'transaction_id' => (string) ($paymentResult['id'] ?? null),
-                ]);
+                if (($paymentResult['status'] ?? '') === 'approved') {
+                    $order->update([
+                        'status' => 'paid',
+                        'transaction_id' => (string) ($paymentResult['id'] ?? null),
+                    ]);
                 // Ativar plano no usuário
                 $user->update([
                     'plan_id' => $plan->id,
@@ -167,6 +168,9 @@ class SubscriptionController extends Controller
                 } catch (\Exception $e) {
                     \Log::error('Erro ao enviar email de pagamento: ' . $e->getMessage());
                 }
+
+                // Emitir fatura em PDF (email)
+                app(InvoiceService::class)->issueAndQueueForOrder($order);
             } else if (in_array(($paymentResult['status'] ?? ''), ['pending', 'in_process'], true)) {
                 // Pix ou pendente
                 $order->update(['transaction_id' => (string) ($paymentResult['id'] ?? null)]);

@@ -44,6 +44,15 @@ Payments (MercadoPago / PagSeguro)
 - Controle de uso:
   - O cupom é **reservado** por 30 minutos ao criar o pedido e marcado como **usado** quando o webhook confirma o pagamento.
 
+## Faturas (PDF por e-mail)
+
+- Admin: gerencie em `/admin/invoices` (criar/editar/ver, enviar e gerar PDF).
+- Pedido (Admin): em `/admin/orders/{order}`, use “Emitir e enviar fatura” quando ainda não existir fatura.
+- Automático: ao confirmar pagamento (webhooks MercadoPago/PagSeguro e assinaturas), o sistema emite a fatura do pedido e enfileira o envio por e-mail.
+- Requisitos:
+  - Rode `php artisan migrate` para criar `invoices` e `invoice_items`.
+  - Mantenha a fila ativa (em cPanel: `QUEUE_CONNECTION=database` + cron/cron interno) para processar a queue `emails`.
+
 ## FAQ (Perguntas Frequentes)
 
 - Admin: gerencie em `/admin/faqs` (contexto, ordem e status).

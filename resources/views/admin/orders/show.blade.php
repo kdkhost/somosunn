@@ -43,6 +43,42 @@
                     @endif
                 </ul>
 
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>Fatura</strong>
+                        @if($order->invoice)
+                            <span class="badge badge-info">{{ $order->invoice->number ?: ('#'.$order->invoice->id) }}</span>
+                        @else
+                            <span class="badge badge-secondary">Não emitida</span>
+                        @endif
+                    </div>
+
+                    @if($order->invoice)
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ route('admin.invoices.show', $order->invoice) }}" class="btn btn-sm btn-secondary" data-pjax>
+                                <i class="fas fa-eye mr-1"></i> Ver
+                            </a>
+                            <a href="{{ route('admin.invoices.pdf', $order->invoice) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="fas fa-file-pdf mr-1"></i> PDF
+                            </a>
+                            <form method="POST" action="{{ route('admin.invoices.send', $order->invoice) }}" class="d-inline">
+                                @csrf
+                                <input type="hidden" name="force" value="1">
+                                <button class="btn btn-sm btn-outline-success" type="submit">
+                                    <i class="fas fa-paper-plane mr-1"></i> Enviar e-mail
+                                </button>
+                            </form>
+                        </div>
+                    @else
+                        <form method="POST" action="{{ route('admin.orders.invoice', $order) }}">
+                            @csrf
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-file-invoice mr-1"></i> Emitir e enviar fatura
+                            </button>
+                        </form>
+                    @endif
+                </div>
+
                 @if($order->status === 'paid')
                 <form action="{{ route('admin.orders.refund', $order->id) }}" method="POST" class="d-grid gap-2">
                     @csrf

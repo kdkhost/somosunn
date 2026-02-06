@@ -317,11 +317,64 @@
                 });
             });
 
-            $(document).on('click', '.btn-delete', function (e) {
+            $(document).on('click', '.btn-delete, [data-confirm-delete]', function (e) {
                 e.preventDefault();
-                const url = $(this).data('action') || $(this).attr('href');
-                Swal.fire({ title: 'Excluir?', text: 'Confirme para apagar definitivamente.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar' })
-                    .then((result) => { if (result.isConfirmed) { $.post(url, { _method: 'DELETE', _token: '{{ csrf_token() }}' }, () => { toastr.success('Excluído'); $.pjax.reload(container); }); } });
+
+                const $btn = $(this);
+                const url = $btn.data('action') || $btn.attr('href');
+                const redirect = $btn.data('redirect') || null;
+                const $form = $btn.closest('form');
+
+                Swal.fire({
+                    title: 'Confirmar ação',
+                    text: 'Confirme para continuar.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (!result.isConfirmed) return;
+
+                    // Prefer form submission when explicitly requested (ex.: reembolso)
+                    if ($btn.is('[data-confirm-delete]') || (!url && $form.length)) {
+                        if ($form.length) {
+                            if ($form.hasClass('ajax-form')) {
+                                $form.trigger('submit');
+                            } else {
+                                $form.get(0).submit();
+                            }
+                            return;
+                        }
+                    }
+
+                    if (!url) {
+                        toastr.error('Ação inválida: URL não encontrada.');
+                        return;
+                    }
+
+                    $.post(url, { _method: 'DELETE', _token: '{{ csrf_token() }}' })
+                        .done(function (resp) {
+                            toastr.success('Excluído');
+
+                            if (redirect) {
+                                window.location.href = redirect;
+                                return;
+                            }
+
+                            if (resp && typeof resp === 'object' && resp.redirect) {
+                                $.pjax({ url: resp.redirect, container: container });
+                                return;
+                            }
+
+                            $.pjax.reload(container);
+                        })
+                        .fail(function (xhr) {
+                            let msg = 'Erro ao excluir';
+                            if (xhr && xhr.status === 419) { msg = 'Sessão expirada. Recarregue a página e tente novamente.'; }
+                            else if (xhr && xhr.responseJSON && xhr.responseJSON.message) { msg = xhr.responseJSON.message; }
+                            toastr.error(msg);
+                        });
+                });
             });
 
             $('#themeToggleBtn').on('click', function () {

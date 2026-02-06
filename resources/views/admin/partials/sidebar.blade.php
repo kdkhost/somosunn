@@ -160,6 +160,7 @@
                             'admin.users.*',
                             'admin.plans.*',
                             'admin.orders.*',
+                            'admin.invoices.*',
                             'admin.coupons.*',
                             'admin.permissions.*',
                             'admin.points-rules.*',
@@ -196,6 +197,12 @@
                                 <a href="{{ route('admin.orders.index') }}" class="nav-link {{ $is('admin.orders.*') }}">
                                     <i class="fas fa-shopping-cart nav-icon"></i>
                                     <p>Vendas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.invoices.index') }}" class="nav-link {{ $is('admin.invoices.*') }}">
+                                    <i class="fas fa-file-invoice nav-icon"></i>
+                                    <p>Faturas</p>
                                 </a>
                             </li>
                             <li class="nav-item">

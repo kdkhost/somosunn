@@ -9,7 +9,7 @@ use App\Http\Controllers\RankingController;
 use App\Http\Controllers\SatisfactionController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/portal', fn() => redirect()->route('admin.dashboard'))->name('portal');
+Route::get('/portal', [HomeController::class, 'portal'])->name('portal');
 Route::get('/premium', [HomeController::class, 'premium'])->name('premium');
 Route::post('/depoimentos', [\App\Http\Controllers\TestimonialController::class, 'store'])->middleware('auth')->name('testimonials.store');
 
@@ -317,6 +317,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         // Plans
         Route::post('orders/{order}/refund', [\App\Http\Controllers\Admin\OrderController::class, 'refund'])->name('orders.refund');
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show'])->names('orders');
+
+        // Faturas (PDF)
+        Route::post('orders/{order}/invoice', [\App\Http\Controllers\Admin\InvoiceController::class, 'issueForOrder'])->name('orders.invoice');
+        Route::post('invoices/{invoice}/send', [\App\Http\Controllers\Admin\InvoiceController::class, 'send'])->name('invoices.send');
+        Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'pdf'])->name('invoices.pdf');
+        Route::resource('invoices', \App\Http\Controllers\Admin\InvoiceController::class)->names('invoices');
 
         // Social / Comunidade Moderação
         Route::get('/social', [\App\Http\Controllers\Admin\SocialController::class, 'index'])->name('social.index');
