@@ -11,10 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('events')) {
+            return;
+        }
+
         Schema::table('events', function (Blueprint $table) {
-            $table->string('address')->nullable()->after('location');
-            $table->decimal('latitude', 10, 8)->nullable()->after('address');
-            $table->decimal('longitude', 11, 8)->nullable()->after('latitude');
+            if (!Schema::hasColumn('events', 'address')) {
+                $table->string('address')->nullable()->after('location');
+            }
+            if (!Schema::hasColumn('events', 'latitude')) {
+                $table->decimal('latitude', 10, 8)->nullable()->after('address');
+            }
+            if (!Schema::hasColumn('events', 'longitude')) {
+                $table->decimal('longitude', 11, 8)->nullable()->after('latitude');
+            }
         });
     }
 
@@ -23,8 +33,20 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('events')) {
+            return;
+        }
+
         Schema::table('events', function (Blueprint $table) {
-            //
+            if (Schema::hasColumn('events', 'longitude')) {
+                $table->dropColumn('longitude');
+            }
+            if (Schema::hasColumn('events', 'latitude')) {
+                $table->dropColumn('latitude');
+            }
+            if (Schema::hasColumn('events', 'address')) {
+                $table->dropColumn('address');
+            }
         });
     }
 };

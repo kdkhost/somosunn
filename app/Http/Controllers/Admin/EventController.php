@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
@@ -132,6 +133,16 @@ class EventController extends Controller
             ? $request->boolean('published')
             : true;
 
+        if (($request->hasFile('image') || $request->boolean('remove_image')) && !Schema::hasColumn('events', 'image')) {
+            $message = 'Seu banco de dados está desatualizado: falta a coluna events.image. Atualize o código e rode: php artisan migrate';
+
+            if (!$request->ajax() && !$request->wantsJson() && !$request->expectsJson()) {
+                return back()->with('error', $message);
+            }
+
+            return response()->json(['status' => 'error', 'message' => $message], 422);
+        }
+
         if ($request->has('all_day')) {
             $validated['all_day'] = $request->boolean('all_day');
         }
@@ -196,6 +207,16 @@ class EventController extends Controller
 
         if ($request->has('published')) {
             $validated['published'] = $request->boolean('published');
+        }
+
+        if (($request->hasFile('image') || $request->boolean('remove_image')) && !Schema::hasColumn('events', 'image')) {
+            $message = 'Seu banco de dados está desatualizado: falta a coluna events.image. Atualize o código e rode: php artisan migrate';
+
+            if (!$request->ajax() && !$request->wantsJson() && !$request->expectsJson()) {
+                return back()->with('error', $message);
+            }
+
+            return response()->json(['status' => 'error', 'message' => $message], 422);
         }
 
         if ($request->has('all_day')) {
