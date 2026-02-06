@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('coupon_redemptions')) {
+            return;
+        }
+
         Schema::create('coupon_redemptions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('coupon_id')->constrained('coupons')->cascadeOnDelete();
@@ -30,4 +34,3 @@ return new class extends Migration
         Schema::dropIfExists('coupon_redemptions');
     }
 };
-

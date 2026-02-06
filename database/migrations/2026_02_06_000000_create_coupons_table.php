@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('coupons')) {
+            return;
+        }
+
         Schema::create('coupons', function (Blueprint $table) {
             $table->id();
 
@@ -42,4 +46,3 @@ return new class extends Migration
         Schema::dropIfExists('coupons');
     }
 };
-
