@@ -142,7 +142,20 @@ class HomeController extends Controller
             ->orderBy('price')
             ->get();
 
-        return view('site.premium', compact('plans'));
+        $testimonials = collect();
+        if (view()->shared('unnDbAvailable')) {
+            try {
+                $testimonials = \App\Models\Testimonial::where('status', 'approved')
+                    ->orderByDesc('is_featured')
+                    ->orderByDesc('created_at')
+                    ->limit(6)
+                    ->get();
+            } catch (\Throwable $e) {
+                \Log::warning('Falha ao carregar depoimentos: ' . $e->getMessage());
+            }
+        }
+
+        return view('site.premium', compact('plans', 'testimonials'));
     }
 
     // Webhook placeholders

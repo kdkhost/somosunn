@@ -48,6 +48,8 @@
     $pwa512   = $getUrl('pwa_icon_512');
     $pwaSplash= $getUrl('pwa_splash');
     $pwaBanner= $getUrl('pwa_banner');
+    $seoOg    = $getUrl('seo_og_image');
+    $seoTwitter = $getUrl('seo_twitter_image');
 @endphp
 
 @section('page_title','Configurações')
@@ -66,6 +68,7 @@
                 <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-preloader" role="tab">Preloader</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-smtp" role="tab">SMTP</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-social" role="tab">Login Social</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-seo" role="tab">SEO & Analytics</a></li>
             </ul>
         </div>
         <div class="card-body">
@@ -743,6 +746,215 @@
                             <div class="form-group">
                                 <label>Client Secret</label>
                                 <input name="social_linkedin_client_secret" class="form-control" value="{{ $settings['social_linkedin_client_secret'] ?? '' }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- SEO & Analytics --}}
+                <div class="tab-pane fade" id="tab-seo" role="tabpanel">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Configure aqui os padrões de SEO do site, imagens para redes sociais e códigos de rastreamento.
+                        <div class="mt-2 text-sm">
+                            <strong>Recomendado:</strong> OpenGraph (Facebook/WhatsApp/LinkedIn) <code>1200×630</code> · Twitter <code>1200×628</code>.
+                        </div>
+                    </div>
+
+                    @if(($analytics['enabled'] ?? false))
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-primary"><i class="fas fa-eye"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Visitas hoje</span>
+                                        <span class="info-box-number">{{ $analytics['today'] ?? 0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-info"><i class="fas fa-calendar-week"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Últimos 7 dias</span>
+                                        <span class="info-box-number">{{ $analytics['last7'] ?? 0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-success"><i class="fas fa-calendar-alt"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Últimos 30 dias</span>
+                                        <span class="info-box-number">{{ $analytics['last30'] ?? 0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card card-outline card-primary">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Top páginas (30 dias)</h3>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <table class="table table-sm mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Página</th>
+                                                    <th class="text-right">Visitas</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse(($analytics['top_pages'] ?? collect()) as $row)
+                                                    <tr>
+                                                        <td><code>{{ $row->path }}</code></td>
+                                                        <td class="text-right">{{ $row->total }}</td>
+                                                    </tr>
+                                                @empty
+                                                    <tr><td colspan="2" class="text-muted text-center py-3">Sem dados ainda.</td></tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card card-outline card-success">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Top países (30 dias)</h3>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <table class="table table-sm mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>País</th>
+                                                    <th class="text-right">Visitas</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse(($analytics['top_countries'] ?? collect()) as $row)
+                                                    <tr>
+                                                        <td>{{ $row->country }}</td>
+                                                        <td class="text-right">{{ $row->total }}</td>
+                                                    </tr>
+                                                @empty
+                                                    <tr><td colspan="2" class="text-muted text-center py-3">Sem dados ainda.</td></tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="alert alert-light border">
+                            <i class="fas fa-chart-bar mr-1"></i>
+                            O contador de visitas aparece aqui após rodar as migrations (tabela <code>visitor_logs</code>).
+                            Para localização precisa, configure <code>IPINFO_TOKEN</code> no <code>.env</code>.
+                        </div>
+                    @endif
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Meta Title (padrão)</label>
+                                <input name="seo_meta_title" class="form-control" value="{{ $settings['seo_meta_title'] ?? '' }}" placeholder="Ex: UNN — Universidade de Negócios e Networking">
+                                <small class="text-muted">Usado quando a página não define um título próprio.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Meta Description (padrão)</label>
+                                <textarea name="seo_meta_description" class="form-control" rows="2" placeholder="Resumo do site (até ~160 caracteres)">{{ $settings['seo_meta_description'] ?? '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Meta Keywords (opcional)</label>
+                                <input name="seo_meta_keywords" class="form-control" value="{{ $settings['seo_meta_keywords'] ?? '' }}" placeholder="negócios, networking, empreendedorismo">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Twitter @ (opcional)</label>
+                                <input name="seo_twitter_site" class="form-control" value="{{ $settings['seo_twitter_site'] ?? '' }}" placeholder="@somosunn">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Robots (padrão)</label>
+                                <select name="seo_robots" class="form-control">
+                                    @php($robots = $settings['seo_robots'] ?? 'index,follow')
+                                    <option value="index,follow" {{ $robots === 'index,follow' ? 'selected' : '' }}>Indexar (index,follow)</option>
+                                    <option value="noindex,nofollow" {{ $robots === 'noindex,nofollow' ? 'selected' : '' }}>Não indexar (noindex,nofollow)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label>Google site verification (opcional)</label>
+                                <input name="seo_google_verification" class="form-control" value="{{ $settings['seo_google_verification'] ?? '' }}" placeholder="Conteúdo da meta verification">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mb-3"><i class="fas fa-share-alt mr-1"></i> Imagens sociais</h5>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>OpenGraph image (1200×630)</label>
+                            <input type="hidden" name="remove_seo_og_image" value="0">
+                            <div class="upload-box" data-max-size="{{ 5*1024*1024 }}" data-existing-url="{{ $seoOg }}" data-remove-input="[name='remove_seo_og_image']">
+                                <input type="file" name="seo_og_image" accept="image/*" class="d-none">
+                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
+                                <div class="upload-help text-muted small"></div>
+                                <div class="upload-meta text-muted small"></div>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
+                                <div class="progress upload-progress d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
+                                <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Twitter image (1200×628)</label>
+                            <input type="hidden" name="remove_seo_twitter_image" value="0">
+                            <div class="upload-box" data-max-size="{{ 5*1024*1024 }}" data-existing-url="{{ $seoTwitter }}" data-remove-input="[name='remove_seo_twitter_image']">
+                                <input type="file" name="seo_twitter_image" accept="image/*" class="d-none">
+                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
+                                <div class="upload-help text-muted small"></div>
+                                <div class="upload-meta text-muted small"></div>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
+                                <div class="progress upload-progress d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
+                                <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                            </div>
+                        </div>
+                    </div>
+                    <small class="text-muted d-block">Dica: use imagens leves (JPG/WEBP) e com textos centralizados para não cortar nas redes.</small>
+
+                    <hr>
+
+                    <h5 class="mb-3"><i class="fas fa-chart-line mr-1"></i> Códigos de rastreamento</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Código no &lt;head&gt; (GA/GTM/meta pixels)</label>
+                                <textarea name="tracking_head" class="form-control" rows="6" placeholder="Cole aqui scripts/trechos para o HEAD">{{ $settings['tracking_head'] ?? '' }}</textarea>
+                                <small class="text-muted">Inserido no <code>&lt;head&gt;</code> do site público.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Código no &lt;body&gt; (ex.: GTM noscript)</label>
+                                <textarea name="tracking_body" class="form-control" rows="6" placeholder="Cole aqui trechos para o início/final do BODY">{{ $settings['tracking_body'] ?? '' }}</textarea>
+                                <small class="text-muted">Inserido no <code>&lt;body&gt;</code> do site público.</small>
                             </div>
                         </div>
                     </div>

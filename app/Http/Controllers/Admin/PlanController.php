@@ -124,6 +124,11 @@ class PlanController extends Controller
             'benefits' => 'nullable|string',
             'permissions' => 'nullable|array',
             'permissions.*' => 'string',
+            'comparison' => 'nullable|array',
+            'comparison.connections_per_month' => 'nullable|string|max:50',
+            'comparison.group_mentorship' => 'nullable|string|max:50',
+            'comparison.individual_mentorship' => 'nullable|string|max:50',
+            'comparison.priority_support' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
         ]);
 
@@ -138,6 +143,17 @@ class PlanController extends Controller
         $data['benefits'] = array_filter(array_map('trim', explode("\n", str_replace("\r", "", $benefitsRaw))));
 
         $data['permissions'] = $request->input('permissions', []);
+
+        $comparison = $request->input('comparison', []);
+        if (!is_array($comparison)) {
+            $comparison = [];
+        }
+        $data['comparison'] = [
+            'connections_per_month' => isset($comparison['connections_per_month']) ? trim((string) $comparison['connections_per_month']) : null,
+            'group_mentorship' => isset($comparison['group_mentorship']) ? trim((string) $comparison['group_mentorship']) : null,
+            'individual_mentorship' => isset($comparison['individual_mentorship']) ? trim((string) $comparison['individual_mentorship']) : null,
+            'priority_support' => (bool) ($comparison['priority_support'] ?? false),
+        ];
 
         return $data;
     }

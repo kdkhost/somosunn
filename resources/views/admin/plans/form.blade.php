@@ -92,6 +92,44 @@
                 </div>
             </div>
 
+            <div class="card card-outline card-secondary">
+                <div class="card-header">
+                    <h3 class="card-title">Comparativo (exibição no Site)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label>Conexões por mês</label>
+                            <input name="comparison[connections_per_month]" class="form-control" placeholder="Ex: 5 / Ilimitadas" value="{{ old('comparison.connections_per_month', data_get($plan->comparison, 'connections_per_month')) }}">
+                            <small class="text-muted">Se vazio: plano grátis → 5, pagos → Ilimitadas.</small>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label>Mentoria em grupo</label>
+                            <input name="comparison[group_mentorship]" class="form-control" placeholder="Ex: 1/mês / Ilimitada" value="{{ old('comparison.group_mentorship', data_get($plan->comparison, 'group_mentorship')) }}">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label>Mentoria individual</label>
+                            <input name="comparison[individual_mentorship]" class="form-control" placeholder="Ex: 1/mês" value="{{ old('comparison.individual_mentorship', data_get($plan->comparison, 'individual_mentorship')) }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
+                                <input type="hidden" name="comparison[priority_support]" value="0">
+                                <input type="checkbox" class="custom-control-input" id="priority_support" name="comparison[priority_support]" value="1" {{ old('comparison.priority_support', (bool) data_get($plan->comparison, 'priority_support')) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="priority_support">Suporte prioritário</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-8">
+                            <small class="text-muted d-block mt-2">
+                                Dica: itens como <strong>Acesso a cursos</strong>, <strong>Eventos</strong> e <strong>Comunidade</strong> são derivados das permissões do plano.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Permissões liberadas por este plano</label>
                 <div class="row">

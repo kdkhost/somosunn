@@ -34,4 +34,16 @@ return [
         'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
         'redirect' => env('APP_URL').'/auth/callback/linkedin',
     ],
+
+    // reCAPTCHA v3
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_V3_SITE_KEY'),
+        'v3_secret' => env('RECAPTCHA_V3_SECRET_KEY'),
+        'v3_min_score' => (float) env('RECAPTCHA_V3_MIN_SCORE', 0.5),
+    ],
+
+    // Geolocalização (opcional) para Analytics
+    'ipinfo' => [
+        'token' => env('IPINFO_TOKEN'),
+    ],
 ];

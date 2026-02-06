@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class SettingController extends Controller
@@ -12,7 +14,56 @@ class SettingController extends Controller
     {
         $settings = Setting::all()->pluck('value', 'key')->toArray();
         $settings = $this->normalizeFileSettings($settings);
-        return view('admin.settings.index', compact('settings'));
+
+        $analytics = [
+            'enabled' => false,
+            'today' => 0,
+            'last7' => 0,
+            'last30' => 0,
+            'top_pages' => collect(),
+            'top_countries' => collect(),
+        ];
+
+        try {
+            if (Schema::hasTable('visitor_logs')) {
+                $analytics['enabled'] = true;
+                $now = now();
+
+                $analytics['today'] = (int) DB::table('visitor_logs')
+                    ->whereDate('created_at', $now->toDateString())
+                    ->count();
+
+                $analytics['last7'] = (int) DB::table('visitor_logs')
+                    ->where('created_at', '>=', $now->copy()->subDays(7))
+                    ->count();
+
+                $analytics['last30'] = (int) DB::table('visitor_logs')
+                    ->where('created_at', '>=', $now->copy()->subDays(30))
+                    ->count();
+
+                $analytics['top_pages'] = DB::table('visitor_logs')
+                    ->select('path', DB::raw('count(*) as total'))
+                    ->where('created_at', '>=', $now->copy()->subDays(30))
+                    ->groupBy('path')
+                    ->orderByDesc('total')
+                    ->limit(10)
+                    ->get();
+
+                $analytics['top_countries'] = DB::table('visitor_logs')
+                    ->select('country', DB::raw('count(*) as total'))
+                    ->where('created_at', '>=', $now->copy()->subDays(30))
+                    ->whereNotNull('country')
+                    ->where('country', '!=', '')
+                    ->groupBy('country')
+                    ->orderByDesc('total')
+                    ->limit(10)
+                    ->get();
+            }
+        } catch (\Throwable $e) {
+            // analytics é opcional; não bloqueia a tela de settings
+        }
+
+        return view('admin.settings.index', compact('settings', 'analytics'));
     }
 
     public function update(Request $request)
@@ -32,6 +83,8 @@ class SettingController extends Controller
             'logo_auth',
             'logo_front',
             'watermark_image',
+            'seo_og_image',
+            'seo_twitter_image',
             // flags de remoção
             'remove_pwa_icon_192',
             'remove_pwa_icon_512',
@@ -44,10 +97,19 @@ class SettingController extends Controller
             'remove_logo_auth',
             'remove_logo_front',
             'remove_watermark_image',
+            'remove_seo_og_image',
+            'remove_seo_twitter_image',
             'hero_image',
             'remove_hero_image',
             'smtp_test_email', // Não salvar e-mail de teste
         ]);
+
+        if ($request->hasFile('seo_og_image') && $this->imageIsSmallerThan($request->file('seo_og_image'), 1200, 630)) {
+            return redirect()->back()->withInput()->with('error', 'A imagem OpenGraph precisa ter pelo menos 1200×630px.');
+        }
+        if ($request->hasFile('seo_twitter_image') && $this->imageIsSmallerThan($request->file('seo_twitter_image'), 1200, 628)) {
+            return redirect()->back()->withInput()->with('error', 'A imagem do Twitter precisa ter pelo menos 1200×628px.');
+        }
 
         $dirs = [
             'uploads/imagens',
@@ -58,6 +120,7 @@ class SettingController extends Controller
             'uploads/imagens/preloader',
             'uploads/imagens/geral',
             'uploads/imagens/watermark',
+            'uploads/imagens/seo',
         ];
         foreach ($dirs as $dir) {
             $this->ensurePublicDir($dir);
@@ -76,6 +139,8 @@ class SettingController extends Controller
             'logo_front',
             'watermark_image',
             'hero_image',
+            'seo_og_image',
+            'seo_twitter_image',
         ];
         foreach ($removals as $key) {
             if ($request->boolean('remove_' . $key)) {
@@ -118,6 +183,12 @@ class SettingController extends Controller
         }
         if ($request->hasFile('hero_image')) {
             $this->replaceFile('hero_image', $this->storePublic($request->file('hero_image'), 'uploads/imagens/frontend'));
+        }
+        if ($request->hasFile('seo_og_image')) {
+            $this->replaceFile('seo_og_image', $this->storePublic($request->file('seo_og_image'), 'uploads/imagens/seo'));
+        }
+        if ($request->hasFile('seo_twitter_image')) {
+            $this->replaceFile('seo_twitter_image', $this->storePublic($request->file('seo_twitter_image'), 'uploads/imagens/seo'));
         }
 
         $bools = ['pwa_enabled', 'preloader_enabled'];
@@ -190,6 +261,8 @@ class SettingController extends Controller
             'pwa_splash' => ['uploads/imagens/pwa', 'uploads/imagens'],
             'pwa_banner' => ['uploads/imagens/pwa', 'uploads/imagens'],
             'hero_image' => ['uploads/imagens/frontend', 'uploads/imagens'],
+            'seo_og_image' => ['uploads/imagens/seo', 'uploads/imagens'],
+            'seo_twitter_image' => ['uploads/imagens/seo', 'uploads/imagens'],
         ];
 
         foreach ($keyDirs as $key => $searchDirs) {
@@ -240,6 +313,21 @@ class SettingController extends Controller
             }
         }
         return $settings;
+    }
+
+    private function imageIsSmallerThan($file, int $minWidth, int $minHeight): bool
+    {
+        try {
+            $path = $file->getPathname();
+            $size = @getimagesize($path);
+            if (!is_array($size) || !isset($size[0], $size[1])) {
+                return true;
+            }
+
+            return ((int) $size[0] < $minWidth) || ((int) $size[1] < $minHeight);
+        } catch (\Throwable $e) {
+            return true;
+        }
     }
 
     public function testSmtp(Request $request)

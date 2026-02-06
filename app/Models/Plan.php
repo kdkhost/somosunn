@@ -24,6 +24,7 @@ class Plan extends Model
         'coupons_enabled',
         'benefits',
         'permissions',
+        'comparison',
         'is_active'
     ];
 
@@ -36,6 +37,7 @@ class Plan extends Model
         'prorata' => 'boolean',
         'benefits' => 'array',
         'permissions' => 'array',
+        'comparison' => 'array',
         'price' => 'decimal:2'
     ];
 

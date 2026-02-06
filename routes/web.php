@@ -1,6 +1,7 @@
 ﻿<?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InteractionController;
 use App\Http\Controllers\MailTestController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\SatisfactionController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portal', fn() => redirect()->route('admin.dashboard'))->name('portal');
 Route::get('/premium', [HomeController::class, 'premium'])->name('premium');
+Route::post('/depoimentos', [\App\Http\Controllers\TestimonialController::class, 'store'])->middleware('auth')->name('testimonials.store');
 
 // Rota de Emergência para Diagnóstico
 Route::get('/debug-test', function () {
@@ -61,6 +63,7 @@ Route::get('/quem-somos', fn() => view('site.institucional.quem-somos'))->name('
 Route::get('/como-funciona', fn() => view('site.institucional.como-funciona'))->name('como-funciona');
 Route::get('/valores', fn() => view('site.institucional.valores'))->name('valores');
 Route::get('/contato', fn() => view('site.institucional.contato'))->name('contato');
+Route::post('/contato', [ContactController::class, 'send'])->middleware('throttle:5,1')->name('contato.send');
 
 // Members
 Route::get('/membros', [\App\Http\Controllers\MemberController::class, 'index'])->name('membros');
@@ -218,6 +221,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     // Perfil (Acessível a membros para completar cadastro)
     Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+
+    // Depoimentos (moderação por permissões)
+    Route::get('/testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'index'])->name('testimonials.index');
+    Route::get('/testimonials/{testimonial}/edit', [\App\Http\Controllers\Admin\TestimonialController::class, 'edit'])->name('testimonials.edit');
+    Route::put('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'update'])->name('testimonials.update');
+    Route::post('/testimonials/{testimonial}/approve', [\App\Http\Controllers\Admin\TestimonialController::class, 'approve'])->name('testimonials.approve');
+    Route::post('/testimonials/{testimonial}/reject', [\App\Http\Controllers\Admin\TestimonialController::class, 'reject'])->name('testimonials.reject');
+    Route::delete('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'destroy'])->name('testimonials.destroy');
 
     // Impersonate Stop (disponível se estiver impersonando, sessão controla)
     Route::get('/stop-impersonating', [\App\Http\Controllers\Admin\ImpersonateController::class, 'stop'])->name('impersonate.stop');

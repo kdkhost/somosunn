@@ -21,7 +21,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', config('app.name', 'UNN'))</title>
+    <title>@yield('title', \App\Models\Setting::get('seo_meta_title') ?: config('app.name', 'UNN'))</title>
     @php
         $logoFront = \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
         $logo = $logoFront ? asset(ltrim($logoFront, '/')) : asset('img/logo.svg');
@@ -29,7 +29,100 @@
         $favicon = $faviconValue ? asset(ltrim($faviconValue, '/')) : asset('favicon.ico');
         $pwaEnabled = (string) \App\Models\Setting::get('pwa_enabled', '1') === '1';
         $pwaTheme = \App\Models\Setting::get('pwa_theme_color', '#1F5EDB');
+
+        $seoDefaultTitle = \App\Models\Setting::get('seo_meta_title') ?: (\App\Models\Setting::get('app_name') ?: config('app.name', 'UNN'));
+        $seoDefaultDescription = (string) (\App\Models\Setting::get('seo_meta_description') ?: '');
+        $seoDefaultKeywords = (string) (\App\Models\Setting::get('seo_meta_keywords') ?: '');
+        $seoRobots = (string) (\App\Models\Setting::get('seo_robots') ?: 'index,follow');
+        $seoGoogleVerification = (string) (\App\Models\Setting::get('seo_google_verification') ?: '');
+
+        $seoOgImageValue = (string) (\App\Models\Setting::get('seo_og_image') ?: '');
+        $seoOgImage = $seoOgImageValue !== '' ? asset(ltrim($seoOgImageValue, '/')) : '';
+
+        $seoTwitterImageValue = (string) (\App\Models\Setting::get('seo_twitter_image') ?: '');
+        if ($seoTwitterImageValue === '') {
+            $seoTwitterImageValue = $seoOgImageValue;
+        }
+        $seoTwitterImage = $seoTwitterImageValue !== '' ? asset(ltrim($seoTwitterImageValue, '/')) : '';
+
+        $seoTwitterSite = (string) (\App\Models\Setting::get('seo_twitter_site') ?: '');
+
+        $trackingHead = (string) (\App\Models\Setting::get('tracking_head') ?: '');
+        $trackingBody = (string) (\App\Models\Setting::get('tracking_body') ?: '');
+
+        $pageTitle = trim($__env->yieldContent('title'));
+        if ($pageTitle === '') {
+            $pageTitle = $seoDefaultTitle;
+        }
+
+        $metaTitle = trim($__env->yieldContent('meta_title'));
+        if ($metaTitle === '') {
+            $metaTitle = $pageTitle;
+        }
+
+        $metaDescription = trim($__env->yieldContent('meta_description'));
+        if ($metaDescription === '') {
+            $metaDescription = $seoDefaultDescription;
+        }
+
+        $metaKeywords = trim($__env->yieldContent('meta_keywords'));
+        if ($metaKeywords === '') {
+            $metaKeywords = $seoDefaultKeywords;
+        }
+
+        $metaImage = trim($__env->yieldContent('meta_image'));
+        if ($metaImage === '') {
+            $metaImage = $seoOgImage;
+        }
+
+        $canonical = trim($__env->yieldContent('canonical'));
+        if ($canonical === '') {
+            $canonical = url()->current();
+        }
     @endphp
+
+    @if($metaDescription !== '')
+        <meta name="description" content="{{ $metaDescription }}">
+    @endif
+    @if($metaKeywords !== '')
+        <meta name="keywords" content="{{ $metaKeywords }}">
+    @endif
+    <meta name="robots" content="{{ trim($__env->yieldContent('meta_robots')) ?: $seoRobots }}">
+    <link rel="canonical" href="{{ $canonical }}">
+
+    {{-- Open Graph --}}
+    <meta property="og:title" content="{{ $metaTitle }}">
+    @if($metaDescription !== '')
+        <meta property="og:description" content="{{ $metaDescription }}">
+    @endif
+    <meta property="og:type" content="{{ trim($__env->yieldContent('og_type')) ?: 'website' }}">
+    <meta property="og:url" content="{{ $canonical }}">
+    <meta property="og:site_name" content="{{ \App\Models\Setting::get('app_name') ?: config('app.name', 'UNN') }}">
+    @if($metaImage !== '')
+        <meta property="og:image" content="{{ $metaImage }}">
+    @endif
+
+    {{-- Twitter --}}
+    <meta name="twitter:card" content="{{ trim($__env->yieldContent('twitter_card')) ?: 'summary_large_image' }}">
+    @if($seoTwitterSite !== '')
+        <meta name="twitter:site" content="{{ $seoTwitterSite }}">
+    @endif
+    <meta name="twitter:title" content="{{ $metaTitle }}">
+    @if($metaDescription !== '')
+        <meta name="twitter:description" content="{{ $metaDescription }}">
+    @endif
+    @if($seoTwitterImage !== '')
+        <meta name="twitter:image" content="{{ trim($__env->yieldContent('twitter_image')) ?: $seoTwitterImage }}">
+    @endif
+
+    @if($seoGoogleVerification !== '')
+        <meta name="google-site-verification" content="{{ $seoGoogleVerification }}">
+    @endif
+
+    @if($trackingHead !== '')
+        {!! $trackingHead !!}
+    @endif
+
     <link rel="icon" href="{{ $favicon }}" type="image/x-icon">
     <link rel="apple-touch-icon" href="{{ $logo }}">
     @if ($pwaEnabled)
@@ -125,6 +218,9 @@
 </head>
 
 <body class="bg-slate-50 min-h-screen">
+    @if($trackingBody !== '')
+        {!! $trackingBody !!}
+    @endif
     {{-- Banner de Impersonation --}}
     @if(session()->has('impersonator_id'))
         <div

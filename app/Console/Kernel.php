@@ -11,6 +11,11 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule): void
     {
+        if (config('internal_cron.run_queue_worker', true)) {
+            $schedule->command('queue:work --stop-when-empty --quiet')
+                ->everyMinute()
+                ->withoutOverlapping(55);
+        }
     }
 
     protected function commands(): void

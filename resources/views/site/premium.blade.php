@@ -140,69 +140,121 @@
             <div class="max-w-5xl mx-auto">
                 <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">Compare os planos</h2>
 
+                @php
+                    $plansCollection = ($plans ?? collect())->values();
+
+                    $highlightPlan = $plansCollection->firstWhere('highlight', true);
+                    $cheapestPlan = $plansCollection->sortBy('price')->first();
+                    $mostExpensivePlan = $plansCollection->sortByDesc('price')->first();
+
+                    $comparePlans = collect([$cheapestPlan, $highlightPlan, $mostExpensivePlan])
+                        ->filter()
+                        ->unique('id')
+                        ->values();
+
+                    foreach ($plansCollection as $candidate) {
+                        if ($comparePlans->count() >= min(3, $plansCollection->count())) {
+                            break;
+                        }
+                        if (!$comparePlans->contains('id', $candidate->id)) {
+                            $comparePlans->push($candidate);
+                        }
+                    }
+
+                    $comparisonRows = [
+                        ['type' => 'permission', 'label' => 'Perfil na comunidade', 'permission' => 'community'],
+                        ['type' => 'text', 'label' => 'Conexões por mês', 'field' => 'connections_per_month'],
+                        ['type' => 'permission', 'label' => 'Acesso a cursos', 'permission' => 'courses'],
+                        ['type' => 'permission', 'label' => 'Eventos exclusivos', 'permission' => 'events'],
+                        ['type' => 'mentorship_group', 'label' => 'Mentoria em grupo', 'field' => 'group_mentorship'],
+                        ['type' => 'text', 'label' => 'Mentoria individual', 'field' => 'individual_mentorship'],
+                        ['type' => 'boolean', 'label' => 'Suporte prioritário', 'field' => 'priority_support'],
+                    ];
+                @endphp
+
                 <div class="bg-white rounded-3xl shadow-lg overflow-hidden">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="border-b border-gray-100">
-                                <th class="text-left p-6 text-gray-900 font-bold">Recurso</th>
-                                <th class="text-center p-6 text-gray-500">Comunidade</th>
-                                <th class="text-center p-6 font-bold" style="background: var(--unn-azul-1); color: white">
-                                    Premium</th>
-                                <th class="text-center p-6 text-gray-500">Business</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm">
-                            <tr class="border-b border-gray-50">
-                                <td class="p-4 text-gray-700">Perfil na comunidade</td>
-                                <td class="text-center p-4"><i class="fas fa-check text-green-500"></i></td>
-                                <td class="text-center p-4" style="background: var(--unn-azul-1)10"><i
-                                        class="fas fa-check text-green-500"></i></td>
-                                <td class="text-center p-4"><i class="fas fa-check text-green-500"></i></td>
-                            </tr>
-                            <tr class="border-b border-gray-50">
-                                <td class="p-4 text-gray-700">Conexões por mês</td>
-                                <td class="text-center p-4 text-gray-500">5</td>
-                                <td class="text-center p-4 font-bold" style="background: var(--unn-azul-1)10">Ilimitadas
-                                </td>
-                                <td class="text-center p-4">Ilimitadas</td>
-                            </tr>
-                            <tr class="border-b border-gray-50">
-                                <td class="p-4 text-gray-700">Acesso a cursos</td>
-                                <td class="text-center p-4"><i class="fas fa-times text-gray-300"></i></td>
-                                <td class="text-center p-4" style="background: var(--unn-azul-1)10"><i
-                                        class="fas fa-check text-green-500"></i></td>
-                                <td class="text-center p-4"><i class="fas fa-check text-green-500"></i></td>
-                            </tr>
-                            <tr class="border-b border-gray-50">
-                                <td class="p-4 text-gray-700">Eventos exclusivos</td>
-                                <td class="text-center p-4"><i class="fas fa-times text-gray-300"></i></td>
-                                <td class="text-center p-4" style="background: var(--unn-azul-1)10"><i
-                                        class="fas fa-check text-green-500"></i></td>
-                                <td class="text-center p-4"><i class="fas fa-check text-green-500"></i></td>
-                            </tr>
-                            <tr class="border-b border-gray-50">
-                                <td class="p-4 text-gray-700">Mentoria em grupo</td>
-                                <td class="text-center p-4"><i class="fas fa-times text-gray-300"></i></td>
-                                <td class="text-center p-4" style="background: var(--unn-azul-1)10">1/mês</td>
-                                <td class="text-center p-4">Ilimitada</td>
-                            </tr>
-                            <tr class="border-b border-gray-50">
-                                <td class="p-4 text-gray-700">Mentoria individual</td>
-                                <td class="text-center p-4"><i class="fas fa-times text-gray-300"></i></td>
-                                <td class="text-center p-4" style="background: var(--unn-azul-1)10"><i
-                                        class="fas fa-times text-gray-300"></i></td>
-                                <td class="text-center p-4">1/mês</td>
-                            </tr>
-                            <tr>
-                                <td class="p-4 text-gray-700">Suporte prioritário</td>
-                                <td class="text-center p-4"><i class="fas fa-times text-gray-300"></i></td>
-                                <td class="text-center p-4" style="background: var(--unn-azul-1)10"><i
-                                        class="fas fa-times text-gray-300"></i></td>
-                                <td class="text-center p-4"><i class="fas fa-check text-green-500"></i></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[760px]">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class="text-left p-6 text-gray-900 font-bold">Recurso</th>
+                                    @foreach($comparePlans as $plan)
+                                        <th class="text-center p-6 {{ $plan->highlight ? 'font-black' : 'text-gray-500 font-bold' }}"
+                                            style="{{ $plan->highlight ? 'background: var(--unn-azul-1); color: white' : '' }}">
+                                            {{ $plan->name }}
+                                        </th>
+                                    @endforeach
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                @foreach($comparisonRows as $row)
+                                    <tr class="border-b border-gray-50">
+                                        <td class="p-4 text-gray-700">{{ $row['label'] }}</td>
+                                        @foreach($comparePlans as $plan)
+                                            @php
+                                                $isHighlighted = (bool) ($plan->highlight ?? false);
+                                                $cellStyle = $isHighlighted ? 'background: var(--unn-azul-1)10' : '';
+                                            @endphp
+                                            <td class="text-center p-4" style="{{ $cellStyle }}">
+                                                @if($row['type'] === 'permission')
+                                                    @php
+                                                        $perm = $row['permission'] ?? null;
+                                                        $has = $perm ? (method_exists($plan, 'hasFeature') ? $plan->hasFeature($perm) : in_array($perm, (array) ($plan->permissions ?? []))) : false;
+                                                    @endphp
+                                                    @if($has)
+                                                        <i class="fas fa-check text-green-500"></i>
+                                                    @else
+                                                        <i class="fas fa-times text-gray-300"></i>
+                                                    @endif
+                                                @elseif($row['type'] === 'boolean')
+                                                    @php
+                                                        $flag = (bool) data_get($plan->comparison, $row['field'] ?? '', false);
+                                                    @endphp
+                                                    @if($flag)
+                                                        <i class="fas fa-check text-green-500"></i>
+                                                    @else
+                                                        <i class="fas fa-times text-gray-300"></i>
+                                                    @endif
+                                                @elseif($row['type'] === 'mentorship_group')
+                                                    @php
+                                                        $val = trim((string) data_get($plan->comparison, $row['field'] ?? ''));
+                                                        $hasMentorships = method_exists($plan, 'hasFeature') ? $plan->hasFeature('mentorships') : in_array('mentorships', (array) ($plan->permissions ?? []));
+                                                        if ($val === '' && $hasMentorships) {
+                                                            $val = 'Ilimitada';
+                                                        }
+                                                    @endphp
+                                                    @if($val !== '')
+                                                        <span class="{{ $isHighlighted ? 'font-bold text-slate-900' : 'text-gray-700' }}">{{ $val }}</span>
+                                                    @else
+                                                        <i class="fas fa-times text-gray-300"></i>
+                                                    @endif
+                                                @else
+                                                    @php
+                                                        $field = $row['field'] ?? null;
+                                                        $val = $field ? trim((string) data_get($plan->comparison, $field)) : '';
+
+                                                        if ($field === 'connections_per_month' && $val === '') {
+                                                            $val = (float) $plan->price <= 0 ? '5' : 'Ilimitadas';
+                                                        }
+                                                    @endphp
+                                                    @if($val !== '')
+                                                        <span class="{{ $isHighlighted ? 'font-bold text-slate-900' : 'text-gray-700' }}">{{ $val }}</span>
+                                                    @else
+                                                        <i class="fas fa-times text-gray-300"></i>
+                                                    @endif
+                                                @endif
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
+                <p class="text-xs text-gray-500 mt-4 text-center">
+                    Itens marcados com ✓ são derivados das permissões do plano. Valores como conexões/mentorias e suporte são configuráveis no Admin.
+                </p>
             </div>
         </section>
 
@@ -211,35 +263,123 @@
             <div class="max-w-7xl mx-auto">
                 <h2 class="text-3xl font-black text-gray-900 mb-12 text-center">O que dizem nossos membros Premium</h2>
 
-                <div class="grid md:grid-cols-3 gap-8">
-                    @php
-                        $testimonials = [
-                            ['name' => 'Carlos Mendes', 'role' => 'CEO, Tech Solutions', 'text' => 'Desde que me tornei Premium, fechei 3 parcerias estratégicas que mudaram meu negócio. O ROI foi absurdo!', 'rating' => 5],
-                            ['name' => 'Ana Paula Lima', 'role' => 'Fundadora, EcoModa', 'text' => 'As mentorias exclusivas valem cada centavo. Acesso a conhecimento que eu não encontraria em nenhum outro lugar.', 'rating' => 5],
-                            ['name' => 'Roberto Silva', 'role' => 'Diretor, Investimentos RS', 'text' => 'A qualidade das conexões no plano Premium é incomparável. Networking de verdade, com pessoas sérias.', 'rating' => 5],
-                        ];
-                    @endphp
+                @if(session('error'))
+                    <div class="max-w-3xl mx-auto bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-8">
+                        <i class="fas fa-triangle-exclamation mr-2"></i>{{ session('error') }}
+                    </div>
+                @endif
+                @if(session('success'))
+                    <div class="max-w-3xl mx-auto bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mb-8">
+                        <i class="fas fa-circle-check mr-2"></i>{{ session('success') }}
+                    </div>
+                @endif
 
-                    @foreach($testimonials as $testimonial)
-                        <div class="bg-slate-50 rounded-3xl p-8">
+                @php
+                    $approvedTestimonials = ($testimonials ?? collect())->values();
+
+                    $fallbackTestimonials = collect([
+                        ['name' => 'Carlos Mendes', 'role' => 'CEO, Tech Solutions', 'text' => 'Desde que me tornei Premium, fechei 3 parcerias estratégicas que mudaram meu negócio. O ROI foi absurdo!', 'rating' => 5],
+                        ['name' => 'Ana Paula Lima', 'role' => 'Fundadora, EcoModa', 'text' => 'As mentorias exclusivas valem cada centavo. Acesso a conhecimento que eu não encontraria em nenhum outro lugar.', 'rating' => 5],
+                        ['name' => 'Roberto Silva', 'role' => 'Diretor, Investimentos RS', 'text' => 'A qualidade das conexões no plano Premium é incomparável. Networking de verdade, com pessoas sérias.', 'rating' => 5],
+                    ]);
+
+                    $displayTestimonials = $approvedTestimonials->isNotEmpty()
+                        ? $approvedTestimonials
+                        : $fallbackTestimonials;
+                @endphp
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    @foreach($displayTestimonials as $testimonial)
+                        @php
+                            $name = data_get($testimonial, 'author_name') ?? data_get($testimonial, 'name') ?? 'Membro UNN';
+                            $role = data_get($testimonial, 'author_title') ?? data_get($testimonial, 'role') ?? null;
+                            $text = data_get($testimonial, 'content') ?? data_get($testimonial, 'text') ?? '';
+                            $rating = data_get($testimonial, 'rating');
+                            $isFeatured = (bool) data_get($testimonial, 'is_featured', false);
+
+                            if ($rating !== null) {
+                                $rating = (int) $rating;
+                                $rating = max(1, min(5, $rating));
+                            }
+                        @endphp
+                        <div class="bg-slate-50 rounded-3xl p-8 relative">
+                            @if($isFeatured)
+                                <span class="absolute top-5 right-5 text-xs font-bold px-3 py-1 rounded-full text-white"
+                                    style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
+                                    Em destaque
+                                </span>
+                            @endif
+
                             <div class="flex gap-1 mb-4">
-                                @for($i = 0; $i < $testimonial['rating']; $i++)
-                                    <i class="fas fa-star text-yellow-500"></i>
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star {{ ($rating !== null && $i <= $rating) ? 'text-yellow-500' : 'text-slate-300' }}"></i>
                                 @endfor
                             </div>
-                            <p class="text-gray-600 mb-6 italic">"{{ $testimonial['text'] }}"</p>
+                            <p class="text-gray-600 mb-6 italic">"{{ $text }}"</p>
                             <div class="flex items-center gap-4">
-                                <div
-                                    class="w-12 h-12 btn-primary rounded-full flex items-center justify-center text-white font-bold">
-                                    {{ substr($testimonial['name'], 0, 1) }}
+                                <div class="w-12 h-12 btn-primary rounded-full flex items-center justify-center text-white font-bold">
+                                    {{ mb_substr($name, 0, 1) }}
                                 </div>
                                 <div>
-                                    <p class="font-bold text-gray-900">{{ $testimonial['name'] }}</p>
-                                    <p class="text-sm text-gray-500">{{ $testimonial['role'] }}</p>
+                                    <p class="font-bold text-gray-900">{{ $name }}</p>
+                                    @if($role)
+                                        <p class="text-sm text-gray-500">{{ $role }}</p>
+                                    @endif
                                 </div>
                             </div>
                         </div>
                     @endforeach
+                </div>
+
+                <div class="max-w-3xl mx-auto mt-10 bg-white rounded-3xl shadow-lg p-8 border border-slate-100">
+                    <div class="flex items-start justify-between gap-6 flex-wrap">
+                        <div>
+                            <h3 class="text-xl font-black text-gray-900">Quer deixar seu depoimento?</h3>
+                            <p class="text-gray-600 mt-1">Seu depoimento passa por moderação antes de ser publicado.</p>
+                        </div>
+                    </div>
+
+                    @auth
+                        <form action="{{ route('testimonials.store') }}" method="POST" class="mt-6 space-y-4">
+                            @csrf
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Avaliação (opcional)</label>
+                                <select name="rating" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition"
+                                    style="--tw-ring-color: var(--unn-azul-1)">
+                                    <option value="">—</option>
+                                    @for($i=5;$i>=1;$i--)
+                                        <option value="{{ $i }}">{{ $i }}/5</option>
+                                    @endfor
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Seu depoimento</label>
+                                <textarea name="content" rows="4" required minlength="20" maxlength="2000"
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition resize-none"
+                                    style="--tw-ring-color: var(--unn-azul-1)"
+                                    placeholder="Conte como a UNN ajudou você a crescer com networking e oportunidades..."></textarea>
+                                <p class="text-xs text-gray-500 mt-2">Mínimo: 20 caracteres. Máximo: 2000.</p>
+                            </div>
+
+                            <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
+                                <i class="fas fa-paper-plane"></i>
+                                Enviar depoimento
+                            </button>
+                        </form>
+                    @else
+                        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                            <a href="{{ route('login') }}" class="btn-primary text-white px-6 py-3 rounded-xl font-bold inline-flex items-center justify-center gap-2">
+                                <i class="fas fa-right-to-bracket"></i>
+                                Entrar para enviar
+                            </a>
+                            <a href="{{ route('register') }}" class="px-6 py-3 rounded-xl font-bold border-2 inline-flex items-center justify-center gap-2"
+                                style="border-color: var(--unn-azul-1); color: var(--unn-azul-1)">
+                                <i class="fas fa-user-plus"></i>
+                                Criar conta
+                            </a>
+                        </div>
+                    @endauth
                 </div>
             </div>
         </section>

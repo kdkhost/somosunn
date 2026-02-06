@@ -281,6 +281,15 @@
                     </a>
                 </li>
 
+                @if(auth()->user()->hasPermission('testimonials.view') || auth()->user()->hasPermission('testimonials.moderate') || auth()->user()->hasPermission('testimonials.delete'))
+                    <li class="nav-item">
+                        <a href="{{ route('admin.testimonials.index') }}" class="nav-link {{ $is('admin.testimonials.*') }}">
+                            <i class="nav-icon fas fa-quote-left"></i>
+                            <p>Depoimentos</p>
+                        </a>
+                    </li>
+                @endif
+
                 <!-- Comunidade -->
                 @if(auth()->user()->canAccessFeature('community'))
                     <li class="nav-item">

@@ -49,6 +49,41 @@ PWA
 - Upload de ícones no painel atualiza `manifest.webmanifest` dinamicamente
 - O manifest dinâmico é servido em `GET /manifest.webmanifest` e respeita a flag `pwa_enabled`
 
+## Depoimentos (moderação)
+
+- **Site:** a página `/premium` exibe depoimentos aprovados e permite envio autenticado via `POST /depoimentos` (fica como **pendente** até moderação).
+- **Admin:** moderação em `/admin/testimonials` (aprovar/recusar/editar; exclusão só para quem tiver permissão).
+- **Permissões (RBAC):** `testimonials.view`, `testimonials.moderate`, `testimonials.delete`.
+
+## Contato + reCAPTCHA v3
+
+- **Página:** `/contato` (dados como e-mail/telefone/endereço são lidos de Configurações → Geral).
+- **Envio:** `POST /contato` envia e-mail para `company_email` (fallback `mail.from.address`) aplicando automaticamente as configs SMTP salvas no banco (`smtp_*`).
+- **reCAPTCHA v3:** configure no `.env`:
+  - `RECAPTCHA_V3_SITE_KEY`
+  - `RECAPTCHA_V3_SECRET_KEY`
+  - `RECAPTCHA_V3_MIN_SCORE` (padrão 0.5)
+
+## SEO & Analytics (Admin)
+
+- **Admin:** Configurações → **SEO & Analytics**
+  - Meta padrão: title/description/keywords + robots + google verification
+  - Imagens sociais: OpenGraph e Twitter (com validação mínima de tamanho)
+  - Trechos de rastreamento: `tracking_head` (HEAD) e `tracking_body` (BODY)
+- **Contador de visitas:** tabela `visitor_logs` + cards/resumos no mesmo tab.
+- **Geolocalização (opcional):** informe `IPINFO_TOKEN` no `.env` para enriquecer país/cidade/região.
+
+## Cron interno (fallback)
+
+Para hospedagens sem cron confiável, existe um fallback que roda `schedule:run` em background (na finalização das requisições do site), respeitando um intervalo mínimo.
+
+- Variáveis no `.env`:
+  - `INTERNAL_CRON_ENABLED=true`
+  - `INTERNAL_CRON_MIN_INTERVAL_SECONDS=60`
+  - `INTERNAL_CRON_RUN_QUEUE_WORKER=true`
+
+Observação: por depender de tráfego, isso não é “cirúrgico” como um cron real. Em produção, recomenda-se configurar cron do cPanel para `php artisan schedule:run` e para processar filas.
+
 Instalador Web
 - Acesse `/install` em ambiente sem `APP_INSTALLED=true` para executar migrations, seeders e criar o administrador inicial via formulário web.
 - O instalador gerará `APP_KEY`, rodará `php artisan migrate --seed` e adicionará `APP_INSTALLED=true` no `.env` (se permitido).

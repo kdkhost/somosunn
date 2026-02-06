@@ -68,6 +68,10 @@ class PermissionsSeeder extends Seeder
             'settings.smtp.test' => 'Testar SMTP',
             'settings.pwa.toggle' => 'Ativar/desativar PWA',
             'settings.branding.update' => 'Atualizar branding (logo/preloader)',
+            // Depoimentos
+            'testimonials.view' => 'Listar depoimentos',
+            'testimonials.moderate' => 'Moderar depoimentos (aprovar/recusar)',
+            'testimonials.delete' => 'Excluir depoimentos',
             // Permissões
             'permissions.view' => 'Listar permissões',
             'permissions.assign' => 'Atribuir permissões',
@@ -146,7 +150,9 @@ class PermissionsSeeder extends Seeder
                 'mailtemplates.create',
                 'mailtemplates.edit',
                 'mail.sendtest',
-                'uploads.manage'
+                'uploads.manage',
+                'testimonials.view',
+                'testimonials.moderate',
             ]),
             'suporte' => $subset([
                 'dashboard.view',
@@ -157,7 +163,8 @@ class PermissionsSeeder extends Seeder
                 'uploads.manage',
                 'events.view',
                 'mentorships.view',
-                'courses.view'
+                'courses.view',
+                'testimonials.view',
             ]),
             'membro' => $subset([
                 'dashboard.view',

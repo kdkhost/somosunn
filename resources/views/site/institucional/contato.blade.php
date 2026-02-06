@@ -3,6 +3,25 @@
 @section('title', 'Contato - UNN')
 
 @section('content')
+@php
+    $companyName = \App\Models\Setting::get('company_name') ?: 'UNN';
+    $companyEmail = \App\Models\Setting::get('company_email') ?: 'contato@somosunn.com.br';
+    $companyPhone = \App\Models\Setting::get('company_phone') ?: '(11) 99999-9999';
+    $companyZip = \App\Models\Setting::get('company_zip') ?: '01310-100';
+    $companyAddress = \App\Models\Setting::get('company_address') ?: 'Av. Paulista, 1000';
+    $companyNumber = \App\Models\Setting::get('company_number') ?: '1001';
+    $companyComplement = \App\Models\Setting::get('company_complement') ?: null;
+    $companyDistrict = \App\Models\Setting::get('company_district') ?: 'Bela Vista';
+    $companyCity = \App\Models\Setting::get('company_city') ?: 'São Paulo';
+    $companyState = \App\Models\Setting::get('company_state') ?: 'SP';
+
+    $socialInstagram = \App\Models\Setting::get('social_instagram') ?: '#';
+    $socialFacebook = \App\Models\Setting::get('social_facebook') ?: '#';
+    $socialYoutube = \App\Models\Setting::get('social_youtube') ?: '#';
+    $socialLinkedin = \App\Models\Setting::get('social_linkedin') ?: '#';
+
+    $recaptchaSiteKey = (string) config('services.recaptcha.site_key', '');
+@endphp
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
     <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
@@ -19,6 +38,17 @@
     <!-- Contact Section -->
     <section class="py-12 md:py-16 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
+            @if(session('error'))
+                <div class="max-w-3xl mx-auto bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-8">
+                    <i class="fas fa-triangle-exclamation mr-2"></i>{{ session('error') }}
+                </div>
+            @endif
+            @if(session('success'))
+                <div class="max-w-3xl mx-auto bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mb-8">
+                    <i class="fas fa-circle-check mr-2"></i>{{ session('success') }}
+                </div>
+            @endif
+
             <div class="grid lg:grid-cols-2 gap-8 md:gap-12">
                 <!-- Contact Info -->
                 <div>
@@ -31,8 +61,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-gray-900 mb-1">E-mail</h3>
-                                <p class="text-gray-600">contato@somosunn.com.br</p>
-                                <p class="text-gray-600">suporte@somosunn.com.br</p>
+                                <p class="text-gray-600">{{ $companyEmail }}</p>
                             </div>
                         </div>
 
@@ -42,7 +71,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-gray-900 mb-1">WhatsApp</h3>
-                                <p class="text-gray-600">(11) 99999-9999</p>
+                                <p class="text-gray-600">{{ $companyPhone }}</p>
                                 <p class="text-sm text-gray-500">Seg-Sex, 9h às 18h</p>
                             </div>
                         </div>
@@ -53,9 +82,11 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-gray-900 mb-1">Endereço</h3>
-                                <p class="text-gray-600">Av. Paulista, 1000 - Sala 1001</p>
-                                <p class="text-gray-600">Bela Vista, São Paulo - SP</p>
-                                <p class="text-gray-600">CEP: 01310-100</p>
+                                <p class="text-gray-600">
+                                    {{ $companyAddress }}{{ $companyNumber ? ', '.$companyNumber : '' }}@if($companyComplement) - {{ $companyComplement }}@endif
+                                </p>
+                                <p class="text-gray-600">{{ $companyDistrict }}, {{ $companyCity }} - {{ $companyState }}</p>
+                                <p class="text-gray-600">CEP: {{ $companyZip }}</p>
                             </div>
                         </div>
                     </div>
@@ -64,16 +95,16 @@
                     <div class="mt-8 bg-white rounded-2xl p-6 shadow-lg text-center md:text-left">
                         <h3 class="font-bold text-gray-900 mb-4">Redes Sociais</h3>
                         <div class="flex gap-4 justify-center md:justify-start flex-wrap">
-                            <a href="#" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
+                            <a href="{{ $socialInstagram }}" target="_blank" rel="noopener" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
                                 <i class="fab fa-instagram text-xl"></i>
                             </a>
-                            <a href="#" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
+                            <a href="{{ $socialLinkedin }}" target="_blank" rel="noopener" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
                                 <i class="fab fa-linkedin text-xl"></i>
                             </a>
-                            <a href="#" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
+                            <a href="{{ $socialYoutube }}" target="_blank" rel="noopener" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
                                 <i class="fab fa-youtube text-xl"></i>
                             </a>
-                            <a href="#" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
+                            <a href="{{ $socialFacebook }}" target="_blank" rel="noopener" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
                                 <i class="fab fa-facebook text-xl"></i>
                             </a>
                         </div>
@@ -84,14 +115,15 @@
                 <div class="bg-white rounded-3xl p-6 md:p-8 shadow-2xl">
                     <h2 class="text-2xl font-black text-gray-900 mb-6">Envie uma mensagem</h2>
                     
-                    <form action="#" method="POST" class="space-y-6">
+                    <form id="contact-form" action="{{ route('contato.send') }}" method="POST" class="space-y-6">
                         @csrf
+                        <input type="hidden" name="recaptcha_token" id="recaptcha_token" value="">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Nome completo</label>
                             <input type="text" name="name" required 
                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition" 
                                    style="--tw-ring-color: var(--unn-azul-1)"
-                                   placeholder="Seu nome">
+                                   placeholder="Seu nome" value="{{ old('name') }}">
                         </div>
 
                         <div>
@@ -99,7 +131,7 @@
                             <input type="email" name="email" required 
                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition" 
                                    style="--tw-ring-color: var(--unn-azul-1)"
-                                   placeholder="seu@email.com">
+                                   placeholder="seu@email.com" value="{{ old('email') }}">
                         </div>
 
                         <div>
@@ -107,7 +139,7 @@
                             <input type="tel" name="phone" 
                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition" 
                                    style="--tw-ring-color: var(--unn-azul-1)"
-                                   placeholder="(00) 00000-0000">
+                                   placeholder="(00) 00000-0000" value="{{ old('phone') }}">
                         </div>
 
                         <div>
@@ -116,12 +148,12 @@
                                     class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition"
                                     style="--tw-ring-color: var(--unn-azul-1)">
                                 <option value="">Selecione um assunto</option>
-                                <option value="duvidas">Dúvidas sobre a plataforma</option>
-                                <option value="parcerias">Propostas de parceria</option>
-                                <option value="suporte">Suporte técnico</option>
-                                <option value="comercial">Departamento comercial</option>
-                                <option value="imprensa">Assessoria de imprensa</option>
-                                <option value="outro">Outro assunto</option>
+                                <option value="duvidas" {{ old('subject') === 'duvidas' ? 'selected' : '' }}>Dúvidas sobre a plataforma</option>
+                                <option value="parcerias" {{ old('subject') === 'parcerias' ? 'selected' : '' }}>Propostas de parceria</option>
+                                <option value="suporte" {{ old('subject') === 'suporte' ? 'selected' : '' }}>Suporte técnico</option>
+                                <option value="comercial" {{ old('subject') === 'comercial' ? 'selected' : '' }}>Departamento comercial</option>
+                                <option value="imprensa" {{ old('subject') === 'imprensa' ? 'selected' : '' }}>Assessoria de imprensa</option>
+                                <option value="outro" {{ old('subject') === 'outro' ? 'selected' : '' }}>Outro assunto</option>
                             </select>
                         </div>
 
@@ -130,7 +162,7 @@
                             <textarea name="message" rows="5" required 
                                       class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition resize-none" 
                                       style="--tw-ring-color: var(--unn-azul-1)"
-                                      placeholder="Como podemos ajudar?"></textarea>
+                                      placeholder="Como podemos ajudar?">{{ old('message') }}</textarea>
                         </div>
 
                         <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
@@ -193,3 +225,34 @@
 }
 </style>
 @endsection
+
+@push('scripts')
+@php($recaptchaSiteKey = (string) config('services.recaptcha.site_key', ''))
+@if($recaptchaSiteKey !== '')
+    <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('contact-form');
+            const tokenInput = document.getElementById('recaptcha_token');
+            const siteKey = @json($recaptchaSiteKey);
+
+            if (!form || !tokenInput || !siteKey || typeof grecaptcha === 'undefined') {
+                return;
+            }
+
+            form.addEventListener('submit', function (e) {
+                if (form.dataset.recaptchaReady === '1') return;
+
+                e.preventDefault();
+                grecaptcha.ready(function () {
+                    grecaptcha.execute(siteKey, { action: 'contact' }).then(function (token) {
+                        tokenInput.value = token;
+                        form.dataset.recaptchaReady = '1';
+                        form.submit();
+                    });
+                });
+            });
+        });
+    </script>
+@endif
+@endpush
