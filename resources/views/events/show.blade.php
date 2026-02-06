@@ -12,6 +12,45 @@
     }
     $eventColor = $event->color ?? '#1F5EDB';
 
+    $hexToRgba = function (?string $hex, float $alpha): ?string {
+        $hex = trim((string) $hex);
+        if ($hex === '') {
+            return null;
+        }
+
+        $alpha = max(0, min(1, $alpha));
+
+        if (preg_match('/^#?[0-9a-fA-F]{3}$/', $hex)) {
+            $hex = ltrim($hex, '#');
+            $r = hexdec(str_repeat($hex[0], 2));
+            $g = hexdec(str_repeat($hex[1], 2));
+            $b = hexdec(str_repeat($hex[2], 2));
+            return "rgba({$r},{$g},{$b},{$alpha})";
+        }
+
+        if (preg_match('/^#?[0-9a-fA-F]{6}$/', $hex)) {
+            $hex = ltrim($hex, '#');
+            $r = hexdec(substr($hex, 0, 2));
+            $g = hexdec(substr($hex, 2, 2));
+            $b = hexdec(substr($hex, 4, 2));
+            return "rgba({$r},{$g},{$b},{$alpha})";
+        }
+
+        return null;
+    };
+
+    $sitePrimary = \App\Models\Setting::get('site_color_primary') ?: '#1F5EDB';
+    $siteSecondary = \App\Models\Setting::get('site_color_secondary') ?: '#1D3FC4';
+
+    $sitePrimary38 = $hexToRgba($sitePrimary, 0.38) ?: 'rgba(31,94,219,0.38)';
+    $sitePrimary30 = $hexToRgba($sitePrimary, 0.30) ?: 'rgba(31,94,219,0.30)';
+    $sitePrimary22 = $hexToRgba($sitePrimary, 0.22) ?: 'rgba(31,94,219,0.22)';
+    $sitePrimary14 = $hexToRgba($sitePrimary, 0.14) ?: 'rgba(31,94,219,0.14)';
+
+    $siteSecondary28 = $hexToRgba($siteSecondary, 0.28) ?: 'rgba(29,63,196,0.28)';
+    $siteSecondary18 = $hexToRgba($siteSecondary, 0.18) ?: 'rgba(29,63,196,0.18)';
+    $siteSecondary08 = $hexToRgba($siteSecondary, 0.08) ?: 'rgba(29,63,196,0.08)';
+
     $resolveImageUrl = function (?string $path): ?string {
         $path = trim((string) $path);
         if ($path === '') {
@@ -45,12 +84,24 @@
 
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
-    <section class="pt-24 md:pt-28 pb-6 md:pb-12 px-4 md:px-12 lg:px-24 relative overflow-hidden" style="background: linear-gradient(135deg, {{ $eventColor }}20 0%, {{ $eventColor }}05 100%);">
+    <section class="pt-24 md:pt-28 pb-6 md:pb-12 px-4 md:px-12 lg:px-24 relative overflow-hidden"
+        style="background:
+            radial-gradient(1200px circle at 15% 25%, {{ $sitePrimary14 }} 0%, transparent 58%),
+            radial-gradient(900px circle at 85% 0%, {{ $siteSecondary08 }} 0%, transparent 55%),
+            linear-gradient(135deg, {{ $sitePrimary14 }} 0%, {{ $siteSecondary08 }} 100%);">
         @if($eventImageUrl)
             <div class="absolute inset-0 pointer-events-none">
-                <img src="{{ $eventImageUrl }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-30" loading="lazy" aria-hidden="true">
-                <div class="absolute inset-0" style="background: linear-gradient(135deg, {{ $eventColor }}35 0%, {{ $eventColor }}08 100%);"></div>
-                <div class="absolute inset-0 bg-gradient-to-b from-white/70 via-white/55 to-white/80"></div>
+                <img src="{{ $eventImageUrl }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-125 blur-3xl opacity-45 saturate-150" loading="lazy" aria-hidden="true">
+
+                <!-- Película degradê (paleta do site) -->
+                <div class="absolute inset-0" style="background:
+                    radial-gradient(1100px circle at 15% 25%, {{ $sitePrimary38 }} 0%, transparent 60%),
+                    radial-gradient(900px circle at 85% 0%, {{ $siteSecondary28 }} 0%, transparent 55%),
+                    linear-gradient(135deg, {{ $sitePrimary30 }} 0%, {{ $siteSecondary18 }} 55%, {{ $sitePrimary22 }} 100%);">
+                </div>
+
+                <!-- Filme claro para manter legibilidade -->
+                <div class="absolute inset-0 bg-gradient-to-b from-white/70 via-white/45 to-white/80"></div>
             </div>
         @endif
 
