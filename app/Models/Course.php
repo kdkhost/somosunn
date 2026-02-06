@@ -17,8 +17,24 @@ class Course extends Model
 
         static::creating(function ($course) {
             if (empty($course->slug)) {
-                $course->slug = Str::slug($course->title) . '-' . uniqid();
+                $base = Str::slug((string) ($course->title ?? ''));
+                if ($base === '') {
+                    $base = 'curso';
+                }
+                $course->slug = $base . '-' . uniqid();
             }
+        });
+
+        static::saving(function ($course) {
+            if (!empty($course->slug)) {
+                return;
+            }
+
+            $base = Str::slug((string) ($course->title ?? ''));
+            if ($base === '') {
+                $base = 'curso';
+            }
+            $course->slug = $base . '-' . uniqid();
         });
     }
 
