@@ -287,10 +287,25 @@
                     processData: false,
                     contentType: false,
                     success: function (resp) {
-                        toastr.success('Salvo com sucesso');
+                        const msg = (resp && resp.message) ? resp.message : 'Salvo com sucesso';
+                        toastr.success(msg);
                         if (resp && resp.redirect) { $.pjax({ url: resp.redirect, container: container }); }
                     },
-                    error: function () { toastr.error('Erro ao salvar'); }
+                    error: function (xhr) {
+                        let msg = 'Erro ao salvar';
+                        if (xhr && xhr.status === 419) { msg = 'Sessão expirada. Recarregue a página e tente novamente.'; }
+                        else if (xhr && xhr.status === 413) { msg = 'Arquivo muito grande para enviar.'; }
+                        else if (xhr && xhr.responseJSON) {
+                            if (xhr.responseJSON.message) { msg = xhr.responseJSON.message; }
+                            const errors = xhr.responseJSON.errors || null;
+                            if (errors && typeof errors === 'object') {
+                                const firstKey = Object.keys(errors)[0];
+                                const firstVal = firstKey ? errors[firstKey] : null;
+                                if (Array.isArray(firstVal) && firstVal[0]) { msg = firstVal[0]; }
+                            }
+                        }
+                        toastr.error(msg);
+                    }
                 });
             });
 
@@ -458,9 +473,10 @@
                             const eta = speed > 0 ? Math.max((file.size - speed * elapsed) / speed, 0) : 0;
                             const extra = ' • ' + (file.size / 1024 / 1024).toFixed(2) + ' MB • ' + (file.type || 'tipo desconhecido') + ' • ~' + eta.toFixed(1) + 's';
                             if (crop) {
-                                openCropper(url, function (croppedBlob, croppedUrl) {
+                                openCropper(url, { outputType: 'image/jpeg', quality: 0.92, maxSize: maxSize }, function (croppedBlob, croppedUrl) {
                                     const fileExt = (croppedBlob.type && croppedBlob.type.split('/')[1]) ? croppedBlob.type.split('/')[1] : 'png';
-                                    const croppedFile = new File([croppedBlob], file.name.replace(/\.[^/.]+$/, '') + '.' + fileExt, { type: croppedBlob.type });
+                                    const normalizedExt = fileExt === 'jpeg' ? 'jpg' : fileExt;
+                                    const croppedFile = new File([croppedBlob], file.name.replace(/\.[^/.]+$/, '') + '.' + normalizedExt, { type: croppedBlob.type });
                                     bindFileToInput(croppedFile);
                                     setPreview(croppedFile, croppedFile.name + extra, croppedUrl);
                                 });
@@ -523,7 +539,16 @@
                     });
                 });
             }
-            function openCropper(imageUrl, callback) {
+            function openCropper(imageUrl, options, callback) {
+                if (typeof options === 'function') {
+                    callback = options;
+                    options = {};
+                }
+                options = options || {};
+                const outputType = options.outputType || 'image/jpeg';
+                const quality = typeof options.quality === 'number' ? options.quality : 0.92;
+                const maxSize = options.maxSize || null;
+
                 const modalId = 'cropperModal';
                 let modal = $('#' + modalId);
                 if (!modal.length) {
@@ -552,11 +577,20 @@
                 });
                 $('#' + modalId + '-apply').off('click').on('click', function () {
                     if (!cropper) return;
-                    cropper.getCroppedCanvas().toBlob(function (blob) {
+                    cropper.getCroppedCanvas({ fillColor: '#fff' }).toBlob(function (blob) {
+                        if (!blob) {
+                            toastr.error('Falha ao gerar a imagem recortada.');
+                            return;
+                        }
+                        if (maxSize && blob.size > maxSize) {
+                            const mb = (maxSize / 1024 / 1024).toFixed(2);
+                            toastr.error('A imagem recortada excede o limite de ' + mb + ' MB.');
+                            return;
+                        }
                         const url = URL.createObjectURL(blob);
                         callback(blob, url);
                         modal.modal('hide');
-                    });
+                    }, outputType, quality);
                 });
                 modal.modal('show');
             }

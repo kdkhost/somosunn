@@ -30,6 +30,20 @@ Payments (MercadoPago / PagSeguro)
   - /webhook/mercadopago
   - /webhook/pagseguro
 
+## Cupons de desconto (Eventos / Cursos / Mentorias)
+
+- Admin: gerencie em `/admin/coupons` (criação, edição e remoção).
+- Regras suportadas:
+  - Desconto **percentual** ou **valor fixo**
+  - Escopo: **Geral**, **Eventos**, **Cursos** ou **Mentorias**
+  - Opcional: limitar por **ID** do item (promoção direcionada)
+  - Validade por período (início/término) e limites de uso (total e por usuário)
+- Aplicação no site:
+  - Eventos: campo de cupom no checkout em `/eventos/{event}/checkout`
+  - Cursos: campo de cupom no checkout em `/checkout/{course}`
+- Controle de uso:
+  - O cupom é **reservado** por 30 minutos ao criar o pedido e marcado como **usado** quando o webhook confirma o pagamento.
+
 PWA
 - Ative/desative pelo painel administrativo em Configurações → PWA
 - Upload de ícones no painel atualiza `manifest.webmanifest` dinamicamente

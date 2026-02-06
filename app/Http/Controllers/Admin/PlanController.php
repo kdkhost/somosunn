@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Plan;
 use App\Models\Permission;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -34,6 +35,11 @@ class PlanController extends Controller
             $plan = Plan::create($data);
             $this->enforceSingleHighlight($plan);
         });
+
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => route('admin.plans.index')]);
+        }
+
         return redirect()->route('admin.plans.index')->with('success', 'Plano criado');
     }
 
@@ -46,19 +52,38 @@ class PlanController extends Controller
     public function update(Request $request, Plan $plan)
     {
         $data = $this->validateData($request, $plan->id);
+
+        if ($request->boolean('remove_image')) {
+            $this->deletePlanImageIfExists($plan);
+            $data['image'] = null;
+        }
+
         if ($request->hasFile('image')) {
+            $this->deletePlanImageIfExists($plan);
             $data['image'] = $request->file('image')->store('plan-images', 'public');
         }
+
         DB::transaction(function () use ($plan, $data) {
             $plan->update($data);
             $this->enforceSingleHighlight($plan);
         });
+
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => route('admin.plans.index')]);
+        }
+
         return redirect()->route('admin.plans.index')->with('success', 'Plano atualizado');
     }
 
     public function destroy(Plan $plan)
     {
+        $this->deletePlanImageIfExists($plan);
         $plan->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json(['redirect' => route('admin.plans.index')]);
+        }
+
         return redirect()->route('admin.plans.index')->with('success', 'Plano removido');
     }
 
@@ -90,6 +115,8 @@ class PlanController extends Controller
                 Rule::unique('plans', 'slug')->ignore($id),
             ],
             'description' => 'nullable|string',
+            'image' => 'nullable|image|max:5120',
+            'remove_image' => 'nullable|boolean',
             'price' => 'required|numeric|min:0',
             'period' => 'required|string|max:50',
             'highlight' => 'nullable|boolean',
@@ -113,6 +140,16 @@ class PlanController extends Controller
         $data['permissions'] = $request->input('permissions', []);
 
         return $data;
+    }
+
+    private function deletePlanImageIfExists(Plan $plan): void
+    {
+        $path = trim((string) ($plan->image ?? ''));
+        if ($path === '') {
+            return;
+        }
+
+        Storage::disk('public')->delete($path);
     }
 
     private function enforceSingleHighlight(Plan $plan): void

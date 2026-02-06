@@ -36,10 +36,10 @@
                 <div class="form-group col-md-4">
                     <label>Slug (URL)</label>
                     <input name="slug" class="form-control" value="{{ old('slug',$plan->slug) }}" placeholder="ex: pro, elite">
-                    <small class="text-muted">Se vazio, serÃ¡ gerado automaticamente.</small>
+                    <small class="text-muted">Se vazio, será gerado automaticamente.</small>
                 </div>
                 <div class="form-group col-md-8">
-                    <label>DescriÃ§Ã£o</label>
+                    <label>Descrição</label>
                     <textarea name="description" class="form-control" rows="2" placeholder="Resumo do plano (aparece no site)">{{ old('description',$plan->description) }}</textarea>
                 </div>
             </div>
@@ -71,15 +71,15 @@
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label>Imagem do pacote</label>
-                    <div class="upload-box" data-max-size="5242880" data-crop="1">
+                    <input type="hidden" name="remove_image" value="0">
+                    <div class="upload-box" data-max-size="5242880" data-crop="1" data-existing-url="{{ $plan->image ? asset('storage/'.$plan->image) : '' }}" data-remove-input="[name='remove_image']">
                         <input type="file" name="image" accept="image/*" class="d-none">
                         <div class="upload-preview mb-2"></div>
                         <div class="upload-meta text-muted"></div>
                         <small class="text-muted upload-help"></small>
-                        <div class="progress progress-sm d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
+                        <div class="progress upload-progress progress-sm d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
                         <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
                     </div>
-                    @if($plan->image)<div class="mt-2"><img src="{{ asset('storage/'.$plan->image) }}" class="img-thumbnail" width="120"></div>@endif
                 </div>
                 <div class="form-group col-md-6">
                     <label>Benefícios (um por linha)</label>

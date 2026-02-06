@@ -129,17 +129,32 @@ class MercadoPagoService
             ];
         }
 
+        $context = (string) data_get($order->metadata, 'context', '');
+        if ($context === '') {
+            $firstType = (string) optional($order->items->first())->item_type;
+            $context = $firstType ?: 'unknown';
+        }
+
+        $backUrls = match ($context) {
+            'course' => [
+                'success' => route('checkout.success', ['order' => $order->id]),
+                'failure' => route('checkout.failure', ['order' => $order->id]),
+                'pending' => route('checkout.pending', ['order' => $order->id]),
+            ],
+            default => [
+                'success' => route('subscription.success', ['order' => $order->id]),
+                'failure' => route('subscription.checkout', ['plan' => $order->items->first()->item_id]),
+                'pending' => route('subscription.checkout', ['plan' => $order->items->first()->item_id]),
+            ],
+        };
+
         return [
             'items' => $items,
             'payer' => [
                 'name' => $order->user->name,
                 'email' => $order->user->email,
             ],
-            'back_urls' => [
-                'success' => route('subscription.success', ['order' => $order->id]), // Updated route
-                'failure' => route('subscription.checkout', ['plan' => $order->items->first()->item_id]),
-                'pending' => route('subscription.checkout', ['plan' => $order->items->first()->item_id]),
-            ],
+            'back_urls' => $backUrls,
             'auto_return' => 'approved',
             'external_reference' => (string)$order->id,
             'statement_descriptor' => 'UNN PLATAFORMA',

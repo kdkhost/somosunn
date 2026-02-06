@@ -263,6 +263,13 @@
                             <p>Vendas</p>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('admin.coupons.index') }}" class="nav-link {{ $is('admin.coupons.*') }}">
+                            <i class="nav-icon fas fa-ticket-alt"></i>
+                            <p>Cupons</p>
+                        </a>
+                    </li>
                 @endif
 
                 <li class="nav-header">PERSONALIZAÇÃO</li>

@@ -6,13 +6,16 @@ use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\GatewayAccount;
 use App\Models\Order;
+use App\Models\CouponRedemption;
 use App\Models\User;
+use App\Services\CouponService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class EventReservationController extends Controller
 {
@@ -34,7 +37,7 @@ class EventReservationController extends Controller
         return view('events.checkout', compact('event', 'registration'));
     }
 
-    public function reserve(Request $request, Event $event)
+    public function reserve(Request $request, Event $event, CouponService $couponService)
     {
         $this->abortIfDisabledOrUnpublished($event);
 
@@ -48,6 +51,10 @@ class EventReservationController extends Controller
 
         $quantity = (int) $request->input('quantity', 1);
         $quantity = max(1, min(10, $quantity));
+
+        $request->validate([
+            'coupon_code' => 'nullable|string|max:40',
+        ]);
 
         $isPaid = (float) $event->current_price > 0;
 
@@ -80,8 +87,10 @@ class EventReservationController extends Controller
         $registration = null;
         $order = null;
         $currentPrice = (float) $event->current_price;
+        $couponCode = $isPaid ? $couponService->normalizeCode($request->input('coupon_code')) : '';
 
-        DB::transaction(function () use ($event, $user, $quantity, $isPaid, $currentPrice, &$registration, &$order) {
+        try {
+            DB::transaction(function () use ($event, $user, $quantity, $isPaid, $currentPrice, $couponCode, $couponService, &$registration, &$order) {
             $registration = EventRegistration::where('event_id', $event->id)
                 ->where('user_id', $user->id)
                 ->lockForUpdate()
@@ -127,12 +136,30 @@ class EventReservationController extends Controller
                 }
             }
 
+            $originalTotal = round($currentPrice * $quantity, 2);
+            $discountAmount = 0.0;
+            $coupon = null;
+
+            if ($couponCode !== '') {
+                $result = $couponService->validateAndCalculateLocked(
+                    $couponCode,
+                    CouponService::CONTEXT_EVENT,
+                    (int) $event->id,
+                    (int) $user->id,
+                    (float) $originalTotal
+                );
+                $coupon = $result['coupon'];
+                $discountAmount = (float) $result['discount_amount'];
+            }
+
+            $finalTotal = max(0, round($originalTotal - $discountAmount, 2));
+
             if (!$order) {
                 $order = Order::create([
                     'user_id' => $user->id,
                     'seller_id' => null,
                     'status' => 'pending',
-                    'total_amount' => $currentPrice * $quantity,
+                    'total_amount' => $finalTotal,
                     'fee_amount' => 0,
                     'platform_fee_amount' => 0,
                     'currency' => 'BRL',
@@ -141,21 +168,77 @@ class EventReservationController extends Controller
                     'metadata' => [
                         'context' => 'event',
                         'public_token' => Str::random(40),
+                        'original_total_amount' => $originalTotal,
                     ],
                 ]);
+            } else {
+                $order->update([
+                    'user_id' => $user->id,
+                    'status' => 'pending',
+                    'total_amount' => $finalTotal,
+                    'currency' => 'BRL',
+                    'gateway' => 'mercadopago',
+                    'metadata' => array_merge($order->metadata ?? [], [
+                        'context' => 'event',
+                        'original_total_amount' => $originalTotal,
+                    ]),
+                ]);
 
+                $order->items()->delete();
+                CouponRedemption::query()->where('order_id', $order->id)->where('status', 'reserved')->delete();
+            }
+
+            $itemData = [
+                'event_start_at' => optional($event->start_at)->toIso8601String(),
+                'event_end_at' => optional($event->end_at)->toIso8601String(),
+                'batch_label' => $event->current_batch_label,
+                'original_unit_price' => $currentPrice,
+                'discount_amount' => $discountAmount,
+            ];
+
+            if ($discountAmount > 0 && $quantity > 1) {
+                foreach ($couponService->splitUnitPrices($finalTotal, $quantity) as $split) {
+                    $order->items()->create([
+                        'item_type' => 'event',
+                        'item_id' => $event->id,
+                        'title' => $event->title,
+                        'price' => $split['unit_price'],
+                        'quantity' => (int) $split['quantity'],
+                        'data' => $itemData,
+                    ]);
+                }
+            } else {
                 $order->items()->create([
                     'item_type' => 'event',
                     'item_id' => $event->id,
                     'title' => $event->title,
-                    'price' => $currentPrice,
+                    'price' => $discountAmount > 0 ? $finalTotal : $currentPrice,
                     'quantity' => $quantity,
-                    'data' => [
-                        'event_start_at' => optional($event->start_at)->toIso8601String(),
-                        'event_end_at' => optional($event->end_at)->toIso8601String(),
-                        'batch_label' => $event->current_batch_label,
-                    ],
+                    'data' => $itemData,
                 ]);
+            }
+
+            if ($coupon && $discountAmount > 0) {
+                $order->update([
+                    'metadata' => array_merge($order->metadata ?? [], [
+                        'coupon' => [
+                            'id' => $coupon->id,
+                            'code' => $coupon->code,
+                            'discount_type' => $coupon->discount_type,
+                            'discount_value' => (float) $coupon->discount_value,
+                            'discount_amount' => $discountAmount,
+                        ],
+                    ]),
+                ]);
+
+                $couponService->reserveRedemption($coupon, (int) $user->id, (int) $order->id, $discountAmount);
+            } else {
+                // Clear coupon metadata if any (e.g. reused order)
+                if (is_array($order->metadata) && array_key_exists('coupon', $order->metadata)) {
+                    $meta = $order->metadata;
+                    unset($meta['coupon']);
+                    $order->update(['metadata' => $meta]);
+                }
             }
 
             if (!$registration) {
@@ -175,7 +258,13 @@ class EventReservationController extends Controller
                     'quantity' => $quantity,
                 ])->save();
             }
-        });
+            });
+        } catch (ValidationException $e) {
+            $msg = collect($e->errors())->flatten()->first() ?? 'Não foi possível aplicar o cupom.';
+            return back()->with('error', $msg)->withInput();
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage())->withInput();
+        }
 
         if ($registration && in_array($registration->status, EventRegistration::COUNTED_STATUSES, true)) {
             return redirect()->route('events.show', $event)->with('success', 'Sua vaga já está confirmada.');

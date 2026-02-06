@@ -102,6 +102,15 @@
                                 </div>
                             </div>
 
+                            @if($isPaid)
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Cupom de desconto (opcional)</label>
+                                    <input type="text" name="coupon_code" value="{{ old('coupon_code') }}" placeholder="Ex: BLACKFRIDAY26"
+                                        class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" {{ $isDemo ? 'disabled' : '' }}>
+                                    <p class="text-xs text-gray-500 mt-2">Se tiver um cupom, aplique aqui antes do pagamento.</p>
+                                </div>
+                            @endif
+
                             @guest
                                 <div class="border-t border-gray-100 pt-6">
                                     <h3 class="text-lg font-bold text-gray-900 mb-4">Seus dados</h3>
@@ -171,4 +180,3 @@
     </div>
 </div>
 @endsection
-

@@ -8,6 +8,7 @@ use App\Models\EventRegistration;
 use App\Models\GatewayAccount;
 use App\Models\Order;
 use App\Models\Plan;
+use App\Services\CouponService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -88,6 +89,7 @@ class PaymentWebhookController extends Controller
                                      ]);
                                  }
 
+                                 app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
                                  $this->confirmEventRegistrationsForOrder($order);
                                  $this->activatePlanForOrder($order);
                              }
@@ -212,6 +214,7 @@ class PaymentWebhookController extends Controller
                              ]);
                              \Log::info("Order #{$referenceId} marked as PAID via PS Webhook");
                          }
+                         app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
                          break;
                     }
                 }

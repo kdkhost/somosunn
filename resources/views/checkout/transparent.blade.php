@@ -15,6 +15,12 @@
                         <span>R$ {{ number_format($item->price, 2, ',', '.') }}</span>
                     </div>
                 @endforeach
+                @if(data_get($order->metadata, 'coupon.code') && data_get($order->metadata, 'coupon.discount_amount'))
+                    <div class="flex justify-between py-2 text-sm text-green-700">
+                        <span>Cupom {{ data_get($order->metadata, 'coupon.code') }}</span>
+                        <span>- R$ {{ number_format((float) data_get($order->metadata, 'coupon.discount_amount'), 2, ',', '.') }}</span>
+                    </div>
+                @endif
                 <div class="flex justify-between py-2 font-bold text-xl mt-2">
                     <span>Total</span>
                     <span>R$ {{ number_format($order->total_amount, 2, ',', '.') }}</span>

@@ -240,6 +240,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         // Plans CRUD
         Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)->names('plans');
 
+        // Coupons
+        Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class)->names('coupons');
+
         // Courses CRUD
         Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class)->names('courses');
 
