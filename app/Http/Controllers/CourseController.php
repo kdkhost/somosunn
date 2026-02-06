@@ -24,8 +24,18 @@ class CourseController extends Controller
             abort(404, 'Cursos temporariamente indisponível');
         }
 
+        $publicStatuses = ['published', 'paused'];
+
+        $featuredCourse = Course::with('creator')
+            ->whereIn('status', $publicStatuses)
+            ->orderByDesc('is_featured')
+            ->orderByDesc('id')
+            ->first();
+
         $courses = Course::with('creator')
-            ->latest()
+            ->whereIn('status', $publicStatuses)
+            ->orderByDesc('is_featured')
+            ->orderByDesc('id')
             ->paginate(12);
 
         // If no courses exist, provide demo data
@@ -66,10 +76,14 @@ class CourseController extends Controller
                 ],
             ]);
 
-            return view('courses.index', ['courses' => $demoCourses, 'isDemo' => true]);
+            return view('courses.index', [
+                'courses' => $demoCourses,
+                'featuredCourse' => $demoCourses->first(),
+                'isDemo' => true,
+            ]);
         }
 
-        return view('courses.index', compact('courses'));
+        return view('courses.index', compact('courses', 'featuredCourse'));
     }
 
     /**
@@ -133,12 +147,19 @@ class CourseController extends Controller
             ])
             ->firstOrFail();
 
-        // Strict access check
-        $this->authorize('view', $course);
+        $isEnabled = \App\Models\Setting::get('feature_courses', '1') === '1';
+        if (!$isEnabled) {
+            abort(404);
+        }
 
-        // $isEnrolled is now implicitly true if authorized by policy (for Members)
-        // Check for specific 'enrolled' status for UI nuances if needed, but 'view' policy covers access.
-        $isEnrolled = true;
+        $isPublic = in_array((string) ($course->status ?? ''), ['published', 'paused'], true);
+        $canManage = Auth::check() && (Auth::user()->isAdmin() || Auth::id() === $course->user_id);
+
+        if (!$isPublic && !$canManage) {
+            abort(404);
+        }
+
+        $isEnrolled = Auth::check() && Auth::user()->hasCourseAccess($course);
 
         return view('courses.show', compact('course', 'isEnrolled'));
     }

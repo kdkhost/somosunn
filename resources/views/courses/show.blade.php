@@ -3,6 +3,19 @@
 @section('title', $course->title . ' - UNN')
 
 @section('content')
+@php
+    $thumbUrl = null;
+    if (!empty($course->thumbnail)) {
+        $path = trim((string) $course->thumbnail);
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) $thumbUrl = $path;
+        elseif (str_starts_with($path, 'storage/')) $thumbUrl = asset($path);
+        elseif (str_starts_with($path, 'uploads/')) $thumbUrl = asset($path);
+        else $thumbUrl = asset('storage/' . ltrim($path, '/'));
+    }
+    $isPaused = (string) ($course->status ?? '') === 'paused';
+    $authorName = $course->author_name ?? optional($course->creator)->name ?? 'UNN Academy';
+    $firstLesson = $course->lessons->first();
+@endphp
 <div class="bg-gray-50 min-h-screen pb-12">
     <div class="bg-[#1F5EDB] text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-8">
@@ -15,7 +28,7 @@
                 <p class="text-lg text-blue-100 max-w-2xl mb-6">{{ $course->short_description }}</p>
                 
                 <div class="flex items-center gap-6 text-sm">
-                    <span>Criado por <strong>{{ $course->author_name }}</strong></span>
+                    <span>Criado por <strong>{{ $authorName }}</strong></span>
                     <span><i class="far fa-clock mr-1"></i> {{ $course->duration }} min</span>
                     <span><i class="far fa-calendar-alt mr-1"></i> {{ $course->created_at->format('d/m/Y') }}</span>
                 </div>
@@ -23,23 +36,36 @@
             
             <div class="md:w-1/3">
                 <div class="bg-white rounded-lg shadow-xl overflow-hidden text-gray-900 p-1">
-                    @if($course->thumbnail)
-                        <img src="{{ asset('storage/'.$course->thumbnail) }}" class="w-full h-48 object-cover rounded-t-lg">
+                    @if($thumbUrl)
+                        <img src="{{ $thumbUrl }}" class="w-full h-48 object-cover rounded-t-lg" alt="{{ $course->title }}">
                     @endif
                     <div class="p-6">
                         @if($isEnrolled)
                             <div class="text-center">
                                 <span class="block text-sm text-green-600 font-bold mb-2">Você já possui este curso!</span>
-                                <a href="{{ route('courses.lessons.show', [$course->id, $course->lessons->first()->id]) }}" class="block w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold text-center rounded-lg transition">
-                                    Continuar Estudando
-                                </a>
+                                @if($firstLesson)
+                                    <a href="{{ route('courses.lessons.show', [$course->id, $firstLesson->id]) }}" class="block w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold text-center rounded-lg transition">
+                                        Continuar estudando
+                                    </a>
+                                @else
+                                    <button type="button" disabled class="block w-full py-3 bg-gray-200 text-gray-500 font-bold text-center rounded-lg cursor-not-allowed">
+                                        Curso sem aulas
+                                    </button>
+                                @endif
                             </div>
                         @else
                             <div class="text-3xl font-bold text-gray-900 mb-4">{{ $course->price > 0 ? 'R$ ' . number_format($course->price, 2, ',', '.') : 'Gratuito' }}</div>
-                            <button class="block w-full py-3 bg-[#1F5EDB] hover:bg-blue-700 text-white font-bold rounded-lg transition mb-3">
-                                Comprar Agora
-                            </button>
-                            <p class="text-xs text-gray-500 text-center">Acesso vitalício e certificado incluso.</p>
+                            @if($isPaused)
+                                <button type="button" disabled class="block w-full py-3 bg-gray-200 text-gray-500 font-bold rounded-lg transition mb-3 cursor-not-allowed">
+                                    Vendas pausadas
+                                </button>
+                                <p class="text-xs text-gray-500 text-center">Este curso está publicado, mas as vendas estão pausadas no momento.</p>
+                            @else
+                                <a href="{{ route('checkout.show', $course->id) }}" class="block w-full py-3 bg-[#1F5EDB] hover:bg-blue-700 text-white font-bold rounded-lg transition mb-3 text-center">
+                                    Comprar agora
+                                </a>
+                                <p class="text-xs text-gray-500 text-center">Pagamento seguro e liberação automática após confirmação.</p>
+                            @endif
                         @endif
                     </div>
                 </div>
