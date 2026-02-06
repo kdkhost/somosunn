@@ -234,6 +234,7 @@
             </section>
         </div>
 
+        @include('admin.partials.control-sidebar')
         @include('admin.partials.footer')
     </div>
 

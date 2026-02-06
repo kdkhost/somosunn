@@ -273,6 +273,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         Route::delete('/fonts/{font}', [\App\Http\Controllers\Admin\CustomFontController::class, 'destroy'])->name('fonts.destroy');
         Route::get('/fonts/api/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])->name('fonts.api.active');
 
+        // FAQ (Perguntas frequentes)
+        Route::resource('faqs', \App\Http\Controllers\Admin\FaqController::class)->names('faqs');
+
         // Events CRUD
         Route::get('events/feed', [\App\Http\Controllers\Admin\EventController::class, 'feed'])->name('events.feed');
         Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');

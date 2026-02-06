@@ -435,29 +435,7 @@
         </section>
 
         <!-- FAQ -->
-        <section class="py-16 px-6 md:px-12 lg:px-24">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">Perguntas Frequentes</h2>
-
-                <div class="space-y-4">
-                    @php
-                        $faqs = [
-                            ['q' => 'Posso cancelar a qualquer momento?', 'a' => 'Sim! Não temos taxa de cancelamento ou fidelidade. Você pode cancelar quando quiser pelo próprio painel.'],
-                            ['q' => 'Como funciona o pagamento?', 'a' => 'Aceitamos cartão de crédito, PIX e boleto. O pagamento é recorrente mensal ou anual, conforme sua escolha.'],
-                            ['q' => 'O que acontece se eu fizer downgrade?', 'a' => 'Você perde acesso aos benefícios premium imediatamente, mas mantém seu perfil e conexões feitas.'],
-                            ['q' => 'Posso migrar do mensal para o anual?', 'a' => 'Sim! A migração é simples e você ganha o desconto proporcional ao período restante.'],
-                        ];
-                    @endphp
-
-                    @foreach($faqs as $faq)
-                        <div class="bg-white rounded-2xl p-6 shadow-lg">
-                            <h3 class="font-bold text-gray-900 mb-2">{{ $faq['q'] }}</h3>
-                            <p class="text-gray-600">{{ $faq['a'] }}</p>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </section>
+        <x-faq-section context="premium" />
 
         <!-- CTA Final -->
         <section class="py-16 px-6 md:px-12 lg:px-24"

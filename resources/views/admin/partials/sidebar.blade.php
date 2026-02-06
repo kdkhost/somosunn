@@ -155,120 +155,98 @@
 
                 {{-- Itens exclusivos de Admin --}}
                 @if(auth()->user()->isAdmin())
+                    @php
+                        $adminMenuPatterns = [
+                            'admin.users.*',
+                            'admin.plans.*',
+                            'admin.orders.*',
+                            'admin.coupons.*',
+                            'admin.permissions.*',
+                            'admin.points-rules.*',
+                            'admin.ranking',
+                            'admin.mailtemplates.*',
+                            'admin.certificates.*',
+                            'admin.fonts.*',
+                            'admin.faqs.*',
+                            'admin.settings',
+                        ];
+                    @endphp
+
                     <li class="nav-header">ADMINISTRAÇÃO</li>
 
-                    <li class="nav-item has-treeview {{ $open('admin.users.*') }}">
-                        <a href="#" class="nav-link {{ $is('admin.users.*') }}">
-                            <i class="nav-icon fas fa-users-cog"></i>
-                            <p>Usuários<i class="right fas fa-angle-left"></i></p>
+                    <li class="nav-item has-treeview {{ $open($adminMenuPatterns) }}">
+                        <a href="#" class="nav-link {{ $is($adminMenuPatterns) }}">
+                            <i class="nav-icon fas fa-tools"></i>
+                            <p>Administração<i class="right fas fa-angle-left"></i></p>
                         </a>
                         <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('admin.users.index') }}"
-                                    class="nav-link {{ $is('admin.users.index') }}"><i class="fas fa-list nav-icon"></i>
-                                    <p>Listar</p>
-                                </a></li>
-                            <li class="nav-item"><a href="{{ route('admin.users.create') }}"
-                                    class="nav-link {{ $is('admin.users.create') }}"><i class="fas fa-plus nav-icon"></i>
-                                    <p>Novo</p>
-                                </a></li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.users.index') }}" class="nav-link {{ $is('admin.users.*') }}">
+                                    <i class="fas fa-users-cog nav-icon"></i>
+                                    <p>Usuários</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.plans.index') }}" class="nav-link {{ $is('admin.plans.*') }}">
+                                    <i class="fas fa-tags nav-icon"></i>
+                                    <p>Planos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.orders.index') }}" class="nav-link {{ $is('admin.orders.*') }}">
+                                    <i class="fas fa-shopping-cart nav-icon"></i>
+                                    <p>Vendas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.coupons.index') }}" class="nav-link {{ $is('admin.coupons.*') }}">
+                                    <i class="fas fa-ticket-alt nav-icon"></i>
+                                    <p>Cupons</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.permissions.index') }}" class="nav-link {{ $is('admin.permissions.*') }}">
+                                    <i class="fas fa-user-shield nav-icon"></i>
+                                    <p>Permissões</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.points-rules.index') }}" class="nav-link {{ $is('admin.points-rules.*') }}">
+                                    <i class="fas fa-star nav-icon"></i>
+                                    <p>Pontuação</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.mailtemplates.index') }}" class="nav-link {{ $is('admin.mailtemplates.*') }}">
+                                    <i class="fas fa-envelope nav-icon"></i>
+                                    <p>E-mails</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.certificates.create') }}" class="nav-link {{ $is('admin.certificates.*') }}">
+                                    <i class="fas fa-certificate nav-icon"></i>
+                                    <p>Certificados</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.fonts.index') }}" class="nav-link {{ $is('admin.fonts.*') }}">
+                                    <i class="fas fa-font nav-icon"></i>
+                                    <p>Fontes</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.faqs.index') }}" class="nav-link {{ $is('admin.faqs.*') }}">
+                                    <i class="fas fa-question-circle nav-icon"></i>
+                                    <p>FAQ</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.settings') }}" class="nav-link {{ $is('admin.settings') }}">
+                                    <i class="fas fa-cogs nav-icon"></i>
+                                    <p>Configurações</p>
+                                </a>
+                            </li>
                         </ul>
-                    </li>
-                    </li>
-
-                    <li class="nav-item has-treeview {{ $open('admin.plans.*') }}">
-                        <a href="#" class="nav-link {{ $is('admin.plans.*') }}">
-                            <i class="nav-icon fas fa-tags"></i>
-                            <p>Planos<i class="right fas fa-angle-left"></i></p>
-                        </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('admin.plans.index') }}"
-                                    class="nav-link {{ $is('admin.plans.index') }}"><i class="fas fa-list nav-icon"></i>
-                                    <p>Listar</p>
-                                </a></li>
-                            <li class="nav-item"><a href="{{ route('admin.plans.create') }}"
-                                    class="nav-link {{ $is('admin.plans.create') }}"><i class="fas fa-plus nav-icon"></i>
-                                    <p>Novo</p>
-                                </a></li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item has-treeview {{ $open('admin.certificates.*') }}">
-                        <a href="#" class="nav-link {{ $is('admin.certificates.*') }}">
-                            <i class="nav-icon fas fa-certificate"></i>
-                            <p>Certificados<i class="right fas fa-angle-left"></i></p>
-                        </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('admin.certificates.create') }}"
-                                    class="nav-link {{ $is('admin.certificates.create') }}"><i
-                                        class="fas fa-file-signature nav-icon"></i>
-                                    <p>Gerar</p>
-                                </a></li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item has-treeview {{ $open(['admin.mailtemplates.*', 'admin.mailtest']) }}">
-                        <a href="#" class="nav-link {{ $is(['admin.mailtemplates.*', 'admin.mailtest']) }}">
-                            <i class="nav-icon fas fa-envelope"></i>
-                            <p>E-mails<i class="right fas fa-angle-left"></i></p>
-                        </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('admin.mailtemplates.index') }}"
-                                    class="nav-link {{ $is('admin.mailtemplates.index') }}"><i
-                                        class="fas fa-table nav-icon"></i>
-                                    <p>Templates</p>
-                                </a></li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item has-treeview {{ $open(['admin.points-rules.*', 'admin.ranking']) }}">
-                        <a href="#" class="nav-link {{ $is(['admin.points-rules.*', 'admin.ranking']) }}">
-                            <i class="nav-icon fas fa-star"></i>
-                            <p>Pontuação<i class="right fas fa-angle-left"></i></p>
-                        </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('admin.points-rules.index') }}"
-                                    class="nav-link {{ $is('admin.points-rules.index') }}"><i
-                                        class="fas fa-sliders-h nav-icon"></i>
-                                    <p>Regras</p>
-                                </a></li>
-                            <li class="nav-item"><a href="{{ route('admin.ranking') }}"
-                                    class="nav-link {{ $is('admin.ranking') }}"><i class="fas fa-trophy nav-icon"></i>
-                                    <p>Ranking</p>
-                                </a></li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item has-treeview {{ $open('admin.permissions.*') }}">
-                        <a href="#" class="nav-link {{ $is('admin.permissions.*') }}">
-                            <i class="nav-icon fas fa-user-shield"></i>
-                            <p>Permissões<i class="right fas fa-angle-left"></i></p>
-                        </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('admin.permissions.index') }}"
-                                    class="nav-link {{ $is('admin.permissions.index') }}"><i
-                                        class="fas fa-list nav-icon"></i>
-                                    <p>Listar</p>
-                                </a></li>
-                            <li class="nav-item"><a href="{{ route('admin.permissions.create') }}"
-                                    class="nav-link {{ $is('admin.permissions.create') }}"><i
-                                        class="fas fa-plus nav-icon"></i>
-                                    <p>Novo</p>
-                                </a></li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="{{ route('admin.orders.index') }}" class="nav-link {{ $is('admin.orders.*') }}">
-                            <i class="nav-icon fas fa-shopping-cart"></i>
-                            <p>Vendas</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="{{ route('admin.coupons.index') }}" class="nav-link {{ $is('admin.coupons.*') }}">
-                            <i class="nav-icon fas fa-ticket-alt"></i>
-                            <p>Cupons</p>
-                        </a>
                     </li>
                 @endif
 
@@ -310,12 +288,7 @@
                     </li>
                 @endif
 
-                @if(auth()->user()->isAdmin())
-                    <li class="nav-item"><a href="{{ route('admin.settings') }}"
-                            class="nav-link {{ $is('admin.settings') }}"><i class="nav-icon fas fa-cogs"></i>
-                            <p>Configurações</p>
-                        </a></li>
-                @endif
+
         </nav>
     </div>
 </aside>

@@ -226,30 +226,8 @@
         </div>
     </section>
 
-    <!-- FAQ Preview -->
-    <section class="py-16 px-6 md:px-12 lg:px-24">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">Perguntas Frequentes</h2>
-            
-            <div class="space-y-4">
-                @php
-                    $faqs = [
-                        ['q' => 'Como faço para me tornar membro?', 'a' => 'Basta se cadastrar no site. O plano básico é gratuito e já dá acesso à comunidade.'],
-                        ['q' => 'Os eventos são presenciais ou online?', 'a' => 'Realizamos eventos nos dois formatos! Temos encontros presenciais em diversas cidades e webinars semanais.'],
-                        ['q' => 'Posso cancelar minha assinatura a qualquer momento?', 'a' => 'Sim! Não temos fidelidade. Você pode cancelar quando quiser sem taxas adicionais.'],
-                        ['q' => 'Como funciona o sistema de indicações?', 'a' => 'Membros podem indicar outros membros para oportunidades de negócio. Facilitamos e acompanhamos cada conexão.'],
-                    ];
-                @endphp
-                
-                @foreach($faqs as $faq)
-                <div class="bg-white rounded-2xl p-6 shadow-lg">
-                    <h3 class="font-bold text-gray-900 mb-2">{{ $faq['q'] }}</h3>
-                    <p class="text-gray-600">{{ $faq['a'] }}</p>
-                </div>
-                @endforeach
-            </div>
-        </div>
-    </section>
+    <!-- FAQ -->
+    <x-faq-section context="contact" />
 </div>
 
 <style>

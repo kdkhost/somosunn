@@ -99,6 +99,12 @@
             </div>
         </li>
 
+        <li class="nav-item mr-2">
+            <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button" title="Painel rápido">
+                <i class="fas fa-sliders-h"></i>
+            </a>
+        </li>
+
         <li class="nav-item mr-2 d-flex align-items-center">
             <form method="POST" action="{{ route('admin.settings.update') }}" id="themeToggleForm" class="m-0 p-0">
                 @csrf

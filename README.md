@@ -44,6 +44,15 @@ Payments (MercadoPago / PagSeguro)
 - Controle de uso:
   - O cupom é **reservado** por 30 minutos ao criar o pedido e marcado como **usado** quando o webhook confirma o pagamento.
 
+## FAQ (Perguntas Frequentes)
+
+- Admin: gerencie em `/admin/faqs` (contexto, ordem e status).
+- Site:
+  - Páginas que consomem: `/premium` (contexto `premium`) e `/contato` (contexto `contact`).
+  - Fallback automático: se não houver perguntas no contexto da página, busca em `general`.
+  - Até 4 itens: exibe cartões abertos (pergunta + resposta).
+  - Mais de 4 itens: exibe em acordeon e paginação (4 por página).
+
 PWA
 - Ative/desative pelo painel administrativo em Configurações → PWA
 - Upload de ícones no painel atualiza `manifest.webmanifest` dinamicamente
