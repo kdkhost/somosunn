@@ -62,7 +62,7 @@
             <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
                 <h3 class="text-lg font-bold mb-4">Conteúdo da Aula</h3>
                 <div class="prose max-w-none text-gray-700">
-                    {!! nl2br(e($lesson->content)) !!}
+                    {!! \App\Support\RichText::toHtml($lesson->content) !!}
                 </div>
 
                 @if($lesson->attachments->count() > 0)

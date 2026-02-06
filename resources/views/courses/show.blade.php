@@ -78,7 +78,7 @@
             <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
                 <h2 class="text-2xl font-bold mb-4">Sobre o curso</h2>
                 <div class="prose max-w-none text-gray-600">
-                    {!! nl2br(e($course->full_description)) !!}
+                    {!! \App\Support\RichText::toHtml($course->full_description) !!}
                 </div>
             </div>
 
