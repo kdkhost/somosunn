@@ -389,7 +389,23 @@
                 $('.mask-datetime').inputmask('99/99/9999 99:99');
                 $('.mask-time').inputmask('99:99');
                 $('.mask-phone').inputmask({ 'mask': ['(99) 9999-9999', '(99) 9 9999-9999'], keepStatic: true });
-                $('.mask-money').inputmask('currency', { prefix: 'R$ ', radixPoint: ',', groupSeparator: '.', autoGroup: true, digits: 2, rightAlign: false });
+                $('.mask-money').inputmask('currency', {
+                    prefix: 'R$ ',
+                    radixPoint: ',',
+                    groupSeparator: '.',
+                    autoGroup: true,
+                    digits: 2,
+                    rightAlign: false,
+                    substituteRadixPoint: true,
+                    onBeforeMask: function (value) {
+                        if (value === null || value === undefined) return value;
+                        value = String(value);
+                        // Eloquent decimal casts usually return "97.00" (dot decimal). Inputmask here expects comma.
+                        if (value.includes(',') || !value.includes('.')) return value;
+                        if (/^\\d+\\.\\d{1,2}$/.test(value)) return value.replace('.', ',');
+                        return value;
+                    }
+                });
                 $('.mask-cpf-cnpj').inputmask({ mask: ['999.999.999-99', '99.999.999/9999-99'], keepStatic: true, placeholder: '_' });
             }
 
