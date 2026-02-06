@@ -1,8 +1,12 @@
-@extends('layouts.app')
+@extends($extends ?? 'layouts.app')
 
 @section('title', 'Mensagens - UNN')
 
 @section('content')
+    @php
+        $routeNamePrefix = $routeNamePrefix ?? 'chat';
+    @endphp
+
     <div class="max-w-6xl mx-auto px-0 md:px-4 py-6 h-[calc(100vh-80px)]">
         <div class="bg-white rounded-lg shadow-xl overflow-hidden flex h-full border border-gray-200">
             <!-- Sidebar Conversations -->
@@ -12,7 +16,7 @@
                 </div>
                 <div class="flex-1 overflow-y-auto" id="conversations-list">
                     @foreach($conversations as $conv)
-                        <a href="{{ route('chat.show', $conv->id) }}"
+                        <a href="{{ route($routeNamePrefix . '.show', $conv->id) }}" data-conversation-id="{{ $conv->id }}"
                             class="block p-4 hover:bg-blue-50 transition border-b border-gray-100">
                             <div class="flex items-center gap-3">
                                 <div
@@ -53,11 +57,12 @@
     @push('scripts')
         <script>
             setInterval(() => {
-                fetch('{{ route("chat.list") }}')
+                fetch('{{ route($routeNamePrefix . ".list") }}')
                     .then(r => r.json())
                     .then(conversations => {
                         conversations.forEach(conv => {
-                            const badgeContainer = document.querySelector(`a[href*="/chat/show/${conv.id}"] .flex.items-center`);
+                            const link = document.querySelector(`[data-conversation-id="${conv.id}"]`);
+                            const badgeContainer = link ? link.querySelector('.flex.items-center') : null;
                             if (badgeContainer) {
                                 let badge = badgeContainer.querySelector('span.bg-blue-600');
                                 if (conv.unread_count > 0) {

@@ -2,6 +2,35 @@
 
 @section('title', 'Planos Premium - UNN')
 
+@push('styles')
+    <style>
+        .unn-star-rating {
+            display: inline-flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        .unn-star-rating input {
+            display: none;
+        }
+
+        .unn-star-rating label {
+            cursor: pointer;
+            color: #cbd5e1; /* slate-300 */
+            font-size: 28px;
+            line-height: 1;
+            transition: color 0.15s ease;
+        }
+
+        .unn-star-rating input:checked~label,
+        .unn-star-rating label:hover,
+        .unn-star-rating label:hover~label {
+            color: #f59e0b; /* amber-500 */
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
         <!-- Hero Section -->
@@ -344,13 +373,34 @@
                             @csrf
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Avaliação (opcional)</label>
-                                <select name="rating" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition"
-                                    style="--tw-ring-color: var(--unn-azul-1)">
-                                    <option value="">—</option>
-                                    @for($i=5;$i>=1;$i--)
-                                        <option value="{{ $i }}">{{ $i }}/5</option>
-                                    @endfor
-                                </select>
+                                <div class="flex items-center gap-4 flex-wrap">
+                                    @php
+                                        $oldRating = old('rating');
+                                        $oldRating = is_numeric($oldRating) ? (int) $oldRating : null;
+                                        if ($oldRating !== null) {
+                                            $oldRating = max(1, min(5, $oldRating));
+                                        }
+                                    @endphp
+
+                                    <div class="unn-star-rating" role="radiogroup" aria-label="Avaliação por estrelas">
+                                        @for($i = 5; $i >= 1; $i--)
+                                            <input type="radio" id="testimonial-rating-{{ $i }}" name="rating"
+                                                value="{{ $i }}" {{ (string) $oldRating === (string) $i ? 'checked' : '' }}>
+                                            <label for="testimonial-rating-{{ $i }}" title="{{ $i }}/5">
+                                                <i class="fas fa-star"></i>
+                                            </label>
+                                        @endfor
+                                    </div>
+
+                                    <div class="text-sm text-gray-500">
+                                        <input type="radio" id="testimonial-rating-none" name="rating" value=""
+                                            {{ $oldRating === null ? 'checked' : '' }} class="sr-only">
+                                        <label for="testimonial-rating-none" class="cursor-pointer underline hover:text-gray-700">
+                                            Sem avaliação
+                                        </label>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">Clique nas estrelas para escolher uma nota.</p>
                             </div>
 
                             <div>

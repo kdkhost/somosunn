@@ -294,8 +294,7 @@
                 @if(auth()->user()->canAccessFeature('community'))
                     <li class="nav-item">
                         {{-- Usa rota do feed se disponível, senão admin.social --}}
-                        <a href="{{ Route::has('social.feed') ? route('social.feed') : route('admin.social.index') }}"
-                            class="nav-link {{ $is(['admin.social.*', 'social.*']) }}">
+                        <a href="{{ route('admin.social.feed.internal') }}" class="nav-link {{ $is('admin.social.*') }}">
                             <i class="nav-icon fas fa-comments"></i>
                             <p>Comunidade</p>
                         </a>
@@ -304,7 +303,7 @@
 
                 @if(auth()->user()->canAccessFeature('chat'))
                     <li class="nav-item">
-                        <a href="{{ route('chat.index') }}" class="nav-link {{ $is('chat.*') }}">
+                        <a href="{{ route('admin.chat.index') }}" class="nav-link {{ $is('admin.chat.*') }}">
                             <i class="nav-icon fas fa-comment-dots"></i>
                             <p>Chat</p>
                         </a>

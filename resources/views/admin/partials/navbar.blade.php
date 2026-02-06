@@ -32,7 +32,7 @@
                 <div class="dropdown-divider"></div>
                 @if(isset($unreadMessagesGroups) && $unreadMessagesGroups->isNotEmpty())
                     @foreach($unreadMessagesGroups as $group)
-                        <a href="{{ route('chat.start', $group->user->id) }}" class="dropdown-item">
+                        <a href="{{ route('admin.chat.start', $group->user->id) }}" class="dropdown-item">
                             <div class="media">
                                 <img src="{{ $group->user->photo ? asset($group->user->photo) : asset('img/default-user.png') }}"
                                     alt="User Avatar" class="img-size-50 mr-3 img-circle">
@@ -53,7 +53,7 @@
                     <a href="#" class="dropdown-item">Nenhuma mensagem nova</a>
                 @endif
                 <div class="dropdown-divider"></div>
-                <a href="{{ route('chat.index') }}" class="dropdown-item dropdown-footer">Ver Todas as Mensagens</a>
+                <a href="{{ route('admin.chat.index') }}" class="dropdown-item dropdown-footer">Ver Todas as Mensagens</a>
             </div>
         </li>
 

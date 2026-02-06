@@ -3,6 +3,14 @@
 @section('title', 'Comunidade - UNN')
 
 @section('content')
+    @php
+        $isAdminContext = ($extends ?? 'layouts.app') === 'admin.layouts.app';
+
+        $feedUrl = $isAdminContext ? route('admin.social.feed.internal') : route('social.feed');
+        $chatUrl = $isAdminContext ? route('admin.chat.index') : route('chat.index');
+        $profileUrl = $isAdminContext ? route('admin.profile.edit') : route('social.profile', Auth::id());
+    @endphp
+
     <div class="bg-gray-100 min-h-screen pt-4">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -21,15 +29,15 @@
                                 </div>
                             </div>
                             <nav class="space-y-2">
-                                <a href="{{ route('social.feed') }}"
+                                <a href="{{ $feedUrl }}"
                                     class="flex items-center gap-2 text-blue-600 font-medium p-2 bg-blue-50 rounded">
                                     <i class="fas fa-newspaper w-6"></i> Feed
                                 </a>
-                                <a href="{{ route('chat.index') }}"
+                                <a href="{{ $chatUrl }}"
                                     class="flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
                                     <i class="fas fa-comments w-6"></i> Mensagens
                                 </a>
-                                <a href="{{ route('social.profile', Auth::id()) }}"
+                                <a href="{{ $profileUrl }}"
                                     class="flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
                                     <i class="fas fa-user w-6"></i> Meu Perfil
                                 </a>

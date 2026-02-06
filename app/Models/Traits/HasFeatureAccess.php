@@ -30,16 +30,7 @@ trait HasFeatureAccess
             return false;
         }
 
-        // 3. Check Plan Features (stored in 'permissions' json column)
-        $features = $plan->permissions ?? [];
-
-        // If features is null or not array, default to empty
-        if (!is_array($features)) {
-            $features = [];
-        }
-
-        // Check for specific feature or wildcards
-        return in_array($feature, $features) || in_array('*', $features);
+        return method_exists($plan, 'hasFeature') ? $plan->hasFeature($feature) : false;
     }
 
     /**

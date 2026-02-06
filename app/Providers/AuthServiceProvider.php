@@ -5,7 +5,6 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Schema;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -18,6 +17,10 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::before(function ($user, $ability) {
+            if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
+                return true;
+            }
+
             // superadmin tem acesso total
             $isSuper = DB::table('role_user')
                 ->join('roles','roles.id','=','role_user.role_id')
@@ -44,14 +47,6 @@ class AuthServiceProvider extends ServiceProvider
         $perms = $perms->merge($rolePerms);
 
         // Permissões do plano ativo (se houver coluna plan_id)
-        if(Schema::hasColumn('users','plan_id') && $user->plan_id){
-            $planPerms = DB::table('permission_plan')
-                ->join('permissions','permissions.id','=','permission_plan.permission_id')
-                ->where('permission_plan.plan_id',$user->plan_id)
-                ->pluck('permissions.name');
-            $perms = $perms->merge($planPerms);
-        }
-
         return $perms->unique();
     }
 }

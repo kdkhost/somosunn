@@ -130,17 +130,41 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Permissões liberadas por este plano</label>
-                <div class="row">
-                    @foreach($permissions as $perm)
-                        <div class="col-md-4 col-lg-3">
-                            <div class="custom-control custom-checkbox mb-2">
-                                <input type="checkbox" class="custom-control-input" id="perm-{{ $perm->id }}" name="permissions[]" value="{{ $perm->name }}" {{ in_array($perm->name, old('permissions',$plan->permissions ?? [])) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="perm-{{ $perm->id }}">{{ $perm->label ?: $perm->name }}</label>
+            @php
+                $planFeatures = $planFeatures ?? [];
+                $selectedFeatures = old('permissions', $plan->permissions ?? []);
+                if (!is_array($selectedFeatures)) {
+                    $selectedFeatures = [];
+                }
+            @endphp
+
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Recursos do Plano (Site)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @forelse($planFeatures as $featureKey => $featureLabel)
+                            <div class="col-md-4 col-lg-3">
+                                <div class="custom-control custom-checkbox mb-2">
+                                    <input type="checkbox" class="custom-control-input" id="feature-{{ $featureKey }}"
+                                        name="permissions[]" value="{{ $featureKey }}"
+                                        {{ in_array($featureKey, $selectedFeatures, true) ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="feature-{{ $featureKey }}">{{ $featureLabel }}</label>
+                                </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @empty
+                            <div class="col-12">
+                                <div class="alert alert-warning mb-0">
+                                    Nenhum recurso configurado para planos. Atualize o código do painel.
+                                </div>
+                            </div>
+                        @endforelse
+                    </div>
+
+                    <small class="text-muted d-block mt-2">
+                        Esses recursos controlam o acesso no site (ex.: Comunidade/Chat) e alimentam o comparativo em <code>/premium</code>.
+                    </small>
                 </div>
             </div>
 

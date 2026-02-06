@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Plan;
-use App\Models\Permission;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -13,6 +12,14 @@ use Illuminate\Validation\Rule;
 
 class PlanController extends Controller
 {
+    private const PLAN_FEATURES = [
+        'community' => 'Comunidade (perfil/feed)',
+        'chat' => 'Chat (mensagens)',
+        'courses' => 'Cursos',
+        'events' => 'Eventos',
+        'mentorships' => 'Mentorias',
+    ];
+
     public function index()
     {
         $plans = Plan::orderByDesc('highlight')->orderBy('price')->paginate(12);
@@ -21,8 +28,10 @@ class PlanController extends Controller
 
     public function create()
     {
-        $permissions = Permission::all();
-        return view('admin.plans.form', ['plan' => new Plan(), 'permissions' => $permissions]);
+        return view('admin.plans.form', [
+            'plan' => new Plan(),
+            'planFeatures' => self::PLAN_FEATURES,
+        ]);
     }
 
     public function store(Request $request)
@@ -45,8 +54,10 @@ class PlanController extends Controller
 
     public function edit(Plan $plan)
     {
-        $permissions = Permission::all();
-        return view('admin.plans.form', compact('plan', 'permissions'));
+        return view('admin.plans.form', [
+            'plan' => $plan,
+            'planFeatures' => self::PLAN_FEATURES,
+        ]);
     }
 
     public function update(Request $request, Plan $plan)
@@ -123,7 +134,10 @@ class PlanController extends Controller
             'coupons_enabled' => 'nullable|boolean',
             'benefits' => 'nullable|string',
             'permissions' => 'nullable|array',
-            'permissions.*' => 'string',
+            'permissions.*' => [
+                'string',
+                Rule::in(array_keys(self::PLAN_FEATURES)),
+            ],
             'comparison' => 'nullable|array',
             'comparison.connections_per_month' => 'nullable|string|max:50',
             'comparison.group_mentorship' => 'nullable|string|max:50',
@@ -142,7 +156,15 @@ class PlanController extends Controller
         $benefitsRaw = $request->input('benefits', '');
         $data['benefits'] = array_filter(array_map('trim', explode("\n", str_replace("\r", "", $benefitsRaw))));
 
-        $data['permissions'] = $request->input('permissions', []);
+        $rawPermissions = $request->input('permissions', []);
+        if (!is_array($rawPermissions)) {
+            $rawPermissions = [];
+        }
+
+        $allowed = array_keys(self::PLAN_FEATURES);
+        $data['permissions'] = array_values(array_unique(array_values(array_filter($rawPermissions, function ($name) use ($allowed) {
+            return is_string($name) && in_array($name, $allowed, true);
+        }))));
 
         $comparison = $request->input('comparison', []);
         if (!is_array($comparison)) {

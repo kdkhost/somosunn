@@ -20,12 +20,10 @@ class PlansSeederUtf8 extends Seeder
                 'is_featured' => 0,
                 'billing_cycle' => 'monthly',
                 'prorata' => false,
-                'permissions' => [
-                    'dashboard.view',
-                    'events.view',
-                    'courses.view',
-                    'mentorships.view',
-                    'ranking.view',
+                'features' => [
+                    'community',
+                    'courses',
+                    'events',
                 ],
             ],
             'pro' => [
@@ -36,13 +34,12 @@ class PlansSeederUtf8 extends Seeder
                 'is_featured' => 1,
                 'billing_cycle' => 'monthly',
                 'prorata' => false,
-                'permissions' => [
-                    'dashboard.view',
-                    'events.view','events.create','events.ticket.manage',
-                    'courses.view',
-                    'mentorships.view','mentorships.schedule',
-                    'ranking.view',
-                    'uploads.manage',
+                'features' => [
+                    'community',
+                    'chat',
+                    'courses',
+                    'events',
+                    'mentorships',
                 ],
             ],
             'elite' => [
@@ -53,18 +50,15 @@ class PlansSeederUtf8 extends Seeder
                 'is_featured' => 0,
                 'billing_cycle' => 'monthly',
                 'prorata' => false,
-                'permissions' => [
-                    'dashboard.view',
-                    'events.view','events.create','events.edit','events.publish','events.ticket.manage',
-                    'courses.view',
-                    'mentorships.view','mentorships.schedule','mentorships.create',
-                    'ranking.view','ranking.edit',
-                    'uploads.manage',
+                'features' => [
+                    'community',
+                    'chat',
+                    'courses',
+                    'events',
+                    'mentorships',
                 ],
             ],
         ];
-
-        $permIds = DB::table('permissions')->pluck('id','name');
 
         foreach($plans as $slug => $plan){
             DB::table('plans')->updateOrInsert(
@@ -77,23 +71,11 @@ class PlansSeederUtf8 extends Seeder
                     'is_featured'=>$plan['is_featured'],
                     'billing_cycle'=>$plan['billing_cycle'],
                     'prorata'=>$plan['prorata'],
+                    'permissions'=>json_encode($plan['features'] ?? []),
                     'created_at'=>$now,
                     'updated_at'=>$now
                 ]
             );
-            $planRowId = DB::table('plans')->where('slug',$slug)->value('id');
-            if(!$planRowId) continue;
-
-            DB::table('permission_plan')->where('plan_id',$planRowId)->delete();
-            $rows=[];
-            foreach($plan['permissions'] as $pname){
-                if(isset($permIds[$pname])){
-                    $rows[]=['plan_id'=>$planRowId,'permission_id'=>$permIds[$pname]];
-                }
-            }
-            if($rows){
-                DB::table('permission_plan')->insert($rows);
-            }
         }
     }
 }

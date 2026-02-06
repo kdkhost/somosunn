@@ -6,6 +6,36 @@
     <li class="breadcrumb-item active">Editar</li>
 @endsection
 
+@push('styles')
+    <style>
+        .unn-star-rating {
+            display: inline-flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        .unn-star-rating input {
+            display: none;
+        }
+
+        .unn-star-rating label {
+            cursor: pointer;
+            color: #cbd5e1;
+            font-size: 22px;
+            line-height: 1;
+            transition: color 0.15s ease;
+            margin: 0;
+        }
+
+        .unn-star-rating input:checked~label,
+        .unn-star-rating label:hover,
+        .unn-star-rating label:hover~label {
+            color: #f59e0b;
+        }
+    </style>
+@endpush
+
 @section('content')
 <div class="card">
     <div class="card-body">
@@ -27,12 +57,32 @@
             <div class="form-row">
                 <div class="form-group col-md-3">
                     <label>Avaliação</label>
-                    <select name="rating" class="form-control">
-                        <option value="">—</option>
-                        @for($i=1;$i<=5;$i++)
-                            <option value="{{ $i }}" {{ (string) old('rating', $testimonial->rating) === (string) $i ? 'selected' : '' }}>{{ $i }}/5</option>
-                        @endfor
-                    </select>
+                    @php
+                        $oldRating = old('rating', $testimonial->rating);
+                        $oldRating = is_numeric($oldRating) ? (int) $oldRating : null;
+                        if ($oldRating !== null) {
+                            $oldRating = max(1, min(5, $oldRating));
+                        }
+                    @endphp
+
+                    <div class="d-flex align-items-center flex-wrap" style="gap: 14px;">
+                        <div class="unn-star-rating" role="radiogroup" aria-label="Avaliação por estrelas">
+                            @for($i = 5; $i >= 1; $i--)
+                                <input type="radio" id="admin-testimonial-rating-{{ $i }}" name="rating"
+                                    value="{{ $i }}" {{ (string) $oldRating === (string) $i ? 'checked' : '' }}>
+                                <label for="admin-testimonial-rating-{{ $i }}" title="{{ $i }}/5">
+                                    <i class="fas fa-star"></i>
+                                </label>
+                            @endfor
+                        </div>
+                        <div class="text-muted small">
+                            <input type="radio" id="admin-testimonial-rating-none" name="rating" value=""
+                                {{ $oldRating === null ? 'checked' : '' }} class="d-none">
+                            <label for="admin-testimonial-rating-none" class="mb-0" style="cursor:pointer; text-decoration: underline;">
+                                Sem avaliação
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group col-md-3">
                     <label>Status</label>
@@ -60,4 +110,3 @@
     </div>
 </div>
 @endsection
-

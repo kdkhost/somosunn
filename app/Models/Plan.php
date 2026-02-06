@@ -43,10 +43,40 @@ class Plan extends Model
 
     public function hasFeature($feature)
     {
+        $feature = (string) $feature;
+
         $features = $this->permissions ?? [];
         if (!is_array($features)) {
-            return false;
+            $features = [];
         }
-        return in_array($feature, $features) || in_array('*', $features);
+
+        if (in_array('*', $features, true)) {
+            return true;
+        }
+
+        if (in_array($feature, $features, true)) {
+            return true;
+        }
+
+        // Compatibilidade: versões antigas gravavam permissões "admin-like" (ex.: courses.view)
+        $legacyPrefixes = [
+            'courses' => 'courses.',
+            'events' => 'events.',
+            'mentorships' => 'mentorships.',
+        ];
+
+        if (isset($legacyPrefixes[$feature])) {
+            $prefix = $legacyPrefixes[$feature];
+            foreach ($features as $value) {
+                if (!is_string($value)) {
+                    continue;
+                }
+                if (str_starts_with($value, $prefix)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

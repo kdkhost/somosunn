@@ -189,9 +189,9 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
         Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
         Route::get('/chat/start/{user}', [\App\Http\Controllers\ChatController::class, 'start'])->name('chat.start');
         Route::get('/chat/list', [\App\Http\Controllers\ChatController::class, 'list'])->name('chat.list');
+        Route::get('/chat/{conversation}/messages', [\App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
+        Route::post('/chat/{conversation}/message', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('chat.message.store');
         Route::get('/chat/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
-        Route::get('/chat/messages', [\App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
-        Route::post('/chat/message', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('chat.message.store');
 
         // Floating Chat Routes
         Route::get('/chat/with/{user}', [\App\Http\Controllers\ChatController::class, 'withUser'])->name('chat.with.user');
@@ -216,7 +216,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     // Rotas de Membro (Comum a todos no painel)
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/portal', [\App\Http\Controllers\Admin\MemberController::class, 'portal'])->name('portal.index');
-    Route::get('/comunidade', [\App\Http\Controllers\Admin\MemberController::class, 'socialFeed'])->name('social.feed.internal');
+    Route::get('/comunidade', [\App\Http\Controllers\Admin\MemberController::class, 'socialFeed'])->middleware('check.feature:community')->name('social.feed.internal');
+
+    // Chat interno (mantém layout do painel)
+    Route::middleware(['check.feature:chat', 'check.connection'])->group(function () {
+        Route::get('/chat', [\App\Http\Controllers\Admin\ChatController::class, 'index'])->name('chat.index');
+        Route::get('/chat/start/{user}', [\App\Http\Controllers\Admin\ChatController::class, 'start'])->name('chat.start');
+        Route::get('/chat/list', [\App\Http\Controllers\Admin\ChatController::class, 'list'])->name('chat.list');
+        Route::get('/chat/{conversation}/messages', [\App\Http\Controllers\Admin\ChatController::class, 'getMessages'])->name('chat.messages');
+        Route::post('/chat/{conversation}/message', [\App\Http\Controllers\Admin\ChatController::class, 'storeMessage'])->name('chat.message.store');
+        Route::get('/chat/{conversation}', [\App\Http\Controllers\Admin\ChatController::class, 'show'])->name('chat.show');
+    });
 
     // Perfil (Acessível a membros para completar cadastro)
     Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');

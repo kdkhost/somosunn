@@ -1,20 +1,24 @@
-@extends('layouts.app')
+@extends($extends ?? 'layouts.app')
 
 @section('title', 'Chat - UNN')
 
 @section('content')
+    @php
+        $routeNamePrefix = $routeNamePrefix ?? 'chat';
+    @endphp
+
     <div class="max-w-6xl mx-auto px-0 md:px-4 py-6 h-[calc(100vh-80px)]">
         <div class="bg-white rounded-lg shadow-xl overflow-hidden flex h-full border border-gray-200">
             <!-- Sidebar (hidden on mobile when chat open, visible on md) -->
             <div class="hidden md:flex w-1/3 border-r border-gray-200 flex-col bg-white">
                 <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
                     <h2 class="font-bold text-xl text-gray-800">Mensagens</h2>
-                    <a href="{{ route('chat.index') }}" class="text-xs text-blue-600">Voltar</a>
+                    <a href="{{ route($routeNamePrefix . '.index') }}" class="text-xs text-blue-600">Voltar</a>
                 </div>
                 <!-- List logic same as index, abbreviated -->
                 <div class="flex-1 overflow-y-auto" id="conversations-list">
                     @foreach($conversations as $conv)
-                        <a href="{{ route('chat.show', $conv->id) }}"
+                        <a href="{{ route($routeNamePrefix . '.show', $conv->id) }}" data-conversation-id="{{ $conv->id }}"
                             class="block p-4 hover:bg-blue-50 transition border-b border-gray-100 {{ isset($conversation) && $conversation->id == $conv->id ? 'bg-blue-50 border-blue-200' : '' }}">
                             <div class="flex items-center gap-3">
                                 <div
@@ -38,11 +42,11 @@
             </div>
 
             <!-- Chat Area -->
-            <div class="w-full flex-1 flex flex-col bg-slate-50 relative">
+                <div class="w-full flex-1 flex flex-col bg-slate-50 relative">
                 <!-- Header -->
                 <div class="p-4 border-b border-gray-200 bg-white flex items-center justify-between shadow-sm z-10">
                     <div class="flex items-center gap-3">
-                        <a href="{{ route('chat.index') }}" class="md:hidden text-gray-500 hover:text-gray-700">
+                        <a href="{{ route($routeNamePrefix . '.index') }}" class="md:hidden text-gray-500 hover:text-gray-700">
                             <i class="fas fa-arrow-left"></i>
                         </a>
                         <div
@@ -111,7 +115,7 @@
                     input.value = '';
 
                     // Ajax send
-                    fetch('{{ route("chat.message.store", $conversation->id) }}', {
+                    fetch('{{ route($routeNamePrefix . ".message.store", $conversation->id) }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -136,7 +140,7 @@
                 setInterval(() => {
                     if (!isTabActive) return;
 
-                    fetch('{{ route("chat.messages", $conversation->id) }}')
+                    fetch('{{ route($routeNamePrefix . ".messages", $conversation->id) }}')
                         .then(response => response.json())
                         .then(messages => {
                             const container = document.getElementById('messages-container');
@@ -165,11 +169,12 @@
                         });
 
                     // Poll conversation list for sidebar badges
-                    fetch('{{ route("chat.list") }}')
+                    fetch('{{ route($routeNamePrefix . ".list") }}')
                         .then(r => r.json())
                         .then(conversations => {
                             conversations.forEach(conv => {
-                                const badgeContainer = document.querySelector(`a[href*="/chat/show/${conv.id}"] .flex.items-center`);
+                                const link = document.querySelector(`[data-conversation-id="${conv.id}"]`);
+                                const badgeContainer = link ? link.querySelector('.flex.items-center') : null;
                                 if (badgeContainer) {
                                     let badge = badgeContainer.querySelector('span.bg-blue-600');
                                     if (conv.unread_count > 0) {
