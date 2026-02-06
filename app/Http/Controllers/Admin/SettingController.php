@@ -274,6 +274,86 @@ class SettingController extends Controller
             $data['video_watermark_blend'] = in_array($value, $allowed, true) ? $value : 'normal';
         }
 
+        // Infra (reCAPTCHA v3 / S3 / limites de upload)
+        foreach ([
+            'recaptcha_v3_site_key',
+            'recaptcha_v3_secret_key',
+            's3_key',
+            's3_secret',
+            's3_region',
+            's3_bucket',
+            's3_url',
+            's3_endpoint',
+        ] as $key) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+            $data[$key] = trim((string) $data[$key]);
+        }
+
+        if (array_key_exists('recaptcha_v3_min_score', $data)) {
+            $raw = trim((string) $data['recaptcha_v3_min_score']);
+            if ($raw === '') {
+                $data['recaptcha_v3_min_score'] = '';
+            } else {
+                $raw = str_replace(',', '.', $raw);
+                $value = (float) $raw;
+                $value = max(0.0, min(1.0, $value));
+                $data['recaptcha_v3_min_score'] = rtrim(rtrim(number_format($value, 2, '.', ''), '0'), '.');
+            }
+        }
+
+        foreach ([
+            'video_max_mb' => ['min' => 1, 'max' => 10240],
+            'document_max_mb' => ['min' => 1, 'max' => 1024],
+        ] as $key => $limits) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+
+            $raw = trim((string) $data[$key]);
+            if ($raw === '') {
+                $data[$key] = '';
+                continue;
+            }
+
+            $value = (int) $raw;
+            $value = max((int) $limits['min'], min((int) $limits['max'], $value));
+            $data[$key] = (string) $value;
+        }
+
+        foreach (['allowed_video_formats', 'allowed_document_formats'] as $key) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+
+            $raw = trim((string) $data[$key]);
+            if ($raw === '') {
+                $data[$key] = '';
+                continue;
+            }
+
+            $parts = preg_split('/[,\s;]+/', $raw) ?: [];
+            $parts = array_map(static fn ($p) => strtolower(trim((string) $p)), $parts);
+            $parts = array_values(array_filter($parts, static fn ($p) => $p !== '' && preg_match('/^[a-z0-9]+$/', $p)));
+            $parts = array_values(array_unique($parts));
+
+            $data[$key] = implode(',', $parts);
+        }
+
+        if (array_key_exists('uploads_storage_disk', $data)) {
+            $raw = trim((string) $data['uploads_storage_disk']);
+            if ($raw === '') {
+                $data['uploads_storage_disk'] = '';
+            } else {
+                $data['uploads_storage_disk'] = in_array($raw, ['public', 's3'], true) ? $raw : 'public';
+            }
+        }
+
+        if ($request->has('s3_path_style')) {
+            $data['s3_path_style'] = $request->boolean('s3_path_style') ? 1 : 0;
+        }
+
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
         }

@@ -9,27 +9,40 @@ class UploadController extends Controller
 {
     public function upload(Request $request)
     {
-        // Basic validations: will be extended (file type/size)
-        $maxMb = config('uploads.video_max_mb', 1024);
-        $maxKb = $maxMb * 1024;
-
         $request->validate([
-            'file' => 'required|file|max:'. $maxKb,
+            'file' => 'required|file',
         ]);
 
         $file = $request->file('file');
         $ext = strtolower($file->getClientOriginalExtension());
 
-        $allowedV = config('uploads.allowed_video_formats', []);
-        $allowedD = config('uploads.allowed_document_formats', []);
-        $allowed = array_merge($allowedV, $allowedD);
+        $allowedV = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_video_formats', [])));
+        $allowedD = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_document_formats', [])));
 
-        if(!in_array($ext, $allowed)){
+        $isVideo = in_array($ext, $allowedV, true);
+        $isDoc = in_array($ext, $allowedD, true);
+
+        if(!$isVideo && !$isDoc){
             return response()->json(['error' => 'Formato de arquivo não permitido'], 422);
         }
 
-        $path = $file->store('uploads', 'public');
+        $maxMb = (int) ($isVideo ? config('uploads.video_max_mb', 1024) : config('uploads.document_max_mb', 50));
+        $maxKb = max(1, $maxMb) * 1024;
 
-        return response()->json(['url' => Storage::disk('public')->url($path), 'path' => $path]);
+        $request->validate([
+            'file' => 'required|file|max:' . $maxKb,
+        ]);
+
+        $disk = (string) config('uploads.disk', 'public');
+        if ($disk === '') {
+            $disk = 'public';
+        }
+
+        $path = $file->storePublicly('uploads', $disk);
+
+        return response()->json([
+            'url' => Storage::disk($disk)->url($path),
+            'path' => $path,
+        ]);
     }
 }

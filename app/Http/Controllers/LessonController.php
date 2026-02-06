@@ -16,11 +16,16 @@ class LessonController extends Controller
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', 0);
 
+        $videoMaxMb = (int) config('uploads.video_max_mb', 1024);
+        $videoMaxKb = max(1, $videoMaxMb) * 1024;
+        $allowedVideoExt = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_video_formats', [])));
+        $allowedVideoRule = !empty($allowedVideoExt) ? ('|mimes:' . implode(',', $allowedVideoExt)) : '';
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'order' => 'required|integer',
             'video_url' => 'nullable|url',
-            'video_file' => 'nullable|file|mimetypes:video/mp4,video/mpeg,video/quicktime,video/x-msvideo|max:512000', // 500MB
+            'video_file' => 'nullable|file|max:' . $videoMaxKb . $allowedVideoRule,
             'content' => 'nullable|string',
             'is_free_preview' => 'nullable|boolean',
             'duration' => 'nullable|integer',
@@ -120,9 +125,14 @@ class LessonController extends Controller
         set_time_limit(0);
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', 0);
-        
+
+        $docMaxMb = (int) config('uploads.document_max_mb', 50);
+        $docMaxKb = max(1, $docMaxMb) * 1024;
+        $allowedDocExt = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_document_formats', [])));
+        $allowedDocRule = !empty($allowedDocExt) ? ('|mimes:' . implode(',', $allowedDocExt)) : '';
+
         $request->validate([
-            'file' => 'required|file|max:512000' // 500MB max
+            'file' => 'required|file|max:' . $docMaxKb . $allowedDocRule,
         ]);
 
         $file = $request->file('file');

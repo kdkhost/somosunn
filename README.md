@@ -68,7 +68,7 @@ PWA
 
 - **Página:** `/contato` (dados como e-mail/telefone/endereço são lidos de Configurações → Geral).
 - **Envio:** `POST /contato` envia e-mail para `company_email` (fallback `mail.from.address`) aplicando automaticamente as configs SMTP salvas no banco (`smtp_*`).
-- **reCAPTCHA v3:** configure no `.env`:
+- **reCAPTCHA v3:** configure no `.env` ou no Admin (Configurações → Geral → Segurança (reCAPTCHA v3)):
   - `RECAPTCHA_V3_SITE_KEY`
   - `RECAPTCHA_V3_SECRET_KEY`
   - `RECAPTCHA_V3_MIN_SCORE` (padrão 0.5)
@@ -99,7 +99,7 @@ Instalador Web
 
 Uploads
 - Teste de upload chunked disponível em `/admin/upload-test`
-- Configurações de formatos e limites em `config/uploads.php`
+- Configurações de formatos/limites e disco de upload em `config/uploads.php` ou no Admin (Configurações → Geral → Limites de Upload / Armazenamento S3)
 2. Para hospedagem em cPanel sem SSH, gere o projeto localmente e suba os arquivos (incluindo `vendor/`).
 
 3. Gateways de pagamento configurados por placeholders: MercadoPago e PagSeguro.

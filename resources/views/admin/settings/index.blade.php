@@ -204,6 +204,183 @@
                             </div>
                         </div>
                     </div>
+
+                    <hr class="my-4">
+
+                    <div class="card card-outline card-secondary collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-shield-alt mr-2"></i>Segurança (reCAPTCHA v3)</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Site Key</label>
+                                        <input name="recaptcha_v3_site_key" class="form-control" value="{{ $settings['recaptcha_v3_site_key'] ?? (string) config('services.recaptcha.site_key', '') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Secret Key</label>
+                                        <input name="recaptcha_v3_secret_key" type="password" class="form-control" value="{{ $settings['recaptcha_v3_secret_key'] ?? (string) config('services.recaptcha.v3_secret', '') }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Score mínimo (0.0–1.0)</label>
+                                        <input name="recaptcha_v3_min_score" class="form-control" value="{{ $settings['recaptcha_v3_min_score'] ?? (string) config('services.recaptcha.v3_min_score', 0.5) }}" placeholder="0.5">
+                                        <small class="text-muted">Recomendado: 0.5. Quanto maior, mais rígido.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="alert alert-light border mb-0">
+                                        <div class="small text-muted">
+                                            Usado principalmente em formulários públicos (ex.: <code>/contato</code>). Se ficar vazio, o sistema usa as variáveis do <code>.env</code>.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-outline card-info collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-cloud mr-2"></i>Armazenamento (S3 compatível)</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body" style="display: none;">
+                            @php($uploadsDisk = $settings['uploads_storage_disk'] ?? (string) config('uploads.disk', 'public'))
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Disco para uploads (vídeos/documentos)</label>
+                                        <select name="uploads_storage_disk" class="form-control">
+                                            <option value="public" {{ $uploadsDisk === 'public' ? 'selected' : '' }}>Local (public)</option>
+                                            <option value="s3" {{ $uploadsDisk === 's3' ? 'selected' : '' }}>S3</option>
+                                        </select>
+                                        <small class="text-muted">Ajusta endpoints de upload do sistema (ex.: <code>/upload</code> e uploads em partes).</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="alert alert-light border mb-0">
+                                        <div class="small text-muted">
+                                            Compatível com AWS S3, Wasabi, DigitalOcean Spaces, MinIO etc. Para S3 “compatível”, preencha <strong>Endpoint</strong> e marque <strong>Path-style</strong> se necessário.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Access Key ID</label>
+                                        <input name="s3_key" class="form-control" value="{{ $settings['s3_key'] ?? (string) config('filesystems.disks.s3.key', '') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Secret Access Key</label>
+                                        <input name="s3_secret" type="password" class="form-control" value="{{ $settings['s3_secret'] ?? (string) config('filesystems.disks.s3.secret', '') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Região</label>
+                                        <input name="s3_region" class="form-control" value="{{ $settings['s3_region'] ?? (string) config('filesystems.disks.s3.region', '') }}" placeholder="us-east-1">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Bucket</label>
+                                        <input name="s3_bucket" class="form-control" value="{{ $settings['s3_bucket'] ?? (string) config('filesystems.disks.s3.bucket', '') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>URL pública/CDN (opcional)</label>
+                                        <input name="s3_url" class="form-control" value="{{ $settings['s3_url'] ?? (string) config('filesystems.disks.s3.url', '') }}" placeholder="https://...">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Endpoint (opcional)</label>
+                                        <input name="s3_endpoint" class="form-control" value="{{ $settings['s3_endpoint'] ?? (string) config('filesystems.disks.s3.endpoint', '') }}" placeholder="https://s3.us-east-1.amazonaws.com">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-0">
+                                @php($s3PathStyle = (int) ($settings['s3_path_style'] ?? (int) config('filesystems.disks.s3.use_path_style_endpoint', 0)))
+                                <div class="custom-control custom-switch">
+                                    <input type="hidden" name="s3_path_style" value="0">
+                                    <input type="checkbox" class="custom-control-input" id="s3_path_style" name="s3_path_style" value="1" {{ $s3PathStyle ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="s3_path_style">Usar endpoint path-style</label>
+                                </div>
+                                <small class="text-muted">Alguns provedores/MinIO exigem isso.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-outline card-warning collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-upload mr-2"></i>Limites de Upload</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>VIDEO_MAX_MB</label>
+                                        <input name="video_max_mb" type="number" min="1" max="10240" class="form-control" value="{{ $settings['video_max_mb'] ?? (int) config('uploads.video_max_mb', 1024) }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>DOCUMENT_MAX_MB</label>
+                                        <input name="document_max_mb" type="number" min="1" max="1024" class="form-control" value="{{ $settings['document_max_mb'] ?? (int) config('uploads.document_max_mb', 50) }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-light border mb-0">
+                                        <div class="small text-muted">
+                                            Se os campos ficarem vazios, o sistema usa os valores do <code>.env</code>.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>ALLOWED_VIDEO_FORMATS</label>
+                                        <input name="allowed_video_formats" class="form-control" value="{{ $settings['allowed_video_formats'] ?? implode(',', (array) config('uploads.allowed_video_formats', [])) }}" placeholder="mp4,webm,mkv">
+                                        <small class="text-muted">Separar por vírgula. Ex: <code>mp4,webm,mkv</code></small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>ALLOWED_DOCUMENT_FORMATS</label>
+                                        <input name="allowed_document_formats" class="form-control" value="{{ $settings['allowed_document_formats'] ?? implode(',', (array) config('uploads.allowed_document_formats', [])) }}" placeholder="pdf,docx,pptx">
+                                        <small class="text-muted">Separar por vírgula. Ex: <code>pdf,docx,pptx</code></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- APARÊNCIA (NOVO) --}}
