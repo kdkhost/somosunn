@@ -5,17 +5,40 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class Course extends Model
 {
     use HasFactory;
 
+    protected static function slugColumnExists(): bool
+    {
+        static $exists = null;
+
+        if ($exists !== null) {
+            return $exists;
+        }
+
+        try {
+            $exists = Schema::hasColumn((new static())->getTable(), 'slug');
+        } catch (\Throwable $e) {
+            // If schema inspection fails for any reason, keep legacy behavior.
+            $exists = true;
+        }
+
+        return $exists;
+    }
+
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($course) {
+            if (!static::slugColumnExists()) {
+                return;
+            }
+
             if (empty($course->slug)) {
                 $base = Str::slug((string) ($course->title ?? ''));
                 if ($base === '') {
@@ -26,6 +49,10 @@ class Course extends Model
         });
 
         static::saving(function ($course) {
+            if (!static::slugColumnExists()) {
+                return;
+            }
+
             if (!empty($course->slug)) {
                 return;
             }

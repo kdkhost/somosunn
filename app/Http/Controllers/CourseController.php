@@ -6,6 +6,7 @@ use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class CourseController extends Controller
@@ -109,16 +110,18 @@ class CourseController extends Controller
             'full_description' => 'nullable|string',
         ]);
 
-        $slug = Str::slug($validated['title']) . '-' . uniqid();
+        $slug = null;
+        if (Schema::hasColumn('courses', 'slug')) {
+            $slug = Str::slug($validated['title']) . '-' . uniqid();
+        }
 
         $path = null;
         if ($request->hasFile('thumbnail')) {
             $path = $request->file('thumbnail')->store('courses', 'public');
         }
 
-        $course = Auth::user()->createdCourses()->create([
+        $courseData = [
             'title' => $validated['title'],
-            'slug' => $slug,
             'price' => $validated['price'],
             'duration' => $validated['duration'] ?? 0,
             'is_certificate_enabled' => $request->has('is_certificate_enabled'),
@@ -127,9 +130,17 @@ class CourseController extends Controller
             'full_description' => $validated['full_description'],
             'author_name' => Auth::user()->name,
             'status' => 'draft',
-        ]);
+        ];
 
-        return redirect()->route('courses.show', $course->slug)
+        if ($slug !== null) {
+            $courseData['slug'] = $slug;
+        }
+
+        $course = Auth::user()->createdCourses()->create($courseData);
+
+        $routeParam = $course->slug ?: $course->id;
+
+        return redirect()->route('courses.show', $routeParam)
             ->with('success', 'Curso criado com sucesso! Adicione aulas agora.');
     }
 
@@ -140,18 +151,30 @@ class CourseController extends Controller
     {
         $courseParam = (string) $courseParam;
 
-        $course = Course::query()
-            ->where('slug', $courseParam)
-            ->when(ctype_digit($courseParam), function ($q) use ($courseParam) {
-                $q->orWhere('id', (int) $courseParam);
-            })
-            ->with([
-                'lessons' => function ($q) {
-                    // Determine if user can see full content logic here if needed
-                    $q->orderBy('order');
+        $query = Course::query()->with([
+            'lessons' => function ($q) {
+                $q->orderBy('order');
+            },
+        ]);
+
+        if (Schema::hasColumn('courses', 'slug')) {
+            $query->where(function ($q) use ($courseParam) {
+                $q->where('slug', $courseParam);
+
+                if (ctype_digit($courseParam)) {
+                    $q->orWhere('id', (int) $courseParam);
                 }
-            ])
-            ->firstOrFail();
+            });
+        } else {
+            // Banco legado sem coluna slug: evita 500 e permite acesso por ID.
+            if (!ctype_digit($courseParam)) {
+                abort(404);
+            }
+
+            $query->where('id', (int) $courseParam);
+        }
+
+        $course = $query->firstOrFail();
 
         $isEnabled = \App\Models\Setting::get('feature_courses', '1') === '1';
         if (!$isEnabled) {
