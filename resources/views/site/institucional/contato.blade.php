@@ -15,10 +15,49 @@
     $companyCity = \App\Models\Setting::get('company_city') ?: 'São Paulo';
     $companyState = \App\Models\Setting::get('company_state') ?: 'SP';
 
-    $socialInstagram = \App\Models\Setting::get('social_instagram') ?: '#';
-    $socialFacebook = \App\Models\Setting::get('social_facebook') ?: '#';
-    $socialYoutube = \App\Models\Setting::get('social_youtube') ?: '#';
-    $socialLinkedin = \App\Models\Setting::get('social_linkedin') ?: '#';
+    $normalizeSocialUrl = function ($value, string $network): ?string {
+        $value = trim((string) $value);
+        if ($value === '' || $value === '#') {
+            return null;
+        }
+
+        // Safety: avoid javascript: payloads in admin-configured links.
+        if (preg_match('/^\\s*javascript\\s*:/i', $value)) {
+            return null;
+        }
+
+        if (preg_match('/^https?:\\/\\//i', $value)) {
+            return $value;
+        }
+        if (str_starts_with($value, '//')) {
+            return 'https:' . $value;
+        }
+
+        if ($network === 'instagram' && str_starts_with($value, '@')) {
+            return 'https://instagram.com/' . ltrim($value, '@');
+        }
+
+        // If looks like a domain/path, prefix https://
+        if (preg_match('/^[a-z0-9.-]+\\.[a-z]{2,}/i', $value)) {
+            return 'https://' . $value;
+        }
+
+        return $value;
+    };
+
+    $socialInstagram = $normalizeSocialUrl(\App\Models\Setting::get('social_instagram'), 'instagram');
+    $socialFacebook = $normalizeSocialUrl(\App\Models\Setting::get('social_facebook'), 'facebook');
+    $socialYoutube = $normalizeSocialUrl(\App\Models\Setting::get('social_youtube'), 'youtube');
+    $socialLinkedin = $normalizeSocialUrl(\App\Models\Setting::get('social_linkedin'), 'linkedin');
+
+    $socialLinks = array_values(array_filter([
+        ['url' => $socialInstagram, 'icon' => 'fab fa-instagram', 'title' => 'Instagram'],
+        ['url' => $socialLinkedin, 'icon' => 'fab fa-linkedin', 'title' => 'LinkedIn'],
+        ['url' => $socialYoutube, 'icon' => 'fab fa-youtube', 'title' => 'YouTube'],
+        ['url' => $socialFacebook, 'icon' => 'fab fa-facebook', 'title' => 'Facebook'],
+    ], function ($item) {
+        return !empty($item['url']);
+    }));
 
     $recaptchaSiteKey = (string) config('services.recaptcha.site_key', '');
 @endphp
@@ -93,21 +132,18 @@
 
                     <!-- Social Media -->
                     <div class="mt-8 bg-white rounded-2xl p-6 shadow-lg text-center md:text-left">
-                        <h3 class="font-bold text-gray-900 mb-4">Redes Sociais</h3>
-                        <div class="flex gap-4 justify-center md:justify-start flex-wrap">
-                            <a href="{{ $socialInstagram }}" target="_blank" rel="noopener" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
-                                <i class="fab fa-instagram text-xl"></i>
-                            </a>
-                            <a href="{{ $socialLinkedin }}" target="_blank" rel="noopener" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
-                                <i class="fab fa-linkedin text-xl"></i>
-                            </a>
-                            <a href="{{ $socialYoutube }}" target="_blank" rel="noopener" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
-                                <i class="fab fa-youtube text-xl"></i>
-                            </a>
-                            <a href="{{ $socialFacebook }}" target="_blank" rel="noopener" class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
-                                <i class="fab fa-facebook text-xl"></i>
-                            </a>
-                        </div>
+                        @if(!empty($socialLinks))
+                            <h3 class="font-bold text-gray-900 mb-4">Redes Sociais</h3>
+                            <div class="flex gap-4 justify-center md:justify-start flex-wrap">
+                                @foreach($socialLinks as $link)
+                                    <a href="{{ $link['url'] }}" target="_blank" rel="noopener"
+                                       class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center text-white hover:shadow-lg transition"
+                                       aria-label="{{ $link['title'] }}">
+                                        <i class="{{ $link['icon'] }} text-xl"></i>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
                 </div>
 
