@@ -9,7 +9,7 @@
             <h1 class="text-2xl font-bold text-gray-900">Editar Curso</h1>
             <p class="text-gray-600">{{ $course->title }}</p>
         </div>
-        <a href="{{ route('courses.show', $course->slug) }}" class="text-sm text-blue-600 hover:underline">Ver Curso</a>
+        <a href="{{ route('courses.show', $course->slug ?: $course->id) }}" class="text-sm text-blue-600 hover:underline">Ver Curso</a>
     </div>
 
     <form action="{{ route('courses.update', $course->id) }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded-lg p-8 space-y-6">

@@ -5,7 +5,7 @@
 @section('content')
 <div class="min-h-screen bg-slate-50 pt-28 pb-20 px-4">
     <div class="max-w-4xl mx-auto">
-        <a href="{{ route('courses.show', $course) }}" class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-700 mb-6">
+        <a href="{{ route('courses.show', $course->slug ?: $course->id) }}" class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-700 mb-6">
             <i class="fas fa-arrow-left"></i> Voltar para o curso
         </a>
 

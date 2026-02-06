@@ -247,13 +247,13 @@
                                             </div>
                                         </div>
 
-                                        @if($course->exists && $course->slug)
+                                        @if($course->exists)
                                             <div class="card shadow-sm border-0 mt-3">
                                                 <div class="card-body">
                                                     <label class="mb-2">Link do Curso</label>
                                                     <div class="input-group mb-2">
                                                         <input type="text" class="form-control form-control-sm" id="courseLink"
-                                                            value="{{ route('courses.show', $course->slug) }}" readonly>
+                                                            value="{{ route('courses.show', $course->slug ?: $course->id) }}" readonly>
                                                         <div class="input-group-append">
                                                             <button class="btn btn-outline-secondary btn-sm" type="button"
                                                                 onclick="copyLink()">
@@ -261,7 +261,7 @@
                                                             </button>
                                                         </div>
                                                     </div>
-                                                    <a href="{{ route('courses.show', $course->slug) }}" target="_blank"
+                                                    <a href="{{ route('courses.show', $course->slug ?: $course->id) }}" target="_blank"
                                                         class="btn btn-sm btn-outline-info btn-block">
                                                         Visualizar Página <i class="fas fa-external-link-alt ml-1"></i>
                                                     </a>

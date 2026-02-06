@@ -136,9 +136,15 @@ class CourseController extends Controller
     /**
      * Display the specified course.
      */
-    public function show($slug)
+    public function show($courseParam)
     {
-        $course = Course::where('slug', $slug)
+        $courseParam = (string) $courseParam;
+
+        $course = Course::query()
+            ->where('slug', $courseParam)
+            ->when(ctype_digit($courseParam), function ($q) use ($courseParam) {
+                $q->orWhere('id', (int) $courseParam);
+            })
             ->with([
                 'lessons' => function ($q) {
                     // Determine if user can see full content logic here if needed
@@ -150,6 +156,11 @@ class CourseController extends Controller
         $isEnabled = \App\Models\Setting::get('feature_courses', '1') === '1';
         if (!$isEnabled) {
             abort(404);
+        }
+
+        // Canonical: if accessed by ID but the course has a slug, redirect to slug URL.
+        if (ctype_digit($courseParam) && !empty($course->slug) && $courseParam !== (string) $course->slug) {
+            return redirect()->route('courses.show', $course->slug, 301);
         }
 
         $isPublic = in_array((string) ($course->status ?? ''), ['published', 'paused'], true);

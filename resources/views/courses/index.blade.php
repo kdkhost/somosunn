@@ -146,7 +146,7 @@
                                         </div>
 
                                         <div class="mt-8 flex flex-col sm:flex-row gap-3">
-                                            <a href="{{ $isDemo ? '#' : route('courses.show', $featured->slug) }}"
+                                            <a href="{{ $isDemo ? '#' : route('courses.show', $featured->slug ?: $featured->id) }}"
                                                 class="px-8 py-4 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
                                                 Saiba mais
                                             </a>
@@ -157,7 +157,7 @@
                                                     Vendas pausadas
                                                 </button>
                                             @elseif($featuredHasAccess)
-                                                <a href="{{ $isDemo ? '#' : route('courses.show', $featured->slug) }}"
+                                                <a href="{{ $isDemo ? '#' : route('courses.show', $featured->slug ?: $featured->id) }}"
                                                     class="px-8 py-4 rounded-xl font-bold btn-primary shadow-lg hover:shadow-xl transition inline-flex items-center justify-center {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
                                                     Acessar curso
                                                 </a>
@@ -308,7 +308,7 @@
                                             </div>
 
                                             <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                                                <a href="{{ $isDemo ? '#' : route('courses.show', $course->slug) }}"
+                                                <a href="{{ $isDemo ? '#' : route('courses.show', $course->slug ?: $course->id) }}"
                                                     class="w-full sm:w-auto flex-1 px-4 py-3 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
                                                     Saiba mais
                                                 </a>
@@ -319,7 +319,7 @@
                                                         Vendas pausadas
                                                     </button>
                                                 @elseif($hasAccess)
-                                                    <a href="{{ $isDemo ? '#' : route('courses.show', $course->slug) }}"
+                                                    <a href="{{ $isDemo ? '#' : route('courses.show', $course->slug ?: $course->id) }}"
                                                         class="w-full sm:w-auto flex-1 px-4 py-3 rounded-xl font-bold btn-primary shadow-md hover:shadow-lg transition inline-flex items-center justify-center {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
                                                         Acessar
                                                     </a>
