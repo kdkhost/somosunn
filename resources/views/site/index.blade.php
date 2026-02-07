@@ -181,7 +181,7 @@
                     <h2 class="text-3xl font-black text-gray-900">Mentorias premium</h2>
                     <p class="text-gray-500">Conteúdo gravado + acompanhamento de mentores</p>
                 </div>
-                <a href="{{ route('portal') }}" class="hidden md:inline-flex items-center gap-2 font-semibold" style="color: var(--unn-azul-1)">
+                <a href="{{ route('mentorships.index') }}" class="hidden md:inline-flex items-center gap-2 font-semibold" style="color: var(--unn-azul-1)">
                     Ver todas as mentorias <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -206,9 +206,10 @@
                         Garantir vaga
                     </button>
                     @else
-                    <button class="w-full btn-primary text-white py-3 rounded-xl font-semibold">
+                    <a href="{{ ($mentorship->id ?? null) ? route('mentorships.show', $mentorship->id) : '#' }}"
+                        class="w-full btn-primary text-white py-3 rounded-xl font-semibold inline-flex items-center justify-center">
                         Garantir vaga
-                    </button>
+                    </a>
                     @endif
                 </article>
                 @endforeach
