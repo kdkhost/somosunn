@@ -108,6 +108,7 @@
     }
     .color-chooser .color-item.active { border-color: #111827; }
     .calendar-card { border-top: 3px solid var(--unn-calendar-primary); }
+    #calendar { min-height: 760px; }
 </style>
 @endpush
 
@@ -470,8 +471,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/locales/pt-br.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function () {
+        function initAdminEventsCalendar() {
         var calendarEl = document.getElementById('calendar');
+        if (!calendarEl) {
+            return;
+        }
+        if (typeof window.FullCalendar === 'undefined' || typeof FullCalendar.Calendar !== 'function') {
+            calendarEl.innerHTML = '<div class="alert alert-warning m-3 mb-0">Nao foi possivel carregar o FullCalendar. Recarregue a pagina.</div>';
+            $('#recent-events').html('<span class="text-muted">Nao foi possivel carregar o calendario.</span>');
+            return;
+        }
         var modalMap = null;
         var modalMarker = null;
         var tempExternalEvent = null;
@@ -484,19 +494,21 @@
 
         // External draggable events
         var externalEventsEl = document.getElementById('external-events');
-        var externalDraggable = new FullCalendar.Draggable(externalEventsEl, {
-            itemSelector: '.external-event',
-            eventData: function(eventEl) {
-                var title = eventEl.getAttribute('data-title') || eventEl.innerText.trim();
-                var color = eventEl.getAttribute('data-color') || '{{ $buttonColor }}';
-                return {
-                    title: title,
-                    backgroundColor: color,
-                    borderColor: color,
-                    textColor: eventTextColor
-                };
-            }
-        });
+        if (externalEventsEl && typeof FullCalendar.Draggable === 'function') {
+            new FullCalendar.Draggable(externalEventsEl, {
+                itemSelector: '.external-event',
+                eventData: function(eventEl) {
+                    var title = eventEl.getAttribute('data-title') || eventEl.innerText.trim();
+                    var color = eventEl.getAttribute('data-color') || '{{ $buttonColor }}';
+                    return {
+                        title: title,
+                        backgroundColor: color,
+                        borderColor: color,
+                        textColor: eventTextColor
+                    };
+                }
+            });
+        }
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
             plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'bootstrap' ],
@@ -517,6 +529,8 @@
             firstDay: {{ $firstDay }},
             weekends: {{ $weekends ? 'true' : 'false' }},
             weekNumbers: {{ $weekNumbers ? 'true' : 'false' }},
+            height: 'auto',
+            contentHeight: 700,
             events: feedUrl,
             editable: true,
             droppable: true,
@@ -971,6 +985,14 @@
                 }
             });
         });
-    });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initAdminEventsCalendar);
+            return;
+        }
+
+        initAdminEventsCalendar();
+    })();
 </script>
 @endpush

@@ -50,7 +50,7 @@ class EventController extends Controller
                 });
         })->get();
 
-        $formattedEvents = $events->map(function ($event) {
+        $formattedEvents = $events->map(function ($event) use ($textColor) {
             return [
                 'id' => $event->id,
                 'title' => $event->title,

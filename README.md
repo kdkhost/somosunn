@@ -61,6 +61,12 @@ POST /api/v1/auth/login
 }
 ```
 
+## Correções recentes (Admin)
+
+- Calendário de Eventos (`/admin/events`) com inicialização reforçada no FullCalendar v4 para evitar tela em branco em carregamentos fora do fluxo padrão.
+- Feed de eventos ajustado no backend (`Admin\\EventController@feed`) para garantir JSON válido com `textColor` em todos os itens.
+- Área do calendário com altura mínima para manter visualização estável mesmo quando não houver eventos.
+
 ## Cupons de desconto (Eventos / Cursos / Mentorias)
 
 - Admin: gerencie em `/admin/coupons` (criação, edição e remoção).
