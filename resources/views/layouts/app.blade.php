@@ -338,6 +338,59 @@
                 border-radius: 0.75rem;
             }
 
+            .unn-video-float-placeholder {
+                display: none;
+            }
+
+            .unn-video-float {
+                position: fixed !important;
+                width: var(--unn-float-width, 420px) !important;
+                height: var(--unn-float-height, 236px) !important;
+                right: 24px;
+                bottom: 92px;
+                z-index: 9999;
+                margin: 0 !important;
+                border-radius: 16px;
+                overflow: hidden;
+                background: #000;
+                box-shadow: 0 18px 55px rgba(0, 0, 0, 0.35);
+            }
+
+            .unn-video-float .unn-video-float-close {
+                display: inline-flex;
+            }
+
+            .unn-video-float-close {
+                display: none;
+                position: absolute;
+                z-index: 10;
+                top: 10px;
+                right: 10px;
+                width: 34px;
+                height: 34px;
+                border-radius: 999px;
+                align-items: center;
+                justify-content: center;
+                background: rgba(15, 23, 42, 0.65);
+                border: 1px solid rgba(255, 255, 255, 0.25);
+                color: #fff;
+                cursor: pointer;
+                backdrop-filter: blur(6px);
+            }
+
+            .unn-video-float-close:hover {
+                background: rgba(15, 23, 42, 0.85);
+            }
+
+            @media (max-width: 768px) {
+                .unn-video-float {
+                    right: 12px;
+                    bottom: 12px;
+                    width: min(92vw, var(--unn-float-width, 420px)) !important;
+                    height: min(52vw, var(--unn-float-height, 236px)) !important;
+                }
+            }
+
             .unn-video-watermark {
                 position: absolute;
                 z-index: 6;
@@ -645,6 +698,25 @@
                     return null;
                 }
 
+                function normalizeVideoUrl(value) {
+                    let url = (value == null) ? '' : String(value);
+                    url = url.trim();
+                    if (!url) return '';
+
+                    if (/^https?:\/\//i.test(url)) return url;
+                    if (url.startsWith('//')) return (window.location.protocol || 'https:') + url;
+                    if (url.startsWith('/')) return url;
+
+                    // Allow common providers without protocol.
+                    if (/^(www\.)?(youtube\.com|youtu\.be|vimeo\.com|player\.vimeo\.com)\//i.test(url)) {
+                        url = url.replace(/^www\./i, '');
+                        return 'https://' + url;
+                    }
+
+                    // Most stored paths are relative to the public root (ex: storage/... or uploads/...).
+                    return '/' + url;
+                }
+
                 function isDirectVideo(url) {
                     if (!url) return false;
                     const cleaned = String(url).split('#')[0].split('?')[0].toLowerCase();
@@ -712,15 +784,30 @@
                     if (!wrapper || wrapper.dataset.unnVideoPlayerInit === '1') return;
                     wrapper.dataset.unnVideoPlayerInit = '1';
 
-                    const url = wrapper.dataset.videoUrl || wrapper.getAttribute('data-video-url') || '';
+                    const rawUrl = wrapper.dataset.videoUrl || wrapper.getAttribute('data-video-url') || '';
+                    const url = normalizeVideoUrl(rawUrl);
                     if (!url) return;
 
                     const youtubeId = extractYouTubeId(url);
                     const vimeoId = youtubeId ? null : extractVimeoId(url);
                     const options = buildPlyrOptions();
 
+                    const blockDownload = (wrapper.dataset.blockDownload === '1') || (wrapper.getAttribute('data-block-download') === '1');
+                    const floatingEnabled = (wrapper.dataset.floatingEnabled === '1') || (wrapper.getAttribute('data-floating-enabled') === '1');
+                    const floatingWidth = parseInt(wrapper.dataset.floatingWidth || wrapper.getAttribute('data-floating-width') || '', 10);
+                    const floatingHeight = parseInt(wrapper.dataset.floatingHeight || wrapper.getAttribute('data-floating-height') || '', 10);
+
+                    if (blockDownload) {
+                        options.disableContextMenu = true;
+                        if (Array.isArray(options.controls) && options.controls.length) {
+                            options.controls = options.controls.filter(c => c !== 'download');
+                        }
+                    }
+
                     wrapper.classList.add('unn-video-player');
                     wrapper.innerHTML = '';
+
+                    const host = wrapper.closest('[data-unn-video-host]') || wrapper;
 
                     let target;
                     if (youtubeId) {
@@ -737,6 +824,9 @@
                         target = document.createElement('video');
                         target.setAttribute('playsinline', '');
                         target.setAttribute('controls', '');
+                        if (blockDownload) {
+                            target.setAttribute('controlsList', 'nodownload');
+                        }
 
                         const source = document.createElement('source');
                         source.src = String(url);
@@ -757,6 +847,91 @@
 
                     const player = new Plyr(target, options);
                     applyWatermark(player);
+
+                    if (floatingEnabled) {
+                        const width = Number.isFinite(floatingWidth) ? floatingWidth : 420;
+                        const height = Number.isFinite(floatingHeight) ? floatingHeight : Math.round(width * 9 / 16);
+                        setupFloatingPlayer(host, player, { width, height });
+                    }
+                }
+
+                function setupFloatingPlayer(host, player, cfg) {
+                    if (!host || host.dataset.unnVideoFloatingInit === '1') return;
+                    host.dataset.unnVideoFloatingInit = '1';
+
+                    let disabled = false;
+
+                    const clampInt = function (value, fallback, min, max) {
+                        const parsed = parseInt(String(value || ''), 10);
+                        const n = Number.isFinite(parsed) ? parsed : fallback;
+                        return Math.max(min, Math.min(max, n));
+                    };
+
+                    const width = clampInt(cfg && cfg.width, 420, 260, 960);
+                    const height = clampInt(cfg && cfg.height, Math.round(width * 9 / 16), 160, 720);
+
+                    host.style.setProperty('--unn-float-width', width + 'px');
+                    host.style.setProperty('--unn-float-height', height + 'px');
+
+                    const closeBtn = document.createElement('button');
+                    closeBtn.type = 'button';
+                    closeBtn.className = 'unn-video-float-close';
+                    closeBtn.setAttribute('aria-label', 'Fechar mini player');
+                    closeBtn.innerHTML = '&times;';
+                    closeBtn.addEventListener('click', function () {
+                        disabled = true;
+                        setFloating(false);
+                    });
+                    host.appendChild(closeBtn);
+
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'unn-video-float-placeholder';
+                    placeholder.style.display = 'none';
+                    if (host.parentNode) {
+                        host.parentNode.insertBefore(placeholder, host);
+                    }
+
+                    function setFloating(on) {
+                        if (disabled) on = false;
+
+                        if (on) {
+                            if (!host.classList.contains('unn-video-float')) {
+                                const rect = host.getBoundingClientRect();
+                                placeholder.style.height = rect.height + 'px';
+                                placeholder.style.display = 'block';
+                                host.classList.add('unn-video-float');
+                            }
+                        } else {
+                            if (host.classList.contains('unn-video-float')) {
+                                host.classList.remove('unn-video-float');
+                                placeholder.style.display = 'none';
+                            }
+                        }
+
+                        try {
+                            if (player && typeof player.resize === 'function') {
+                                player.resize();
+                            }
+                        } catch (e) { /* ignore */ }
+                    }
+
+                    if ('IntersectionObserver' in window) {
+                        const observer = new IntersectionObserver(function (entries) {
+                            for (const entry of entries) {
+                                // Float when the player is mostly out of view.
+                                setFloating(!entry.isIntersecting);
+                            }
+                        }, { threshold: 0.15 });
+                        observer.observe(host);
+                    } else {
+                        const onScroll = function () {
+                            const rect = host.getBoundingClientRect();
+                            const inView = rect.bottom > 100 && rect.top < (window.innerHeight - 100);
+                            setFloating(!inView);
+                        };
+                        window.addEventListener('scroll', onScroll, { passive: true });
+                        onScroll();
+                    }
                 }
 
                 function initAll() {

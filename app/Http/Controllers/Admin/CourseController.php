@@ -38,10 +38,14 @@ class CourseController extends Controller
             'author_name' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published,archived,paused',
             'thumbnail' => 'nullable|image|max:10240', // 10MB Max
+            'video_floating_width' => 'nullable|integer|min:260|max:960',
+            'video_floating_height' => 'nullable|integer|min:160|max:720',
         ]);
 
         $data['is_featured'] = $request->has('is_featured');
         $data['is_certificate_enabled'] = $request->has('is_certificate_enabled');
+        $data['video_block_download'] = $request->has('video_block_download');
+        $data['video_floating_enabled'] = $request->has('video_floating_enabled');
 
         // Handle Certificate Settings
         if ($request->has('certificate_settings')) {
@@ -104,10 +108,14 @@ class CourseController extends Controller
             'certificate_settings' => 'nullable|json',
             'certificate_title' => 'nullable|string|max:255',
             'presentation_text' => 'nullable|string|max:500',
+            'video_floating_width' => 'nullable|integer|min:260|max:960',
+            'video_floating_height' => 'nullable|integer|min:160|max:720',
         ]);
 
         $data['is_featured'] = $request->has('is_featured');
         $data['is_certificate_enabled'] = $request->has('is_certificate_enabled');
+        $data['video_block_download'] = $request->has('video_block_download');
+        $data['video_floating_enabled'] = $request->has('video_floating_enabled');
 
         // Handle Certificate Settings
         if ($request->has('certificate_settings')) {

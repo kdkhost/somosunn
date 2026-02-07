@@ -82,6 +82,10 @@ class Course extends Model
         'instructor_signature',
         'certificate_settings',
         'published', // Legacy
+        'video_block_download',
+        'video_floating_enabled',
+        'video_floating_width',
+        'video_floating_height',
     ];
 
     protected $casts = [
@@ -89,6 +93,10 @@ class Course extends Model
         'is_featured' => 'boolean',
         'certificate_settings' => 'array',
         'price' => 'decimal:2',
+        'video_block_download' => 'boolean',
+        'video_floating_enabled' => 'boolean',
+        'video_floating_width' => 'integer',
+        'video_floating_height' => 'integer',
     ];
 
     /**

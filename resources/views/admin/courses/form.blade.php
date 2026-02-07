@@ -239,6 +239,47 @@
                                                     </div>
                                                 </div>
 
+                                                <div class="form-group mb-4">
+                                                    <h6 class="text-muted mb-2"><i class="fas fa-play-circle mr-2"></i>Player de Vídeo</h6>
+
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input"
+                                                            name="video_block_download" id="video_block_download" value="1" {{ $course->video_block_download ? 'checked' : '' }}>
+                                                        <label class="custom-control-label font-weight-bold"
+                                                            for="video_block_download">Bloquear download do vídeo</label>
+                                                    </div>
+                                                    <small class="text-muted d-block mt-1">
+                                                        Remove botões/menus de download (não impede download via ferramentas do navegador).
+                                                    </small>
+
+                                                    <div class="custom-control custom-switch mt-3">
+                                                        <input type="checkbox" class="custom-control-input"
+                                                            name="video_floating_enabled" id="video_floating_enabled" value="1" {{ $course->video_floating_enabled ? 'checked' : '' }}>
+                                                        <label class="custom-control-label font-weight-bold"
+                                                            for="video_floating_enabled">Mini player flutuante</label>
+                                                    </div>
+
+                                                    <div class="row mt-3" id="video_floating_size_group" style="{{ $course->video_floating_enabled ? '' : 'display:none;' }}">
+                                                        <div class="col-6">
+                                                            <label class="small text-muted">Largura (px)</label>
+                                                            <input type="number" min="260" max="960" name="video_floating_width"
+                                                                class="form-control"
+                                                                value="{{ old('video_floating_width', $course->video_floating_width ?? 420) }}">
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="small text-muted">Altura (px)</label>
+                                                            <input type="number" min="160" max="720" name="video_floating_height"
+                                                                class="form-control"
+                                                                value="{{ old('video_floating_height', $course->video_floating_height ?? 236) }}">
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <small class="text-muted d-block mt-2">
+                                                                Ao rolar a página, o vídeo fica fixo no canto da tela.
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                                 <hr>
 
                                                 <button class="btn btn-primary btn-block btn-lg shadow-sm">
@@ -733,6 +774,12 @@
     <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
     <script>
         Dropzone.autoDiscover = false;
+
+        $(document).ready(function () {
+            $('#video_floating_enabled').on('change', function () {
+                $('#video_floating_size_group').toggle(this.checked);
+            });
+        });
 
         // Helper functions
         function openLessonModal(lesson = null) {

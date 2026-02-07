@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Lesson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class LessonController extends Controller
 {
@@ -35,7 +36,7 @@ class LessonController extends Controller
 
         if ($request->hasFile('video_file')) {
             $path = $request->file('video_file')->store('course-videos', 'public');
-            $videoUrl = 'storage/' . $path;
+            $videoUrl = Storage::disk('public')->url($path);
         }
 
         $lesson = $course->lessons()->create([
