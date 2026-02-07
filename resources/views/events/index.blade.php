@@ -224,10 +224,16 @@
                     </a>
                 </div>
 
-                <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
-                    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-                        <h3 class="text-lg font-bold text-gray-900">Próximos eventos</h3>
-                        <span class="text-sm text-gray-500">
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+                    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
+                        <h3 class="text-lg font-black text-gray-900 flex items-center gap-2">
+                            <span class="w-9 h-9 rounded-xl flex items-center justify-center btn-primary shadow-sm">
+                                <i class="fas fa-calendar-check text-white"></i>
+                            </span>
+                            Próximos eventos
+                        </h3>
+                        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600 shadow-sm">
+                            <i class="fas fa-layer-group text-slate-400"></i>
                             {{ $events->count() }} {{ $events->count() === 1 ? 'evento' : 'eventos' }}
                         </span>
                     </div>
@@ -239,72 +245,148 @@
                             <p class="text-slate-600">Confira os últimos eventos abaixo e fique atento às próximas datas.</p>
                         </div>
                     @else
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full">
-                                <thead class="bg-slate-50">
-                                    <tr class="text-left text-sm text-gray-600">
-                                        <th class="px-6 py-4 font-bold">Data</th>
-                                        <th class="px-6 py-4 font-bold">Evento</th>
-                                        <th class="px-6 py-4 font-bold">Localização</th>
-                                        <th class="px-6 py-4 font-bold">Vagas</th>
-                                        <th class="px-6 py-4 font-bold">Valor</th>
-                                        <th class="px-6 py-4 font-bold text-right">Ação</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    @foreach($events as $event)
-                                        @php
-                                            $startDate = is_string($event->start_at) ? \Carbon\Carbon::parse($event->start_at) : $event->start_at;
-                                            $locationLine = $event->location ?: ($event->address ? 'Local do evento' : 'A confirmar');
-                                        @endphp
-                                        <tr class="hover:bg-slate-50/60 transition">
-                                            <td class="px-6 py-5 align-top">
-                                                <div class="w-14 text-center bg-slate-50 rounded-xl p-2 border border-slate-200">
-                                                    <span class="block font-black text-lg leading-none text-slate-900">{{ $startDate->format('d') }}</span>
-                                                    <span class="block uppercase text-xs font-bold text-slate-500">{{ $startDate->translatedFormat('M') }}</span>
+                        <div class="bg-slate-50/40 p-4 sm:p-6">
+                            <div class="hidden md:grid grid-cols-12 gap-4 px-4 pb-3 text-xs font-black uppercase tracking-wider text-slate-500">
+                                <div class="col-span-2">Data</div>
+                                <div class="col-span-4">Evento</div>
+                                <div class="col-span-3">Localização</div>
+                                <div class="col-span-1">Vagas</div>
+                                <div class="col-span-1">Valor</div>
+                                <div class="col-span-1 text-right">Ação</div>
+                            </div>
+
+                            <div class="space-y-3">
+                                @foreach($events as $event)
+                                    @php
+                                        $startDate = is_string($event->start_at) ? \Carbon\Carbon::parse($event->start_at) : $event->start_at;
+                                        $locationLine = $event->location ?: ($event->address ? 'Local do evento' : 'A confirmar');
+
+                                        $relativeLabel = $startDate && method_exists($startDate, 'isToday') && $startDate->isToday()
+                                            ? 'Hoje'
+                                            : ($startDate && method_exists($startDate, 'isTomorrow') && $startDate->isTomorrow()
+                                                ? 'Amanhã'
+                                                : ($startDate ? ucfirst($startDate->translatedFormat('D')) : ''));
+
+                                        $imageValue = trim((string) ($event->image ?? ''));
+                                        $eventImageUrl = '';
+                                        if ($imageValue !== '') {
+                                            if (\Illuminate\Support\Str::startsWith($imageValue, ['http://', 'https://'])) {
+                                                $eventImageUrl = $imageValue;
+                                            } else {
+                                                $normalized = ltrim(str_replace('\\', '/', $imageValue), '/');
+                                                $eventImageUrl = asset($normalized);
+                                            }
+                                        }
+                                    @endphp
+
+                                    <div class="group rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-[1px] transition will-change-transform">
+                                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-5 md:p-6">
+                                            <div class="md:col-span-2">
+                                                <div class="flex md:block items-center justify-between gap-3">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-14 text-center rounded-2xl p-2 border border-slate-200 bg-gradient-to-br from-white to-slate-50 shadow-inner">
+                                                            <span class="block font-black text-lg leading-none text-slate-900">{{ $startDate ? $startDate->format('d') : '--' }}</span>
+                                                            <span class="block uppercase text-xs font-black text-slate-500">{{ $startDate ? $startDate->translatedFormat('M') : '' }}</span>
+                                                        </div>
+                                                        <div class="md:hidden">
+                                                            <div class="text-xs font-bold text-slate-700">
+                                                                {{ $startDate ? ucfirst($startDate->translatedFormat('l')) : '' }}
+                                                            </div>
+                                                            <div class="text-xs text-slate-500 mt-0.5">
+                                                                <i class="far fa-clock mr-1"></i>{{ $startDate ? $startDate->format('H:i') : '' }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    @if($relativeLabel)
+                                                        <span class="md:mt-3 inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-slate-100 text-slate-700 border border-slate-200">
+                                                            {{ $relativeLabel }}
+                                                        </span>
+                                                    @endif
                                                 </div>
-                                                <div class="text-xs text-slate-500 mt-2 text-center">
-                                                    <i class="far fa-clock mr-1"></i>{{ $startDate->format('H:i') }}
+
+                                                <div class="hidden md:block text-xs text-slate-500 mt-3">
+                                                    <div class="font-bold text-slate-700">{{ $startDate ? ucfirst($startDate->translatedFormat('l')) : '' }}</div>
+                                                    <div class="mt-1"><i class="far fa-clock mr-1"></i>{{ $startDate ? $startDate->format('H:i') : '' }}</div>
                                                 </div>
-                                            </td>
-                                            <td class="px-6 py-5">
-                                                <div class="font-black text-slate-900">{{ $event->title }}</div>
-                                                @if($event->speaker)
-                                                    <div class="text-sm text-slate-500 mt-1"><i class="fas fa-user-tie mr-1"></i>{{ $event->speaker }}</div>
-                                                @endif
-                                            </td>
-                                            <td class="px-6 py-5">
-                                                <div class="text-slate-700"><i class="fas fa-map-marker-alt text-red-500 mr-1"></i>{{ $locationLine }}</div>
+                                            </div>
+
+                                            <div class="md:col-span-4">
+                                                <div class="flex items-start gap-4">
+                                                    <div class="relative w-16 h-16 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0">
+                                                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-indigo-500/10"></div>
+                                                        @if($eventImageUrl !== '')
+                                                            <img src="{{ $eventImageUrl }}" alt="Imagem do evento" class="absolute inset-0 w-full h-full object-cover" loading="lazy" onerror="this.remove();">
+                                                            <div class="absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-black/0"></div>
+                                                        @endif
+                                                        <div class="absolute inset-0 flex items-center justify-center text-slate-400">
+                                                            <i class="fas fa-calendar-alt"></i>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="min-w-0">
+                                                        <div class="font-black text-slate-900 leading-tight truncate">
+                                                            {{ $event->title }}
+                                                        </div>
+
+                                                        <div class="mt-2 flex flex-wrap items-center gap-2">
+                                                            @if($event->speaker)
+                                                                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                                                    <i class="fas fa-user-tie text-slate-400"></i>{{ $event->speaker }}
+                                                                </span>
+                                                            @endif
+
+                                                            @if($event->current_batch_label)
+                                                                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black text-white shadow-sm"
+                                                                    style="background: var(--unn-azul-1)">
+                                                                    <i class="fas fa-tag"></i>{{ $event->current_batch_label }}
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="md:col-span-3">
+                                                <div class="text-slate-800 font-bold">
+                                                    <i class="fas fa-map-marker-alt text-red-500 mr-1"></i>{{ $locationLine }}
+                                                </div>
                                                 @if($event->address)
-                                                    <div class="text-xs text-slate-500 mt-1 max-w-sm truncate">{{ $event->address }}</div>
+                                                    <div class="text-xs text-slate-500 mt-1 leading-snug">
+                                                        {{ $event->address }}
+                                                    </div>
                                                 @endif
-                                            </td>
-                                            <td class="px-6 py-5">
+                                            </div>
+
+                                            <div class="md:col-span-1">
                                                 @if($event->capacity)
-                                                    <div class="text-sm font-bold text-slate-900">{{ $event->capacity }} vagas</div>
-                                                    <div class="text-xs text-slate-500 mt-1">sujeito a lotação</div>
+                                                    <div class="text-sm font-black text-slate-900">{{ $event->capacity }}</div>
+                                                    <div class="text-xs text-slate-500 mt-1">vagas</div>
                                                 @else
-                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Ilimitado</span>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-green-100 text-green-700">Ilimitado</span>
                                                 @endif
-                                            </td>
-                                            <td class="px-6 py-5">
+                                            </div>
+
+                                            <div class="md:col-span-1">
                                                 @if($event->current_price > 0 || $event->price > 0)
                                                     <div class="font-black text-slate-900">R$ {{ number_format($event->current_price ?: $event->price, 2, ',', '.') }}</div>
-                                                    <div class="text-xs text-slate-500 mt-1">{{ $event->current_batch_label ?? 'Ingresso' }}</div>
+                                                    <div class="text-xs text-slate-500 mt-1">por pessoa</div>
                                                 @else
-                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">GRÁTIS</span>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-green-100 text-green-700">GRÁTIS</span>
                                                 @endif
-                                            </td>
-                                            <td class="px-6 py-5 text-right">
+                                            </div>
+
+                                            <div class="md:col-span-1 md:text-right">
                                                 <a href="{{ $isDemo ? '#' : route('events.show', $event->id) }}"
-                                                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-white btn-primary shadow-lg hover:shadow-xl transition {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
-                                                    <i class="fas fa-ticket-alt"></i> Detalhes
+                                                    class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-black text-white btn-primary shadow-lg hover:shadow-xl transition whitespace-nowrap w-full md:w-auto {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
+                                                    <i class="fas fa-ticket-alt"></i>
+                                                    Detalhes
                                                 </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     @endif
                 </div>
