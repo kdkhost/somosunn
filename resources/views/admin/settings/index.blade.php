@@ -51,6 +51,7 @@
     $seoOg    = $getUrl('seo_og_image');
     $seoTwitter = $getUrl('seo_twitter_image');
     $watermarkUrl = $getUrl('watermark_image');
+    $heroUrl  = $getUrl('hero_image');
 @endphp
 
 @section('page_title','Configurações')
@@ -400,7 +401,6 @@
                         <div class="col-md-6">
                             <label>Imagem de Fundo (Hero)</label>
                             <input type="hidden" name="remove_hero_image" value="0">
-                            @php $heroUrl = $getUrl('hero_image'); @endphp
                             <div class="upload-box" data-max-size="{{ 5*1024*1024 }}" data-existing-url="{{ $heroUrl }}" data-remove-input="[name='remove_hero_image']">
                                 <input type="file" name="hero_image" accept="image/*" class="d-none">
                                 <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>

@@ -12,7 +12,11 @@
         <div class="card card-primary card-outline">
             <div class="card-body box-profile">
                 <div class="text-center">
-                    <img class="profile-user-img img-fluid img-circle" src="{{ $order->user->profile_photo_url ?? asset('images/default-avatar.png') }}" alt="User profile picture">
+                    @php
+                        $photo = $order->user->photo ?? null;
+                        $avatarUrl = $photo ? asset($photo) : asset('img/default-user.svg');
+                    @endphp
+                    <img class="profile-user-img img-fluid img-circle" src="{{ $avatarUrl }}" alt="User profile picture" onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                 </div>
                 <h3 class="profile-username text-center">{{ $order->user->name }}</h3>
                 <p class="text-muted text-center">{{ $order->user->email }}</p>

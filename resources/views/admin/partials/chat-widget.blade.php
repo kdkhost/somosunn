@@ -133,7 +133,7 @@
                 data.forEach(conv => {
                     const otherUser = conv.users.find(u => u.id !== {{ auth()->id() }}) || { name: 'Usuário', photo: null };
                     const lastMsg = conv.messages && conv.messages.length ? conv.messages[0].body : 'Nova conversa';
-                    const avatar = otherUser.photo ? (otherUser.photo.startsWith('http') ? otherUser.photo : '/' + otherUser.photo) : '/img/default-user.png';
+                    const avatar = otherUser.photo ? (otherUser.photo.startsWith('http') ? otherUser.photo : '/' + otherUser.photo) : '/img/default-user.svg';
 
                     const item = document.createElement('div');
                     item.className = 'conversation-item list-group-item px-3 py-2 border-0 border-bottom';

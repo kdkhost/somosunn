@@ -34,7 +34,7 @@
                     @foreach($unreadMessagesGroups as $group)
                         <a href="{{ route('admin.chat.start', $group->user->id) }}" class="dropdown-item">
                             <div class="media">
-                                <img src="{{ $group->user->photo ? asset($group->user->photo) : asset('img/default-user.png') }}"
+                                <img src="{{ $group->user->photo ? asset($group->user->photo) : asset('img/default-user.svg') }}"
                                     alt="User Avatar" class="img-size-50 mr-3 img-circle">
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title">
@@ -72,7 +72,7 @@
                     @foreach($pendingConnections as $conn)
                         <div class="dropdown-item">
                             <div class="media">
-                                <img src="{{ $conn->requester->photo ? asset($conn->requester->photo) : asset('img/default-user.png') }}"
+                                <img src="{{ $conn->requester->photo ? asset($conn->requester->photo) : asset('img/default-user.svg') }}"
                                     class="img-size-50 mr-3 img-circle">
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title">

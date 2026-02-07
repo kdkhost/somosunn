@@ -39,7 +39,11 @@
                             <td>#{{ $order->id }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <img src="{{ $order->user->profile_photo_url ?? asset('images/default-avatar.png') }}" class="img-circle elevation-1 mr-2" style="width:30px;height:30px;object-fit:cover">
+                                    @php
+                                        $photo = $order->user->photo ?? null;
+                                        $avatarUrl = $photo ? asset($photo) : asset('img/default-user.svg');
+                                    @endphp
+                                    <img src="{{ $avatarUrl }}" class="img-circle elevation-1 mr-2" style="width:30px;height:30px;object-fit:cover" onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                                     {{ $order->user->name ?? 'Usuário Removido' }}
                                 </div>
                             </td>
