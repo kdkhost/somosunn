@@ -29,7 +29,7 @@ return [
             'provider' => 'users',
         ],
 
-        // PadrÃ£o do Sanctum para tokens de API via `auth:sanctum`
+        // Padrão do Sanctum para tokens de API via `auth:sanctum`
         'sanctum' => [
             'driver' => 'sanctum',
             'provider' => 'users',

@@ -30,17 +30,17 @@ Payments (MercadoPago / PagSeguro)
   - /webhook/mercadopago
   - /webhook/pagseguro
 
-## API REST (Apps Mobile / IntegraÃ§Ãµes)
+## API REST (Apps Mobile / Integrações)
 
 Base URL: `/api/v1`
 
-AutenticaÃ§Ã£o (Sanctum):
-- `POST /api/v1/auth/register` â†’ retorna `token` + `user`
-- `POST /api/v1/auth/login` â†’ retorna `token` + `user`
+Autenticação (Sanctum):
+- `POST /api/v1/auth/register` → retorna `token` + `user`
+- `POST /api/v1/auth/login` → retorna `token` + `user`
 - `POST /api/v1/auth/logout` (auth:sanctum)
 - `GET /api/v1/me` (auth:sanctum)
 
-Recursos pÃºblicos:
+Recursos públicos:
 - `GET /api/v1/events?status=upcoming|past|all`
 - `GET /api/v1/events/{id}`
 - `GET /api/v1/courses?status=published|all`

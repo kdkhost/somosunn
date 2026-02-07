@@ -34,27 +34,77 @@
             gap: 1rem;
         }
 
-        @media (min-width: 1200px) {
+        .events-table-head > div,
+        .events-table-row > div {
+            min-width: 0;
+        }
+
+        @media (min-width: 1400px) {
             .events-table-head,
             .events-table-row {
                 grid-template-columns:
-                    minmax(130px, 0.85fr)
-                    minmax(260px, 1.7fr)
-                    minmax(260px, 1.7fr)
-                    minmax(90px, 0.6fr)
-                    minmax(120px, 0.8fr)
-                    minmax(170px, 0.95fr);
+                    0.78fr
+                    1.65fr
+                    1.85fr
+                    0.62fr
+                    0.74fr
+                    0.96fr;
+                align-items: center;
+            }
+        }
+
+        @media (min-width: 1200px) and (max-width: 1399.98px) {
+            .events-table-head,
+            .events-table-row {
+                grid-template-columns:
+                    0.68fr
+                    1.35fr
+                    1.45fr
+                    0.56fr
+                    0.64fr
+                    0.72fr;
+                gap: 0.65rem;
                 align-items: center;
             }
 
+            .events-table-head {
+                font-size: 0.68rem;
+            }
+
+            .events-col-action .events-action-btn {
+                max-width: 138px;
+                padding-left: 0.7rem;
+                padding-right: 0.7rem;
+                font-size: 0.93rem;
+            }
+
+            .events-col-event .font-black,
+            .events-col-location .text-slate-800 {
+                font-size: 0.94rem;
+            }
+        }
+
+        @media (min-width: 1200px) {
             .events-col-action {
                 display: flex;
+                align-items: center;
                 justify-content: flex-end;
             }
 
             .events-col-action .events-action-btn {
-                min-width: 152px;
-                width: auto;
+                width: 100%;
+                max-width: 170px;
+                min-width: 0;
+            }
+
+            .events-col-location,
+            .events-col-event {
+                overflow: hidden;
+            }
+
+            .events-col-location .text-slate-800 {
+                line-height: 1.2;
+                word-break: break-word;
             }
         }
 
@@ -70,6 +120,32 @@
             .events-col-action .events-action-btn {
                 width: 100%;
                 justify-content: center;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .events-col-action .events-action-btn {
+                padding-left: 0.95rem;
+                padding-right: 0.95rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        .events-total-badge {
+            white-space: nowrap;
+        }
+
+        @media (max-width: 640px) {
+            .events-headbar {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+            }
+
+            .events-total-badge {
+                margin-left: auto;
+                padding: 0.35rem 0.65rem;
+                font-size: 0.74rem;
+                gap: 0.35rem;
             }
         }
 
@@ -287,14 +363,14 @@
                 </div>
 
                 <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
-                    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
+                    <div class="events-headbar px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
                         <h3 class="text-lg font-black text-gray-900 flex items-center gap-2">
                             <span class="w-9 h-9 rounded-xl flex items-center justify-center btn-primary shadow-sm">
                                 <i class="fas fa-calendar-check text-white"></i>
                             </span>
                             Próximos eventos
                         </h3>
-                        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600 shadow-sm">
+                        <span class="events-total-badge inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600 shadow-sm">
                             <i class="fas fa-layer-group text-slate-400"></i>
                             {{ $events->count() }} {{ $events->count() === 1 ? 'evento' : 'eventos' }}
                         </span>
@@ -566,7 +642,7 @@
                                     </div>
                                 </div>
 
-                                <div class="mt-6 flex items-center justify-between gap-4">
+                                <div class="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                                     <div>
                                         @if($event->current_price > 0 || $event->price > 0)
                                             <div class="font-black text-slate-900">R$ {{ number_format($event->current_price ?: $event->price, 2, ',', '.') }}</div>
@@ -603,9 +679,11 @@
 
                         <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                             <a href="{{ route('register') }}"
-                                class="inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-10 sm:py-4 rounded-full font-black bg-white shadow-lg hover:shadow-xl transition"
+                                class="inline-flex items-center justify-center gap-3 px-5 py-3 sm:px-10 sm:py-4 rounded-full font-black text-sm sm:text-base bg-white shadow-lg hover:shadow-xl transition whitespace-nowrap"
                                 style="color: var(--unn-azul-1)">
-                                <i class="fas fa-rocket"></i> Começar agora - É grátis
+                                <i class="fas fa-rocket"></i>
+                                <span class="sm:hidden">Começar grátis</span>
+                                <span class="hidden sm:inline">Começar agora - É grátis</span>
                             </a>
                             <a href="{{ route('premium') }}"
                                 class="inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-10 sm:py-4 rounded-full font-black border-2 border-white text-white bg-white/10 hover:bg-white/15 transition">

@@ -52,6 +52,7 @@
     $seoTwitter = $getUrl('seo_twitter_image');
     $watermarkUrl = $getUrl('watermark_image');
     $heroUrl  = $getUrl('hero_image');
+    $wmPos = (string) ($settings['video_watermark_position'] ?? 'top-right');
 @endphp
 
 @section('page_title','Configurações')
@@ -765,11 +766,11 @@
                                     <div class="form-group">
                                         <label>Posição</label>
                                         <select name="video_watermark_position" class="form-control">
-                                            <option value="top-left" @selected(($settings['video_watermark_position'] ?? 'top-right') === 'top-left')>Topo esquerdo</option>
-                                            <option value="top-right" @selected(($settings['video_watermark_position'] ?? 'top-right') === 'top-right')>Topo direito</option>
-                                            <option value="bottom-left" @selected(($settings['video_watermark_position'] ?? 'top-right') === 'bottom-left')>Inferior esquerdo</option>
-                                            <option value="bottom-right" @selected(($settings['video_watermark_position'] ?? 'top-right') === 'bottom-right')>Inferior direito</option>
-                                            <option value="center" @selected(($settings['video_watermark_position'] ?? 'top-right') === 'center')>Centro</option>
+                                            <option value="top-left" @selected($wmPos === 'top-left')>Topo esquerdo</option>
+                                            <option value="top-right" @selected($wmPos === 'top-right')>Topo direito</option>
+                                            <option value="bottom-left" @selected($wmPos === 'bottom-left')>Inferior esquerdo</option>
+                                            <option value="bottom-right" @selected($wmPos === 'bottom-right')>Inferior direito</option>
+                                            <option value="center" @selected($wmPos === 'center')>Centro</option>
                                         </select>
                                     </div>
                                 </div>

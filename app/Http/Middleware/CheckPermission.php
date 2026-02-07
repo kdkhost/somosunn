@@ -10,7 +10,7 @@ class CheckPermission
     {
         $user = auth()->user();
         if(!$user || !$user->hasPermission($permission)){
-            abort(403, 'Permissão negada.');
+            abort(403, 'PermissÃ£o negada.');
         }
         return $next($request);
     }

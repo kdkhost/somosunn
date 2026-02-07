@@ -26,17 +26,17 @@ AddDefaultCharset UTF-8
     RewriteRule ^img/(.*)$ public/img/$1 [L,NC]
 
     # /storage: evita depender de symlink e serve uploads tanto do public/storage
-    # quanto do storage/app/public (Laravel padrÃ£o) quando existirem.
+    # quanto do storage/app/public (Laravel padrão) quando existirem.
     # Bloqueia path traversal (..)
     RewriteCond %{REQUEST_URI} ^/storage/.*\.\. [NC]
     RewriteRule ^storage/ - [F,L]
 
-    # 1) PreferÃªncia: public/storage (sem symlink)
+    # 1) Preferência: public/storage (sem symlink)
     RewriteCond %{REQUEST_URI} ^/storage/(.*)$
     RewriteCond %{DOCUMENT_ROOT}/public/storage/%1 -f
     RewriteRule ^storage/(.*)$ public/storage/$1 [L,NC]
 
-    # 2) Fallback: storage/app/public (quando arquivos foram gravados no padrÃ£o do Laravel)
+    # 2) Fallback: storage/app/public (quando arquivos foram gravados no padrão do Laravel)
     RewriteCond %{REQUEST_URI} ^/storage/(.*)$
     RewriteCond %{DOCUMENT_ROOT}/storage/app/public/%1 -f
     RewriteRule ^storage/(.*)$ storage/app/public/$1 [L,NC]

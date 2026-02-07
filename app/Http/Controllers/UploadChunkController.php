@@ -91,7 +91,7 @@ class UploadChunkController extends Controller
 
         if (!$isVideo && !$isDoc) {
             $publicDisk->delete($outRelativePath);
-            return response()->json(['error' => 'Formato de arquivo nÃ£o permitido'], 422);
+            return response()->json(['error' => 'Formato de arquivo não permitido'], 422);
         }
 
         $maxMb = (int) ($isVideo ? config('uploads.video_max_mb', 1024) : config('uploads.document_max_mb', 50));
