@@ -19,6 +19,7 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+.vscode/
 *.suo
 *.ntvs*
 *.njsproj
@@ -26,4 +27,5 @@ yarn-error.log
 *.sw?
 package-lock.json
 yarn.lock
+/.agent
 .agent/
