@@ -82,7 +82,7 @@
             </div>
 
             <!-- Mobile Toggle -->
-            <button id="mobile-menu-toggle" class="lg:hidden inline-flex items-center justify-center rounded-full border border-[#1F5EDB] px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
+            <button id="mobile-menu-toggle" class="lg:hidden inline-flex items-center justify-center rounded-full border-0 sm:border sm:border-[#1F5EDB] px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
                 <span class="sr-only">Abrir menu</span>
                 <i class="fas fa-bars text-lg"></i>
             </button>
