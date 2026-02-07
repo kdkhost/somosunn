@@ -40,7 +40,11 @@
 
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Descrição Completa</label>
-            <textarea name="full_description" rows="5" class="w-full rounded-md border-gray-300 shadow-sm">{{ $course->full_description }}</textarea>
+            @php
+                $fullDescriptionValue = old('full_description', (string) ($course->full_description ?? ''));
+                $fullDescriptionValue = html_entity_decode($fullDescriptionValue, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            @endphp
+            <textarea name="full_description" rows="5" class="w-full rounded-md border-gray-300 shadow-sm">{!! $fullDescriptionValue !!}</textarea>
         </div>
 
         <div>

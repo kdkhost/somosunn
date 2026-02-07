@@ -13,8 +13,10 @@
             <div class="card-body box-profile">
                 <div class="text-center">
                     @php
-                        $photo = $order->user->photo ?? null;
-                        $avatarUrl = $photo ? asset($photo) : asset('img/default-user.svg');
+                        $photo = trim((string) ($order->user->photo ?? ''));
+                        $avatarUrl = $photo !== ''
+                            ? ((str_starts_with($photo, 'http://') || str_starts_with($photo, 'https://')) ? $photo : asset($photo))
+                            : asset('img/default-user.svg');
                     @endphp
                     <img class="profile-user-img img-fluid img-circle" src="{{ $avatarUrl }}" alt="User profile picture" onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                 </div>

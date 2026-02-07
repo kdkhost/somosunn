@@ -40,8 +40,10 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     @php
-                                        $photo = $order->user->photo ?? null;
-                                        $avatarUrl = $photo ? asset($photo) : asset('img/default-user.svg');
+                                        $photo = trim((string) optional($order->user)->photo);
+                                        $avatarUrl = $photo !== ''
+                                            ? ((str_starts_with($photo, 'http://') || str_starts_with($photo, 'https://')) ? $photo : asset($photo))
+                                            : asset('img/default-user.svg');
                                     @endphp
                                     <img src="{{ $avatarUrl }}" class="img-circle elevation-1 mr-2" style="width:30px;height:30px;object-fit:cover" onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                                     {{ $order->user->name ?? 'Usuário Removido' }}

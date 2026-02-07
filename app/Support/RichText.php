@@ -21,6 +21,12 @@ class RichText
             return static::sanitizeHtml($value);
         }
 
+        // Alguns editores salvam HTML escapado (ex.: &lt;p&gt;...&lt;/p&gt;). Se parecer HTML apos decodificar, renderiza como HTML.
+        $decoded = html_entity_decode($value, \ENT_QUOTES | \ENT_HTML5, 'UTF-8');
+        if ($decoded !== $value && preg_match('/<\\s*\\/?\\s*[a-z][^>]*>/i', $decoded)) {
+            return static::sanitizeHtml($decoded);
+        }
+
         return nl2br(e($value));
     }
 
@@ -170,4 +176,3 @@ class RichText
         $parent->removeChild($el);
     }
 }
-

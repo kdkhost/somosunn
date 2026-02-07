@@ -42,14 +42,31 @@
     $sitePrimary = \App\Models\Setting::get('site_color_primary') ?: '#1F5EDB';
     $siteSecondary = \App\Models\Setting::get('site_color_secondary') ?: '#1D3FC4';
 
-    $sitePrimary38 = $hexToRgba($sitePrimary, 0.38) ?: 'rgba(31,94,219,0.38)';
-    $sitePrimary30 = $hexToRgba($sitePrimary, 0.30) ?: 'rgba(31,94,219,0.30)';
-    $sitePrimary22 = $hexToRgba($sitePrimary, 0.22) ?: 'rgba(31,94,219,0.22)';
-    $sitePrimary14 = $hexToRgba($sitePrimary, 0.14) ?: 'rgba(31,94,219,0.14)';
+    // Admin controls (Settings -> Aparência -> Eventos)
+    $eventsHeroBlurPxRaw = \App\Models\Setting::get('events_hero_bg_blur_px');
+    $eventsHeroBlurPx = is_numeric($eventsHeroBlurPxRaw) ? (int) $eventsHeroBlurPxRaw : 64;
+    $eventsHeroBlurPx = max(0, min(140, $eventsHeroBlurPx));
 
-    $siteSecondary28 = $hexToRgba($siteSecondary, 0.28) ?: 'rgba(29,63,196,0.28)';
-    $siteSecondary18 = $hexToRgba($siteSecondary, 0.18) ?: 'rgba(29,63,196,0.18)';
+    $eventsHeroFilmRaw = \App\Models\Setting::get('events_hero_film_strength_percent');
+    $eventsHeroFilmPercent = is_numeric($eventsHeroFilmRaw) ? (int) $eventsHeroFilmRaw : 100;
+    $eventsHeroFilmPercent = max(0, min(100, $eventsHeroFilmPercent));
+    $eventsHeroFilmScale = $eventsHeroFilmPercent / 100;
+    $filmAlpha = static function (float $base) use ($eventsHeroFilmScale): float {
+        $value = $base * $eventsHeroFilmScale;
+        return max(0.0, min(1.0, $value));
+    };
+
+    // Base background (subtle, always on)
+    $sitePrimary14 = $hexToRgba($sitePrimary, 0.14) ?: 'rgba(31,94,219,0.14)';
     $siteSecondary08 = $hexToRgba($siteSecondary, 0.08) ?: 'rgba(29,63,196,0.08)';
+
+    // Film (insulfilm) overlay scales by Admin slider
+    $sitePrimary38 = $hexToRgba($sitePrimary, $filmAlpha(0.38)) ?: ('rgba(31,94,219,' . $filmAlpha(0.38) . ')');
+    $sitePrimary30 = $hexToRgba($sitePrimary, $filmAlpha(0.30)) ?: ('rgba(31,94,219,' . $filmAlpha(0.30) . ')');
+    $sitePrimary22 = $hexToRgba($sitePrimary, $filmAlpha(0.22)) ?: ('rgba(31,94,219,' . $filmAlpha(0.22) . ')');
+
+    $siteSecondary28 = $hexToRgba($siteSecondary, $filmAlpha(0.28)) ?: ('rgba(29,63,196,' . $filmAlpha(0.28) . ')');
+    $siteSecondary18 = $hexToRgba($siteSecondary, $filmAlpha(0.18)) ?: ('rgba(29,63,196,' . $filmAlpha(0.18) . ')');
 
     $resolveImageUrl = function (?string $path): ?string {
         $path = trim((string) $path);
@@ -91,7 +108,7 @@
             linear-gradient(135deg, {{ $sitePrimary14 }} 0%, {{ $siteSecondary08 }} 100%);">
         @if($eventImageUrl)
             <div class="absolute inset-0 pointer-events-none">
-                <img src="{{ $eventImageUrl }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-125 blur-3xl opacity-45 saturate-150" loading="lazy" aria-hidden="true">
+                <img src="{{ $eventImageUrl }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-125 opacity-45 saturate-150" style="--tw-blur: blur({{ $eventsHeroBlurPx }}px)" loading="lazy" aria-hidden="true">
 
                 <!-- Película degradê (paleta do site) -->
                 <div class="absolute inset-0" style="background:
@@ -99,9 +116,6 @@
                     radial-gradient(900px circle at 85% 0%, {{ $siteSecondary28 }} 0%, transparent 55%),
                     linear-gradient(135deg, {{ $sitePrimary30 }} 0%, {{ $siteSecondary18 }} 55%, {{ $sitePrimary22 }} 100%);">
                 </div>
-
-                <!-- Filme claro para manter legibilidade -->
-                <div class="absolute inset-0 bg-gradient-to-b from-white/70 via-white/45 to-white/80"></div>
             </div>
         @endif
 

@@ -401,7 +401,7 @@
                         <div class="col-md-6">
                             <label>Imagem de Fundo (Hero)</label>
                             <input type="hidden" name="remove_hero_image" value="0">
-                            <div class="upload-box" data-max-size="{{ 5*1024*1024 }}" data-existing-url="{{ $heroUrl }}" data-remove-input="[name='remove_hero_image']">
+                            <div class="upload-box" data-max-size="{{ 5*1024*1024 }}" data-existing-url="{{ $heroUrl ?? '' }}" data-remove-input="[name='remove_hero_image']">
                                 <input type="file" name="hero_image" accept="image/*" class="d-none">
                                 <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
                                 <div class="upload-help text-muted small">Recomendado: 1920x1080px</div>
@@ -409,6 +409,33 @@
                                 <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
                                 <div class="progress upload-progress d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
                                 <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="text-primary mb-3"><i class="fas fa-calendar-alt mr-2"></i>Eventos (Hero)</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Desfoque do fundo (px)</label>
+                                <input name="events_hero_bg_blur_px" type="number" min="0" max="140" class="form-control" value="{{ $settings['events_hero_bg_blur_px'] ?? 64 }}">
+                                <small class="text-muted">Controla o blur da imagem de fundo na p&aacute;gina do evento.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Pel&iacute;cula (0&ndash;100)</label>
+                                <input name="events_hero_film_strength_percent" type="number" min="0" max="100" class="form-control" value="{{ $settings['events_hero_film_strength_percent'] ?? 100 }}">
+                                <small class="text-muted">Intensidade do degrad&ecirc; sobre a imagem (0 = sem pel&iacute;cula).</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-light border">
+                                <div class="small text-muted mb-0">
+                                    Afeta apenas o fundo da p&aacute;gina de detalhes do evento no site.
+                                </div>
                             </div>
                         </div>
                     </div>
