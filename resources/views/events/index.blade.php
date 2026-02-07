@@ -277,6 +277,8 @@
                                                 $eventImageUrl = asset($normalized);
                                             }
                                         }
+
+                                        $hasPrice = ((float) ($event->current_price ?: $event->price) > 0);
                                     @endphp
 
                                     <div class="group rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-[1px] transition will-change-transform">
@@ -315,13 +317,13 @@
                                                 <div class="flex items-start gap-4">
                                                     <div class="relative w-16 h-16 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0">
                                                         <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-indigo-500/10"></div>
-                                                        @if($eventImageUrl !== '')
-                                                            <img src="{{ $eventImageUrl }}" alt="Imagem do evento" class="absolute inset-0 w-full h-full object-cover" loading="lazy" onerror="this.remove();">
-                                                            <div class="absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-black/0"></div>
-                                                        @endif
                                                         <div class="absolute inset-0 flex items-center justify-center text-slate-400">
                                                             <i class="fas fa-calendar-alt"></i>
                                                         </div>
+                                                        @if($eventImageUrl !== '')
+                                                            <img src="{{ $eventImageUrl }}" alt="Imagem do evento" class="absolute inset-0 w-full h-full object-cover z-10" loading="lazy" onerror="this.remove();">
+                                                            <div class="absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-black/0 z-20"></div>
+                                                        @endif
                                                     </div>
 
                                                     <div class="min-w-0">
@@ -336,7 +338,7 @@
                                                                 </span>
                                                             @endif
 
-                                                            @if($event->current_batch_label)
+                                                            @if($hasPrice && $event->current_batch_label)
                                                                 <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black text-white shadow-sm"
                                                                     style="background: var(--unn-azul-1)">
                                                                     <i class="fas fa-tag"></i>{{ $event->current_batch_label }}
