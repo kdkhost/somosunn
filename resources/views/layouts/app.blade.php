@@ -303,6 +303,27 @@
         }
 
         @media (max-width: 640px) {
+            /* Typography scale for small screens */
+            .text-3xl {
+                font-size: 1.5rem;
+                line-height: 1.25;
+            }
+
+            .text-2xl {
+                font-size: 1.25rem;
+                line-height: 1.25;
+            }
+
+            .text-xl {
+                font-size: 1.125rem;
+                line-height: 1.35;
+            }
+
+            .text-lg {
+                font-size: 1rem;
+                line-height: 1.5;
+            }
+
             .text-5xl {
                 font-size: 2rem;
                 line-height: 1.2;
@@ -318,9 +339,35 @@
                 line-height: 1.3;
             }
 
+            /* Common spacing utilities used in CTAs */
             .px-10 {
-                padding-left: 1.5rem;
-                padding-right: 1.5rem;
+                padding-left: 1.25rem;
+                padding-right: 1.25rem;
+            }
+
+            .px-8 {
+                padding-left: 1.25rem;
+                padding-right: 1.25rem;
+            }
+
+            .px-6 {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            /* Normalize button paddings without collapsing layout blocks */
+            a.py-4,
+            button.py-4,
+            [role="button"].py-4 {
+                padding-top: 0.75rem;
+                padding-bottom: 0.75rem;
+            }
+
+            a.py-3,
+            button.py-3,
+            [role="button"].py-3 {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
             }
 
             table {

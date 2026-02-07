@@ -102,7 +102,7 @@
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-black/0"></div>
 
                                         @if($featuredEvent->capacity)
-                                            <span class="absolute top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full font-bold text-white shadow-lg"
+                                            <span class="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base rounded-full font-bold text-white shadow-lg"
                                                 style="background: var(--unn-azul-1)">
                                                 Vagas limitadas
                                             </span>
@@ -541,12 +541,12 @@
 
                         <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                             <a href="{{ route('register') }}"
-                                class="inline-flex items-center justify-center gap-3 px-10 py-4 rounded-full font-black bg-white shadow-lg hover:shadow-xl transition"
+                                class="inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-10 sm:py-4 rounded-full font-black bg-white shadow-lg hover:shadow-xl transition"
                                 style="color: var(--unn-azul-1)">
                                 <i class="fas fa-rocket"></i> Começar agora - É grátis
                             </a>
                             <a href="{{ route('premium') }}"
-                                class="inline-flex items-center justify-center gap-3 px-10 py-4 rounded-full font-black border-2 border-white text-white bg-white/10 hover:bg-white/15 transition">
+                                class="inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-10 sm:py-4 rounded-full font-black border-2 border-white text-white bg-white/10 hover:bg-white/15 transition">
                                 <i class="fas fa-crown"></i> Ver planos Premium
                             </a>
                         </div>

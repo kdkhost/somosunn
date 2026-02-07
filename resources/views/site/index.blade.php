@@ -372,11 +372,11 @@
             <h2 class="text-3xl lg:text-4xl font-black mb-4">Pronto para transformar sua rede?</h2>
             <p class="text-lg opacity-90 mb-8">Junte-se a milhares de empreendedores que já estão crescendo juntos.</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition" style="color: var(--unn-azul-1)">
+                <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-2 bg-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold hover:bg-blue-50 transition" style="color: var(--unn-azul-1)">
                     <i class="fas fa-rocket"></i>
                     Começar agora - É grátis
                 </a>
-                <a href="{{ route('premium') }}" class="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white/10 transition">
+                <a href="{{ route('premium') }}" class="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold hover:bg-white/10 transition">
                     Ver planos Premium
                 </a>
             </div>
