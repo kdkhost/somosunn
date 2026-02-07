@@ -1160,11 +1160,8 @@
                         <div class="form-group col-md-6 d-flex align-items-end gap-2">
                             <button type="button" class="btn btn-secondary mr-2" id="btnTestSmtp"><i class="fas fa-paper-plane"></i> Enviar teste</button>
                             
-                            @php
-                                $smtpTemplate = \App\Models\MailTemplate::where('slug', 'smtp_test')->first();
-                            @endphp
-                            @if($smtpTemplate)
-                                <a href="{{ route('admin.mailtemplates.edit', $smtpTemplate->id) }}" class="btn btn-outline-info"><i class="fas fa-edit"></i> Editar Template de Teste</a>
+                            @if($smtpTemplateId = \App\Models\MailTemplate::where('slug', 'smtp_test')->value('id'))
+                                <a href="{{ route('admin.mailtemplates.edit', $smtpTemplateId) }}" class="btn btn-outline-info"><i class="fas fa-edit"></i> Editar Template de Teste</a>
                             @else
                                 <span class="text-muted text-sm">(Salve uma vez para criar o template)</span>
                             @endif
