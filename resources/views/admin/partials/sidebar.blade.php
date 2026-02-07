@@ -114,7 +114,7 @@
                             <p>Eventos<i class="right fas fa-angle-left"></i></p>
                         </a>
                         <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('admin.events.index') }}" class="nav-link {{ $is('admin.events.index') }}"><i
+                            <li class="nav-item"><a href="{{ route('admin.events.index') }}" data-pjax="false" class="nav-link {{ $is('admin.events.index') }}"><i
                                         class="fas fa-calendar-alt nav-icon"></i>
                                     <p>Calendário</p>
                                 </a></li>

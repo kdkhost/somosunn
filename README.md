@@ -30,6 +30,37 @@ Payments (MercadoPago / PagSeguro)
   - /webhook/mercadopago
   - /webhook/pagseguro
 
+## API REST (Apps Mobile / IntegraÃ§Ãµes)
+
+Base URL: `/api/v1`
+
+AutenticaÃ§Ã£o (Sanctum):
+- `POST /api/v1/auth/register` â†’ retorna `token` + `user`
+- `POST /api/v1/auth/login` â†’ retorna `token` + `user`
+- `POST /api/v1/auth/logout` (auth:sanctum)
+- `GET /api/v1/me` (auth:sanctum)
+
+Recursos pÃºblicos:
+- `GET /api/v1/events?status=upcoming|past|all`
+- `GET /api/v1/events/{id}`
+- `GET /api/v1/courses?status=published|all`
+- `GET /api/v1/courses/{id}`
+- `GET /api/v1/mentorships`
+- `GET /api/v1/mentorships/{id}`
+- `GET /api/v1/plans`
+- `GET /api/v1/plans/{id}`
+- `GET /api/v1/testimonials`
+
+Exemplo de login (token bearer):
+```
+POST /api/v1/auth/login
+{
+  "email": "user@email.com",
+  "password": "senha",
+  "device_name": "android"
+}
+```
+
 ## Cupons de desconto (Eventos / Cursos / Mentorias)
 
 - Admin: gerencie em `/admin/coupons` (criação, edição e remoção).

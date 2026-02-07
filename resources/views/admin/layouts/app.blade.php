@@ -262,11 +262,16 @@
     <script>
         $(function () {
             const container = '#pjax-container';
-            $(document).pjax('a[data-pjax]', container, { timeout: 8000 });
+            $(document).pjax('a[data-pjax="true"]', container, { timeout: 8000 });
             $('.nav-sidebar a, .navbar a').each(function () {
-                const h = $(this).attr('href') || '';
-                if (h.startsWith('http') || h === '#' || $(this).attr('target')) return;
-                $(this).attr('data-pjax', 'true');
+                const $a = $(this);
+                const h = $a.attr('href') || '';
+                if (h.startsWith('http') || h === '#' || $a.attr('target')) return;
+
+                // Respect explicit opt-out (for pages that require full reload for JS stacks)
+                if ($a.is('[data-pjax]') || $a.is('[data-no-pjax]') || $a.hasClass('no-pjax')) return;
+
+                $a.attr('data-pjax', 'true');
             });
             $(document).on('pjax:end', function () {
                 $('.summernote').summernote({ height: 180 });
