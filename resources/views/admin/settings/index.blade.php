@@ -765,12 +765,11 @@
                                     <div class="form-group">
                                         <label>Posição</label>
                                         <select name="video_watermark_position" class="form-control">
-                                            @php $wmPos = $settings['video_watermark_position'] ?? 'top-right'; @endphp
-                                            <option value="top-left" {{ $wmPos==='top-left'?'selected':'' }}>Topo esquerdo</option>
-                                            <option value="top-right" {{ $wmPos==='top-right'?'selected':'' }}>Topo direito</option>
-                                            <option value="bottom-left" {{ $wmPos==='bottom-left'?'selected':'' }}>Inferior esquerdo</option>
-                                            <option value="bottom-right" {{ $wmPos==='bottom-right'?'selected':'' }}>Inferior direito</option>
-                                            <option value="center" {{ $wmPos==='center'?'selected':'' }}>Centro</option>
+                                            <option value="top-left" @selected(($settings['video_watermark_position'] ?? 'top-right') === 'top-left')>Topo esquerdo</option>
+                                            <option value="top-right" @selected(($settings['video_watermark_position'] ?? 'top-right') === 'top-right')>Topo direito</option>
+                                            <option value="bottom-left" @selected(($settings['video_watermark_position'] ?? 'top-right') === 'bottom-left')>Inferior esquerdo</option>
+                                            <option value="bottom-right" @selected(($settings['video_watermark_position'] ?? 'top-right') === 'bottom-right')>Inferior direito</option>
+                                            <option value="center" @selected(($settings['video_watermark_position'] ?? 'top-right') === 'center')>Centro</option>
                                         </select>
                                     </div>
                                 </div>
@@ -792,14 +791,13 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Blend mode</label>
-                                        @php $wmBlend = $settings['video_watermark_blend'] ?? 'normal'; @endphp
                                         <select name="video_watermark_blend" class="form-control">
-                                            <option value="normal" {{ $wmBlend==='normal'?'selected':'' }}>Normal</option>
-                                            <option value="multiply" {{ $wmBlend==='multiply'?'selected':'' }}>Multiply</option>
-                                            <option value="screen" {{ $wmBlend==='screen'?'selected':'' }}>Screen</option>
-                                            <option value="overlay" {{ $wmBlend==='overlay'?'selected':'' }}>Overlay</option>
-                                            <option value="lighten" {{ $wmBlend==='lighten'?'selected':'' }}>Lighten</option>
-                                            <option value="darken" {{ $wmBlend==='darken'?'selected':'' }}>Darken</option>
+                                            <option value="normal" @selected(($settings['video_watermark_blend'] ?? 'normal') === 'normal')>Normal</option>
+                                            <option value="multiply" @selected(($settings['video_watermark_blend'] ?? 'normal') === 'multiply')>Multiply</option>
+                                            <option value="screen" @selected(($settings['video_watermark_blend'] ?? 'normal') === 'screen')>Screen</option>
+                                            <option value="overlay" @selected(($settings['video_watermark_blend'] ?? 'normal') === 'overlay')>Overlay</option>
+                                            <option value="lighten" @selected(($settings['video_watermark_blend'] ?? 'normal') === 'lighten')>Lighten</option>
+                                            <option value="darken" @selected(($settings['video_watermark_blend'] ?? 'normal') === 'darken')>Darken</option>
                                         </select>
                                     </div>
                                 </div>

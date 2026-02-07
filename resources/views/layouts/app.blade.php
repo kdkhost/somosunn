@@ -376,6 +376,38 @@
             }
         }
 
+        @media (max-width: 1200px) {
+            .text-6xl {
+                font-size: clamp(2.2rem, 6vw, 3.1rem);
+                line-height: 1.15;
+            }
+
+            .text-5xl {
+                font-size: clamp(1.95rem, 5vw, 2.7rem);
+                line-height: 1.2;
+            }
+
+            .text-4xl {
+                font-size: clamp(1.65rem, 4vw, 2.2rem);
+                line-height: 1.25;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            a.btn-primary,
+            button.btn-primary {
+                font-size: 0.95rem;
+                line-height: 1.25rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            a.rounded-full,
+            button.rounded-full {
+                max-width: 100%;
+            }
+        }
+
         @if($videoPlayerEnabled)
             .unn-video-player {
                 position: relative;

@@ -27,6 +27,68 @@
         .unn-events-cta {
             background: linear-gradient(180deg, var(--unn-azul-3) 0%, var(--unn-azul-1) 55%, var(--unn-azul-3) 100%);
         }
+
+        .events-table-head,
+        .events-table-row {
+            display: grid;
+            gap: 1rem;
+        }
+
+        @media (min-width: 1200px) {
+            .events-table-head,
+            .events-table-row {
+                grid-template-columns:
+                    minmax(130px, 0.85fr)
+                    minmax(260px, 1.7fr)
+                    minmax(260px, 1.7fr)
+                    minmax(90px, 0.6fr)
+                    minmax(120px, 0.8fr)
+                    minmax(170px, 0.95fr);
+                align-items: center;
+            }
+
+            .events-col-action {
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            .events-col-action .events-action-btn {
+                min-width: 152px;
+                width: auto;
+            }
+        }
+
+        @media (max-width: 1199.98px) {
+            .events-table-head {
+                display: none !important;
+            }
+
+            .events-table-row {
+                grid-template-columns: 1fr;
+            }
+
+            .events-col-action .events-action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .events-top-cta {
+                width: 100%;
+                justify-content: center;
+                text-align: center;
+            }
+
+            .events-main-title {
+                font-size: clamp(1.85rem, 4.4vw, 2.5rem);
+                line-height: 1.2;
+            }
+
+            .events-subtitle {
+                font-size: clamp(1rem, 2.4vw, 1.2rem);
+            }
+        }
     </style>
 @endpush
 
@@ -211,14 +273,14 @@
                             style="background: var(--unn-azul-1); color: white">
                             <i class="fas fa-calendar-check"></i> Agenda
                         </span>
-                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 mt-4">Agenda de Eventos</h2>
-                        <p class="text-gray-600 mt-2 max-w-2xl">
+                        <h2 class="events-main-title text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 mt-4">Agenda de Eventos</h2>
+                        <p class="events-subtitle text-gray-600 mt-2 max-w-2xl">
                             Visualização é pública. A confirmação de vaga pode exigir pagamento conforme o evento.
                         </p>
                     </div>
 
                     <a href="{{ route('premium') }}"
-                        class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-bold bg-white border hover:bg-slate-50 transition"
+                        class="events-top-cta inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-bold bg-white border hover:bg-slate-50 transition"
                         style="border-color: var(--unn-azul-1); color: var(--unn-azul-1)">
                         <i class="fas fa-crown"></i> Ver planos Premium
                     </a>
@@ -246,13 +308,13 @@
                         </div>
                     @else
                         <div class="bg-slate-50/40 p-4 sm:p-6">
-                            <div class="hidden md:grid grid-cols-12 gap-4 px-4 pb-3 text-xs font-black uppercase tracking-wider text-slate-500">
-                                <div class="col-span-2">Data</div>
-                                <div class="col-span-4">Evento</div>
-                                <div class="col-span-3">Localização</div>
-                                <div class="col-span-1">Vagas</div>
-                                <div class="col-span-1">Valor</div>
-                                <div class="col-span-1 text-right">Ação</div>
+                            <div class="events-table-head px-4 pb-3 text-xs font-black uppercase tracking-wider text-slate-500">
+                                <div>Data</div>
+                                <div>Evento</div>
+                                <div>Localização</div>
+                                <div>Vagas</div>
+                                <div>Valor</div>
+                                <div class="text-right">Ação</div>
                             </div>
 
                             <div class="space-y-3">
@@ -282,8 +344,8 @@
                                     @endphp
 
                                     <div class="group rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-[1px] transition will-change-transform">
-                                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-5 md:p-6">
-                                            <div class="md:col-span-2">
+                                        <div class="events-table-row p-5 md:p-6">
+                                            <div class="events-col-date min-w-0">
                                                 <div class="flex md:block items-center justify-between gap-3">
                                                     <div class="flex items-center gap-3">
                                                         <div class="w-14 text-center rounded-2xl p-2 border border-slate-200 bg-gradient-to-br from-white to-slate-50 shadow-inner">
@@ -313,7 +375,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="md:col-span-4">
+                                            <div class="events-col-event min-w-0">
                                                 <div class="flex items-start gap-4">
                                                     <div class="relative w-16 h-16 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0">
                                                         <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-indigo-500/10"></div>
@@ -349,7 +411,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="md:col-span-3">
+                                            <div class="events-col-location min-w-0">
                                                 <div class="text-slate-800 font-bold">
                                                     <i class="fas fa-map-marker-alt text-red-500 mr-1"></i>{{ $locationLine }}
                                                 </div>
@@ -360,7 +422,7 @@
                                                 @endif
                                             </div>
 
-                                            <div class="md:col-span-1">
+                                            <div class="events-col-capacity min-w-0">
                                                 @if($event->capacity)
                                                     <div class="text-sm font-black text-slate-900">{{ $event->capacity }}</div>
                                                     <div class="text-xs text-slate-500 mt-1">vagas</div>
@@ -369,7 +431,7 @@
                                                 @endif
                                             </div>
 
-                                            <div class="md:col-span-1">
+                                            <div class="events-col-price min-w-0">
                                                 @if($event->current_price > 0 || $event->price > 0)
                                                     <div class="font-black text-slate-900">R$ {{ number_format($event->current_price ?: $event->price, 2, ',', '.') }}</div>
                                                     <div class="text-xs text-slate-500 mt-1">por pessoa</div>
@@ -378,9 +440,9 @@
                                                 @endif
                                             </div>
 
-                                            <div class="md:col-span-1 md:text-right">
+                                            <div class="events-col-action md:text-right">
                                                 <a href="{{ $isDemo ? '#' : route('events.show', $event->id) }}"
-                                                    class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-black text-white btn-primary shadow-lg hover:shadow-xl transition whitespace-nowrap w-full md:w-auto {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
+                                                    class="events-action-btn inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-black text-white btn-primary shadow-lg hover:shadow-xl transition whitespace-nowrap w-full md:w-auto {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
                                                     <i class="fas fa-ticket-alt"></i>
                                                     Detalhes
                                                 </a>
@@ -514,7 +576,7 @@
                                         @endif
                                     </div>
                                     <a href="{{ $isDemo ? '#' : route('events.show', $event) }}"
-                                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-white btn-primary shadow-md hover:shadow-lg transition {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
+                                        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-bold text-white btn-primary shadow-md hover:shadow-lg transition w-full sm:w-auto sm:min-w-[150px] {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
                                         Ver detalhes <i class="fas fa-arrow-right text-sm"></i>
                                     </a>
                                 </div>
