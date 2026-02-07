@@ -24,27 +24,30 @@ class ContactController extends Controller
         if (!$this->verifyRecaptchaV3($request)) {
             return back()
                 ->withInput()
-                ->with('error', 'Falha na verificação de segurança (reCAPTCHA). Tente novamente.');
+                ->with('error', 'Falha na verificacao de seguranca (reCAPTCHA). Tente novamente.');
         }
 
         $this->applySmtpSettingsFromDatabase();
 
         $to = trim((string) Setting::get('company_email', ''));
         if ($to === '') {
+            $to = trim((string) Setting::get('smtp_from_email', ''));
+        }
+        if ($to === '') {
             $to = trim((string) config('mail.from.address', ''));
         }
 
         if ($to === '') {
-            Log::warning('Contato: e-mail de destino não configurado (company_email / mail.from.address).');
+            Log::warning('Contato: email de destino nao configurado (company_email/smtp_from_email/mail.from.address).');
             return back()
                 ->withInput()
-                ->with('error', 'E-mail de contato não configurado. Tente novamente mais tarde.');
+                ->with('error', 'Email de contato nao configurado. Tente novamente mais tarde.');
         }
 
         $subjectLabels = [
-            'duvidas' => 'Dúvidas sobre a plataforma',
+            'duvidas' => 'Duvidas sobre a plataforma',
             'parcerias' => 'Propostas de parceria',
-            'suporte' => 'Suporte técnico',
+            'suporte' => 'Suporte tecnico',
             'comercial' => 'Departamento comercial',
             'imprensa' => 'Assessoria de imprensa',
             'outro' => 'Outro assunto',
@@ -52,7 +55,7 @@ class ContactController extends Controller
 
         $siteName = Setting::get('app_name') ?: config('app.name', 'UNN');
         $subjectText = $subjectLabels[$data['subject']] ?? $data['subject'];
-        $mailSubject = "[Contato] {$subjectText} — {$siteName}";
+        $mailSubject = "[Contato] {$subjectText} - {$siteName}";
 
         $html = view('emails.contact', [
             'data' => [
@@ -72,10 +75,15 @@ class ContactController extends Controller
                 $message->replyTo($data['email'], $data['name']);
             });
         } catch (\Throwable $e) {
-            Log::error('Contato: falha ao enviar e-mail: ' . $e->getMessage());
+            Log::error('Contato: falha ao enviar email: ' . $e->getMessage(), [
+                'to' => $to,
+                'smtp_host' => config('mail.mailers.smtp.host'),
+                'smtp_port' => config('mail.mailers.smtp.port'),
+            ]);
+
             return back()
                 ->withInput()
-                ->with('error', 'Não foi possível enviar sua mensagem agora. Tente novamente mais tarde.');
+                ->with('error', 'Nao foi possivel enviar sua mensagem agora. Tente novamente mais tarde.');
         }
 
         return back()->with('success', 'Mensagem enviada com sucesso! Em breve retornaremos seu contato.');
@@ -83,9 +91,10 @@ class ContactController extends Controller
 
     private function verifyRecaptchaV3(Request $request): bool
     {
-        $secret = (string) config('services.recaptcha.v3_secret', '');
-        if ($secret === '') {
-            // Sem secret configurado, não bloqueia o formulário (ambiente dev/staging).
+        $siteKey = trim((string) (Setting::get('recaptcha_v3_site_key') ?: config('services.recaptcha.site_key', '')));
+        $secret = trim((string) (Setting::get('recaptcha_v3_secret_key') ?: config('services.recaptcha.v3_secret', '')));
+
+        if ($siteKey === '' || $secret === '') {
             return true;
         }
 
@@ -94,11 +103,13 @@ class ContactController extends Controller
             return false;
         }
 
-        $minScore = (float) config('services.recaptcha.v3_min_score', 0.5);
+        $minScoreRaw = (string) (Setting::get('recaptcha_v3_min_score') ?: config('services.recaptcha.v3_min_score', 0.5));
+        $minScore = (float) str_replace(',', '.', $minScoreRaw);
+        $minScore = max(0.0, min(1.0, $minScore));
 
         try {
             $response = Http::asForm()
-                ->timeout(5)
+                ->timeout(8)
                 ->post('https://www.google.com/recaptcha/api/siteverify', [
                     'secret' => $secret,
                     'response' => $token,
@@ -106,13 +117,13 @@ class ContactController extends Controller
                 ]);
 
             if (!$response->ok()) {
-                Log::warning('reCAPTCHA: resposta não OK: ' . $response->status());
+                Log::warning('reCAPTCHA: resposta nao OK', ['status' => $response->status()]);
                 return false;
             }
 
             $payload = $response->json();
             if (!is_array($payload) || !($payload['success'] ?? false)) {
-                Log::info('reCAPTCHA: falhou', ['payload' => $payload]);
+                Log::info('reCAPTCHA: validacao falhou', ['payload' => $payload]);
                 return false;
             }
 
@@ -124,13 +135,13 @@ class ContactController extends Controller
 
             $score = (float) ($payload['score'] ?? 0);
             if ($score < $minScore) {
-                Log::info('reCAPTCHA: score abaixo do mínimo', ['score' => $score, 'min' => $minScore]);
+                Log::info('reCAPTCHA: score abaixo do minimo', ['score' => $score, 'min' => $minScore]);
                 return false;
             }
 
             return true;
         } catch (\Throwable $e) {
-            Log::warning('reCAPTCHA: exceção ao validar: ' . $e->getMessage());
+            Log::warning('reCAPTCHA: excecao ao validar', ['error' => $e->getMessage()]);
             return false;
         }
     }
@@ -155,6 +166,7 @@ class ContactController extends Controller
             }
 
             config([
+                'mail.default' => 'smtp',
                 'mail.mailers.smtp.transport' => 'smtp',
                 'mail.mailers.smtp.host' => $host,
                 'mail.mailers.smtp.port' => $port,
@@ -162,10 +174,10 @@ class ContactController extends Controller
                 'mail.mailers.smtp.password' => $password !== '' ? $password : null,
                 'mail.mailers.smtp.encryption' => $encryption !== '' ? $encryption : null,
                 'mail.from.address' => $fromEmail,
-                'mail.from.name' => $fromName !== '' ? $fromName : (Setting::get('app_name') ?: config('app.name')),
+                'mail.from.name' => $fromName !== '' ? $fromName : (Setting::get('app_name') ?: config('app.name', 'UNN')),
             ]);
         } catch (\Throwable $e) {
-            Log::warning('Contato: falha ao aplicar SMTP do banco: ' . $e->getMessage());
+            Log::warning('Contato: falha ao aplicar SMTP do banco', ['error' => $e->getMessage()]);
         }
     }
 }

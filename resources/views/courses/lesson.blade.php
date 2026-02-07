@@ -46,18 +46,33 @@
             
             <div class="aspect-w-16 aspect-h-9 bg-black rounded-xl overflow-hidden shadow-2xl mb-8" data-unn-video-host>
                 @if($lesson->video_url)
+                    @php
+                        $normalizedVideoUrl = trim((string) $lesson->video_url);
+                        if (
+                            $normalizedVideoUrl !== '' &&
+                            !preg_match('/^https?:\\/\\//i', $normalizedVideoUrl) &&
+                            !str_starts_with($normalizedVideoUrl, '//') &&
+                            !str_starts_with($normalizedVideoUrl, '/')
+                        ) {
+                            $normalizedVideoUrl = '/' . $normalizedVideoUrl;
+                        }
+                    @endphp
                     @php $usePlyr = (string) \App\Models\Setting::get('video_player_enabled', '1') === '1'; @endphp
                     @if($usePlyr)
                         <div class="w-full h-full min-h-[400px]"
                             data-unn-video-player
-                            data-video-url="{{ $lesson->video_url }}"
+                            data-video-url="{{ $normalizedVideoUrl }}"
                             data-block-download="{{ !empty($course->video_block_download) ? '1' : '0' }}"
                             data-floating-enabled="{{ !empty($course->video_floating_enabled) ? '1' : '0' }}"
                             data-floating-width="{{ (int) ($course->video_floating_width ?? 420) }}"
                             data-floating-height="{{ (int) ($course->video_floating_height ?? 236) }}"
-                        ></div>
+                        >
+                            <video class="w-full h-full min-h-[400px]" controls playsinline preload="metadata">
+                                <source src="{{ $normalizedVideoUrl }}">
+                            </video>
+                        </div>
                     @else
-                        <iframe src="{{ str_replace('youtu.be/', 'youtube.com/embed/', $lesson->video_url) }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full min-h-[400px]"></iframe>
+                        <iframe src="{{ str_replace('youtu.be/', 'youtube.com/embed/', $normalizedVideoUrl) }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full min-h-[400px]"></iframe>
                     @endif
                 @else
                     <div class="flex items-center justify-center h-full text-white">
@@ -79,7 +94,7 @@
                     </h4>
                     <div class="grid gap-3">
                         @foreach($lesson->attachments as $attachment)
-                        <a href="{{ asset('storage/'.$attachment->file_path) }}" target="_blank" class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition group">
+                        <a href="{{ route('courses.lessons.attachments.download', [$course->id, $lesson->id, $attachment->id]) }}" class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition group">
                             <div class="flex items-center overflow-hidden">
                                 <div class="bg-blue-100 text-blue-600 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 mr-3">
                                     <i class="fas fa-file-alt"></i>

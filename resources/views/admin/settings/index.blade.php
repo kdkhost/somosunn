@@ -1291,6 +1291,50 @@
                         </div>
                     </div>
 
+                    <div class="card card-outline card-primary mb-3">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-map-signs mr-1"></i> Guia rápido de configuração</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="font-weight-bold">Google Analytics 4 (GA4)</h6>
+                                    <ol class="pl-3 text-muted small">
+                                        <li>Acesse <a href="https://analytics.google.com/" target="_blank" rel="noopener">analytics.google.com</a> e crie uma propriedade GA4.</li>
+                                        <li>Abra <strong>Administrador &gt; Fluxos de dados &gt; Web</strong>.</li>
+                                        <li>Copie a tag/trecho e cole em <strong>Código no &lt;head&gt;</strong>.</li>
+                                    </ol>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="font-weight-bold">Google Tag Manager (GTM)</h6>
+                                    <ol class="pl-3 text-muted small">
+                                        <li>Acesse <a href="https://tagmanager.google.com/" target="_blank" rel="noopener">tagmanager.google.com</a> e crie o container Web.</li>
+                                        <li>Cole o script principal em <strong>Código no &lt;head&gt;</strong>.</li>
+                                        <li>Cole o trecho <code>&lt;noscript&gt;</code> em <strong>Código no &lt;body&gt;</strong>.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <h6 class="font-weight-bold">Meta Pixel</h6>
+                                    <ol class="pl-3 text-muted small">
+                                        <li>No Meta Business, abra <strong>Gerenciador de Eventos</strong>.</li>
+                                        <li>Crie ou selecione o Pixel.</li>
+                                        <li>Copie o código base e cole em <strong>Código no &lt;head&gt;</strong>.</li>
+                                    </ol>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="font-weight-bold">Google Search Console</h6>
+                                    <ol class="pl-3 text-muted small">
+                                        <li>Acesse <a href="https://search.google.com/search-console" target="_blank" rel="noopener">search.google.com/search-console</a>.</li>
+                                        <li>Adicione a propriedade do domínio.</li>
+                                        <li>Escolha validação por meta tag e cole somente o valor em <strong>Google site verification</strong>.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     @if(($analytics['enabled'] ?? false))
                         <div class="row">
                             <div class="col-md-4">

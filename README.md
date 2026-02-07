@@ -34,33 +34,123 @@ Payments (MercadoPago / PagSeguro)
 
 Base URL: `/api/v1`
 
-Autenticação (Sanctum):
-- `POST /api/v1/auth/register` → retorna `token` + `user`
-- `POST /api/v1/auth/login` → retorna `token` + `user`
-- `POST /api/v1/auth/logout` (auth:sanctum)
-- `GET /api/v1/me` (auth:sanctum)
+### Padrão de comunicação
+- Formato: `application/json`
+- Charset: `UTF-8` (sem BOM)
+- Versionamento: prefixo `/v1`
+- Paginação: endpoints de listagem retornam `data`, `links` e `meta` (padrão Laravel)
 
-Recursos públicos:
-- `GET /api/v1/events?status=upcoming|past|all`
-- `GET /api/v1/events/{id}`
-- `GET /api/v1/courses?status=published|all`
-- `GET /api/v1/courses/{id}`
-- `GET /api/v1/mentorships`
-- `GET /api/v1/mentorships/{id}`
-- `GET /api/v1/plans`
-- `GET /api/v1/plans/{id}`
-- `GET /api/v1/testimonials`
+### Autenticação (Laravel Sanctum)
 
-Exemplo de login (token bearer):
+Fluxo recomendado para Android/iOS/Windows:
+1. `POST /api/v1/auth/login` (ou `register`) para obter token.
+2. Guardar token no storage seguro do app.
+3. Enviar `Authorization: Bearer {token}` nas rotas protegidas.
+4. Encerrar sessão com `POST /api/v1/auth/logout`.
+
+Rotas de autenticação:
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/logout` (requer token)
+- `GET /api/v1/me` (requer token)
+
+Exemplo de request de login:
+```bash
+curl -X POST "https://SEU-DOMINIO/api/v1/auth/login" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@email.com",
+    "password": "senha",
+    "device_name": "android"
+  }'
 ```
-POST /api/v1/auth/login
+
+Exemplo de resposta de login:
+```json
 {
-  "email": "user@email.com",
-  "password": "senha",
-  "device_name": "android"
+  "token": "1|TOKEN_GERADO",
+  "user": {
+    "id": 10,
+    "name": "Fulano",
+    "email": "user@email.com",
+    "phone": "(11) 99999-9999",
+    "photo_url": "https://SEU-DOMINIO/storage/...",
+    "role": "member",
+    "level": "basic",
+    "plan_id": 1,
+    "plan_expires_at": "2026-12-31T23:59:59+00:00",
+    "created_at": "2026-02-07T12:00:00+00:00"
+  }
 }
 ```
 
+Exemplo de rota autenticada:
+```bash
+curl "https://SEU-DOMINIO/api/v1/me" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer 1|TOKEN_GERADO"
+```
+
+### Endpoints públicos
+
+#### Healthcheck
+- `GET /api/v1/health`
+- Resposta:
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-02-07T18:20:00+00:00"
+}
+```
+
+#### Eventos
+- `GET /api/v1/events?status=upcoming|past|all&per_page=20`
+- `GET /api/v1/events/{event}`
+- Campos principais: `id`, `title`, `speaker`, `description`, `image_url`, `start_at`, `end_at`, `all_day`, `location`, `address`, `latitude`, `longitude`, `price`, `current_price`, `batch_label`, `capacity`, `confirmed_seats`, `remaining_seats`, `published`, `color`.
+
+#### Cursos
+- `GET /api/v1/courses?status=published|all&per_page=20`
+- `GET /api/v1/courses/{course}`
+- Campos principais: `id`, `title`, `slug`, `price`, `duration`, `total_hours`, `thumbnail_url`, `short_description`, `full_description`, `author_name`, `status`, `is_featured`.
+
+#### Mentorias
+- `GET /api/v1/mentorships?per_page=20`
+- `GET /api/v1/mentorships/{mentorship}`
+- Campos principais: `id`, `title`, `description`, `price`, `slots`, `schedule`, `mentor`.
+
+#### Planos
+- `GET /api/v1/plans?per_page=20`
+- `GET /api/v1/plans/{plan}`
+- Campos principais: `id`, `name`, `slug`, `price`, `period`, `billing_cycle`, `prorata`, `description`, `image_url`, `is_featured`, `highlight`, `coupons_enabled`, `benefits`, `permissions`, `comparison`, `is_active`.
+
+#### Depoimentos
+- `GET /api/v1/testimonials?per_page=20`
+- Retorna apenas itens aprovados.
+
+### Contrato de erros
+- `401 Unauthorized`: token ausente/inválido.
+- `404 Not Found`: recurso não publicado/inexistente.
+- `422 Unprocessable Entity`: erro de validação (ex.: login/registro).
+- `500 Internal Server Error`: erro inesperado.
+
+Exemplo de validação:
+```json
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": [
+      "Credenciais inválidas."
+    ]
+  }
+}
+```
+
+### Dicas para apps
+- Defina timeout e retry no cliente HTTP.
+- Renove token refazendo login quando receber `401`.
+- Prefira `per_page` entre `10` e `50` para melhor desempenho em redes móveis.
+- Use cache local para listas (`events`, `courses`, `plans`) e invalide por tempo.
 ## Correções recentes (Admin)
 
 - Calendário de Eventos (`/admin/events`) com inicialização reforçada no FullCalendar v4 para evitar tela em branco em carregamentos fora do fluxo padrão.

@@ -59,7 +59,17 @@
         return !empty($item['url']);
     }));
 
-    $recaptchaSiteKey = (string) config('services.recaptcha.site_key', '');
+    $fullAddress = trim(implode(', ', array_filter([
+        $companyAddress . ($companyNumber ? ' ' . $companyNumber : ''),
+        $companyComplement,
+        $companyDistrict,
+        $companyCity . ' - ' . $companyState,
+        'CEP ' . $companyZip,
+        'Brasil',
+    ])));
+    $mapQuery = $fullAddress !== '' ? rawurlencode($fullAddress) : rawurlencode('Sao Paulo, Brasil');
+    $mapEmbedUrl = 'https://www.google.com/maps?q=' . $mapQuery . '&output=embed';
+    $recaptchaSiteKey = (string) (\App\Models\Setting::get('recaptcha_v3_site_key') ?: config('services.recaptcha.site_key', ''));
 @endphp
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
@@ -217,7 +227,7 @@
             <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">Nossa Localização</h2>
             <div class="rounded-3xl overflow-hidden shadow-2xl h-[400px]">
                 <iframe 
-                    src="https://www.openstreetmap.org/export/embed.html?bbox=-46.6600,-23.5650,-46.6500,-23.5550&layer=mapnik&marker=-23.5600,-46.6550"
+                    src="{{ $mapEmbedUrl }}"
                     class="w-full h-full border-0"
                     loading="lazy"
                     title="Localização UNN"
@@ -241,7 +251,7 @@
 @endsection
 
 @push('scripts')
-@php($recaptchaSiteKey = (string) config('services.recaptcha.site_key', ''))
+@php($recaptchaSiteKey = (string) (\App\Models\Setting::get('recaptcha_v3_site_key') ?: config('services.recaptcha.site_key', '')))
 @if($recaptchaSiteKey !== '')
     <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}"></script>
     <script>

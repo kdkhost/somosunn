@@ -688,7 +688,8 @@
         <script>
             (function () {
                 const config = (window.UNN && window.UNN.videoPlayer) ? window.UNN.videoPlayer : null;
-                if (!config || !config.enabled || typeof Plyr === 'undefined') return;
+                if (!config || !config.enabled) return;
+                const plyrAvailable = typeof Plyr !== 'undefined';
 
                 function deepMerge(target, source) {
                     if (!source || typeof source !== 'object') return target;
@@ -890,16 +891,34 @@
 
                     let target;
                     if (youtubeId) {
-                        target = document.createElement('div');
-                        target.setAttribute('data-plyr-provider', 'youtube');
-                        target.setAttribute('data-plyr-embed-id', youtubeId);
-                        wrapper.appendChild(target);
+                        if (plyrAvailable) {
+                            target = document.createElement('div');
+                            target.setAttribute('data-plyr-provider', 'youtube');
+                            target.setAttribute('data-plyr-embed-id', youtubeId);
+                            wrapper.appendChild(target);
+                        } else {
+                            target = document.createElement('iframe');
+                            target.src = 'https://www.youtube.com/embed/' + encodeURIComponent(youtubeId);
+                            target.setAttribute('allowfullscreen', '');
+                            target.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                            target.className = 'w-full h-full min-h-[400px]';
+                            wrapper.appendChild(target);
+                        }
                     } else if (vimeoId) {
-                        target = document.createElement('div');
-                        target.setAttribute('data-plyr-provider', 'vimeo');
-                        target.setAttribute('data-plyr-embed-id', vimeoId);
-                        wrapper.appendChild(target);
-                    } else if (isDirectVideo(url)) {
+                        if (plyrAvailable) {
+                            target = document.createElement('div');
+                            target.setAttribute('data-plyr-provider', 'vimeo');
+                            target.setAttribute('data-plyr-embed-id', vimeoId);
+                            wrapper.appendChild(target);
+                        } else {
+                            target = document.createElement('iframe');
+                            target.src = 'https://player.vimeo.com/video/' + encodeURIComponent(vimeoId);
+                            target.setAttribute('allowfullscreen', '');
+                            target.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+                            target.className = 'w-full h-full min-h-[400px]';
+                            wrapper.appendChild(target);
+                        }
+                    } else {
                         target = document.createElement('video');
                         target.setAttribute('playsinline', '');
                         target.setAttribute('controls', '');
@@ -913,14 +932,9 @@
                         target.appendChild(source);
 
                         wrapper.appendChild(target);
-                    } else {
-                        const link = document.createElement('a');
-                        link.href = String(url);
-                        link.target = '_blank';
-                        link.rel = 'noopener';
-                        link.className = 'text-white underline';
-                        link.textContent = 'Abrir vídeo';
-                        wrapper.appendChild(link);
+                    }
+
+                    if (!plyrAvailable) {
                         return;
                     }
 

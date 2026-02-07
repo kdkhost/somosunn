@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\LessonAttachment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -52,7 +53,7 @@ class LessonController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Aula criada com sucesso',
-                'lesson' => $lesson
+                'lesson' => $lesson,
             ]);
         }
 
@@ -61,25 +62,21 @@ class LessonController extends Controller
 
     public function show(Course $course, Lesson $lesson)
     {
-        // Public/Student view - existing logic...
-        $canView = $lesson->is_free_preview || 
-                   (Auth::check() && ($course->user_id == Auth::id() || $course->enrollments()->where('user_id', Auth::id())->exists()));
-        
-        if (!$canView) {
-            abort(403, 'Você precisa comprar este curso para ver esta aula.');
+        if (!$this->canViewLesson($course, $lesson)) {
+            abort(403, 'Voce precisa comprar este curso para ver esta aula.');
         }
 
         $previous = $course->lessons()->where('order', '<', $lesson->order)->orderBy('order', 'desc')->first();
         $next = $course->lessons()->where('order', '>', $lesson->order)->orderBy('order', 'asc')->first();
 
-        // Mark progress if enrolled
-        if(Auth::check() && $course->user_id != Auth::id()){
-             $enrollment = $course->enrollments()->where('user_id', Auth::id())->first();
-             if($enrollment){
-                 $lesson->progress()->firstOrCreate([
-                     'user_id' => Auth::id()
-                 ], ['completed_at' => now()]);
-             }
+        if (Auth::check() && $course->user_id != Auth::id()) {
+            $enrollment = $course->enrollments()->where('user_id', Auth::id())->first();
+            if ($enrollment) {
+                $lesson->progress()->firstOrCreate(
+                    ['user_id' => Auth::id()],
+                    ['completed_at' => now()]
+                );
+            }
         }
 
         return view('courses.lesson', compact('course', 'lesson', 'previous', 'next'));
@@ -88,7 +85,7 @@ class LessonController extends Controller
     public function update(Request $request, Course $course, Lesson $lesson)
     {
         $this->authorize('update', $course);
-        
+
         $validated = $request->validate([
             'title' => 'required|string',
             'order' => 'integer',
@@ -97,14 +94,14 @@ class LessonController extends Controller
             'duration' => 'nullable|integer',
             'is_free_preview' => 'nullable|boolean',
         ]);
-        
+
         $lesson->update($validated + ['is_free_preview' => $request->has('is_free_preview')]);
 
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Aula atualizada com sucesso',
-                'lesson' => $lesson
+                'lesson' => $lesson,
             ]);
         }
 
@@ -117,8 +114,6 @@ class LessonController extends Controller
         $lesson->delete();
         return back()->with('success', 'Aula removida.');
     }
-
-    // Attachment Methods
 
     public function uploadAttachment(Request $request, Course $course, Lesson $lesson)
     {
@@ -138,40 +133,61 @@ class LessonController extends Controller
 
         $file = $request->file('file');
         $path = $file->store('course-materials', 'public');
-        
+
         $attachment = $lesson->attachments()->create([
             'file_path' => $path,
             'file_name' => $request->input('name', $file->getClientOriginalName()),
             'file_type' => $file->getClientOriginalExtension(),
-            'file_size' => $file->getSize()
+            'file_size' => $file->getSize(),
         ]);
 
         return response()->json([
             'success' => true,
-            'attachment' => $attachment
+            'attachment' => $attachment,
         ]);
     }
 
-    public function deleteAttachment(Course $course, Lesson $lesson, \App\Models\LessonAttachment $attachment)
+    public function downloadAttachment(Course $course, Lesson $lesson, LessonAttachment $attachment)
+    {
+        if ((int) $attachment->lesson_id !== (int) $lesson->id || (int) $lesson->course_id !== (int) $course->id) {
+            abort(404);
+        }
+
+        if (!$this->canViewLesson($course, $lesson)) {
+            abort(403, 'Voce nao tem permissao para baixar este material.');
+        }
+
+        if (!Storage::disk('public')->exists($attachment->file_path)) {
+            abort(404);
+        }
+
+        $downloadName = trim((string) $attachment->file_name) !== ''
+            ? $attachment->file_name
+            : basename((string) $attachment->file_path);
+
+        return Storage::disk('public')->download($attachment->file_path, $downloadName);
+    }
+
+    public function deleteAttachment(Course $course, Lesson $lesson, LessonAttachment $attachment)
     {
         $this->authorize('update', $course);
-        
-        if(\Illuminate\Support\Facades\Storage::disk('public')->exists($attachment->file_path)){
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($attachment->file_path);
+
+        if (Storage::disk('public')->exists($attachment->file_path)) {
+            Storage::disk('public')->delete($attachment->file_path);
         }
-        
+
         $attachment->delete();
-        
+
         return response()->json(['success' => true]);
     }
 
-    public function renameAttachment(Request $request, Course $course, Lesson $lesson, \App\Models\LessonAttachment $attachment)
+    public function renameAttachment(Request $request, Course $course, Lesson $lesson, LessonAttachment $attachment)
     {
         $this->authorize('update', $course);
         $request->validate(['name' => 'required|string|max:255']);
-        
+
         $attachment->update(['file_name' => $request->name]);
-        
+
         return response()->json(['success' => true]);
     }
 
@@ -179,5 +195,22 @@ class LessonController extends Controller
     {
         $this->authorize('update', $course);
         return response()->json($lesson->load('attachments'));
+    }
+
+    private function canViewLesson(Course $course, Lesson $lesson): bool
+    {
+        if ($lesson->is_free_preview) {
+            return true;
+        }
+
+        if (!Auth::check()) {
+            return false;
+        }
+
+        if ((int) $course->user_id === (int) Auth::id()) {
+            return true;
+        }
+
+        return $course->enrollments()->where('user_id', Auth::id())->exists();
     }
 }
