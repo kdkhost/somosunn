@@ -29,6 +29,12 @@ return [
             'provider' => 'users',
         ],
 
+        // PadrÃ£o do Sanctum para tokens de API via `auth:sanctum`
+        'sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+
         'api' => [
             'driver' => 'sanctum',
             'provider' => 'users',

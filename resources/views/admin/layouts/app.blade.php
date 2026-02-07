@@ -263,10 +263,26 @@
         $(function () {
             const container = '#pjax-container';
             $(document).pjax('a[data-pjax="true"]', container, { timeout: 8000 });
+
+            function shouldDisablePjax(href) {
+                if (!href) return false;
+                try {
+                    const url = new URL(href, window.location.origin);
+                    return url.pathname.endsWith('/admin/events');
+                } catch (e) {
+                    return href.indexOf('/admin/events') !== -1;
+                }
+            }
             $('.nav-sidebar a, .navbar a').each(function () {
                 const $a = $(this);
                 const h = $a.attr('href') || '';
                 if (h.startsWith('http') || h === '#' || $a.attr('target')) return;
+
+                // FullCalendar requires a full page load (scripts are stacked in layout).
+                if (shouldDisablePjax(h)) {
+                    $a.attr('data-pjax', 'false');
+                    return;
+                }
 
                 // Respect explicit opt-out (for pages that require full reload for JS stacks)
                 if ($a.is('[data-pjax]') || $a.is('[data-no-pjax]') || $a.hasClass('no-pjax')) return;
