@@ -168,6 +168,8 @@ class ChatController extends Controller
             'messages' => $messages->map(fn($m) => [
                 'id' => $m->id,
                 'content' => $m->body,
+                'type' => $m->type,
+                'media_path' => $m->media_path,
                 'is_mine' => $m->user_id === $me->id,
                 'created_at' => $m->created_at
             ])

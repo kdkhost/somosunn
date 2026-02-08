@@ -81,10 +81,10 @@
 
     <div class="bg-gray-100 min-h-screen {{ $isAdminContext ? 'pt-0' : 'pt-4' }}">
         <div class="{{ $isAdminContext ? 'mx-auto px-0' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8' }}">
-            <div class="{{ $isAdminContext ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-1 md:grid-cols-4 gap-6' }}">
+            <div class="{{ $isAdminContext ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-1 md:grid-cols-12 gap-6' }}">
                 @unless($isAdminContext)
                     <!-- Sidebar Left -->
-                    <div class="hidden md:block">
+                    <div class="hidden md:block md:col-span-3">
                         <div class="bg-white rounded-lg shadow p-4 sticky top-24">
                             @auth
                                 <div class="flex items-center gap-3 mb-6">
@@ -97,66 +97,25 @@
                                         <p class="text-xs text-gray-500">Membro</p>
                                     </div>
                                 </div>
-                                <div id="recommendations-panel" class="border-t border-gray-100 pt-4">
-                                    <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
-                                    <div class="space-y-4">
-                                        @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
-                                            @php
-                                                $connectionMap = $connectionMap ?? [];
-                                                $authUserId = auth()->id();
-                                            @endphp
-                                            @foreach($recommendedUsers as $user)
-                                                @php
-                                                    $connection = $connectionMap[$user->id] ?? null;
-                                                    $isPending = $connection && $connection->status === 'pending';
-                                                    $isConnected = $connection && $connection->status === 'accepted';
-                                                    $isRequester = $connection && $authUserId && $connection->requester_id === $authUserId;
-                                                    $pendingTime = $connection ? $connection->created_at->diffForHumans() : '';
-                                                @endphp
-                                                <div class="flex items-center justify-between gap-3">
-                                                    <div class="flex items-center gap-3">
-                                                        <a class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0" href="{{ route('social.profile', $user->id) }}">
-                                                            <img src="{{ $user->profile_photo_url }}" alt="Avatar"
-                                                                class="w-10 h-10 object-cover"
-                                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                                        </a>
-                                                        <div>
-                                                            <a href="{{ route('social.profile', $user->id) }}" class="text-sm font-semibold text-gray-800 hover:text-blue-600">
-                                                                {{ $user->name }}
-                                                            </a>
-                                                            <p class="text-xs text-gray-500">Membro</p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="text-right">
-                                                        @if($isConnected)
-                                                            <span class="text-xs text-gray-400">Conectado</span>
-                                                        @elseif($isPending && $isRequester)
-                                                            <div class="text-[11px] text-gray-400">Pendente {{ $pendingTime }}</div>
-                                                            <button type="button"
-                                                                class="text-xs text-red-600 hover:text-red-700 font-medium"
-                                                                onclick="cancelInvite({{ $user->id }})">
-                                                                Cancelar
-                                                            </button>
-                                                        @elseif($isPending)
-                                                            <div class="text-[11px] text-gray-400">Solicitacao recebida</div>
-                                                            <button type="button"
-                                                                class="text-xs text-green-600 hover:text-green-700 font-medium"
-                                                                onclick="acceptInvite({{ $user->id }})">
-                                                                Aceitar
-                                                            </button>
-                                                        @else
-                                                            <button type="button"
-                                                                class="text-xs text-blue-600 hover:text-blue-700 font-medium"
-                                                                onclick="requestInvite({{ $user->id }})">
-                                                                Conectar
-                                                            </button>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        @else
-                                            <p class="text-xs text-gray-500">Sem recomendacoes no momento.</p>
-                                        @endif
+                                <div class="border-t border-gray-100 pt-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="font-bold text-gray-900">Conversas</h3>
+                                        <button type="button" class="text-gray-400 hover:text-gray-600" title="Nova conversa">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </div>
+                                    <div class="relative mb-3">
+                                        <i class="fas fa-search text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 text-xs"></i>
+                                        <input type="text" id="conversation-search" placeholder="Pesquisar no Messenger"
+                                            class="w-full border border-gray-200 rounded-full pl-9 pr-3 py-2 text-xs focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                    <div class="flex items-center gap-2 text-xs text-gray-500 mb-3">
+                                        <button type="button" class="px-3 py-1 rounded-full bg-blue-50 text-blue-600">Tudo</button>
+                                        <button type="button" class="px-3 py-1 rounded-full hover:bg-gray-100">Nao lidas</button>
+                                        <button type="button" class="px-3 py-1 rounded-full hover:bg-gray-100">Grupos</button>
+                                    </div>
+                                    <div id="conversation-list" class="space-y-1">
+                                        <p class="text-xs text-gray-500">Carregando conversas...</p>
                                     </div>
                                 </div>
                             @else
@@ -169,390 +128,94 @@
                     </div>
                 @endunless
 
-                <!-- Main Feed -->
-                <div class="{{ $isAdminContext ? 'space-y-6' : 'md:col-span-2 space-y-6' }}">
-                    <!-- Composer -->
-                    @auth
-                        <div class="bg-white rounded-lg shadow p-4">
-                            <form id="post-form" action="{{ route('social.post.store') }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                <div class="flex gap-3">
-                                    <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
-                                        <img src="{{ $authAvatar }}" alt="Avatar" class="w-10 h-10 object-cover"
-                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                    </div>
-                                    <div class="flex-1">
-                                        <textarea name="content" rows="3" id="post-content"
-                                            class="w-full border-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 p-3"
-                                            placeholder="No que você está pensando?"></textarea>
-                                    </div>
+                <!-- Mensagens -->
+                <div class="{{ $isAdminContext ? 'space-y-6' : 'md:col-span-6 space-y-6' }}">
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-100" id="conversation-avatar-wrap">
+                                    <img id="conversation-avatar" src="{{ asset('img/default-user.svg') }}" alt="Avatar"
+                                        class="w-10 h-10 object-cover">
                                 </div>
-                                <div id="post-preview-top" class="hidden mt-3">
-                                    <div class="relative inline-flex">
-                                        <img id="post-preview-top-img" src="" alt="Preview"
-                                            class="max-h-40 rounded-lg border border-gray-200 object-cover">
-                                        <button type="button" id="post-preview-remove"
-                                            class="absolute -top-2 -right-2 bg-white text-gray-500 border border-gray-200 rounded-full w-7 h-7 flex items-center justify-center hover:text-red-600">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="mt-3">
-                                    <input type="file" name="media[]" id="post-media" accept="image/*" class="hidden" multiple>
-                                    <div id="post-dropzone"
-                                        class="post-dropzone rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 flex flex-col gap-2">
-                                        <div class="flex flex-wrap items-center gap-3">
-                                            <div class="flex items-center gap-2 text-gray-600">
-                                                <span
-                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white border border-gray-200">
-                                                    <i class="fas fa-image"></i>
-                                                </span>
-                                                <span class="text-sm font-medium">Arraste e solte imagens</span>
-                                            </div>
-                                            <button type="button" id="post-select-file"
-                                                class="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                                                Selecionar imagens
-                                            </button>
-                                        </div>
-                                        <div class="text-xs text-gray-500" id="post-upload-name">Nenhuma imagem selecionada</div>
-                                        <div id="post-preview-inline" class="hidden items-center gap-3">
-                                            <img id="post-preview-inline-img" src="" alt="Preview"
-                                                class="w-12 h-12 rounded border border-gray-200 object-cover">
-                                            <span class="text-xs text-gray-600" id="post-preview-inline-name"></span>
-                                        </div>
-                                    </div>
-                                    <div id="post-upload-progress" class="hidden mt-3">
-                                        <div class="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
-                                            <div id="post-upload-bar" class="post-progress-bar h-2 w-0 rounded-full"></div>
-                                        </div>
-                                        <div class="text-xs text-gray-500 mt-1" id="post-upload-text">0%</div>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col gap-3 mt-3 pt-3 border-t">
-                                    <div class="flex flex-wrap items-center justify-between gap-3">
-                                        <div class="relative">
-                                            <button type="button" id="emoji-toggle" data-picker="emoji-picker"
-                                                class="text-gray-500 hover:text-blue-600 p-2 rounded hover:bg-gray-100"
-                                                title="Inserir emoji">
-                                                <i class="fas fa-smile"></i>
-                                            </button>
-                                            <div id="emoji-picker" data-target="post-content"
-                                                class="emoji-picker-panel hidden absolute left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
-                                                @include('social.partials.emoji_tabs')
-                                                @include('social.partials.emoji_grid')
-                                            </div>
-                                        </div>
-
-                                        <div class="flex items-center gap-2">
-                                            <label for="visibility" class="text-sm text-gray-500">Visibilidade</label>
-                                            <select name="visibility" id="visibility"
-                                                class="border border-gray-200 rounded-full px-3 py-1 text-sm">
-                                                <option value="public">Publico</option>
-                                                <option value="connections">Somente seguidores</option>
-                                                <option value="community" selected>Somente comunidade</option>
-                                            </select>
-                                        </div>
-
-                                        <button type="submit"
-                                            class="bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition">
-                                            Publicar
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    @endauth
-
-                    <!-- Posts -->
-                    @forelse($posts as $post)
-                        <div class="bg-white rounded-lg shadow p-4" id="post-{{ $post->id }}">
-                            @php
-                                $viewerId = Auth::id();
-                                $hasLiked = $viewerId ? $post->reactions->firstWhere('user_id', $viewerId) : null;
-                                $likeCount = $post->reactions->count();
-                                $commentCount = $post->comments->count();
-                                $postAvatar = $post->user->profile_photo_url ?? asset('img/default-user.svg');
-                                $postLink = route('social.post.public', $post);
-                            @endphp
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="flex items-center gap-3">
-                                    <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
-                                        <img src="{{ $postAvatar }}" alt="Avatar" class="w-10 h-10 object-cover"
-                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-gray-900">{{ $post->user->name }}</h4>
-                                        <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
-                                    </div>
-                                </div>
-                                <div class="relative">
-                                    <button type="button" class="text-gray-400 hover:text-gray-600" title="Mais opcoes"
-                                        onclick="togglePanel('menu-{{ $post->id }}')">
-                                        <i class="fas fa-ellipsis-h"></i>
-                                    </button>
-                                    <div id="menu-{{ $post->id }}"
-                                        class="hidden absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow z-10">
-                                        <div class="py-1 text-sm text-gray-700">
-                                            @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                                <form action="{{ route('social.post.destroy', $post) }}" method="POST"
-                                                    class="js-confirm-delete" data-confirm-title="Remover publicacao?"
-                                                    data-confirm-text="Esta acao nao pode ser desfeita.">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                        class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2">
-                                                        <i class="fas fa-trash"></i>
-                                                        <span>Remover</span>
-                                                    </button>
-                                                </form>
-                                                <form action="{{ route('social.post.unpublish', $post) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit"
-                                                        class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
-                                                        <i class="fas fa-eye-slash"></i>
-                                                        <span>Despublicar</span>
-                                                    </button>
-                                                </form>
-                                            @endif
-                                            @auth
-                                                <form action="{{ route('social.post.hide', $post) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit"
-                                                        class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
-                                                        <i class="fas fa-eye"></i>
-                                                        <span>Ocultar postagem</span>
-                                                    </button>
-                                                </form>
-                                            @endauth
-                                            @auth
-                                                @if(!(Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                                    <button type="button"
-                                                        class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2"
-                                                        onclick="togglePanel('report-{{ $post->id }}'); togglePanel('menu-{{ $post->id }}');">
-                                                        <i class="fas fa-flag"></i>
-                                                        <span>Denunciar</span>
-                                                    </button>
-                                                @endif
-                                            @endauth
-                                        </div>
-                                    </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900" id="conversation-name">Selecione uma conversa</p>
+                                    <p class="text-xs text-gray-500" id="conversation-meta">Mensagens recentes</p>
                                 </div>
                             </div>
-
-                            <div class="prose max-w-none text-gray-800 mb-4">
-                                {!! nl2br(e($post->content)) !!}
-                            </div>
-
-                            @if($post->media->isNotEmpty())
-                                <div class="mb-4">
-                                    @php
-                                        $mediaCount = $post->media->count();
-                                    @endphp
-                                    @if($mediaCount === 1)
-                                        <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
-                                            class="w-full rounded-lg object-cover">
-                                    @else
-                                        <div class="relative" data-carousel data-total="{{ $mediaCount }}">
-                                            <div class="overflow-hidden rounded-lg">
-                                                <div class="flex transition-transform duration-300" data-track>
-                                                    @foreach($post->media as $media)
-                                                        <img src="{{ asset($media->path) }}" alt="Midia do post"
-                                                            class="w-full shrink-0 object-cover">
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                            <button type="button" data-prev
-                                                class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
-                                                <i class="fas fa-chevron-left"></i>
-                                            </button>
-                                            <button type="button" data-next
-                                                class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
-                                                <i class="fas fa-chevron-right"></i>
-                                            </button>
-                                            <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full" data-counter>
-                                                1/{{ $mediaCount }}
-                                            </div>
-                                        </div>
-                                    @endif
-                                </div>
-                            @endif
-
-                            <!-- Reactions / Actions -->
-                            <div class="flex items-center justify-between pt-3 border-t text-sm text-gray-500">
-                                @auth
-                                    <form action="{{ route('social.post.react', $post) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" aria-label="Curtir"
-                                            class="flex items-center gap-2 transition {{ $hasLiked ? 'text-blue-600' : 'hover:text-blue-600' }}">
-                                            <i class="{{ $hasLiked ? 'fas' : 'far' }} fa-thumbs-up"></i>
-                                            <span class="hidden sm:inline">Curtir</span>
-                                        </button>
-                                    </form>
-                                @else
-                                    <span class="flex items-center gap-2" aria-label="Curtir">
-                                        <i class="far fa-thumbs-up"></i>
-                                        <span class="hidden sm:inline">Curtir</span>
-                                    </span>
-                                @endauth
-
-                                <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
-                                    onclick="document.getElementById('comment-{{ $post->id }}').focus();" aria-label="Comentar">
-                                    <i class="far fa-comment"></i>
-                                    <span class="hidden sm:inline">Comentar</span>
+                            <div class="flex items-center gap-3 text-gray-400">
+                                <button type="button" class="hover:text-gray-600" title="Chamar">
+                                    <i class="fas fa-phone"></i>
                                 </button>
-
-                                <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
-                                    onclick="togglePanel('share-{{ $post->id }}')" aria-label="Compartilhar">
-                                    <i class="fas fa-share"></i>
-                                    <span class="hidden sm:inline">Compartilhar</span>
+                                <button type="button" class="hover:text-gray-600" title="Video">
+                                    <i class="fas fa-video"></i>
+                                </button>
+                                <button type="button" class="hover:text-gray-600" title="Info">
+                                    <i class="fas fa-info-circle"></i>
                                 </button>
                             </div>
-                            <div id="share-{{ $post->id }}" class="hidden mt-3 border-t pt-3 space-y-3">
-                                <div class="flex flex-wrap gap-3 text-sm">
-                                    <button type="button" class="text-blue-600" data-copy="{{ $postLink }}"
-                                        onclick="copyPostLink(this)">Copiar link</button>
-                                    <a class="text-green-600" target="_blank" rel="noopener"
-                                        href="https://wa.me/?text={{ urlencode($postLink) }}">WhatsApp</a>
-                                    <a class="text-blue-500" target="_blank" rel="noopener"
-                                        href="https://t.me/share/url?url={{ urlencode($postLink) }}">Telegram</a>
-                                    <a class="text-blue-700" target="_blank" rel="noopener"
-                                        href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($postLink) }}">Facebook</a>
-                                </div>
-
-                                @auth
-                                    <form action="{{ route('social.post.share', $post) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="text-sm text-gray-600 hover:text-blue-600">
-                                            Compartilhar na comunidade
-                                        </button>
-                                    </form>
-
-                                    @if($shareTargets->isNotEmpty())
-                                        <form action="{{ route('social.post.share.user', $post) }}" method="POST"
-                                            class="flex flex-col gap-2">
-                                            @csrf
-                                            <div class="flex flex-wrap gap-2">
-                                                <select name="target_user_id" class="border border-gray-200 rounded px-3 py-2 text-sm">
-                                                    @foreach($shareTargets as $target)
-                                                        <option value="{{ $target->id }}">{{ $target->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <input type="text" name="message" placeholder="Mensagem opcional"
-                                                    class="flex-1 border border-gray-200 rounded px-3 py-2 text-sm">
-                                                <button type="submit"
-                                                    class="bg-blue-600 text-white px-3 py-2 rounded text-sm">Enviar</button>
-                                            </div>
-                                        </form>
-                                    @endif
-                                @endauth
-                            </div>
-
-                            <div id="report-{{ $post->id }}" class="hidden mt-3 border-t pt-3">
-                                @auth
-                                    <form action="{{ route('social.post.report', $post) }}" method="POST"
-                                        class="flex flex-col gap-2">
-                                        @csrf
-                                        <textarea name="reason" rows="2" required
-                                            placeholder="Descreva o motivo da denuncia"
-                                            class="border border-gray-200 rounded px-3 py-2 text-sm"></textarea>
-                                        <button type="submit" class="text-sm text-red-600">Denunciar</button>
-                                    </form>
-                                @endauth
-                            </div>
-
-                            <div class="mt-2 text-xs text-gray-400 flex gap-3">
-                                <span>{{ $likeCount }} curtida{{ $likeCount === 1 ? '' : 's' }}</span>
-                                <span>{{ $commentCount }} comentario{{ $commentCount === 1 ? '' : 's' }}</span>
-                            </div>
-
-                            @if($post->comments->isNotEmpty())
-                                <div class="mt-4 space-y-3">
-                                    @foreach($post->comments as $comment)
-                                        @php
-                                            $commentUser = $comment->user;
-                                            $commentAvatar = $commentUser
-                                                ? $commentUser->profile_photo_url
-                                                : asset('img/default-user.svg');
-                                            $commentName = $commentUser ? $commentUser->name : 'Usuario';
-                                        @endphp
-                                        <div class="flex gap-3">
-                                            <div class="rounded-full w-8 h-8 overflow-hidden flex-shrink-0">
-                                                <img src="{{ $commentAvatar }}" alt="Avatar"
-                                                    class="w-8 h-8 object-cover"
-                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                            </div>
-                                            <div class="bg-gray-50 rounded-lg px-3 py-2 w-full">
-                                                <div class="flex justify-between items-center">
-                                                    <p class="text-xs font-semibold text-gray-700">{{ $commentName }}</p>
-                                                    @if(Auth::check() && (Auth::id() === $comment->user_id || Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                                        <form action="{{ route('social.comment.destroy', $comment) }}" method="POST"
-                                                            class="js-confirm-delete" data-confirm-title="Remover comentario?"
-                                                            data-confirm-text="Esta acao nao pode ser desfeita.">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="text-xs text-red-500" title="Remover">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                                </div>
-                                                <p class="text-sm text-gray-700">{{ $comment->content }}</p>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-
-                            @auth
-                                <form action="{{ route('social.post.comment', $post) }}" method="POST"
-                                    class="mt-3 flex gap-2">
-                                    @csrf
-                                    <input type="text" name="content" id="comment-{{ $post->id }}"
-                                        placeholder="Escreva um comentario..."
-                                        class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-                                    <div class="relative">
-                                        <button type="button" class="comment-emoji-toggle text-gray-500 hover:text-blue-600"
-                                            data-picker="comment-emoji-{{ $post->id }}" title="Inserir emoji">
-                                            <i class="far fa-smile"></i>
-                                        </button>
-                                        <div id="comment-emoji-{{ $post->id }}" data-target="comment-{{ $post->id }}"
-                                            class="emoji-picker-panel hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
-                                            @include('social.partials.emoji_tabs')
-                                            @include('social.partials.emoji_grid')
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                        class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition">
-                                        Enviar
-                                    </button>
-                                </form>
-                            @endauth
                         </div>
-                        @if(!empty($adsEnabled) && !empty($adsCode) && $loop->iteration % 3 === 0)
-                            <div class="bg-white rounded-lg shadow p-4">
-                                {!! $adsCode !!}
-                            </div>
-                        @endif
-                    @empty
-                        <div class="text-center py-10 text-gray-500">
-                            <p>Nenhum post ainda. Seja o primeiro a publicar!</p>
-                        </div>
-                    @endforelse
 
-                    {{ $posts->links() }}
+                        <div id="conversation-messages" class="h-[520px] overflow-y-auto space-y-3 pr-2">
+                            <p class="text-sm text-gray-500">Selecione um membro para ver a conversa.</p>
+                        </div>
+                        <form id="conversation-form" class="mt-4 flex items-center gap-2">
+                            <input type="text" id="conversation-input"
+                                class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Digite uma mensagem...">
+                            <button type="submit"
+                                class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 @unless($isAdminContext)
-                    <!-- Sidebar Right (Messages) -->
-                    <div class="hidden md:block">
-                        <div id="messages-panel" class="bg-white rounded-lg shadow p-4 sticky top-24">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="font-bold text-gray-900">Mensagens</h3>
-                                <button type="button" id="messages-refresh"
-                                    class="text-xs text-blue-600 hover:text-blue-700 font-medium">Atualizar</button>
+                    <!-- Sidebar Right (Info) -->
+                    <div class="hidden md:block md:col-span-3">
+                        <div class="bg-white rounded-lg shadow p-4 sticky top-24">
+                            <div class="flex flex-col items-center text-center mb-4">
+                                <div class="w-20 h-20 rounded-full overflow-hidden bg-gray-100 mb-3">
+                                    <img id="conversation-info-avatar" src="{{ asset('img/default-user.svg') }}" alt="Avatar"
+                                        class="w-20 h-20 object-cover">
+                                </div>
+                                <p class="font-semibold text-gray-900" id="conversation-info-name">Selecione uma conversa</p>
+                                <p class="text-xs text-gray-500" id="conversation-info-status">Online recentemente</p>
                             </div>
-                            <div id="messages-list" class="space-y-3">
-                                <p class="text-xs text-gray-500">Carregando conversas...</p>
+                            <div class="grid grid-cols-3 gap-2 text-center text-xs text-gray-500 mb-4">
+                                <button type="button" class="py-2 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-user text-gray-400"></i>
+                                    <span class="block mt-1">Perfil</span>
+                                </button>
+                                <button type="button" class="py-2 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-bell text-gray-400"></i>
+                                    <span class="block mt-1">Silenciar</span>
+                                </button>
+                                <button type="button" class="py-2 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-search text-gray-400"></i>
+                                    <span class="block mt-1">Pesquisar</span>
+                                </button>
+                            </div>
+                            <div class="border-t border-gray-100 pt-3">
+                                <button type="button" class="w-full text-left text-sm font-semibold text-gray-700 flex items-center justify-between">
+                                    Informacoes da conversa
+                                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                                </button>
+                            </div>
+                            <div class="border-t border-gray-100 pt-3">
+                                <button type="button" class="w-full text-left text-sm font-semibold text-gray-700 flex items-center justify-between">
+                                    Personalizar conversa
+                                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                                </button>
+                            </div>
+                            <div class="border-t border-gray-100 pt-3">
+                                <button type="button" class="w-full text-left text-sm font-semibold text-gray-700 flex items-center justify-between">
+                                    Midia e arquivos
+                                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                                </button>
+                                <div id="conversation-shared" class="mt-3 space-y-2 text-xs text-gray-500">
+                                    <p>Sem itens compartilhados.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -654,9 +317,18 @@
         const authUserId = {{ Auth::id() ?? 'null' }};
         const csrfToken = '{{ csrf_token() }}';
 
-        const messagesPanel = document.getElementById('messages-panel');
-        const messagesList = document.getElementById('messages-list');
-        const messagesRefresh = document.getElementById('messages-refresh');
+        const conversationList = document.getElementById('conversation-list');
+        const conversationName = document.getElementById('conversation-name');
+        const conversationMeta = document.getElementById('conversation-meta');
+        const conversationAvatar = document.getElementById('conversation-avatar');
+        const conversationMessages = document.getElementById('conversation-messages');
+        const conversationForm = document.getElementById('conversation-form');
+        const conversationInput = document.getElementById('conversation-input');
+        const conversationShared = document.getElementById('conversation-shared');
+        const conversationSearch = document.getElementById('conversation-search');
+        const conversationInfoAvatar = document.getElementById('conversation-info-avatar');
+        const conversationInfoName = document.getElementById('conversation-info-name');
+        const conversationInfoStatus = document.getElementById('conversation-info-status');
         const chatBoxes = document.getElementById('chat-boxes');
         const chatOverflow = document.getElementById('chat-overflow');
         const chatOverflowToggle = document.getElementById('chat-overflow-toggle');
@@ -665,31 +337,278 @@
         const chatOrder = [];
         const maxVisibleChats = 5;
         let chatPollTimer = null;
+        let activeConversationUserId = null;
+        let conversationPollTimer = null;
+        const notifiedUsers = new Set();
 
-        if (messagesRefresh) {
-            messagesRefresh.addEventListener('click', loadConversations);
-        }
-
-        if (messagesPanel && messagesList) {
-            loadConversations();
-        }
-
-        function loadConversations() {
-            if (!messagesList || !authUserId) {
+        const startConversationPolling = () => {
+            if (conversationPollTimer) {
                 return;
             }
 
-            messagesList.innerHTML = '<p class="text-xs text-gray-500">Carregando conversas...</p>';
+            conversationPollTimer = setInterval(() => {
+                loadConversations();
+                refreshActiveConversation();
+            }, 8000);
+        };
+
+        const setConversationHeader = (name, photo) => {
+            if (conversationName) {
+                conversationName.textContent = name || 'Selecione uma conversa';
+            }
+            if (conversationMeta) {
+                conversationMeta.textContent = name ? 'Conversando agora' : 'Mensagens recentes';
+            }
+            if (conversationAvatar) {
+                conversationAvatar.src = photo || '/img/default-user.svg';
+            }
+            if (conversationInfoAvatar) {
+                conversationInfoAvatar.src = photo || '/img/default-user.svg';
+            }
+            if (conversationInfoName) {
+                conversationInfoName.textContent = name || 'Selecione uma conversa';
+            }
+            if (conversationInfoStatus) {
+                conversationInfoStatus.textContent = name ? 'Online recentemente' : 'Sem conversa ativa';
+            }
+        };
+
+        const renderConversationMessages = (messages) => {
+            if (!conversationMessages) {
+                return;
+            }
+
+            if (!Array.isArray(messages) || messages.length === 0) {
+                conversationMessages.innerHTML = '<p class="text-sm text-gray-500">Nenhuma mensagem ainda.</p>';
+                return;
+            }
+
+            conversationMessages.innerHTML = '';
+            const isImagePath = (path, type) => {
+                if (type === 'image') {
+                    return true;
+                }
+                return !!path && /\.(png|jpe?g|gif|webp)$/i.test(path);
+            };
+
+            messages.slice().reverse().forEach((msg) => {
+                const wrap = document.createElement('div');
+                wrap.className = `flex ${msg.is_mine ? 'justify-end' : 'justify-start'}`;
+                const bubble = document.createElement('div');
+                bubble.className = `text-sm px-3 py-2 rounded-2xl shadow ${msg.is_mine ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border border-gray-100'}`;
+                bubble.style.maxWidth = '80%';
+
+                if (msg.media_path) {
+                    const mediaUrl = `/${msg.media_path.replace(/^\/+/, '')}`;
+                    if (isImagePath(msg.media_path, msg.type)) {
+                        const img = document.createElement('img');
+                        img.src = mediaUrl;
+                        img.alt = 'Compartilhado';
+                        img.className = 'w-full rounded-lg mb-2';
+                        bubble.appendChild(img);
+                    } else {
+                        const link = document.createElement('a');
+                        link.href = mediaUrl;
+                        link.target = '_blank';
+                        link.rel = 'noopener';
+                        link.className = 'block text-sm text-blue-600 underline mb-2';
+                        link.textContent = 'Arquivo compartilhado';
+                        bubble.appendChild(link);
+                    }
+                }
+
+                const text = document.createElement('div');
+                text.textContent = msg.content || '';
+                bubble.appendChild(text);
+                wrap.appendChild(bubble);
+                conversationMessages.appendChild(wrap);
+            });
+            conversationMessages.scrollTop = conversationMessages.scrollHeight;
+        };
+
+        const renderSharedItems = (messages) => {
+            if (!conversationShared) {
+                return;
+            }
+
+            const shared = (Array.isArray(messages) ? messages : []).filter((msg) => msg.media_path);
+            if (!shared.length) {
+                conversationShared.innerHTML = '<p>Sem itens compartilhados.</p>';
+                return;
+            }
+
+            conversationShared.innerHTML = '';
+            shared.slice(0, 6).forEach((msg) => {
+                const mediaUrl = `/${msg.media_path.replace(/^\/+/, '')}`;
+                if (msg.type === 'image' || /\.(png|jpe?g|gif|webp)$/i.test(msg.media_path)) {
+                    const item = document.createElement('img');
+                    item.src = mediaUrl;
+                    item.alt = 'Compartilhado';
+                    item.className = 'w-full rounded border border-gray-200';
+                    conversationShared.appendChild(item);
+                } else {
+                    const link = document.createElement('a');
+                    link.href = mediaUrl;
+                    link.target = '_blank';
+                    link.rel = 'noopener';
+                    link.className = 'block text-xs text-blue-600 underline';
+                    link.textContent = 'Arquivo compartilhado';
+                    conversationShared.appendChild(link);
+                }
+            });
+        };
+
+        const refreshActiveConversation = () => {
+            if (!activeConversationUserId) {
+                return;
+            }
+
+            fetch(`/chat/with/${activeConversationUserId}`)
+                .then((r) => r.json())
+                .then((data) => {
+                    renderConversationMessages(data.messages || []);
+                    renderSharedItems(data.messages || []);
+                })
+                .catch(() => {
+                    return;
+                });
+        };
+
+        const openConversation = (userId, userName, userPhoto) => {
+            if (!userId) {
+                return;
+            }
+
+            activeConversationUserId = userId;
+            setConversationHeader(userName, userPhoto);
+            if (conversationMessages) {
+                conversationMessages.innerHTML = '<p class="text-sm text-gray-500">Carregando mensagens...</p>';
+            }
+
+            fetch(`/chat/with/${userId}`)
+                .then((r) => r.json())
+                .then((data) => {
+                    renderConversationMessages(data.messages || []);
+                    renderSharedItems(data.messages || []);
+                })
+                .catch(() => {
+                    if (conversationMessages) {
+                        conversationMessages.innerHTML = '<p class="text-sm text-red-500">Erro ao carregar conversa.</p>';
+                    }
+                });
+        };
+
+        if (conversationForm) {
+            conversationForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                if (!conversationInput || !activeConversationUserId) {
+                    return;
+                }
+
+                const message = conversationInput.value.trim();
+                if (!message) {
+                    return;
+                }
+
+                fetch(`/chat/with/${activeConversationUserId}/message`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                })
+                    .then((r) => r.json())
+                    .then((data) => {
+                        if (data.success) {
+                            conversationInput.value = '';
+                            openConversation(activeConversationUserId, conversationName?.textContent || '', conversationAvatar?.src || '');
+                        } else {
+                            toastr.error(data.message || 'Erro ao enviar mensagem');
+                        }
+                    })
+                    .catch(() => {
+                        toastr.error('Erro ao enviar mensagem');
+                    });
+            });
+        }
+
+        if (conversationSearch) {
+            const escapeHtml = (value) => {
+                return String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            };
+
+            const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+            const highlightText = (text, term) => {
+                if (!term) {
+                    return escapeHtml(text);
+                }
+                const safe = escapeRegex(term);
+                return escapeHtml(text).replace(new RegExp(`(${safe})`, 'gi'), '<mark class="bg-blue-100 text-blue-900 px-0.5 rounded">$1</mark>');
+            };
+
+            const applyConversationFilter = () => {
+                const term = conversationSearch.value.trim().toLowerCase();
+                document.querySelectorAll('[data-conversation-row]').forEach((row) => {
+                    const rawName = row.getAttribute('data-name') || '';
+                    const rawMessage = row.getAttribute('data-message') || '';
+                    const name = rawName.toLowerCase();
+                    const message = rawMessage.toLowerCase();
+                    const matches = !term || name.includes(term) || message.includes(term);
+                    row.classList.toggle('hidden', !matches);
+
+                    const nameNode = row.querySelector('[data-role="conversation-name"]');
+                    const messageNode = row.querySelector('[data-role="conversation-message"]');
+                    if (nameNode) {
+                        nameNode.innerHTML = highlightText(rawName, term);
+                    }
+                    if (messageNode) {
+                        messageNode.innerHTML = highlightText(rawMessage, term);
+                    }
+                });
+            };
+
+            conversationSearch.addEventListener('input', applyConversationFilter);
+            conversationSearch.addEventListener('search', applyConversationFilter);
+            conversationSearch.addEventListener('keyup', (event) => {
+                if (event.key === 'Escape') {
+                    conversationSearch.value = '';
+                    applyConversationFilter();
+                }
+            });
+
+            conversationSearch.dataset.boundFilter = 'true';
+            window.applyConversationFilter = applyConversationFilter;
+        }
+
+        if (conversationList && authUserId) {
+            loadConversations();
+            startConversationPolling();
+        }
+
+        function loadConversations() {
+            if (!conversationList || !authUserId) {
+                return;
+            }
+
+            conversationList.innerHTML = '<p class="text-xs text-gray-500">Carregando conversas...</p>';
 
             fetch('{{ route('chat.list') }}')
                 .then((r) => r.json())
                 .then((conversations) => {
                     if (!Array.isArray(conversations) || conversations.length === 0) {
-                        messagesList.innerHTML = '<p class="text-xs text-gray-500">Nenhuma conversa iniciada.</p>';
+                        conversationList.innerHTML = '<p class="text-xs text-gray-500">Nenhuma conversa iniciada.</p>';
                         return;
                     }
 
-                    messagesList.innerHTML = '';
+                    conversationList.innerHTML = '';
+                    let firstUser = null;
                     conversations.forEach((conv) => {
                         const otherUser = (conv.users || []).find((u) => u.id !== authUserId) || (conv.users || [])[0];
                         if (!otherUser) {
@@ -698,26 +617,49 @@
 
                         const lastMessage = conv.messages && conv.messages.length ? conv.messages[0].body : 'Nova conversa';
                         const avatar = otherUser.profile_photo_url || otherUser.photo || null;
+                        if (!firstUser) {
+                            firstUser = { id: otherUser.id, name: otherUser.name, avatar };
+                        }
 
                         const row = document.createElement('button');
                         row.type = 'button';
-                        row.className = 'w-full text-left flex items-center gap-3 p-2 rounded hover:bg-blue-50 transition';
+                        row.className = `w-full text-left flex items-center gap-3 p-2 rounded transition ${otherUser.id === activeConversationUserId ? 'bg-blue-50' : 'hover:bg-blue-50'}`;
+                        row.setAttribute('data-conversation-row', 'true');
+                        row.setAttribute('data-name', otherUser.name || '');
+                        row.setAttribute('data-message', lastMessage || '');
                         row.innerHTML = `
                             <img src="${avatar || '/img/default-user.svg'}" class="w-10 h-10 rounded-full object-cover" onerror="this.onerror=null;this.src='/img/default-user.svg';" />
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
-                                    <p class="text-sm font-semibold text-gray-800 truncate">${otherUser.name}</p>
+                                    <p class="text-sm font-semibold text-gray-800 truncate" data-role="conversation-name">${otherUser.name}</p>
                                     ${conv.unread_count > 0 ? `<span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${conv.unread_count}</span>` : ''}
                                 </div>
-                                <p class="text-xs text-gray-500 truncate">${lastMessage}</p>
+                                <p class="text-xs text-gray-500 truncate" data-role="conversation-message">${lastMessage}</p>
                             </div>
                         `;
-                        row.addEventListener('click', () => openMultiChat(otherUser.id, otherUser.name, avatar));
-                        messagesList.appendChild(row);
+                        row.addEventListener('click', () => openConversation(otherUser.id, otherUser.name, avatar));
+                        conversationList.appendChild(row);
+
+                        if (conv.unread_count === 0) {
+                            notifiedUsers.delete(otherUser.id);
+                        }
+
+                        if (conv.unread_count > 0 && otherUser.id !== activeConversationUserId && !openChats.has(otherUser.id) && !notifiedUsers.has(otherUser.id)) {
+                            notifiedUsers.add(otherUser.id);
+                            openMultiChat(otherUser.id, otherUser.name, avatar);
+                        }
                     });
+
+                    if (!activeConversationUserId && firstUser) {
+                        openConversation(firstUser.id, firstUser.name, firstUser.avatar);
+                    }
+
+                    if (window.applyConversationFilter && conversationSearch) {
+                        window.applyConversationFilter();
+                    }
                 })
                 .catch(() => {
-                    messagesList.innerHTML = '<p class="text-xs text-red-500">Erro ao carregar conversas.</p>';
+                    conversationList.innerHTML = '<p class="text-xs text-red-500">Erro ao carregar conversas.</p>';
                 });
         }
 
