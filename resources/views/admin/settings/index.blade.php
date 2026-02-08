@@ -53,6 +53,30 @@
     $watermarkUrl = $getUrl('watermark_image');
     $heroUrl  = $getUrl('hero_image');
     $wmPos = (string) ($settings['video_watermark_position'] ?? 'top-right');
+    $recaptchaStatus = $recaptchaStatus ?? [
+        'is_configured' => false,
+        'site_key_masked' => '-',
+        'secret_key_masked' => '-',
+        'min_score' => '0.5',
+    ];
+    $storageStatus = $storageStatus ?? [
+        'disk' => (string) ($settings['uploads_storage_disk'] ?? 'public'),
+        'is_configured' => false,
+        's3_configured' => false,
+        's3_bucket' => '-',
+        's3_region' => '-',
+        's3_endpoint' => '-',
+        'uploaded_files' => 0,
+        'uploaded_bytes' => 0,
+        'uploaded_size_human' => '0 B',
+        'stats_error' => '',
+    ];
+    $uploadLimitsStatus = $uploadLimitsStatus ?? [
+        'video_max_mb' => (int) ($settings['video_max_mb'] ?? 1024),
+        'document_max_mb' => (int) ($settings['document_max_mb'] ?? 50),
+        'allowed_video_formats' => (string) ($settings['allowed_video_formats'] ?? '-'),
+        'allowed_document_formats' => (string) ($settings['allowed_document_formats'] ?? '-'),
+    ];
 @endphp
 
 @section('page_title','Configurações')
@@ -212,11 +236,22 @@
                     <div class="card card-outline card-secondary collapsed-card">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-shield-alt mr-2"></i>Segurança (reCAPTCHA v3)</h3>
-                            <div class="card-tools">
+                            <div class="card-tools d-flex align-items-center">
+                                <span class="badge {{ $recaptchaStatus['is_configured'] ? 'badge-success' : 'badge-warning' }} mr-2">
+                                    {{ $recaptchaStatus['is_configured'] ? 'Configurado' : 'Nao configurado' }}
+                                </span>
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
                             </div>
                         </div>
                         <div class="card-body" style="display: none;">
+                            <div class="alert {{ $recaptchaStatus['is_configured'] ? 'alert-success' : 'alert-warning' }}">
+                                <div class="small">
+                                    <strong>Status:</strong> {{ $recaptchaStatus['is_configured'] ? 'Ativo para uso' : 'Pendente de configuracao' }}<br>
+                                    <strong>Site Key:</strong> <code>{{ $recaptchaStatus['site_key_masked'] }}</code><br>
+                                    <strong>Secret:</strong> <code>{{ $recaptchaStatus['secret_key_masked'] }}</code><br>
+                                    <strong>Score minimo:</strong> {{ $recaptchaStatus['min_score'] }}
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -254,11 +289,36 @@
                     <div class="card card-outline card-info collapsed-card">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-cloud mr-2"></i>Armazenamento (S3 compatível)</h3>
-                            <div class="card-tools">
+                            <div class="card-tools d-flex align-items-center">
+                                <span class="badge badge-secondary mr-2">{{ strtoupper((string) $storageStatus['disk']) }}</span>
+                                <span class="badge {{ $storageStatus['is_configured'] ? 'badge-success' : 'badge-warning' }} mr-2">
+                                    {{ $storageStatus['is_configured'] ? 'Configurado' : 'Nao configurado' }}
+                                </span>
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
                             </div>
                         </div>
                         <div class="card-body" style="display: none;">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="small text-muted">Arquivos enviados para o repositorio</div>
+                                    <div class="h5 mb-0">{{ number_format((int) $storageStatus['uploaded_files'], 0, ',', '.') }}</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="small text-muted">Volume total enviado</div>
+                                    <div class="h5 mb-0">{{ $storageStatus['uploaded_size_human'] }}</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="small text-muted">Bucket/Regiao</div>
+                                    <div class="h6 mb-0">
+                                        {{ $storageStatus['s3_bucket'] }} / {{ $storageStatus['s3_region'] }}
+                                    </div>
+                                </div>
+                            </div>
+                            @if(!empty($storageStatus['stats_error']))
+                                <div class="alert alert-warning">
+                                    <strong>Aviso:</strong> nao foi possivel ler o uso do repositorio agora.
+                                </div>
+                            @endif
                             @php($uploadsDisk = $settings['uploads_storage_disk'] ?? (string) config('uploads.disk', 'public'))
 
                             <div class="row">
@@ -338,7 +398,9 @@
                     <div class="card card-outline card-warning collapsed-card">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-upload mr-2"></i>Limites de Upload</h3>
-                            <div class="card-tools">
+                            <div class="card-tools d-flex align-items-center">
+                                <span class="badge badge-info mr-2">Video: {{ (int) $uploadLimitsStatus['video_max_mb'] }} MB</span>
+                                <span class="badge badge-info mr-2">Doc: {{ (int) $uploadLimitsStatus['document_max_mb'] }} MB</span>
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
                             </div>
                         </div>

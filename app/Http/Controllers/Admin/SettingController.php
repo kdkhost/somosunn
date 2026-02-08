@@ -6,6 +6,7 @@ use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class SettingController extends Controller
@@ -14,6 +15,9 @@ class SettingController extends Controller
     {
         $settings = Setting::all()->pluck('value', 'key')->toArray();
         $settings = $this->normalizeFileSettings($settings);
+        $recaptchaStatus = $this->buildRecaptchaStatus($settings);
+        $storageStatus = $this->buildStorageStatus($settings);
+        $uploadLimitsStatus = $this->buildUploadLimitsStatus($settings);
 
         $analytics = [
             'enabled' => false,
@@ -63,7 +67,13 @@ class SettingController extends Controller
             // analytics é opcional; não bloqueia a tela de settings
         }
 
-        return view('admin.settings.index', compact('settings', 'analytics'));
+        return view('admin.settings.index', compact(
+            'settings',
+            'analytics',
+            'recaptchaStatus',
+            'storageStatus',
+            'uploadLimitsStatus'
+        ));
     }
 
     public function update(Request $request)
@@ -486,6 +496,126 @@ class SettingController extends Controller
         } catch (\Throwable $e) {
             return true;
         }
+    }
+
+    private function buildRecaptchaStatus(array $settings): array
+    {
+        $siteKey = trim((string) ($settings['recaptcha_v3_site_key'] ?? config('services.recaptcha.site_key', '')));
+        $secretKey = trim((string) ($settings['recaptcha_v3_secret_key'] ?? config('services.recaptcha.v3_secret', '')));
+        $minScore = trim((string) ($settings['recaptcha_v3_min_score'] ?? config('services.recaptcha.v3_min_score', 0.5)));
+        $isConfigured = ($siteKey !== '' && $secretKey !== '');
+
+        return [
+            'is_configured' => $isConfigured,
+            'site_key_masked' => $siteKey !== '' ? $this->maskSecret($siteKey, 8) : '-',
+            'secret_key_masked' => $secretKey !== '' ? $this->maskSecret($secretKey, 6) : '-',
+            'min_score' => $minScore !== '' ? $minScore : '0.5',
+        ];
+    }
+
+    private function buildStorageStatus(array $settings): array
+    {
+        $uploadsDisk = trim((string) ($settings['uploads_storage_disk'] ?? config('uploads.disk', 'public')));
+        if (!in_array($uploadsDisk, ['public', 's3'], true)) {
+            $uploadsDisk = 'public';
+        }
+
+        $s3Key = trim((string) ($settings['s3_key'] ?? config('filesystems.disks.s3.key', '')));
+        $s3Secret = trim((string) ($settings['s3_secret'] ?? config('filesystems.disks.s3.secret', '')));
+        $s3Region = trim((string) ($settings['s3_region'] ?? config('filesystems.disks.s3.region', '')));
+        $s3Bucket = trim((string) ($settings['s3_bucket'] ?? config('filesystems.disks.s3.bucket', '')));
+        $s3Endpoint = trim((string) ($settings['s3_endpoint'] ?? config('filesystems.disks.s3.endpoint', '')));
+
+        $s3Configured = ($s3Key !== '' && $s3Secret !== '' && $s3Region !== '' && $s3Bucket !== '');
+        $isConfigured = $uploadsDisk === 'public' ? true : $s3Configured;
+
+        $uploadedFiles = 0;
+        $uploadedBytes = 0;
+        $statsError = '';
+
+        try {
+            $disk = Storage::disk($uploadsDisk);
+            $files = $disk->allFiles('uploads');
+            $uploadedFiles = count($files);
+
+            foreach ($files as $path) {
+                try {
+                    $uploadedBytes += (int) $disk->size($path);
+                } catch (\Throwable $e) {
+                    // ignora arquivo sem metadado de tamanho
+                }
+            }
+        } catch (\Throwable $e) {
+            $statsError = $e->getMessage();
+        }
+
+        return [
+            'disk' => $uploadsDisk,
+            'is_configured' => $isConfigured,
+            's3_configured' => $s3Configured,
+            's3_bucket' => $s3Bucket !== '' ? $s3Bucket : '-',
+            's3_region' => $s3Region !== '' ? $s3Region : '-',
+            's3_endpoint' => $s3Endpoint !== '' ? $s3Endpoint : '-',
+            'uploaded_files' => $uploadedFiles,
+            'uploaded_bytes' => $uploadedBytes,
+            'uploaded_size_human' => $this->formatBytes($uploadedBytes),
+            'stats_error' => $statsError,
+        ];
+    }
+
+    private function buildUploadLimitsStatus(array $settings): array
+    {
+        $videoMaxMb = (int) ($settings['video_max_mb'] ?? config('uploads.video_max_mb', 1024));
+        $documentMaxMb = (int) ($settings['document_max_mb'] ?? config('uploads.document_max_mb', 50));
+
+        $allowedVideo = trim((string) ($settings['allowed_video_formats'] ?? ''));
+        if ($allowedVideo === '') {
+            $allowedVideo = implode(',', (array) config('uploads.allowed_video_formats', []));
+        }
+
+        $allowedDocument = trim((string) ($settings['allowed_document_formats'] ?? ''));
+        if ($allowedDocument === '') {
+            $allowedDocument = implode(',', (array) config('uploads.allowed_document_formats', []));
+        }
+
+        return [
+            'video_max_mb' => $videoMaxMb,
+            'document_max_mb' => $documentMaxMb,
+            'allowed_video_formats' => $allowedVideo !== '' ? $allowedVideo : '-',
+            'allowed_document_formats' => $allowedDocument !== '' ? $allowedDocument : '-',
+        ];
+    }
+
+    private function formatBytes(int $bytes): string
+    {
+        if ($bytes <= 0) {
+            return '0 B';
+        }
+
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $power = (int) floor(log($bytes, 1024));
+        $power = max(0, min($power, count($units) - 1));
+        $value = $bytes / (1024 ** $power);
+
+        return number_format($value, $power === 0 ? 0 : 2, '.', '') . ' ' . $units[$power];
+    }
+
+    private function maskSecret(string $value, int $visible): string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return '-';
+        }
+
+        $len = strlen($value);
+        if ($len <= $visible) {
+            return str_repeat('*', $len);
+        }
+
+        $head = substr($value, 0, max(1, (int) floor($visible / 2)));
+        $tail = substr($value, -max(1, (int) ceil($visible / 2)));
+
+        return $head . str_repeat('*', max(4, $len - strlen($head) - strlen($tail))) . $tail;
     }
 
     public function testSmtp(Request $request)

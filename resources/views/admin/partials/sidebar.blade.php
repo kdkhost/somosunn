@@ -275,6 +275,15 @@
                     </li>
                 @endif
 
+                @if(auth()->user()->isAdmin() || auth()->user()->canAccessFeature('courses') || auth()->user()->canAccessFeature('mentorships'))
+                    <li class="nav-item">
+                        <a href="{{ route('admin.reviews.index') }}" class="nav-link {{ $is('admin.reviews.*') }}">
+                            <i class="nav-icon fas fa-star-half-alt"></i>
+                            <p>Avaliações</p>
+                        </a>
+                    </li>
+                @endif
+
                 <!-- Comunidade -->
                 @if(auth()->user()->canAccessFeature('community'))
                     <li class="nav-item">

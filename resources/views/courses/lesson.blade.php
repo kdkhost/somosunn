@@ -1,6 +1,20 @@
 @extends('layouts.app')
 
 @section('title', $lesson->title . ' - ' . $course->title)
+@php
+    $formatSeconds = static function ($seconds): string {
+        $seconds = max(0, (int) $seconds);
+        $h = intdiv($seconds, 3600);
+        $m = intdiv($seconds % 3600, 60);
+        $s = $seconds % 60;
+
+        if ($h > 0) {
+            return sprintf('%02d:%02d:%02d', $h, $m, $s);
+        }
+
+        return sprintf('%02d:%02d', $m, $s);
+    };
+@endphp
 
 @section('content')
 <div class="flex flex-col lg:flex-row min-h-screen bg-gray-100">
@@ -50,11 +64,22 @@
                         $normalizedVideoUrl = trim((string) $lesson->video_url);
                         if (
                             $normalizedVideoUrl !== '' &&
-                            !preg_match('/^https?:\\/\\//i', $normalizedVideoUrl) &&
-                            !str_starts_with($normalizedVideoUrl, '//') &&
-                            !str_starts_with($normalizedVideoUrl, '/')
+                            !preg_match('/^(https?:)?\\/\\//i', $normalizedVideoUrl)
                         ) {
-                            $normalizedVideoUrl = '/' . $normalizedVideoUrl;
+                            $candidate = ltrim(str_replace('\\', '/', $normalizedVideoUrl), '/');
+                            if (\Illuminate\Support\Str::startsWith($candidate, 'storage/app/public/')) {
+                                $candidate = 'storage/' . substr($candidate, strlen('storage/app/public/'));
+                            } elseif (\Illuminate\Support\Str::startsWith($candidate, 'public/')) {
+                                $candidate = substr($candidate, strlen('public/'));
+                            }
+
+                            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($candidate)) {
+                                $normalizedVideoUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($candidate);
+                            } elseif (\Illuminate\Support\Str::startsWith($candidate, 'storage/')) {
+                                $normalizedVideoUrl = '/' . $candidate;
+                            } else {
+                                $normalizedVideoUrl = '/' . $candidate;
+                            }
                         }
                     @endphp
                     @php $usePlyr = (string) \App\Models\Setting::get('video_player_enabled', '1') === '1'; @endphp
@@ -62,6 +87,10 @@
                         <div class="w-full h-full min-h-[400px]"
                             data-unn-video-player
                             data-video-url="{{ $normalizedVideoUrl }}"
+                            data-progress-url="{{ route('courses.lessons.progress.update', [$course->id, $lesson->id]) }}"
+                            data-bookmark-store-url="{{ route('courses.lessons.bookmarks.store', [$course->id, $lesson->id]) }}"
+                            data-bookmark-delete-url-template="{{ route('courses.lessons.bookmarks.destroy', [$course->id, $lesson->id, '__BOOKMARK_ID__']) }}"
+                            data-resume-at="{{ (int) ($resumeAt ?? 0) }}"
                             data-block-download="{{ !empty($course->video_block_download) ? '1' : '0' }}"
                             data-floating-enabled="{{ !empty($course->video_floating_enabled) ? '1' : '0' }}"
                             data-floating-width="{{ (int) ($course->video_floating_width ?? 420) }}"
@@ -87,6 +116,41 @@
                     {!! \App\Support\RichText::toHtml($lesson->content) !!}
                 </div>
 
+                @auth
+                <div class="mt-8 pt-6 border-t border-gray-100">
+                    <h4 class="text-md font-bold mb-3 flex items-center text-gray-800">
+                        <i class="fas fa-bookmark mr-2 text-blue-500"></i> Anotações da aula
+                    </h4>
+                    <p class="text-sm text-gray-600 mb-4">Marque o momento do vídeo e escreva um comentário para revisar depois ou tirar dúvidas com o instrutor.</p>
+
+                    <div class="flex flex-col md:flex-row gap-3 mb-4">
+                        <button type="button" id="lessonBookmarkCurrentTime" class="px-3 py-2 rounded-lg border border-blue-200 text-blue-700 bg-blue-50 text-sm font-semibold md:w-32 text-center">
+                            00:00
+                        </button>
+                        <input type="text" id="lessonBookmarkNote" maxlength="1000" placeholder="Ex: Rever este ponto com o instrutor..." class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <button type="button" id="lessonBookmarkAddBtn" class="px-4 py-2 rounded-lg bg-[#1F5EDB] text-white hover:bg-blue-700 transition text-sm font-semibold">
+                            Salvar marcador
+                        </button>
+                    </div>
+
+                    <div id="lessonBookmarkList" class="space-y-2">
+                        @forelse($bookmarks as $bookmark)
+                            <div class="flex items-start justify-between gap-3 p-3 border border-gray-200 rounded-lg" data-bookmark-id="{{ $bookmark->id }}" data-bookmark-seconds="{{ (int) $bookmark->position_seconds }}">
+                                <div class="min-w-0">
+                                    <button type="button" class="text-sm font-bold text-[#1F5EDB] hover:underline text-left lesson-bookmark-jump">
+                                        <i class="fas fa-play-circle mr-1"></i>{{ $formatSeconds($bookmark->position_seconds) }}
+                                    </button>
+                                    <p class="text-sm text-gray-700 mt-1 break-words">{{ $bookmark->note }}</p>
+                                </div>
+                                <button type="button" class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 lesson-bookmark-delete">Excluir</button>
+                            </div>
+                        @empty
+                            <p id="lessonBookmarkEmpty" class="text-sm text-gray-500">Nenhum marcador salvo nesta aula.</p>
+                        @endforelse
+                    </div>
+                </div>
+                @endauth
+
                 @if($lesson->attachments->count() > 0)
                 <div class="mt-8 pt-6 border-t border-gray-100">
                     <h4 class="text-md font-bold mb-3 flex items-center text-gray-800">
@@ -94,7 +158,7 @@
                     </h4>
                     <div class="grid gap-3">
                         @foreach($lesson->attachments as $attachment)
-                        <a href="{{ route('courses.lessons.attachments.download', [$course->id, $lesson->id, $attachment->id]) }}" class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition group">
+                        <a href="{{ route('courses.lessons.attachments.download', [$course->id, $lesson->id, $attachment->id]) }}" download="{{ $attachment->file_name }}" class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition group">
                             <div class="flex items-center overflow-hidden">
                                 <div class="bg-blue-100 text-blue-600 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 mr-3">
                                     <i class="fas fa-file-alt"></i>
@@ -135,3 +199,239 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+@auth
+<script>
+    (function () {
+        const wrapper = document.querySelector('[data-unn-video-player]');
+        if (!wrapper) return;
+
+        const progressUrl = wrapper.dataset.progressUrl || '';
+        const bookmarkStoreUrl = wrapper.dataset.bookmarkStoreUrl || '';
+        const bookmarkDeleteTemplate = wrapper.dataset.bookmarkDeleteUrlTemplate || '';
+        const resumeAt = Number.parseInt(wrapper.dataset.resumeAt || '0', 10) || 0;
+        const csrfToken = '{{ csrf_token() }}';
+
+        const bookmarkList = document.getElementById('lessonBookmarkList');
+        const bookmarkEmpty = document.getElementById('lessonBookmarkEmpty');
+        const bookmarkNote = document.getElementById('lessonBookmarkNote');
+        const bookmarkAddBtn = document.getElementById('lessonBookmarkAddBtn');
+        const bookmarkCurrentTime = document.getElementById('lessonBookmarkCurrentTime');
+
+        let media = null;
+        let lastSavedSeconds = -1;
+        let saveTimer = null;
+        let resumeApplied = false;
+
+        const formatSeconds = (value) => {
+            const total = Math.max(0, Math.floor(Number(value) || 0));
+            const h = Math.floor(total / 3600);
+            const m = Math.floor((total % 3600) / 60);
+            const s = total % 60;
+            if (h > 0) return [h, m, s].map((v) => String(v).padStart(2, '0')).join(':');
+            return [m, s].map((v) => String(v).padStart(2, '0')).join(':');
+        };
+
+        const renderEmptyState = () => {
+            if (!bookmarkList) return;
+            const hasItems = bookmarkList.querySelector('[data-bookmark-id]') !== null;
+            if (bookmarkEmpty) {
+                bookmarkEmpty.style.display = hasItems ? 'none' : '';
+            } else if (!hasItems) {
+                const p = document.createElement('p');
+                p.id = 'lessonBookmarkEmpty';
+                p.className = 'text-sm text-gray-500';
+                p.textContent = 'Nenhum marcador salvo nesta aula.';
+                bookmarkList.appendChild(p);
+            }
+        };
+
+        const postJson = async (url, payload, keepalive = false) => {
+            const response = await fetch(url, {
+                method: 'POST',
+                credentials: 'same-origin',
+                keepalive: !!keepalive,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify(payload || {}),
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro na requisicao');
+            }
+
+            return response.json();
+        };
+
+        const saveProgress = async (force = false, keepalive = false) => {
+            if (!media || !progressUrl) return;
+            const seconds = Math.max(0, Math.floor(Number(media.currentTime) || 0));
+            if (!force && seconds === lastSavedSeconds) return;
+            lastSavedSeconds = seconds;
+
+            try {
+                await postJson(progressUrl, { current_time_seconds: seconds }, keepalive);
+            } catch (e) {
+                // no-op
+            }
+        };
+
+        const onTimeTick = () => {
+            if (!media) return;
+            if (bookmarkCurrentTime) {
+                bookmarkCurrentTime.textContent = formatSeconds(media.currentTime);
+            }
+        };
+
+        const bindBookmarkActions = () => {
+            if (!bookmarkList || !media) return;
+
+            bookmarkList.addEventListener('click', async (event) => {
+                const jumpBtn = event.target.closest('.lesson-bookmark-jump');
+                if (jumpBtn) {
+                    const row = jumpBtn.closest('[data-bookmark-id]');
+                    if (!row) return;
+                    const seconds = Number.parseInt(row.dataset.bookmarkSeconds || '0', 10) || 0;
+                    media.currentTime = seconds;
+                    if (typeof media.play === 'function') {
+                        media.play().catch(() => {});
+                    }
+                    return;
+                }
+
+                const deleteBtn = event.target.closest('.lesson-bookmark-delete');
+                if (!deleteBtn) return;
+
+                const row = deleteBtn.closest('[data-bookmark-id]');
+                if (!row) return;
+                const id = row.dataset.bookmarkId;
+                if (!id || !bookmarkDeleteTemplate) return;
+                if (!confirm('Excluir este marcador?')) return;
+
+                try {
+                    const response = await fetch(bookmarkDeleteTemplate.replace('__BOOKMARK_ID__', id), {
+                        method: 'DELETE',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                    });
+                    if (!response.ok) throw new Error('Falha');
+                    row.remove();
+                    renderEmptyState();
+                } catch (e) {
+                    alert('Não foi possível excluir o marcador.');
+                }
+            });
+
+            if (bookmarkAddBtn && bookmarkNote) {
+                bookmarkAddBtn.addEventListener('click', async () => {
+                    const note = (bookmarkNote.value || '').trim();
+                    if (note.length < 2) {
+                        alert('Digite um comentário com pelo menos 2 caracteres.');
+                        bookmarkNote.focus();
+                        return;
+                    }
+
+                    const seconds = Math.max(0, Math.floor(Number(media.currentTime) || 0));
+
+                    try {
+                        bookmarkAddBtn.disabled = true;
+                        const result = await postJson(bookmarkStoreUrl, {
+                            position_seconds: seconds,
+                            note: note,
+                        });
+
+                        if (!result || !result.success || !result.bookmark) {
+                            throw new Error('Resposta invalida');
+                        }
+
+                        const row = document.createElement('div');
+                        row.className = 'flex items-start justify-between gap-3 p-3 border border-gray-200 rounded-lg';
+                        row.dataset.bookmarkId = String(result.bookmark.id);
+                        row.dataset.bookmarkSeconds = String(result.bookmark.position_seconds || 0);
+                        row.innerHTML = `
+                            <div class="min-w-0">
+                                <button type="button" class="text-sm font-bold text-[#1F5EDB] hover:underline text-left lesson-bookmark-jump">
+                                    <i class="fas fa-play-circle mr-1"></i>${formatSeconds(result.bookmark.position_seconds || 0)}
+                                </button>
+                                <p class="text-sm text-gray-700 mt-1 break-words"></p>
+                            </div>
+                            <button type="button" class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 lesson-bookmark-delete">Excluir</button>
+                        `;
+                        row.querySelector('p').textContent = result.bookmark.note || '';
+                        bookmarkList.prepend(row);
+                        bookmarkNote.value = '';
+                        renderEmptyState();
+                    } catch (e) {
+                        alert('Não foi possível salvar o marcador.');
+                    } finally {
+                        bookmarkAddBtn.disabled = false;
+                    }
+                });
+            }
+        };
+
+        const bindMedia = (api) => {
+            media = (api && api.media) ? api.media : null;
+            if (!media) return;
+
+            onTimeTick();
+
+            const applyResume = () => {
+                if (resumeApplied || resumeAt <= 0) return;
+                if (!Number.isFinite(media.duration) || media.duration <= 0) return;
+                media.currentTime = Math.min(resumeAt, Math.max(0, media.duration - 1));
+                resumeApplied = true;
+            };
+
+            if (media.readyState >= 1) {
+                applyResume();
+            } else {
+                media.addEventListener('loadedmetadata', applyResume, { once: true });
+            }
+
+            media.addEventListener('timeupdate', onTimeTick);
+            media.addEventListener('pause', () => saveProgress(true));
+            media.addEventListener('ended', () => saveProgress(true));
+            media.addEventListener('play', () => {
+                if (saveTimer) {
+                    window.clearInterval(saveTimer);
+                }
+                saveTimer = window.setInterval(() => saveProgress(false), 15000);
+            });
+            media.addEventListener('ended', () => {
+                if (saveTimer) {
+                    window.clearInterval(saveTimer);
+                    saveTimer = null;
+                }
+            });
+
+            bindBookmarkActions();
+        };
+
+        const existingApi = wrapper.__unnVideoApi || null;
+        if (existingApi) {
+            bindMedia(existingApi);
+        } else {
+            wrapper.addEventListener('unn:video-ready', (event) => bindMedia((event && event.detail) ? event.detail : null), { once: true });
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                saveProgress(true, true);
+            }
+        });
+        window.addEventListener('pagehide', () => saveProgress(true, true));
+        window.addEventListener('beforeunload', () => saveProgress(true, true));
+
+        renderEmptyState();
+    })();
+</script>
+@endauth
+@endpush

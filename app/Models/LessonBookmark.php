@@ -5,24 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class LessonProgress extends Model
+class LessonBookmark extends Model
 {
     use HasFactory;
 
-    protected $table = 'lesson_progress';
-
     protected $fillable = [
         'user_id',
+        'course_id',
         'lesson_id',
-        'completed_at',
-        'current_time_seconds',
-        'last_position_at',
+        'position_seconds',
+        'note',
     ];
 
     protected $casts = [
-        'completed_at' => 'datetime',
-        'last_position_at' => 'datetime',
-        'current_time_seconds' => 'integer',
+        'position_seconds' => 'integer',
     ];
 
     public function user()
@@ -30,8 +26,14 @@ class LessonProgress extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
+
     public function lesson()
     {
         return $this->belongsTo(Lesson::class);
     }
 }
+

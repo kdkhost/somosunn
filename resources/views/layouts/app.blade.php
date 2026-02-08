@@ -156,6 +156,19 @@
                 'animate' => $videoWatermarkAnimate,
             ],
         ];
+        $videoPlayerConfigJson = json_encode(
+            $videoPlayerConfig,
+            JSON_UNESCAPED_UNICODE
+            | JSON_UNESCAPED_SLASHES
+            | JSON_INVALID_UTF8_SUBSTITUTE
+            | JSON_HEX_TAG
+            | JSON_HEX_APOS
+            | JSON_HEX_AMP
+            | JSON_HEX_QUOT
+        );
+        if (!is_string($videoPlayerConfigJson) || $videoPlayerConfigJson === '') {
+            $videoPlayerConfigJson = '{"enabled":false}';
+        }
 
         $pageTitle = trim($__env->yieldContent('title'));
         if ($pageTitle === '') {
@@ -244,7 +257,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @if($videoPlayerEnabled)
-        <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+        <link rel="stylesheet" href="{{ asset('vendor/plyr/plyr.css') }}">
     @endif
 
     @stack('styles')
@@ -682,14 +695,14 @@
     @if($videoPlayerEnabled)
         <script>
             window.UNN = window.UNN || {};
-            window.UNN.videoPlayer = @json($videoPlayerConfig);
+            window.UNN.videoPlayer = {!! $videoPlayerConfigJson !!};
         </script>
-        <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+        <script src="{{ asset('vendor/plyr/plyr.polyfilled.js') }}"></script>
         <script>
             (function () {
                 const config = (window.UNN && window.UNN.videoPlayer) ? window.UNN.videoPlayer : null;
                 if (!config || !config.enabled) return;
-                const plyrAvailable = typeof Plyr !== 'undefined';
+                const canUsePlyr = () => typeof Plyr !== 'undefined';
 
                 function deepMerge(target, source) {
                     if (!source || typeof source !== 'object') return target;
@@ -785,6 +798,20 @@
 
                     if (/^https?:\/\//i.test(url)) return url;
                     if (url.startsWith('//')) return (window.location.protocol || 'https:') + url;
+
+                    if (url.startsWith('/storage/app/public/')) {
+                        return '/storage/' + url.replace(/^\/storage\/app\/public\//, '');
+                    }
+                    if (url.startsWith('storage/app/public/')) {
+                        return '/storage/' + url.replace(/^storage\/app\/public\//, '');
+                    }
+                    if (url.startsWith('public/')) {
+                        url = url.replace(/^public\//, '');
+                    }
+                    if (/^(course-videos|course-materials)\//i.test(url)) {
+                        return '/storage/' + url;
+                    }
+
                     if (url.startsWith('/')) return url;
 
                     // Allow common providers without protocol.
@@ -815,12 +842,11 @@
                     return 'video/mp4';
                 }
 
-                function applyWatermark(player) {
+                function applyWatermark(container) {
                     const wm = config.watermark || {};
                     if (!wm.enabled) return;
                     if (!wm.imageUrl && !wm.text) return;
 
-                    const container = (player && player.elements) ? player.elements.container : null;
                     if (!container) return;
                     if (container.querySelector('.unn-video-watermark')) return;
 
@@ -860,6 +886,29 @@
                     container.appendChild(outer);
                 }
 
+                function bindPlaybackProtections(target, disableContextMenu, blockDownload) {
+                    if (!target) return;
+
+                    if (disableContextMenu) {
+                        target.addEventListener('contextmenu', function (event) {
+                            event.preventDefault();
+                        });
+                    }
+
+                    if (!blockDownload) {
+                        return;
+                    }
+
+                    target.addEventListener('dragstart', function (event) {
+                        event.preventDefault();
+                    });
+
+                    if (target.tagName === 'VIDEO') {
+                        target.setAttribute('controlsList', 'nodownload noplaybackrate noremoteplayback');
+                        target.setAttribute('disablePictureInPicture', '');
+                    }
+                }
+
                 function initOne(wrapper) {
                     if (!wrapper || wrapper.dataset.unnVideoPlayerInit === '1') return;
                     wrapper.dataset.unnVideoPlayerInit = '1';
@@ -876,16 +925,17 @@
                     const floatingEnabled = (wrapper.dataset.floatingEnabled === '1') || (wrapper.getAttribute('data-floating-enabled') === '1');
                     const floatingWidth = parseInt(wrapper.dataset.floatingWidth || wrapper.getAttribute('data-floating-width') || '', 10);
                     const floatingHeight = parseInt(wrapper.dataset.floatingHeight || wrapper.getAttribute('data-floating-height') || '', 10);
+                    const plyrAvailable = canUsePlyr();
+                    const disableContextMenu = blockDownload || options.disableContextMenu !== false;
 
-                    if (blockDownload) {
-                        options.disableContextMenu = true;
-                        if (Array.isArray(options.controls) && options.controls.length) {
-                            options.controls = options.controls.filter(c => c !== 'download');
-                        }
+                    options.disableContextMenu = disableContextMenu;
+                    if (blockDownload && Array.isArray(options.controls) && options.controls.length) {
+                        options.controls = options.controls.filter(c => c !== 'download');
                     }
 
                     wrapper.classList.add('unn-video-player');
                     wrapper.innerHTML = '';
+                    bindPlaybackProtections(wrapper, disableContextMenu, blockDownload);
 
                     const host = wrapper.closest('[data-unn-video-host]') || wrapper;
 
@@ -922,9 +972,6 @@
                         target = document.createElement('video');
                         target.setAttribute('playsinline', '');
                         target.setAttribute('controls', '');
-                        if (blockDownload) {
-                            target.setAttribute('controlsList', 'nodownload');
-                        }
 
                         const source = document.createElement('source');
                         source.src = String(url);
@@ -933,13 +980,33 @@
 
                         wrapper.appendChild(target);
                     }
+                    bindPlaybackProtections(target, disableContextMenu, blockDownload);
 
                     if (!plyrAvailable) {
+                        wrapper.__unnVideoApi = {
+                            player: null,
+                            media: target && target.tagName === 'VIDEO' ? target : null,
+                            wrapper: wrapper,
+                        };
+                        wrapper.dispatchEvent(new CustomEvent('unn:video-ready', { detail: wrapper.__unnVideoApi }));
+                        applyWatermark(wrapper);
+                        if (floatingEnabled) {
+                            const width = Number.isFinite(floatingWidth) ? floatingWidth : 420;
+                            const height = Number.isFinite(floatingHeight) ? floatingHeight : Math.round(width * 9 / 16);
+                            setupFloatingPlayer(host, null, { width, height });
+                        }
                         return;
                     }
 
                     const player = new Plyr(target, options);
-                    applyWatermark(player);
+                    const container = (player && player.elements) ? player.elements.container : wrapper;
+                    wrapper.__unnVideoApi = {
+                        player: player,
+                        media: player && player.media ? player.media : null,
+                        wrapper: wrapper,
+                    };
+                    wrapper.dispatchEvent(new CustomEvent('unn:video-ready', { detail: wrapper.__unnVideoApi }));
+                    applyWatermark(container);
 
                     if (floatingEnabled) {
                         const width = Number.isFinite(floatingWidth) ? floatingWidth : 420;

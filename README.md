@@ -1,6 +1,6 @@
 # UNN — Plataforma de Networking (Scaffold)
 
-Este diretório contém o scaffold inicial para um projeto Laravel 12 preparado para PHP 8.4 e hospedagem em cPanel.
+Este diretório contém o scaffold inicial para um projeto Laravel 10 preparado para PHP 8.4 e hospedagem em cPanel.
 
 Principais instruções rápidas:
 
@@ -114,6 +114,17 @@ curl "https://SEU-DOMINIO/api/v1/me" \
 - `GET /api/v1/courses/{course}`
 - Campos principais: `id`, `title`, `slug`, `price`, `duration`, `total_hours`, `thumbnail_url`, `short_description`, `full_description`, `author_name`, `status`, `is_featured`.
 
+#### Aulas (progresso e marcadores)
+- `GET /courses/{course}/lessons/{lesson}` (web, autenticado quando não for prévia gratuita)
+- `POST /courses/{course}/lessons/{lesson}/progress` (auth)
+  - payload: `{ "current_time_seconds": 123 }`
+  - uso: salvar ponto atual do vídeo (retomada automática)
+- `POST /courses/{course}/lessons/{lesson}/bookmarks` (auth)
+  - payload: `{ "position_seconds": 123, "note": "Revisar este trecho" }`
+  - uso: criar marcador com comentário na timeline da aula
+- `DELETE /courses/{course}/lessons/{lesson}/bookmarks/{bookmark}` (auth)
+  - uso: remover marcador do usuário logado
+
 #### Mentorias
 - `GET /api/v1/mentorships?per_page=20`
 - `GET /api/v1/mentorships/{mentorship}`
@@ -199,6 +210,17 @@ PWA
 - **Site:** a página `/premium` exibe depoimentos aprovados e permite envio autenticado via `POST /depoimentos` (fica como **pendente** até moderação).
 - **Admin:** moderação em `/admin/testimonials` (aprovar/recusar/editar; exclusão só para quem tiver permissão).
 - **Permissões (RBAC):** `testimonials.view`, `testimonials.moderate`, `testimonials.delete`.
+
+## Avaliações de Cursos e Mentorias
+
+- **Página de venda:** cursos (`/courses/{course}`) e mentorias (`/mentorships/{mentorship}`) exibem nota média, total de avaliações e grade com comentários aprovados.
+- **Envio com estrelas:** membro autenticado envia avaliação de 1 a 5 estrelas + comentário; curso exige acesso ativo para avaliação.
+- **Moderação:** toda avaliação entra como `pending` e pode ser aprovada/recusada em `/admin/reviews`.
+- **Gestor ou plataforma:** admins moderam tudo; gestores moderam apenas avaliações dos próprios cursos/mentorias.
+- **Rotas principais:**
+  - `POST /courses/{course}/reviews`
+  - `POST /mentorships/{mentorship}/reviews`
+  - `GET /admin/reviews`
 
 ## Contato + reCAPTCHA v3
 

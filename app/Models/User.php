@@ -186,6 +186,11 @@ class User extends Authenticatable
         return $this->hasMany(Post::class);
     }
 
+    public function itemReviews()
+    {
+        return $this->hasMany(ItemReview::class);
+    }
+
     public function isProfileComplete(): bool
     {
         $requiredValues = [

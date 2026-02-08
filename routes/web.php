@@ -152,6 +152,12 @@ Route::resource('courses', \App\Http\Controllers\CourseController::class);
 Route::middleware(['check.feature:mentorships'])->group(function () {
     Route::resource('mentorships', \App\Http\Controllers\MentorshipController::class)->only(['index', 'show']);
 });
+Route::post('courses/{course}/reviews', [\App\Http\Controllers\ItemReviewController::class, 'storeCourse'])
+    ->middleware('auth')
+    ->name('courses.reviews.store');
+Route::post('mentorships/{mentorship}/reviews', [\App\Http\Controllers\ItemReviewController::class, 'storeMentorship'])
+    ->middleware('auth')
+    ->name('mentorships.reviews.store');
 
 Route::post('courses/{course}/lessons', [\App\Http\Controllers\LessonController::class, 'store'])->name('courses.lessons.store');
 Route::put('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'update'])->name('courses.lessons.update');
@@ -164,6 +170,11 @@ Route::get('courses/{course}/lessons/{lesson}/attachments/{attachment}/download'
 Route::delete('courses/{course}/lessons/{lesson}/attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'deleteAttachment'])->name('courses.lessons.attachments.destroy');
 Route::put('courses/{course}/lessons/{lesson}/attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'renameAttachment'])->name('courses.lessons.attachments.rename');
 Route::get('courses/{course}/lessons/{lesson}/details', [\App\Http\Controllers\LessonController::class, 'getDetails'])->name('courses.lessons.details');
+Route::middleware('auth')->group(function () {
+    Route::post('courses/{course}/lessons/{lesson}/progress', [\App\Http\Controllers\LessonController::class, 'updatePlaybackProgress'])->name('courses.lessons.progress.update');
+    Route::post('courses/{course}/lessons/{lesson}/bookmarks', [\App\Http\Controllers\LessonController::class, 'storeBookmark'])->name('courses.lessons.bookmarks.store');
+    Route::delete('courses/{course}/lessons/{lesson}/bookmarks/{bookmark}', [\App\Http\Controllers\LessonController::class, 'destroyBookmark'])->name('courses.lessons.bookmarks.destroy');
+});
 
 // (events.show/events.index defined above as public routes)
 
@@ -240,6 +251,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::post('/testimonials/{testimonial}/approve', [\App\Http\Controllers\Admin\TestimonialController::class, 'approve'])->name('testimonials.approve');
     Route::post('/testimonials/{testimonial}/reject', [\App\Http\Controllers\Admin\TestimonialController::class, 'reject'])->name('testimonials.reject');
     Route::delete('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'destroy'])->name('testimonials.destroy');
+
+    // Avaliações de cursos e mentorias (moderação)
+    Route::get('/reviews', [\App\Http\Controllers\Admin\ItemReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/reviews/{review}/approve', [\App\Http\Controllers\Admin\ItemReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('/reviews/{review}/reject', [\App\Http\Controllers\Admin\ItemReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('/reviews/{review}', [\App\Http\Controllers\Admin\ItemReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // Impersonate Stop (disponível se estiver impersonando, sessão controla)
     Route::get('/stop-impersonating', [\App\Http\Controllers\Admin\ImpersonateController::class, 'stop'])->name('impersonate.stop');

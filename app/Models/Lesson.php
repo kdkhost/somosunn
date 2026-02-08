@@ -33,4 +33,9 @@ class Lesson extends Model
     {
         return $this->hasOne(LessonProgress::class);
     }
+
+    public function bookmarks()
+    {
+        return $this->hasMany(LessonBookmark::class);
+    }
 }

@@ -19,4 +19,9 @@ class Mentorship extends Model
     {
         return $this->belongsTo(User::class, 'mentor_id');
     }
+
+    public function reviews()
+    {
+        return $this->morphMany(ItemReview::class, 'reviewable');
+    }
 }
