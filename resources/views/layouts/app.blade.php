@@ -643,17 +643,21 @@
     @if($trackingBody !== '')
         {!! $trackingBody !!}
     @endif
-    {{-- Banner de Impersonation --}}
+    {{-- Banner de Impersonation - Flutuante discreto --}}
     @if(session()->has('impersonator_id'))
-        <div
-            class="bg-yellow-400 text-yellow-900 px-4 py-2 text-center text-sm font-bold flex justify-center items-center gap-4 fixed w-full top-0 z-[100]">
-            <span><i class="fas fa-user-secret mr-1"></i> Acessando conta de {{ auth()->user()->name }} como administrador</span>
+        <div id="impersonation-badge"
+            class="fixed bottom-4 left-4 z-[9999] bg-yellow-400 text-yellow-900 px-3 py-2 rounded-lg shadow-lg text-xs font-bold flex items-center gap-2 max-w-xs">
+            <i class="fas fa-user-secret"></i>
+            <span class="truncate">{{ auth()->user()->name }}</span>
             <a href="{{ route('admin.impersonate.stop') }}"
-                class="bg-yellow-900 text-yellow-100 px-3 py-1 rounded hover:bg-yellow-800 transition text-xs">
-                Voltar ao Admin
+                class="bg-yellow-900 text-yellow-100 px-2 py-1 rounded hover:bg-yellow-800 transition whitespace-nowrap">
+                Sair
             </a>
+            <button onclick="document.getElementById('impersonation-badge').style.display='none'" 
+                class="text-yellow-900 hover:text-yellow-700 ml-1" title="Minimizar">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-        <div class="h-10"></div>
     @endif
 
     @php $showNavigation = $showNavigation ?? true; @endphp
