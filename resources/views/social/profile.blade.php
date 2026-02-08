@@ -25,11 +25,12 @@
 
                             @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
                                 <form action="{{ route('social.post.destroy', $post) }}" method="POST"
-                                    onsubmit="return confirm('Excluir esta publicacao?');">
+                                        class="js-confirm-delete" data-confirm-title="Remover publicacao?"
+                                        data-confirm-text="Esta acao nao pode ser desfeita.">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="flex items-center gap-2 text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash"></i> Excluir
+                                        <button type="submit" class="flex items-center gap-2 text-red-500 hover:text-red-700" title="Remover">
+                                            <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
                             @endif
@@ -473,10 +474,13 @@
                                                 <p class="text-xs font-semibold text-gray-700">{{ $commentName }}</p>
                                                 @if(Auth::check() && (Auth::id() === $comment->user_id || Auth::id() === $post->user_id || Auth::user()->isAdmin()))
                                                     <form action="{{ route('social.comment.destroy', $comment) }}" method="POST"
-                                                        onsubmit="return confirm('Excluir este comentario?');">
+                                                            class="js-confirm-delete" data-confirm-title="Remover comentario?"
+                                                            data-confirm-text="Esta acao nao pode ser desfeita.">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="text-xs text-red-500">Excluir</button>
+                                                            <button type="submit" class="text-xs text-red-500" title="Remover">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
                                                     </form>
                                                 @endif
                                             </div>
@@ -589,5 +593,33 @@
                 }, 1500);
             });
         }
+
+        document.querySelectorAll('.js-confirm-delete').forEach((form) => {
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                Swal.fire({
+                    title: form.dataset.confirmTitle || 'Remover?'
+                    ,
+                    text: form.dataset.confirmText || 'Esta acao nao pode ser desfeita.'
+                    ,
+                    icon: 'warning'
+                    ,
+                    showCancelButton: true
+                    ,
+                    confirmButtonColor: '#d33'
+                    ,
+                    cancelButtonColor: '#6c757d'
+                    ,
+                    confirmButtonText: 'Sim, remover'
+                    ,
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
     </script>
 @endpush

@@ -420,6 +420,34 @@
             });
         }
 
+        document.querySelectorAll('.js-confirm-delete').forEach((form) => {
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                Swal.fire({
+                    title: form.dataset.confirmTitle || 'Remover?'
+                    ,
+                    text: form.dataset.confirmText || 'Esta acao nao pode ser desfeita.'
+                    ,
+                    icon: 'warning'
+                    ,
+                    showCancelButton: true
+                    ,
+                    confirmButtonColor: '#d33'
+                    ,
+                    cancelButtonColor: '#6c757d'
+                    ,
+                    confirmButtonText: 'Sim, remover'
+                    ,
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+
         window.insertPostEmoji = function () {
             const textarea = document.getElementById('post-content');
             if (!textarea) {
