@@ -217,19 +217,19 @@
                 const id = $(this).data('id');
                 const name = $(this).data('name');
 
-                if (!confirmAction(null, 'Remover?', `Deseja remover a fonte "${name}"?`)) return;
-
-                $.ajax({
-                    url: '/admin/fonts/' + id,
-                    type: 'DELETE',
-                    data: { _token: '{{ csrf_token() }}' },
-                    success: function (response) {
-                        toastr.success(response.message || 'Fonte removida.');
-                        $('#font-' + id).fadeOut();
-                    },
-                    error: function () {
-                        toastr.error('Erro ao remover fonte.');
-                    }
+                confirmAction(null, 'Remover?', `Deseja remover a fonte "${name}"?`, function () {
+                    $.ajax({
+                        url: '/admin/fonts/' + id,
+                        type: 'DELETE',
+                        data: { _token: '{{ csrf_token() }}' },
+                        success: function (response) {
+                            toastr.success(response.message || 'Fonte removida.');
+                            $('#font-' + id).fadeOut();
+                        },
+                        error: function () {
+                            toastr.error('Erro ao remover fonte.');
+                        }
+                    });
                 });
             });
 

@@ -398,6 +398,48 @@
                 });
             });
 
+            window.confirmAction = function (event, title, text, onConfirm) {
+                if (event && typeof event.preventDefault === 'function') {
+                    event.preventDefault();
+                }
+
+                return Swal.fire({
+                    title: title || 'Confirmar acao',
+                    text: text || 'Confirme para continuar.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (!result.isConfirmed) {
+                        return false;
+                    }
+
+                    if (typeof onConfirm === 'function') {
+                        onConfirm();
+                        return true;
+                    }
+
+                    if (event) {
+                        const target = event.currentTarget || event.target;
+                        const form = target && target.closest ? target.closest('form') : null;
+
+                        if (form) {
+                            form.submit();
+                            return true;
+                        }
+
+                        const link = target && target.getAttribute ? target.getAttribute('href') : null;
+                        if (link && link !== '#') {
+                            window.location.href = link;
+                            return true;
+                        }
+                    }
+
+                    return true;
+                });
+            };
+
             $('#themeToggleBtn').on('click', function () {
                 const input = $('#site_theme_input');
                 input.val(input.val() === 'dark' ? 'light' : 'dark');
