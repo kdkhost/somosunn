@@ -9,6 +9,17 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    /**
+     * Available features that can be granted individually to users.
+     */
+    private const USER_FEATURES = [
+        'community' => 'Comunidade (perfil/feed)',
+        'chat' => 'Chat (mensagens)',
+        'courses' => 'Cursos',
+        'events' => 'Eventos',
+        'mentorships' => 'Mentorias',
+    ];
+
     public function index()
     {
         $query = User::latest();
@@ -25,7 +36,10 @@ class UserController extends Controller
     public function create()
     {
         $user = new User();
-        return view('admin.users.form', compact('user'));
+        return view('admin.users.form', [
+            'user' => $user,
+            'userFeatures' => self::USER_FEATURES,
+        ]);
     }
 
     public function store(Request $request)
@@ -38,15 +52,21 @@ class UserController extends Controller
             'level' => 'nullable|string',
             'plan_id' => 'nullable|exists:plans,id',
             'plan_expires_at' => 'nullable|date',
+            'extra_features' => 'nullable|array',
+            'extra_features.*' => 'string|in:' . implode(',', array_keys(self::USER_FEATURES)),
         ]);
         $data['password'] = Hash::make($data['password']);
+        $data['extra_features'] = $data['extra_features'] ?? [];
         User::create($data);
         return redirect()->route('admin.users.index')->with('success', 'Usuário criado.');
     }
 
     public function edit(User $user)
     {
-        return view('admin.users.form', compact('user'));
+        return view('admin.users.form', [
+            'user' => $user,
+            'userFeatures' => self::USER_FEATURES,
+        ]);
     }
 
     public function update(Request $request, User $user)
@@ -59,12 +79,15 @@ class UserController extends Controller
             'level' => 'nullable|string',
             'plan_id' => 'nullable|exists:plans,id',
             'plan_expires_at' => 'nullable|date',
+            'extra_features' => 'nullable|array',
+            'extra_features.*' => 'string|in:' . implode(',', array_keys(self::USER_FEATURES)),
         ]);
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         } else {
             unset($data['password']);
         }
+        $data['extra_features'] = $data['extra_features'] ?? [];
         $user->update($data);
         return redirect()->route('admin.users.index')->with('success', 'Usuário atualizado.');
     }

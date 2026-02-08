@@ -79,6 +79,45 @@
                     </div>
                 </div>
             </div>
+
+            @php
+                $userFeatures = $userFeatures ?? [];
+                $selectedFeatures = old('extra_features', $user->extra_features ?? []);
+                if (!is_array($selectedFeatures)) {
+                    $selectedFeatures = [];
+                }
+            @endphp
+
+            <div class="card mt-4 border-success">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title"><i class="fas fa-unlock-alt mr-1"></i> Recursos Individuais (Extras)</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Libere recursos específicos para este usuário, independente do plano atribuído.
+                        Esses recursos se somam aos do plano.
+                    </p>
+                    <div class="row">
+                        @forelse($userFeatures as $featureKey => $featureLabel)
+                            <div class="col-md-4 col-lg-3">
+                                <div class="custom-control custom-checkbox mb-2">
+                                    <input type="checkbox" class="custom-control-input" id="extra-feature-{{ $featureKey }}"
+                                        name="extra_features[]" value="{{ $featureKey }}"
+                                        {{ in_array($featureKey, $selectedFeatures, true) ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="extra-feature-{{ $featureKey }}">{{ $featureLabel }}</label>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="col-12">
+                                <div class="alert alert-warning mb-0">
+                                    Nenhum recurso configurado.
+                                </div>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
         @endif
 
         <div class="mt-4">
