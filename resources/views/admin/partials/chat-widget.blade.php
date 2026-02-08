@@ -118,8 +118,16 @@
     }
 
     function loadChatConversations() {
-        fetch('{{ route("chat.list") }}')
-            .then(r => r.json())
+        fetch('{{ route("chat.list") }}', {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(r => {
+                if (!r.ok) throw new Error('Erro ao carregar');
+                return r.json();
+            })
             .then(data => {
                 const list = document.getElementById('chat-conversations-list');
                 document.getElementById('chat-list-loading').classList.add('d-none');

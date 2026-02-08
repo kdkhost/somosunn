@@ -1125,8 +1125,16 @@
 
             conversationList.innerHTML = '<p class="text-xs text-gray-500">Carregando conversas...</p>';
 
-            fetch('{{ route('chat.list') }}')
-                .then((r) => r.json())
+            fetch('{{ route('chat.list') }}', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then((r) => {
+                    if (!r.ok) throw new Error('Erro ao carregar');
+                    return r.json();
+                })
                 .then((conversations) => {
                     if (!Array.isArray(conversations) || conversations.length === 0) {
                         conversationList.innerHTML = '<p class="text-xs text-gray-500">Nenhuma conversa iniciada.</p>';
