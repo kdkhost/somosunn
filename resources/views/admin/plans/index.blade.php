@@ -138,8 +138,9 @@
                                 <a href="{{ route('admin.plans.edit', $plan) }}" class="btn btn-sm btn-secondary">Editar</a>
                                 <form action="{{ route('admin.plans.destroy', $plan) }}" method="POST" class="d-inline mb-0">
                                     @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-danger"
-                                        onclick="return confirmAction(event, 'Remover plano?', 'O plano será excluído permanentemente.')">Excluir</button>
+                                    <button class="btn btn-sm btn-danger" data-confirm-delete
+                                        data-confirm-title="Remover plano?"
+                                        data-confirm-text="O plano será excluído permanentemente.">Excluir</button>
                                 </form>
                             </div>
                         </div>

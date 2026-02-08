@@ -54,11 +54,12 @@
                                         <i class="fas fa-edit"></i> Editar
                                     </a>
                                     <form action="{{ route('admin.mentorships.destroy', $item) }}" method="POST"
-                                        class="d-inline-block"
-                                        onsubmit="return confirmAction(event, 'Remover esta mentoria?', 'Esta ação não pode ser desfeita.')">
+                                        class="d-inline-block">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn btn-sm btn-danger">
+                                        <button class="btn btn-sm btn-danger" data-confirm-delete
+                                            data-confirm-title="Remover esta mentoria?"
+                                            data-confirm-text="Esta ação não pode ser desfeita.">
                                             <i class="fas fa-trash"></i> Excluir
                                         </button>
                                     </form>

@@ -33,8 +33,9 @@
                             <form action="{{ route('admin.points-rules.destroy', $r) }}" method="POST" style="display:inline">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-sm btn-danger"
-                                    onclick="return confirmAction(event, 'Remover?', 'Esta ação não pode ser desfeita.')">Remover</button>
+                                <button class="btn btn-sm btn-danger" data-confirm-delete
+                                    data-confirm-title="Remover?"
+                                    data-confirm-text="Esta ação não pode ser desfeita.">Remover</button>
                             </form>
                         </td>
                     </tr>

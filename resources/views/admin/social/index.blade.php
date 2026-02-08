@@ -21,10 +21,11 @@
                             <td>{{ Str::limit($post->content, 100) }}</td>
                             <td>{{ $post->created_at->format('d/m/Y H:i') }}</td>
                             <td>
-                                <form action="{{ route('admin.social.destroy', $post->id) }}" method="POST" class="d-inline"
-                                    onsubmit="return confirmAction(event, 'Excluir este post?', 'Esta ação não pode ser desfeita.')">
+                                <form action="{{ route('admin.social.destroy', $post->id) }}" method="POST" class="d-inline">
                                     @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                    <button class="btn btn-sm btn-danger" data-confirm-delete
+                                        data-confirm-title="Excluir este post?"
+                                        data-confirm-text="Esta ação não pode ser desfeita."><i class="fas fa-trash"></i></button>
                                 </form>
                             </td>
                         </tr>
