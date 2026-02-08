@@ -40,22 +40,24 @@
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center">
                             <div class="mr-3">
-                            <img src="{{ $post->user?->profile_photo_url ?? asset('img/default-user.svg') }}"
-                                alt="Avatar" class="img-circle" style="width:40px;height:40px;object-fit:cover;">
+                                <img src="{{ $post->user?->profile_photo_url ?? asset('img/default-user.svg') }}"
+                                    alt="Avatar" class="img-circle" style="width:40px;height:40px;object-fit:cover;">
                             </div>
                             <div>
                                 <strong>{{ $post->user->name ?? 'Anonimo' }}</strong>
                                 <div class="text-muted text-sm">{{ $post->created_at->diffForHumans() }}</div>
                             </div>
                         </div>
-                        <form action="{{ route('social.post.destroy', $post) }}" method="POST" class="d-inline js-confirm-delete"
-                            data-confirm-title="Remover publicacao?" data-confirm-text="Esta acao nao pode ser desfeita.">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
+                        <div class="card-tools">
+                            <form action="{{ route('social.post.destroy', $post) }}" method="POST" class="d-inline js-confirm-delete"
+                                data-confirm-title="Remover publicacao?" data-confirm-text="Esta acao nao pode ser desfeita.">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                     <div class="card-body">
                         <p class="mb-3">{!! nl2br(e($post->content)) !!}</p>
