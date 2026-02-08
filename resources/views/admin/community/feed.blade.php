@@ -57,13 +57,21 @@
                             </div>
                         </div>
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                            <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2 position-relative">
                                 <button type="button" id="admin-emoji-toggle" class="btn btn-light" title="Inserir emoji">
                                     <i class="far fa-smile"></i>
                                 </button>
-                                <div id="admin-emoji-picker" class="d-none position-absolute bg-white border rounded shadow p-2" style="z-index: 20; width: 260px;">
-                                    @include('social.partials.emoji_tabs')
-                                    @include('social.partials.emoji_grid')
+                                <div id="admin-emoji-picker" class="d-none position-absolute bg-white border rounded shadow" style="z-index: 20; width: 280px; top: 46px; left: 0;">
+                                    <div class="d-flex align-items-center justify-content-between px-2 pt-2">
+                                        <span class="text-muted text-xs">Emojis</span>
+                                        <button type="button" class="btn btn-tool btn-xs" id="admin-emoji-close" title="Fechar">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="px-2 pb-2">
+                                        @include('social.partials.emoji_tabs')
+                                        @include('social.partials.emoji_grid')
+                                    </div>
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary">Publicar</button>
@@ -220,6 +228,8 @@
 
         #admin-emoji-picker {
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            max-height: 360px;
+            overflow: hidden;
         }
 
         #admin-emoji-picker .emoji-grid {
@@ -227,6 +237,9 @@
             grid-template-columns: repeat(6, minmax(0, 1fr));
             gap: 6px;
             margin-top: 6px;
+            max-height: 260px;
+            overflow-y: auto;
+            padding-right: 2px;
         }
 
         #admin-emoji-picker .emoji-item {
@@ -286,6 +299,7 @@
         const adminPreviewRemove = document.getElementById('admin-preview-remove');
         const adminEmojiToggle = document.getElementById('admin-emoji-toggle');
         const adminEmojiPicker = document.getElementById('admin-emoji-picker');
+        const adminEmojiClose = document.getElementById('admin-emoji-close');
 
         const setAdminUploadName = (file) => {
             if (adminUploadName) {
@@ -397,6 +411,26 @@
                 adminEmojiPicker.classList.toggle('d-none');
             });
         }
+
+        if (adminEmojiClose && adminEmojiPicker) {
+            adminEmojiClose.addEventListener('click', (event) => {
+                event.preventDefault();
+                adminEmojiPicker.classList.add('d-none');
+            });
+        }
+
+        document.addEventListener('click', (event) => {
+            if (!adminEmojiPicker || adminEmojiPicker.classList.contains('d-none')) {
+                return;
+            }
+
+            const isInsidePicker = adminEmojiPicker.contains(event.target);
+            const isToggle = adminEmojiToggle && adminEmojiToggle.contains(event.target);
+
+            if (!isInsidePicker && !isToggle) {
+                adminEmojiPicker.classList.add('d-none');
+            }
+        });
 
         document.querySelectorAll('#admin-emoji-picker .emoji-tab').forEach((tab) => {
             tab.addEventListener('click', () => {
