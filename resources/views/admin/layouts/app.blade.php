@@ -245,6 +245,20 @@
 
 <body
     class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}">
+    {{-- Badge de Impersonation - Flutuante discreto --}}
+    @if(session()->has('impersonator_id'))
+        <div id="impersonation-badge"
+            class="position-fixed bg-warning text-dark px-3 py-2 rounded shadow font-weight-bold d-flex align-items-center"
+            style="bottom: 1rem; left: 1rem; z-index: 9999; font-size: 0.8rem; max-width: 250px;">
+            <i class="fas fa-user-secret mr-2"></i>
+            <span class="text-truncate mr-2">{{ auth()->user()->name }}</span>
+            <a href="{{ route('admin.impersonate.stop') }}" class="btn btn-xs btn-danger">Sair</a>
+            <button onclick="document.getElementById('impersonation-badge').style.display='none'" 
+                class="btn btn-xs btn-link text-dark ml-1 p-0" title="Minimizar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    @endif
     <div class="wrapper">
         @if($preloaderEnabled)
             <div class="preloader flex-column justify-content-center align-items-center">

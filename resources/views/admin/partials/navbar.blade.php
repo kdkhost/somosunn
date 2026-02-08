@@ -7,15 +7,6 @@
         <li class="nav-item d-none d-sm-inline-block">
             <a href="{{ route('home') }}" class="nav-link" target="_blank" rel="noopener">Ver site</a>
         </li>
-        @if(session()->has('impersonator_id'))
-            <li class="nav-item ml-3">
-                <div class="bg-warning px-3 py-1 rounded d-flex align-items-center">
-                    <span class="text-dark mr-2 font-weight-bold"><i class="fas fa-user-secret mr-1"></i> Acessando como:
-                        {{ auth()->user()->name }}</span>
-                    <a href="{{ route('admin.impersonate.stop') }}" class="btn btn-xs btn-danger">Voltar ao Admin</a>
-                </div>
-            </li>
-        @endif
     </ul>
 
     <ul class="navbar-nav ml-auto align-items-center">
