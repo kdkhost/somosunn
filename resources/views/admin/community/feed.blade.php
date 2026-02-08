@@ -15,7 +15,7 @@
                         </button>
                         <div id="admin-post-options" class="d-none position-absolute bg-white border rounded shadow p-3" style="right: 1rem; z-index: 20; min-width: 220px;">
                             <label class="mb-1 text-muted small">Visibilidade</label>
-                            <select name="visibility" class="form-control form-control-sm">
+                            <select id="admin-visibility-select" class="form-control form-control-sm">
                                 <option value="public">Publico</option>
                                 <option value="connections">Somente seguidores</option>
                                 <option value="community" selected>Somente comunidade</option>
@@ -26,18 +26,19 @@
                 <div class="card-body">
                     <form id="admin-post-form" action="{{ route('social.post.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        <input type="hidden" name="visibility" id="admin-visibility-input" value="community">
                         <div class="form-group">
                             <textarea name="content" rows="3" class="form-control" placeholder="No que voce esta pensando?"></textarea>
                         </div>
-                        <input type="file" name="media" class="d-none" id="admin-post-media" accept="image/*">
+                        <input type="file" name="media[]" class="d-none" id="admin-post-media" accept="image/*" multiple>
                         <div class="form-group" id="admin-dropzone">
                             <div class="border rounded p-3 bg-light d-flex flex-column gap-2">
                                 <div class="d-flex align-items-center justify-content-between flex-wrap">
                                     <div class="text-muted">
-                                        <i class="fas fa-image mr-1"></i> Arraste e solte uma imagem
+                                        <i class="fas fa-image mr-1"></i> Arraste e solte imagens
                                     </div>
                                     <button type="button" class="btn btn-sm btn-outline-primary" id="admin-post-select">
-                                        Selecionar imagem
+                                        Selecionar imagens
                                     </button>
                                 </div>
                                 <div class="text-muted small" id="admin-upload-name">Nenhuma imagem selecionada</div>
@@ -106,7 +107,29 @@
                     <div class="card-body">
                         <p class="mb-3">{!! nl2br(e($post->content)) !!}</p>
                         @if($post->media->isNotEmpty())
-                            <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post" class="img-fluid rounded">
+                            @php
+                                $mediaCount = $post->media->count();
+                            @endphp
+                            @if($mediaCount === 1)
+                                <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post" class="img-fluid rounded">
+                            @else
+                                <div class="position-relative" data-carousel data-total="{{ $mediaCount }}">
+                                    <div class="overflow-hidden rounded">
+                                        <div class="d-flex" data-track style="transition: transform 0.3s ease;">
+                                            @foreach($post->media as $media)
+                                                <img src="{{ asset($media->path) }}" alt="Midia do post" class="w-100 flex-shrink-0" style="object-fit: cover;">
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-light btn-sm position-absolute" style="top:50%;left:8px;transform:translateY(-50%);" data-prev>
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-light btn-sm position-absolute" style="top:50%;right:8px;transform:translateY(-50%);" data-next>
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                    <span class="badge badge-dark position-absolute" style="right:8px;bottom:8px;" data-counter>1/{{ $mediaCount }}</span>
+                                </div>
+                            @endif
                         @endif
                     </div>
                     <div class="card-footer d-flex justify-content-between align-items-center">
@@ -300,14 +323,28 @@
         const adminEmojiToggle = document.getElementById('admin-emoji-toggle');
         const adminEmojiPicker = document.getElementById('admin-emoji-picker');
         const adminEmojiClose = document.getElementById('admin-emoji-close');
+        const adminVisibilitySelect = document.getElementById('admin-visibility-select');
+        const adminVisibilityInput = document.getElementById('admin-visibility-input');
 
-        const setAdminUploadName = (file) => {
+        const formatAdminUploadName = (files) => {
+            if (!files || !files.length) {
+                return 'Nenhuma imagem selecionada';
+            }
+
+            if (files.length === 1) {
+                return files[0].name;
+            }
+
+            return `${files.length} imagens selecionadas`;
+        };
+
+        const setAdminUploadName = (files) => {
             if (adminUploadName) {
-                adminUploadName.textContent = file ? file.name : 'Nenhuma imagem selecionada';
+                adminUploadName.textContent = formatAdminUploadName(files);
             }
         };
 
-        const showAdminPreview = (file) => {
+        const showAdminPreview = (file, total) => {
             if (!file || !adminPreviewTopImg || !adminPreviewInlineImg) {
                 return;
             }
@@ -321,7 +358,8 @@
                 adminPreviewTopImg.src = src;
                 adminPreviewInlineImg.src = src;
                 if (adminPreviewInlineName) {
-                    adminPreviewInlineName.textContent = file.name;
+                    const extra = total && total > 1 ? ` (+${total - 1})` : '';
+                    adminPreviewInlineName.textContent = `${file.name}${extra}`;
                 }
                 if (adminPreviewTop) {
                     adminPreviewTop.classList.remove('d-none');
@@ -359,10 +397,11 @@
 
         if (adminMedia) {
             adminMedia.addEventListener('change', () => {
-                const file = adminMedia.files[0];
-                setAdminUploadName(file);
+                const files = adminMedia.files;
+                const file = files && files.length ? files[0] : null;
+                setAdminUploadName(files);
                 if (file) {
-                    showAdminPreview(file);
+                    showAdminPreview(file, files.length);
                 } else {
                     clearAdminPreview();
                 }
@@ -396,13 +435,21 @@
                     return;
                 }
 
-                const file = files[0];
                 const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
+                Array.from(files).forEach((file) => dataTransfer.items.add(file));
                 adminMedia.files = dataTransfer.files;
-                setAdminUploadName(file);
-                showAdminPreview(file);
+                const file = adminMedia.files[0];
+                setAdminUploadName(adminMedia.files);
+                showAdminPreview(file, adminMedia.files.length);
             });
+        }
+
+        if (adminVisibilitySelect && adminVisibilityInput) {
+            const syncAdminVisibility = () => {
+                adminVisibilityInput.value = adminVisibilitySelect.value;
+            };
+            adminVisibilitySelect.addEventListener('change', syncAdminVisibility);
+            syncAdminVisibility();
         }
 
         if (adminEmojiToggle && adminEmojiPicker) {
@@ -467,6 +514,56 @@
                 target.focus();
             });
         });
+
+        const initCarousels = () => {
+            document.querySelectorAll('[data-carousel]').forEach((carousel) => {
+                const track = carousel.querySelector('[data-track]');
+                if (!track) {
+                    return;
+                }
+
+                const total = parseInt(carousel.getAttribute('data-total') || track.children.length, 10);
+                let index = parseInt(carousel.getAttribute('data-index') || '0', 10);
+                const counter = carousel.querySelector('[data-counter]');
+                const prev = carousel.querySelector('[data-prev]');
+                const next = carousel.querySelector('[data-next]');
+
+                const update = () => {
+                    if (total <= 1) {
+                        return;
+                    }
+                    if (index < 0) {
+                        index = total - 1;
+                    }
+                    if (index >= total) {
+                        index = 0;
+                    }
+                    track.style.transform = `translateX(-${index * 100}%)`;
+                    if (counter) {
+                        counter.textContent = `${index + 1}/${total}`;
+                    }
+                    carousel.setAttribute('data-index', String(index));
+                };
+
+                if (prev) {
+                    prev.addEventListener('click', () => {
+                        index -= 1;
+                        update();
+                    });
+                }
+
+                if (next) {
+                    next.addEventListener('click', () => {
+                        index += 1;
+                        update();
+                    });
+                }
+
+                update();
+            });
+        };
+
+        initCarousels();
     </script>
 @endpush
 

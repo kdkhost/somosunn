@@ -97,16 +97,68 @@
                                         <p class="text-xs text-gray-500">Membro</p>
                                     </div>
                                 </div>
-                                <nav class="space-y-2">
-                                    <button type="button" id="feed-toggle"
-                                        class="w-full flex items-center gap-2 text-blue-600 font-medium p-2 bg-blue-50 rounded">
-                                        <i class="fas fa-newspaper w-6"></i> Feed
-                                    </button>
-                                    <button type="button" id="messages-toggle"
-                                        class="w-full flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
-                                        <i class="fas fa-comments w-6"></i> Mensagens
-                                    </button>
-                                </nav>
+                                <div id="recommendations-panel" class="border-t border-gray-100 pt-4">
+                                    <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
+                                    <div class="space-y-4">
+                                        @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
+                                            @php
+                                                $connectionMap = $connectionMap ?? [];
+                                                $authUserId = auth()->id();
+                                            @endphp
+                                            @foreach($recommendedUsers as $user)
+                                                @php
+                                                    $connection = $connectionMap[$user->id] ?? null;
+                                                    $isPending = $connection && $connection->status === 'pending';
+                                                    $isConnected = $connection && $connection->status === 'accepted';
+                                                    $isRequester = $connection && $authUserId && $connection->requester_id === $authUserId;
+                                                    $pendingTime = $connection ? $connection->created_at->diffForHumans() : '';
+                                                @endphp
+                                                <div class="flex items-center justify-between gap-3">
+                                                    <div class="flex items-center gap-3">
+                                                        <a class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0" href="{{ route('social.profile', $user->id) }}">
+                                                            <img src="{{ $user->profile_photo_url }}" alt="Avatar"
+                                                                class="w-10 h-10 object-cover"
+                                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                        </a>
+                                                        <div>
+                                                            <a href="{{ route('social.profile', $user->id) }}" class="text-sm font-semibold text-gray-800 hover:text-blue-600">
+                                                                {{ $user->name }}
+                                                            </a>
+                                                            <p class="text-xs text-gray-500">Membro</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        @if($isConnected)
+                                                            <span class="text-xs text-gray-400">Conectado</span>
+                                                        @elseif($isPending && $isRequester)
+                                                            <div class="text-[11px] text-gray-400">Pendente {{ $pendingTime }}</div>
+                                                            <button type="button"
+                                                                class="text-xs text-red-600 hover:text-red-700 font-medium"
+                                                                onclick="cancelInvite({{ $user->id }})">
+                                                                Cancelar
+                                                            </button>
+                                                        @elseif($isPending)
+                                                            <div class="text-[11px] text-gray-400">Solicitacao recebida</div>
+                                                            <button type="button"
+                                                                class="text-xs text-green-600 hover:text-green-700 font-medium"
+                                                                onclick="acceptInvite({{ $user->id }})">
+                                                                Aceitar
+                                                            </button>
+                                                        @else
+                                                            <button type="button"
+                                                                class="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                                                                onclick="requestInvite({{ $user->id }})">
+                                                                Conectar
+                                                            </button>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <p class="text-xs text-gray-500">Sem recomendacoes no momento.</p>
+                                        @endif
+                                    </div>
+                                </div>
                             @else
                                 <div class="text-center py-4">
                                     <p class="text-gray-600 mb-2">Faça login para participar</p>
@@ -146,7 +198,7 @@
                                     </div>
                                 </div>
                                 <div class="mt-3">
-                                    <input type="file" name="media" id="post-media" accept="image/*" class="hidden">
+                                    <input type="file" name="media[]" id="post-media" accept="image/*" class="hidden" multiple>
                                     <div id="post-dropzone"
                                         class="post-dropzone rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 flex flex-col gap-2">
                                         <div class="flex flex-wrap items-center gap-3">
@@ -155,11 +207,11 @@
                                                     class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white border border-gray-200">
                                                     <i class="fas fa-image"></i>
                                                 </span>
-                                                <span class="text-sm font-medium">Arraste e solte uma imagem</span>
+                                                <span class="text-sm font-medium">Arraste e solte imagens</span>
                                             </div>
                                             <button type="button" id="post-select-file"
                                                 class="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                                                Selecionar imagem
+                                                Selecionar imagens
                                             </button>
                                         </div>
                                         <div class="text-xs text-gray-500" id="post-upload-name">Nenhuma imagem selecionada</div>
@@ -293,8 +345,35 @@
 
                             @if($post->media->isNotEmpty())
                                 <div class="mb-4">
-                                    <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
-                                        class="w-full rounded-lg object-cover">
+                                    @php
+                                        $mediaCount = $post->media->count();
+                                    @endphp
+                                    @if($mediaCount === 1)
+                                        <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
+                                            class="w-full rounded-lg object-cover">
+                                    @else
+                                        <div class="relative" data-carousel data-total="{{ $mediaCount }}">
+                                            <div class="overflow-hidden rounded-lg">
+                                                <div class="flex transition-transform duration-300" data-track>
+                                                    @foreach($post->media as $media)
+                                                        <img src="{{ asset($media->path) }}" alt="Midia do post"
+                                                            class="w-full shrink-0 object-cover">
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            <button type="button" data-prev
+                                                class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </button>
+                                            <button type="button" data-next
+                                                class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                            <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full" data-counter>
+                                                1/{{ $mediaCount }}
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             @endif
 
@@ -464,72 +543,9 @@
                 </div>
 
                 @unless($isAdminContext)
-                    <!-- Sidebar Right (Suggestions) -->
+                    <!-- Sidebar Right (Messages) -->
                     <div class="hidden md:block">
-                        <div id="recommendations-panel" class="bg-white rounded-lg shadow p-4 sticky top-24">
-                            <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
-                            <div class="space-y-4">
-                                @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
-                                    @php
-                                        $connectionMap = $connectionMap ?? [];
-                                        $authUserId = auth()->id();
-                                    @endphp
-                                    @foreach($recommendedUsers as $user)
-                                        @php
-                                            $connection = $connectionMap[$user->id] ?? null;
-                                            $isPending = $connection && $connection->status === 'pending';
-                                            $isConnected = $connection && $connection->status === 'accepted';
-                                            $isRequester = $connection && $authUserId && $connection->requester_id === $authUserId;
-                                            $pendingTime = $connection ? $connection->created_at->diffForHumans() : '';
-                                        @endphp
-                                        <div class="flex items-center justify-between gap-3">
-                                            <div class="flex items-center gap-3">
-                                                <a class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0" href="{{ route('social.profile', $user->id) }}">
-                                                    <img src="{{ $user->profile_photo_url }}" alt="Avatar"
-                                                        class="w-10 h-10 object-cover"
-                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                                </a>
-                                                <div>
-                                                    <a href="{{ route('social.profile', $user->id) }}" class="text-sm font-semibold text-gray-800 hover:text-blue-600">
-                                                        {{ $user->name }}
-                                                    </a>
-                                                    <p class="text-xs text-gray-500">Membro</p>
-                                                </div>
-                                            </div>
-                                            <div class="text-right">
-                                                @if($isConnected)
-                                                    <span class="text-xs text-gray-400">Conectado</span>
-                                                @elseif($isPending && $isRequester)
-                                                    <div class="text-[11px] text-gray-400">Pendente {{ $pendingTime }}</div>
-                                                    <button type="button"
-                                                        class="text-xs text-red-600 hover:text-red-700 font-medium"
-                                                        onclick="cancelInvite({{ $user->id }})">
-                                                        Cancelar
-                                                    </button>
-                                                @elseif($isPending)
-                                                    <div class="text-[11px] text-gray-400">Solicitacao recebida</div>
-                                                    <button type="button"
-                                                        class="text-xs text-green-600 hover:text-green-700 font-medium"
-                                                        onclick="acceptInvite({{ $user->id }})">
-                                                        Aceitar
-                                                    </button>
-                                                @else
-                                                    <button type="button"
-                                                        class="text-xs text-blue-600 hover:text-blue-700 font-medium"
-                                                        onclick="requestInvite({{ $user->id }})">
-                                                        Conectar
-                                                    </button>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    <p class="text-xs text-gray-500">Sem recomendacoes no momento.</p>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div id="messages-panel" class="bg-white rounded-lg shadow p-4 sticky top-24 hidden">
+                        <div id="messages-panel" class="bg-white rounded-lg shadow p-4 sticky top-24">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="font-bold text-gray-900">Mensagens</h3>
                                 <button type="button" id="messages-refresh"
@@ -638,9 +654,6 @@
         const authUserId = {{ Auth::id() ?? 'null' }};
         const csrfToken = '{{ csrf_token() }}';
 
-        const feedToggle = document.getElementById('feed-toggle');
-        const messagesToggle = document.getElementById('messages-toggle');
-        const recommendationsPanel = document.getElementById('recommendations-panel');
         const messagesPanel = document.getElementById('messages-panel');
         const messagesList = document.getElementById('messages-list');
         const messagesRefresh = document.getElementById('messages-refresh');
@@ -653,55 +666,12 @@
         const maxVisibleChats = 5;
         let chatPollTimer = null;
 
-        const setActiveNav = (active) => {
-            if (!feedToggle || !messagesToggle) {
-                return;
-            }
-
-            if (active === 'messages') {
-                messagesToggle.classList.add('text-blue-600', 'font-medium', 'bg-blue-50');
-                messagesToggle.classList.remove('text-gray-600');
-                feedToggle.classList.remove('text-blue-600', 'font-medium', 'bg-blue-50');
-                feedToggle.classList.add('text-gray-600');
-            } else {
-                feedToggle.classList.add('text-blue-600', 'font-medium', 'bg-blue-50');
-                feedToggle.classList.remove('text-gray-600');
-                messagesToggle.classList.remove('text-blue-600', 'font-medium', 'bg-blue-50');
-                messagesToggle.classList.add('text-gray-600');
-            }
-        };
-
-        const toggleRightPanel = (panel) => {
-            if (!recommendationsPanel || !messagesPanel) {
-                return;
-            }
-
-            if (panel === 'messages') {
-                recommendationsPanel.classList.add('hidden');
-                messagesPanel.classList.remove('hidden');
-                setActiveNav('messages');
-                loadConversations();
-            } else {
-                messagesPanel.classList.add('hidden');
-                recommendationsPanel.classList.remove('hidden');
-                setActiveNav('feed');
-            }
-        };
-
-        if (messagesToggle) {
-            messagesToggle.addEventListener('click', () => toggleRightPanel('messages'));
-        }
-
-        if (feedToggle) {
-            feedToggle.addEventListener('click', () => toggleRightPanel('feed'));
-        }
-
         if (messagesRefresh) {
             messagesRefresh.addEventListener('click', loadConversations);
         }
 
-        if (feedToggle && recommendationsPanel && messagesPanel) {
-            setActiveNav('feed');
+        if (messagesPanel && messagesList) {
+            loadConversations();
         }
 
         function loadConversations() {
@@ -1141,15 +1111,27 @@
         const emojiToggle = document.getElementById('emoji-toggle');
         const emojiPicker = document.getElementById('emoji-picker');
 
-        const updateUploadName = (file) => {
+        const formatUploadName = (files) => {
+            if (!files || !files.length) {
+                return 'Nenhuma imagem selecionada';
+            }
+
+            if (files.length === 1) {
+                return files[0].name;
+            }
+
+            return `${files.length} imagens selecionadas`;
+        };
+
+        const updateUploadName = (files) => {
             if (!uploadName) {
                 return;
             }
 
-            uploadName.textContent = file ? file.name : 'Nenhuma imagem selecionada';
+            uploadName.textContent = formatUploadName(files);
         };
 
-        const showPreview = (file) => {
+        const showPreview = (file, total) => {
             if (!file || !previewTopImg || !previewInlineImg) {
                 return;
             }
@@ -1164,7 +1146,8 @@
                 previewTopImg.src = src;
                 previewInlineImg.src = src;
                 if (previewInlineName) {
-                    previewInlineName.textContent = file.name;
+                    const extra = total && total > 1 ? ` (+${total - 1})` : '';
+                    previewInlineName.textContent = `${file.name}${extra}`;
                 }
                 if (previewTop) {
                     previewTop.classList.remove('hidden');
@@ -1202,10 +1185,11 @@
 
         if (postMedia) {
             postMedia.addEventListener('change', () => {
-                const file = postMedia.files[0];
-                updateUploadName(file);
+                const files = postMedia.files;
+                const file = files && files.length ? files[0] : null;
+                updateUploadName(files);
                 if (file) {
-                    showPreview(file);
+                    showPreview(file, files.length);
                 } else {
                     clearPreview();
                 }
@@ -1239,14 +1223,64 @@
                     return;
                 }
 
-                const file = files[0];
                 const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
+                Array.from(files).forEach((file) => dataTransfer.items.add(file));
                 postMedia.files = dataTransfer.files;
-                updateUploadName(file);
-                showPreview(file);
+                const file = postMedia.files[0];
+                updateUploadName(postMedia.files);
+                showPreview(file, postMedia.files.length);
             });
         }
+
+        const initCarousels = () => {
+            document.querySelectorAll('[data-carousel]').forEach((carousel) => {
+                const track = carousel.querySelector('[data-track]');
+                if (!track) {
+                    return;
+                }
+
+                const total = parseInt(carousel.getAttribute('data-total') || track.children.length, 10);
+                let index = parseInt(carousel.getAttribute('data-index') || '0', 10);
+                const counter = carousel.querySelector('[data-counter]');
+                const prev = carousel.querySelector('[data-prev]');
+                const next = carousel.querySelector('[data-next]');
+
+                const update = () => {
+                    if (total <= 1) {
+                        return;
+                    }
+                    if (index < 0) {
+                        index = total - 1;
+                    }
+                    if (index >= total) {
+                        index = 0;
+                    }
+                    track.style.transform = `translateX(-${index * 100}%)`;
+                    if (counter) {
+                        counter.textContent = `${index + 1}/${total}`;
+                    }
+                    carousel.setAttribute('data-index', String(index));
+                };
+
+                if (prev) {
+                    prev.addEventListener('click', () => {
+                        index -= 1;
+                        update();
+                    });
+                }
+
+                if (next) {
+                    next.addEventListener('click', () => {
+                        index += 1;
+                        update();
+                    });
+                }
+
+                update();
+            });
+        };
+
+        initCarousels();
 
         if (postForm) {
             postForm.addEventListener('submit', (event) => {

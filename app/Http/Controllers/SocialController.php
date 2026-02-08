@@ -344,7 +344,8 @@ class SocialController extends Controller
         $validated = $request->validate([
             'content' => 'required|string|max:1000',
             'visibility' => 'required|string|in:public,connections,community',
-            'media' => 'nullable|image|max:2048',
+            'media' => 'nullable|array',
+            'media.*' => 'image|max:2048',
         ]);
 
         $post = Auth::user()->posts()->create([
@@ -352,22 +353,31 @@ class SocialController extends Controller
             'visibility' => $validated['visibility'],
         ]);
 
-        if ($request->hasFile('media') && $request->file('media')->isValid()) {
-            $file = $request->file('media');
-            $filename = 'post_' . $post->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $directory = public_path('uploads/imagens/posts');
+        if ($request->hasFile('media')) {
+            $files = $request->file('media');
+            if (!is_array($files)) {
+                $files = [$files];
+            }
 
+            $directory = public_path('uploads/imagens/posts');
             if (!is_dir($directory)) {
                 mkdir($directory, 0755, true);
             }
 
-            $file->move($directory, $filename);
+            foreach ($files as $file) {
+                if (!$file || !$file->isValid()) {
+                    continue;
+                }
 
-            PostMedia::create([
-                'post_id' => $post->id,
-                'type' => 'image',
-                'path' => 'uploads/imagens/posts/' . $filename,
-            ]);
+                $filename = 'post_' . $post->id . '_' . uniqid('', true) . '.' . $file->getClientOriginalExtension();
+                $file->move($directory, $filename);
+
+                PostMedia::create([
+                    'post_id' => $post->id,
+                    'type' => 'image',
+                    'path' => 'uploads/imagens/posts/' . $filename,
+                ]);
+            }
         }
 
         // Gamificação: pontuar publicação (se regra existir)

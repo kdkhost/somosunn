@@ -476,8 +476,35 @@
 
                         @if($post->media->isNotEmpty())
                             <div class="mt-3">
-                                <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
-                                    class="w-full rounded-lg object-cover">
+                                @php
+                                    $mediaCount = $post->media->count();
+                                @endphp
+                                @if($mediaCount === 1)
+                                    <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
+                                        class="w-full rounded-lg object-cover">
+                                @else
+                                    <div class="relative" data-carousel data-total="{{ $mediaCount }}">
+                                        <div class="overflow-hidden rounded-lg">
+                                            <div class="flex transition-transform duration-300" data-track>
+                                                @foreach($post->media as $media)
+                                                    <img src="{{ asset($media->path) }}" alt="Midia do post"
+                                                        class="w-full shrink-0 object-cover">
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <button type="button" data-prev
+                                            class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <button type="button" data-next
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                        <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full" data-counter>
+                                            1/{{ $mediaCount }}
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         @endif
 
@@ -816,6 +843,56 @@
                 });
             });
         });
+
+        const initCarousels = () => {
+            document.querySelectorAll('[data-carousel]').forEach((carousel) => {
+                const track = carousel.querySelector('[data-track]');
+                if (!track) {
+                    return;
+                }
+
+                const total = parseInt(carousel.getAttribute('data-total') || track.children.length, 10);
+                let index = parseInt(carousel.getAttribute('data-index') || '0', 10);
+                const counter = carousel.querySelector('[data-counter]');
+                const prev = carousel.querySelector('[data-prev]');
+                const next = carousel.querySelector('[data-next]');
+
+                const update = () => {
+                    if (total <= 1) {
+                        return;
+                    }
+                    if (index < 0) {
+                        index = total - 1;
+                    }
+                    if (index >= total) {
+                        index = 0;
+                    }
+                    track.style.transform = `translateX(-${index * 100}%)`;
+                    if (counter) {
+                        counter.textContent = `${index + 1}/${total}`;
+                    }
+                    carousel.setAttribute('data-index', String(index));
+                };
+
+                if (prev) {
+                    prev.addEventListener('click', () => {
+                        index -= 1;
+                        update();
+                    });
+                }
+
+                if (next) {
+                    next.addEventListener('click', () => {
+                        index += 1;
+                        update();
+                    });
+                }
+
+                update();
+            });
+        };
+
+        initCarousels();
 
 
         const closeAllEmojiPickers = () => {
