@@ -145,7 +145,7 @@
                                                 Conectado
                                             </button>
                                         @elseif($isPending && $isRequester)
-                                            <div class="text-muted text-xs">Pendente ha {{ $pendingTime }}</div>
+                                            <div class="text-muted text-xs">Pendente há {{ $pendingTime }}</div>
                                             <button type="button" class="btn btn-sm btn-outline-danger mt-1"
                                                 onclick="cancelInvite({{ $user->id }})">
                                                 Cancelar
