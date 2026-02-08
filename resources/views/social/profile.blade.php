@@ -149,6 +149,7 @@
                                 $pendingConnection = auth()->user()->hasPendingConnectionWith($user->id);
                                 $isRequester = $pendingConnection && $pendingConnection->requester_id === auth()->id();
                                 $canMessage = auth()->user()->canMessageUser($user);
+                                $showPending = $pendingConnection && !$isConnected;
                             @endphp
 
                             @if($isConnected)
@@ -161,7 +162,7 @@
 
                             @if($canMessage)
                                 <button type="button"
-                                    onclick="openChatBox({{ $user->id }}, '{{ $user->name }}', '{{ $user->profile_photo_url }}')"
+                                    onclick="openProfileChat({{ $user->id }}, '{{ $user->name }}', '{{ $user->profile_photo_url }}')"
                                     class="bg-[#1F5EDB] text-white w-12 h-12 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center justify-center"
                                     title="Mensagem" aria-label="Mensagem">
                                     <i class="fas fa-comment-dots"></i>
@@ -174,7 +175,7 @@
                                 </button>
                             @endif
 
-                            @if($pendingConnection)
+                            @if($showPending)
                                 @if($isRequester)
                                     <button type="button"
                                         class="bg-gray-200 text-gray-500 w-12 h-12 rounded-full font-bold cursor-not-allowed shadow flex items-center justify-center"
@@ -267,6 +268,15 @@
                         confirmButtonColor: '#1F5EDB',
                         confirmButtonText: 'Ok'
                     });
+                }
+
+                function openProfileChat(userId, userName, userPhoto) {
+                    if (typeof window.openChatBox === 'function') {
+                        window.openChatBox(userId, userName, userPhoto);
+                        return;
+                    }
+
+                    window.location.href = '{{ route('chat.start', $user->id) }}';
                 }
 
                 function acceptConnection(userId) {

@@ -562,7 +562,69 @@
                 @unless($isAdminContext)
                     <!-- Sidebar Right (Info) -->
                     <div class="hidden md:block md:col-span-3">
-                        <div class="bg-white rounded-lg shadow p-4 sticky top-24">
+                        <div id="right-recommendations" class="bg-white rounded-lg shadow p-4 sticky top-24">
+                            <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
+                            <div class="space-y-4">
+                                @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
+                                    @php
+                                        $connectionMap = $connectionMap ?? [];
+                                        $authUserId = auth()->id();
+                                    @endphp
+                                    @foreach($recommendedUsers as $user)
+                                        @php
+                                            $connection = $connectionMap[$user->id] ?? null;
+                                            $isPending = $connection && $connection->status === 'pending';
+                                            $isConnected = $connection && $connection->status === 'accepted';
+                                            $isRequester = $connection && $authUserId && $connection->requester_id === $authUserId;
+                                            $pendingTime = $connection ? $connection->created_at->diffForHumans() : '';
+                                        @endphp
+                                        <div class="flex items-center justify-between gap-3">
+                                            <div class="flex items-center gap-3">
+                                                <a class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0" href="{{ route('social.profile', $user->id) }}">
+                                                    <img src="{{ $user->profile_photo_url }}" alt="Avatar"
+                                                        class="w-10 h-10 object-cover"
+                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                </a>
+                                                <div>
+                                                    <a href="{{ route('social.profile', $user->id) }}" class="text-sm font-semibold text-gray-800 hover:text-blue-600">
+                                                        {{ $user->name }}
+                                                    </a>
+                                                    <p class="text-xs text-gray-500">Membro</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                @if($isConnected)
+                                                    <span class="text-xs text-gray-400">Conectado</span>
+                                                @elseif($isPending && $isRequester)
+                                                    <div class="text-[11px] text-gray-400">Pendente {{ $pendingTime }}</div>
+                                                    <button type="button"
+                                                        class="text-xs text-red-600 hover:text-red-700 font-medium"
+                                                        onclick="cancelInvite({{ $user->id }})">
+                                                        Cancelar
+                                                    </button>
+                                                @elseif($isPending)
+                                                    <div class="text-[11px] text-gray-400">Solicitacao recebida</div>
+                                                    <button type="button"
+                                                        class="text-xs text-green-600 hover:text-green-700 font-medium"
+                                                        onclick="acceptInvite({{ $user->id }})">
+                                                        Aceitar
+                                                    </button>
+                                                @else
+                                                    <button type="button"
+                                                        class="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                                                        onclick="requestInvite({{ $user->id }})">
+                                                        Conectar
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <p class="text-xs text-gray-500">Sem recomendacoes no momento.</p>
+                                @endif
+                            </div>
+                        </div>
+                        <div id="right-conversation-info" class="bg-white rounded-lg shadow p-4 sticky top-24 hidden">
                             <div class="flex flex-col items-center text-center mb-4">
                                 <div class="w-20 h-20 rounded-full overflow-hidden bg-gray-100 mb-3">
                                     <img id="conversation-info-avatar" src="{{ asset('img/default-user.svg') }}" alt="Avatar"
@@ -723,6 +785,8 @@
         const sidebarButtons = document.querySelectorAll('nav [data-panel]');
         const conversationEmojiToggle = document.getElementById('conversation-emoji-toggle');
         const conversationEmojiPicker = document.getElementById('conversation-emoji-picker');
+        const rightRecommendations = document.getElementById('right-recommendations');
+        const rightConversationInfo = document.getElementById('right-conversation-info');
         const chatBoxes = document.getElementById('chat-boxes');
         const chatOverflow = document.getElementById('chat-overflow');
         const chatOverflowToggle = document.getElementById('chat-overflow-toggle');
@@ -734,6 +798,7 @@
         let activeConversationUserId = null;
         let conversationPollTimer = null;
         const notifiedUsers = new Set();
+        let hasActiveConversation = false;
 
         const startConversationPolling = () => {
             if (conversationPollTimer) {
@@ -785,6 +850,14 @@
                 btn.classList.toggle('bg-blue-50', isActive);
                 btn.classList.toggle('text-gray-600', !isActive);
             });
+
+            if (rightRecommendations) {
+                rightRecommendations.classList.toggle('hidden', panel !== 'feed');
+            }
+            if (rightConversationInfo) {
+                const shouldShowInfo = panel === 'chat' && hasActiveConversation;
+                rightConversationInfo.classList.toggle('hidden', !shouldShowInfo);
+            }
         };
 
         sidebarButtons.forEach((btn) => {
@@ -901,7 +974,9 @@
             }
 
             activeConversationUserId = userId;
+            hasActiveConversation = true;
             setConversationHeader(userName, userPhoto);
+            setActivePanel('chat');
             if (conversationMessages) {
                 conversationMessages.innerHTML = '<p class="text-sm text-gray-500">Carregando mensagens...</p>';
             }
