@@ -77,8 +77,10 @@
         </div>
     </section>
 
-    <!-- Mentorias Demo -->
-            @if(isset($mentorings) && $mentorings->count() > 0)
+    <!-- Mentorias Disponíveis -->
+    @if(isset($mentorings) && $mentorings->count() > 0)
+    <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
+        <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl font-black text-gray-900">Mentorias Disponíveis</h2>
                 @if(isset($isDemo) && $isDemo)
@@ -110,9 +112,9 @@
                 </article>
                 @endforeach
             </div>
-            @endif
         </div>
     </section>
+    @endif
 
     <!-- Comunidade Segmentada -->
     <section class="py-16 px-6 md:px-12 lg:px-24">

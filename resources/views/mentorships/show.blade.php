@@ -5,10 +5,8 @@
 @push('styles')
     <style>
         .unn-mentorship-show-hero {
-            background:
-                radial-gradient(1200px circle at 15% 20%, rgba(255, 255, 255, 0.18) 0%, transparent 55%),
-                radial-gradient(900px circle at 85% 0%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
-                linear-gradient(180deg, var(--unn-azul-3) 0%, var(--unn-azul-1) 55%, var(--unn-azul-3) 100%);
+            position: relative;
+            background: #1e293b; /* Fallback */
         }
 
         .unn-mentorship-show-hero::before {
@@ -44,9 +42,9 @@
             transition: color 0.15s ease;
         }
 
-        .unn-star-rating input:checked ~ label,
+        .unn-star-rating input:checked~label,
         .unn-star-rating label:hover,
-        .unn-star-rating label:hover ~ label {
+        .unn-star-rating label:hover~label {
             color: #f59e0b;
         }
     </style>
@@ -62,23 +60,84 @@
 
         $selectedRating = old('rating', optional($myReview)->rating);
         $selectedRating = is_numeric($selectedRating) ? max(1, min(5, (int) $selectedRating)) : null;
+
+        $resolveImageUrl = function (?string $path): ?string {
+            $path = trim((string) $path);
+            if ($path === '') return null;
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) return $path;
+            if (str_starts_with($path, 'storage/')) return asset($path);
+            if (str_starts_with($path, 'uploads/')) return asset($path);
+            return asset('storage/' . ltrim($path, '/'));
+        };
+
+        $mentorshipImageUrl = $resolveImageUrl($mentorship->image ?? null);
+
+        $sitePrimary = \App\Models\Setting::get('site_color_primary') ?: '#1F5EDB';
+        $siteSecondary = \App\Models\Setting::get('site_color_secondary') ?: '#1D3FC4';
+
+        $hexToRgba = function (?string $hex, float $alpha): ?string {
+            $hex = trim((string) $hex);
+            if ($hex === '') return null;
+            $alpha = max(0, min(1, $alpha));
+            if (preg_match('/^#?[0-9a-fA-F]{3}$/', $hex)) {
+                $hex = ltrim($hex, '#');
+                $r = hexdec(str_repeat($hex[0], 2));
+                $g = hexdec(str_repeat($hex[1], 2));
+                $b = hexdec(str_repeat($hex[2], 2));
+                return "rgba({$r},{$g},{$b},{$alpha})";
+            }
+            if (preg_match('/^#?[0-9a-fA-F]{6}$/', $hex)) {
+                $hex = ltrim($hex, '#');
+                $r = hexdec(substr($hex, 0, 2));
+                $g = hexdec(substr($hex, 2, 2));
+                $b = hexdec(substr($hex, 4, 2));
+                return "rgba({$r},{$g},{$b},{$alpha})";
+            }
+            return null;
+        };
+
+        // Admin controls
+        $heroBlurPxRaw = \App\Models\Setting::get('events_hero_bg_blur_px');
+        $heroBlurPx = is_numeric($heroBlurPxRaw) ? (int) $heroBlurPxRaw : 64;
+        
+        $heroFilmRaw = \App\Models\Setting::get('events_hero_film_strength_percent');
+        $heroFilmScale = (is_numeric($heroFilmRaw) ? (int) $heroFilmRaw : 100) / 100;
     @endphp
 
     <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
         <section class="unn-mentorship-show-hero relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/25 pointer-events-none"></div>
+            @if($mentorshipImageUrl)
+                <div class="absolute inset-0 pointer-events-none overflow-hidden">
+                    <img src="{{ $mentorshipImageUrl }}" alt="" 
+                        class="absolute inset-0 w-full h-full object-cover scale-110 saturate-[1.1] brightness-[0.85]" 
+                        style="filter: blur({{ $heroBlurPx }}px); opacity: 0.7;" 
+                        aria-hidden="true">
+
+                    <!-- Película transparente em cor degradê -->
+                    <div class="absolute inset-0" style="background: linear-gradient(135deg, 
+                        {{ $hexToRgba($sitePrimary, 0.8 * $heroFilmScale) }} 0%, 
+                        {{ $hexToRgba($siteSecondary, 0.7 * $heroFilmScale) }} 50%, 
+                        {{ $hexToRgba($sitePrimary, 0.9 * $heroFilmScale) }} 100%);">
+                    </div>
+                </div>
+            @else
+                <div class="absolute inset-0 pointer-events-none" style="background: linear-gradient(135deg, var(--unn-azul-3) 0%, var(--unn-azul-1) 100%);"></div>
+            @endif
+            
+            <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/20 text-transparent pointer-events-none"></div>
 
             <div class="px-4 md:px-12 lg:px-24 pt-10 md:pt-14 pb-16 md:pb-20 relative">
                 <div class="max-w-6xl mx-auto">
-                    <a href="{{ route('mentorships.index') }}" class="inline-flex items-center gap-2 text-white/85 hover:text-white font-semibold">
+                    <a href="{{ route('mentorships.index') }}"
+                        class="inline-flex items-center gap-2 text-white/85 hover:text-white font-semibold">
                         <i class="fas fa-arrow-left"></i> Voltar para mentorias
                     </a>
 
                     <div class="mt-8 md:mt-10">
-                        <h1 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white">
+                        <h1 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white drop-shadow-2xl">
                             {{ $mentorship->title ?? 'Mentoria' }}
                         </h1>
-                        <p class="mt-4 text-white/80 text-base sm:text-lg max-w-3xl">
+                        <p class="mt-4 text-white/90 text-base sm:text-lg max-w-3xl font-medium drop-shadow-md">
                             Acompanhamento com orientação prática para acelerar resultados em networking e negócios.
                         </p>
                     </div>
@@ -104,13 +163,14 @@
                     <aside class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 md:p-10">
                         <div class="flex items-center justify-between gap-3">
                             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Investimento</p>
-                            <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-700 px-4 py-2 text-xs font-black uppercase tracking-wider">
+                            <span
+                                class="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-700 px-4 py-2 text-xs font-black uppercase tracking-wider">
                                 Premium
                             </span>
                         </div>
 
                         <p class="mt-3 text-4xl font-black text-slate-900">
-                            {{ $price > 0 ? 'R$ '.number_format($price, 2, ',', '.') : 'Gratuito' }}
+                            {{ $price > 0 ? 'R$ ' . number_format($price, 2, ',', '.') : 'Gratuito' }}
                         </p>
 
                         <div class="mt-8 space-y-4">
@@ -135,17 +195,19 @@
                             </div>
                         </div>
 
-                        <div class="mt-10 flex flex-col gap-3">
-                            <a href="{{ route('premium') }}" class="btn-primary text-white px-8 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition">
+                        <div class="mt-10 flex flex-col gap-4">
+                            <a href="{{ route('premium') }}"
+                                class="btn-primary text-white px-8 py-4 rounded-2xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_15px_30px_-10px_rgba(31,94,219,0.4)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
                                 Ver planos Premium <i class="fas fa-crown"></i>
                             </a>
-                            <a href="{{ route('mentorships.index') }}" class="px-8 py-4 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center">
+                            <a href="{{ route('mentorships.index') }}"
+                                class="px-8 py-4 rounded-2xl font-bold border-2 border-slate-100 text-slate-600 hover:bg-slate-50 hover:border-slate-200 transition-all duration-300 inline-flex items-center justify-center">
                                 Ver outras mentorias
                             </a>
                         </div>
 
-                        <p class="mt-6 text-xs text-slate-500 leading-relaxed">
-                            Dica: para acesso a mentorias e recursos premium, escolha um plano no menu Premium.
+                        <p class="mt-8 text-xs text-slate-400 text-center leading-relaxed">
+                            Acesso exclusivo para membros. Planos Premium liberam mentorias ilimitadas.
                         </p>
                     </aside>
                 </div>
@@ -157,15 +219,18 @@
                             <p class="text-sm text-slate-500">Comentários dos membros sobre esta mentoria.</p>
                         </div>
                         @if($reviewsCount > 0)
-                            <div class="inline-flex items-center gap-2 rounded-full bg-amber-50 text-amber-700 px-4 py-2 text-sm font-semibold">
+                            <div
+                                class="inline-flex items-center gap-2 rounded-full bg-amber-50 text-amber-700 px-4 py-2 text-sm font-semibold">
                                 <i class="fas fa-star"></i>
-                                {{ number_format((float) $reviewsAvg, 1, ',', '.') }}/5 ({{ $reviewsCount }} {{ $reviewsCount === 1 ? 'avaliação' : 'avaliações' }})
+                                {{ number_format((float) $reviewsAvg, 1, ',', '.') }}/5 ({{ $reviewsCount }}
+                                {{ $reviewsCount === 1 ? 'avaliação' : 'avaliações' }})
                             </div>
                         @endif
                     </div>
 
                     @if($myReview)
-                        <div class="mb-4 rounded-lg px-4 py-3 border {{ $myReview->status === 'approved' ? 'bg-green-50 border-green-200 text-green-700' : ($myReview->status === 'rejected' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-yellow-50 border-yellow-200 text-yellow-700') }}">
+                        <div
+                            class="mb-4 rounded-lg px-4 py-3 border {{ $myReview->status === 'approved' ? 'bg-green-50 border-green-200 text-green-700' : ($myReview->status === 'rejected' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-yellow-50 border-yellow-200 text-yellow-700') }}">
                             @if($myReview->status === 'approved')
                                 Sua avaliação está publicada.
                             @elseif($myReview->status === 'rejected')
@@ -181,12 +246,15 @@
                             <article class="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
                                 <div class="flex items-center justify-between gap-3 mb-3">
                                     <div class="flex items-center gap-3 min-w-0">
-                                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center shrink-0">
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center shrink-0">
                                             {{ strtoupper(mb_substr((string) ($review->user->name ?? 'U'), 0, 1)) }}
                                         </div>
                                         <div class="min-w-0">
-                                            <div class="font-semibold text-gray-900 truncate">{{ $review->user->name ?? 'Usuário' }}</div>
-                                            <div class="text-xs text-gray-500">{{ optional($review->created_at)->format('d/m/Y') }}</div>
+                                            <div class="font-semibold text-gray-900 truncate">
+                                                {{ $review->user->name ?? 'Usuário' }}</div>
+                                            <div class="text-xs text-gray-500">
+                                                {{ optional($review->created_at)->format('d/m/Y') }}</div>
                                         </div>
                                     </div>
                                     <div class="text-amber-500 text-sm whitespace-nowrap">
@@ -198,14 +266,16 @@
                                 <p class="text-sm text-gray-700 leading-relaxed">{!! nl2br(e($review->comment)) !!}</p>
                             </article>
                         @empty
-                            <div class="md:col-span-2 rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center text-slate-500">
+                            <div
+                                class="md:col-span-2 rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center text-slate-500">
                                 Esta mentoria ainda não possui avaliações aprovadas.
                             </div>
                         @endforelse
                     </div>
 
                     @auth
-                        <form method="POST" action="{{ route('mentorships.reviews.store', $mentorship->id) }}" class="border border-slate-200 rounded-xl p-5">
+                        <form method="POST" action="{{ route('mentorships.reviews.store', $mentorship->id) }}"
+                            class="border border-slate-200 rounded-xl p-5">
                             @csrf
                             <h3 class="text-lg font-bold text-gray-900 mb-1">Envie sua avaliação</h3>
                             <p class="text-sm text-gray-500 mb-4">Sua avaliação será moderada antes de aparecer na página.</p>
@@ -215,26 +285,32 @@
                                 <div class="unn-star-rating" role="radiogroup" aria-label="Avaliação por estrelas">
                                     @for($i = 5; $i >= 1; $i--)
                                         <input type="radio" id="mentorship-rating-{{ $i }}" name="rating" value="{{ $i }}" {{ (string) $selectedRating === (string) $i ? 'checked' : '' }}>
-                                        <label for="mentorship-rating-{{ $i }}" title="{{ $i }} de 5"><i class="fas fa-star"></i></label>
+                                        <label for="mentorship-rating-{{ $i }}" title="{{ $i }} de 5"><i
+                                                class="fas fa-star"></i></label>
                                     @endfor
                                 </div>
                                 @error('rating')<p class="text-red-600 text-sm mt-2">{{ $message }}</p>@enderror
                             </div>
 
                             <div class="mb-4">
-                                <label for="mentorship-review-comment" class="block text-sm font-semibold text-gray-800 mb-2">Comentário</label>
-                                <textarea id="mentorship-review-comment" name="comment" rows="4" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Conte como foi sua experiência com esta mentoria...">{{ old('comment', optional($myReview)->comment) }}</textarea>
+                                <label for="mentorship-review-comment"
+                                    class="block text-sm font-semibold text-gray-800 mb-2">Comentário</label>
+                                <textarea id="mentorship-review-comment" name="comment" rows="4"
+                                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Conte como foi sua experiência com esta mentoria...">{{ old('comment', optional($myReview)->comment) }}</textarea>
                                 @error('comment')<p class="text-red-600 text-sm mt-2">{{ $message }}</p>@enderror
                             </div>
 
-                            <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#1F5EDB] hover:bg-blue-700 text-white font-semibold px-5 py-2.5 transition">
+                            <button type="submit"
+                                class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#1F5EDB] hover:bg-blue-700 text-white font-semibold px-5 py-2.5 transition">
                                 <i class="fas fa-paper-plane"></i>
                                 {{ $myReview ? 'Atualizar avaliação' : 'Enviar avaliação' }}
                             </button>
                         </form>
                     @else
                         <div class="rounded-lg border border-dashed border-slate-300 px-4 py-5 text-sm text-slate-600">
-                            Faça <a href="{{ route('login') }}" class="text-blue-600 font-semibold">login</a> para avaliar esta mentoria.
+                            Faça <a href="{{ route('login') }}" class="text-blue-600 font-semibold">login</a> para avaliar esta
+                            mentoria.
                         </div>
                     @endauth
                 </div>

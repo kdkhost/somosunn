@@ -117,7 +117,7 @@
                     <span class="info-box-text">Mentorias</span>
                     <span class="info-box-number">Ver Disponíveis</span>
                 </div>
-                <a href="{{ route('mentorships.index') }}" class="stretched-link"></a>
+                <a href="{{ route('admin.mentorships.available') }}" class="stretched-link"></a>
             </div>
         </div>
 

@@ -655,31 +655,37 @@
 
                     <hr>
 
-                    <h5 class="text-primary mb-3"><i class="fas fa-calendar-alt mr-2"></i>Eventos (Hero)</h5>
+                    <h5 class="text-primary mb-3"><i class="fas fa-calendar-alt mr-2"></i>Eventos e Mentorias (Fundo
+                        Hero)</h5>
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="form-group">
-                                <label>Desfoque do fundo (px)</label>
-                                <input name="events_hero_bg_blur_px" type="number" min="0" max="140"
-                                    class="form-control" value="{{ $settings['events_hero_bg_blur_px'] ?? 64 }}">
-                                <small class="text-muted">Controla o blur da imagem de fundo na p&aacute;gina do
-                                    evento.</small>
+                                <label>Desfoque do fundo (Blur: <span
+                                        id="val-blur">{{ $settings['events_hero_bg_blur_px'] ?? 64 }}</span>px)</label>
+                                <input name="events_hero_bg_blur_px" type="range" min="0" max="150" step="5"
+                                    class="custom-range" id="range-blur"
+                                    value="{{ $settings['events_hero_bg_blur_px'] ?? 64 }}"
+                                    oninput="document.getElementById('val-blur').innerText = this.value">
+                                <small class="text-muted d-block">Intensidade do desfoque da imagem de fundo.</small>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="form-group">
-                                <label>Pel&iacute;cula (0&ndash;100)</label>
-                                <input name="events_hero_film_strength_percent" type="number" min="0" max="100"
-                                    class="form-control"
-                                    value="{{ $settings['events_hero_film_strength_percent'] ?? 100 }}">
-                                <small class="text-muted">Intensidade do degrad&ecirc; sobre a imagem (0 = sem
-                                    pel&iacute;cula).</small>
+                                <label>Intensidade da Película (<span
+                                        id="val-film">{{ $settings['events_hero_film_strength_percent'] ?? 100 }}</span>%)</label>
+                                <input name="events_hero_film_strength_percent" type="range" min="0" max="100" step="5"
+                                    class="custom-range" id="range-film"
+                                    value="{{ $settings['events_hero_film_strength_percent'] ?? 100 }}"
+                                    oninput="document.getElementById('val-film').innerText = this.value">
+                                <small class="text-muted d-block">Opacidade da camada de cor sobre a imagem.</small>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="alert alert-light border">
-                                <div class="small text-muted mb-0">
-                                    Afeta apenas o fundo da p&aacute;gina de detalhes do evento no site.
+                        <div class="col-md-4">
+                            <div class="alert alert-info">
+                                <div class="small">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Essas configurações afetam as páginas de detalhes de <strong>Eventos</strong> e
+                                    <strong>Mentorias</strong> no site.
                                 </div>
                             </div>
                         </div>

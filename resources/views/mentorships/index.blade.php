@@ -116,11 +116,11 @@
 
                                     <div class="mt-8 flex flex-col sm:flex-row gap-3">
                                         <a href="{{ $showUrl }}"
-                                            class="px-8 py-4 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center">
+                                            class="px-8 py-4 rounded-xl font-bold border-2 border-slate-100 text-slate-600 hover:bg-slate-50 transition-all duration-300 inline-flex items-center justify-center">
                                             Saiba mais
                                         </a>
                                         <a href="{{ route('premium') }}"
-                                            class="btn-primary text-white px-8 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition">
+                                            class="btn-primary text-white px-8 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_12px_24px_-8px_rgba(31,94,219,0.35)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
                                             Ver planos Premium <i class="fas fa-crown"></i>
                                         </a>
                                     </div>

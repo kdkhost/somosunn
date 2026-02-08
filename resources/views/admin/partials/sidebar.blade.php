@@ -149,7 +149,8 @@
                             <p>Mentorias<i class="right fas fa-angle-left"></i></p>
                         </a>
                         <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('mentorships.index') }}" class="nav-link"><i
+                            <li class="nav-item"><a href="{{ route('admin.mentorships.available') }}"
+                                    class="nav-link {{ $is('admin.mentorships.available') }}"><i
                                         class="fas fa-list nav-icon"></i>
                                     <p>Disponíveis</p>
                                 </a></li>

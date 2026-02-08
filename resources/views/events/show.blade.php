@@ -107,20 +107,23 @@
             radial-gradient(900px circle at 85% 0%, {{ $siteSecondary08 }} 0%, transparent 55%),
             linear-gradient(135deg, {{ $sitePrimary14 }} 0%, {{ $siteSecondary08 }} 100%);">
         @if($eventImageUrl)
-            <div class="absolute inset-0 pointer-events-none">
-                <img src="{{ $eventImageUrl }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-125 opacity-45 saturate-150" style="--tw-blur: blur({{ $eventsHeroBlurPx }}px)" loading="lazy" aria-hidden="true">
+            <div class="absolute inset-0 pointer-events-none overflow-hidden">
+                <img src="{{ $eventImageUrl }}" alt="" 
+                    class="absolute inset-0 w-full h-full object-cover scale-110 saturate-[1.2] brightness-90" 
+                    style="filter: blur({{ $eventsHeroBlurPx }}px); opacity: 0.65;" 
+                    loading="lazy" aria-hidden="true">
 
-                <!-- Película degradê (paleta do site) -->
-                <div class="absolute inset-0" style="background:
-                    radial-gradient(1100px circle at 15% 25%, {{ $sitePrimary38 }} 0%, transparent 60%),
-                    radial-gradient(900px circle at 85% 0%, {{ $siteSecondary28 }} 0%, transparent 55%),
-                    linear-gradient(135deg, {{ $sitePrimary30 }} 0%, {{ $siteSecondary18 }} 55%, {{ $sitePrimary22 }} 100%);">
+                <!-- Película transparente em cor degradê -->
+                <div class="absolute inset-0" style="background: linear-gradient(135deg, 
+                    {{ $hexToRgba($sitePrimary, 0.75 * $eventsHeroFilmScale) }} 0%, 
+                    {{ $hexToRgba($siteSecondary, 0.65 * $eventsHeroFilmScale) }} 50%, 
+                    {{ $hexToRgba($sitePrimary, 0.85 * $eventsHeroFilmScale) }} 100%);">
                 </div>
             </div>
         @endif
 
         <div class="max-w-7xl mx-auto relative">
-            <a href="{{ route('events.index') }}" class="inline-flex items-center gap-2 text-gray-600 mb-4 md:mb-6 transition" style="--tw-text-opacity:1" onmouseover="this.style.color='var(--unn-azul-1)'" onmouseout="this.style.color=''">
+            <a href="{{ route('events.index') }}" class="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-all duration-300 font-semibold drop-shadow-lg">
                 <i class="fas fa-arrow-left"></i> Voltar para eventos
             </a>
 
@@ -150,17 +153,6 @@
                         </span>
                     @endif
                     
-                    <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-3 md:mb-4">{{ $event->title }}</h1>
-                    <p class="text-lg sm:text-xl font-semibold mb-4 md:mb-6" style="color: var(--unn-azul-1)">
-                        <i class="fas fa-user-tie mr-2"></i> {{ $event->speaker }}
-                    </p>
-                    
-                    <p class="text-base sm:text-lg text-gray-600 leading-relaxed mb-6 md:mb-8">{{ $event->description }}</p>
-
-                    <!-- Date & Time Cards -->
-                    <div class="grid sm:grid-cols-2 gap-4 mb-8">
-                        <div class="bg-white rounded-2xl p-5 shadow-lg">
-                            <div class="flex items-center gap-4">
                                 <div class="w-14 h-14 btn-primary rounded-xl flex items-center justify-center">
                                     <i class="fas fa-calendar-alt text-white text-xl"></i>
                                 </div>

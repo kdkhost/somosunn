@@ -34,6 +34,24 @@ class MentorshipController extends Controller
         return view('admin.mentorships.index', compact('items', 'search'));
     }
 
+    public function available(Request $request)
+    {
+        // Any logged in member can view available mentorships
+        $query = Mentorship::query()->with('mentor')->latest('id');
+
+        $search = trim((string) $request->query('q', ''));
+        if ($search !== '') {
+            $query->where(function ($sub) use ($search) {
+                $sub->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+
+        $items = $query->paginate(12)->withQueryString();
+
+        return view('admin.mentorships.available', compact('items', 'search'));
+    }
+
     public function create()
     {
         $this->ensurePermission('mentorships.create');
