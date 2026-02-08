@@ -84,10 +84,17 @@
                 <!-- Input -->
                 <div class="p-4 bg-white border-t border-gray-200">
                     <form id="chat-form" class="flex items-center gap-2">
-                        <button type="button" class="text-gray-400 hover:text-blue-600 p-2"><i
-                                class="fas fa-paperclip"></i></button>
+                        <button type="button" class="text-gray-300 p-2 cursor-not-allowed" title="Em breve" disabled>
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                        <div class="relative">
+                            <button type="button" id="emoji-toggle-btn" class="text-gray-400 hover:text-yellow-500 p-2 transition">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                            @include('partials.emoji-picker', ['pickerId' => 'chat'])
+                        </div>
                         <input type="text" id="message-input"
-                            class="flex-1 border-gray-200 rounded-full px-4 py-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                            class="flex-1 border border-gray-200 rounded-full px-4 py-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
                             placeholder="Digite sua mensagem...">
                         <button type="submit"
                             class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition shadow">
@@ -195,6 +202,57 @@
 
                 // Immediate refresh on load since backend marked this conversation as read
                 if (window.refreshNotifications) window.refreshNotifications();
+
+                // Emoji Picker Logic
+                const emojiToggleBtn = document.getElementById('emoji-toggle-btn');
+                const emojiPicker = document.getElementById('emoji-picker-chat');
+                const messageInput = document.getElementById('message-input');
+
+                if (emojiToggleBtn && emojiPicker) {
+                    emojiToggleBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        emojiPicker.classList.toggle('hidden');
+                    });
+
+                    // Close emoji picker when clicking outside
+                    document.addEventListener('click', (e) => {
+                        if (!emojiPicker.contains(e.target) && e.target !== emojiToggleBtn) {
+                            emojiPicker.classList.add('hidden');
+                        }
+                    });
+
+                    // Emoji tab filtering
+                    emojiPicker.querySelectorAll('.emoji-tab').forEach(tab => {
+                        tab.addEventListener('click', () => {
+                            emojiPicker.querySelectorAll('.emoji-tab').forEach(t => t.classList.remove('is-active', 'bg-blue-100'));
+                            tab.classList.add('is-active', 'bg-blue-100');
+                            
+                            const category = tab.getAttribute('data-category');
+                            emojiPicker.querySelectorAll('.emoji-item').forEach(item => {
+                                if (category === 'all' || item.getAttribute('data-category') === category) {
+                                    item.classList.remove('hidden');
+                                } else {
+                                    item.classList.add('hidden');
+                                }
+                            });
+                        });
+                    });
+
+                    // Insert emoji into input
+                    emojiPicker.querySelectorAll('.emoji-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const emoji = item.getAttribute('data-emoji');
+                            if (messageInput) {
+                                const start = messageInput.selectionStart;
+                                const end = messageInput.selectionEnd;
+                                const text = messageInput.value;
+                                messageInput.value = text.substring(0, start) + emoji + text.substring(end);
+                                messageInput.selectionStart = messageInput.selectionEnd = start + emoji.length;
+                                messageInput.focus();
+                            }
+                        });
+                    });
+                }
             </script>
         @endpush
 @endsection
