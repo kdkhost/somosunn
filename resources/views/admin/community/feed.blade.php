@@ -217,6 +217,50 @@
             border-color: #1f5edb;
             background-color: #eef4ff;
         }
+
+        #admin-emoji-picker {
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+        }
+
+        #admin-emoji-picker .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        #admin-emoji-picker .emoji-item {
+            border: 0;
+            background: transparent;
+            padding: 0;
+            font-size: 20px;
+            line-height: 1;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+
+        #admin-emoji-picker .emoji-item:hover {
+            background-color: #f1f5f9;
+            transform: scale(1.08);
+        }
+
+        #admin-emoji-picker .emoji-tab {
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 14px;
+            line-height: 1;
+            transition: all 0.15s ease;
+        }
+
+        #admin-emoji-picker .emoji-tab.is-active,
+        #admin-emoji-picker .emoji-tab:hover {
+            border-color: #1f5edb;
+            background-color: #eef4ff;
+        }
     </style>
 @endpush
 

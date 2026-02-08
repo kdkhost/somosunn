@@ -1,4 +1,4 @@
-<div class="grid grid-cols-6 gap-2 text-lg text-center">
+<div class="emoji-grid grid grid-cols-6 gap-2 text-lg text-center">
     <button type="button" class="emoji-item" data-category="faces" data-emoji="😀">😀</button>
     <button type="button" class="emoji-item" data-category="faces" data-emoji="😁">😁</button>
     <button type="button" class="emoji-item" data-category="faces" data-emoji="😂">😂</button>
