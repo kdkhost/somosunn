@@ -98,21 +98,16 @@
                                     </div>
                                 </div>
                                 <nav class="space-y-2 mb-4">
-                                    <a href="{{ $feedUrl }}"
+                                    <button type="button" data-panel="feed"
                                         class="w-full flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
                                         <i class="fas fa-newspaper w-6"></i>
                                         <span>Feed</span>
-                                    </a>
-                                    <a href="{{ $chatUrl }}"
+                                    </button>
+                                    <button type="button" data-panel="chat"
                                         class="w-full flex items-center gap-2 text-blue-600 font-medium p-2 bg-blue-50 rounded">
                                         <i class="fas fa-comments w-6"></i>
                                         <span>Mensagens</span>
-                                    </a>
-                                    <a href="{{ $profileUrl }}"
-                                        class="w-full flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
-                                        <i class="fas fa-user w-6"></i>
-                                        <span>Meu perfil</span>
-                                    </a>
+                                    </button>
                                 </nav>
                                 <div class="border-t border-gray-100 pt-4">
                                     <div class="flex items-center justify-between mb-3">
@@ -145,42 +140,422 @@
                     </div>
                 @endunless
 
-                <!-- Mensagens -->
+                <!-- Centro -->
                 <div class="{{ $isAdminContext ? 'space-y-6' : 'md:col-span-6 space-y-6' }}">
-                    <div class="bg-white rounded-lg shadow p-4">
-                        <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-100" id="conversation-avatar-wrap">
-                                    <img id="conversation-avatar" src="{{ asset('img/default-user.svg') }}" alt="Avatar"
-                                        class="w-10 h-10 object-cover">
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-gray-900" id="conversation-name">Selecione uma conversa</p>
-                                    <p class="text-xs text-gray-500" id="conversation-meta">Mensagens recentes</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-3 text-gray-400">
-                                <button type="button" class="hover:text-gray-600" title="Chamar">
-                                    <i class="fas fa-phone"></i>
-                                </button>
-                                <button type="button" class="hover:text-gray-600" title="Info">
-                                    <i class="fas fa-info-circle"></i>
-                                </button>
-                            </div>
-                        </div>
+                    <div id="feed-panel" class="space-y-6 hidden">
+                        @auth
+                            <div class="bg-white rounded-lg shadow p-4">
+                                <form id="post-form" action="{{ route('social.post.store') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="flex gap-3">
+                                        <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
+                                            <img src="{{ $authAvatar }}" alt="Avatar" class="w-10 h-10 object-cover"
+                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                        </div>
+                                        <div class="flex-1">
+                                            <textarea name="content" rows="3" id="post-content"
+                                                class="w-full border-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 p-3"
+                                                placeholder="No que você está pensando?"></textarea>
+                                        </div>
+                                    </div>
+                                    <div id="post-preview-top" class="hidden mt-3">
+                                        <div class="relative inline-flex">
+                                            <img id="post-preview-top-img" src="" alt="Preview"
+                                                class="max-h-40 rounded-lg border border-gray-200 object-cover">
+                                            <button type="button" id="post-preview-remove"
+                                                class="absolute -top-2 -right-2 bg-white text-gray-500 border border-gray-200 rounded-full w-7 h-7 flex items-center justify-center hover:text-red-600">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <input type="file" name="media[]" id="post-media" accept="image/*" class="hidden" multiple>
+                                        <div id="post-dropzone"
+                                            class="post-dropzone rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 flex flex-col gap-2">
+                                            <div class="flex flex-wrap items-center gap-3">
+                                                <div class="flex items-center gap-2 text-gray-600">
+                                                    <span
+                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white border border-gray-200">
+                                                        <i class="fas fa-image"></i>
+                                                    </span>
+                                                    <span class="text-sm font-medium">Arraste e solte imagens</span>
+                                                </div>
+                                                <button type="button" id="post-select-file"
+                                                    class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                                                    Selecionar imagens
+                                                </button>
+                                            </div>
+                                            <div class="text-xs text-gray-500" id="post-upload-name">Nenhuma imagem selecionada</div>
+                                            <div id="post-preview-inline" class="hidden items-center gap-3">
+                                                <img id="post-preview-inline-img" src="" alt="Preview"
+                                                    class="w-12 h-12 rounded border border-gray-200 object-cover">
+                                                <span class="text-xs text-gray-600" id="post-preview-inline-name"></span>
+                                            </div>
+                                        </div>
+                                        <div id="post-upload-progress" class="hidden mt-3">
+                                            <div class="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
+                                                <div id="post-upload-bar" class="post-progress-bar h-2 w-0 rounded-full"></div>
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1" id="post-upload-text">0%</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col gap-3 mt-3 pt-3 border-t">
+                                        <div class="flex flex-wrap items-center justify-between gap-3">
+                                            <div class="relative">
+                                                <button type="button" id="emoji-toggle" data-picker="emoji-picker"
+                                                    class="text-gray-500 hover:text-blue-600 p-2 rounded hover:bg-gray-100"
+                                                    title="Inserir emoji">
+                                                    <i class="fas fa-smile"></i>
+                                                </button>
+                                                <div id="emoji-picker" data-target="post-content"
+                                                    class="emoji-picker-panel hidden absolute left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
+                                                    @include('social.partials.emoji_tabs')
+                                                    @include('social.partials.emoji_grid')
+                                                </div>
+                                            </div>
 
-                        <div id="conversation-messages" class="h-[520px] overflow-y-auto space-y-3 pr-2">
-                            <p class="text-sm text-gray-500">Selecione um membro para ver a conversa.</p>
+                                            <div class="flex items-center gap-2">
+                                                <label for="visibility" class="text-sm text-gray-500">Visibilidade</label>
+                                                <select name="visibility" id="visibility"
+                                                    class="border border-gray-200 rounded-full px-3 py-1 text-sm">
+                                                    <option value="public">Publico</option>
+                                                    <option value="connections">Somente seguidores</option>
+                                                    <option value="community" selected>Somente comunidade</option>
+                                                </select>
+                                            </div>
+
+                                            <button type="submit"
+                                                class="bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition">
+                                                Publicar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        @endauth
+
+                        @forelse($posts as $post)
+                            <div class="bg-white rounded-lg shadow p-4" id="post-{{ $post->id }}">
+                                @php
+                                    $viewerId = Auth::id();
+                                    $hasLiked = $viewerId ? $post->reactions->firstWhere('user_id', $viewerId) : null;
+                                    $likeCount = $post->reactions->count();
+                                    $commentCount = $post->comments->count();
+                                    $postAvatar = $post->user->profile_photo_url ?? asset('img/default-user.svg');
+                                    $postLink = route('social.post.public', $post);
+                                @endphp
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
+                                            <img src="{{ $postAvatar }}" alt="Avatar" class="w-10 h-10 object-cover"
+                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-gray-900">{{ $post->user->name }}</h4>
+                                            <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="relative">
+                                        <button type="button" class="text-gray-400 hover:text-gray-600" title="Mais opcoes"
+                                            onclick="togglePanel('menu-{{ $post->id }}')">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <div id="menu-{{ $post->id }}"
+                                            class="hidden absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow z-10">
+                                            <div class="py-1 text-sm text-gray-700">
+                                                @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                    <form action="{{ route('social.post.destroy', $post) }}" method="POST"
+                                                        class="js-confirm-delete" data-confirm-title="Remover publicacao?"
+                                                        data-confirm-text="Esta acao nao pode ser desfeita.">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2">
+                                                            <i class="fas fa-trash"></i>
+                                                            <span>Remover</span>
+                                                        </button>
+                                                    </form>
+                                                    <form action="{{ route('social.post.unpublish', $post) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
+                                                            <i class="fas fa-eye-slash"></i>
+                                                            <span>Despublicar</span>
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                                @auth
+                                                    <form action="{{ route('social.post.hide', $post) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
+                                                            <i class="fas fa-eye"></i>
+                                                            <span>Ocultar postagem</span>
+                                                        </button>
+                                                    </form>
+                                                @endauth
+                                                @auth
+                                                    @if(!(Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                        <button type="button"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2"
+                                                            onclick="togglePanel('report-{{ $post->id }}'); togglePanel('menu-{{ $post->id }}');">
+                                                            <i class="fas fa-flag"></i>
+                                                            <span>Denunciar</span>
+                                                        </button>
+                                                    @endif
+                                                @endauth
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="prose max-w-none text-gray-800 mb-4">
+                                    {!! nl2br(e($post->content)) !!}
+                                </div>
+
+                                @if($post->media->isNotEmpty())
+                                    <div class="mb-4">
+                                        @php
+                                            $mediaCount = $post->media->count();
+                                        @endphp
+                                        @if($mediaCount === 1)
+                                            <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
+                                                class="w-full rounded-lg object-cover">
+                                        @else
+                                            <div class="relative" data-carousel data-total="{{ $mediaCount }}">
+                                                <div class="overflow-hidden rounded-lg">
+                                                    <div class="flex transition-transform duration-300" data-track>
+                                                        @foreach($post->media as $media)
+                                                            <img src="{{ asset($media->path) }}" alt="Midia do post"
+                                                                class="w-full shrink-0 object-cover">
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                                <button type="button" data-prev
+                                                    class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </button>
+                                                <button type="button" data-next
+                                                    class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </button>
+                                                <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full" data-counter>
+                                                    1/{{ $mediaCount }}
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                <div class="flex items-center justify-between pt-3 border-t text-sm text-gray-500">
+                                    @auth
+                                        <form action="{{ route('social.post.react', $post) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" aria-label="Curtir"
+                                                class="flex items-center gap-2 transition {{ $hasLiked ? 'text-blue-600' : 'hover:text-blue-600' }}">
+                                                <i class="{{ $hasLiked ? 'fas' : 'far' }} fa-thumbs-up"></i>
+                                                <span class="hidden sm:inline">Curtir</span>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="flex items-center gap-2" aria-label="Curtir">
+                                            <i class="far fa-thumbs-up"></i>
+                                            <span class="hidden sm:inline">Curtir</span>
+                                        </span>
+                                    @endauth
+
+                                    <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
+                                        onclick="document.getElementById('comment-{{ $post->id }}').focus();" aria-label="Comentar">
+                                        <i class="far fa-comment"></i>
+                                        <span class="hidden sm:inline">Comentar</span>
+                                    </button>
+
+                                    <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
+                                        onclick="togglePanel('share-{{ $post->id }}')" aria-label="Compartilhar">
+                                        <i class="fas fa-share"></i>
+                                        <span class="hidden sm:inline">Compartilhar</span>
+                                    </button>
+                                </div>
+                                <div id="share-{{ $post->id }}" class="hidden mt-3 border-t pt-3 space-y-3">
+                                    <div class="flex flex-wrap gap-3 text-sm">
+                                        <button type="button" class="text-blue-600" data-copy="{{ $postLink }}"
+                                            onclick="copyPostLink(this)">Copiar link</button>
+                                        <a class="text-green-600" target="_blank" rel="noopener"
+                                            href="https://wa.me/?text={{ urlencode($postLink) }}">WhatsApp</a>
+                                        <a class="text-blue-500" target="_blank" rel="noopener"
+                                            href="https://t.me/share/url?url={{ urlencode($postLink) }}">Telegram</a>
+                                        <a class="text-blue-700" target="_blank" rel="noopener"
+                                            href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($postLink) }}">Facebook</a>
+                                    </div>
+
+                                    @auth
+                                        <form action="{{ route('social.post.share', $post) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="text-sm text-gray-600 hover:text-blue-600">
+                                                Compartilhar na comunidade
+                                            </button>
+                                        </form>
+
+                                        @if($shareTargets->isNotEmpty())
+                                            <form action="{{ route('social.post.share.user', $post) }}" method="POST"
+                                                class="flex flex-col gap-2">
+                                                @csrf
+                                                <div class="flex flex-wrap gap-2">
+                                                    <select name="target_user_id" class="border border-gray-200 rounded px-3 py-2 text-sm">
+                                                        @foreach($shareTargets as $target)
+                                                            <option value="{{ $target->id }}">{{ $target->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <input type="text" name="message" placeholder="Mensagem opcional"
+                                                        class="flex-1 border border-gray-200 rounded px-3 py-2 text-sm">
+                                                    <button type="submit"
+                                                        class="bg-blue-600 text-white px-3 py-2 rounded text-sm">Enviar</button>
+                                                </div>
+                                            </form>
+                                        @endif
+                                    @endauth
+                                </div>
+
+                                <div id="report-{{ $post->id }}" class="hidden mt-3 border-t pt-3">
+                                    @auth
+                                        <form action="{{ route('social.post.report', $post) }}" method="POST"
+                                            class="flex flex-col gap-2">
+                                            @csrf
+                                            <textarea name="reason" rows="2" required
+                                                placeholder="Descreva o motivo da denuncia"
+                                                class="border border-gray-200 rounded px-3 py-2 text-sm"></textarea>
+                                            <button type="submit" class="text-sm text-red-600">Denunciar</button>
+                                        </form>
+                                    @endauth
+                                </div>
+
+                                <div class="mt-2 text-xs text-gray-400 flex gap-3">
+                                    <span>{{ $likeCount }} curtida{{ $likeCount === 1 ? '' : 's' }}</span>
+                                    <span>{{ $commentCount }} comentario{{ $commentCount === 1 ? '' : 's' }}</span>
+                                </div>
+
+                                @if($post->comments->isNotEmpty())
+                                    <div class="mt-4 space-y-3">
+                                        @foreach($post->comments as $comment)
+                                            @php
+                                                $commentUser = $comment->user;
+                                                $commentAvatar = $commentUser
+                                                    ? $commentUser->profile_photo_url
+                                                    : asset('img/default-user.svg');
+                                                $commentName = $commentUser ? $commentUser->name : 'Usuario';
+                                            @endphp
+                                            <div class="flex gap-3">
+                                                <div class="rounded-full w-8 h-8 overflow-hidden flex-shrink-0">
+                                                    <img src="{{ $commentAvatar }}" alt="Avatar"
+                                                        class="w-8 h-8 object-cover"
+                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                </div>
+                                                <div class="bg-gray-50 rounded-lg px-3 py-2 w-full">
+                                                    <div class="flex justify-between items-center">
+                                                        <p class="text-xs font-semibold text-gray-700">{{ $commentName }}</p>
+                                                        @if(Auth::check() && (Auth::id() === $comment->user_id || Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                            <form action="{{ route('social.comment.destroy', $comment) }}" method="POST"
+                                                                class="js-confirm-delete" data-confirm-title="Remover comentario?"
+                                                                data-confirm-text="Esta acao nao pode ser desfeita.">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="text-xs text-red-500" title="Remover">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    </div>
+                                                    <p class="text-sm text-gray-700">{{ $comment->content }}</p>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                @auth
+                                    <form action="{{ route('social.post.comment', $post) }}" method="POST"
+                                        class="mt-3 flex gap-2">
+                                        @csrf
+                                        <input type="text" name="content" id="comment-{{ $post->id }}"
+                                            placeholder="Escreva um comentario..."
+                                            class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                        <div class="relative">
+                                            <button type="button" class="comment-emoji-toggle text-gray-500 hover:text-blue-600"
+                                                data-picker="comment-emoji-{{ $post->id }}" title="Inserir emoji">
+                                                <i class="far fa-smile"></i>
+                                            </button>
+                                            <div id="comment-emoji-{{ $post->id }}" data-target="comment-{{ $post->id }}"
+                                                class="emoji-picker-panel hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
+                                                @include('social.partials.emoji_tabs')
+                                                @include('social.partials.emoji_grid')
+                                            </div>
+                                        </div>
+                                        <button type="submit"
+                                            class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition">
+                                            Enviar
+                                        </button>
+                                    </form>
+                                @endauth
+                            </div>
+                            @if(!empty($adsEnabled) && !empty($adsCode) && $loop->iteration % 3 === 0)
+                                <div class="bg-white rounded-lg shadow p-4">
+                                    {!! $adsCode !!}
+                                </div>
+                            @endif
+                        @empty
+                            <div class="text-center py-10 text-gray-500">
+                                <p>Nenhum post ainda. Seja o primeiro a publicar!</p>
+                            </div>
+                        @endforelse
+
+                        {{ $posts->links() }}
+                    </div>
+
+                    <div id="chat-panel" class="space-y-6">
+                        <div class="bg-white rounded-lg shadow p-4">
+                            <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-100" id="conversation-avatar-wrap">
+                                        <img id="conversation-avatar" src="{{ asset('img/default-user.svg') }}" alt="Avatar"
+                                            class="w-10 h-10 object-cover">
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-900" id="conversation-name">Selecione uma conversa</p>
+                                        <p class="text-xs text-gray-500" id="conversation-meta">Mensagens recentes</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 text-gray-400">
+                                    <button type="button" class="hover:text-gray-600" title="Info">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="conversation-messages" class="h-[520px] overflow-y-auto space-y-3 pr-2">
+                                <p class="text-sm text-gray-500">Selecione um membro para ver a conversa.</p>
+                            </div>
+                            <form id="conversation-form" class="mt-4 flex items-center gap-2">
+                                <div class="relative">
+                                    <button type="button" id="conversation-emoji-toggle"
+                                        class="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100"
+                                        title="Inserir emoji">
+                                        <i class="far fa-smile"></i>
+                                    </button>
+                                    <div id="conversation-emoji-picker" data-target="conversation-input"
+                                        class="emoji-picker-panel hidden absolute left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
+                                        @include('social.partials.emoji_tabs')
+                                        @include('social.partials.emoji_grid')
+                                    </div>
+                                </div>
+                                <input type="text" id="conversation-input"
+                                    class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Digite uma mensagem...">
+                                <button type="submit"
+                                    class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </form>
                         </div>
-                        <form id="conversation-form" class="mt-4 flex items-center gap-2">
-                            <input type="text" id="conversation-input"
-                                class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Digite uma mensagem...">
-                            <button type="submit"
-                                class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </form>
                     </div>
                 </div>
 
@@ -343,6 +718,11 @@
         const conversationInfoAvatar = document.getElementById('conversation-info-avatar');
         const conversationInfoName = document.getElementById('conversation-info-name');
         const conversationInfoStatus = document.getElementById('conversation-info-status');
+        const feedPanel = document.getElementById('feed-panel');
+        const chatPanel = document.getElementById('chat-panel');
+        const sidebarButtons = document.querySelectorAll('nav [data-panel]');
+        const conversationEmojiToggle = document.getElementById('conversation-emoji-toggle');
+        const conversationEmojiPicker = document.getElementById('conversation-emoji-picker');
         const chatBoxes = document.getElementById('chat-boxes');
         const chatOverflow = document.getElementById('chat-overflow');
         const chatOverflowToggle = document.getElementById('chat-overflow-toggle');
@@ -386,6 +766,31 @@
                 conversationInfoStatus.textContent = name ? 'Online recentemente' : 'Sem conversa ativa';
             }
         };
+
+        const setActivePanel = (panel) => {
+            if (!feedPanel || !chatPanel) {
+                return;
+            }
+
+            const showFeed = panel === 'feed';
+            feedPanel.classList.toggle('hidden', !showFeed);
+            chatPanel.classList.toggle('hidden', showFeed);
+
+            sidebarButtons.forEach((btn) => {
+                const isActive = btn.getAttribute('data-panel') === panel;
+                btn.classList.toggle('text-blue-600', isActive);
+                btn.classList.toggle('font-medium', isActive);
+                btn.classList.toggle('bg-blue-50', isActive);
+                btn.classList.toggle('text-gray-600', !isActive);
+            });
+        };
+
+        sidebarButtons.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const panel = btn.getAttribute('data-panel') || 'chat';
+                setActivePanel(panel);
+            });
+        });
 
         const renderConversationMessages = (messages) => {
             if (!conversationMessages) {
@@ -1349,6 +1754,10 @@
             initEmojiPicker(emojiToggle, emojiPicker);
         }
 
+        if (conversationEmojiToggle && conversationEmojiPicker) {
+            initEmojiPicker(conversationEmojiToggle, conversationEmojiPicker);
+        }
+
         document.querySelectorAll('.comment-emoji-toggle').forEach((toggle) => {
             const pickerId = toggle.getAttribute('data-picker');
             const picker = pickerId ? document.getElementById(pickerId) : null;
@@ -1356,11 +1765,13 @@
         });
 
         document.addEventListener('click', (event) => {
-            if (event.target.closest('.emoji-picker-panel') || event.target.closest('.comment-emoji-toggle') || event.target.closest('#emoji-toggle')) {
+            if (event.target.closest('.emoji-picker-panel') || event.target.closest('.comment-emoji-toggle') || event.target.closest('#emoji-toggle') || event.target.closest('#conversation-emoji-toggle')) {
                 return;
             }
 
             closeAllEmojiPickers();
         });
+
+        setActivePanel('feed');
     </script>
 @endpush
