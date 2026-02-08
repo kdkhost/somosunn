@@ -87,6 +87,8 @@ class User extends Authenticatable
         'bio',
         'occupation',
         'company',
+        'segment',
+        'interests',
         'photo',
         'cover_photo',
         'role',

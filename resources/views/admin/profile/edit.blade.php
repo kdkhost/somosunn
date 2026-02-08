@@ -116,6 +116,20 @@
                             </div>
 
                             <div class="form-group row">
+                                <label for="inputSegment" class="col-sm-3 col-form-label">Segmento/Nicho</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="inputSegment" name="segment" value="{{ $user->segment ?? '' }}" placeholder="Ex: Tecnologia, Saude, Educacao">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="inputInterests" class="col-sm-3 col-form-label">Interesses</label>
+                                <div class="col-sm-9">
+                                    <textarea class="form-control" id="inputInterests" name="interests" rows="3" placeholder="Ex: marketing, vendas, ecommerce, inovacao">{{ $user->interests ?? '' }}</textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Foto de Perfil</label>
                                 <div class="col-sm-9">
                                     <div class="custom-file">

@@ -30,6 +30,8 @@ class ProfileController extends Controller
             'doc' => 'nullable|string|max:20',
             'occupation' => 'nullable|string|max:100',
             'company' => 'nullable|string|max:100',
+            'segment' => 'nullable|string|max:120',
+            'interests' => 'nullable|string|max:500',
             'bio' => 'nullable|string|max:500',
             'photo' => 'nullable|image|max:2048',
             'cover_photo' => 'nullable|image|max:4096', // Capa pode ser maior (4MB)

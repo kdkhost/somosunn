@@ -37,15 +37,25 @@
 
             @forelse($posts as $post)
                 <div class="card">
-                    <div class="card-header d-flex align-items-center">
-                        <div class="mr-3">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="mr-3">
                             <img src="{{ $post->user?->profile_photo_url ?? asset('img/default-user.svg') }}"
                                 alt="Avatar" class="img-circle" style="width:40px;height:40px;object-fit:cover;">
+                            </div>
+                            <div>
+                                <strong>{{ $post->user->name ?? 'Anonimo' }}</strong>
+                                <div class="text-muted text-sm">{{ $post->created_at->diffForHumans() }}</div>
+                            </div>
                         </div>
-                        <div>
-                            <strong>{{ $post->user->name ?? 'Anonimo' }}</strong>
-                            <div class="text-muted text-sm">{{ $post->created_at->diffForHumans() }}</div>
-                        </div>
+                        <form action="{{ route('social.post.destroy', $post) }}" method="POST" class="d-inline js-confirm-delete"
+                            data-confirm-title="Remover publicacao?" data-confirm-text="Esta acao nao pode ser desfeita.">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
                     </div>
                     <div class="card-body">
                         <p class="mb-3">{!! nl2br(e($post->content)) !!}</p>
@@ -58,16 +68,15 @@
                             {{ $post->reactions->count() }} curtida{{ $post->reactions->count() === 1 ? '' : 's' }} ·
                             {{ $post->comments->count() }} comentario{{ $post->comments->count() === 1 ? '' : 's' }}
                         </small>
-                        <form action="{{ route('social.post.destroy', $post) }}" method="POST" class="d-inline js-confirm-delete"
-                            data-confirm-title="Remover publicacao?" data-confirm-text="Esta acao nao pode ser desfeita.">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger" title="Remover">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
                     </div>
                 </div>
+                @if(!empty($adsEnabled) && !empty($adsCode) && $loop->iteration % 3 === 0)
+                    <div class="card">
+                        <div class="card-body">
+                            {!! $adsCode !!}
+                        </div>
+                    </div>
+                @endif
             @empty
                 <div class="card">
                     <div class="card-body text-center text-muted">Nenhuma publicacao ainda.</div>
@@ -85,7 +94,48 @@
                     <h3 class="card-title">Resumo</h3>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted mb-0">O feed da comunidade no painel usa o layout AdminLTE 3.2.</p>
+                    <p class="text-muted">Sugestoes de membros para voce:</p>
+                    @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
+                        <ul class="list-unstyled mb-0">
+                            @foreach($recommendedUsers as $user)
+                                <li class="d-flex align-items-center justify-content-between py-2">
+                                    <div class="d-flex align-items-center">
+                                        <a class="mr-2" href="{{ route('social.profile', $user->id) }}">
+                                            <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="img-circle"
+                                                style="width:36px;height:36px;object-fit:cover;"
+                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                        </a>
+                                        <div>
+                                            <a href="{{ route('social.profile', $user->id) }}" class="text-sm font-weight-bold text-dark">
+                                                {{ $user->name }}
+                                            </a>
+                                            <div class="text-muted text-xs">
+                                                @if(!empty($user->segment))
+                                                    {{ $user->segment }}
+                                                @elseif(!empty($user->occupation))
+                                                    {{ $user->occupation }}
+                                                @elseif(!empty($user->company))
+                                                    {{ $user->company }}
+                                                @elseif(!empty($user->interests))
+                                                    {{ \Illuminate\Support\Str::limit($user->interests, 40) }}
+                                                @elseif(!empty($user->city))
+                                                    {{ $user->city }}@if(!empty($user->state)), {{ $user->state }}@endif
+                                                @else
+                                                    Membro
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <form action="{{ route('connection.connect', $user) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Conectar</button>
+                                    </form>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="text-muted mb-0">Sem sugestoes no momento.</p>
+                    @endif
                 </div>
             </div>
         </div>

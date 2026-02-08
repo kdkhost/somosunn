@@ -70,6 +70,7 @@ use App\Models\PostReaction;
 use App\Models\PostReport;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\MemberSuggestionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -109,21 +110,8 @@ class SocialController extends Controller
 
         $recommendedUsers = collect();
         if (Auth::check()) {
-            $excludedIds = array_unique(array_merge([Auth::id()], $blockedUserIds, $connectedUserIds));
-            $recommendedQuery = User::whereNotIn('id', $excludedIds)
-                ->where('role', '!=', 'superadmin');
-
-            if (!Auth::user()->isAdmin()) {
-                $recommendedQuery->where(function ($q) use ($connectedUserIds) {
-                    $q->where('hide_profile', false)
-                        ->orWhereIn('id', $connectedUserIds);
-                });
-            }
-
-            $recommendedUsers = $recommendedQuery
-                ->inRandomOrder()
-                ->limit(5)
-                ->get(['id', 'name']);
+            $recommendedUsers = app(MemberSuggestionService::class)
+                ->suggest(Auth::user(), $blockedUserIds, $connectedUserIds, 5);
         }
 
         $adsEnabled = (string) Setting::get('ads_enabled', '0') === '1';
