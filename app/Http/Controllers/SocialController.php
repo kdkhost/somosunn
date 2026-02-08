@@ -107,6 +107,19 @@ class SocialController extends Controller
             ->values()
             ->toArray();
 
+        $recommendedUsers = collect();
+        if (Auth::check()) {
+            $excludedIds = array_unique(array_merge([Auth::id()], $blockedUserIds, $connectedUserIds));
+            $recommendedUsers = User::whereNotIn('id', $excludedIds)
+                ->where('role', '!=', 'superadmin')
+                ->inRandomOrder()
+                ->limit(5)
+                ->get(['id', 'name', 'profile_photo']);
+        }
+
+        $adsEnabled = (string) Setting::get('ads_enabled', '0') === '1';
+        $adsCode = (string) Setting::get('ads_code_html', '');
+
         $hiddenPostIds = PostHide::where('user_id', Auth::id())
             ->pluck('post_id')
             ->all();
@@ -172,12 +185,18 @@ class SocialController extends Controller
                 'posts' => $posts,
                 'isDemo' => true,
                 'shareTargets' => User::whereIn('id', $connectedUserIds)->orderBy('name')->get(['id', 'name']),
+                'recommendedUsers' => $recommendedUsers,
+                'adsEnabled' => $adsEnabled,
+                'adsCode' => $adsCode,
             ]);
         }
 
         return view('social.feed', [
             'posts' => $posts,
             'shareTargets' => User::whereIn('id', $connectedUserIds)->orderBy('name')->get(['id', 'name']),
+            'recommendedUsers' => $recommendedUsers,
+            'adsEnabled' => $adsEnabled,
+            'adsCode' => $adsCode,
         ]);
     }
 

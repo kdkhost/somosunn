@@ -74,6 +74,9 @@
         $authUser = Auth::user();
         $authAvatar = $authUser ? $authUser->profile_photo_url : null;
         $shareTargets = $shareTargets ?? collect();
+        $recommendedUsers = $recommendedUsers ?? collect();
+        $adsEnabled = $adsEnabled ?? false;
+        $adsCode = $adsCode ?? '';
     @endphp
 
     <div class="bg-gray-100 min-h-screen pt-4">
@@ -101,14 +104,6 @@
                                 <a href="{{ $chatUrl }}"
                                     class="flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
                                     <i class="fas fa-comments w-6"></i> Mensagens
-                                </a>
-                                <a href="{{ $profileUrl }}"
-                                    class="flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
-                                    <i class="fas fa-user w-6"></i> Meu Perfil
-                                </a>
-                                <a href="{{ route('courses.index') }}"
-                                    class="flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
-                                    <i class="fas fa-graduation-cap w-6"></i> Cursos
                                 </a>
                             </nav>
                         @else
@@ -138,6 +133,16 @@
                                             placeholder="No que você está pensando?"></textarea>
                                     </div>
                                 </div>
+                                <div id="post-preview-top" class="hidden mt-3">
+                                    <div class="relative inline-flex">
+                                        <img id="post-preview-top-img" src="" alt="Preview"
+                                            class="max-h-40 rounded-lg border border-gray-200 object-cover">
+                                        <button type="button" id="post-preview-remove"
+                                            class="absolute -top-2 -right-2 bg-white text-gray-500 border border-gray-200 rounded-full w-7 h-7 flex items-center justify-center hover:text-red-600">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
                                 <div class="mt-3">
                                     <input type="file" name="media" id="post-media" accept="image/*" class="hidden">
                                     <div id="post-dropzone"
@@ -156,6 +161,11 @@
                                             </button>
                                         </div>
                                         <div class="text-xs text-gray-500" id="post-upload-name">Nenhuma imagem selecionada</div>
+                                        <div id="post-preview-inline" class="hidden items-center gap-3">
+                                            <img id="post-preview-inline-img" src="" alt="Preview"
+                                                class="w-12 h-12 rounded border border-gray-200 object-cover">
+                                            <span class="text-xs text-gray-600" id="post-preview-inline-name"></span>
+                                        </div>
                                     </div>
                                     <div id="post-upload-progress" class="hidden mt-3">
                                         <div class="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
@@ -437,6 +447,11 @@
                                 </form>
                             @endauth
                         </div>
+                        @if(!empty($adsEnabled) && !empty($adsCode) && $loop->iteration % 3 === 0)
+                            <div class="bg-white rounded-lg shadow p-4">
+                                {!! $adsCode !!}
+                            </div>
+                        @endif
                     @empty
                         <div class="text-center py-10 text-gray-500">
                             <p>Nenhum post ainda. Seja o primeiro a publicar!</p>
@@ -451,8 +466,32 @@
                     <div class="bg-white rounded-lg shadow p-4 sticky top-24">
                         <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
                         <div class="space-y-4">
-                            <!-- Placeholder -->
-                            <p class="text-xs text-gray-500">Nenhum evento próximo.</p>
+                            @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
+                                @foreach($recommendedUsers as $user)
+                                    <div class="flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
+                                                <img src="{{ $user->profile_photo_url }}" alt="Avatar"
+                                                    class="w-10 h-10 object-cover"
+                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-semibold text-gray-800">{{ $user->name }}</p>
+                                                <p class="text-xs text-gray-500">Membro</p>
+                                            </div>
+                                        </div>
+                                        <form action="{{ route('connection.connect', $user) }}" method="POST">
+                                            @csrf
+                                            <button type="submit"
+                                                class="text-xs text-blue-600 hover:text-blue-700 font-medium">
+                                                Conectar
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endforeach
+                            @else
+                                <p class="text-xs text-gray-500">Sem recomendacoes no momento.</p>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -595,6 +634,12 @@
         const progressBar = document.getElementById('post-upload-bar');
         const progressText = document.getElementById('post-upload-text');
         const uploadName = document.getElementById('post-upload-name');
+        const previewTop = document.getElementById('post-preview-top');
+        const previewTopImg = document.getElementById('post-preview-top-img');
+        const previewInline = document.getElementById('post-preview-inline');
+        const previewInlineImg = document.getElementById('post-preview-inline-img');
+        const previewInlineName = document.getElementById('post-preview-inline-name');
+        const previewRemove = document.getElementById('post-preview-remove');
         const emojiToggle = document.getElementById('emoji-toggle');
         const emojiPicker = document.getElementById('emoji-picker');
 
@@ -606,13 +651,74 @@
             uploadName.textContent = file ? file.name : 'Nenhuma imagem selecionada';
         };
 
+        const showPreview = (file) => {
+            if (!file || !previewTopImg || !previewInlineImg) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const src = event.target ? event.target.result : null;
+                if (!src) {
+                    return;
+                }
+
+                previewTopImg.src = src;
+                previewInlineImg.src = src;
+                if (previewInlineName) {
+                    previewInlineName.textContent = file.name;
+                }
+                if (previewTop) {
+                    previewTop.classList.remove('hidden');
+                }
+                if (previewInline) {
+                    previewInline.classList.remove('hidden');
+                    previewInline.classList.add('flex');
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+
+        const clearPreview = () => {
+            if (previewTop) {
+                previewTop.classList.add('hidden');
+            }
+            if (previewInline) {
+                previewInline.classList.add('hidden');
+                previewInline.classList.remove('flex');
+            }
+            if (previewTopImg) {
+                previewTopImg.src = '';
+            }
+            if (previewInlineImg) {
+                previewInlineImg.src = '';
+            }
+            if (previewInlineName) {
+                previewInlineName.textContent = '';
+            }
+        };
+
         if (selectFile && postMedia) {
             selectFile.addEventListener('click', () => postMedia.click());
         }
 
         if (postMedia) {
             postMedia.addEventListener('change', () => {
-                updateUploadName(postMedia.files[0]);
+                const file = postMedia.files[0];
+                updateUploadName(file);
+                if (file) {
+                    showPreview(file);
+                } else {
+                    clearPreview();
+                }
+            });
+        }
+
+        if (previewRemove && postMedia) {
+            previewRemove.addEventListener('click', () => {
+                postMedia.value = '';
+                updateUploadName(null);
+                clearPreview();
             });
         }
 
@@ -640,6 +746,7 @@
                 dataTransfer.items.add(file);
                 postMedia.files = dataTransfer.files;
                 updateUploadName(file);
+                showPreview(file);
             });
         }
 

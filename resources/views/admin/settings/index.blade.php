@@ -2126,6 +2126,22 @@
 
                     <hr>
 
+                    <h5 class="mb-3"><i class="fas fa-bullhorn mr-1"></i> Anúncios da comunidade</h5>
+                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-2">
+                        <input type="hidden" name="ads_enabled" value="0">
+                        <input type="checkbox" class="custom-control-input" id="ads_enabled" name="ads_enabled"
+                            value="1" {{ ($settings['ads_enabled'] ?? 0) ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="ads_enabled">Exibir anúncios entre postagens</label>
+                    </div>
+                    <div class="form-group">
+                        <label>Código HTML/JS do anúncio</label>
+                        <textarea name="ads_code_html" class="form-control" rows="6"
+                            placeholder="Cole aqui o código do Google Ads">{{ $settings['ads_code_html'] ?? '' }}</textarea>
+                        <small class="text-muted">Renderizado entre postagens no feed da comunidade.</small>
+                    </div>
+
+                    <hr>
+
                     <h5 class="mb-3"><i class="fas fa-chart-line mr-1"></i> Códigos de rastreamento</h5>
                     <div class="row">
                         <div class="col-md-6">
