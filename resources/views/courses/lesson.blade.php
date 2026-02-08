@@ -21,19 +21,42 @@
         <!-- Sidebar - Playlist -->
         <div
             class="w-full lg:w-80 bg-white border-r border-gray-200 flex-shrink-0 h-auto lg:h-screen lg:sticky lg:top-0 overflow-y-auto z-10">
+            @php
+                $lessons = $course->lessons()->orderBy('order')->get();
+                $totalLessons = $lessons->count();
+                $completedLessonsCount = 0;
+                $lessonProgressMap = [];
+
+                if (Auth::check()) {
+                    $completedLessonsCount = \App\Models\LessonProgress::where('user_id', Auth::id())
+                        ->whereIn('lesson_id', $lessons->pluck('id'))
+                        ->whereNotNull('completed_at')
+                        ->count();
+
+                    $lessonProgressMap = \App\Models\LessonProgress::where('user_id', Auth::id())
+                        ->whereIn('lesson_id', $lessons->pluck('id'))
+                        ->pluck('completed_at', 'lesson_id')
+                        ->toArray();
+                }
+
+                $percentage = $totalLessons > 0 ? round(($completedLessonsCount / $totalLessons) * 100) : 0;
+            @endphp
             <div class="p-4 border-b border-gray-100">
                 <h2 class="font-bold text-gray-800 text-lg leading-tight">{{ $course->title }}</h2>
                 <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
-                    <div class="bg-green-500 h-2 rounded-full" style="width: 0%"></div> <!-- Progress Bar Placeholder -->
+                    <div class="bg-green-500 h-2 rounded-full transition-all duration-500"
+                        style="width: {{ $percentage }}%"></div>
                 </div>
-                <p class="text-xs text-gray-500 mt-1">0% Concluído</p>
+                <p class="text-xs text-gray-500 mt-1">{{ $percentage }}% Concluído</p>
             </div>
             <div class="py-2">
                 @foreach($course->lessons()->orderBy('order')->get() as $l)
                     <a href="{{ route('courses.lessons.show', [$course->id, $l->id]) }}"
                         class="flex items-center p-4 hover:bg-gray-50 transition border-l-4 {{ $l->id == $lesson->id ? 'border-[#1F5EDB] bg-blue-50' : 'border-transparent' }}">
                         <div class="mr-3">
-                            @if($l->id == $lesson->id)
+                            @if(isset($lessonProgressMap[$l->id]) && $lessonProgressMap[$l->id])
+                                <i class="fas fa-check-circle text-green-500"></i>
+                            @elseif($l->id == $lesson->id)
                                 <i class="fas fa-play text-[#1F5EDB]"></i>
                             @else
                                 <i class="far fa-circle text-gray-400"></i>
@@ -59,7 +82,8 @@
             <div class="max-w-4xl mx-auto">
                 <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ $lesson->title }}</h1>
 
-                <div class="aspect-w-16 aspect-h-9 bg-black rounded-xl overflow-hidden shadow-2xl mb-8" data-unn-video-host>
+                <div class="relative w-full overflow-hidden shadow-2xl mb-8 bg-black rounded-xl"
+                    style="aspect-ratio: 16/9; max-height: 500px;" data-unn-video-host>
                     @if($lesson->video_url)
                         @php
                             $normalizedVideoUrl = trim((string) $lesson->video_url);
@@ -95,14 +119,14 @@
                                 data-floating-enabled="{{ !empty($course->video_floating_enabled) ? '1' : '0' }}"
                                 data-floating-width="{{ (int) ($course->video_floating_width ?? 420) }}"
                                 data-floating-height="{{ (int) ($course->video_floating_height ?? 236) }}">
-                                <video class="w-full h-full min-h-[400px]" controls playsinline preload="metadata">
+                                <video class="w-full h-full object-contain" controls playsinline preload="metadata">
                                     <source src="{{ $normalizedVideoUrl }}">
                                 </video>
                             </div>
                         @else
                             <iframe src="{{ str_replace('youtu.be/', 'youtube.com/embed/', $normalizedVideoUrl) }}" frameborder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen class="w-full h-full min-h-[400px]"></iframe>
+                                allowfullscreen class="w-full h-full"></iframe>
                         @endif
                     @else
                         <div class="flex items-center justify-center h-full text-white">
@@ -211,10 +235,21 @@
                             Próxima <i class="fas fa-arrow-right ml-2"></i>
                         </a>
                     @else
-                        <button id="btn-complete-course"
-                            class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition cursor-pointer">
-                            Concluir Curso <i class="fas fa-check ml-2"></i>
-                        </button>
+                        @php
+                            $userCertificate = Auth::check() ? $course->certificates()->where('user_id', Auth::id())->first() : null;
+                        @endphp
+
+                        @if($userCertificate)
+                            <a href="{{ route('admin.certificates.view', $userCertificate->cert_hash) }}" target="_blank"
+                                class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition cursor-pointer">
+                                Download Certificado <i class="fas fa-file-download ml-2"></i>
+                            </a>
+                        @else
+                            <button id="btn-complete-course"
+                                class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition cursor-pointer">
+                                Concluir Curso <i class="fas fa-check ml-2"></i>
+                            </button>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -400,14 +435,14 @@
                                 row.dataset.bookmarkId = String(result.bookmark.id);
                                 row.dataset.bookmarkSeconds = String(result.bookmark.position_seconds || 0);
                                 row.innerHTML = `
-                                                    <div class="min-w-0">
-                                                        <button type="button" class="text-sm font-bold text-[#1F5EDB] hover:underline text-left lesson-bookmark-jump">
-                                                            <i class="fas fa-play-circle mr-1"></i>${formatSeconds(result.bookmark.position_seconds || 0)}
-                                                        </button>
-                                                        <p class="text-sm text-gray-700 mt-1 break-words"></p>
-                                                    </div>
-                                                    <button type="button" class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 lesson-bookmark-delete">Excluir</button>
-                                                `;
+                                                            <div class="min-w-0">
+                                                                <button type="button" class="text-sm font-bold text-[#1F5EDB] hover:underline text-left lesson-bookmark-jump">
+                                                                    <i class="fas fa-play-circle mr-1"></i>${formatSeconds(result.bookmark.position_seconds || 0)}
+                                                                </button>
+                                                                <p class="text-sm text-gray-700 mt-1 break-words"></p>
+                                                            </div>
+                                                            <button type="button" class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 lesson-bookmark-delete">Excluir</button>
+                                                        `;
                                 row.querySelector('p').textContent = result.bookmark.note || '';
                                 bookmarkList.prepend(row);
                                 bookmarkNote.value = '';

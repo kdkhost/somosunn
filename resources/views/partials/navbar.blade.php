@@ -115,7 +115,7 @@
                                     <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
                                 </div>
 
-                                <a href="{{ route('social.profile', Auth::id()) }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                <a href="{{ route('admin.membro.perfil') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
                                     <i class="fas fa-user-circle w-5 opacity-70"></i>
                                     Meu perfil
                                 </a>

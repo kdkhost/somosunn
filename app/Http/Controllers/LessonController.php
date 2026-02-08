@@ -283,18 +283,64 @@ class LessonController extends Controller
             ]
         );
 
+        $justCompleted = false;
         if ($duration > 0 && $seconds >= (int) floor($duration * 0.95)) {
             if ($progress->completed_at === null) {
                 $progress->completed_at = now();
                 $progress->save();
+                $justCompleted = true;
             }
+        }
+
+        $courseCompleted = false;
+        if ($justCompleted) {
+            $courseCompleted = $this->checkCourseAndIssueCertificate($course);
         }
 
         return response()->json([
             'success' => true,
             'resume_at' => (int) ($progress->current_time_seconds ?? 0),
             'completed_at' => $progress->completed_at ? $progress->completed_at->toIso8601String() : null,
+            'course_completed' => $courseCompleted,
         ]);
+    }
+
+    private function checkCourseAndIssueCertificate(Course $course): bool
+    {
+        $user = Auth::user();
+        $totalLessons = $course->lessons()->count();
+        if ($totalLessons === 0)
+            return false;
+
+        $completedCount = LessonProgress::query()
+            ->where('user_id', $user->id)
+            ->whereIn('lesson_id', $course->lessons()->pluck('id'))
+            ->whereNotNull('completed_at')
+            ->count();
+
+        if ($completedCount >= $totalLessons) {
+            // Course is 100% complete
+            if ($course->is_certificate_enabled) {
+                // Check if already issued
+                $existing = $course->certificates()->where('user_id', $user->id)->first();
+                if (!$existing) {
+                    try {
+                        // Trigger certificate generation
+                        // Using the existing admin controller logic if possible or creating a record
+                        $course->certificates()->create([
+                            'user_id' => $user->id,
+                            'cert_hash' => \Illuminate\Support\Str::random(12),
+                            'issued_at' => now(),
+                        ]);
+                    } catch (\Exception $e) {
+                        \Log::error("Failed to issue certificate for user {$user->id} in course {$course->id}: " . $e->getMessage());
+                    }
+                }
+            }
+            return true;
+        }
+
+        return false;
     }
 
     public function storeBookmark(Request $request, Course $course, Lesson $lesson)

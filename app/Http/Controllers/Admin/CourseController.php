@@ -8,6 +8,19 @@ use App\Models\Course;
 
 class CourseController extends Controller
 {
+    public function available(Request $request)
+    {
+        $q = $request->input('q');
+        $query = Course::query()->where('status', 'published');
+
+        if ($q) {
+            $query->where('title', 'like', "%{$q}%");
+        }
+
+        $items = $query->latest()->paginate(12);
+        return view('admin.courses.available', compact('items', 'q'));
+    }
+
     public function index()
     {
         $courses = Course::latest()->get();

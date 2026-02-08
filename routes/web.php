@@ -229,6 +229,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/portal', [\App\Http\Controllers\Admin\MemberController::class, 'portal'])->name('portal.index');
     Route::get('/comunidade', [\App\Http\Controllers\Admin\MemberController::class, 'socialFeed'])->middleware('check.feature:community')->name('social.feed.internal');
+    Route::get('/courses/available', [\App\Http\Controllers\Admin\CourseController::class, 'available'])->name('courses.available');
     Route::get('/mentorships/available', [\App\Http\Controllers\Admin\MentorshipController::class, 'available'])->name('mentorships.available');
 
     // Chat interno (mantém layout do painel)
@@ -244,6 +245,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     // Perfil (Acessível a membros para completar cadastro)
     Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+
+    // Atalho para Membros (membro/perfil)
+    Route::prefix('membro')->group(function () {
+        Route::get('/perfil', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('membro.perfil');
+    });
 
     // Depoimentos (moderação por permissões)
     Route::get('/testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'index'])->name('testimonials.index');

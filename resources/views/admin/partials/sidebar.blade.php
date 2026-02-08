@@ -104,7 +104,7 @@
                             <p>Cursos<i class="right fas fa-angle-left"></i></p>
                         </a>
                         <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('courses.index') }}" class="nav-link"><i
+                            <li class="nav-item"><a href="{{ route('admin.courses.available') }}" class="nav-link"><i
                                         class="fas fa-list nav-icon"></i>
                                     <p>Meus Cursos</p>
                                 </a></li>
