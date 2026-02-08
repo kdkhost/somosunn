@@ -8,8 +8,8 @@
         $isAdminContext = ($extends ?? 'layouts.app') === 'admin.layouts.app';
     @endphp
 
-    <div class="{{ $isAdminContext ? 'px-0 py-4' : 'max-w-6xl mx-auto px-0 md:px-4 py-6' }} h-[calc(100vh-200px)] min-h-[500px]">
-        <div class="bg-white rounded-lg shadow-xl overflow-hidden flex h-full border border-gray-200">
+    <div class="{{ $isAdminContext ? 'px-0 py-2' : 'max-w-6xl mx-auto px-0 sm:px-4 py-2 sm:py-6' }} h-[calc(100vh-120px)] sm:h-[calc(100vh-160px)] md:h-[calc(100vh-180px)] min-h-[400px]">
+        <div class="bg-white rounded-none sm:rounded-lg shadow-xl overflow-hidden flex h-full border-0 sm:border border-gray-200">
             <!-- Sidebar (hidden on mobile when chat open, visible on md) -->
             <div class="hidden md:flex w-1/3 border-r border-gray-200 flex-col bg-white">
                 <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
@@ -25,10 +25,10 @@
                             $otherUserName = $otherUser?->name ?? ($conv->title ?? 'Conversa');
                         @endphp
                         <a href="{{ route($routeNamePrefix . '.show', $conv->id) }}" data-conversation-id="{{ $conv->id }}"
-                            class="block p-4 hover:bg-blue-50 transition border-b border-gray-100 {{ isset($conversation) && $conversation->id == $conv->id ? 'bg-blue-50 border-blue-200' : '' }}">
-                            <div class="flex items-center gap-3">
+                            class="block p-3 hover:bg-blue-50 transition border-b border-gray-100 {{ isset($conversation) && $conversation->id == $conv->id ? 'bg-blue-50 border-blue-200' : '' }}">
+                            <div class="flex items-center gap-2">
                                 <img src="{{ $otherUserPhoto }}" alt="{{ $otherUserName }}"
-                                    class="w-10 h-10 rounded-full object-cover"
+                                    class="w-9 h-9 rounded-full object-cover flex-shrink-0"
                                     onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}'">
                                 <div class="flex-1 min-w-0">
                                     <h4 class="text-sm font-semibold text-gray-900 truncate">{{ $otherUserName }}
@@ -54,16 +54,16 @@
                     $chatOtherUserPhoto = $chatOtherUser?->profile_photo_url ?? asset('img/default-user.svg');
                     $chatOtherUserName = $chatOtherUser?->name ?? ($conversation->title ?? 'Conversa');
                 @endphp
-                <div class="p-4 border-b border-gray-200 bg-white flex items-center justify-between shadow-sm z-10">
-                    <div class="flex items-center gap-3">
-                        <a href="{{ route($routeNamePrefix . '.index') }}" class="md:hidden text-gray-500 hover:text-gray-700">
-                            <i class="fas fa-arrow-left"></i>
+                <div class="p-3 sm:p-4 border-b border-gray-200 bg-white flex items-center justify-between shadow-sm z-10 sticky top-0">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <a href="{{ route($routeNamePrefix . '.index') }}" class="md:hidden text-gray-500 hover:text-gray-700 p-1">
+                            <i class="fas fa-arrow-left text-lg"></i>
                         </a>
                         <img src="{{ $chatOtherUserPhoto }}" alt="{{ $chatOtherUserName }}"
-                            class="w-10 h-10 rounded-full object-cover"
+                            class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover"
                             onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}'">
                         <div>
-                            <h4 class="font-bold text-gray-900">{{ $chatOtherUserName }}</h4>
+                            <h4 class="font-bold text-gray-900 text-sm sm:text-base">{{ $chatOtherUserName }}</h4>
                             <span class="flex items-center gap-1 text-xs text-green-500"><span
                                     class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
                         </div>
@@ -90,23 +90,23 @@
                 </div>
 
                 <!-- Input -->
-                <div class="p-4 bg-white border-t border-gray-200">
-                    <form id="chat-form" class="flex items-center gap-2">
-                        <button type="button" class="text-gray-300 p-2 cursor-not-allowed" title="Em breve" disabled>
+                <div class="p-2 sm:p-4 bg-white border-t border-gray-200 sticky bottom-0">
+                    <form id="chat-form" class="flex items-center gap-1 sm:gap-2">
+                        <button type="button" class="text-gray-300 p-1 sm:p-2 cursor-not-allowed hidden sm:block" title="Em breve" disabled>
                             <i class="fas fa-paperclip"></i>
                         </button>
                         <div class="relative">
-                            <button type="button" id="emoji-toggle-btn" class="text-gray-400 hover:text-yellow-500 p-2 transition">
-                                <i class="fas fa-smile"></i>
+                            <button type="button" id="emoji-toggle-btn" class="text-gray-400 hover:text-yellow-500 p-1 sm:p-2 transition">
+                                <i class="fas fa-smile text-lg sm:text-base"></i>
                             </button>
                             @include('partials.emoji-picker', ['pickerId' => 'chat'])
                         </div>
                         <input type="text" id="message-input"
-                            class="flex-1 border border-gray-200 rounded-full px-4 py-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                            class="flex-1 border border-gray-200 rounded-full px-3 sm:px-4 py-2 text-sm sm:text-base focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
                             placeholder="Digite sua mensagem...">
                         <button type="submit"
-                            class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition shadow">
-                            <i class="fas fa-paper-plane text-sm"></i>
+                            class="bg-blue-600 text-white rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-blue-700 transition shadow flex-shrink-0">
+                            <i class="fas fa-paper-plane text-xs sm:text-sm"></i>
                         </button>
                     </form>
                 </div>

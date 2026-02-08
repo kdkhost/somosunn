@@ -8,12 +8,12 @@
         $isAdminContext = ($extends ?? 'layouts.app') === 'admin.layouts.app';
     @endphp
 
-    <div class="{{ $isAdminContext ? 'px-0 py-4' : 'max-w-6xl mx-auto px-0 md:px-4 py-6' }} h-[calc(100vh-200px)] min-h-[500px]">
-        <div class="bg-white rounded-lg shadow-xl overflow-hidden flex h-full border border-gray-200">
+    <div class="{{ $isAdminContext ? 'px-0 py-2' : 'max-w-6xl mx-auto px-0 sm:px-4 py-2 sm:py-6' }} h-[calc(100vh-120px)] sm:h-[calc(100vh-160px)] md:h-[calc(100vh-180px)] min-h-[400px]">
+        <div class="bg-white rounded-none sm:rounded-lg shadow-xl overflow-hidden flex h-full border-0 sm:border border-gray-200">
             <!-- Sidebar Conversations -->
             <div class="w-full md:w-1/3 border-r border-gray-200 flex flex-col">
-                <div class="p-4 border-b border-gray-200 bg-gray-50">
-                    <h2 class="font-bold text-xl text-gray-800">Mensagens</h2>
+                <div class="p-3 sm:p-4 border-b border-gray-200 bg-gray-50">
+                    <h2 class="font-bold text-lg sm:text-xl text-gray-800">Mensagens</h2>
                 </div>
                 <div class="flex-1 overflow-y-auto" id="conversations-list">
                     @foreach($conversations as $conv)
@@ -23,10 +23,10 @@
                             $otherUserName = $otherUser?->name ?? ($conv->title ?? 'Conversa');
                         @endphp
                         <a href="{{ route($routeNamePrefix . '.show', $conv->id) }}" data-conversation-id="{{ $conv->id }}"
-                            class="block p-4 hover:bg-blue-50 transition border-b border-gray-100">
-                            <div class="flex items-center gap-3">
+                            class="block p-3 sm:p-4 hover:bg-blue-50 transition border-b border-gray-100">
+                            <div class="flex items-center gap-2 sm:gap-3">
                                 <img src="{{ $otherUserPhoto }}" alt="{{ $otherUserName }}"
-                                    class="w-10 h-10 rounded-full object-cover"
+                                    class="w-10 h-10 rounded-full object-cover flex-shrink-0"
                                     onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}'">
                                 <div class="flex-1 min-w-0">
                                     <h4 class="text-sm font-semibold text-gray-900 truncate">
