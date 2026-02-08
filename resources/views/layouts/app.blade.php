@@ -50,6 +50,10 @@
         $trackingHead = (string) (\App\Models\Setting::get('tracking_head') ?: '');
         $trackingBody = (string) (\App\Models\Setting::get('tracking_body') ?: '');
 
+        // Google AdSense
+        $adsensePublisherId = (string) (\App\Models\Setting::get('adsense_publisher_id') ?: '');
+        $adsEnabled = (string) \App\Models\Setting::get('ads_enabled', '0') === '1';
+
         // Video player (Plyr) - global config
         $videoPlayerEnabled = (string) \App\Models\Setting::get('video_player_enabled', '1') === '1';
         $videoPlyrColor = (string) (\App\Models\Setting::get('video_plyr_color') ?: (\App\Models\Setting::get('site_color_primary') ?: '#1F5EDB'));
@@ -248,6 +252,12 @@
 
     @if($trackingHead !== '')
         {!! $trackingHead !!}
+    @endif
+
+    {{-- Google AdSense Script --}}
+    @if($adsEnabled && $adsensePublisherId !== '')
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $adsensePublisherId }}"
+             crossorigin="anonymous"></script>
     @endif
 
     <link rel="icon" href="{{ $favicon }}" type="image/x-icon">

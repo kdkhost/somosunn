@@ -418,12 +418,14 @@
                         @endphp
                         <div class="flex justify-between items-start mb-3">
                             <div class="flex items-center gap-3">
-                                <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
-                                    <img src="{{ $postAvatar }}" alt="Avatar" class="w-10 h-10 object-cover"
+                                <a href="{{ route('social.profile', $post->user->email) }}" class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0 block">
+                                    <img src="{{ $postAvatar }}" alt="Avatar" class="w-10 h-10 object-cover hover:opacity-80 transition"
                                         onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                </div>
+                                </a>
                                 <div>
-                                    <h4 class="font-bold text-gray-900">{{ $post->user->name }}</h4>
+                                    <a href="{{ route('social.profile', $post->user->email) }}" class="font-bold text-gray-900 hover:text-blue-600 transition">
+                                        {{ $post->user->name }}
+                                    </a>
                                     <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
@@ -481,7 +483,11 @@
                             </div>
                         </div>
                         <div class="prose max-w-none text-gray-800">
-                            {!! nl2br(e($post->content)) !!}
+                            {!! preg_replace(
+                                '/(https?:\/\/[^\s<>"]+)/i',
+                                '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline break-all">$1</a>',
+                                nl2br(e($post->content))
+                            ) !!}
                         </div>
 
                         @if($post->media->isNotEmpty())

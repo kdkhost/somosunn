@@ -134,6 +134,20 @@ class SocialController extends Controller
 
         $adsEnabled = (string) Setting::get('ads_enabled', '0') === '1';
         $adsCode = (string) Setting::get('ads_code_html', '');
+        $adsensePublisherId = (string) Setting::get('adsense_publisher_id', '');
+        $adsenseSlotId = (string) Setting::get('adsense_slot_id', '');
+        $adsenseFormat = (string) Setting::get('adsense_format', 'auto');
+        $adsenseFrequency = (int) Setting::get('adsense_frequency', 5);
+
+        // Build AdSense config for view
+        $adsConfig = [
+            'enabled' => $adsEnabled,
+            'customCode' => $adsCode,
+            'publisherId' => $adsensePublisherId,
+            'slotId' => $adsenseSlotId,
+            'format' => $adsenseFormat,
+            'frequency' => $adsenseFrequency,
+        ];
 
         $hiddenPostIds = PostHide::where('user_id', Auth::id())
             ->pluck('post_id')
@@ -204,6 +218,7 @@ class SocialController extends Controller
                 'connectionMap' => $connectionMap,
                 'adsEnabled' => $adsEnabled,
                 'adsCode' => $adsCode,
+                'adsConfig' => $adsConfig,
             ]);
         }
 
@@ -214,6 +229,7 @@ class SocialController extends Controller
             'connectionMap' => $connectionMap,
             'adsEnabled' => $adsEnabled,
             'adsCode' => $adsCode,
+            'adsConfig' => $adsConfig,
         ]);
     }
 

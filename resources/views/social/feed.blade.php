@@ -77,6 +77,14 @@
         $recommendedUsers = $recommendedUsers ?? collect();
         $adsEnabled = $adsEnabled ?? false;
         $adsCode = $adsCode ?? '';
+        
+        // AdSense config
+        $adsConfig = $adsConfig ?? [];
+        $adsensePublisherId = $adsConfig['publisherId'] ?? '';
+        $adsenseSlotId = $adsConfig['slotId'] ?? '';
+        $adsenseFormat = $adsConfig['format'] ?? 'auto';
+        $adsenseFrequency = (int) ($adsConfig['frequency'] ?? 5);
+        $hasAdsense = !empty($adsensePublisherId) && !empty($adsenseSlotId);
     @endphp
 
     <div class="bg-gray-100 min-h-screen {{ $isAdminContext ? 'pt-0' : 'pt-4' }}">
@@ -246,12 +254,14 @@
                                 @endphp
                                 <div class="flex justify-between items-start mb-3">
                                     <div class="flex items-center gap-3">
-                                        <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
-                                            <img src="{{ $postAvatar }}" alt="Avatar" class="w-10 h-10 object-cover"
+                                        <a href="{{ route('social.profile', $post->user->email) }}" class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0 block">
+                                            <img src="{{ $postAvatar }}" alt="Avatar" class="w-10 h-10 object-cover hover:opacity-80 transition"
                                                 onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                        </div>
+                                        </a>
                                         <div>
-                                            <h4 class="font-bold text-gray-900">{{ $post->user->name }}</h4>
+                                            <a href="{{ route('social.profile', $post->user->email) }}" class="font-bold text-gray-900 hover:text-blue-600 transition">
+                                                {{ $post->user->name }}
+                                            </a>
                                             <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
                                         </div>
                                     </div>
@@ -310,7 +320,11 @@
                                 </div>
 
                                 <div class="prose max-w-none text-gray-800 mb-4">
-                                    {!! nl2br(e($post->content)) !!}
+                                    {!! preg_replace(
+                                        '/(https?:\/\/[^\s<>"]+)/i',
+                                        '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline break-all">$1</a>',
+                                        nl2br(e($post->content))
+                                    ) !!}
                                 </div>
 
                                 @if($post->media->isNotEmpty())
@@ -497,9 +511,19 @@
                                     </form>
                                 @endauth
                             </div>
-                            @if(!empty($adsEnabled) && !empty($adsCode) && $loop->iteration % 3 === 0)
-                                <div class="bg-white rounded-lg shadow p-4">
-                                    {!! $adsCode !!}
+                            @if($adsEnabled && $loop->iteration % $adsenseFrequency === 0)
+                                <div class="bg-white rounded-lg shadow p-4 ad-container">
+                                    @if($hasAdsense)
+                                        <ins class="adsbygoogle"
+                                             style="display:block"
+                                             data-ad-client="{{ $adsensePublisherId }}"
+                                             data-ad-slot="{{ $adsenseSlotId }}"
+                                             data-ad-format="{{ $adsenseFormat }}"
+                                             data-full-width-responsive="true"></ins>
+                                        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                                    @elseif(!empty($adsCode))
+                                        {!! $adsCode !!}
+                                    @endif
                                 </div>
                             @endif
                         @empty

@@ -2133,11 +2133,77 @@
                             value="1" {{ ($settings['ads_enabled'] ?? 0) ? 'checked' : '' }}>
                         <label class="custom-control-label" for="ads_enabled">Exibir anúncios entre postagens</label>
                     </div>
+
+                    <div class="card card-outline card-warning mt-3 mb-3">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fab fa-google mr-1"></i> Google AdSense</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                <strong>Como configurar:</strong>
+                                <ol class="pl-3 mb-0 mt-2 small">
+                                    <li>Acesse <a href="https://www.google.com/adsense/" target="_blank" rel="noopener">google.com/adsense</a> e crie/acesse sua conta.</li>
+                                    <li>Adicione seu site e aguarde aprovação.</li>
+                                    <li>Crie um bloco de anúncios (Display, Feed ou In-article).</li>
+                                    <li>Copie o <strong>data-ad-client</strong> (ex: ca-pub-1234567890) e <strong>data-ad-slot</strong> (ex: 9876543210).</li>
+                                    <li>Cole nos campos abaixo.</li>
+                                </ol>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>AdSense Publisher ID (data-ad-client)</label>
+                                        <input name="adsense_publisher_id" class="form-control"
+                                            value="{{ $settings['adsense_publisher_id'] ?? '' }}"
+                                            placeholder="ca-pub-1234567890123456">
+                                        <small class="text-muted">Começa com <code>ca-pub-</code></small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>AdSense Slot ID (data-ad-slot)</label>
+                                        <input name="adsense_slot_id" class="form-control"
+                                            value="{{ $settings['adsense_slot_id'] ?? '' }}"
+                                            placeholder="1234567890">
+                                        <small class="text-muted">Número do bloco de anúncios.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Formato do anúncio</label>
+                                        <select name="adsense_format" class="form-control">
+                                            @php($adsFormat = $settings['adsense_format'] ?? 'auto')
+                                            <option value="auto" {{ $adsFormat === 'auto' ? 'selected' : '' }}>Automático (responsivo)</option>
+                                            <option value="fluid" {{ $adsFormat === 'fluid' ? 'selected' : '' }}>Fluido (in-feed)</option>
+                                            <option value="rectangle" {{ $adsFormat === 'rectangle' ? 'selected' : '' }}>Retângulo</option>
+                                            <option value="horizontal" {{ $adsFormat === 'horizontal' ? 'selected' : '' }}>Horizontal</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Posição dos anúncios</label>
+                                        <select name="adsense_frequency" class="form-control">
+                                            @php($adsFreq = (int) ($settings['adsense_frequency'] ?? 5))
+                                            <option value="3" {{ $adsFreq === 3 ? 'selected' : '' }}>A cada 3 postagens</option>
+                                            <option value="5" {{ $adsFreq === 5 ? 'selected' : '' }}>A cada 5 postagens</option>
+                                            <option value="7" {{ $adsFreq === 7 ? 'selected' : '' }}>A cada 7 postagens</option>
+                                            <option value="10" {{ $adsFreq === 10 ? 'selected' : '' }}>A cada 10 postagens</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
-                        <label>Código HTML/JS do anúncio</label>
+                        <label>Código HTML/JS personalizado (opcional)</label>
                         <textarea name="ads_code_html" class="form-control" rows="6"
-                            placeholder="Cole aqui o código do Google Ads">{{ $settings['ads_code_html'] ?? '' }}</textarea>
-                        <small class="text-muted">Renderizado entre postagens no feed da comunidade.</small>
+                            placeholder="Cole aqui código personalizado se não usar AdSense acima">{{ $settings['ads_code_html'] ?? '' }}</textarea>
+                        <small class="text-muted">Se preferir, cole código de outras redes de anúncios. Se configurar o AdSense acima, este campo é opcional.</small>
                     </div>
 
                     <hr>
