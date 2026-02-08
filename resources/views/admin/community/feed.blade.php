@@ -98,8 +98,19 @@
                 <div class="card-body">
                     <p class="text-muted">Sugestoes de membros para voce:</p>
                     @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
+                        @php
+                            $connectionMap = $connectionMap ?? [];
+                            $authUserId = auth()->id();
+                        @endphp
                         <ul class="list-unstyled mb-0">
                             @foreach($recommendedUsers as $user)
+                                @php
+                                    $connection = $connectionMap[$user->id] ?? null;
+                                    $isPending = $connection && $connection->status === 'pending';
+                                    $isConnected = $connection && $connection->status === 'accepted';
+                                    $isRequester = $connection && $authUserId && $connection->requester_id === $authUserId;
+                                    $pendingTime = $connection ? $connection->created_at->diffForHumans() : '';
+                                @endphp
                                 <li class="d-flex align-items-center justify-content-between py-2">
                                     <div class="d-flex align-items-center">
                                         <a class="mr-2" href="{{ route('social.profile', $user->id) }}">
@@ -128,10 +139,30 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <form action="{{ route('connection.connect', $user) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-outline-primary">Conectar</button>
-                                    </form>
+                                    <div class="text-right">
+                                        @if($isConnected)
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
+                                                Conectado
+                                            </button>
+                                        @elseif($isPending && $isRequester)
+                                            <div class="text-muted text-xs">Pendente ha {{ $pendingTime }}</div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger mt-1"
+                                                onclick="cancelInvite({{ $user->id }})">
+                                                Cancelar
+                                            </button>
+                                        @elseif($isPending)
+                                            <div class="text-muted text-xs">Solicitacao recebida</div>
+                                            <button type="button" class="btn btn-sm btn-outline-success mt-1"
+                                                onclick="acceptInvite({{ $user->id }})">
+                                                Aceitar
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                onclick="requestInvite({{ $user->id }})">
+                                                Conectar
+                                            </button>
+                                        @endif
+                                    </div>
                                 </li>
                             @endforeach
                         </ul>
@@ -143,3 +174,102 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        const csrfToken = '{{ csrf_token() }}';
+
+        function requestInvite(userId) {
+            Swal.fire({
+                title: 'Conectar com este usuario?',
+                text: 'Voce enviara uma solicitacao de conexao.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#1F5EDB',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, conectar!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                fetch(`/connect/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Enviado!', data.message, 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Ops!', data.message, 'warning');
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire('Ops!', 'Erro ao conectar.', 'error');
+                    });
+            });
+        }
+
+        function cancelInvite(userId) {
+            Swal.fire({
+                title: 'Cancelar solicitacao?',
+                text: 'Voce deseja cancelar o convite enviado?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, cancelar',
+                cancelButtonText: 'Voltar'
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                fetch(`/connection/remove/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Cancelado!', data.message, 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Ops!', data.message, 'warning');
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire('Ops!', 'Erro ao cancelar.', 'error');
+                    });
+            });
+        }
+
+        function acceptInvite(userId) {
+            fetch(`/connection/accept/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Conexao aceita!', data.message, 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire('Ops!', data.message, 'warning');
+                    }
+                })
+                .catch(() => {
+                    Swal.fire('Ops!', 'Erro ao aceitar.', 'error');
+                });
+        }
+    </script>
+@endpush
