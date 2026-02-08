@@ -255,7 +255,10 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
         Route::post('/post', [\App\Http\Controllers\SocialController::class, 'storePost'])->name('social.post.store');
         Route::post('/post/{post}/react', [\App\Http\Controllers\SocialController::class, 'toggleReaction'])->name('social.post.react');
         Route::post('/post/{post}/comment', [\App\Http\Controllers\SocialController::class, 'storeComment'])->name('social.post.comment');
+        Route::delete('/comment/{comment}', [\App\Http\Controllers\SocialController::class, 'destroyComment'])->name('social.comment.destroy');
         Route::post('/post/{post}/share', [\App\Http\Controllers\SocialController::class, 'sharePost'])->name('social.post.share');
+        Route::post('/post/{post}/share-to-user', [\App\Http\Controllers\SocialController::class, 'sharePostToUser'])->name('social.post.share.user');
+        Route::post('/post/{post}/report', [\App\Http\Controllers\SocialController::class, 'reportPost'])->name('social.post.report');
         Route::delete('/post/{post}', [\App\Http\Controllers\SocialController::class, 'destroyPost'])->name('social.post.destroy');
     });
 

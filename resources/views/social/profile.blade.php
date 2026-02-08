@@ -18,18 +18,21 @@
  *
  * -----------------------------------------------------------------------------
  * DIREITOS AUTORAIS:
- * Este software, incluindo seu código-fonte, estrutura, banco de dados,
- * layout, funcionalidades, lógica de programação e documentação associada,
- * é protegido pelas leis brasileiras de direitos autorais (Lei nº 9.610/98)
- * e demais legislações internacionais aplicáveis.
- *
- * -----------------------------------------------------------------------------
- * PROPRIEDADE INTELECTUAL:
- * Todo o conteúdo deste sistema é de propriedade exclusiva do autor,
- * sendo proibida a reprodução total ou parcial, modificação,
- * engenharia reversa, redistribuição, sublicenciamento,
- * comercialização ou qualquer forma de exploração sem autorização
- * expressa e formal do titular dos direitos.
+                            <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
+                                onclick="togglePanel('share-{{ $post->id }}')">
+                                <i class="fas fa-share"></i> Compartilhar
+                            </button>
+
+                            @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                <form action="{{ route('social.post.destroy', $post) }}" method="POST"
+                                    onsubmit="return confirm('Excluir esta publicacao?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="flex items-center gap-2 text-red-500 hover:text-red-700">
+                                        <i class="fas fa-trash"></i> Excluir
+                                    </button>
+                                </form>
+                            @endif
  *
  * -----------------------------------------------------------------------------
  * LICENÇA DE USO:
@@ -65,6 +68,9 @@
 @section('title', $user->name . ' - Perfil UNN')
 
 @section('content')
+    @php
+        $shareTargets = $shareTargets ?? collect();
+    @endphp
     <div class="bg-gray-100 min-h-screen">
         <!-- Cover & Info -->
         <!-- Cover & Info -->
@@ -315,13 +321,14 @@
                 <h3 class="font-bold text-xl text-gray-800">Publicações</h3>
 
                 @forelse($posts as $post)
-                    <div class="bg-white rounded-lg shadow p-4">
+                    <div class="bg-white rounded-lg shadow p-4" id="post-{{ $post->id }}">
                         @php
                             $viewerId = Auth::id();
                             $hasLiked = $viewerId ? $post->reactions->firstWhere('user_id', $viewerId) : null;
                             $likeCount = $post->reactions->count();
                             $commentCount = $post->comments->count();
                             $postAvatar = $post->user->profile_photo_url ?? asset('img/default-user.svg');
+                            $postLink = route('social.feed') . '#post-' . $post->id;
                         @endphp
                         <div class="flex justify-between items-start mb-3">
                             <div class="flex items-center gap-3">
@@ -334,16 +341,10 @@
                                     <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
-                            @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                <form action="{{ route('social.post.destroy', $post) }}" method="POST"
-                                    onsubmit="return confirm('Excluir esta publicacao?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            @endif
+                            <button type="button" class="text-gray-400 hover:text-gray-600" title="Mais opcoes"
+                                onclick="togglePanel('report-{{ $post->id }}')">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
                         </div>
                         <div class="prose max-w-none text-gray-800">
                             {!! nl2br(e($post->content)) !!}
@@ -376,23 +377,79 @@
                                 <i class="far fa-comment"></i> Comentar
                             </button>
 
-                            @auth
-                                <form action="{{ route('social.post.share', $post) }}" method="POST">
+                            <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
+                                onclick="togglePanel('share-{{ $post->id }}')">
+                                <i class="fas fa-share"></i> Compartilhar
+                            </button>
+
+                            @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                <form action="{{ route('social.post.destroy', $post) }}" method="POST"
+                                    onsubmit="return confirm('Excluir esta publicacao?');">
                                     @csrf
-                                    <button type="submit" class="flex items-center gap-2 hover:text-blue-600 transition">
-                                        <i class="fas fa-share"></i> Compartilhar
+                                    @method('DELETE')
+                                    <button type="submit" class="flex items-center gap-2 text-red-500 hover:text-red-700">
+                                        <i class="fas fa-trash"></i> Excluir
                                     </button>
                                 </form>
-                            @else
-                                <span class="flex items-center gap-2">
-                                    <i class="fas fa-share"></i> Compartilhar
-                                </span>
-                            @endauth
+                            @endif
                         </div>
 
                         <div class="mt-2 text-xs text-gray-400 flex gap-3">
                             <span>{{ $likeCount }} curtida{{ $likeCount === 1 ? '' : 's' }}</span>
                             <span>{{ $commentCount }} comentario{{ $commentCount === 1 ? '' : 's' }}</span>
+                        </div>
+
+                        <div id="share-{{ $post->id }}" class="hidden mt-3 border-t pt-3 space-y-3">
+                            <div class="flex flex-wrap gap-3 text-sm">
+                                <button type="button" class="text-blue-600" data-copy="{{ $postLink }}"
+                                    onclick="copyPostLink(this)">Copiar link</button>
+                                <a class="text-green-600" target="_blank" rel="noopener"
+                                    href="https://wa.me/?text={{ urlencode($postLink) }}">WhatsApp</a>
+                                <a class="text-blue-500" target="_blank" rel="noopener"
+                                    href="https://t.me/share/url?url={{ urlencode($postLink) }}">Telegram</a>
+                                <a class="text-blue-700" target="_blank" rel="noopener"
+                                    href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($postLink) }}">Facebook</a>
+                            </div>
+
+                            @auth
+                                <form action="{{ route('social.post.share', $post) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="text-sm text-gray-600 hover:text-blue-600">
+                                        Compartilhar na comunidade
+                                    </button>
+                                </form>
+
+                                @if($shareTargets->isNotEmpty())
+                                    <form action="{{ route('social.post.share.user', $post) }}" method="POST"
+                                        class="flex flex-col gap-2">
+                                        @csrf
+                                        <div class="flex flex-wrap gap-2">
+                                            <select name="target_user_id" class="border border-gray-200 rounded px-3 py-2 text-sm">
+                                                @foreach($shareTargets as $target)
+                                                    <option value="{{ $target->id }}">{{ $target->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <input type="text" name="message" placeholder="Mensagem opcional"
+                                                class="flex-1 border border-gray-200 rounded px-3 py-2 text-sm">
+                                            <button type="submit"
+                                                class="bg-blue-600 text-white px-3 py-2 rounded text-sm">Enviar</button>
+                                        </div>
+                                    </form>
+                                @endif
+                            @endauth
+                        </div>
+
+                        <div id="report-{{ $post->id }}" class="hidden mt-3 border-t pt-3">
+                            @auth
+                                <form action="{{ route('social.post.report', $post) }}" method="POST"
+                                    class="flex flex-col gap-2">
+                                    @csrf
+                                    <textarea name="reason" rows="2" required
+                                        placeholder="Descreva o motivo da denuncia"
+                                        class="border border-gray-200 rounded px-3 py-2 text-sm"></textarea>
+                                    <button type="submit" class="text-sm text-red-600">Denunciar</button>
+                                </form>
+                            @endauth
                         </div>
 
                         @if($post->comments->isNotEmpty())
@@ -412,7 +469,17 @@
                                                 onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                                         </div>
                                         <div class="bg-gray-50 rounded-lg px-3 py-2 w-full">
-                                            <p class="text-xs font-semibold text-gray-700">{{ $commentName }}</p>
+                                            <div class="flex justify-between items-center">
+                                                <p class="text-xs font-semibold text-gray-700">{{ $commentName }}</p>
+                                                @if(Auth::check() && (Auth::id() === $comment->user_id || Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                    <form action="{{ route('social.comment.destroy', $comment) }}" method="POST"
+                                                        onsubmit="return confirm('Excluir este comentario?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-xs text-red-500">Excluir</button>
+                                                    </form>
+                                                @endif
+                                            </div>
                                             <p class="text-sm text-gray-700">{{ $comment->content }}</p>
                                         </div>
                                     </div>
@@ -497,3 +564,30 @@
     <!-- Floating Chat Script -->
     <script src="{{ asset('js/floating-chat.js') }}"></script>
 @endsection
+
+@push('scripts')
+    <script>
+        function togglePanel(id) {
+            const panel = document.getElementById(id);
+            if (!panel) {
+                return;
+            }
+
+            panel.classList.toggle('hidden');
+        }
+
+        function copyPostLink(button) {
+            const link = button.getAttribute('data-copy');
+            if (!link) {
+                return;
+            }
+
+            navigator.clipboard.writeText(link).then(() => {
+                button.textContent = 'Link copiado';
+                setTimeout(() => {
+                    button.textContent = 'Copiar link';
+                }, 1500);
+            });
+        }
+    </script>
+@endpush

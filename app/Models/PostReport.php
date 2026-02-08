@@ -64,23 +64,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PostComment extends Model
+class PostReport extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'post_id',
+        'user_id',
+        'reason',
+        'status',
+        'ip_address',
+        'user_agent',
+    ];
+
     public function post()
     {
         return $this->belongsTo(Post::class);
     }
 
-    protected $fillable = ['post_id', 'user_id', 'parent_id', 'content'];
-
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function replies()
-    {
-        return $this->hasMany(PostComment::class, 'parent_id');
     }
 }

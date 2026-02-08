@@ -66,9 +66,12 @@ use App\Models\Post;
 use App\Models\PostComment;
 use App\Models\PostMedia;
 use App\Models\PostReaction;
+use App\Models\PostReport;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SocialController extends Controller
 {
@@ -101,7 +104,7 @@ class SocialController extends Controller
             ->values()
             ->toArray();
 
-        $posts = Post::with(['user', 'comments.user', 'reactions'])
+        $posts = Post::with(['user', 'sharedTo', 'comments.user', 'reactions', 'media'])
             ->whereNotIn('user_id', $blockedUserIds)
             ->where(function ($query) use ($connectedUserIds) {
                 $query->where('visibility', 'public')
@@ -155,10 +158,17 @@ class SocialController extends Controller
                 1
             );
 
-            return view('social.feed', ['posts' => $posts, 'isDemo' => true]);
+            return view('social.feed', [
+                'posts' => $posts,
+                'isDemo' => true,
+                'shareTargets' => User::whereIn('id', $connectedUserIds)->orderBy('name')->get(['id', 'name']),
+            ]);
         }
 
-        return view('social.feed', compact('posts'));
+        return view('social.feed', [
+            'posts' => $posts,
+            'shareTargets' => User::whereIn('id', $connectedUserIds)->orderBy('name')->get(['id', 'name']),
+        ]);
     }
 
     public function profile($username)
@@ -184,8 +194,11 @@ class SocialController extends Controller
             }
         }
 
-        $postsQuery = Post::with(['user', 'comments.user', 'reactions'])
-            ->where('user_id', $user->id)
+        $postsQuery = Post::with(['user', 'sharedTo', 'comments.user', 'reactions', 'media'])
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->orWhere('shared_to_user_id', $user->id);
+            })
             ->latest();
 
         if (Auth::check() && Auth::id() === $user->id) {
@@ -205,7 +218,30 @@ class SocialController extends Controller
                 ->paginate(10);
         }
 
-        return view('social.profile', compact('user', 'posts'));
+        $shareTargets = [];
+        if (Auth::check()) {
+            $shareTargets = Connection::where('status', 'accepted')
+                ->where(function ($q) {
+                    $q->where('requester_id', Auth::id())->orWhere('requested_id', Auth::id());
+                })
+                ->get()
+                ->map(function ($connection) {
+                    return $connection->requester_id === Auth::id()
+                        ? $connection->requested_id
+                        : $connection->requester_id;
+                })
+                ->unique()
+                ->values()
+                ->toArray();
+        }
+
+        return view('social.profile', [
+            'user' => $user,
+            'posts' => $posts,
+            'shareTargets' => empty($shareTargets)
+                ? collect()
+                : User::whereIn('id', $shareTargets)->orderBy('name')->get(['id', 'name']),
+        ]);
     }
 
     public function storePost(Request $request)
@@ -291,6 +327,20 @@ class SocialController extends Controller
         return back();
     }
 
+    public function destroyComment(PostComment $comment)
+    {
+        $postOwnerId = $comment->post?->user_id;
+
+        if ($comment->user_id !== Auth::id() && $postOwnerId !== Auth::id() && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        PostComment::where('parent_id', $comment->id)->delete();
+        $comment->delete();
+
+        return back()->with('success', 'Comentario removido com sucesso.');
+    }
+
     public function sharePost(Post $post)
     {
         $sharedContent = "Compartilhou de {$post->user->name}:\n\n" . (string) $post->content;
@@ -301,6 +351,70 @@ class SocialController extends Controller
         ]);
 
         return back()->with('success', 'Post compartilhado!');
+    }
+
+    public function sharePostToUser(Request $request, Post $post)
+    {
+        $validated = $request->validate([
+            'target_user_id' => 'required|integer|exists:users,id',
+            'message' => 'nullable|string|max:500',
+        ]);
+
+        $targetUserId = (int) $validated['target_user_id'];
+
+        if (!Auth::user()->isConnectedWith($targetUserId)) {
+            abort(403);
+        }
+
+        $message = trim((string) ($validated['message'] ?? ''));
+        $sharedContent = "Compartilhou de {$post->user->name}:\n\n" . (string) $post->content;
+        $content = $message !== '' ? ($message . "\n\n" . $sharedContent) : $sharedContent;
+
+        Auth::user()->posts()->create([
+            'content' => $content,
+            'visibility' => 'connections',
+            'shared_to_user_id' => $targetUserId,
+        ]);
+
+        return back()->with('success', 'Post compartilhado na linha do tempo do membro.');
+    }
+
+    public function reportPost(Request $request, Post $post)
+    {
+        $validated = $request->validate([
+            'reason' => 'required|string|max:1000',
+        ]);
+
+        $report = PostReport::create([
+            'post_id' => $post->id,
+            'user_id' => Auth::id(),
+            'reason' => $validated['reason'],
+            'status' => 'open',
+            'ip_address' => $request->ip(),
+            'user_agent' => (string) $request->userAgent(),
+        ]);
+
+        $adminEmails = User::whereIn('role', ['admin', 'superadmin'])
+            ->whereNotNull('email')
+            ->pluck('email')
+            ->unique()
+            ->values()
+            ->all();
+
+        if (!empty($adminEmails)) {
+            try {
+                Mail::raw(
+                    "Denuncia de post #{$post->id}\nAutor: {$post->user->name}\nDenunciante: " . Auth::user()->name . "\nMotivo: {$report->reason}",
+                    function ($message) use ($adminEmails) {
+                        $message->to($adminEmails)->subject('Denuncia de post na comunidade');
+                    }
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Falha ao notificar admins sobre denuncia de post: ' . $e->getMessage());
+            }
+        }
+
+        return back()->with('success', 'Denuncia enviada. Obrigado por ajudar a comunidade.');
     }
 
     public function destroyPost(Post $post)

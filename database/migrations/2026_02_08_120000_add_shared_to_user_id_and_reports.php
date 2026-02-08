@@ -59,28 +59,42 @@
  * =============================================================================
  */
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class PostComment extends Model
+return new class extends Migration
 {
-    use HasFactory;
-    public function post()
+    public function up()
     {
-        return $this->belongsTo(Post::class);
+        Schema::table('posts', function (Blueprint $table) {
+            $table->foreignId('shared_to_user_id')
+                ->nullable()
+                ->after('user_id')
+                ->constrained('users')
+                ->nullOnDelete();
+        });
+
+        Schema::create('post_reports', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('post_id')->constrained('posts')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->text('reason');
+            $table->string('status')->default('open');
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->timestamps();
+
+            $table->index(['post_id', 'status']);
+        });
     }
 
-    protected $fillable = ['post_id', 'user_id', 'parent_id', 'content'];
-
-    public function user()
+    public function down()
     {
-        return $this->belongsTo(User::class);
-    }
+        Schema::dropIfExists('post_reports');
 
-    public function replies()
-    {
-        return $this->hasMany(PostComment::class, 'parent_id');
+        Schema::table('posts', function (Blueprint $table) {
+            $table->dropConstrainedForeignId('shared_to_user_id');
+        });
     }
-}
+};

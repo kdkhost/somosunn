@@ -68,13 +68,18 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'content', 'visibility', 'is_pinned'];
+    protected $fillable = ['user_id', 'shared_to_user_id', 'content', 'visibility', 'is_pinned'];
 
     protected $with = ['user', 'media', 'reactions', 'comments.user'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function sharedTo()
+    {
+        return $this->belongsTo(User::class, 'shared_to_user_id');
     }
 
     public function media()
@@ -90,5 +95,10 @@ class Post extends Model
     public function comments()
     {
         return $this->hasMany(PostComment::class)->whereNull('parent_id')->orderBy('created_at', 'asc');
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(PostReport::class);
     }
 }
