@@ -65,87 +65,71 @@
 @section('page_title', 'Mentorias Disponíveis')
 
 @section('content')
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card card-success card-outline">
-                <div class="card-body d-flex align-items-center justify-content-between">
-                    <div>
-                        <h2 class="h5 font-weight-bold mb-1">Pronto para o próximo nível?</h2>
-                        <p class="text-muted mb-0">Escolha uma mentoria e acelere seu crescimento com orientação prática de especialistas.</p>
-                    </div>
-                    <div class="d-none d-md-block text-success">
-                        <i class="fas fa-users-cog fa-3x"></i>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Mentorias Disponiveis</h3>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Escolha uma mentoria e acelere seu crescimento com orientacao pratica de especialistas.</p>
+
+            <form method="GET" class="mb-3">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="O que voce deseja aprender hoje?"
+                        value="{{ $search ?? '' }}">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+            </form>
 
-    <form method="GET" class="mb-4">
-        <div class="input-group input-group-lg">
-            <input type="text" name="q" class="form-control" placeholder="O que você deseja aprender hoje?"
-                value="{{ $search ?? '' }}">
-            <div class="input-group-append">
-                <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
-            </div>
-        </div>
-    </form>
+            <div class="row">
+                @forelse($items as $item)
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge badge-success">
+                                        R$ {{ number_format((float) $item->price, 2, ',', '.') }}
+                                    </span>
+                                    <span class="text-xs text-muted text-uppercase">{{ $item->mentor?->name ?? 'Mentor UNN' }}</span>
+                                </div>
 
-    <div class="row">
-        @forelse($items as $item)
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="badge badge-success">
-                                R$ {{ number_format((float) $item->price, 2, ',', '.') }}
-                            </div>
-                            <span class="text-xs text-muted font-weight-bold text-uppercase"
-                                style="font-size: 0.75rem;">{{ $item->mentor?->name ?? 'Mentor UNN' }}</span>
-                        </div>
+                                <h3 class="h6 font-weight-bold mb-2 text-dark">{{ $item->title }}</h3>
+                                <p class="text-muted small">
+                                    {{ \Illuminate\Support\Str::limit(strip_tags((string) $item->description), 140) }}
+                                </p>
 
-                        <h3 class="h5 font-weight-bold mb-3 text-dark" style="min-height: 3rem;">{{ $item->title }}</h3>
-                        <p class="text-muted small mb-4" style="min-height: 4.5rem;">
-                            {{ \Illuminate\Support\Str::limit(strip_tags((string) $item->description), 140) }}
-                        </p>
-
-                        <div class="row mb-4">
-                            <div class="col-6">
-                                <div class="bg-light rounded p-2 text-center">
-                                    <small class="d-block text-muted font-weight-bold text-uppercase"
-                                        style="font-size: 0.65rem;">Vagas</small>
-                                    <span class="font-weight-bold">{{ $item->slots ?: 'Ilimitadas' }}</span>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="bg-light rounded p-2 text-center">
+                                            <small class="d-block text-muted text-uppercase">Vagas</small>
+                                            <span class="font-weight-bold">{{ $item->slots ?: 'Ilimitadas' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="bg-light rounded p-2 text-center">
+                                            <small class="d-block text-muted text-uppercase">Formato</small>
+                                            <span class="font-weight-bold">Premium</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <div class="bg-light rounded p-2 text-center">
-                                    <small class="d-block text-muted font-weight-bold text-uppercase"
-                                        style="font-size: 0.65rem;">Formato</small>
-                                    <span class="font-weight-bold">Premium</span>
-                                </div>
+                            <div class="card-footer bg-white">
+                                <a href="{{ route('mentorships.show', $item->id) }}" class="btn btn-primary btn-block">
+                                    <i class="fas fa-external-link-alt mr-1"></i> Ver Detalhes
+                                </a>
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer bg-white">
-                        <a href="{{ route('mentorships.show', $item->id) }}"
-                            class="btn btn-primary btn-block">
-                            <i class="fas fa-external-link-alt mr-1"></i> Ver Detalhes
-                        </a>
-                    </div>
-                </div>
+                @empty
+                    <div class="col-12 text-center py-4 text-muted">Nenhuma mentoria encontrada.</div>
+                @endforelse
             </div>
-        @empty
-            <div class="col-12 text-center py-5">
-                <div class="callout callout-info">
-                    <h5 class="mb-1">Nenhuma mentoria encontrada.</h5>
-                    <p class="mb-0">Tente buscar por termos diferentes ou confira novamente em breve.</p>
-                </div>
-            </div>
-        @endforelse
-    </div>
 
-    <div class="d-flex justify-content-center mt-4">
-        {{ $items->links() }}
+            <div class="d-flex justify-content-center mt-3">
+                {{ $items->links() }}
+            </div>
+        </div>
     </div>
 
 @endsection
