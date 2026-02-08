@@ -334,10 +334,27 @@
                                     <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
+                            @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                <form action="{{ route('social.post.destroy', $post) }}" method="POST"
+                                    onsubmit="return confirm('Excluir esta publicacao?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-500 hover:text-red-700">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                         <div class="prose max-w-none text-gray-800">
                             {!! nl2br(e($post->content)) !!}
                         </div>
+
+                        @if($post->media->isNotEmpty())
+                            <div class="mt-3">
+                                <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
+                                    class="w-full rounded-lg object-cover">
+                            </div>
+                        @endif
 
                         <div class="flex items-center justify-between pt-3 mt-3 border-t text-sm text-gray-500">
                             @auth
@@ -354,9 +371,10 @@
                                 </span>
                             @endauth
 
-                            <span class="flex items-center gap-2">
+                            <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
+                                onclick="document.getElementById('comment-{{ $post->id }}').focus();">
                                 <i class="far fa-comment"></i> Comentar
-                            </span>
+                            </button>
 
                             @auth
                                 <form action="{{ route('social.post.share', $post) }}" method="POST">
@@ -406,7 +424,8 @@
                             <form action="{{ route('social.post.comment', $post) }}" method="POST"
                                 class="mt-3 flex gap-2">
                                 @csrf
-                                <input type="text" name="content" placeholder="Escreva um comentario..."
+                                <input type="text" name="content" id="comment-{{ $post->id }}"
+                                    placeholder="Escreva um comentario..."
                                     class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                                 <button type="submit"
                                     class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition">

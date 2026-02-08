@@ -256,6 +256,7 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
         Route::post('/post/{post}/react', [\App\Http\Controllers\SocialController::class, 'toggleReaction'])->name('social.post.react');
         Route::post('/post/{post}/comment', [\App\Http\Controllers\SocialController::class, 'storeComment'])->name('social.post.comment');
         Route::post('/post/{post}/share', [\App\Http\Controllers\SocialController::class, 'sharePost'])->name('social.post.share');
+        Route::delete('/post/{post}', [\App\Http\Controllers\SocialController::class, 'destroyPost'])->name('social.post.destroy');
     });
 
     // Chat (Feature: chat)

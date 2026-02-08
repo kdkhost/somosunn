@@ -124,7 +124,7 @@
                     <!-- Composer -->
                     @auth
                         <div class="bg-white rounded-lg shadow p-4">
-                            <form action="{{ route('social.post.store') }}" method="POST">
+                            <form action="{{ route('social.post.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="flex gap-3">
                                     <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
@@ -132,26 +132,44 @@
                                             onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                                     </div>
                                     <div class="flex-1">
-                                        <textarea name="content" rows="3"
+                                        <textarea name="content" rows="3" id="post-content"
                                             class="w-full border-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 p-3"
                                             placeholder="No que você está pensando?"></textarea>
                                     </div>
                                 </div>
-                                <div class="flex justify-between items-center mt-3 pt-3 border-t">
-                                    <div class="flex gap-2">
-                                        <button type="button"
-                                            class="text-gray-500 hover:text-blue-600 p-2 rounded hover:bg-gray-100">
-                                            <i class="fas fa-image"></i>
-                                        </button>
-                                        <button type="button"
-                                            class="text-gray-500 hover:text-blue-600 p-2 rounded hover:bg-gray-100">
-                                            <i class="fas fa-smile"></i>
+                                <div class="flex flex-col gap-3 mt-3 pt-3 border-t">
+                                    <div class="flex flex-wrap items-center justify-between gap-3">
+                                        <div class="flex gap-2">
+                                            <input type="file" name="media" id="post-media" accept="image/*" class="hidden">
+                                            <button type="button"
+                                                class="text-gray-500 hover:text-blue-600 p-2 rounded hover:bg-gray-100"
+                                                title="Adicionar imagem"
+                                                onclick="document.getElementById('post-media').click();">
+                                                <i class="fas fa-image"></i>
+                                            </button>
+                                            <button type="button"
+                                                class="text-gray-500 hover:text-blue-600 p-2 rounded hover:bg-gray-100"
+                                                title="Inserir emoji"
+                                                onclick="window.insertPostEmoji && window.insertPostEmoji();">
+                                                <i class="fas fa-smile"></i>
+                                            </button>
+                                        </div>
+
+                                        <div class="flex items-center gap-2">
+                                            <label for="visibility" class="text-sm text-gray-500">Visibilidade</label>
+                                            <select name="visibility" id="visibility"
+                                                class="border border-gray-200 rounded-full px-3 py-1 text-sm">
+                                                <option value="public">Publico</option>
+                                                <option value="connections">Somente seguidores</option>
+                                                <option value="community" selected>Somente comunidade</option>
+                                            </select>
+                                        </div>
+
+                                        <button type="submit"
+                                            class="bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition">
+                                            Publicar
                                         </button>
                                     </div>
-                                    <button type="submit"
-                                        class="bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition">
-                                        Publicar
-                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -178,12 +196,31 @@
                                         <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
                                     </div>
                                 </div>
-                                <button class="text-gray-400 hover:text-gray-600"><i class="fas fa-ellipsis-h"></i></button>
+                                <div class="flex items-center gap-2">
+                                    @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                        <form action="{{ route('social.post.destroy', $post) }}" method="POST"
+                                            onsubmit="return confirm('Excluir esta publicacao?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                    <button class="text-gray-400 hover:text-gray-600"><i class="fas fa-ellipsis-h"></i></button>
+                                </div>
                             </div>
 
                             <div class="prose max-w-none text-gray-800 mb-4">
                                 {!! nl2br(e($post->content)) !!}
                             </div>
+
+                            @if($post->media->isNotEmpty())
+                                <div class="mb-4">
+                                    <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
+                                        class="w-full rounded-lg object-cover">
+                                </div>
+                            @endif
 
                             <!-- Reactions / Actions -->
                             <div class="flex items-center justify-between pt-3 border-t text-sm text-gray-500">
@@ -201,9 +238,10 @@
                                     </span>
                                 @endauth
 
-                                <span class="flex items-center gap-2">
+                                <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
+                                    onclick="document.getElementById('comment-{{ $post->id }}').focus();">
                                     <i class="far fa-comment"></i> Comentar
-                                </span>
+                                </button>
 
                                 @auth
                                     <form action="{{ route('social.post.share', $post) }}" method="POST">
@@ -253,7 +291,8 @@
                                 <form action="{{ route('social.post.comment', $post) }}" method="POST"
                                     class="mt-3 flex gap-2">
                                     @csrf
-                                    <input type="text" name="content" placeholder="Escreva um comentario..."
+                                    <input type="text" name="content" id="comment-{{ $post->id }}"
+                                        placeholder="Escreva um comentario..."
                                         class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                                     <button type="submit"
                                         class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition">
@@ -285,3 +324,23 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        window.insertPostEmoji = function () {
+            const textarea = document.getElementById('post-content');
+            if (!textarea) {
+                return;
+            }
+
+            const emoji = '😊';
+            const start = textarea.selectionStart || 0;
+            const end = textarea.selectionEnd || 0;
+            const value = textarea.value || '';
+
+            textarea.value = value.slice(0, start) + emoji + value.slice(end);
+            textarea.focus();
+            textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+        };
+    </script>
+@endpush

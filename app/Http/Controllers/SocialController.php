@@ -64,6 +64,7 @@ namespace App\Http\Controllers;
 use App\Models\Connection;
 use App\Models\Post;
 use App\Models\PostComment;
+use App\Models\PostMedia;
 use App\Models\PostReaction;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -86,8 +87,31 @@ class SocialController extends Controller
             $q->where('requester_id', Auth::id())->orWhere('requested_id', Auth::id());
         })->where('status', 'blocked')->pluck('requester_id', 'requested_id')->flatten()->unique()->toArray();
 
+        $connectedUserIds = Connection::where('status', 'accepted')
+            ->where(function ($q) {
+                $q->where('requester_id', Auth::id())->orWhere('requested_id', Auth::id());
+            })
+            ->get()
+            ->map(function ($connection) {
+                return $connection->requester_id === Auth::id()
+                    ? $connection->requested_id
+                    : $connection->requester_id;
+            })
+            ->unique()
+            ->values()
+            ->toArray();
+
         $posts = Post::with(['user', 'comments.user', 'reactions'])
             ->whereNotIn('user_id', $blockedUserIds)
+            ->where(function ($query) use ($connectedUserIds) {
+                $query->where('visibility', 'public')
+                    ->orWhere('visibility', 'community')
+                    ->orWhere(function ($sub) use ($connectedUserIds) {
+                        $sub->where('visibility', 'connections')
+                            ->whereIn('user_id', $connectedUserIds);
+                    })
+                    ->orWhere('user_id', Auth::id());
+            })
             ->latest()
             ->paginate(10);
 
@@ -160,10 +184,26 @@ class SocialController extends Controller
             }
         }
 
-        $posts = Post::with(['user', 'comments.user', 'reactions'])
+        $postsQuery = Post::with(['user', 'comments.user', 'reactions'])
             ->where('user_id', $user->id)
-            ->latest()
-            ->paginate(10);
+            ->latest();
+
+        if (Auth::check() && Auth::id() === $user->id) {
+            $posts = $postsQuery->paginate(10);
+        } else {
+            $isConnected = Auth::check() ? Auth::user()->isConnectedWith($user->id) : false;
+
+            $posts = $postsQuery
+                ->where(function ($query) use ($isConnected) {
+                    $query->where('visibility', 'public')
+                        ->orWhere('visibility', 'community');
+
+                    if ($isConnected) {
+                        $query->orWhere('visibility', 'connections');
+                    }
+                })
+                ->paginate(10);
+        }
 
         return view('social.profile', compact('user', 'posts'));
     }
@@ -172,12 +212,32 @@ class SocialController extends Controller
     {
         $validated = $request->validate([
             'content' => 'required|string|max:1000',
+            'visibility' => 'required|string|in:public,connections,community',
+            'media' => 'nullable|image|max:2048',
         ]);
 
         $post = Auth::user()->posts()->create([
             'content' => $validated['content'],
-            'visibility' => 'public',
+            'visibility' => $validated['visibility'],
         ]);
+
+        if ($request->hasFile('media') && $request->file('media')->isValid()) {
+            $file = $request->file('media');
+            $filename = 'post_' . $post->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $directory = public_path('uploads/imagens/posts');
+
+            if (!is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            $file->move($directory, $filename);
+
+            PostMedia::create([
+                'post_id' => $post->id,
+                'type' => 'image',
+                'path' => 'uploads/imagens/posts/' . $filename,
+            ]);
+        }
 
         // Gamificação: pontuar publicação (se regra existir)
         try {
@@ -237,9 +297,20 @@ class SocialController extends Controller
 
         Auth::user()->posts()->create([
             'content' => $sharedContent,
-            'visibility' => 'public',
+            'visibility' => 'community',
         ]);
 
         return back()->with('success', 'Post compartilhado!');
+    }
+
+    public function destroyPost(Post $post)
+    {
+        if ($post->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        $post->delete();
+
+        return back()->with('success', 'Publicacao removida com sucesso.');
     }
 }
