@@ -97,6 +97,23 @@
                                         <p class="text-xs text-gray-500">Membro</p>
                                     </div>
                                 </div>
+                                <nav class="space-y-2 mb-4">
+                                    <a href="{{ $feedUrl }}"
+                                        class="w-full flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
+                                        <i class="fas fa-newspaper w-6"></i>
+                                        <span>Feed</span>
+                                    </a>
+                                    <a href="{{ $chatUrl }}"
+                                        class="w-full flex items-center gap-2 text-blue-600 font-medium p-2 bg-blue-50 rounded">
+                                        <i class="fas fa-comments w-6"></i>
+                                        <span>Mensagens</span>
+                                    </a>
+                                    <a href="{{ $profileUrl }}"
+                                        class="w-full flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
+                                        <i class="fas fa-user w-6"></i>
+                                        <span>Meu perfil</span>
+                                    </a>
+                                </nav>
                                 <div class="border-t border-gray-100 pt-4">
                                     <div class="flex items-center justify-between mb-3">
                                         <h3 class="font-bold text-gray-900">Conversas</h3>
@@ -145,9 +162,6 @@
                             <div class="flex items-center gap-3 text-gray-400">
                                 <button type="button" class="hover:text-gray-600" title="Chamar">
                                     <i class="fas fa-phone"></i>
-                                </button>
-                                <button type="button" class="hover:text-gray-600" title="Video">
-                                    <i class="fas fa-video"></i>
                                 </button>
                                 <button type="button" class="hover:text-gray-600" title="Info">
                                     <i class="fas fa-info-circle"></i>
