@@ -11,9 +11,8 @@ class MemberController extends Controller
     public function socialFeed()
     {
         $posts = Post::with('user')->latest()->paginate(10);
-        return view('social.feed', [
+        return view('admin.community.feed', [
             'posts' => $posts,
-            'extends' => 'admin.layouts.app'
         ]);
     }
 
