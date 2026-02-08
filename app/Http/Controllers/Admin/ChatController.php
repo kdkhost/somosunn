@@ -96,6 +96,11 @@ class ChatController extends Controller
 
     public function list()
     {
+        // Se não for requisição AJAX, redireciona para a página de chat
+        if (!request()->expectsJson() && !request()->ajax()) {
+            return redirect()->route('admin.chat.index');
+        }
+
         $conversations = Auth::user()->conversations()
             ->with([
                 'users',
