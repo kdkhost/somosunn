@@ -24,11 +24,14 @@ class PermissionController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:100',
-            'slug' => 'required|string|max:100|unique:roles,slug',
+            'name' => 'required|string|max:100|unique:roles,name',
+            'label' => 'nullable|string|max:100',
             'permissions' => 'array'
         ]);
-        $role = Role::create(['name'=>$data['name'],'slug'=>$data['slug']]);
+        $role = Role::create([
+            'name' => $data['name'],
+            'label' => $data['label'] ?? $data['name'],
+        ]);
         $role->permissions()->sync($data['permissions'] ?? []);
         return response()->json(['redirect'=>route('admin.permissions.index')]);
     }
@@ -42,11 +45,14 @@ class PermissionController extends Controller
     public function update(Request $request, Role $permission)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:100',
-            'slug' => 'required|string|max:100|unique:roles,slug,'.$permission->id,
+            'name' => 'required|string|max:100|unique:roles,name,'.$permission->id,
+            'label' => 'nullable|string|max:100',
             'permissions' => 'array'
         ]);
-        $permission->update(['name'=>$data['name'],'slug'=>$data['slug']]);
+        $permission->update([
+            'name' => $data['name'],
+            'label' => $data['label'] ?? $data['name'],
+        ]);
         $permission->permissions()->sync($data['permissions'] ?? []);
         return response()->json(['redirect'=>route('admin.permissions.index')]);
     }
