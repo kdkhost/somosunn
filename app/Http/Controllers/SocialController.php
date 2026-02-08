@@ -110,8 +110,17 @@ class SocialController extends Controller
         $recommendedUsers = collect();
         if (Auth::check()) {
             $excludedIds = array_unique(array_merge([Auth::id()], $blockedUserIds, $connectedUserIds));
-            $recommendedUsers = User::whereNotIn('id', $excludedIds)
-                ->where('role', '!=', 'superadmin')
+            $recommendedQuery = User::whereNotIn('id', $excludedIds)
+                ->where('role', '!=', 'superadmin');
+
+            if (!Auth::user()->isAdmin()) {
+                $recommendedQuery->where(function ($q) use ($connectedUserIds) {
+                    $q->where('hide_profile', false)
+                        ->orWhereIn('id', $connectedUserIds);
+                });
+            }
+
+            $recommendedUsers = $recommendedQuery
                 ->inRandomOrder()
                 ->limit(5)
                 ->get(['id', 'name']);

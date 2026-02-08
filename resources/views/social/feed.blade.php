@@ -470,13 +470,15 @@
                                 @foreach($recommendedUsers as $user)
                                     <div class="flex items-center justify-between gap-3">
                                         <div class="flex items-center gap-3">
-                                            <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
+                                            <a class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0" href="{{ route('social.profile', $user->id) }}">
                                                 <img src="{{ $user->profile_photo_url }}" alt="Avatar"
                                                     class="w-10 h-10 object-cover"
                                                     onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                            </div>
+                                            </a>
                                             <div>
-                                                <p class="text-sm font-semibold text-gray-800">{{ $user->name }}</p>
+                                                <a href="{{ route('social.profile', $user->id) }}" class="text-sm font-semibold text-gray-800 hover:text-blue-600">
+                                                    {{ $user->name }}
+                                                </a>
                                                 <p class="text-xs text-gray-500">Membro</p>
                                             </div>
                                         </div>

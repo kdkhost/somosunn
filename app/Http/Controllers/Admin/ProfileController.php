@@ -58,6 +58,7 @@ class ProfileController extends Controller
         $data['show_email_public'] = $request->has('show_email_public');
         $data['show_phone_public'] = $request->has('show_phone_public');
         $data['show_address_public'] = $request->has('show_address_public');
+        $data['hide_profile'] = $request->has('hide_profile');
 
         // Upload de foto de perfil
         $uploadedPhotoPath = null;

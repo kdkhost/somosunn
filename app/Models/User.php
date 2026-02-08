@@ -114,7 +114,8 @@ class User extends Authenticatable
         // Privacidade
         'show_email_public',
         'show_phone_public',
-        'show_address_public'
+        'show_address_public',
+        'hide_profile'
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -122,7 +123,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'plan_expires_at' => 'datetime',
-        'social_links' => 'array'
+        'social_links' => 'array',
+        'hide_profile' => 'boolean'
     ];
 
     public function plan()

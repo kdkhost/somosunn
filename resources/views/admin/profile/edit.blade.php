@@ -294,6 +294,17 @@
 
                             <div class="form-group">
                                 <div class="custom-control custom-switch custom-switch-lg">
+                                    <input type="checkbox" class="custom-control-input" id="hideProfile" name="hide_profile" 
+                                           {{ $user->hide_profile ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="hideProfile">
+                                        <strong>Restringir perfil apenas para contatos</strong>
+                                        <small class="d-block text-muted">Nao conectado vera somente uma mensagem de perfil restrito</small>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="custom-control custom-switch custom-switch-lg">
                                     <input type="checkbox" class="custom-control-input" id="showEmail" name="show_email_public" 
                                            {{ $user->show_email_public ? 'checked' : '' }}>
                                     <label class="custom-control-label" for="showEmail">
