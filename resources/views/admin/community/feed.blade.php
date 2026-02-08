@@ -95,13 +95,15 @@
                             </div>
                         </div>
                         <div class="card-tools ml-auto">
-                            <form action="{{ route('social.post.destroy', $post) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" class="btn btn-tool text-danger" title="Remover" data-confirm-delete>
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
+                            @if(auth()->user()->isAdmin() || $post->user_id === auth()->id())
+                                <form action="{{ route('social.post.destroy', $post) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="btn btn-tool text-danger" title="Remover" data-confirm-delete>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                     <div class="card-body">

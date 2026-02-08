@@ -957,8 +957,16 @@
                 return;
             }
 
-            fetch(`/chat/with/${activeConversationUserId}`)
-                .then((r) => r.json())
+            fetch(`/chat/with/${activeConversationUserId}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then((r) => {
+                    if (!r.ok) throw new Error('Erro');
+                    return r.json();
+                })
                 .then((data) => {
                     renderConversationMessages(data.messages || []);
                     renderSharedItems(data.messages || []);
@@ -981,8 +989,16 @@
                 conversationMessages.innerHTML = '<p class="text-sm text-gray-500">Carregando mensagens...</p>';
             }
 
-            fetch(`/chat/with/${userId}`)
-                .then((r) => r.json())
+            fetch(`/chat/with/${userId}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then((r) => {
+                    if (!r.ok) throw new Error('Erro');
+                    return r.json();
+                })
                 .then((data) => {
                     renderConversationMessages(data.messages || []);
                     renderSharedItems(data.messages || []);
@@ -1010,7 +1026,9 @@
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify({ message })
                 })
@@ -1357,7 +1375,9 @@
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify({ message })
                 }).then((r) => r.json())
@@ -1388,7 +1408,12 @@
         };
 
         const loadChatMessages = (userId, chat, scroll = true) => {
-            fetch(`/chat/with/${userId}`)
+            fetch(`/chat/with/${userId}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
                 .then((r) => r.json())
                 .then((data) => {
                     if (!data || !Array.isArray(data.messages)) {
