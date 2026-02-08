@@ -14,8 +14,7 @@ class EventController extends Controller
 {
     public function index(Request $request)
     {
-        $this->ensurePermission('events.view');
-
+        // Todos os membros podem visualizar o calendário
         if ($request->ajax() || $request->wantsJson()) {
             return $this->feed($request);
         }
@@ -53,9 +52,10 @@ class EventController extends Controller
                 });
         });
 
-        // Se não for admin, mostra apenas eventos do próprio usuário
+        // Todos os membros podem ver todos os eventos publicados
+        // Admins veem todos, membros veem apenas os publicados
         if (!Auth::user()->isAdmin()) {
-            $query->where('user_id', Auth::id());
+            $query->where('published', true);
         }
 
         $events = $query->get();
