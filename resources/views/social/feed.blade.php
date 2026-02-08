@@ -1681,47 +1681,10 @@
 
         if (postForm) {
             postForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-
                 if (!postMedia || !validatePostImages(postMedia.files)) {
+                    event.preventDefault();
                     return;
                 }
-
-                const formData = new FormData(postForm);
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', postForm.action, true);
-                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-                if (progressWrap && progressBar && progressText) {
-                    progressWrap.classList.remove('hidden');
-                    progressBar.style.width = '0%';
-                    progressText.textContent = '0%';
-                }
-
-                xhr.upload.addEventListener('progress', (event) => {
-                    if (!event.lengthComputable || !progressBar || !progressText) {
-                        return;
-                    }
-
-                    const percent = Math.min(100, Math.round((event.loaded / event.total) * 100));
-                    progressBar.style.width = percent + '%';
-                    progressText.textContent = percent + '%';
-                });
-
-                xhr.onload = () => {
-                    if (xhr.status >= 200 && xhr.status < 400) {
-                        window.location.href = xhr.responseURL || window.location.href;
-                        return;
-                    }
-
-                    window.location.reload();
-                };
-
-                xhr.onerror = () => {
-                    window.location.reload();
-                };
-
-                xhr.send(formData);
             });
         }
 
