@@ -104,8 +104,13 @@
                         Meu perfil
                     </a>
                 @endguest
+                @auth
+                    <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
+                        <i class="fas fa-th-large mr-1 font-normal opacity-70"></i> Painel Administrativo
+                    </a>
+                @endauth
                 <a href="{{ $cta['href'] }}" class="inline-flex items-center gap-2 rounded-full {{ $cta['class'] }} px-7 py-3 text-sm font-bold">
-                    {{ $cta['label'] }}
+                    {{ Auth::check() ? 'Minha Conta' : $cta['label'] }}
                 </a>
             </div>
         </div>

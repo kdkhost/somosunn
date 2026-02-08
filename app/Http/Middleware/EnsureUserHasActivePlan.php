@@ -45,6 +45,7 @@ class EnsureUserHasActivePlan
             'verification.notice',
             'verification.verify',
             'verification.resend',
+            'admin.impersonate.stop',
             'install.*'
         ];
 

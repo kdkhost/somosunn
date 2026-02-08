@@ -602,7 +602,7 @@
     @if(session()->has('impersonator_id'))
         <div
             class="bg-yellow-400 text-yellow-900 px-4 py-2 text-center text-sm font-bold flex justify-center items-center gap-4 fixed w-full top-0 z-[100]">
-            <span><i class="fas fa-user-secret mr-1"></i> Acessando como: {{ auth()->user()->name }}</span>
+            <span><i class="fas fa-user-secret mr-1"></i> Acessando conta de {{ auth()->user()->name }} como administrador</span>
             <a href="{{ route('admin.impersonate.stop') }}"
                 class="bg-yellow-900 text-yellow-100 px-3 py-1 rounded hover:bg-yellow-800 transition text-xs">
                 Voltar ao Admin

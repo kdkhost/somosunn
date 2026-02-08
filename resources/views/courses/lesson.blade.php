@@ -180,9 +180,11 @@
                                             <div class="truncate">
                                                 <p
                                                     class="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 transition">
-                                                    {{ $attachment->file_name }}</p>
+                                                    {{ $attachment->file_name }}
+                                                </p>
                                                 <p class="text-xs text-gray-500">
-                                                    {{ round($attachment->file_size / 1024 / 1024, 2) }} MB</p>
+                                                    {{ round($attachment->file_size / 1024 / 1024, 2) }} MB
+                                                </p>
                                             </div>
                                         </div>
                                         <i class="fas fa-download text-gray-400 group-hover:text-blue-600 transition"></i>
@@ -209,7 +211,8 @@
                             Próxima <i class="fas fa-arrow-right ml-2"></i>
                         </a>
                     @else
-                        <button class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition">
+                        <button id="btn-complete-course"
+                            class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition cursor-pointer">
                             Concluir Curso <i class="fas fa-check ml-2"></i>
                         </button>
                     @endif
@@ -397,14 +400,14 @@
                                 row.dataset.bookmarkId = String(result.bookmark.id);
                                 row.dataset.bookmarkSeconds = String(result.bookmark.position_seconds || 0);
                                 row.innerHTML = `
-                                    <div class="min-w-0">
-                                        <button type="button" class="text-sm font-bold text-[#1F5EDB] hover:underline text-left lesson-bookmark-jump">
-                                            <i class="fas fa-play-circle mr-1"></i>${formatSeconds(result.bookmark.position_seconds || 0)}
-                                        </button>
-                                        <p class="text-sm text-gray-700 mt-1 break-words"></p>
-                                    </div>
-                                    <button type="button" class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 lesson-bookmark-delete">Excluir</button>
-                                `;
+                                                    <div class="min-w-0">
+                                                        <button type="button" class="text-sm font-bold text-[#1F5EDB] hover:underline text-left lesson-bookmark-jump">
+                                                            <i class="fas fa-play-circle mr-1"></i>${formatSeconds(result.bookmark.position_seconds || 0)}
+                                                        </button>
+                                                        <p class="text-sm text-gray-700 mt-1 break-words"></p>
+                                                    </div>
+                                                    <button type="button" class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 lesson-bookmark-delete">Excluir</button>
+                                                `;
                                 row.querySelector('p').textContent = result.bookmark.note || '';
                                 bookmarkList.prepend(row);
                                 bookmarkNote.value = '';
@@ -507,6 +510,22 @@
                 window.addEventListener('beforeunload', () => saveProgress(true, true));
 
                 renderEmptyState();
+
+                // Course Completion Handler
+                const btnComplete = document.getElementById('btn-complete-course');
+                if (btnComplete) {
+                    btnComplete.addEventListener('click', function () {
+                        Swal.fire({
+                            title: 'Parabéns!',
+                            text: 'Você concluiu o curso com sucesso.',
+                            icon: 'success',
+                            confirmButtonColor: '#1F5EDB',
+                            confirmButtonText: 'Continuar'
+                        }).then(() => {
+                            window.location.href = "{{ route('portal') }}";
+                        });
+                    });
+                }
             })();
         </script>
     @endauth
