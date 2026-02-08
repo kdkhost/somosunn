@@ -125,7 +125,7 @@
                     <!-- Composer -->
                     @auth
                         <div class="bg-white rounded-lg shadow p-4">
-                            <form action="{{ route('social.post.store') }}" method="POST" enctype="multipart/form-data">
+                            <form id="post-form" action="{{ route('social.post.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="flex gap-3">
                                     <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
@@ -138,22 +138,45 @@
                                             placeholder="No que você está pensando?"></textarea>
                                     </div>
                                 </div>
+                                <div class="mt-3">
+                                    <input type="file" name="media" id="post-media" accept="image/*" class="hidden">
+                                    <div id="post-dropzone"
+                                        class="post-dropzone rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 flex flex-col gap-2">
+                                        <div class="flex flex-wrap items-center gap-3">
+                                            <div class="flex items-center gap-2 text-gray-600">
+                                                <span
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white border border-gray-200">
+                                                    <i class="fas fa-image"></i>
+                                                </span>
+                                                <span class="text-sm font-medium">Arraste e solte uma imagem</span>
+                                            </div>
+                                            <button type="button" id="post-select-file"
+                                                class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                                                Selecionar imagem
+                                            </button>
+                                        </div>
+                                        <div class="text-xs text-gray-500" id="post-upload-name">Nenhuma imagem selecionada</div>
+                                    </div>
+                                    <div id="post-upload-progress" class="hidden mt-3">
+                                        <div class="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
+                                            <div id="post-upload-bar" class="post-progress-bar h-2 w-0 rounded-full"></div>
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-1" id="post-upload-text">0%</div>
+                                    </div>
+                                </div>
                                 <div class="flex flex-col gap-3 mt-3 pt-3 border-t">
                                     <div class="flex flex-wrap items-center justify-between gap-3">
-                                        <div class="flex gap-2">
-                                            <input type="file" name="media" id="post-media" accept="image/*" class="hidden">
-                                            <button type="button"
+                                        <div class="relative">
+                                            <button type="button" id="emoji-toggle" data-picker="emoji-picker"
                                                 class="text-gray-500 hover:text-blue-600 p-2 rounded hover:bg-gray-100"
-                                                title="Adicionar imagem"
-                                                onclick="document.getElementById('post-media').click();">
-                                                <i class="fas fa-image"></i>
-                                            </button>
-                                            <button type="button"
-                                                class="text-gray-500 hover:text-blue-600 p-2 rounded hover:bg-gray-100"
-                                                title="Inserir emoji"
-                                                onclick="window.insertPostEmoji && window.insertPostEmoji();">
+                                                title="Inserir emoji">
                                                 <i class="fas fa-smile"></i>
                                             </button>
+                                            <div id="emoji-picker" data-target="post-content"
+                                                class="emoji-picker-panel hidden absolute left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
+                                                @include('social.partials.emoji_tabs')
+                                                @include('social.partials.emoji_grid')
+                                            </div>
                                         </div>
 
                                         <div class="flex items-center gap-2">
@@ -198,21 +221,57 @@
                                         <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                        <form action="{{ route('social.post.destroy', $post) }}" method="POST"
-                                            onsubmit="return confirm('Excluir esta publicacao?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-500 hover:text-red-700" title="Excluir">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    @endif
+                                <div class="relative">
                                     <button type="button" class="text-gray-400 hover:text-gray-600" title="Mais opcoes"
-                                        onclick="togglePanel('report-{{ $post->id }}')">
+                                        onclick="togglePanel('menu-{{ $post->id }}')">
                                         <i class="fas fa-ellipsis-h"></i>
                                     </button>
+                                    <div id="menu-{{ $post->id }}"
+                                        class="hidden absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow z-10">
+                                        <div class="py-1 text-sm text-gray-700">
+                                            @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                <form action="{{ route('social.post.destroy', $post) }}" method="POST"
+                                                    class="js-confirm-delete" data-confirm-title="Remover publicacao?"
+                                                    data-confirm-text="Esta acao nao pode ser desfeita.">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2">
+                                                        <i class="fas fa-trash"></i>
+                                                        <span>Remover</span>
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('social.post.unpublish', $post) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
+                                                        <i class="fas fa-eye-slash"></i>
+                                                        <span>Despublicar</span>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            @auth
+                                                <form action="{{ route('social.post.hide', $post) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
+                                                        <i class="fas fa-eye"></i>
+                                                        <span>Ocultar postagem</span>
+                                                    </button>
+                                                </form>
+                                            @endauth
+                                            @auth
+                                                @if(!(Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                    <button type="button"
+                                                        class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2"
+                                                        onclick="togglePanel('report-{{ $post->id }}'); togglePanel('menu-{{ $post->id }}');">
+                                                        <i class="fas fa-flag"></i>
+                                                        <span>Denunciar</span>
+                                                    </button>
+                                                @endif
+                                            @endauth
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -232,37 +291,30 @@
                                 @auth
                                     <form action="{{ route('social.post.react', $post) }}" method="POST">
                                         @csrf
-                                        <button type="submit"
+                                        <button type="submit" aria-label="Curtir"
                                             class="flex items-center gap-2 transition {{ $hasLiked ? 'text-blue-600' : 'hover:text-blue-600' }}">
-                                            <i class="{{ $hasLiked ? 'fas' : 'far' }} fa-thumbs-up"></i> Curtir
+                                            <i class="{{ $hasLiked ? 'fas' : 'far' }} fa-thumbs-up"></i>
+                                            <span class="hidden sm:inline">Curtir</span>
                                         </button>
                                     </form>
                                 @else
-                                    <span class="flex items-center gap-2">
-                                        <i class="far fa-thumbs-up"></i> Curtir
+                                    <span class="flex items-center gap-2" aria-label="Curtir">
+                                        <i class="far fa-thumbs-up"></i>
+                                        <span class="hidden sm:inline">Curtir</span>
                                     </span>
                                 @endauth
 
                                 <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
-                                    onclick="document.getElementById('comment-{{ $post->id }}').focus();">
-                                    <i class="far fa-comment"></i> Comentar
+                                    onclick="document.getElementById('comment-{{ $post->id }}').focus();" aria-label="Comentar">
+                                    <i class="far fa-comment"></i>
+                                    <span class="hidden sm:inline">Comentar</span>
                                 </button>
 
                                 <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
-                                    onclick="togglePanel('share-{{ $post->id }}')">
-                                    <i class="fas fa-share"></i> Compartilhar
+                                    onclick="togglePanel('share-{{ $post->id }}')" aria-label="Compartilhar">
+                                    <i class="fas fa-share"></i>
+                                    <span class="hidden sm:inline">Compartilhar</span>
                                 </button>
-
-                                @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                    <form action="{{ route('social.post.destroy', $post) }}" method="POST"
-                                        onsubmit="return confirm('Excluir esta publicacao?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="flex items-center gap-2 text-red-500 hover:text-red-700">
-                                            <i class="fas fa-trash"></i> Excluir
-                                        </button>
-                                    </form>
-                                @endif
                             </div>
                             <div id="share-{{ $post->id }}" class="hidden mt-3 border-t pt-3 space-y-3">
                                 <div class="flex flex-wrap gap-3 text-sm">
@@ -343,10 +395,13 @@
                                                     <p class="text-xs font-semibold text-gray-700">{{ $commentName }}</p>
                                                     @if(Auth::check() && (Auth::id() === $comment->user_id || Auth::id() === $post->user_id || Auth::user()->isAdmin()))
                                                         <form action="{{ route('social.comment.destroy', $comment) }}" method="POST"
-                                                            onsubmit="return confirm('Excluir este comentario?');">
+                                                            class="js-confirm-delete" data-confirm-title="Remover comentario?"
+                                                            data-confirm-text="Esta acao nao pode ser desfeita.">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="text-xs text-red-500">Excluir</button>
+                                                            <button type="submit" class="text-xs text-red-500" title="Remover">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
                                                         </form>
                                                     @endif
                                                 </div>
@@ -364,6 +419,17 @@
                                     <input type="text" name="content" id="comment-{{ $post->id }}"
                                         placeholder="Escreva um comentario..."
                                         class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <div class="relative">
+                                        <button type="button" class="comment-emoji-toggle text-gray-500 hover:text-blue-600"
+                                            data-picker="comment-emoji-{{ $post->id }}" title="Inserir emoji">
+                                            <i class="far fa-smile"></i>
+                                        </button>
+                                        <div id="comment-emoji-{{ $post->id }}" data-target="comment-{{ $post->id }}"
+                                            class="emoji-picker-panel hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
+                                            @include('social.partials.emoji_tabs')
+                                            @include('social.partials.emoji_grid')
+                                        </div>
+                                    </div>
                                     <button type="submit"
                                         class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition">
                                         Enviar
@@ -394,6 +460,79 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+    <style>
+        .post-dropzone.is-dragover {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+        }
+
+        .post-progress-bar {
+            background: linear-gradient(90deg, #1f5edb 0%, #3b82f6 50%, #1f5edb 100%);
+            background-size: 200% 100%;
+            animation: progress-flow 1.2s linear infinite;
+            transition: width 0.2s ease;
+        }
+
+        .emoji-item {
+            width: 100%;
+            padding: 0.25rem 0;
+            border-radius: 0.5rem;
+            transition: transform 0.15s ease;
+            animation: emoji-float 1.6s ease-in-out infinite;
+        }
+
+        .emoji-item:hover {
+            transform: scale(1.2);
+            background-color: #f3f4f6;
+        }
+
+        .emoji-item:nth-child(3n) {
+            animation-delay: 0.2s;
+        }
+
+        .emoji-item:nth-child(4n) {
+            animation-delay: 0.35s;
+        }
+
+        .emoji-tab {
+            padding: 0.25rem 0.45rem;
+            border-radius: 9999px;
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+            transition: all 0.15s ease;
+        }
+
+        .emoji-tab:hover {
+            background-color: #f3f4f6;
+        }
+
+        .emoji-tab.is-active {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+        }
+
+        @keyframes progress-flow {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 100% 50%;
+            }
+        }
+
+        @keyframes emoji-float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+    </style>
+@endpush
 
 @push('scripts')
     <script>
@@ -448,20 +587,185 @@
             });
         });
 
-        window.insertPostEmoji = function () {
-            const textarea = document.getElementById('post-content');
-            if (!textarea) {
+        const postForm = document.getElementById('post-form');
+        const postMedia = document.getElementById('post-media');
+        const dropzone = document.getElementById('post-dropzone');
+        const selectFile = document.getElementById('post-select-file');
+        const progressWrap = document.getElementById('post-upload-progress');
+        const progressBar = document.getElementById('post-upload-bar');
+        const progressText = document.getElementById('post-upload-text');
+        const uploadName = document.getElementById('post-upload-name');
+        const emojiToggle = document.getElementById('emoji-toggle');
+        const emojiPicker = document.getElementById('emoji-picker');
+
+        const updateUploadName = (file) => {
+            if (!uploadName) {
                 return;
             }
 
-            const emoji = '😊';
-            const start = textarea.selectionStart || 0;
-            const end = textarea.selectionEnd || 0;
-            const value = textarea.value || '';
-
-            textarea.value = value.slice(0, start) + emoji + value.slice(end);
-            textarea.focus();
-            textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+            uploadName.textContent = file ? file.name : 'Nenhuma imagem selecionada';
         };
+
+        if (selectFile && postMedia) {
+            selectFile.addEventListener('click', () => postMedia.click());
+        }
+
+        if (postMedia) {
+            postMedia.addEventListener('change', () => {
+                updateUploadName(postMedia.files[0]);
+            });
+        }
+
+        if (dropzone && postMedia) {
+            dropzone.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                dropzone.classList.add('is-dragover');
+            });
+
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('is-dragover');
+            });
+
+            dropzone.addEventListener('drop', (event) => {
+                event.preventDefault();
+                dropzone.classList.remove('is-dragover');
+
+                const files = event.dataTransfer ? event.dataTransfer.files : [];
+                if (!files || !files.length) {
+                    return;
+                }
+
+                const file = files[0];
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                postMedia.files = dataTransfer.files;
+                updateUploadName(file);
+            });
+        }
+
+        if (postForm) {
+            postForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                const formData = new FormData(postForm);
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', postForm.action, true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                if (progressWrap && progressBar && progressText) {
+                    progressWrap.classList.remove('hidden');
+                    progressBar.style.width = '0%';
+                    progressText.textContent = '0%';
+                }
+
+                xhr.upload.addEventListener('progress', (event) => {
+                    if (!event.lengthComputable || !progressBar || !progressText) {
+                        return;
+                    }
+
+                    const percent = Math.min(100, Math.round((event.loaded / event.total) * 100));
+                    progressBar.style.width = percent + '%';
+                    progressText.textContent = percent + '%';
+                });
+
+                xhr.onload = () => {
+                    if (xhr.status >= 200 && xhr.status < 400) {
+                        window.location.href = xhr.responseURL || window.location.href;
+                        return;
+                    }
+
+                    window.location.reload();
+                };
+
+                xhr.onerror = () => {
+                    window.location.reload();
+                };
+
+                xhr.send(formData);
+            });
+        }
+
+        const closeAllEmojiPickers = () => {
+            document.querySelectorAll('.emoji-picker-panel').forEach((panel) => {
+                panel.classList.add('hidden');
+            });
+        };
+
+        const initEmojiPicker = (toggle, picker) => {
+            if (!toggle || !picker) {
+                return;
+            }
+
+            const emojiTabs = picker.querySelectorAll('.emoji-tab');
+            const emojiItems = picker.querySelectorAll('.emoji-item');
+            const targetId = picker.getAttribute('data-target');
+
+            const applyEmojiCategory = (category) => {
+                emojiItems.forEach((item) => {
+                    const itemCategory = item.getAttribute('data-category');
+                    const show = category === 'all' || itemCategory === category;
+                    item.classList.toggle('hidden', !show);
+                });
+
+                emojiTabs.forEach((tab) => {
+                    tab.classList.toggle('is-active', tab.getAttribute('data-category') === category);
+                });
+            };
+
+            if (emojiTabs.length) {
+                emojiTabs.forEach((tab) => {
+                    tab.addEventListener('click', () => {
+                        const category = tab.getAttribute('data-category') || 'all';
+                        applyEmojiCategory(category);
+                    });
+                });
+
+                const initial = picker.querySelector('.emoji-tab.is-active') || emojiTabs[0];
+                const initialCategory = initial ? initial.getAttribute('data-category') : 'all';
+                applyEmojiCategory(initialCategory || 'all');
+            }
+
+            toggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const isHidden = picker.classList.contains('hidden');
+                closeAllEmojiPickers();
+                picker.classList.toggle('hidden', !isHidden);
+            });
+
+            emojiItems.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const emoji = button.getAttribute('data-emoji') || '';
+                    const target = targetId ? document.getElementById(targetId) : null;
+                    if (!target || emoji === '') {
+                        return;
+                    }
+
+                    const start = target.selectionStart || 0;
+                    const end = target.selectionEnd || 0;
+                    const value = target.value || '';
+                    target.value = value.slice(0, start) + emoji + value.slice(end);
+                    target.focus();
+                    target.selectionStart = target.selectionEnd = start + emoji.length;
+                });
+            });
+        };
+
+        if (emojiToggle && emojiPicker) {
+            initEmojiPicker(emojiToggle, emojiPicker);
+        }
+
+        document.querySelectorAll('.comment-emoji-toggle').forEach((toggle) => {
+            const pickerId = toggle.getAttribute('data-picker');
+            const picker = pickerId ? document.getElementById(pickerId) : null;
+            initEmojiPicker(toggle, picker);
+        });
+
+        document.addEventListener('click', (event) => {
+            if (event.target.closest('.emoji-picker-panel') || event.target.closest('.comment-emoji-toggle') || event.target.closest('#emoji-toggle')) {
+                return;
+            }
+
+            closeAllEmojiPickers();
+        });
     </script>
 @endpush

@@ -64,6 +64,7 @@ namespace App\Http\Controllers;
 use App\Models\Connection;
 use App\Models\Post;
 use App\Models\PostComment;
+use App\Models\PostHide;
 use App\Models\PostMedia;
 use App\Models\PostReaction;
 use App\Models\PostReport;
@@ -106,8 +107,15 @@ class SocialController extends Controller
             ->values()
             ->toArray();
 
+        $hiddenPostIds = PostHide::where('user_id', Auth::id())
+            ->pluck('post_id')
+            ->all();
+
         $posts = Post::with(['user', 'sharedTo', 'comments.user', 'reactions', 'media'])
             ->whereNotIn('user_id', $blockedUserIds)
+            ->when(!empty($hiddenPostIds), function ($query) use ($hiddenPostIds) {
+                $query->whereNotIn('posts.id', $hiddenPostIds);
+            })
             ->where(function ($query) use ($connectedUserIds) {
                 $query->where('visibility', 'public')
                     ->orWhere('visibility', 'community')
@@ -200,7 +208,17 @@ class SocialController extends Controller
             ->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
                     ->orWhere('shared_to_user_id', $user->id);
-            })
+            });
+
+        if (Auth::check()) {
+            $hiddenPostIds = PostHide::where('user_id', Auth::id())
+                ->pluck('post_id')
+                ->all();
+
+            if (!empty($hiddenPostIds)) {
+                $postsQuery->whereNotIn('posts.id', $hiddenPostIds);
+            }
+        }
             ->latest();
 
         if (Auth::check() && Auth::id() === $user->id) {
@@ -441,6 +459,35 @@ class SocialController extends Controller
         }
 
         return back()->with('success', 'Denuncia enviada. Obrigado por ajudar a comunidade.');
+    }
+
+    public function hidePost(Post $post)
+    {
+        $hidden = PostHide::where('user_id', Auth::id())
+            ->where('post_id', $post->id)
+            ->first();
+
+        if (!$hidden) {
+            PostHide::create([
+                'post_id' => $post->id,
+                'user_id' => Auth::id(),
+            ]);
+        }
+
+        return back()->with('success', 'Postagem ocultada.');
+    }
+
+    public function unpublishPost(Post $post)
+    {
+        if ($post->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        $post->update([
+            'visibility' => 'community',
+        ]);
+
+        return back()->with('success', 'Postagem despublicada.');
     }
 
     public function destroyPost(Post $post)

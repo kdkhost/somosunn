@@ -342,10 +342,58 @@
                                     <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
-                            <button type="button" class="text-gray-400 hover:text-gray-600" title="Mais opcoes"
-                                onclick="togglePanel('report-{{ $post->id }}')">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
+                            <div class="relative">
+                                <button type="button" class="text-gray-400 hover:text-gray-600" title="Mais opcoes"
+                                    onclick="togglePanel('menu-{{ $post->id }}')">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <div id="menu-{{ $post->id }}"
+                                    class="hidden absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow z-10">
+                                    <div class="py-1 text-sm text-gray-700">
+                                        @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                            <form action="{{ route('social.post.destroy', $post) }}" method="POST"
+                                                class="js-confirm-delete" data-confirm-title="Remover publicacao?"
+                                                data-confirm-text="Esta acao nao pode ser desfeita.">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2">
+                                                    <i class="fas fa-trash"></i>
+                                                    <span>Remover</span>
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('social.post.unpublish', $post) }}" method="POST">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
+                                                    <i class="fas fa-eye-slash"></i>
+                                                    <span>Despublicar</span>
+                                                </button>
+                                            </form>
+                                        @endif
+                                        @auth
+                                            <form action="{{ route('social.post.hide', $post) }}" method="POST">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
+                                                    <i class="fas fa-eye"></i>
+                                                    <span>Ocultar postagem</span>
+                                                </button>
+                                            </form>
+                                        @endauth
+                                        @auth
+                                            @if(!(Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                <button type="button"
+                                                    class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2"
+                                                    onclick="togglePanel('report-{{ $post->id }}'); togglePanel('menu-{{ $post->id }}');">
+                                                    <i class="fas fa-flag"></i>
+                                                    <span>Denunciar</span>
+                                                </button>
+                                            @endif
+                                        @endauth
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="prose max-w-none text-gray-800">
                             {!! nl2br(e($post->content)) !!}
@@ -362,37 +410,30 @@
                             @auth
                                 <form action="{{ route('social.post.react', $post) }}" method="POST">
                                     @csrf
-                                    <button type="submit"
+                                    <button type="submit" aria-label="Curtir"
                                         class="flex items-center gap-2 transition {{ $hasLiked ? 'text-blue-600' : 'hover:text-blue-600' }}">
-                                        <i class="{{ $hasLiked ? 'fas' : 'far' }} fa-thumbs-up"></i> Curtir
+                                        <i class="{{ $hasLiked ? 'fas' : 'far' }} fa-thumbs-up"></i>
+                                        <span class="hidden sm:inline">Curtir</span>
                                     </button>
                                 </form>
                             @else
-                                <span class="flex items-center gap-2">
-                                    <i class="far fa-thumbs-up"></i> Curtir
+                                <span class="flex items-center gap-2" aria-label="Curtir">
+                                    <i class="far fa-thumbs-up"></i>
+                                    <span class="hidden sm:inline">Curtir</span>
                                 </span>
                             @endauth
 
                             <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
-                                onclick="document.getElementById('comment-{{ $post->id }}').focus();">
-                                <i class="far fa-comment"></i> Comentar
+                                onclick="document.getElementById('comment-{{ $post->id }}').focus();" aria-label="Comentar">
+                                <i class="far fa-comment"></i>
+                                <span class="hidden sm:inline">Comentar</span>
                             </button>
 
                             <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
-                                onclick="togglePanel('share-{{ $post->id }}')">
-                                <i class="fas fa-share"></i> Compartilhar
+                                onclick="togglePanel('share-{{ $post->id }}')" aria-label="Compartilhar">
+                                <i class="fas fa-share"></i>
+                                <span class="hidden sm:inline">Compartilhar</span>
                             </button>
-
-                            @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                <form action="{{ route('social.post.destroy', $post) }}" method="POST"
-                                    onsubmit="return confirm('Excluir esta publicacao?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="flex items-center gap-2 text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash"></i> Excluir
-                                    </button>
-                                </form>
-                            @endif
                         </div>
 
                         <div class="mt-2 text-xs text-gray-400 flex gap-3">
@@ -498,6 +539,17 @@
                                 <input type="text" name="content" id="comment-{{ $post->id }}"
                                     placeholder="Escreva um comentario..."
                                     class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                <div class="relative">
+                                    <button type="button" class="comment-emoji-toggle text-gray-500 hover:text-blue-600"
+                                        data-picker="comment-emoji-{{ $post->id }}" title="Inserir emoji">
+                                        <i class="far fa-smile"></i>
+                                    </button>
+                                    <div id="comment-emoji-{{ $post->id }}" data-target="comment-{{ $post->id }}"
+                                        class="emoji-picker-panel hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
+                                        @include('social.partials.emoji_tabs')
+                                        @include('social.partials.emoji_grid')
+                                    </div>
+                                </div>
                                 <button type="submit"
                                     class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition">
                                     Enviar
@@ -557,6 +609,17 @@
                 <input type="hidden" id="chatUserId" value="">
                 <input type="text" id="chatInput" placeholder="Digite sua mensagem..."
                     class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-[#1F5EDB] focus:ring-1 focus:ring-[#1F5EDB]">
+                <div class="relative">
+                    <button type="button" class="emoji-toggle text-gray-500 hover:text-blue-600" data-picker="chat-emoji-picker"
+                        title="Inserir emoji">
+                        <i class="far fa-smile"></i>
+                    </button>
+                    <div id="chat-emoji-picker" data-target="chatInput"
+                        class="emoji-picker-panel hidden absolute right-0 bottom-12 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
+                        @include('social.partials.emoji_tabs')
+                        @include('social.partials.emoji_grid')
+                    </div>
+                </div>
                 <button type="submit"
                     class="bg-[#1F5EDB] text-white px-5 py-2 rounded-full hover:bg-blue-700 transition font-medium">
                     <i class="fas fa-paper-plane"></i>
@@ -568,6 +631,58 @@
     <!-- Floating Chat Script -->
     <script src="{{ asset('js/floating-chat.js') }}"></script>
 @endsection
+
+@push('styles')
+    <style>
+        .emoji-item {
+            width: 100%;
+            padding: 0.25rem 0;
+            border-radius: 0.5rem;
+            transition: transform 0.15s ease;
+            animation: emoji-float 1.6s ease-in-out infinite;
+        }
+
+        .emoji-item:hover {
+            transform: scale(1.2);
+            background-color: #f3f4f6;
+        }
+
+        .emoji-item:nth-child(3n) {
+            animation-delay: 0.2s;
+        }
+
+        .emoji-item:nth-child(4n) {
+            animation-delay: 0.35s;
+        }
+
+        .emoji-tab {
+            padding: 0.25rem 0.45rem;
+            border-radius: 9999px;
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+            transition: all 0.15s ease;
+        }
+
+        .emoji-tab:hover {
+            background-color: #f3f4f6;
+        }
+
+        .emoji-tab.is-active {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+        }
+
+        @keyframes emoji-float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+    </style>
+@endpush
 
 @push('scripts')
     <script>
@@ -620,6 +735,85 @@
                     }
                 });
             });
+        });
+
+        const closeAllEmojiPickers = () => {
+            document.querySelectorAll('.emoji-picker-panel').forEach((panel) => {
+                panel.classList.add('hidden');
+            });
+        };
+
+        const initEmojiPicker = (toggle, picker) => {
+            if (!toggle || !picker) {
+                return;
+            }
+
+            const emojiTabs = picker.querySelectorAll('.emoji-tab');
+            const emojiItems = picker.querySelectorAll('.emoji-item');
+            const targetId = picker.getAttribute('data-target');
+
+            const applyEmojiCategory = (category) => {
+                emojiItems.forEach((item) => {
+                    const itemCategory = item.getAttribute('data-category');
+                    const show = category === 'all' || itemCategory === category;
+                    item.classList.toggle('hidden', !show);
+                });
+
+                emojiTabs.forEach((tab) => {
+                    tab.classList.toggle('is-active', tab.getAttribute('data-category') === category);
+                });
+            };
+
+            if (emojiTabs.length) {
+                emojiTabs.forEach((tab) => {
+                    tab.addEventListener('click', () => {
+                        const category = tab.getAttribute('data-category') || 'all';
+                        applyEmojiCategory(category);
+                    });
+                });
+
+                const initial = picker.querySelector('.emoji-tab.is-active') || emojiTabs[0];
+                const initialCategory = initial ? initial.getAttribute('data-category') : 'all';
+                applyEmojiCategory(initialCategory || 'all');
+            }
+
+            toggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const isHidden = picker.classList.contains('hidden');
+                closeAllEmojiPickers();
+                picker.classList.toggle('hidden', !isHidden);
+            });
+
+            emojiItems.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const emoji = button.getAttribute('data-emoji') || '';
+                    const target = targetId ? document.getElementById(targetId) : null;
+                    if (!target || emoji === '') {
+                        return;
+                    }
+
+                    const start = target.selectionStart || 0;
+                    const end = target.selectionEnd || 0;
+                    const value = target.value || '';
+                    target.value = value.slice(0, start) + emoji + value.slice(end);
+                    target.focus();
+                    target.selectionStart = target.selectionEnd = start + emoji.length;
+                });
+            });
+        };
+
+        document.querySelectorAll('.comment-emoji-toggle, .emoji-toggle').forEach((toggle) => {
+            const pickerId = toggle.getAttribute('data-picker');
+            const picker = pickerId ? document.getElementById(pickerId) : null;
+            initEmojiPicker(toggle, picker);
+        });
+
+        document.addEventListener('click', (event) => {
+            if (event.target.closest('.emoji-picker-panel') || event.target.closest('.comment-emoji-toggle') || event.target.closest('.emoji-toggle')) {
+                return;
+            }
+
+            closeAllEmojiPickers();
         });
     </script>
 @endpush
