@@ -142,7 +142,7 @@
 
                 <!-- Centro -->
                 <div class="{{ $isAdminContext ? 'space-y-6' : 'md:col-span-6 space-y-6' }}">
-                    <div id="feed-panel" class="space-y-6 hidden">
+                    <div id="feed-panel" class="space-y-6">
                         @auth
                             <div class="bg-white rounded-lg shadow p-4">
                                 <form id="post-form" action="{{ route('social.post.store') }}" method="POST" enctype="multipart/form-data">
@@ -511,7 +511,7 @@
                         {{ $posts->links() }}
                     </div>
 
-                    <div id="chat-panel" class="space-y-6">
+                    <div id="chat-panel" class="space-y-6" hidden>
                         <div class="bg-white rounded-lg shadow p-4">
                             <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
                                 <div class="flex items-center gap-3">
@@ -775,6 +775,8 @@
             const showFeed = panel === 'feed';
             feedPanel.classList.toggle('hidden', !showFeed);
             chatPanel.classList.toggle('hidden', showFeed);
+            feedPanel.toggleAttribute('hidden', !showFeed);
+            chatPanel.toggleAttribute('hidden', showFeed);
 
             sidebarButtons.forEach((btn) => {
                 const isActive = btn.getAttribute('data-panel') === panel;
