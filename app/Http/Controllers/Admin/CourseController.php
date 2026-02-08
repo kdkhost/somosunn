@@ -24,6 +24,8 @@ class CourseController extends Controller
 
     public function index()
     {
+        $this->ensurePermission('courses.view');
+
         $query = Course::latest();
 
         // Se não for admin, mostra apenas cursos do próprio usuário
@@ -37,11 +39,15 @@ class CourseController extends Controller
 
     public function create()
     {
+        $this->ensurePermission('courses.create');
+
         return view('admin.courses.form', ['course' => new Course]);
     }
 
     public function store(Request $request)
     {
+        $this->ensurePermission('courses.create');
+
         if ($request->has('price')) {
             $price = $request->price;
             // Remove R$, whitespace, and dots (thousand separators)
@@ -104,20 +110,16 @@ class CourseController extends Controller
 
     public function edit(Course $course)
     {
-        // Verifica se é dono do curso ou admin
-        if (!Auth::user()->isAdmin() && !$course->isOwnedBy(Auth::id())) {
-            abort(403, 'Você não tem permissão para editar este curso.');
-        }
+        $this->ensurePermission('courses.edit');
+        $this->ensureCanManage($course);
 
         return view('admin.courses.form', compact('course'));
     }
 
     public function update(Request $request, Course $course)
     {
-        // Verifica se é dono do curso ou admin
-        if (!Auth::user()->isAdmin() && !$course->isOwnedBy(Auth::id())) {
-            return response()->json(['success' => false, 'message' => 'Você não tem permissão para editar este curso.'], 403);
-        }
+        $this->ensurePermission('courses.edit');
+        $this->ensureCanManage($course);
 
         if ($request->has('price')) {
             $price = $request->price;
@@ -212,12 +214,35 @@ class CourseController extends Controller
 
     public function destroy(Course $course)
     {
-        // Verifica se é dono do curso ou admin
-        if (!Auth::user()->isAdmin() && !$course->isOwnedBy(Auth::id())) {
-            abort(403, 'Você não tem permissão para remover este curso.');
-        }
+        $this->ensurePermission('courses.delete');
+        $this->ensureCanManage($course);
 
         $course->delete();
         return redirect()->route('admin.courses.index')->with('success', 'Curso removido');
+    }
+
+    /**
+     * Verifica se o usuário tem permissão ou é admin.
+     */
+    protected function ensurePermission(string $permission): void
+    {
+        $user = Auth::user();
+        if (!$user || (!$user->isAdmin() && !$user->hasPermission($permission))) {
+            abort(403, 'Você não tem permissão para realizar esta ação.');
+        }
+    }
+
+    /**
+     * Verifica se o usuário pode gerenciar o curso (é dono ou admin).
+     */
+    protected function ensureCanManage(Course $course): void
+    {
+        if (Auth::user()->isAdmin()) {
+            return;
+        }
+
+        if (!$course->isOwnedBy(Auth::id())) {
+            abort(403, 'Você não tem permissão para gerenciar este curso.');
+        }
     }
 }

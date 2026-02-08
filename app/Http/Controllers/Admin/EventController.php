@@ -14,6 +14,8 @@ class EventController extends Controller
 {
     public function index(Request $request)
     {
+        $this->ensurePermission('events.view');
+
         if ($request->ajax() || $request->wantsJson()) {
             return $this->feed($request);
         }
@@ -93,21 +95,23 @@ class EventController extends Controller
 
     public function create()
     {
+        $this->ensurePermission('events.create');
+
         return view('admin.events.form', ['event' => new Event]);
     }
 
     public function edit(Event $event)
     {
-        // Verifica se é dono do evento ou admin
-        if (!Auth::user()->isAdmin() && !$event->isOwnedBy(Auth::id())) {
-            abort(403, 'Você não tem permissão para editar este evento.');
-        }
+        $this->ensurePermission('events.edit');
+        $this->ensureCanManage($event);
 
         return view('admin.events.form', compact('event'));
     }
 
     public function store(Request $request)
     {
+        $this->ensurePermission('events.create');
+
         foreach (['price', 'batch_1_price', 'batch_2_price', 'batch_3_price'] as $field) {
             if (!$request->has($field)) {
                 continue;
@@ -187,13 +191,8 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event)
     {
-        // Verifica se é dono do evento ou admin
-        if (!Auth::user()->isAdmin() && !$event->isOwnedBy(Auth::id())) {
-            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                return response()->json(['status' => 'error', 'message' => 'Você não tem permissão para editar este evento.'], 403);
-            }
-            abort(403, 'Você não tem permissão para editar este evento.');
-        }
+        $this->ensurePermission('events.edit');
+        $this->ensureCanManage($event);
 
         foreach (['price', 'batch_1_price', 'batch_2_price', 'batch_3_price'] as $field) {
             if (!$request->has($field)) {
@@ -278,13 +277,8 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
-        // Verifica se é dono do evento ou admin
-        if (!Auth::user()->isAdmin() && !$event->isOwnedBy(Auth::id())) {
-            if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
-                return response()->json(['status' => 'error', 'message' => 'Você não tem permissão para remover este evento.'], 403);
-            }
-            abort(403, 'Você não tem permissão para remover este evento.');
-        }
+        $this->ensurePermission('events.delete');
+        $this->ensureCanManage($event);
 
         $this->deleteEventImageIfExists($event);
         $event->delete();
@@ -489,5 +483,30 @@ class EventController extends Controller
         }
 
         Storage::disk('public')->delete($event->image);
+    }
+
+    /**
+     * Verifica se o usuário tem permissão ou é admin.
+     */
+    protected function ensurePermission(string $permission): void
+    {
+        $user = Auth::user();
+        if (!$user || (!$user->isAdmin() && !$user->hasPermission($permission))) {
+            abort(403, 'Você não tem permissão para realizar esta ação.');
+        }
+    }
+
+    /**
+     * Verifica se o usuário pode gerenciar o evento (é dono ou admin).
+     */
+    protected function ensureCanManage(Event $event): void
+    {
+        if (Auth::user()->isAdmin()) {
+            return;
+        }
+
+        if (!$event->isOwnedBy(Auth::id())) {
+            abort(403, 'Você não tem permissão para gerenciar este evento.');
+        }
     }
 }

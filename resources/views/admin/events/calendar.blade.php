@@ -177,7 +177,7 @@
                     <div id="recent-events" class="small text-muted">Carregando...</div>
                 </div>
             </div>
-            @if(auth()->user()->isAdmin())
+            @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('events.create'))
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Eventos Arrastáveis</h3>

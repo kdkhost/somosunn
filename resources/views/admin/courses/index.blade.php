@@ -11,9 +11,11 @@
         <div class="card-header">
             <h3 class="card-title">Listagem de Cursos</h3>
             <div class="card-tools">
+                @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('courses.create'))
                 <a href="{{ route('admin.courses.create') }}" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus"></i> Novo curso
                 </a>
+                @endif
             </div>
         </div>
         <div class="card-body">
@@ -53,9 +55,12 @@
                                 @endif
                             </td>
                             <td>
+                                @if(auth()->user()->isAdmin() || (auth()->user()->hasPermission('courses.edit') && $c->user_id === auth()->id()))
                                 <a href="{{ route('admin.courses.edit', $c) }}" class="btn btn-sm btn-info" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                @endif
+                                @if(auth()->user()->isAdmin() || (auth()->user()->hasPermission('courses.delete') && $c->user_id === auth()->id()))
                                 <form method="POST" action="{{ route('admin.courses.destroy', $c) }}" style="display:inline"
                                     class="delete-course-form">
                                     @csrf
@@ -64,6 +69,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
