@@ -2,6 +2,13 @@
 
 @section('title', 'Mensagens - UNN')
 
+@if(($extends ?? 'layouts.app') === 'admin.layouts.app')
+    @section('page_title', 'Mensagens')
+    @section('breadcrumb_items')
+        <li class="breadcrumb-item active">Chat</li>
+    @endsection
+@endif
+
 @section('content')
     @php
         $routeNamePrefix = $routeNamePrefix ?? 'chat';
