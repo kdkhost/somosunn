@@ -98,14 +98,14 @@
                                     </div>
                                 </div>
                                 <nav class="space-y-2">
-                                    <a href="{{ $feedUrl }}"
-                                        class="flex items-center gap-2 text-blue-600 font-medium p-2 bg-blue-50 rounded">
+                                    <button type="button" id="feed-toggle"
+                                        class="w-full flex items-center gap-2 text-blue-600 font-medium p-2 bg-blue-50 rounded">
                                         <i class="fas fa-newspaper w-6"></i> Feed
-                                    </a>
-                                    <a href="{{ $chatUrl }}"
-                                        class="flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
+                                    </button>
+                                    <button type="button" id="messages-toggle"
+                                        class="w-full flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
                                         <i class="fas fa-comments w-6"></i> Mensagens
-                                    </a>
+                                    </button>
                                 </nav>
                             @else
                                 <div class="text-center py-4">
@@ -466,7 +466,7 @@
                 @unless($isAdminContext)
                     <!-- Sidebar Right (Suggestions) -->
                     <div class="hidden md:block">
-                        <div class="bg-white rounded-lg shadow p-4 sticky top-24">
+                        <div id="recommendations-panel" class="bg-white rounded-lg shadow p-4 sticky top-24">
                             <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
                             <div class="space-y-4">
                                 @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
@@ -528,11 +528,36 @@
                                 @endif
                             </div>
                         </div>
+
+                        <div id="messages-panel" class="bg-white rounded-lg shadow p-4 sticky top-24 hidden">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-gray-900">Mensagens</h3>
+                                <button type="button" id="messages-refresh"
+                                    class="text-xs text-blue-600 hover:text-blue-700 font-medium">Atualizar</button>
+                            </div>
+                            <div id="messages-list" class="space-y-3">
+                                <p class="text-xs text-gray-500">Carregando conversas...</p>
+                            </div>
+                        </div>
                     </div>
                 @endunless
             </div>
         </div>
     </div>
+
+    @unless($isAdminContext)
+        <div id="floating-chat-dock" class="fixed bottom-4 right-4 z-50 flex items-end gap-3 flex-row-reverse">
+            <div id="chat-overflow" class="relative hidden">
+                <button id="chat-overflow-toggle"
+                    class="bg-white border border-gray-200 text-gray-700 rounded-full px-3 py-2 text-xs shadow hover:bg-gray-50">
+                    +0
+                </button>
+                <div id="chat-overflow-list"
+                    class="hidden absolute bottom-12 right-0 bg-white border border-gray-200 rounded-lg shadow p-2 w-56"></div>
+            </div>
+            <div id="chat-boxes" class="flex items-end gap-3 flex-row-reverse"></div>
+        </div>
+    @endunless
 @endsection
 
 @push('styles')
@@ -610,7 +635,350 @@
 
 @push('scripts')
     <script>
+        const authUserId = {{ Auth::id() ?? 'null' }};
         const csrfToken = '{{ csrf_token() }}';
+
+        const feedToggle = document.getElementById('feed-toggle');
+        const messagesToggle = document.getElementById('messages-toggle');
+        const recommendationsPanel = document.getElementById('recommendations-panel');
+        const messagesPanel = document.getElementById('messages-panel');
+        const messagesList = document.getElementById('messages-list');
+        const messagesRefresh = document.getElementById('messages-refresh');
+        const chatBoxes = document.getElementById('chat-boxes');
+        const chatOverflow = document.getElementById('chat-overflow');
+        const chatOverflowToggle = document.getElementById('chat-overflow-toggle');
+        const chatOverflowList = document.getElementById('chat-overflow-list');
+        const openChats = new Map();
+        const chatOrder = [];
+        const maxVisibleChats = 5;
+        let chatPollTimer = null;
+
+        const setActiveNav = (active) => {
+            if (!feedToggle || !messagesToggle) {
+                return;
+            }
+
+            if (active === 'messages') {
+                messagesToggle.classList.add('text-blue-600', 'font-medium', 'bg-blue-50');
+                messagesToggle.classList.remove('text-gray-600');
+                feedToggle.classList.remove('text-blue-600', 'font-medium', 'bg-blue-50');
+                feedToggle.classList.add('text-gray-600');
+            } else {
+                feedToggle.classList.add('text-blue-600', 'font-medium', 'bg-blue-50');
+                feedToggle.classList.remove('text-gray-600');
+                messagesToggle.classList.remove('text-blue-600', 'font-medium', 'bg-blue-50');
+                messagesToggle.classList.add('text-gray-600');
+            }
+        };
+
+        const toggleRightPanel = (panel) => {
+            if (!recommendationsPanel || !messagesPanel) {
+                return;
+            }
+
+            if (panel === 'messages') {
+                recommendationsPanel.classList.add('hidden');
+                messagesPanel.classList.remove('hidden');
+                setActiveNav('messages');
+                loadConversations();
+            } else {
+                messagesPanel.classList.add('hidden');
+                recommendationsPanel.classList.remove('hidden');
+                setActiveNav('feed');
+            }
+        };
+
+        if (messagesToggle) {
+            messagesToggle.addEventListener('click', () => toggleRightPanel('messages'));
+        }
+
+        if (feedToggle) {
+            feedToggle.addEventListener('click', () => toggleRightPanel('feed'));
+        }
+
+        if (messagesRefresh) {
+            messagesRefresh.addEventListener('click', loadConversations);
+        }
+
+        if (feedToggle && recommendationsPanel && messagesPanel) {
+            setActiveNav('feed');
+        }
+
+        function loadConversations() {
+            if (!messagesList || !authUserId) {
+                return;
+            }
+
+            messagesList.innerHTML = '<p class="text-xs text-gray-500">Carregando conversas...</p>';
+
+            fetch('{{ route('chat.list') }}')
+                .then((r) => r.json())
+                .then((conversations) => {
+                    if (!Array.isArray(conversations) || conversations.length === 0) {
+                        messagesList.innerHTML = '<p class="text-xs text-gray-500">Nenhuma conversa iniciada.</p>';
+                        return;
+                    }
+
+                    messagesList.innerHTML = '';
+                    conversations.forEach((conv) => {
+                        const otherUser = (conv.users || []).find((u) => u.id !== authUserId) || (conv.users || [])[0];
+                        if (!otherUser) {
+                            return;
+                        }
+
+                        const lastMessage = conv.messages && conv.messages.length ? conv.messages[0].body : 'Nova conversa';
+                        const avatar = otherUser.profile_photo_url || otherUser.photo || null;
+
+                        const row = document.createElement('button');
+                        row.type = 'button';
+                        row.className = 'w-full text-left flex items-center gap-3 p-2 rounded hover:bg-blue-50 transition';
+                        row.innerHTML = `
+                            <img src="${avatar || '/img/default-user.svg'}" class="w-10 h-10 rounded-full object-cover" onerror="this.onerror=null;this.src='/img/default-user.svg';" />
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm font-semibold text-gray-800 truncate">${otherUser.name}</p>
+                                    ${conv.unread_count > 0 ? `<span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${conv.unread_count}</span>` : ''}
+                                </div>
+                                <p class="text-xs text-gray-500 truncate">${lastMessage}</p>
+                            </div>
+                        `;
+                        row.addEventListener('click', () => openMultiChat(otherUser.id, otherUser.name, avatar));
+                        messagesList.appendChild(row);
+                    });
+                })
+                .catch(() => {
+                    messagesList.innerHTML = '<p class="text-xs text-red-500">Erro ao carregar conversas.</p>';
+                });
+        }
+
+        const startChatPolling = () => {
+            if (chatPollTimer) {
+                return;
+            }
+
+            chatPollTimer = setInterval(() => {
+                openChats.forEach((chat) => {
+                    loadChatMessages(chat.userId, chat, false);
+                });
+            }, 5000);
+        };
+
+        const stopChatPolling = () => {
+            if (chatPollTimer && openChats.size === 0) {
+                clearInterval(chatPollTimer);
+                chatPollTimer = null;
+            }
+        };
+
+        const refreshChatDock = () => {
+            if (!chatBoxes) {
+                return;
+            }
+
+            const visibleIds = chatOrder.slice(-maxVisibleChats);
+            const hiddenIds = chatOrder.slice(0, Math.max(0, chatOrder.length - maxVisibleChats));
+
+            openChats.forEach((chat, userId) => {
+                chat.element.classList.toggle('hidden', !visibleIds.includes(userId));
+            });
+
+            if (chatOverflow && chatOverflowToggle && chatOverflowList) {
+                if (hiddenIds.length > 0) {
+                    chatOverflow.classList.remove('hidden');
+                    chatOverflowToggle.textContent = `+${hiddenIds.length}`;
+                    chatOverflowList.innerHTML = '';
+                    hiddenIds.forEach((userId) => {
+                        const chat = openChats.get(userId);
+                        if (!chat) {
+                            return;
+                        }
+                        const item = document.createElement('button');
+                        item.type = 'button';
+                        item.className = 'w-full text-left text-sm text-gray-700 px-2 py-1 rounded hover:bg-gray-100';
+                        item.textContent = chat.userName;
+                        item.addEventListener('click', () => {
+                            bringChatToFront(userId);
+                            chatOverflowList.classList.add('hidden');
+                        });
+                        chatOverflowList.appendChild(item);
+                    });
+                } else {
+                    chatOverflow.classList.add('hidden');
+                    chatOverflowList.innerHTML = '';
+                }
+            }
+        };
+
+        if (chatOverflowToggle && chatOverflowList) {
+            chatOverflowToggle.addEventListener('click', () => {
+                chatOverflowList.classList.toggle('hidden');
+            });
+        }
+
+        document.addEventListener('click', (event) => {
+            if (!chatOverflowList || chatOverflowList.classList.contains('hidden')) {
+                return;
+            }
+
+            const isOverflow = chatOverflow && chatOverflow.contains(event.target);
+            if (!isOverflow) {
+                chatOverflowList.classList.add('hidden');
+            }
+        });
+
+        const bringChatToFront = (userId) => {
+            const index = chatOrder.indexOf(userId);
+            if (index !== -1) {
+                chatOrder.splice(index, 1);
+            }
+            chatOrder.push(userId);
+            refreshChatDock();
+        };
+
+        const closeChat = (userId) => {
+            const chat = openChats.get(userId);
+            if (!chat) {
+                return;
+            }
+
+            chat.element.remove();
+            openChats.delete(userId);
+            const index = chatOrder.indexOf(userId);
+            if (index !== -1) {
+                chatOrder.splice(index, 1);
+            }
+            refreshChatDock();
+            stopChatPolling();
+        };
+
+        const toggleChatMinimize = (userId) => {
+            const chat = openChats.get(userId);
+            if (!chat) {
+                return;
+            }
+            chat.body.classList.toggle('hidden');
+            chat.footer.classList.toggle('hidden');
+        };
+
+        const createChatBox = (userId, userName, userPhoto) => {
+            if (!chatBoxes) {
+                return null;
+            }
+
+            const chat = document.createElement('div');
+            chat.className = 'bg-white w-72 rounded-xl shadow-xl border border-gray-200 flex flex-col';
+            chat.innerHTML = `
+                <div class="bg-[#1F5EDB] text-white px-3 py-2 rounded-t-xl flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <img src="${userPhoto || '/img/default-user.svg'}" class="w-7 h-7 rounded-full object-cover" onerror="this.onerror=null;this.src='/img/default-user.svg';" />
+                        <span class="text-sm font-semibold truncate" style="max-width: 140px;">${userName}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" class="text-white text-xs" data-action="minimize"><i class="fas fa-minus"></i></button>
+                        <button type="button" class="text-white text-xs" data-action="close"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="p-3 bg-slate-50 space-y-2 overflow-y-auto" style="height: 220px;"></div>
+                <div class="border-t border-gray-200 p-2 bg-white rounded-b-xl">
+                    <form class="flex items-center gap-2">
+                        <input type="text" class="flex-1 border border-gray-200 rounded-full px-3 py-1 text-sm" placeholder="Digite...">
+                        <button type="submit" class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                            <i class="fas fa-paper-plane text-xs"></i>
+                        </button>
+                    </form>
+                </div>
+            `;
+
+            const body = chat.children[1];
+            const footer = chat.children[2];
+            const form = footer.querySelector('form');
+            const input = footer.querySelector('input');
+            chat.querySelector('[data-action="close"]').addEventListener('click', () => closeChat(userId));
+            chat.querySelector('[data-action="minimize"]').addEventListener('click', () => toggleChatMinimize(userId));
+
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const message = input.value.trim();
+                if (!message) {
+                    return;
+                }
+                appendChatMessage(body, message, true);
+                input.value = '';
+
+                fetch(`/chat/with/${userId}/message`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                }).then((r) => r.json())
+                    .then((data) => {
+                        if (!data.success) {
+                            toastr.error(data.message || 'Erro ao enviar mensagem');
+                        }
+                    })
+                    .catch(() => {
+                        toastr.error('Erro ao enviar mensagem');
+                    });
+            });
+
+            chatBoxes.appendChild(chat);
+            return { element: chat, body, footer, userId, userName };
+        };
+
+        const appendChatMessage = (container, content, isMine) => {
+            const bubble = document.createElement('div');
+            bubble.className = `text-sm px-3 py-2 rounded-2xl shadow ${isMine ? 'bg-blue-600 text-white ml-auto' : 'bg-white text-gray-800 border border-gray-100'}`;
+            bubble.style.maxWidth = '80%';
+            bubble.textContent = content;
+            const wrap = document.createElement('div');
+            wrap.className = `flex ${isMine ? 'justify-end' : 'justify-start'}`;
+            wrap.appendChild(bubble);
+            container.appendChild(wrap);
+            container.scrollTop = container.scrollHeight;
+        };
+
+        const loadChatMessages = (userId, chat, scroll = true) => {
+            fetch(`/chat/with/${userId}`)
+                .then((r) => r.json())
+                .then((data) => {
+                    if (!data || !Array.isArray(data.messages)) {
+                        return;
+                    }
+
+                    chat.body.innerHTML = '';
+                    data.messages.reverse().forEach((msg) => {
+                        appendChatMessage(chat.body, msg.content, msg.is_mine);
+                    });
+                    if (scroll) {
+                        chat.body.scrollTop = chat.body.scrollHeight;
+                    }
+                });
+        };
+
+        function openMultiChat(userId, userName, userPhoto) {
+            if (!userId) {
+                return;
+            }
+
+            const existing = openChats.get(userId);
+            if (existing) {
+                bringChatToFront(userId);
+                return;
+            }
+
+            const chat = createChatBox(userId, userName, userPhoto);
+            if (!chat) {
+                return;
+            }
+
+            openChats.set(userId, chat);
+            chatOrder.push(userId);
+            bringChatToFront(userId);
+            loadChatMessages(userId, chat, true);
+            startChatPolling();
+        }
 
         function requestInvite(userId) {
             Swal.fire({

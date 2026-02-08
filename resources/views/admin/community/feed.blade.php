@@ -432,18 +432,29 @@
             }
         });
 
+        const applyAdminEmojiCategory = (category) => {
+            const grid = document.querySelector('#admin-emoji-picker .emoji-grid');
+            if (!grid) {
+                return;
+            }
+
+            grid.querySelectorAll('.emoji-item').forEach((item) => {
+                const itemCategory = item.getAttribute('data-category');
+                const shouldShow = category === 'all' || itemCategory === category;
+                item.style.display = shouldShow ? '' : 'none';
+            });
+        };
+
         document.querySelectorAll('#admin-emoji-picker .emoji-tab').forEach((tab) => {
             tab.addEventListener('click', () => {
-                const target = tab.getAttribute('data-target');
-                const grid = document.querySelector('#admin-emoji-picker .emoji-grid');
-                if (!grid) {
-                    return;
-                }
-                grid.setAttribute('data-active', target);
+                const category = tab.getAttribute('data-category') || 'all';
                 document.querySelectorAll('#admin-emoji-picker .emoji-tab').forEach((t) => t.classList.remove('is-active'));
                 tab.classList.add('is-active');
+                applyAdminEmojiCategory(category);
             });
         });
+
+        applyAdminEmojiCategory('faces');
 
         document.querySelectorAll('#admin-emoji-picker .emoji-item').forEach((item) => {
             item.addEventListener('click', () => {
