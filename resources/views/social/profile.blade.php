@@ -153,36 +153,41 @@
 
                             @if($isConnected)
                                 <button onclick="removeConnection({{ $user->id }})"
-                                    class="bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-bold hover:bg-gray-300 transition shadow flex items-center gap-2">
-                                    <i class="fas fa-user-check text-green-600"></i> Conectado
+                                    class="bg-gray-200 text-gray-700 w-12 h-12 rounded-full font-bold hover:bg-gray-300 transition shadow flex items-center justify-center"
+                                    title="Conectado" aria-label="Conectado">
+                                    <i class="fas fa-user-check text-green-600"></i>
                                 </button>
                             @endif
 
                             @if($canMessage)
                                 <button
                                     onclick="openChatBox({{ $user->id }}, '{{ $user->name }}', '{{ $user->profile_photo_url }}')"
-                                    class="bg-[#1F5EDB] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center gap-2">
-                                    <i class="fas fa-comment-dots"></i> Mensagem
+                                    class="bg-[#1F5EDB] text-white w-12 h-12 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center justify-center"
+                                    title="Mensagem" aria-label="Mensagem">
+                                    <i class="fas fa-comment-dots"></i>
                                 </button>
                             @endif
 
                             @if($pendingConnection)
                                 @if($isRequester)
                                     <button
-                                        class="bg-gray-200 text-gray-500 px-8 py-3 rounded-full font-bold cursor-not-allowed shadow flex items-center gap-2">
-                                        <i class="fas fa-clock"></i> Pendente
+                                        class="bg-gray-200 text-gray-500 w-12 h-12 rounded-full font-bold cursor-not-allowed shadow flex items-center justify-center"
+                                        title="Pendente" aria-label="Pendente">
+                                        <i class="fas fa-clock"></i>
                                     </button>
                                 @else
                                     <button onclick="acceptConnection({{ $user->id }})"
-                                        class="bg-green-600 text-white px-8 py-3 rounded-full font-bold hover:bg-green-700 transition shadow-lg flex items-center gap-2">
-                                        <i class="fas fa-check"></i> Aceitar
+                                        class="bg-green-600 text-white w-12 h-12 rounded-full font-bold hover:bg-green-700 transition shadow-lg flex items-center justify-center"
+                                        title="Aceitar conexao" aria-label="Aceitar conexao">
+                                        <i class="fas fa-check"></i>
                                     </button>
                                 @endif
                             @elseif(!$isConnected)
                                 <button onclick="requestConnection({{ $user->id }})"
-                                    class="bg-[#1F5EDB] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center gap-2"
+                                    class="bg-[#1F5EDB] text-white w-12 h-12 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center justify-center"
                                     id="btn-connect-{{ $user->id }}">
-                                    <i class="fas fa-user-plus"></i> Conectar
+                                    <i class="fas fa-user-plus"></i>
+                                    <span class="sr-only">Conectar</span>
                                 </button>
                             @endif
                         @endif
