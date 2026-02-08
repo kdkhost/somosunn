@@ -356,7 +356,7 @@
                     </div>
 
                     <a href="{{ route('premium') }}"
-                        class="events-top-cta inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-bold bg-white border hover:bg-slate-50 transition"
+                        class="events-top-cta inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-bold bg-white border hover:bg-slate-50 transition whitespace-nowrap"
                         style="border-color: var(--unn-azul-1); color: var(--unn-azul-1)">
                         <i class="fas fa-crown"></i> Ver planos Premium
                     </a>
@@ -686,7 +686,7 @@
                                 <span class="hidden sm:inline">Começar agora - É grátis</span>
                             </a>
                             <a href="{{ route('premium') }}"
-                                class="inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-10 sm:py-4 rounded-full font-black border-2 border-white text-white bg-white/10 hover:bg-white/15 transition">
+                                class="inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-10 sm:py-4 rounded-full font-black border-2 border-white text-white bg-white/10 hover:bg-white/15 transition whitespace-nowrap">
                                 <i class="fas fa-crown"></i> Ver planos Premium
                             </a>
                         </div>

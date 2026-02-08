@@ -120,7 +120,7 @@
                                             Saiba mais
                                         </a>
                                         <a href="{{ route('premium') }}"
-                                            class="btn-primary text-white px-8 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_12px_24px_-8px_rgba(31,94,219,0.35)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
+                                            class="btn-primary text-white px-8 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_12px_24px_-8px_rgba(31,94,219,0.35)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
                                             Ver planos Premium <i class="fas fa-crown"></i>
                                         </a>
                                     </div>

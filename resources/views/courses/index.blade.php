@@ -216,7 +216,7 @@
                     </div>
 
                     <a href="{{ route('premium') }}"
-                        class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-bold bg-white border hover:bg-slate-50 transition"
+                        class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-bold bg-white border hover:bg-slate-50 transition whitespace-nowrap"
                         style="border-color: var(--unn-azul-1); color: var(--unn-azul-1)">
                         <i class="fas fa-crown"></i> Ver planos Premium
                     </a>
@@ -395,7 +395,7 @@
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3">
                         <a href="{{ route('premium') }}"
-                            class="px-8 py-4 rounded-xl font-bold bg-white text-slate-900 hover:bg-slate-50 transition inline-flex items-center justify-center">
+                            class="px-8 py-4 rounded-xl font-bold bg-white text-slate-900 hover:bg-slate-50 transition inline-flex items-center justify-center whitespace-nowrap">
                             <i class="fas fa-crown mr-2"></i> Ver planos Premium
                         </a>
                         <a href="{{ route('events.index') }}"

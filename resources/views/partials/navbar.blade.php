@@ -90,7 +90,7 @@
             <!-- Action Buttons -->
             <div class="hidden lg:flex items-center gap-3">
                 @guest
-                    <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
+                    <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition-all whitespace-nowrap">
                         Entrar
                     </a>
                 @else
@@ -100,18 +100,52 @@
                             <span id="connection-notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1 rounded-full hidden">0</span>
                         </a>
                     </div>
-                    <a href="{{ route('social.profile', Auth::id()) }}" class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
-                        Meu perfil
+
+                    <!-- Dropdown Minha Conta -->
+                    <div class="relative group">
+                        <button class="inline-flex items-center gap-2 rounded-full {{ $cta['class'] }} px-7 py-3 text-sm font-bold text-white transition-all transform hover:scale-105 active:scale-95 whitespace-nowrap">
+                            Minha Conta
+                            <i class="fas fa-chevron-down text-xs opacity-70"></i>
+                        </button>
+
+                        <div class="absolute right-0 top-full pt-3 hidden group-hover:block z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                            <div class="rounded-2xl bg-white shadow-2xl border border-slate-100 min-w-[240px] py-3 overflow-hidden">
+                                <div class="px-5 py-2 border-b border-slate-50 mb-2">
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Membro UNN</p>
+                                    <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
+                                </div>
+
+                                <a href="{{ route('social.profile', Auth::id()) }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                    <i class="fas fa-user-circle w-5 opacity-70"></i>
+                                    Meu perfil
+                                </a>
+
+                                @if(Auth::user()->canAccessFeature('admin_panel'))
+                                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-th-large w-5 opacity-70"></i>
+                                        Painel Administrativo
+                                    </a>
+                                @endif
+
+                                <div class="mt-2 pt-2 border-t border-slate-50">
+                                    <form action="{{ route('logout') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="flex w-full items-center gap-3 px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-all font-semibold">
+                                            <i class="fas fa-sign-out-alt w-5 opacity-70"></i>
+                                            Sair da conta
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endguest
+
+                @guest
+                    <a href="{{ $cta['href'] }}" class="inline-flex items-center gap-2 rounded-full {{ $cta['class'] }} px-7 py-3 text-sm font-bold whitespace-nowrap">
+                        {{ $cta['label'] }}
                     </a>
                 @endguest
-                @auth
-                    <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
-                        <i class="fas fa-th-large mr-1 font-normal opacity-70"></i> Painel Administrativo
-                    </a>
-                @endauth
-                <a href="{{ $cta['href'] }}" class="inline-flex items-center gap-2 rounded-full {{ $cta['class'] }} px-7 py-3 text-sm font-bold">
-                    {{ Auth::check() ? 'Minha Conta' : $cta['label'] }}
-                </a>
             </div>
         </div>
     </div>
@@ -146,10 +180,38 @@
                 </div>
             @endforeach
         </nav>
-        <div class="px-6 mt-2 mb-6">
-            <a href="{{ $cta['href'] }}" class="inline-flex w-full items-center justify-center rounded-full border border-[#1F5EDB] px-6 py-3 text-sm font-semibold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
-                {{ $cta['label'] }}
-            </a>
+        <div class="px-6 mt-2 mb-6 space-y-3">
+            @guest
+                <a href="{{ route('login') }}" class="inline-flex w-full items-center justify-center rounded-full border border-[#1F5EDB] px-6 py-3 text-sm font-semibold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
+                    Entrar
+                </a>
+                <a href="{{ route('register') }}" class="inline-flex w-full items-center justify-center rounded-full {{ $cta['class'] }} px-6 py-3 text-sm font-bold text-white transition">
+                    Fazer parte
+                </a>
+            @else
+                <div class="p-4 bg-slate-50 rounded-2xl mb-4">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Membro UNN</p>
+                    <p class="font-bold text-gray-800">{{ Auth::user()->name }}</p>
+                </div>
+                
+                <a href="{{ route('social.profile', Auth::id()) }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <i class="fas fa-user-circle w-5 opacity-70"></i> Meu perfil
+                </a>
+                
+                @if(Auth::user()->canAccessFeature('admin_panel'))
+                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                        <i class="fas fa-th-large w-5 opacity-70"></i> Painel Administrativo
+                    </a>
+                @endif
+                
+                <form action="{{ route('logout') }}" method="POST" class="mt-4">
+                    @csrf
+                    <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 transition">
+                        <i class="fas fa-sign-out-alt w-5 opacity-70"></i> Sair da conta
+                    </button>
+                </form>
+            @endguest
+
             @if(!empty($pwaEnabled))
                 <button onclick="showInstallModal()" class="w-full mt-3 inline-flex items-center justify-center rounded-full bg-slate-100 px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">
                     <i class="fas fa-download mr-2"></i> Instalar App

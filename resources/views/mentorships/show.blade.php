@@ -6,7 +6,8 @@
     <style>
         .unn-mentorship-show-hero {
             position: relative;
-            background: #1e293b; /* Fallback */
+            background: #1e293b;
+            /* Fallback */
         }
 
         .unn-mentorship-show-hero::before {
@@ -63,10 +64,14 @@
 
         $resolveImageUrl = function (?string $path): ?string {
             $path = trim((string) $path);
-            if ($path === '') return null;
-            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) return $path;
-            if (str_starts_with($path, 'storage/')) return asset($path);
-            if (str_starts_with($path, 'uploads/')) return asset($path);
+            if ($path === '')
+                return null;
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://'))
+                return $path;
+            if (str_starts_with($path, 'storage/'))
+                return asset($path);
+            if (str_starts_with($path, 'uploads/'))
+                return asset($path);
             return asset('storage/' . ltrim($path, '/'));
         };
 
@@ -77,7 +82,8 @@
 
         $hexToRgba = function (?string $hex, float $alpha): ?string {
             $hex = trim((string) $hex);
-            if ($hex === '') return null;
+            if ($hex === '')
+                return null;
             $alpha = max(0, min(1, $alpha));
             if (preg_match('/^#?[0-9a-fA-F]{3}$/', $hex)) {
                 $hex = ltrim($hex, '#');
@@ -99,7 +105,7 @@
         // Admin controls
         $heroBlurPxRaw = \App\Models\Setting::get('events_hero_bg_blur_px');
         $heroBlurPx = is_numeric($heroBlurPxRaw) ? (int) $heroBlurPxRaw : 64;
-        
+
         $heroFilmRaw = \App\Models\Setting::get('events_hero_film_strength_percent');
         $heroFilmScale = (is_numeric($heroFilmRaw) ? (int) $heroFilmRaw : 100) / 100;
     @endphp
@@ -108,23 +114,25 @@
         <section class="unn-mentorship-show-hero relative overflow-hidden">
             @if($mentorshipImageUrl)
                 <div class="absolute inset-0 pointer-events-none overflow-hidden">
-                    <img src="{{ $mentorshipImageUrl }}" alt="" 
-                        class="absolute inset-0 w-full h-full object-cover scale-110 saturate-[1.1] brightness-[0.85]" 
-                        style="filter: blur({{ $heroBlurPx }}px); opacity: 0.7;" 
-                        aria-hidden="true">
+                    <img src="{{ $mentorshipImageUrl }}" alt=""
+                        class="absolute inset-0 w-full h-full object-cover scale-110 saturate-[1.1] brightness-[0.85]"
+                        style="filter: blur({{ $heroBlurPx }}px); opacity: 0.7;" aria-hidden="true">
 
                     <!-- Película transparente em cor degradê -->
                     <div class="absolute inset-0" style="background: linear-gradient(135deg, 
-                        {{ $hexToRgba($sitePrimary, 0.8 * $heroFilmScale) }} 0%, 
-                        {{ $hexToRgba($siteSecondary, 0.7 * $heroFilmScale) }} 50%, 
-                        {{ $hexToRgba($sitePrimary, 0.9 * $heroFilmScale) }} 100%);">
+                                {{ $hexToRgba($sitePrimary, 0.8 * $heroFilmScale) }} 0%, 
+                                {{ $hexToRgba($siteSecondary, 0.7 * $heroFilmScale) }} 50%, 
+                                {{ $hexToRgba($sitePrimary, 0.9 * $heroFilmScale) }} 100%);">
                     </div>
                 </div>
             @else
-                <div class="absolute inset-0 pointer-events-none" style="background: linear-gradient(135deg, var(--unn-azul-3) 0%, var(--unn-azul-1) 100%);"></div>
+                <div class="absolute inset-0 pointer-events-none"
+                    style="background: linear-gradient(135deg, var(--unn-azul-3) 0%, var(--unn-azul-1) 100%);"></div>
             @endif
-            
-            <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/20 text-transparent pointer-events-none"></div>
+
+            <div
+                class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/20 text-transparent pointer-events-none">
+            </div>
 
             <div class="px-4 md:px-12 lg:px-24 pt-10 md:pt-14 pb-16 md:pb-20 relative">
                 <div class="max-w-6xl mx-auto">
@@ -197,11 +205,11 @@
 
                         <div class="mt-10 flex flex-col gap-4">
                             <a href="{{ route('premium') }}"
-                                class="btn-primary text-white px-8 py-4 rounded-2xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_15px_30px_-10px_rgba(31,94,219,0.4)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
+                                class="btn-primary text-white px-8 py-4 rounded-2xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_15px_30px_-10px_rgba(31,94,219,0.4)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
                                 Ver planos Premium <i class="fas fa-crown"></i>
                             </a>
                             <a href="{{ route('mentorships.index') }}"
-                                class="px-8 py-4 rounded-2xl font-bold border-2 border-slate-100 text-slate-600 hover:bg-slate-50 hover:border-slate-200 transition-all duration-300 inline-flex items-center justify-center">
+                                class="px-8 py-4 rounded-2xl font-bold border-2 border-slate-100 text-slate-600 hover:bg-slate-50 hover:border-slate-200 transition-all duration-300 inline-flex items-center justify-center whitespace-nowrap">
                                 Ver outras mentorias
                             </a>
                         </div>
@@ -252,9 +260,11 @@
                                         </div>
                                         <div class="min-w-0">
                                             <div class="font-semibold text-gray-900 truncate">
-                                                {{ $review->user->name ?? 'Usuário' }}</div>
+                                                {{ $review->user->name ?? 'Usuário' }}
+                                            </div>
                                             <div class="text-xs text-gray-500">
-                                                {{ optional($review->created_at)->format('d/m/Y') }}</div>
+                                                {{ optional($review->created_at)->format('d/m/Y') }}
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="text-amber-500 text-sm whitespace-nowrap">
