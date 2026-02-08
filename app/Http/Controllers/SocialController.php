@@ -114,7 +114,7 @@ class SocialController extends Controller
                 ->where('role', '!=', 'superadmin')
                 ->inRandomOrder()
                 ->limit(5)
-                ->get(['id', 'name', 'profile_photo']);
+                ->get(['id', 'name']);
         }
 
         $adsEnabled = (string) Setting::get('ads_enabled', '0') === '1';
