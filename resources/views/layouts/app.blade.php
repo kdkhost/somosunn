@@ -1239,6 +1239,9 @@
         </script>
     @endif
 
+    {{-- Floating Chat Component (persiste entre páginas) --}}
+    @include('partials.floating-chat')
+
     @stack('scripts')
 
     @if ($pwaEnabled)
