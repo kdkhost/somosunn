@@ -283,6 +283,15 @@ class SocialController extends Controller
                 ->toArray();
         }
 
+        $pendingRequests = collect();
+        if (Auth::check() && Auth::id() === $user->id) {
+            $pendingRequests = Connection::where('requested_id', Auth::id())
+                ->where('status', 'pending')
+                ->with('requester')
+                ->latest()
+                ->get();
+        }
+
         $adsEnabled = (string) Setting::get('ads_enabled', '0') === '1';
         $adsCode = (string) Setting::get('ads_code_html', '');
 
@@ -294,6 +303,7 @@ class SocialController extends Controller
                 : User::whereIn('id', $shareTargets)->orderBy('name')->get(['id', 'name']),
             'adsEnabled' => $adsEnabled,
             'adsCode' => $adsCode,
+            'pendingRequests' => $pendingRequests,
         ]);
     }
 

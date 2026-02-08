@@ -210,9 +210,11 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const btn = document.getElementById(`btn-connect-${userId}`);
-                            const originalContent = btn.innerHTML;
-                            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                            btn.disabled = true;
+                            const originalContent = btn ? btn.innerHTML : '';
+                            if (btn) {
+                                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                                btn.disabled = true;
+                            }
 
                             fetch(`/connect/${userId}`, {
                                 method: 'POST',
@@ -235,14 +237,18 @@
                                         });
                                     } else {
                                         toastr.error(data.message);
-                                        btn.innerHTML = originalContent;
-                                        btn.disabled = false;
+                                        if (btn) {
+                                            btn.innerHTML = originalContent;
+                                            btn.disabled = false;
+                                        }
                                     }
                                 })
                                 .catch(() => {
                                     toastr.error('Erro ao conectar.');
-                                    btn.innerHTML = originalContent;
-                                    btn.disabled = false;
+                                    if (btn) {
+                                        btn.innerHTML = originalContent;
+                                        btn.disabled = false;
+                                    }
                                 });
                         }
                     });
@@ -285,16 +291,63 @@
                                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                     'Content-Type': 'application/json'
                                 }
-                            }) \n.then(r => r.json()) \n.then(data => { \n                                if (data.success) { \n                                    toastr.success(data.message); \n                                    location.reload(); \n } else { \n                                    toastr.error(data.message); \n } \n }); \n
-                        } \n
-                    }); \n
-                } \n            </script>
+                            })
+                                .then(r => r.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        toastr.success(data.message);
+                                        location.reload();
+                                    } else {
+                                        toastr.error(data.message);
+                                    }
+                                });
+                        }
+                    });
+                }
+            </script>
         @endpush
 
         <!-- Content -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Sidebar -->
             <div class="space-y-6">
+                @if(Auth::check() && Auth::id() === $user->id && !empty($pendingRequests) && $pendingRequests->isNotEmpty())
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="font-bold text-gray-900 mb-4">Solicitacoes de conexao</h3>
+                        <div class="space-y-3">
+                            @foreach($pendingRequests as $request)
+                                @php
+                                    $requester = $request->requester;
+                                @endphp
+                                @if($requester)
+                                    <div class="flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
+                                                <img src="{{ $requester->profile_photo_url }}" alt="Avatar"
+                                                    class="w-10 h-10 object-cover"
+                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-semibold text-gray-800">{{ $requester->name }}</p>
+                                                <p class="text-xs text-gray-500">Solicitacao pendente</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" onclick="acceptConnection({{ $requester->id }})"
+                                                class="text-xs text-green-600 hover:text-green-700 font-medium" title="Aceitar">
+                                                Aceitar
+                                            </button>
+                                            <button type="button" onclick="removeConnection({{ $requester->id }})"
+                                                class="text-xs text-red-600 hover:text-red-700 font-medium" title="Recusar">
+                                                Recusar
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="font-bold text-gray-900 mb-4">Sobre</h3>
                     <p class="text-gray-600 text-sm">
