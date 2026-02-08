@@ -5,9 +5,10 @@
 @section('content')
     @php
         $routeNamePrefix = $routeNamePrefix ?? 'chat';
+        $isAdminContext = ($extends ?? 'layouts.app') === 'admin.layouts.app';
     @endphp
 
-    <div class="max-w-6xl mx-auto px-0 md:px-4 py-6 h-[calc(100vh-80px)]">
+    <div class="{{ $isAdminContext ? 'px-0 py-4' : 'max-w-6xl mx-auto px-0 md:px-4 py-6' }} h-[calc(100vh-200px)] min-h-[500px]">
         <div class="bg-white rounded-lg shadow-xl overflow-hidden flex h-full border border-gray-200">
             <!-- Sidebar (hidden on mobile when chat open, visible on md) -->
             <div class="hidden md:flex w-1/3 border-r border-gray-200 flex-col bg-white">

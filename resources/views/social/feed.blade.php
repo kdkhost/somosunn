@@ -121,10 +121,10 @@
                                         <input type="text" id="conversation-search" placeholder="Pesquisar no Messenger"
                                             class="w-full border border-gray-200 rounded-full pl-9 pr-3 py-2 text-xs focus:ring-blue-500 focus:border-blue-500">
                                     </div>
-                                    <div class="flex items-center gap-2 text-xs text-gray-500 mb-3">
-                                        <button type="button" class="px-3 py-1 rounded-full bg-blue-50 text-blue-600">Tudo</button>
-                                        <button type="button" class="px-3 py-1 rounded-full hover:bg-gray-100">Nao lidas</button>
-                                        <button type="button" class="px-3 py-1 rounded-full hover:bg-gray-100">Grupos</button>
+                                    <div id="conversation-filters" class="flex items-center gap-2 text-xs text-gray-500 mb-3">
+                                        <button type="button" data-filter="all" class="filter-btn px-3 py-1 rounded-full bg-blue-50 text-blue-600">Tudo</button>
+                                        <button type="button" data-filter="unread" class="filter-btn px-3 py-1 rounded-full hover:bg-gray-100">Não lidas</button>
+                                        <button type="button" data-filter="groups" class="filter-btn px-3 py-1 rounded-full hover:bg-gray-100">Grupos</button>
                                     </div>
                                     <div id="conversation-list" class="space-y-1">
                                         <p class="text-xs text-gray-500">Carregando conversas...</p>
@@ -1051,12 +1051,26 @@
 
             const applyConversationFilter = () => {
                 const term = conversationSearch.value.trim().toLowerCase();
+                const activeFilter = document.querySelector('#conversation-filters .filter-btn.bg-blue-50')?.getAttribute('data-filter') || 'all';
+                
                 document.querySelectorAll('[data-conversation-row]').forEach((row) => {
                     const rawName = row.getAttribute('data-name') || '';
                     const rawMessage = row.getAttribute('data-message') || '';
                     const name = rawName.toLowerCase();
                     const message = rawMessage.toLowerCase();
-                    const matches = !term || name.includes(term) || message.includes(term);
+                    const isUnread = row.getAttribute('data-unread') === 'true';
+                    const isGroup = row.getAttribute('data-is-group') === 'true';
+                    
+                    const matchesSearch = !term || name.includes(term) || message.includes(term);
+                    let matchesFilter = true;
+                    
+                    if (activeFilter === 'unread') {
+                        matchesFilter = isUnread;
+                    } else if (activeFilter === 'groups') {
+                        matchesFilter = isGroup;
+                    }
+                    
+                    const matches = matchesSearch && matchesFilter;
                     row.classList.toggle('hidden', !matches);
 
                     const nameNode = row.querySelector('[data-role="conversation-name"]');
@@ -1069,6 +1083,22 @@
                     }
                 });
             };
+            
+            // Filter buttons logic
+            const filterContainer = document.getElementById('conversation-filters');
+            if (filterContainer) {
+                filterContainer.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filterContainer.querySelectorAll('.filter-btn').forEach(b => {
+                            b.classList.remove('bg-blue-50', 'text-blue-600');
+                            b.classList.add('hover:bg-gray-100');
+                        });
+                        btn.classList.add('bg-blue-50', 'text-blue-600');
+                        btn.classList.remove('hover:bg-gray-100');
+                        applyConversationFilter();
+                    });
+                });
+            }
 
             conversationSearch.addEventListener('input', applyConversationFilter);
             conversationSearch.addEventListener('search', applyConversationFilter);
@@ -1123,6 +1153,8 @@
                         row.setAttribute('data-conversation-row', 'true');
                         row.setAttribute('data-name', otherUser.name || '');
                         row.setAttribute('data-message', lastMessage || '');
+                        row.setAttribute('data-unread', conv.unread_count > 0 ? 'true' : 'false');
+                        row.setAttribute('data-is-group', conv.type === 'group' ? 'true' : 'false');
                         row.innerHTML = `
                             <img src="${avatar || '/img/default-user.svg'}" class="w-10 h-10 rounded-full object-cover" onerror="this.onerror=null;this.src='/img/default-user.svg';" />
                             <div class="flex-1 min-w-0">
