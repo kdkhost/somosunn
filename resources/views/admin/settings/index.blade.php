@@ -616,27 +616,37 @@
                         <div class="col-md-6">
                             <label>Imagem de Fundo Global</label>
                             <input type="hidden" name="remove_site_bg_image" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}" data-existing-url="{{ $getUrl('site_bg_image') }}" data-remove-input="[name='remove_site_bg_image']">
+                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
+                                data-existing-url="{{ $getUrl('site_bg_image') }}"
+                                data-remove-input="[name='remove_site_bg_image']">
                                 <input type="file" name="site_bg_image" accept="image/*" class="d-none">
                                 <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
                                 <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar imagem</button>
-                                <div class="progress upload-progress d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
-                                <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
+                                    imagem</button>
+                                <div class="progress upload-progress d-none mt-2">
+                                    <div class="progress-bar bg-primary" style="width:0%"></div>
+                                </div>
+                                <button type="button"
+                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Opacidade do Degradê (%)</label>
-                                <input name="site_bg_gradient_opacity" type="number" min="0" max="100" class="form-control" value="{{ $settings['site_bg_gradient_opacity'] ?? 85 }}">
-                                <small class="text-muted">Opacidade da camada de degradê sobre a imagem de fundo (0-100%).</small>
+                                <input name="site_bg_gradient_opacity" type="number" min="0" max="100"
+                                    class="form-control" value="{{ $settings['site_bg_gradient_opacity'] ?? 85 }}">
+                                <small class="text-muted">Opacidade da camada de degradê sobre a imagem de fundo
+                                    (0-100%).</small>
                             </div>
                             <div class="form-group">
                                 <label>Cor do Degradê (Início)</label>
                                 <div class="input-group colorpicker-element">
-                                    <input name="site_bg_gradient_start" class="form-control" value="{{ $settings['site_bg_gradient_start'] ?? '#000000' }}">
+                                    <input name="site_bg_gradient_start" class="form-control"
+                                        value="{{ $settings['site_bg_gradient_start'] ?? '#000000' }}">
                                     <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fas fa-square" style="color: {{ $settings['site_bg_gradient_start'] ?? '#000000' }}"></i></span>
+                                        <span class="input-group-text"><i class="fas fa-square"
+                                                style="color: {{ $settings['site_bg_gradient_start'] ?? '#000000' }}"></i></span>
                                     </div>
                                 </div>
                             </div>
@@ -1214,8 +1224,8 @@
                         <div class="form-group col-md-3">
                             <label>Icon 192x192</label>
                             <input type="hidden" name="remove_pwa_icon_192" value="0">
-                            <div class="upload-box" data-max-size="{{ 2 * 1024 * 1024 }}" data-existing-url="{{ $pwa192 }}"
-                                data-remove-input="[name='remove_pwa_icon_192']">
+                            <div class="upload-box" data-max-size="{{ 2 * 1024 * 1024 }}"
+                                data-existing-url="{{ $pwa192 }}" data-remove-input="[name='remove_pwa_icon_192']">
                                 <input type="file" name="pwa_icon_192" accept="image/*" class="d-none">
                                 <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
                                 <div class="upload-help text-muted small"></div>
@@ -1232,8 +1242,8 @@
                         <div class="form-group col-md-3">
                             <label>Icon 512x512</label>
                             <input type="hidden" name="remove_pwa_icon_512" value="0">
-                            <div class="upload-box" data-max-size="{{ 3 * 1024 * 1024 }}" data-existing-url="{{ $pwa512 }}"
-                                data-remove-input="[name='remove_pwa_icon_512']">
+                            <div class="upload-box" data-max-size="{{ 3 * 1024 * 1024 }}"
+                                data-existing-url="{{ $pwa512 }}" data-remove-input="[name='remove_pwa_icon_512']">
                                 <input type="file" name="pwa_icon_512" accept="image/*" class="d-none">
                                 <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
                                 <div class="upload-help text-muted small"></div>
@@ -1666,7 +1676,8 @@
                                 </option>
                                 <option value="ssl" {{ ($settings['smtp_encryption'] ?? '') === 'ssl' ? 'selected' : '' }}>SSL
                                 </option>
-                                <option value="" {{ empty($settings['smtp_encryption'] ?? '') ? 'selected' : '' }}>Nenhuma
+                                <option value="" {{ empty($settings['smtp_encryption'] ?? '') ? 'selected' : '' }}>
+                                    Nenhuma
                                 </option>
                             </select></div>
                     </div>
@@ -2069,8 +2080,8 @@
                         <div class="form-group col-md-6">
                             <label>OpenGraph image (1200×630)</label>
                             <input type="hidden" name="remove_seo_og_image" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}" data-existing-url="{{ $seoOg }}"
-                                data-remove-input="[name='remove_seo_og_image']">
+                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
+                                data-existing-url="{{ $seoOg }}" data-remove-input="[name='remove_seo_og_image']">
                                 <input type="file" name="seo_og_image" accept="image/*" class="d-none">
                                 <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
                                 <div class="upload-help text-muted small"></div>
