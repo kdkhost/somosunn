@@ -1,3 +1,65 @@
+<?php
+/**
+ * =============================================================================
+ * AVISO LEGAL DE DIREITOS AUTORAIS E PROPRIEDADE INTELECTUAL
+ * =============================================================================
+ *
+ * © 2026 Marcelo Brad - Todos os direitos reservados.
+ *
+ * AUTOR:
+ * marcelo-brad rj
+ *
+ * CONTATO:
+ * Tel: +55 21 98132-5441
+ * Email: contato@kdkhost.com.br
+ * Telegram: @MARCELO_BRAD
+ * Instagram: @marcelobradrj
+ * WhatsApp: +55 21 98132-5441
+ *
+ * -----------------------------------------------------------------------------
+ * DIREITOS AUTORAIS:
+ * Este software, incluindo seu código-fonte, estrutura, banco de dados,
+ * layout, funcionalidades, lógica de programação e documentação associada,
+ * é protegido pelas leis brasileiras de direitos autorais (Lei nº 9.610/98)
+ * e demais legislações internacionais aplicáveis.
+ *
+ * -----------------------------------------------------------------------------
+ * PROPRIEDADE INTELECTUAL:
+ * Todo o conteúdo deste sistema é de propriedade exclusiva do autor,
+ * sendo proibida a reprodução total ou parcial, modificação,
+ * engenharia reversa, redistribuição, sublicenciamento,
+ * comercialização ou qualquer forma de exploração sem autorização
+ * expressa e formal do titular dos direitos.
+ *
+ * -----------------------------------------------------------------------------
+ * LICENÇA DE USO:
+ * Este sistema é licenciado, não vendido.
+ * O uso é restrito ao cliente contratante conforme contrato firmado.
+ * É vedado o compartilhamento, revenda ou distribuição a terceiros
+ * sem autorização prévia e documentada.
+ *
+ * -----------------------------------------------------------------------------
+ * RESPONSABILIDADE:
+ * Alterações realizadas por terceiros não autorizados anulam qualquer
+ * responsabilidade do autor sobre falhas, vulnerabilidades ou danos
+ * decorrentes do uso indevido do sistema.
+ *
+ * -----------------------------------------------------------------------------
+ * SEGURANÇA E MONITORAMENTO:
+ * Este software pode conter mecanismos de identificação,
+ * rastreamento de licença e validação de integridade para
+ * proteção contra uso não autorizado e pirataria.
+ *
+ * -----------------------------------------------------------------------------
+ * PENALIDADES:
+ * O uso indevido ou não autorizado poderá resultar em medidas legais
+ * cabíveis nas esferas civil e criminal, incluindo indenizações por
+ * perdas e danos.
+ *
+ * =============================================================================
+ */
+?>
+
 @extends('layouts.app')
 
 @section('title', $user->name . ' - Perfil UNN')
@@ -23,15 +85,9 @@
                     <!-- Avatar -->
                     <div class="flex-shrink-0 relative">
                         <div class="w-40 h-40 sm:w-48 sm:h-48 bg-white rounded-full p-1.5 shadow-xl">
-                            @if(isset($user->photo) && $user->photo)
-                                <img src="{{ asset($user->photo) }}"
-                                    class="w-full h-full rounded-full object-cover border-4 border-white">
-                            @else
-                                <div
-                                    class="w-full h-full bg-[#1F5EDB] rounded-full flex items-center justify-center text-5xl text-white font-bold border-4 border-white">
-                                    {{ substr($user->name, 0, 1) }}
-                                </div>
-                            @endif
+                            <img src="{{ $user->profile_photo_url }}"
+                                class="w-full h-full rounded-full object-cover border-4 border-white" alt="Avatar"
+                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                         </div>
                     </div>
 
@@ -95,7 +151,7 @@
 
                             @if($canMessage)
                                 <button
-                                    onclick="openChatBox({{ $user->id }}, '{{ $user->name }}', '{{ $user->photo ? asset($user->photo) : '' }}')"
+                                    onclick="openChatBox({{ $user->id }}, '{{ $user->name }}', '{{ $user->profile_photo_url }}')"
                                     class="bg-[#1F5EDB] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center gap-2">
                                     <i class="fas fa-comment-dots"></i> Mensagem
                                 </button>
@@ -260,11 +316,18 @@
 
                 @forelse($posts as $post)
                     <div class="bg-white rounded-lg shadow p-4">
+                        @php
+                            $viewerId = Auth::id();
+                            $hasLiked = $viewerId ? $post->reactions->firstWhere('user_id', $viewerId) : null;
+                            $likeCount = $post->reactions->count();
+                            $commentCount = $post->comments->count();
+                            $postAvatar = $post->user->profile_photo_url ?? asset('img/default-user.svg');
+                        @endphp
                         <div class="flex justify-between items-start mb-3">
                             <div class="flex items-center gap-3">
-                                <div
-                                    class="bg-gray-200 text-gray-600 rounded-full w-10 h-10 flex items-center justify-center font-bold">
-                                    {{ substr($post->user->name, 0, 1) }}
+                                <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
+                                    <img src="{{ $postAvatar }}" alt="Avatar" class="w-10 h-10 object-cover"
+                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                                 </div>
                                 <div>
                                     <h4 class="font-bold text-gray-900">{{ $post->user->name }}</h4>
@@ -275,6 +338,82 @@
                         <div class="prose max-w-none text-gray-800">
                             {!! nl2br(e($post->content)) !!}
                         </div>
+
+                        <div class="flex items-center justify-between pt-3 mt-3 border-t text-sm text-gray-500">
+                            @auth
+                                <form action="{{ route('social.post.react', $post) }}" method="POST">
+                                    @csrf
+                                    <button type="submit"
+                                        class="flex items-center gap-2 transition {{ $hasLiked ? 'text-blue-600' : 'hover:text-blue-600' }}">
+                                        <i class="{{ $hasLiked ? 'fas' : 'far' }} fa-thumbs-up"></i> Curtir
+                                    </button>
+                                </form>
+                            @else
+                                <span class="flex items-center gap-2">
+                                    <i class="far fa-thumbs-up"></i> Curtir
+                                </span>
+                            @endauth
+
+                            <span class="flex items-center gap-2">
+                                <i class="far fa-comment"></i> Comentar
+                            </span>
+
+                            @auth
+                                <form action="{{ route('social.post.share', $post) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="flex items-center gap-2 hover:text-blue-600 transition">
+                                        <i class="fas fa-share"></i> Compartilhar
+                                    </button>
+                                </form>
+                            @else
+                                <span class="flex items-center gap-2">
+                                    <i class="fas fa-share"></i> Compartilhar
+                                </span>
+                            @endauth
+                        </div>
+
+                        <div class="mt-2 text-xs text-gray-400 flex gap-3">
+                            <span>{{ $likeCount }} curtida{{ $likeCount === 1 ? '' : 's' }}</span>
+                            <span>{{ $commentCount }} comentario{{ $commentCount === 1 ? '' : 's' }}</span>
+                        </div>
+
+                        @if($post->comments->isNotEmpty())
+                            <div class="mt-4 space-y-3">
+                                @foreach($post->comments as $comment)
+                                    @php
+                                        $commentUser = $comment->user;
+                                        $commentAvatar = $commentUser
+                                            ? $commentUser->profile_photo_url
+                                            : asset('img/default-user.svg');
+                                        $commentName = $commentUser ? $commentUser->name : 'Usuario';
+                                    @endphp
+                                    <div class="flex gap-3">
+                                        <div class="rounded-full w-8 h-8 overflow-hidden flex-shrink-0">
+                                            <img src="{{ $commentAvatar }}" alt="Avatar"
+                                                class="w-8 h-8 object-cover"
+                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                        </div>
+                                        <div class="bg-gray-50 rounded-lg px-3 py-2 w-full">
+                                            <p class="text-xs font-semibold text-gray-700">{{ $commentName }}</p>
+                                            <p class="text-sm text-gray-700">{{ $comment->content }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        @auth
+                            <form action="{{ route('social.post.comment', $post) }}" method="POST"
+                                class="mt-3 flex gap-2">
+                                @csrf
+                                <input type="text" name="content" placeholder="Escreva um comentario..."
+                                    class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                <button type="submit"
+                                    class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition">
+                                    Enviar
+                                </button>
+                            </form>
+                        @endauth
                     </div>
                 @empty
                     <div class="text-center py-10 text-gray-500 bg-white rounded-lg shadow">
