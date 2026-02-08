@@ -114,6 +114,24 @@ class SocialController extends Controller
                 ->suggest(Auth::user(), $blockedUserIds, $connectedUserIds, 5);
         }
 
+        $connectionMap = [];
+        if (Auth::check() && $recommendedUsers->isNotEmpty()) {
+            $authId = Auth::id();
+            $recommendedIds = $recommendedUsers->pluck('id')->all();
+            $connections = Connection::where(function ($q) use ($authId, $recommendedIds) {
+                $q->where('requester_id', $authId)->whereIn('requested_id', $recommendedIds);
+            })->orWhere(function ($q) use ($authId, $recommendedIds) {
+                $q->where('requested_id', $authId)->whereIn('requester_id', $recommendedIds);
+            })->get();
+
+            foreach ($connections as $connection) {
+                $otherId = $connection->requester_id === $authId
+                    ? $connection->requested_id
+                    : $connection->requester_id;
+                $connectionMap[$otherId] = $connection;
+            }
+        }
+
         $adsEnabled = (string) Setting::get('ads_enabled', '0') === '1';
         $adsCode = (string) Setting::get('ads_code_html', '');
 
@@ -183,6 +201,7 @@ class SocialController extends Controller
                 'isDemo' => true,
                 'shareTargets' => User::whereIn('id', $connectedUserIds)->orderBy('name')->get(['id', 'name']),
                 'recommendedUsers' => $recommendedUsers,
+                'connectionMap' => $connectionMap,
                 'adsEnabled' => $adsEnabled,
                 'adsCode' => $adsCode,
             ]);
@@ -192,6 +211,7 @@ class SocialController extends Controller
             'posts' => $posts,
             'shareTargets' => User::whereIn('id', $connectedUserIds)->orderBy('name')->get(['id', 'name']),
             'recommendedUsers' => $recommendedUsers,
+            'connectionMap' => $connectionMap,
             'adsEnabled' => $adsEnabled,
             'adsCode' => $adsCode,
         ]);

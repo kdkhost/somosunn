@@ -84,14 +84,33 @@
 
                 @php
                     $pending = auth()->user()->hasPendingConnectionWith($user->id);
+                    $isRequester = $pending && $pending->requester_id === auth()->id();
+                    $pendingTime = $pending ? $pending->created_at->diffForHumans() : '';
                 @endphp
 
                 @if($pending)
-                    <button class="px-6 py-3 bg-blue-100 text-blue-600 rounded-full font-bold cursor-not-allowed">
-                        Solicitação Pendente
-                    </button>
+                    <div class="text-center">
+                        <div class="text-sm text-slate-500">Pendente {{ $pendingTime }}</div>
+                        @if($isRequester)
+                            <button type="button" onclick="cancelInvite({{ $user->id }})"
+                                class="mt-2 px-6 py-3 bg-red-100 text-red-600 rounded-full font-bold hover:bg-red-200 transition">
+                                Cancelar convite
+                            </button>
+                        @else
+                            <div class="mt-2 flex flex-wrap justify-center gap-3">
+                                <button type="button" onclick="acceptInvite({{ $user->id }})"
+                                    class="px-6 py-3 bg-green-600 text-white rounded-full font-bold hover:bg-green-700 transition">
+                                    Aceitar
+                                </button>
+                                <button type="button" onclick="cancelInvite({{ $user->id }})"
+                                    class="px-6 py-3 bg-slate-100 text-slate-700 rounded-full font-bold hover:bg-slate-200 transition">
+                                    Recusar
+                                </button>
+                            </div>
+                        @endif
+                    </div>
                 @else
-                    <button onclick="requestConnection({{ $user->id }})"
+                    <button type="button" onclick="requestInvite({{ $user->id }})"
                         class="px-8 py-3 bg-[#1F5EDB] text-white rounded-full font-bold hover:bg-blue-700 transition shadow-lg">
                         Conectar agora
                     </button>
@@ -102,21 +121,98 @@
 
     @push('scripts')
         <script>
-            function requestConnection(userId) {
-                fetch(`/connect/${userId}`, {
+            const csrfToken = '{{ csrf_token() }}';
+
+            function requestInvite(userId) {
+                Swal.fire({
+                    title: 'Conectar com este membro?',
+                    text: 'Voce enviara uma solicitacao de conexao.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#1F5EDB',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sim, conectar!',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+
+                    fetch(`/connect/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Enviado!', data.message, 'success').then(() => location.reload());
+                            } else {
+                                Swal.fire('Ops!', data.message, 'warning');
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire('Ops!', 'Erro ao conectar.', 'error');
+                        });
+                });
+            }
+
+            function cancelInvite(userId) {
+                Swal.fire({
+                    title: 'Cancelar solicitacao?',
+                    text: 'Voce deseja cancelar o convite?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sim, cancelar',
+                    cancelButtonText: 'Voltar'
+                }).then((result) => {
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+
+                    fetch(`/connection/remove/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Cancelado!', data.message, 'success').then(() => location.reload());
+                            } else {
+                                Swal.fire('Ops!', data.message, 'warning');
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire('Ops!', 'Erro ao cancelar.', 'error');
+                        });
+                });
+            }
+
+            function acceptInvite(userId) {
+                fetch(`/connection/accept/${userId}`, {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json'
                     }
                 })
                     .then(r => r.json())
                     .then(data => {
                         if (data.success) {
-                            Swal.fire('Enviado!', data.message, 'success').then(() => location.reload());
+                            Swal.fire('Conexao aceita!', data.message, 'success').then(() => location.reload());
                         } else {
                             Swal.fire('Ops!', data.message, 'warning');
                         }
+                    })
+                    .catch(() => {
+                        Swal.fire('Ops!', 'Erro ao aceitar.', 'error');
                     });
             }
         </script>
