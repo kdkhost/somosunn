@@ -158,6 +158,9 @@ Route::get('/favicon.ico', function () {
     return response()->file($default, ['Content-Type' => 'image/svg+xml']);
 });
 
+Route::get('/post/{post}', [\App\Http\Controllers\SocialController::class, 'publicPost'])
+    ->name('social.post.public');
+
 // Auth scaffold (simplificado)
 Route::get('/login', fn() => view('auth.login'))->name('login');
 Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'authenticate']);

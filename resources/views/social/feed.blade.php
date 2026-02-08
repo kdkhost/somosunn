@@ -185,7 +185,7 @@
                                 $likeCount = $post->reactions->count();
                                 $commentCount = $post->comments->count();
                                 $postAvatar = $post->user->profile_photo_url ?? asset('img/default-user.svg');
-                                $postLink = $feedUrl . '#post-' . $post->id;
+                                $postLink = route('social.post.public', $post);
                             @endphp
                             <div class="flex justify-between items-start mb-3">
                                 <div class="flex items-center gap-3">

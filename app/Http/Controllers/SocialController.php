@@ -67,11 +67,13 @@ use App\Models\PostComment;
 use App\Models\PostMedia;
 use App\Models\PostReaction;
 use App\Models\PostReport;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class SocialController extends Controller
 {
@@ -241,6 +243,30 @@ class SocialController extends Controller
             'shareTargets' => empty($shareTargets)
                 ? collect()
                 : User::whereIn('id', $shareTargets)->orderBy('name')->get(['id', 'name']),
+        ]);
+    }
+
+    public function publicPost(Post $post)
+    {
+        $post->load(['user', 'media']);
+
+        $imagePath = $post->media->first()?->path;
+        $seoImage = (string) (Setting::get('seo_og_image') ?: '');
+        if ($seoImage === '') {
+            $seoImage = (string) (Setting::get('logo_front') ?: Setting::get('logo_image'));
+        }
+        if ($seoImage === '') {
+            $seoImage = 'img/logo.svg';
+        }
+        $shareImage = $imagePath ? asset($imagePath) : asset(ltrim($seoImage, '/'));
+
+        $contentText = trim(strip_tags((string) ($post->content ?? '')));
+        $shareDescription = Str::limit($contentText, 160);
+
+        return view('social.post_share', [
+            'post' => $post,
+            'shareImage' => $shareImage,
+            'shareDescription' => $shareDescription,
         ]);
     }
 
