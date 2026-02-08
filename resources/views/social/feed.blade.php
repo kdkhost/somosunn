@@ -79,44 +79,46 @@
         $adsCode = $adsCode ?? '';
     @endphp
 
-    <div class="bg-gray-100 min-h-screen pt-4">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <!-- Sidebar Left -->
-                <div class="hidden md:block">
-                    <div class="bg-white rounded-lg shadow p-4 sticky top-24">
-                        @auth
-                            <div class="flex items-center gap-3 mb-6">
-                                <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
-                                    <img src="{{ $authAvatar }}" alt="Avatar" class="w-10 h-10 object-cover"
-                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+    <div class="bg-gray-100 min-h-screen {{ $isAdminContext ? 'pt-0' : 'pt-4' }}">
+        <div class="{{ $isAdminContext ? 'mx-auto px-0' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8' }}">
+            <div class="{{ $isAdminContext ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-1 md:grid-cols-4 gap-6' }}">
+                @unless($isAdminContext)
+                    <!-- Sidebar Left -->
+                    <div class="hidden md:block">
+                        <div class="bg-white rounded-lg shadow p-4 sticky top-24">
+                            @auth
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
+                                        <img src="{{ $authAvatar }}" alt="Avatar" class="w-10 h-10 object-cover"
+                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900">{{ Auth::user()->name }}</p>
+                                        <p class="text-xs text-gray-500">Membro</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="font-bold text-gray-900">{{ Auth::user()->name }}</p>
-                                    <p class="text-xs text-gray-500">Membro</p>
+                                <nav class="space-y-2">
+                                    <a href="{{ $feedUrl }}"
+                                        class="flex items-center gap-2 text-blue-600 font-medium p-2 bg-blue-50 rounded">
+                                        <i class="fas fa-newspaper w-6"></i> Feed
+                                    </a>
+                                    <a href="{{ $chatUrl }}"
+                                        class="flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
+                                        <i class="fas fa-comments w-6"></i> Mensagens
+                                    </a>
+                                </nav>
+                            @else
+                                <div class="text-center py-4">
+                                    <p class="text-gray-600 mb-2">Faça login para participar</p>
+                                    <a href="{{ route('login') }}" class="text-blue-600 hover:underline">Entrar</a>
                                 </div>
-                            </div>
-                            <nav class="space-y-2">
-                                <a href="{{ $feedUrl }}"
-                                    class="flex items-center gap-2 text-blue-600 font-medium p-2 bg-blue-50 rounded">
-                                    <i class="fas fa-newspaper w-6"></i> Feed
-                                </a>
-                                <a href="{{ $chatUrl }}"
-                                    class="flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
-                                    <i class="fas fa-comments w-6"></i> Mensagens
-                                </a>
-                            </nav>
-                        @else
-                            <div class="text-center py-4">
-                                <p class="text-gray-600 mb-2">Faça login para participar</p>
-                                <a href="{{ route('login') }}" class="text-blue-600 hover:underline">Entrar</a>
-                            </div>
-                        @endauth
+                            @endauth
+                        </div>
                     </div>
-                </div>
+                @endunless
 
                 <!-- Main Feed -->
-                <div class="md:col-span-2 space-y-6">
+                <div class="{{ $isAdminContext ? 'space-y-6' : 'md:col-span-2 space-y-6' }}">
                     <!-- Composer -->
                     @auth
                         <div class="bg-white rounded-lg shadow p-4">
@@ -461,42 +463,44 @@
                     {{ $posts->links() }}
                 </div>
 
-                <!-- Sidebar Right (Suggestions) -->
-                <div class="hidden md:block">
-                    <div class="bg-white rounded-lg shadow p-4 sticky top-24">
-                        <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
-                        <div class="space-y-4">
-                            @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
-                                @foreach($recommendedUsers as $user)
-                                    <div class="flex items-center justify-between gap-3">
-                                        <div class="flex items-center gap-3">
-                                            <a class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0" href="{{ route('social.profile', $user->id) }}">
-                                                <img src="{{ $user->profile_photo_url }}" alt="Avatar"
-                                                    class="w-10 h-10 object-cover"
-                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                            </a>
-                                            <div>
-                                                <a href="{{ route('social.profile', $user->id) }}" class="text-sm font-semibold text-gray-800 hover:text-blue-600">
-                                                    {{ $user->name }}
+                @unless($isAdminContext)
+                    <!-- Sidebar Right (Suggestions) -->
+                    <div class="hidden md:block">
+                        <div class="bg-white rounded-lg shadow p-4 sticky top-24">
+                            <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
+                            <div class="space-y-4">
+                                @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
+                                    @foreach($recommendedUsers as $user)
+                                        <div class="flex items-center justify-between gap-3">
+                                            <div class="flex items-center gap-3">
+                                                <a class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0" href="{{ route('social.profile', $user->id) }}">
+                                                    <img src="{{ $user->profile_photo_url }}" alt="Avatar"
+                                                        class="w-10 h-10 object-cover"
+                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                                                 </a>
-                                                <p class="text-xs text-gray-500">Membro</p>
+                                                <div>
+                                                    <a href="{{ route('social.profile', $user->id) }}" class="text-sm font-semibold text-gray-800 hover:text-blue-600">
+                                                        {{ $user->name }}
+                                                    </a>
+                                                    <p class="text-xs text-gray-500">Membro</p>
+                                                </div>
                                             </div>
+                                            <form action="{{ route('connection.connect', $user) }}" method="POST">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="text-xs text-blue-600 hover:text-blue-700 font-medium">
+                                                    Conectar
+                                                </button>
+                                            </form>
                                         </div>
-                                        <form action="{{ route('connection.connect', $user) }}" method="POST">
-                                            @csrf
-                                            <button type="submit"
-                                                class="text-xs text-blue-600 hover:text-blue-700 font-medium">
-                                                Conectar
-                                            </button>
-                                        </form>
-                                    </div>
-                                @endforeach
-                            @else
-                                <p class="text-xs text-gray-500">Sem recomendacoes no momento.</p>
-                            @endif
+                                    @endforeach
+                                @else
+                                    <p class="text-xs text-gray-500">Sem recomendacoes no momento.</p>
+                                @endif
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endunless
             </div>
         </div>
     </div>
