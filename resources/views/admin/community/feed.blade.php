@@ -7,8 +7,21 @@
     <div class="row">
         <div class="col-lg-8">
             <div class="card card-outline card-primary">
-                <div class="card-header">
+                <div class="card-header d-flex align-items-center">
                     <h3 class="card-title">Nova publicacao</h3>
+                    <div class="card-tools ml-auto">
+                        <button type="button" class="btn btn-tool" title="Opcoes" onclick="togglePanel('admin-post-options')">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <div id="admin-post-options" class="d-none position-absolute bg-white border rounded shadow p-3" style="right: 1rem; z-index: 20; min-width: 220px;">
+                            <label class="mb-1 text-muted small">Visibilidade</label>
+                            <select name="visibility" class="form-control form-control-sm">
+                                <option value="public">Publico</option>
+                                <option value="connections">Somente seguidores</option>
+                                <option value="community" selected>Somente comunidade</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <form id="admin-post-form" action="{{ route('social.post.store') }}" method="POST" enctype="multipart/form-data">
@@ -51,19 +64,6 @@
                                 <div id="admin-emoji-picker" class="d-none position-absolute bg-white border rounded shadow p-2" style="z-index: 20; width: 260px;">
                                     @include('social.partials.emoji_tabs')
                                     @include('social.partials.emoji_grid')
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <button type="button" class="btn btn-light" title="Opcoes" onclick="togglePanel('admin-post-options')">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </button>
-                                <div id="admin-post-options" class="d-none position-absolute bg-white border rounded shadow p-3" style="right: 1rem; z-index: 20; min-width: 220px;">
-                                    <label class="mb-1 text-muted small">Visibilidade</label>
-                                    <select name="visibility" class="form-control form-control-sm">
-                                        <option value="public">Publico</option>
-                                        <option value="connections">Somente seguidores</option>
-                                        <option value="community" selected>Somente comunidade</option>
-                                    </select>
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary">Publicar</button>
