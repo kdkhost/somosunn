@@ -95,15 +95,40 @@
                             </div>
                         </div>
                         <div class="card-tools ml-auto">
-                            @if(auth()->user()->isAdmin() || $post->user_id === auth()->id())
-                                <form action="{{ route('social.post.destroy', $post) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="btn btn-tool text-danger" title="Remover" data-confirm-delete>
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            @endif
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-tool" data-toggle="dropdown" aria-expanded="false" title="Mais opções">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    @if(auth()->user()->isAdmin() || $post->user_id === auth()->id())
+                                        <form action="{{ route('social.post.destroy', $post) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="dropdown-item text-danger" data-confirm-delete>
+                                                <i class="fas fa-trash mr-2"></i> Remover
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('social.post.unpublish', $post) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="fas fa-eye-slash mr-2"></i> Despublicar
+                                            </button>
+                                        </form>
+                                        <div class="dropdown-divider"></div>
+                                    @endif
+                                    <form action="{{ route('social.post.hide', $post) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fas fa-eye mr-2"></i> Ocultar postagem
+                                        </button>
+                                    </form>
+                                    @if(!(auth()->user()->isAdmin() || $post->user_id === auth()->id()))
+                                        <button type="button" class="dropdown-item text-danger" data-toggle="modal" data-target="#reportModal-{{ $post->id }}">
+                                            <i class="fas fa-flag mr-2"></i> Denunciar
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -141,6 +166,36 @@
                         </small>
                     </div>
                 </div>
+
+                {{-- Modal de Denúncia --}}
+                @if(!(auth()->user()->isAdmin() || $post->user_id === auth()->id()))
+                    <div class="modal fade" id="reportModal-{{ $post->id }}" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel-{{ $post->id }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="reportModalLabel-{{ $post->id }}">Denunciar publicação</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form action="{{ route('social.post.report', $post) }}" method="POST">
+                                    @csrf
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="reason-{{ $post->id }}">Motivo da denúncia</label>
+                                            <textarea name="reason" id="reason-{{ $post->id }}" rows="4" class="form-control" required placeholder="Descreva o motivo da denúncia..."></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-danger">Denunciar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 @if(!empty($adsEnabled) && !empty($adsCode) && $loop->iteration % 3 === 0)
                     <div class="card">
                         <div class="card-body">
