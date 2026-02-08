@@ -35,34 +35,16 @@ class HomeController extends Controller
             }
         }
 
-        // Demo data fallback for mentorships
+        // Demo data fallback for mentorships (Only if demo_mode is true and no data exists)
         if ($demoMode && $paidMentorings->isEmpty()) {
             $paidMentorings = collect([
                 (object) [
                     'id' => 1,
-                    'title' => 'Mentoria: Vendas B2B de Alta Performance',
-                    'description' => 'Aprenda a fechar contratos de alto valor com empresas usando técnicas avançadas de negociação.',
+                    'title' => 'Conexão Elite: Mentoria de Negócios (DEMO)',
+                    'description' => 'ESTE É UM DADO DE EXEMPLO. Aprenda estratégias de escala e networking de alto nível.',
                     'mentor' => (object) ['name' => 'Carlos Mendes'],
                     'price' => 997,
                     'slots' => 5,
-                    'is_demo' => true,
-                ],
-                (object) [
-                    'id' => 2,
-                    'title' => 'Mentoria: Marketing Digital 360°',
-                    'description' => 'Domine tráfego pago, orgânico, funis de vendas e automações para escalar suas vendas online.',
-                    'mentor' => (object) ['name' => 'Ana Paula Costa'],
-                    'price' => 797,
-                    'slots' => 8,
-                    'is_demo' => true,
-                ],
-                (object) [
-                    'id' => 3,
-                    'title' => 'Mentoria: Gestão Financeira Empresarial',
-                    'description' => 'Organize as finanças da sua empresa e tome decisões baseadas em dados para crescer com segurança.',
-                    'mentor' => (object) ['name' => 'Roberto Almeida'],
-                    'price' => 597,
-                    'slots' => 10,
                     'is_demo' => true,
                 ],
             ]);
@@ -108,7 +90,7 @@ class HomeController extends Controller
             'paidMentorings' => $paidMentorings,
             'levelSummary' => $levelSummary,
             'topRankings' => $overview['leaderboard'],
-            'isDemo' => $demoMode && (($freeEvents->first()->is_demo ?? false) || (data_get($overview['leaderboard']->first(), 'score') == 9850)),
+            'isDemo' => $demoMode && ($freeEvents->where('is_demo', true)->count() > 0 || $paidMentorings->where('is_demo', true)->count() > 0),
         ]);
     }
 
@@ -132,6 +114,7 @@ class HomeController extends Controller
             'mentorings' => $mentorings,
             'levelSummary' => $overview['levelSummary'],
             'topRankings' => $overview['leaderboard'],
+            'isDemo' => config('app.demo_mode') && $mentorings->isEmpty(),
         ]);
     }
 

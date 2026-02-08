@@ -78,24 +78,17 @@
     </section>
 
     <!-- Mentorias Demo -->
-    <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
-        <div class="max-w-7xl mx-auto">
+            @if(isset($mentorings) && $mentorings->count() > 0)
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl font-black text-gray-900">Mentorias Disponíveis</h2>
+                @if(isset($isDemo) && $isDemo)
                 <span class="text-sm text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full font-semibold">
                     <i class="fas fa-info-circle mr-1"></i> Dados Demo
                 </span>
+                @endif
             </div>
-            
+
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @php
-                    $mentorings = $mentorings ?? collect([
-                        (object)['title' => 'Estratégias de Vendas B2B', 'mentor' => (object)['name' => 'Carlos Mendes'], 'description' => 'Aprenda técnicas avançadas de vendas para o mercado corporativo com resultados comprovados.', 'price' => 497, 'slots' => 5],
-                        (object)['title' => 'Marketing Digital 360°', 'mentor' => (object)['name' => 'Ana Paula Costa'], 'description' => 'Domine todas as vertentes do marketing digital: SEO, tráfego pago, redes sociais e conversão.', 'price' => 397, 'slots' => 8],
-                        (object)['title' => 'Gestão Financeira Empresarial', 'mentor' => (object)['name' => 'Roberto Almeida'], 'description' => 'Organize as finanças da sua empresa e tome decisões baseadas em dados reais.', 'price' => 597, 'slots' => 3],
-                    ]);
-                @endphp
-                
                 @foreach($mentorings as $mentorship)
                 <article class="bg-slate-50 rounded-3xl p-8 border border-gray-100">
                     <div class="flex justify-between items-center mb-3">
@@ -105,12 +98,19 @@
                     <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $mentorship->title }}</h3>
                     <p class="text-gray-600 text-sm mb-4">{{ Str::limit($mentorship->description, 100) }}</p>
                     <p class="text-sm text-gray-500 mb-4">Vagas: <strong>{{ $mentorship->slots }}</strong></p>
-                    <button class="btn-primary text-white px-6 py-3 rounded-xl font-semibold w-full">
+                    @if(isset($mentorship->id))
+                    <a href="{{ route('mentorships.show', $mentorship->id) }}" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold w-full block text-center">
                         Ver detalhes
+                    </a>
+                    @else
+                    <button class="btn-primary text-white px-6 py-3 rounded-xl font-semibold w-full opacity-70 cursor-not-allowed">
+                        Ver detalhes (Demo)
                     </button>
+                    @endif
                 </article>
                 @endforeach
             </div>
+            @endif
         </div>
     </section>
 
