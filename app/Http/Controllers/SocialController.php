@@ -283,12 +283,17 @@ class SocialController extends Controller
                 ->toArray();
         }
 
+        $adsEnabled = (string) Setting::get('ads_enabled', '0') === '1';
+        $adsCode = (string) Setting::get('ads_code_html', '');
+
         return view('social.profile', [
             'user' => $user,
             'posts' => $posts,
             'shareTargets' => empty($shareTargets)
                 ? collect()
                 : User::whereIn('id', $shareTargets)->orderBy('name')->get(['id', 'name']),
+            'adsEnabled' => $adsEnabled,
+            'adsCode' => $adsCode,
         ]);
     }
 

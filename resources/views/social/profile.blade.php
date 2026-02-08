@@ -71,6 +71,8 @@
 @section('content')
     @php
         $shareTargets = $shareTargets ?? collect();
+        $adsEnabled = $adsEnabled ?? false;
+        $adsCode = $adsCode ?? '';
     @endphp
     <div class="bg-gray-100 min-h-screen">
         <!-- Cover & Info -->
@@ -557,6 +559,11 @@
                             </form>
                         @endauth
                     </div>
+                    @if(!empty($adsEnabled) && !empty($adsCode) && $loop->iteration % 3 === 0)
+                        <div class="bg-white rounded-lg shadow p-4">
+                            {!! $adsCode !!}
+                        </div>
+                    @endif
                 @empty
                     <div class="text-center py-10 text-gray-500 bg-white rounded-lg shadow">
                         <p>Nenhuma publicação ainda.</p>
