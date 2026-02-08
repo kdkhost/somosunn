@@ -193,6 +193,51 @@
         }
 
         /* input fica oculto, acionado por clique/botão */
+
+        .ui-tooltip {
+            position: relative;
+        }
+
+        .ui-tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 10px);
+            transform: translateX(-50%);
+            background: #1F5EDB;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+            z-index: 20;
+        }
+
+        .ui-tooltip::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 4px);
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: #1F5EDB transparent transparent transparent;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            z-index: 20;
+        }
+
+        .ui-tooltip:hover::after,
+        .ui-tooltip:focus-visible::after,
+        .ui-tooltip:hover::before,
+        .ui-tooltip:focus-visible::before {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-2px);
+        }
     </style>
     @stack('styles')
 </head>
@@ -825,6 +870,15 @@
                 });
                 modal.modal('show');
             }
+
+            $('[title]').each(function () {
+                var $el = $(this);
+                var text = $el.attr('title');
+                if (!text) return;
+                $el.attr('data-tooltip', text);
+                $el.addClass('ui-tooltip');
+                $el.removeAttr('title');
+            });
         });
     </script>
 </body>
