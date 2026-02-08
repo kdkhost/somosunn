@@ -37,7 +37,7 @@
 
             @forelse($posts as $post)
                 <div class="card">
-                    <div class="card-header d-flex align-items-center justify-content-between">
+                    <div class="card-header d-flex align-items-center">
                         <div class="d-flex align-items-center">
                             <div class="mr-3">
                                 <img src="{{ $post->user?->profile_photo_url ?? asset('img/default-user.svg') }}"
@@ -48,12 +48,12 @@
                                 <div class="text-muted text-sm">{{ $post->created_at->diffForHumans() }}</div>
                             </div>
                         </div>
-                        <div class="card-tools">
+                        <div class="card-tools ml-auto">
                             <form action="{{ route('social.post.destroy', $post) }}" method="POST" class="d-inline js-confirm-delete"
                                 data-confirm-title="Remover publicacao?" data-confirm-text="Esta acao nao pode ser desfeita.">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover">
+                                <button type="submit" class="btn btn-tool text-danger" title="Remover">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>
