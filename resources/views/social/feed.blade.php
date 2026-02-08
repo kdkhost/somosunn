@@ -1473,6 +1473,28 @@
         const previewRemove = document.getElementById('post-preview-remove');
         const emojiToggle = document.getElementById('emoji-toggle');
         const emojiPicker = document.getElementById('emoji-picker');
+        const maxPostImages = 5;
+
+        const showUploadLimitAlert = (message) => {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire('Atenção', message, 'warning');
+            } else {
+                alert(message);
+            }
+        };
+
+        const validatePostImages = (files) => {
+            const count = files ? files.length : 0;
+            if (count < 1) {
+                showUploadLimitAlert('Selecione pelo menos 1 imagem para publicar.');
+                return false;
+            }
+            if (count > maxPostImages) {
+                showUploadLimitAlert(`Você pode enviar no máximo ${maxPostImages} imagens.`);
+                return false;
+            }
+            return true;
+        };
 
         const formatUploadName = (files) => {
             if (!files || !files.length) {
@@ -1549,6 +1571,13 @@
         if (postMedia) {
             postMedia.addEventListener('change', () => {
                 const files = postMedia.files;
+                if (files && files.length > maxPostImages) {
+                    postMedia.value = '';
+                    updateUploadName(null);
+                    clearPreview();
+                    showUploadLimitAlert(`Você pode selecionar no máximo ${maxPostImages} imagens.`);
+                    return;
+                }
                 const file = files && files.length ? files[0] : null;
                 updateUploadName(files);
                 if (file) {
@@ -1583,6 +1612,11 @@
 
                 const files = event.dataTransfer ? event.dataTransfer.files : [];
                 if (!files || !files.length) {
+                    return;
+                }
+
+                if (files.length > maxPostImages) {
+                    showUploadLimitAlert(`Você pode enviar no máximo ${maxPostImages} imagens.`);
                     return;
                 }
 
@@ -1648,6 +1682,10 @@
         if (postForm) {
             postForm.addEventListener('submit', (event) => {
                 event.preventDefault();
+
+                if (!postMedia || !validatePostImages(postMedia.files)) {
+                    return;
+                }
 
                 const formData = new FormData(postForm);
                 const xhr = new XMLHttpRequest();

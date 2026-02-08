@@ -344,7 +344,7 @@ class SocialController extends Controller
         $validated = $request->validate([
             'content' => 'required|string|max:1000',
             'visibility' => 'required|string|in:public,connections,community',
-            'media' => 'nullable|array',
+            'media' => 'required|array|min:1|max:5',
             'media.*' => 'image|max:2048',
         ]);
 
