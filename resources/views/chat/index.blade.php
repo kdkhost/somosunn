@@ -17,16 +17,20 @@
                 </div>
                 <div class="flex-1 overflow-y-auto" id="conversations-list">
                     @foreach($conversations as $conv)
+                        @php
+                            $otherUser = $conv->users->where('id', '!=', Auth::id())->first() ?? $conv->users->first();
+                            $otherUserPhoto = $otherUser?->profile_photo_url ?? asset('img/default-user.svg');
+                            $otherUserName = $otherUser?->name ?? ($conv->title ?? 'Conversa');
+                        @endphp
                         <a href="{{ route($routeNamePrefix . '.show', $conv->id) }}" data-conversation-id="{{ $conv->id }}"
                             class="block p-4 hover:bg-blue-50 transition border-b border-gray-100">
                             <div class="flex items-center gap-3">
-                                <div
-                                    class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
-                                    {{ substr($conv->title ?? 'Chat', 0, 1) }}
-                                </div>
+                                <img src="{{ $otherUserPhoto }}" alt="{{ $otherUserName }}"
+                                    class="w-10 h-10 rounded-full object-cover"
+                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}'">
                                 <div class="flex-1 min-w-0">
                                     <h4 class="text-sm font-semibold text-gray-900 truncate">
-                                        {{ $conv->title ?? 'Conversa #' . $conv->id }}
+                                        {{ $otherUserName }}
                                     </h4>
                                     <p class="text-xs text-gray-500 truncate">Ver conversa...</p>
                                 </div>
