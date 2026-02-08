@@ -219,7 +219,7 @@ class SocialController extends Controller
                 $postsQuery->whereNotIn('posts.id', $hiddenPostIds);
             }
         }
-            ->latest();
+        $postsQuery->latest();
 
         if (Auth::check() && Auth::id() === $user->id) {
             $posts = $postsQuery->paginate(10);
