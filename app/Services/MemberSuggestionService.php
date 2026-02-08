@@ -59,7 +59,18 @@ class MemberSuggestionService
             $ordered = $ordered->merge($group->shuffle());
         }
 
-        return $ordered->pluck('user')->take($limit)->values();
+        $primaryCount = (int) ceil($limit * 0.7);
+        $primary = $ordered->pluck('user')->take($primaryCount);
+
+        $primaryIds = $primary->pluck('id')->all();
+        $secondary = $candidates
+            ->reject(function (User $user) use ($primaryIds) {
+                return in_array($user->id, $primaryIds, true);
+            })
+            ->shuffle()
+            ->take(max(0, $limit - $primary->count()));
+
+        return $primary->merge($secondary)->take($limit)->values();
     }
 
     private function buildProfileTokens(User $user): array
