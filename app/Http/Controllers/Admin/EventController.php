@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
@@ -42,13 +43,20 @@ class EventController extends Controller
             return response()->json(['message' => 'Intervalo inválido para o feed de eventos.'], 422);
         }
 
-        $events = Event::where(function ($query) use ($start, $end) {
+        $query = Event::where(function ($query) use ($start, $end) {
             $query->where('start_at', '<', $end)
                 ->where(function ($q) use ($start) {
                     $q->where('end_at', '>', $start)
                         ->orWhereNull('end_at');
                 });
-        })->get();
+        });
+
+        // Se não for admin, mostra apenas eventos do próprio usuário
+        if (!Auth::user()->isAdmin()) {
+            $query->where('user_id', Auth::id());
+        }
+
+        $events = $query->get();
 
         $formattedEvents = $events->map(function ($event) use ($textColor) {
             return [
@@ -90,6 +98,11 @@ class EventController extends Controller
 
     public function edit(Event $event)
     {
+        // Verifica se é dono do evento ou admin
+        if (!Auth::user()->isAdmin() && !$event->isOwnedBy(Auth::id())) {
+            abort(403, 'Você não tem permissão para editar este evento.');
+        }
+
         return view('admin.events.form', compact('event'));
     }
 
@@ -160,6 +173,9 @@ class EventController extends Controller
             $validated['image'] = $request->file('image')->store('event-images', 'public');
         }
 
+        // Define o criador do evento
+        $validated['user_id'] = Auth::id();
+
         $event = Event::create($validated);
 
         if (!$request->ajax() && !$request->wantsJson() && !$request->expectsJson()) {
@@ -171,6 +187,14 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event)
     {
+        // Verifica se é dono do evento ou admin
+        if (!Auth::user()->isAdmin() && !$event->isOwnedBy(Auth::id())) {
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json(['status' => 'error', 'message' => 'Você não tem permissão para editar este evento.'], 403);
+            }
+            abort(403, 'Você não tem permissão para editar este evento.');
+        }
+
         foreach (['price', 'batch_1_price', 'batch_2_price', 'batch_3_price'] as $field) {
             if (!$request->has($field)) {
                 continue;
@@ -254,6 +278,14 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
+        // Verifica se é dono do evento ou admin
+        if (!Auth::user()->isAdmin() && !$event->isOwnedBy(Auth::id())) {
+            if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
+                return response()->json(['status' => 'error', 'message' => 'Você não tem permissão para remover este evento.'], 403);
+            }
+            abort(403, 'Você não tem permissão para remover este evento.');
+        }
+
         $this->deleteEventImageIfExists($event);
         $event->delete();
 

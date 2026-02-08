@@ -39,6 +39,11 @@ class Mentorship extends Model
         return $this->belongsTo(User::class, 'mentor_id');
     }
 
+    public function isOwnedBy($userId): bool
+    {
+        return $this->mentor_id === $userId;
+    }
+
     public function reviews()
     {
         return $this->morphMany(ItemReview::class, 'reviewable');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Course;
 
 class CourseController extends Controller
@@ -23,7 +24,14 @@ class CourseController extends Controller
 
     public function index()
     {
-        $courses = Course::latest()->get();
+        $query = Course::latest();
+
+        // Se não for admin, mostra apenas cursos do próprio usuário
+        if (!Auth::user()->isAdmin()) {
+            $query->where('user_id', Auth::id());
+        }
+
+        $courses = $query->get();
         return view('admin.courses.index', compact('courses'));
     }
 
@@ -96,11 +104,21 @@ class CourseController extends Controller
 
     public function edit(Course $course)
     {
+        // Verifica se é dono do curso ou admin
+        if (!Auth::user()->isAdmin() && !$course->isOwnedBy(Auth::id())) {
+            abort(403, 'Você não tem permissão para editar este curso.');
+        }
+
         return view('admin.courses.form', compact('course'));
     }
 
     public function update(Request $request, Course $course)
     {
+        // Verifica se é dono do curso ou admin
+        if (!Auth::user()->isAdmin() && !$course->isOwnedBy(Auth::id())) {
+            return response()->json(['success' => false, 'message' => 'Você não tem permissão para editar este curso.'], 403);
+        }
+
         if ($request->has('price')) {
             $price = $request->price;
             $price = str_replace(['R$', ' ', '.'], '', $price);
@@ -194,6 +212,11 @@ class CourseController extends Controller
 
     public function destroy(Course $course)
     {
+        // Verifica se é dono do curso ou admin
+        if (!Auth::user()->isAdmin() && !$course->isOwnedBy(Auth::id())) {
+            abort(403, 'Você não tem permissão para remover este curso.');
+        }
+
         $course->delete();
         return redirect()->route('admin.courses.index')->with('success', 'Curso removido');
     }

@@ -10,6 +10,7 @@ class Event extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'title','speaker','description','image','start_at','end_at','location','address','latitude','longitude',
         'price','capacity','published', 'color', 'all_day',
         'batch_1_price', 'batch_1_deadline',
@@ -75,6 +76,16 @@ class Event extends Model
     public function registrations()
     {
         return $this->hasMany(EventRegistration::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function isOwnedBy($userId): bool
+    {
+        return $this->user_id === $userId;
     }
 
     public function paidOrConfirmedRegistrations()

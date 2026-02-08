@@ -123,6 +123,11 @@ class Course extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function isOwnedBy($userId): bool
+    {
+        return $this->user_id === $userId;
+    }
+
     public function lessons()
     {
         return $this->hasMany(Lesson::class)->orderBy('order');
