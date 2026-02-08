@@ -49,11 +49,10 @@
                             </div>
                         </div>
                         <div class="card-tools ml-auto">
-                            <form action="{{ route('social.post.destroy', $post) }}" method="POST" class="d-inline js-confirm-delete"
-                                data-confirm-title="Remover publicacao?" data-confirm-text="Esta acao nao pode ser desfeita.">
+                            <form action="{{ route('social.post.destroy', $post) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-tool text-danger" title="Remover">
+                                <button type="button" class="btn btn-tool text-danger" title="Remover" data-confirm-delete>
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>
