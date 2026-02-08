@@ -256,15 +256,22 @@
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
                 },
                 body: JSON.stringify(payload || {}),
             });
 
+            const contentType = String(response.headers.get('content-type') || '').toLowerCase();
+            const data = contentType.includes('application/json')
+                ? await response.json()
+                : null;
+
             if (!response.ok) {
-                throw new Error('Erro na requisicao');
+                const message = data && data.message ? String(data.message) : 'Erro na requisição';
+                throw new Error(message);
             }
 
-            return response.json();
+            return data || {};
         };
 
         const saveProgress = async (force = false, keepalive = false) => {
@@ -331,6 +338,11 @@
 
             if (bookmarkAddBtn && bookmarkNote) {
                 bookmarkAddBtn.addEventListener('click', async () => {
+                    if (!bookmarkStoreUrl) {
+                        alert('Rota de marcador não configurada.');
+                        return;
+                    }
+
                     const note = (bookmarkNote.value || '').trim();
                     if (note.length < 2) {
                         alert('Digite um comentário com pelo menos 2 caracteres.');
@@ -375,42 +387,77 @@
                     }
                 });
             }
+
+            if (bookmarkCurrentTime) {
+                bookmarkCurrentTime.addEventListener('click', () => {
+                    onTimeTick();
+                    if (bookmarkNote) {
+                        bookmarkNote.focus();
+                    }
+                });
+            }
         };
 
         const bindMedia = (api) => {
             media = (api && api.media) ? api.media : null;
-            if (!media) return;
+            const player = (api && api.player) ? api.player : null;
+            if (!media && !player) return;
 
             onTimeTick();
 
             const applyResume = () => {
+                if (!media) return;
                 if (resumeApplied || resumeAt <= 0) return;
                 if (!Number.isFinite(media.duration) || media.duration <= 0) return;
                 media.currentTime = Math.min(resumeAt, Math.max(0, media.duration - 1));
                 resumeApplied = true;
             };
 
-            if (media.readyState >= 1) {
-                applyResume();
-            } else {
-                media.addEventListener('loadedmetadata', applyResume, { once: true });
+            if (media) {
+                if (media.readyState >= 1) {
+                    applyResume();
+                } else {
+                    media.addEventListener('loadedmetadata', applyResume, { once: true });
+                }
             }
 
-            media.addEventListener('timeupdate', onTimeTick);
-            media.addEventListener('pause', () => saveProgress(true));
-            media.addEventListener('ended', () => saveProgress(true));
-            media.addEventListener('play', () => {
+            const onPlay = () => {
                 if (saveTimer) {
                     window.clearInterval(saveTimer);
                 }
                 saveTimer = window.setInterval(() => saveProgress(false), 15000);
-            });
-            media.addEventListener('ended', () => {
+            };
+            const onPause = () => {
+                onTimeTick();
+                saveProgress(true);
+            };
+            const onEnded = () => {
+                onTimeTick();
+                saveProgress(true);
                 if (saveTimer) {
                     window.clearInterval(saveTimer);
                     saveTimer = null;
                 }
-            });
+            };
+
+            if (media) {
+                media.addEventListener('loadedmetadata', onTimeTick);
+                media.addEventListener('timeupdate', onTimeTick);
+                media.addEventListener('pause', onPause);
+                media.addEventListener('ended', onEnded);
+                media.addEventListener('play', onPlay);
+            }
+
+            if (player && typeof player.on === 'function') {
+                player.on('timeupdate', onTimeTick);
+                player.on('pause', onPause);
+                player.on('ended', onEnded);
+                player.on('play', onPlay);
+                player.on('ready', () => {
+                    applyResume();
+                    onTimeTick();
+                });
+            }
 
             bindBookmarkActions();
         };

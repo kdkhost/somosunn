@@ -279,6 +279,10 @@
             @if($videoPlayerEnabled)
                 --plyr-color-main: {{ $videoPlyrColor }};
                 --plyr-font-family: 'Inter', sans-serif;
+                --plyr-menu-background: rgba(15, 23, 42, 0.92);
+                --plyr-menu-color: #ffffff;
+                --plyr-tooltip-background: var(--unn-azul-1);
+                --plyr-tooltip-color: #ffffff;
             @endif
         }
 
@@ -796,7 +800,33 @@
                     url = url.trim();
                     if (!url) return '';
 
-                    if (/^https?:\/\//i.test(url)) return url;
+                    if (/^https?:\/\//i.test(url)) {
+                        try {
+                            const parsed = new URL(url);
+                            const sameHost = parsed.host === window.location.host;
+                            if (!sameHost) {
+                                return url;
+                            }
+
+                            let path = String(parsed.pathname || '').replace(/^\/+/, '');
+                            if (path.startsWith('public/storage/app/public/')) {
+                                return '/storage/' + path.replace(/^public\/storage\/app\/public\//, '');
+                            }
+                            if (path.startsWith('storage/app/public/')) {
+                                return '/storage/' + path.replace(/^storage\/app\/public\//, '');
+                            }
+                            if (path.startsWith('public/')) {
+                                path = path.replace(/^public\//, '');
+                            }
+                            if (/^(course-videos|course-materials)\//i.test(path)) {
+                                return '/storage/' + path;
+                            }
+                            if (path.startsWith('storage/')) {
+                                return '/' + path;
+                            }
+                        } catch (e) { /* ignore */ }
+                        return url;
+                    }
                     if (url.startsWith('//')) return (window.location.protocol || 'https:') + url;
 
                     if (url.startsWith('/storage/app/public/')) {
@@ -870,7 +900,7 @@
                     if (wm.imageUrl) {
                         const img = document.createElement('img');
                         img.src = wm.imageUrl;
-                        img.alt = 'Marca d\\'água';
+                        img.alt = "Marca d'agua";
                         img.loading = 'lazy';
                         inner.appendChild(img);
                     }
@@ -892,7 +922,8 @@
                     if (disableContextMenu) {
                         target.addEventListener('contextmenu', function (event) {
                             event.preventDefault();
-                        });
+                        }, true);
+                        target.setAttribute('oncontextmenu', 'return false;');
                     }
 
                     if (!blockDownload) {
@@ -901,11 +932,12 @@
 
                     target.addEventListener('dragstart', function (event) {
                         event.preventDefault();
-                    });
+                    }, true);
 
                     if (target.tagName === 'VIDEO') {
                         target.setAttribute('controlsList', 'nodownload noplaybackrate noremoteplayback');
                         target.setAttribute('disablePictureInPicture', '');
+                        target.setAttribute('disableRemotePlayback', '');
                     }
                 }
 
@@ -999,10 +1031,17 @@
                     }
 
                     const player = new Plyr(target, options);
+                    const media = (player && player.media) ? player.media : null;
+                    if (media) {
+                        bindPlaybackProtections(media, disableContextMenu, blockDownload);
+                    }
                     const container = (player && player.elements) ? player.elements.container : wrapper;
+                    if (container) {
+                        bindPlaybackProtections(container, disableContextMenu, blockDownload);
+                    }
                     wrapper.__unnVideoApi = {
                         player: player,
-                        media: player && player.media ? player.media : null,
+                        media: media,
                         wrapper: wrapper,
                     };
                     wrapper.dispatchEvent(new CustomEvent('unn:video-ready', { detail: wrapper.__unnVideoApi }));

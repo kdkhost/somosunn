@@ -192,7 +192,30 @@ class LessonController extends Controller
             ? $attachment->file_name
             : basename((string) $attachment->file_path);
 
-        return Storage::disk('public')->download($attachment->file_path, $downloadName);
+        $headers = [
+            'Content-Type' => 'application/octet-stream',
+            'X-Content-Type-Options' => 'nosniff',
+        ];
+
+        $publicDisk = Storage::disk('public');
+        if (method_exists($publicDisk, 'path')) {
+            $absolutePath = $publicDisk->path($attachment->file_path);
+            if (is_file($absolutePath)) {
+                return response()->download($absolutePath, $downloadName, $headers);
+            }
+        }
+
+        $stream = $publicDisk->readStream($attachment->file_path);
+        if ($stream === false) {
+            abort(404);
+        }
+
+        return response()->streamDownload(function () use ($stream) {
+            fpassthru($stream);
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+        }, $downloadName, $headers);
     }
 
     public function deleteAttachment(Course $course, Lesson $lesson, LessonAttachment $attachment)
