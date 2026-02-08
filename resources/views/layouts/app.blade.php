@@ -84,6 +84,10 @@
         $videoPlyrClickToPlay = (string) \App\Models\Setting::get('video_plyr_click_to_play', '1') === '1';
         $videoPlyrDisableContextMenu = (string) \App\Models\Setting::get('video_plyr_disable_context_menu', '1') === '1';
 
+        $videoPlyrRewind = (string) \App\Models\Setting::get('video_plyr_rewind_enabled', '1') === '1';
+        $videoPlyrFastForward = (string) \App\Models\Setting::get('video_plyr_fast_forward_enabled', '1') === '1';
+        $videoPlyrVolumeEnabled = (string) \App\Models\Setting::get('video_plyr_volume_enabled', '1') === '1';
+
         $videoPlyrOptionsJson = trim((string) (\App\Models\Setting::get('video_plyr_options_json') ?: ''));
         $videoPlyrOptionsCustom = null;
         if ($videoPlyrOptionsJson !== '') {
@@ -135,6 +139,9 @@
                 'muted' => $videoPlyrMuted,
                 'clickToPlay' => $videoPlyrClickToPlay,
                 'disableContextMenu' => $videoPlyrDisableContextMenu,
+                'rewindEnabled' => $videoPlyrRewind,
+                'fastForwardEnabled' => $videoPlyrFastForward,
+                'volumeEnabled' => $videoPlyrVolumeEnabled,
                 'seekTime' => $videoPlyrSeekTime,
                 'volume' => $videoPlyrVolumeValue,
                 'controls' => $videoPlyrControls,
@@ -299,7 +306,28 @@
         }
 
         body {
-            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 40%);
+            @php
+                $bgImage = \App\Models\Setting::get('site_bg_image');
+                $bgOpacity = (int) \App\Models\Setting::get('site_bg_gradient_opacity', 85);
+                $bgStart = \App\Models\Setting::get('site_bg_gradient_start', '#000000');
+                $rgbaColor = 'rgba(0,0,0,0.85)';
+                if ($bgStart) {
+                    try {
+                        list($r, $g, $b) = sscanf($bgStart, "#%02x%02x%02x");
+                        $rgbaColor = "rgba($r, $g, $b, " . ($bgOpacity / 100) . ")";
+                    } catch (\Throwable $e) { }
+                }
+            @endphp
+
+            @if($bgImage)
+                background: linear-gradient({{ $rgbaColor }}, {{ $rgbaColor }}), url('{{ asset($bgImage) }}');
+                background-attachment: fixed;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            @else
+                background: linear-gradient(180deg, #f8fbff 0%, #ffffff 40%);
+            @endif
             color: var(--unn-text);
         }
 
@@ -737,12 +765,21 @@
                     };
 
                     if (Array.isArray(plyr.controls) && plyr.controls.length) {
-                        base.controls = plyr.controls;
+                        let controls = [...plyr.controls];
+                        if (plyr.rewindEnabled === false) controls = controls.filter(c => c !== 'rewind');
+                        if (plyr.fastForwardEnabled === false) controls = controls.filter(c => c !== 'fast-forward');
+                        if (plyr.volumeEnabled === false) controls = controls.filter(c => c !== 'mute' && c !== 'volume');
+                        
+                        // Ensure buttons are present if enabled
+                        if (plyr.rewindEnabled && !controls.includes('rewind')) controls.splice(1, 0, 'rewind');
+                        if (plyr.fastForwardEnabled && !controls.includes('fast-forward')) controls.splice(2, 0, 'fast-forward');
+
+                        base.controls = controls;
                     }
                     if (Array.isArray(plyr.settings) && plyr.settings.length) {
                         base.settings = plyr.settings;
                     }
-                    if (Number.isFinite(plyr.volume)) {
+                    if (Number.isFinite(plyr.volume) && plyr.volumeEnabled !== false) {
                         base.volume = Math.max(0, Math.min(1, Number(plyr.volume)));
                     }
                     if (Array.isArray(plyr.speedOptions) && plyr.speedOptions.length) {

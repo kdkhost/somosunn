@@ -68,6 +68,21 @@
         }
     </style>
     <div class="sidebar">
+        {{-- User Panel with Plan --}}
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
+            <div class="image">
+                <img src="{{ auth()->user()->photo ? asset(auth()->user()->photo) : asset('img/user.png') }}"
+                    class="img-circle elevation-2" alt="User Image"
+                    style="width: 34px; height: 34px; object-fit: cover;">
+            </div>
+            <div class="info">
+                <a href="{{ route('admin.profile.edit') }}" class="d-block text-wrap"
+                    style="max-width: 160px;">{{ auth()->user()->name }}</a>
+                <span class="text-muted small"><i
+                        class="fas fa-crown text-warning mr-1"></i>{{ auth()->user()->activePlan() ? auth()->user()->activePlan()->name : 'Acesso Limitado' }}</span>
+            </div>
+        </div>
+
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" data-accordion="true"
                 id="sidebar-tree" role="menu">
@@ -107,14 +122,15 @@
                     </li>
                 @endif
 
-                @if(auth()->user()->isAdmin() && auth()->user()->canAccessFeature('events'))
+                @if(auth()->user()->canAccessFeature('events'))
                     <li class="nav-item has-treeview {{ $open('admin.events.*') }}">
                         <a href="#" class="nav-link {{ $is('admin.events.*') }}">
                             <i class="nav-icon fas fa-calendar"></i>
                             <p>Eventos<i class="right fas fa-angle-left"></i></p>
                         </a>
                         <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('admin.events.index') }}" data-pjax="false" class="nav-link {{ $is('admin.events.index') }}"><i
+                            <li class="nav-item"><a href="{{ route('admin.events.index') }}" data-pjax="false"
+                                    class="nav-link {{ $is('admin.events.index') }}"><i
                                         class="fas fa-calendar-alt nav-icon"></i>
                                     <p>Calendário</p>
                                 </a></li>
@@ -200,7 +216,8 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.invoices.index') }}" class="nav-link {{ $is('admin.invoices.*') }}">
+                                <a href="{{ route('admin.invoices.index') }}"
+                                    class="nav-link {{ $is('admin.invoices.*') }}">
                                     <i class="fas fa-file-invoice nav-icon"></i>
                                     <p>Faturas</p>
                                 </a>
@@ -212,25 +229,29 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.permissions.index') }}" class="nav-link {{ $is('admin.permissions.*') }}">
+                                <a href="{{ route('admin.permissions.index') }}"
+                                    class="nav-link {{ $is('admin.permissions.*') }}">
                                     <i class="fas fa-user-shield nav-icon"></i>
                                     <p>Permissões</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.points-rules.index') }}" class="nav-link {{ $is('admin.points-rules.*') }}">
+                                <a href="{{ route('admin.points-rules.index') }}"
+                                    class="nav-link {{ $is('admin.points-rules.*') }}">
                                     <i class="fas fa-star nav-icon"></i>
                                     <p>Pontuação</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.mailtemplates.index') }}" class="nav-link {{ $is('admin.mailtemplates.*') }}">
+                                <a href="{{ route('admin.mailtemplates.index') }}"
+                                    class="nav-link {{ $is('admin.mailtemplates.*') }}">
                                     <i class="fas fa-envelope nav-icon"></i>
                                     <p>E-mails</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.certificates.create') }}" class="nav-link {{ $is('admin.certificates.*') }}">
+                                <a href="{{ route('admin.certificates.create') }}"
+                                    class="nav-link {{ $is('admin.certificates.*') }}">
                                     <i class="fas fa-certificate nav-icon"></i>
                                     <p>Certificados</p>
                                 </a>
@@ -268,7 +289,8 @@
 
                 @if(auth()->user()->hasPermission('testimonials.view') || auth()->user()->hasPermission('testimonials.moderate') || auth()->user()->hasPermission('testimonials.delete'))
                     <li class="nav-item">
-                        <a href="{{ route('admin.testimonials.index') }}" class="nav-link {{ $is('admin.testimonials.*') }}">
+                        <a href="{{ route('admin.testimonials.index') }}"
+                            class="nav-link {{ $is('admin.testimonials.*') }}">
                             <i class="nav-icon fas fa-quote-left"></i>
                             <p>Depoimentos</p>
                         </a>

@@ -6,6 +6,43 @@
 @endsection
 
 @section('content')
+    @if(!$isAdmin)
+        <div class="row">
+            <div class="col-12">
+                <div class="card bg-gradient-navy shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                @if(auth()->user()->photo)
+                                    <img src="{{ asset(auth()->user()->photo) }}"
+                                        class="rounded-circle border border-light elevation-2"
+                                        style="width: 80px; height: 80px; object-fit: cover;">
+                                @else
+                                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center border border-light elevation-2"
+                                        style="width: 80px; height: 80px; font-size: 32px;">
+                                        {{ substr(auth()->user()->name, 0, 1) }}
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="col">
+                                <h2 class="h4 font-weight-bold mb-1">Olá, {{ auth()->user()->name }}!</h2>
+                                <p class="mb-0 text-light opacity-75">Bem-vindo ao seu painel UNN. Aqui você gerencia seus
+                                    cursos, mentorias e conexões.</p>
+                            </div>
+                            <div class="col-md-auto mt-3 mt-md-0 text-md-right">
+                                <div class="badge badge-light p-2 px-3 shadow-sm">
+                                    <i class="fas fa-crown text-warning mr-1"></i>
+                                    Plano: <span
+                                        class="font-weight-bold text-primary">{{ auth()->user()->activePlan() ? auth()->user()->activePlan()->name : 'Acesso Limitado' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="row">
         @if($isAdmin)
             <!-- Balance -->

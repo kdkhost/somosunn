@@ -108,6 +108,10 @@ class MentorshipController extends Controller
             'slots' => 'nullable|integer|min:1|max:100000',
             'description' => 'nullable|string|max:20000',
             'schedule_json' => 'nullable|string|max:20000',
+            'type' => 'required|in:online,presencial',
+            'video_platform' => 'nullable|string|max:255',
+            'video_link' => 'nullable|string|max:2000',
+            'demo_link' => 'nullable|string|max:2000',
         ]);
     }
 
