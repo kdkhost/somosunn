@@ -1,3 +1,11 @@
+# Novidades Fevereiro 2026
+
+- Todos os títulos principais das páginas públicas (Home, Portal, Membros, Premium) agora exibem efeito de gradiente azul (Azul Royal, Oceano, Ciano Vivo) para reforçar a identidade visual UNN.
+- Carrossel de cursos em destaque na Home e Portal, exibindo até 6 cursos aleatórios, com navegação responsiva.
+- Paleta UNN aplicada em todo o frontend público, mantendo o painel admin com cores originais.
+- Sidebar do admin modernizada e responsiva.
+- Correções de layout, responsividade e experiência visual em todas as páginas públicas.
+
 # Granularidade de Permissões (Fevereiro 2026)
 
 O sistema agora possui controle total e granular de permissões para todas as áreas (cursos, mentorias, eventos, marketplace, uploads, faturas, certificados, pontos, cupons, planos, permissões, usuários, FAQ, fontes, mailtemplates, ranking, social, orders, invoices, reviews, depoimentos, comunidade, chat, etc).
