@@ -308,49 +308,10 @@
                             </div>
                         </article>
                     @empty
-                        @php
-                            $demoRanking = [
-                                ['name' => 'Marcelo Silva', 'level' => 'Mentor', 'connections' => 234, 'score' => 9850],
-                                ['name' => 'Juliana Costa', 'level' => 'Empresário', 'connections' => 198, 'score' => 8720],
-                                ['name' => 'Fernando Alves', 'level' => 'Empresário', 'connections' => 176, 'score' => 7650],
-                            ];
-                        @endphp
-                        @foreach($demoRanking as $index => $rank)
-                            <article class="bg-slate-50 rounded-3xl p-6 ring-2 ring-yellow-400 relative overflow-hidden">
-                                @if($index == 0)
-                                    <div
-                                        class="absolute top-0 right-0 bg-yellow-400 text-white w-10 h-10 rounded-bl-2xl flex items-center justify-center shadow-sm">
-                                        <i class="fas fa-medal text-lg"></i>
-                                    </div>
-                                @elseif($index == 1)
-                                    <div
-                                        class="absolute top-0 right-0 bg-gray-400 text-white w-10 h-10 rounded-bl-2xl flex items-center justify-center shadow-sm">
-                                        <i class="fas fa-medal text-lg"></i>
-                                    </div>
-                                @elseif($index == 2)
-                                    <div
-                                        class="absolute top-0 right-0 bg-[#CD7F32] text-white w-10 h-10 rounded-bl-2xl flex items-center justify-center shadow-sm">
-                                        <i class="fas fa-medal text-lg"></i>
-                                    </div>
-                                @endif
-
-                                <div class="flex items-center gap-4 mb-4">
-                                    <div
-                                        class="w-14 h-14 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl">
-                                        {{ substr($rank['name'], 0, 1) }}
-                                    </div>
-                                    <div>
-                                        <h3 class="font-bold text-gray-900">{{ $rank['name'] }}</h3>
-                                        <p class="text-sm text-gray-500">{{ $rank['level'] }}</p>
-                                    </div>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm text-gray-500">{{ $rank['connections'] }} conexões</span>
-                                    <span class="text-lg font-bold"
-                                        style="color: var(--unn-azul-1)">{{ number_format($rank['score'], 0, '', '.') }} pts</span>
-                                </div>
-                            </article>
-                        @endforeach
+                        <div class="col-span-3 text-center py-12 text-gray-500 text-lg">
+                            Nenhum ranking disponível ainda.<br>
+                            Participe de conexões e avaliações para aparecer aqui!
+                        </div>
                     @endforelse
                 </div>
             </div>

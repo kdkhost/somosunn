@@ -51,46 +51,19 @@ class HomeController extends Controller
         }
 
         $overview = $this->networkingOverview();
-
-        // Demo data for levels if empty
         $levelSummary = $overview['levelSummary'];
-        if ($demoMode && (empty($levelSummary) || (($levelSummary['iniciante'] ?? 0) == 0 && ($levelSummary['sucesso'] ?? 0) == 0))) {
-            $levelSummary = ['iniciante' => 1250, 'sucesso' => 380];
-        }
 
-        // Demo data fallback for leaderboard
-        if ($demoMode && $overview['leaderboard']->isEmpty()) {
-            $overview['leaderboard'] = collect([
-                (object) [
-                    'user' => (object) ['name' => 'Marcelo Silva', 'avatar' => null],
-                    'level' => 'Mentor',
-                    'interactions_count' => 234,
-                    'average_rating' => 5.0,
-                    'score' => 9850
-                ],
-                (object) [
-                    'user' => (object) ['name' => 'Juliana Costa', 'avatar' => null],
-                    'level' => 'Empresário',
-                    'interactions_count' => 198,
-                    'average_rating' => 4.9,
-                    'score' => 8720
-                ],
-                (object) [
-                    'user' => (object) ['name' => 'Fernando Alves', 'avatar' => null],
-                    'level' => 'Empresário',
-                    'interactions_count' => 176,
-                    'average_rating' => 4.8,
-                    'score' => 7650
-                ],
-            ]);
-        }
+        // Se não houver dados reais, exibe mensagem no ranking
+        $topRankings = $overview['leaderboard'];
+        $showNoRankingMsg = $topRankings->isEmpty();
 
         return view('site.index', [
             'freeEvents' => $freeEvents,
             'paidMentorings' => $paidMentorings,
             'levelSummary' => $levelSummary,
-            'topRankings' => $overview['leaderboard'],
-            'isDemo' => $demoMode && ($freeEvents->where('is_demo', true)->count() > 0 || $paidMentorings->where('is_demo', true)->count() > 0),
+            'topRankings' => $topRankings,
+            'showNoRankingMsg' => $showNoRankingMsg,
+            'isDemo' => false,
         ]);
     }
 
