@@ -1,12 +1,82 @@
-    <!-- Cursos em Destaque -->
-    @php $__inserirCursosDestaque = true; @endphp
-
 @extends($extends ?? 'layouts.app')
 
 @section('title', 'Portal de Networking - UNN')
 
 @section('content')
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- Hero Section -->
+    <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
+                Portal de <span class="text-gradient">Networking</span>
+            </h1>
+            <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.
+            </p>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="pb-12 px-4 md:px-12 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">120+</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Palestras</p>
+                </div>
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">50+</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Mentorias</p>
+                </div>
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">5.000+</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Membros</p>
+                </div>
+                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">95%</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Satisfação</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Access -->
+    <section class="py-12 px-6 md:px-12 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-black text-gray-900 mb-8">Acesso Rápido</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="{{ route('social.feed') }}" class="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition group">
+                    <div class="w-14 h-14 btn-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-newspaper text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Feed Social</h3>
+                    <p class="text-sm text-gray-500">Conecte-se com outros membros</p>
+                </a>
+                <a href="{{ route('courses.index') }}" class="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition group">
+                    <div class="w-14 h-14 btn-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Cursos</h3>
+                    <p class="text-sm text-gray-500">Aprenda com especialistas</p>
+                </a>
+                <a href="{{ route('events.index') }}" class="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition group">
+                    <div class="w-14 h-14 btn-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-calendar-alt text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Eventos</h3>
+                    <p class="text-sm text-gray-500">Participe de encontros</p>
+                </a>
+                <a href="{{ route('membros') }}" class="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition group">
+                    <div class="w-14 h-14 btn-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-users text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Membros</h3>
+                    <p class="text-sm text-gray-500">Conheça a comunidade</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
     <!-- Cursos em Destaque -->
     @if(isset($featuredCourses) && $featuredCourses->count() > 0)
     <section class="pt-12 pb-8 px-4 md:px-12 lg:px-24">
