@@ -10,6 +10,7 @@ class GranularPlanSeeder extends Seeder
     {
         Plan::create([
             'name' => 'Plano Granular Completo',
+            'slug' => 'granular-completo',
             'permissions' => [
                 'courses_access', 'courses_create', 'courses_edit', 'courses_delete',
                 'mentorships_access', 'mentorships_create', 'mentorships_edit', 'mentorships_delete',
