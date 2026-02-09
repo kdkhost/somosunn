@@ -1,83 +1,86 @@
     <!-- Cursos em Destaque -->
     @php $__inserirCursosDestaque = true; @endphp
+
 @extends($extends ?? 'layouts.app')
 
 @section('title', 'Portal de Networking - UNN')
 
 @section('content')
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
-    <!-- Hero Section -->
-    <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
-        <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
-                Portal de <span class="text-gradient">Networking</span>
-            </h1>
-            <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.
-            </p>
-        </div>
-    </section>
-
-    <!-- Stats -->
-    <section class="pb-12 px-4 md:px-12 lg:px-24">
+    <!-- Cursos em Destaque -->
+    @if(isset($featuredCourses) && $featuredCourses->count() > 0)
+    <section class="pt-12 pb-8 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">120+</p>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Palestras</p>
+            <div class="flex justify-between items-center mb-2">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-black text-gray-900">Cursos em Destaque</h2>
+                    <p class="text-gray-500 text-sm md:text-base">Desenvolva novas habilidades com os especialistas</p>
                 </div>
-                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">50+</p>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Mentorias</p>
-                </div>
-                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">5.000+</p>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Membros</p>
-                </div>
-                <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">95%</p>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Satisfação</p>
-                </div>
+                <a href="{{ route('courses.index') }}" class="text-sm font-bold text-white bg-blue-700 hover:bg-blue-800 px-5 py-2 rounded-full shadow transition">Ver Todos</a>
+            </div>
+            <div id="featured-courses-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($featuredCourses as $course)
+                <article class="bg-white rounded-2xl p-6 border border-gray-100 flex flex-col shadow-sm relative">
+                    @if($course->price > 0 && $course->price < 100)
+                        <span class="absolute top-4 right-4 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">Premium</span>
+                    @elseif($course->price > 0)
+                        <span class="absolute top-4 right-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Pago</span>
+                    @else
+                        <span class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">Grátis</span>
+                    @endif
+                    <img src="{{ $course->thumbnail ?? asset('img/course-default.png') }}" alt="{{ $course->title }}" class="w-full h-40 object-cover rounded-xl mb-4">
+                    <div class="mb-2 flex items-center gap-2">
+                        <span class="text-xs font-bold text-blue-600">{{ $course->category ?? 'Categoria' }}</span>
+                        <span class="text-xs text-gray-400 flex items-center gap-1"><i class="fas fa-clock"></i> {{ $course->total_hours ?? $course->getTotalHoursAttribute() }} horas</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">{{ $course->title }}</h3>
+                    <p class="text-gray-600 text-sm mb-2">{{ Str::limit($course->short_description, 80) }}</p>
+                    <p class="text-xs text-gray-500 mb-2">Por {{ $course->author_name ?? 'Especialista UNN' }}</p>
+                    <div class="mt-auto flex flex-col gap-2">
+                        @if($course->price > 0)
+                            <span class="text-base font-bold text-gray-900">R$ {{ number_format($course->price, 2, ',', '.') }}</span>
+                        @else
+                            <span class="text-base font-bold text-green-600">GRÁTIS</span>
+                        @endif
+                        <a href="{{ route('courses.show', $course->slug) }}" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold w-full block text-center mt-2">@if($course->price > 0) Saber Mais @else Começar Agora @endif</a>
+                    </div>
+                </article>
+                @endforeach
             </div>
         </div>
     </section>
+    @endif
 
-    <!-- Quick Access -->
-    <section class="py-12 px-6 md:px-12 lg:px-24">
+    <!-- Palestras Gratuitas -->
+    @if(isset($freeEvents) && $freeEvents->count() > 0)
+    <section class="pt-8 pb-12 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl font-black text-gray-900 mb-8">Acesso Rápido</h2>
+            <div class="flex justify-between items-center mb-2">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-black text-gray-900">Palestras Gratuitas</h2>
+                    <p class="text-gray-500 text-sm md:text-base">Aprenda com os melhores empresários</p>
+                </div>
+                <a href="{{ route('events.index') }}" class="text-sm font-bold text-white bg-blue-700 hover:bg-blue-800 px-5 py-2 rounded-full shadow transition">Ver Todas</a>
+            </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <a href="{{ route('social.feed') }}" class="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition group">
-                    <div class="w-14 h-14 btn-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-newspaper text-white text-xl"></i>
+                @foreach($freeEvents as $event)
+                <article class="bg-white rounded-2xl p-5 border border-gray-100 flex flex-col shadow-sm relative">
+                    <span class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">Gratuito</span>
+                    <img src="{{ $event->thumbnail ?? asset('img/event-default.png') }}" alt="{{ $event->title }}" class="w-full h-28 object-cover rounded-xl mb-3">
+                    <h3 class="text-base font-bold text-gray-900 mb-1">{{ $event->title }}</h3>
+                    <p class="text-xs text-gray-500 mb-1">{{ $event->speaker ?? $event->author_name ?? 'Palestrante UNN' }}</p>
+                    <p class="text-gray-600 text-xs mb-2">{{ Str::limit($event->description, 60) }}</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-xs text-gray-500 flex items-center gap-1"><i class="fas fa-clock"></i> {{ $event->duration ?? '60' }} min</span>
+                        <span class="text-xs text-gray-500 flex items-center gap-1"><i class="fas fa-users"></i> {{ $event->participants_count ?? '---' }}</span>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Feed Social</h3>
-                    <p class="text-sm text-gray-500">Conecte-se com outros membros</p>
-                </a>
-                <a href="{{ route('courses.index') }}" class="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition group">
-                    <div class="w-14 h-14 btn-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-graduation-cap text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Cursos</h3>
-                    <p class="text-sm text-gray-500">Aprenda com especialistas</p>
-                </a>
-                <a href="{{ route('events.index') }}" class="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition group">
-                    <div class="w-14 h-14 btn-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-calendar-alt text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Eventos</h3>
-                    <p class="text-sm text-gray-500">Participe de encontros</p>
-                </a>
-                <a href="{{ route('membros') }}" class="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition group">
-                    <div class="w-14 h-14 btn-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-users text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Membros</h3>
-                    <p class="text-sm text-gray-500">Conheça a comunidade</p>
-                </a>
+                    <a href="{{ route('events.show', $event->id) }}" class="btn-primary text-white px-4 py-2 rounded-xl font-semibold w-full block text-center mt-3">Assistir Agora</a>
+                </article>
+                @endforeach
             </div>
         </div>
     </section>
+    @endif
 
     <!-- Cursos em Destaque -->
     @if(isset($featuredCourses) && $featuredCourses->count() > 0 && isset($__inserirCursosDestaque))
