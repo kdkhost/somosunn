@@ -95,8 +95,8 @@
 
         /* layout espaçamentos padrão AdminLTE */
         .content-wrapper {
-            /* Usar cor padrão AdminLTE */
-            background: inherit;
+            background: #f4f6f9;
+            /* min-height calculation handled by AdminLTE JS */
             transition: margin-left .3s ease-in-out;
         }
 
@@ -159,7 +159,7 @@
             text-align: center;
             cursor: pointer;
             position: relative;
-            background: inherit;
+            background: linear-gradient(180deg, #f8fafc, #fff);
             transition: all .2s ease;
             min-height: 180px;
             display: flex;
@@ -176,7 +176,7 @@
 
         .upload-box.dragover {
             border-color: #2563eb;
-            background: inherit;
+            background: #eef2ff;
         }
 
         .upload-box .upload-icon {
@@ -196,7 +196,7 @@
             object-fit: contain;
             /* Correct proportion */
             box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
-            background-color: inherit;
+            background-color: #f0f0f0;
             /* See transparent images */
         }
 
