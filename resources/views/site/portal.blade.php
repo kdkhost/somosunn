@@ -3,7 +3,7 @@
 @section('title', 'Portal de Networking - UNN')
 
 @section('content')
-<div class="min-h-screen" style="background: linear-gradient(135deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-white">
     <!-- Hero Section -->
     <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto text-center">
