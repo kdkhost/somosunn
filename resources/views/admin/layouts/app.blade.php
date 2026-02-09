@@ -114,7 +114,7 @@
             padding: 6px 12px 6px 12px;
             margin: 0;
             border-bottom: 0;
-            background: #fff;
+            background: #f4f6f9;
         }
 
         .content-header .container-fluid {
@@ -129,7 +129,7 @@
 
         .content-header .breadcrumb {
             margin-bottom: 0;
-            background: #fff;
+            background: #f4f6f9;
         }
 
         /* Mobile responsivo para header */
@@ -159,7 +159,7 @@
             text-align: center;
             cursor: pointer;
             position: relative;
-            background: linear-gradient(180deg, #f8fafc, #fff);
+            background: #fff;
             transition: all .2s ease;
             min-height: 180px;
             display: flex;
@@ -176,7 +176,7 @@
 
         .upload-box.dragover {
             border-color: #2563eb;
-            background: #eef2ff;
+            background: #fff;
         }
 
         .upload-box .upload-icon {
@@ -196,7 +196,7 @@
             object-fit: contain;
             /* Correct proportion */
             box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
-            background-color: #f0f0f0;
+            background-color: #fff;
             /* See transparent images */
         }
 
