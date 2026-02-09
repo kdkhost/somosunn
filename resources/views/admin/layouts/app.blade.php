@@ -95,7 +95,7 @@
 
         /* layout espaçamentos padrão AdminLTE */
         .content-wrapper {
-            background: #f4f6f9;
+            background: #222d32;
             /* min-height calculation handled by AdminLTE JS */
             transition: margin-left .3s ease-in-out;
         }
@@ -114,7 +114,7 @@
             padding: 6px 12px 6px 12px;
             margin: 0;
             border-bottom: 0;
-            background: transparent;
+            background: #222d32;
         }
 
         .content-header .container-fluid {
@@ -129,7 +129,7 @@
 
         .content-header .breadcrumb {
             margin-bottom: 0;
-            background: transparent;
+            background: #222d32;
         }
 
         /* Mobile responsivo para header */
@@ -159,7 +159,7 @@
             text-align: center;
             cursor: pointer;
             position: relative;
-            background: linear-gradient(180deg, #f8fafc, #fff);
+            background: #222d32;
             transition: all .2s ease;
             min-height: 180px;
             display: flex;
@@ -196,7 +196,7 @@
             object-fit: contain;
             /* Correct proportion */
             box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
-            background-color: #f0f0f0;
+            background-color: #222d32;
             /* See transparent images */
         }
 
