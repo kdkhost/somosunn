@@ -3,7 +3,7 @@
 @section('title', 'Portal de Networking - UNN')
 
 @section('content')
-<div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+<div class="min-h-screen" style="background: linear-gradient(135deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);">
     <!-- Hero Section -->
     <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto text-center">
@@ -77,7 +77,7 @@
         </div>
     </section>
 
-    <!-- Cursos em Destaque -->
+    <!-- Cursos em Destaque (Carrossel) -->
     @if(isset($featuredCourses) && $featuredCourses->count() > 0)
     <section class="pt-12 pb-8 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto">
@@ -88,9 +88,9 @@
                 </div>
                 <a href="{{ route('courses.index') }}" class="text-sm font-bold text-white bg-blue-700 hover:bg-blue-800 px-5 py-2 rounded-full shadow transition">Ver Todos</a>
             </div>
-            <div id="featured-courses-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="featured-courses-list" class="grid md:grid-cols-3 gap-6 overflow-hidden">
                 @foreach($featuredCourses as $course)
-                <article class="bg-white rounded-2xl p-6 border border-gray-100 flex flex-col shadow-sm relative">
+                <article class="bg-white rounded-2xl p-6 border border-gray-100 flex flex-col shadow-sm relative transition-all duration-500">
                     @if($course->price > 0 && $course->price < 100)
                         <span class="absolute top-4 right-4 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">Premium</span>
                     @elseif($course->price > 0)
@@ -312,12 +312,52 @@
 </div>
 
 <style>
-.text-gradient {
-    background: linear-gradient(135deg, var(--unn-azul-1) 0%, var(--unn-azul-3) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
+    :root {
+        --unn-azul-royal: #2E3192;
+        --unn-azul-oceano: #0071BC;
+        --unn-ciano-vivo: #29ABE2;
+    }
+    .text-gradient {
+        background: linear-gradient(135deg, var(--unn-azul-royal) 0%, var(--unn-azul-oceano) 60%, var(--unn-ciano-vivo) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .btn-primary {
+        background: linear-gradient(90deg, var(--unn-azul-royal) 0%, var(--unn-azul-oceano) 60%, var(--unn-ciano-vivo) 100%);
+        color: #fff !important;
+        border: none;
+        font-weight: 600;
+        transition: background 0.18s;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(90deg, var(--unn-ciano-vivo) 0%, var(--unn-azul-oceano) 60%, var(--unn-azul-royal) 100%);
+        color: #fff !important;
+    }
+    .bg-blue-700 {
+        background-color: var(--unn-azul-royal) !important;
+    }
+    .bg-blue-800 {
+        background-color: var(--unn-azul-oceano) !important;
+    }
+    .text-blue-600 {
+        color: var(--unn-azul-oceano) !important;
+    }
+    .border-blue-200 {
+        border-color: var(--unn-ciano-vivo) !important;
+    }
+    .shadow-lg {
+        box-shadow: 0 8px 24px rgba(46,49,146,0.08);
+    }
+    .shadow-xl {
+        box-shadow: 0 12px 32px rgba(41,171,226,0.12);
+    }
+    .font-black {
+        color: var(--unn-azul-royal);
+    }
+    .bg-gradient-to-br {
+        background: linear-gradient(135deg, var(--unn-azul-royal) 0%, var(--unn-azul-oceano) 60%, var(--unn-ciano-vivo) 100%);
+    }
 </style>
-<script src="/js/featured-courses.js"></script>
+<script src="/js/featured-courses-carousel.js"></script>
 @endsection
