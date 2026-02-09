@@ -178,8 +178,12 @@
                         <article class="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
                             <div class="flex items-center justify-between gap-3 mb-3">
                                 <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center shrink-0">
-                                        {{ strtoupper(mb_substr((string) ($review->user->name ?? 'U'), 0, 1)) }}
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center shrink-0 overflow-hidden">
+                                        @if(!empty($review->user->photo))
+                                            <img src="{{ $review->user->profile_photo_url ?? '' }}" alt="Foto de {{ $review->user->name ?? 'Usuário' }}" class="w-full h-full object-cover rounded-full">
+                                        @else
+                                            {{ strtoupper(mb_substr((string) ($review->user->name ?? 'U'), 0, 1)) }}
+                                        @endif
                                     </div>
                                     <div class="min-w-0">
                                         <div class="font-semibold text-gray-900 truncate">{{ $review->user->name ?? 'Usuário' }}</div>
