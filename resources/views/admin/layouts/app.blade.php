@@ -95,8 +95,8 @@
 
         /* layout espaçamentos padrão AdminLTE */
         .content-wrapper {
-            background: #f4f6f9;
-            /* min-height calculation handled by AdminLTE JS */
+            /* Usar cor padrão AdminLTE */
+            background: inherit;
             transition: margin-left .3s ease-in-out;
         }
 
@@ -159,7 +159,7 @@
             text-align: center;
             cursor: pointer;
             position: relative;
-            background: linear-gradient(180deg, #f8fafc, #fff);
+            background: inherit;
             transition: all .2s ease;
             min-height: 180px;
             display: flex;
@@ -176,7 +176,7 @@
 
         .upload-box.dragover {
             border-color: #2563eb;
-            background: #eef2ff;
+            background: inherit;
         }
 
         .upload-box .upload-icon {
@@ -196,7 +196,7 @@
             object-fit: contain;
             /* Correct proportion */
             box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
-            background-color: #f0f0f0;
+            background-color: inherit;
             /* See transparent images */
         }
 
@@ -229,12 +229,7 @@
         }
 
         .ui-tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            left: 50%;
-            bottom: calc(100% + 10px);
-            transform: translateX(-50%);
-            background: #1F5EDB;
+            background: #343a40; /* cor tooltip padrão AdminLTE */
             color: #fff;
             padding: 6px 10px;
             border-radius: 999px;
@@ -255,7 +250,7 @@
             transform: translateX(-50%);
             border-width: 6px;
             border-style: solid;
-            border-color: #1F5EDB transparent transparent transparent;
+            border-color: #343a40 transparent transparent transparent;
             opacity: 0;
             transition: opacity 0.15s ease;
             z-index: 20;
