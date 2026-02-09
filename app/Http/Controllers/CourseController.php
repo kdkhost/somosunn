@@ -29,12 +29,18 @@ class CourseController extends Controller
         $publicStatuses = ['published', 'paused'];
 
         $featuredCourse = Course::with('creator')
+            ->withCount(['reviews as approved_reviews_count' => function ($query) {
+                $query->where('status', 'approved');
+            }])
             ->whereIn('status', $publicStatuses)
             ->orderByDesc('is_featured')
             ->orderByDesc('id')
             ->first();
 
         $courses = Course::with('creator')
+            ->withCount(['reviews as approved_reviews_count' => function ($query) {
+                $query->where('status', 'approved');
+            }])
             ->whereIn('status', $publicStatuses)
             ->orderByDesc('is_featured')
             ->orderByDesc('id')

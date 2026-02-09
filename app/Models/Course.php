@@ -152,4 +152,20 @@ class Course extends Model
     {
         return $this->morphMany(ItemReview::class, 'reviewable');
     }
+
+    /**
+     * Retorna a média de avaliações aprovadas.
+     */
+    public function getAverageRatingAttribute(): float
+    {
+        return round((float) $this->reviews()->approved()->avg('rating'), 1);
+    }
+
+    /**
+     * Retorna a quantidade de avaliações aprovadas.
+     */
+    public function getApprovedReviewsCountAttribute(): int
+    {
+        return (int) $this->reviews()->approved()->count();
+    }
 }

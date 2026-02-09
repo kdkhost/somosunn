@@ -124,6 +124,27 @@
                                                 <p class="mt-3 text-slate-600">
                                                     {{ $featured->short_description ?? 'Aprenda com conteúdo objetivo e aplicável no seu dia a dia.' }}
                                                 </p>
+                                                @php
+                                                    $featuredAvgRating = $featured->average_rating ?? 0;
+                                                    $featuredReviewsCount = $featured->approved_reviews_count ?? 0;
+                                                @endphp
+                                                @if($featuredReviewsCount > 0)
+                                                    <div class="mt-3 flex items-center gap-2 text-sm">
+                                                        <span class="font-bold text-slate-900">{{ number_format($featuredAvgRating, 1, ',', '.') }}</span>
+                                                        <div class="flex items-center gap-0.5 text-yellow-400">
+                                                            @for($i = 1; $i <= 5; $i++)
+                                                                @if($i <= floor($featuredAvgRating))
+                                                                    <i class="fas fa-star text-xs"></i>
+                                                                @elseif($i - $featuredAvgRating < 1)
+                                                                    <i class="fas fa-star-half-alt text-xs"></i>
+                                                                @else
+                                                                    <i class="far fa-star text-xs text-slate-300"></i>
+                                                                @endif
+                                                            @endfor
+                                                        </div>
+                                                        <span class="text-slate-500">({{ $featuredReviewsCount }} {{ $featuredReviewsCount === 1 ? 'avaliação' : 'avaliações' }})</span>
+                                                    </div>
+                                                @endif
                                             </div>
                                             @if($featuredIsPaused)
                                                 <span class="shrink-0 inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-700 px-4 py-2 text-xs font-black uppercase tracking-wider">
@@ -300,6 +321,28 @@
                                             <p class="mt-2 text-sm text-slate-600">
                                                 {{ Str::limit((string) ($course->short_description ?? 'Sem descrição.'), 110) }}
                                             </p>
+
+                                            @php
+                                                $avgRating = $course->average_rating ?? 0;
+                                                $reviewsCount = $course->approved_reviews_count ?? 0;
+                                            @endphp
+                                            @if($reviewsCount > 0)
+                                                <div class="mt-3 flex items-center gap-2 text-sm">
+                                                    <span class="font-bold text-slate-900">{{ number_format($avgRating, 1, ',', '.') }}</span>
+                                                    <div class="flex items-center gap-0.5 text-yellow-400">
+                                                        @for($i = 1; $i <= 5; $i++)
+                                                            @if($i <= floor($avgRating))
+                                                                <i class="fas fa-star text-xs"></i>
+                                                            @elseif($i - $avgRating < 1)
+                                                                <i class="fas fa-star-half-alt text-xs"></i>
+                                                            @else
+                                                                <i class="far fa-star text-xs text-slate-300"></i>
+                                                            @endif
+                                                        @endfor
+                                                    </div>
+                                                    <span class="text-slate-500">({{ $reviewsCount }})</span>
+                                                </div>
+                                            @endif
 
                                             <div class="mt-4 flex items-center justify-between text-sm text-slate-500">
                                                 <span class="inline-flex items-center gap-2">
