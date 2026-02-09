@@ -78,8 +78,8 @@
                             style="background: var(--unn-azul-1); color: white">
                             <i class="fas fa-crown mr-2"></i> Associação Premium
                         </span>
-                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
-                            Invista no seu <span class="text-gradient">crescimento</span>
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-gradient-title">
+                            Invista no seu <span class="unn-gradient-title">crescimento</span>
                         </h1>
                         <p class="text-xl text-gray-600 leading-relaxed mb-8">
                             Escolha o plano ideal para você e desbloqueie todo o potencial da maior comunidade de networking

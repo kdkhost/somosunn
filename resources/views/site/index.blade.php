@@ -15,9 +15,9 @@
             <div class="max-w-7xl mx-auto">
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <div>
-                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-gradient-title">
                             {{ $heroTitle }}<br />
-                            <span class="text-gradient">{{ $heroSubtitle }}</span>
+                            <span class="unn-gradient-title">{{ $heroSubtitle }}</span>
                         </h1>
                         <p class="text-base sm:text-lg text-gray-600 mb-6 md:mb-8 leading-relaxed max-w-xl">
                             {{ $heroText }}
