@@ -1,34 +1,5 @@
     <!-- Cursos em Destaque -->
-    @if(isset($featuredCourses) && $featuredCourses->count() > 0)
-    <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-3xl font-black text-gray-900">Destaques na Home</h2>
-                <span class="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-semibold">
-                    <i class="fas fa-star mr-1"></i> Cursos em destaque
-                </span>
-            </div>
-            <div id="featured-courses-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach($featuredCourses as $course)
-                <article class="bg-slate-50 rounded-3xl p-8 border border-gray-100 flex flex-col">
-                    <div class="mb-3">
-                        <img src="{{ $course->thumbnail ?? asset('img/course-default.png') }}" alt="{{ $course->title }}" class="w-full h-40 object-cover rounded-xl mb-2">
-                        <h3 class="text-xl font-bold text-gray-900 mb-1">{{ $course->title }}</h3>
-                        <p class="text-gray-600 text-sm mb-2">{{ Str::limit($course->short_description, 80) }}</p>
-                    </div>
-                    <div class="mt-auto flex flex-col gap-2">
-                        <span class="text-xs text-gray-500">Carga horária: <strong>{{ $course->total_hours ?? $course->getTotalHoursAttribute() }}h</strong></span>
-                        <span class="text-xs text-gray-500">Avaliação: <strong>{{ $course->average_rating ?? '-' }}/5</strong> ({{ $course->approved_reviews_count ?? '0' }} avaliações)</span>
-                        <a href="{{ route('courses.show', $course->slug) }}" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold w-full block text-center mt-2">
-                            Ver curso
-                        </a>
-                    </div>
-                </article>
-                @endforeach
-            </div>
-        </div>
-    </section>
-    @endif
+    @php $__inserirCursosDestaque = true; @endphp
 @extends($extends ?? 'layouts.app')
 
 @section('title', 'Portal de Networking - UNN')
@@ -108,7 +79,39 @@
         </div>
     </section>
 
+    <!-- Cursos em Destaque -->
+    @if(isset($featuredCourses) && $featuredCourses->count() > 0 && isset($__inserirCursosDestaque))
+    <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-black text-gray-900">Destaques na Home</h2>
+                <span class="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-semibold">
+                    <i class="fas fa-star mr-1"></i> Cursos em destaque
+                </span>
+            </div>
+            <div id="featured-courses-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach($featuredCourses as $course)
+                <article class="bg-slate-50 rounded-3xl p-8 border border-gray-100 flex flex-col">
+                    <div class="mb-3">
+                        <img src="{{ $course->thumbnail ?? asset('img/course-default.png') }}" alt="{{ $course->title }}" class="w-full h-40 object-cover rounded-xl mb-2">
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">{{ $course->title }}</h3>
+                        <p class="text-gray-600 text-sm mb-2">{{ Str::limit($course->short_description, 80) }}</p>
+                    </div>
+                    <div class="mt-auto flex flex-col gap-2">
+                        <span class="text-xs text-gray-500">Carga horária: <strong>{{ $course->total_hours ?? $course->getTotalHoursAttribute() }}h</strong></span>
+                        <span class="text-xs text-gray-500">Avaliação: <strong>{{ $course->average_rating ?? '-' }}/5</strong> ({{ $course->approved_reviews_count ?? '0' }} avaliações)</span>
+                        <a href="{{ route('courses.show', $course->slug) }}" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold w-full block text-center mt-2">
+                            Ver curso
+                        </a>
+                    </div>
+                </article>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
     <!-- Mentorias Disponíveis -->
+    @php unset($__inserirCursosDestaque); @endphp
     @if(isset($mentorings) && $mentorings->count() > 0)
     <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
         <div class="max-w-7xl mx-auto">
