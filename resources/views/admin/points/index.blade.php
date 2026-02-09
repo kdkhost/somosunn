@@ -14,11 +14,13 @@
 @endif
 
 <div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="card-title mb-0"><i class="fas fa-star mr-2"></i>Regras de Pontuação</h3>
-        <a href="{{ route('admin.points-rules.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus mr-1"></i>Nova Regra
-        </a>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-star mr-2"></i>Regras de Pontuação</h3>
+        <div class="card-tools">
+            <a href="{{ route('admin.points-rules.create') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus mr-1"></i>Nova Regra
+            </a>
+        </div>
     </div>
     <div class="card-body">
         <p class="text-muted mb-3">
