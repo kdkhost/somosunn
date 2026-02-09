@@ -17,8 +17,11 @@ class PermissionController extends Controller
 
     public function create()
     {
-        $permissions = Permission::all();
-        return view('admin.permissions.form', ['role'=>new Role(),'permissions'=>$permissions]);
+        $permissionsGrouped = Permission::grouped();
+        return view('admin.permissions.form', [
+            'role' => new Role(),
+            'permissionsGrouped' => $permissionsGrouped
+        ]);
     }
 
     public function store(Request $request)
@@ -38,8 +41,11 @@ class PermissionController extends Controller
 
     public function edit(Role $permission)
     {
-        $permissions = Permission::all();
-        return view('admin.permissions.form', ['role'=>$permission,'permissions'=>$permissions]);
+        $permissionsGrouped = Permission::grouped();
+        return view('admin.permissions.form', [
+            'role' => $permission,
+            'permissionsGrouped' => $permissionsGrouped
+        ]);
     }
 
     public function update(Request $request, Role $permission)

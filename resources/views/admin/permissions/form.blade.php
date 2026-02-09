@@ -12,79 +12,116 @@
     <form method="POST" action="{{ $role->exists ? route('admin.permissions.update',$role) : route('admin.permissions.store') }}" class="ajax-form">
         @csrf
         @if($role->exists) @method('PUT') @endif
-        <div class="form-group mb-3"><label>Nome (slug)</label><input name="name" class="form-control" value="{{ old('name',$role->name) }}" required></div>
-        <div class="form-group mb-3"><label>Rótulo</label><input name="label" class="form-control" value="{{ old('label',$role->label) }}"></div>
-        @php
-            $desc = [
-                'dashboard.view' => 'Ver o painel inicial.',
-                'users.view' => 'Listar usuários.',
-                'users.create' => 'Criar usuários.',
-                'users.edit' => 'Editar usuários.',
-                'users.delete' => 'Excluir usuários.',
-                'users.impersonate' => 'Assumir a sessão de um usuário.',
-                'courses.view' => 'Listar cursos.',
-                'courses.create' => 'Criar cursos.',
-                'courses.edit' => 'Editar cursos.',
-                'courses.delete' => 'Excluir cursos.',
-                'courses.publish' => 'Publicar/arquivar cursos.',
-                'mentorships.view' => 'Ver mentorias.',
-                'mentorships.create' => 'Criar mentorias.',
-                'mentorships.edit' => 'Editar mentorias.',
-                'mentorships.delete' => 'Excluir mentorias.',
-                'mentorships.schedule' => 'Agendar sessão de mentoria.',
-                'events.view' => 'Listar eventos.',
-                'events.create' => 'Criar eventos.',
-                'events.edit' => 'Editar eventos.',
-                'events.delete' => 'Excluir eventos.',
-                'events.publish' => 'Publicar/encerrar eventos.',
-                'events.ticket.manage' => 'Gerenciar ingressos/participações.',
-                'plans.view' => 'Listar planos.',
-                'plans.create' => 'Criar planos.',
-                'plans.edit' => 'Editar planos.',
-                'plans.delete' => 'Excluir planos.',
-                'plans.feature.toggle' => 'Destacar/ocultar planos.',
-                'plans.discount.manage' => 'Gerenciar descontos de planos.',
-                'certificates.generate' => 'Gerar certificados.',
-                'certificates.view' => 'Listar certificados.',
-                'certificates.delete' => 'Excluir certificados.',
-                'points.rules.manage' => 'Gerenciar regras de pontuação.',
-                'ranking.view' => 'Ver ranking.',
-                'ranking.edit' => 'Editar ranking.',
-                'mailtemplates.view' => 'Listar templates de e-mail.',
-                'mailtemplates.create' => 'Criar templates.',
-                'mailtemplates.edit' => 'Editar templates.',
-                'mailtemplates.delete' => 'Excluir templates.',
-                'mail.sendtest' => 'Enviar e-mail de teste.',
-                'uploads.manage' => 'Gerenciar uploads/arquivos.',
-                'settings.view' => 'Ver configurações.',
-                'settings.update' => 'Atualizar configurações.',
-                'settings.smtp.test' => 'Testar SMTP.',
-                'settings.pwa.toggle' => 'Ativar/desativar PWA.',
-                'settings.branding.update' => 'Atualizar branding (logo/preloader).',
-                'permissions.view' => 'Listar permissões.',
-                'permissions.assign' => 'Atribuir permissões a papéis/usuários.',
-                'permissions.sync' => 'Sincronizar permissões.',
-                'roles.manage' => 'Gerenciar papéis (criar/editar/excluir).',
-            ];
-        @endphp
-        <div class="form-group mb-3">
-            <label>Permissões</label>
-            <div class="row">
-            @foreach($permissions as $p)
-                <div class="col-md-4 mb-2">
-                    @php $d = $desc[$p->name] ?? 'Sem descrição'; @endphp
-                    <label class="mb-0" title="{{ $d }}">
-                        <input type="checkbox" name="permissions[]" value="{{ $p->id }}" {{ $role->permissions->contains($p->id) ? 'checked' : '' }}>
-                        {{ $p->name }}
-                        <i class="fas fa-info-circle text-muted ml-1" data-toggle="tooltip" data-placement="top" title="{{ $d }}"></i>
-                    </label>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label>Nome (slug)</label>
+                    <input name="name" class="form-control" value="{{ old('name',$role->name) }}" required placeholder="ex: editor">
                 </div>
-            @endforeach
+            </div>
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label>Rótulo</label>
+                    <input name="label" class="form-control" value="{{ old('label',$role->label) }}" placeholder="ex: Editor de conteúdo">
+                </div>
             </div>
         </div>
-        <button class="btn btn-primary">Salvar</button>
+
+        <div class="form-group mb-3">
+            <label class="d-flex justify-content-between align-items-center">
+                <span>Permissões</span>
+                <div>
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="selectAll">Marcar todas</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAll">Desmarcar todas</button>
+                </div>
+            </label>
+
+            @php
+                $categoryColors = [
+                    'Dashboard' => 'primary',
+                    'Usuários' => 'info',
+                    'Cursos' => 'success',
+                    'Mentorias' => 'warning',
+                    'Eventos' => 'danger',
+                    'Planos' => 'secondary',
+                    'Vendas' => 'dark',
+                    'Faturas' => 'primary',
+                    'Cupons' => 'info',
+                    'Certificados' => 'success',
+                    'Pontuação' => 'warning',
+                    'Comunidade' => 'danger',
+                    'E-mails' => 'secondary',
+                    'Depoimentos' => 'dark',
+                    'FAQ' => 'primary',
+                    'Uploads' => 'info',
+                    'Pagamentos' => 'success',
+                    'Relatórios' => 'warning',
+                    'Configurações' => 'danger',
+                    'Fontes' => 'secondary',
+                    'Permissões' => 'dark',
+                    'Outros' => 'light',
+                ];
+            @endphp
+
+            @foreach($permissionsGrouped as $category => $permissions)
+                @php $color = $categoryColors[$category] ?? 'secondary'; @endphp
+                <div class="card mb-3 border-{{ $color }}">
+                    <div class="card-header bg-{{ $color }} {{ in_array($color, ['warning', 'light']) ? 'text-dark' : 'text-white' }} py-2 d-flex justify-content-between align-items-center">
+                        <strong><i class="fas fa-folder mr-2"></i>{{ $category }}</strong>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-light selectCategory" data-category="{{ $category }}">Marcar</button>
+                            <button type="button" class="btn btn-sm btn-outline-light deselectCategory" data-category="{{ $category }}">Desmarcar</button>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="row">
+                            @foreach($permissions as $p)
+                                <div class="col-md-4 col-lg-3 mb-2">
+                                    <label class="mb-0 d-flex align-items-start" title="{{ $p->label }}">
+                                        <input type="checkbox" name="permissions[]" value="{{ $p->id }}" 
+                                            class="mr-2 mt-1 perm-checkbox" data-category="{{ $category }}"
+                                            {{ $role->permissions->contains($p->id) ? 'checked' : '' }}>
+                                        <span>
+                                            <code class="text-{{ $color }}">{{ $p->name }}</code>
+                                            <small class="d-block text-muted">{{ $p->label }}</small>
+                                        </span>
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <button class="btn btn-primary"><i class="fas fa-save mr-2"></i>Salvar</button>
         <a href="{{ route('admin.permissions.index') }}" class="btn btn-secondary" data-pjax="true">Voltar</a>
     </form>
   </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('selectAll').addEventListener('click', function() {
+        document.querySelectorAll('.perm-checkbox').forEach(cb => cb.checked = true);
+    });
+    document.getElementById('deselectAll').addEventListener('click', function() {
+        document.querySelectorAll('.perm-checkbox').forEach(cb => cb.checked = false);
+    });
+    document.querySelectorAll('.selectCategory').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const cat = this.dataset.category;
+            document.querySelectorAll('.perm-checkbox[data-category="'+cat+'"]').forEach(cb => cb.checked = true);
+        });
+    });
+    document.querySelectorAll('.deselectCategory').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const cat = this.dataset.category;
+            document.querySelectorAll('.perm-checkbox[data-category="'+cat+'"]').forEach(cb => cb.checked = false);
+        });
+    });
+});
+</script>
+@endpush
