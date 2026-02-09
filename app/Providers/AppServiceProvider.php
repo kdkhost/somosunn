@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
     {
         \App\Models\User::observe(\App\Observers\UserObserver::class);
 
-        View::composer('admin.partials.navbar', \App\Http\View\Composers\NavbarComposer::class);
+        View::composer(['admin.partials.navbar', 'admin.partials.sidebar'], \App\Http\View\Composers\NavbarComposer::class);
 
         View::share('unnDbAvailable', true);
 

@@ -293,7 +293,11 @@
                         <a href="{{ route('admin.testimonials.index') }}"
                             class="nav-link {{ $is('admin.testimonials.*') }}">
                             <i class="nav-icon fas fa-quote-left"></i>
-                            <p>Depoimentos</p>
+                            <p>Depoimentos
+                                @if(isset($pendingTestimonialsCount) && $pendingTestimonialsCount > 0)
+                                    <span class="badge badge-success right">{{ $pendingTestimonialsCount }}</span>
+                                @endif
+                            </p>
                         </a>
                     </li>
                 @endif
@@ -302,7 +306,11 @@
                     <li class="nav-item">
                         <a href="{{ route('admin.reviews.index') }}" class="nav-link {{ $is('admin.reviews.*') }}">
                             <i class="nav-icon fas fa-star-half-alt"></i>
-                            <p>Avaliações</p>
+                            <p>Avaliações
+                                @if(isset($pendingReviewsCount) && $pendingReviewsCount > 0)
+                                    <span class="badge badge-info right">{{ $pendingReviewsCount }}</span>
+                                @endif
+                            </p>
                         </a>
                     </li>
                 @endif
@@ -313,7 +321,11 @@
                         {{-- Usa rota do feed se disponível, senão admin.social --}}
                         <a href="{{ route('admin.social.feed.internal') }}" class="nav-link {{ $is('admin.social.*') }}">
                             <i class="nav-icon fas fa-comments"></i>
-                            <p>Comunidade</p>
+                            <p>Comunidade
+                                @if(isset($pendingConnectionsCount) && $pendingConnectionsCount > 0)
+                                    <span class="badge badge-warning right">{{ $pendingConnectionsCount }}</span>
+                                @endif
+                            </p>
                         </a>
                     </li>
                 @endif
@@ -322,7 +334,11 @@
                     <li class="nav-item">
                         <a href="{{ route('admin.chat.index') }}" class="nav-link {{ $is('admin.chat.*') }}">
                             <i class="nav-icon fas fa-comment-dots"></i>
-                            <p>Chat</p>
+                            <p>Chat
+                                @if(isset($unreadMessagesCount) && $unreadMessagesCount > 0)
+                                    <span class="badge badge-danger right">{{ $unreadMessagesCount }}</span>
+                                @endif
+                            </p>
                         </a>
                     </li>
                 @endif

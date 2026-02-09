@@ -6,6 +6,10 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Connection;
 use App\Models\Message;
+use App\Models\ItemReview;
+use App\Models\Testimonial;
+use App\Models\Course;
+use App\Models\Mentorship;
 
 class NavbarComposer
 {
@@ -51,7 +55,67 @@ class NavbarComposer
                 $unreadMessagesCount = 0;
             }
 
-            $view->with(compact('pendingConnectionsCount', 'pendingConnections', 'unreadMessagesCount', 'unreadMessagesGroups'));
+            // Pending Reviews - for content owners
+            $pendingReviewsCount = 0;
+            $pendingReviews = collect();
+            try {
+                // Get IDs of courses and mentorships owned by user
+                $userCourseIds = Course::where('user_id', $user->id)->pluck('id')->toArray();
+                $userMentorshipIds = Mentorship::where('mentor_id', $user->id)->pluck('id')->toArray();
+
+                $reviewsQuery = ItemReview::where('status', 'pending')
+                    ->where(function ($q) use ($userCourseIds, $userMentorshipIds, $user) {
+                        // Reviews on user's courses
+                        $q->where(function ($sub) use ($userCourseIds) {
+                            $sub->where('reviewable_type', 'App\\Models\\Course')
+                                ->whereIn('reviewable_id', $userCourseIds);
+                        });
+                        // Reviews on user's mentorships
+                        $q->orWhere(function ($sub) use ($userMentorshipIds) {
+                            $sub->where('reviewable_type', 'App\\Models\\Mentorship')
+                                ->whereIn('reviewable_id', $userMentorshipIds);
+                        });
+                        // Admins see all pending reviews
+                        if ($user->isAdmin()) {
+                            $q->orWhereNotNull('id');
+                        }
+                    })
+                    ->with(['user', 'reviewable']);
+
+                $pendingReviewsCount = $reviewsQuery->count();
+                $pendingReviews = $reviewsQuery->latest()->take(5)->get();
+            } catch (\Exception $e) {
+                // Silently fail
+            }
+
+            // Pending Testimonials - for admins only
+            $pendingTestimonialsCount = 0;
+            $pendingTestimonials = collect();
+            try {
+                if ($user->isAdmin() || $user->hasPermission('testimonials.moderate')) {
+                    $testimonialsQuery = Testimonial::where('status', 'pending')
+                        ->with('user');
+                    $pendingTestimonialsCount = $testimonialsQuery->count();
+                    $pendingTestimonials = $testimonialsQuery->latest()->take(5)->get();
+                }
+            } catch (\Exception $e) {
+                // Silently fail
+            }
+
+            // Total notification count for bell
+            $totalNotificationsCount = $pendingConnectionsCount + $pendingReviewsCount + $pendingTestimonialsCount;
+
+            $view->with(compact(
+                'pendingConnectionsCount', 
+                'pendingConnections', 
+                'unreadMessagesCount', 
+                'unreadMessagesGroups',
+                'pendingReviewsCount',
+                'pendingReviews',
+                'pendingTestimonialsCount',
+                'pendingTestimonials',
+                'totalNotificationsCount'
+            ));
         }
     }
 }

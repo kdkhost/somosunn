@@ -52,14 +52,86 @@
         <li class="nav-item dropdown mr-2">
             <a class="nav-link" data-toggle="dropdown" href="#">
                 <i class="far fa-bell"></i>
-                @if(isset($pendingConnectionsCount) && $pendingConnectionsCount > 0)
-                    <span class="badge badge-warning navbar-badge">{{ $pendingConnectionsCount }}</span>
+                @if(isset($totalNotificationsCount) && $totalNotificationsCount > 0)
+                    <span class="badge badge-warning navbar-badge">{{ $totalNotificationsCount }}</span>
                 @endif
             </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-item dropdown-header">{{ $pendingConnectionsCount ?? 0 }} Notificações</span>
-                <div class="dropdown-divider"></div>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="max-height: 400px; overflow-y: auto;">
+                <span class="dropdown-item dropdown-header">{{ $totalNotificationsCount ?? 0 }} Notificações</span>
+                
+                {{-- Pending Reviews --}}
+                @if(isset($pendingReviews) && $pendingReviews->isNotEmpty())
+                    <div class="dropdown-divider"></div>
+                    <span class="dropdown-item dropdown-header text-info py-1">
+                        <i class="fas fa-star-half-alt mr-1"></i> Avaliações Pendentes ({{ $pendingReviewsCount }})
+                    </span>
+                    @foreach($pendingReviews->take(3) as $review)
+                        <a href="{{ route('admin.reviews.index') }}" class="dropdown-item">
+                            <div class="media">
+                                <img src="{{ $review->user->photo ? asset($review->user->photo) : asset('img/default-user.svg') }}"
+                                    class="img-size-50 mr-3 img-circle" alt="">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title">
+                                        {{ \Illuminate\Support\Str::limit($review->user->name ?? 'Usuário', 15) }}
+                                    </h3>
+                                    <p class="text-sm text-muted mb-0">
+                                        {{ $review->rating }}/5 estrelas
+                                        @if($review->reviewable)
+                                            em <strong>{{ \Illuminate\Support\Str::limit($review->reviewable->title ?? '', 20) }}</strong>
+                                        @endif
+                                    </p>
+                                    <p class="text-xs text-muted">
+                                        <i class="far fa-clock mr-1"></i>{{ $review->created_at->diffForHumans() }}
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                    @if($pendingReviewsCount > 3)
+                        <a href="{{ route('admin.reviews.index') }}" class="dropdown-item dropdown-footer text-info">
+                            Ver todas as {{ $pendingReviewsCount }} avaliações
+                        </a>
+                    @endif
+                @endif
+
+                {{-- Pending Testimonials --}}
+                @if(isset($pendingTestimonials) && $pendingTestimonials->isNotEmpty())
+                    <div class="dropdown-divider"></div>
+                    <span class="dropdown-item dropdown-header text-success py-1">
+                        <i class="fas fa-quote-left mr-1"></i> Depoimentos Pendentes ({{ $pendingTestimonialsCount }})
+                    </span>
+                    @foreach($pendingTestimonials->take(3) as $testimonial)
+                        <a href="{{ route('admin.testimonials.index') }}" class="dropdown-item">
+                            <div class="media">
+                                <img src="{{ $testimonial->user && $testimonial->user->photo ? asset($testimonial->user->photo) : asset('img/default-user.svg') }}"
+                                    class="img-size-50 mr-3 img-circle" alt="">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title">
+                                        {{ \Illuminate\Support\Str::limit($testimonial->author_name ?? ($testimonial->user->name ?? 'Anônimo'), 15) }}
+                                    </h3>
+                                    <p class="text-sm text-muted mb-0">
+                                        {{ \Illuminate\Support\Str::limit($testimonial->content, 40) }}
+                                    </p>
+                                    <p class="text-xs text-muted">
+                                        <i class="far fa-clock mr-1"></i>{{ $testimonial->created_at->diffForHumans() }}
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                    @if($pendingTestimonialsCount > 3)
+                        <a href="{{ route('admin.testimonials.index') }}" class="dropdown-item dropdown-footer text-success">
+                            Ver todos os {{ $pendingTestimonialsCount }} depoimentos
+                        </a>
+                    @endif
+                @endif
+
+                {{-- Pending Connections --}}
                 @if(isset($pendingConnections) && $pendingConnections->isNotEmpty())
+                    <div class="dropdown-divider"></div>
+                    <span class="dropdown-item dropdown-header text-warning py-1">
+                        <i class="fas fa-user-plus mr-1"></i> Conexões Pendentes ({{ $pendingConnectionsCount }})
+                    </span>
                     @foreach($pendingConnections as $conn)
                         <div class="dropdown-item">
                             <div class="media">
@@ -82,9 +154,12 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="dropdown-divider"></div>
                     @endforeach
-                @else
+                @endif
+
+                {{-- Empty state --}}
+                @if((!isset($pendingReviews) || $pendingReviews->isEmpty()) && (!isset($pendingTestimonials) || $pendingTestimonials->isEmpty()) && (!isset($pendingConnections) || $pendingConnections->isEmpty()))
+                    <div class="dropdown-divider"></div>
                     <span class="dropdown-item text-center text-muted">Sem novas notificações</span>
                 @endif
             </div>
