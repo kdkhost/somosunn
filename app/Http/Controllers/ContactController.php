@@ -84,11 +84,20 @@ class ContactController extends Controller
                 $message->to($to)->subject($mailSubject);
                 $message->replyTo($data['email'], $data['name']);
             });
+
+            Log::info('Contato: email enviado com sucesso', [
+                'to' => $to,
+                'subject' => $mailSubject,
+                'from_name' => $data['name'],
+                'from_email' => $data['email'],
+            ]);
         } catch (\Throwable $e) {
             Log::error('Contato: falha ao enviar email: ' . $e->getMessage(), [
                 'to' => $to,
                 'smtp_host' => config('mail.mailers.smtp.host'),
                 'smtp_port' => config('mail.mailers.smtp.port'),
+                'smtp_encryption' => config('mail.mailers.smtp.encryption'),
+                'exception' => $e->getTraceAsString(),
             ]);
 
             return back()
@@ -176,25 +185,45 @@ class ContactController extends Controller
             $fromEmail = trim((string) Setting::get('smtp_from_email', ''));
             $fromName = trim((string) Setting::get('smtp_from_name', ''));
 
+            Log::info('Contato: configuracoes SMTP carregadas', [
+                'host' => $host,
+                'port' => $port,
+                'username' => $username,
+                'encryption' => $encryption,
+                'from_email' => $fromEmail,
+                'from_name' => $fromName,
+                'has_password' => $password !== '',
+            ]);
+
             if ($host === '' || $port === '' || $fromEmail === '') {
+                Log::warning('Contato: SMTP incompleto', [
+                    'has_host' => $host !== '',
+                    'has_port' => $port !== '',
+                    'has_from_email' => $fromEmail !== '',
+                ]);
                 return;
             }
 
-            if ($encryption === 'null') {
+            if ($encryption === 'null' || strtolower($encryption) === 'null') {
                 $encryption = '';
             }
+            
+            // Normalizar encryption para minúsculas
+            $encryption = strtolower($encryption);
 
             config([
                 'mail.default' => 'smtp',
                 'mail.mailers.smtp.transport' => 'smtp',
                 'mail.mailers.smtp.host' => $host,
-                'mail.mailers.smtp.port' => $port,
+                'mail.mailers.smtp.port' => (int) $port,
                 'mail.mailers.smtp.username' => $username !== '' ? $username : null,
                 'mail.mailers.smtp.password' => $password !== '' ? $password : null,
                 'mail.mailers.smtp.encryption' => $encryption !== '' ? $encryption : null,
                 'mail.from.address' => $fromEmail,
                 'mail.from.name' => $fromName !== '' ? $fromName : (Setting::get('app_name') ?: config('app.name', 'UNN')),
             ]);
+
+            Log::info('Contato: SMTP aplicado com sucesso');
         } catch (\Throwable $e) {
             Log::warning('Contato: falha ao aplicar SMTP do banco', ['error' => $e->getMessage()]);
         }
