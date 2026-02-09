@@ -170,10 +170,17 @@ class HomeController extends Controller
                 ->groupBy('level')
                 ->pluck('total', 'level');
 
-            $leaderboard = Ranking::with('user')
+            $leaderboard = Ranking::with(['user' => function($q) {
+                $q->whereNotIn('role', ['admin', 'superadmin']);
+            }])
                 ->orderByDesc('score')
-                ->limit(6)
-                ->get();
+                ->get()
+                ->filter(function($rank) {
+                    // Exclui se não tem user ou se user é admin/superadmin
+                    return $rank->user && !in_array($rank->user->role, ['admin', 'superadmin']);
+                })
+                ->take(6)
+                ->values();
         } catch (\Throwable $e) {
             Log::warning('Falha ao montar overview de networking: ' . $e->getMessage());
         }
