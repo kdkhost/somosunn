@@ -1699,6 +1699,16 @@
                         <div class="form-group col-md-6"><label>From e-mail</label><input name="smtp_from_email"
                                 class="form-control" value="{{ $settings['smtp_from_email'] ?? '' }}"></div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>CC (Cópia) <small class="text-muted">- separar múltiplos por vírgula</small></label>
+                            <input name="smtp_cc" class="form-control" value="{{ $settings['smtp_cc'] ?? '' }}" placeholder="email1@exemplo.com, email2@exemplo.com">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>BCC (Cópia Oculta) <small class="text-muted">- separar múltiplos por vírgula</small></label>
+                            <input name="smtp_bcc" class="form-control" value="{{ $settings['smtp_bcc'] ?? '' }}" placeholder="email1@exemplo.com, email2@exemplo.com">
+                        </div>
+                    </div>
                     <div class="form-row align-items-end">
                         <div class="form-group col-md-4">
                             <label>Enviar teste para</label>

@@ -79,14 +79,27 @@ class ContactController extends Controller
             ],
         ])->render();
 
+        // Carregar CC e BCC das configurações
+        $ccEmails = $this->parseEmailList(Setting::get('smtp_cc', ''));
+        $bccEmails = $this->parseEmailList(Setting::get('smtp_bcc', ''));
+
         try {
-            Mail::html($html, function ($message) use ($to, $mailSubject, $data) {
+            Mail::html($html, function ($message) use ($to, $mailSubject, $data, $ccEmails, $bccEmails) {
                 $message->to($to)->subject($mailSubject);
                 $message->replyTo($data['email'], $data['name']);
+                
+                if (!empty($ccEmails)) {
+                    $message->cc($ccEmails);
+                }
+                if (!empty($bccEmails)) {
+                    $message->bcc($bccEmails);
+                }
             });
 
             Log::info('Contato: email enviado com sucesso', [
                 'to' => $to,
+                'cc' => $ccEmails,
+                'bcc' => $bccEmails,
                 'subject' => $mailSubject,
                 'from_name' => $data['name'],
                 'from_email' => $data['email'],
@@ -227,5 +240,27 @@ class ContactController extends Controller
         } catch (\Throwable $e) {
             Log::warning('Contato: falha ao aplicar SMTP do banco', ['error' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Parse comma-separated email list into array of valid emails
+     */
+    private function parseEmailList(?string $emails): array
+    {
+        if ($emails === null || trim($emails) === '') {
+            return [];
+        }
+
+        $list = preg_split('/[,;\s]+/', $emails) ?: [];
+        $valid = [];
+
+        foreach ($list as $email) {
+            $email = trim($email);
+            if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $valid[] = $email;
+            }
+        }
+
+        return $valid;
     }
 }
