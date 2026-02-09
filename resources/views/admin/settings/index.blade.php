@@ -1753,7 +1753,7 @@
                         </div>
                         <div class="card-body">
                             <div class="alert alert-light border-danger">
-                                <h5><i class="icon fas fa-info-circle text-danger"></i> Configuração Google</h5>
+                                <h5><i class="icon fas fa-info-circle text-danger"></i> Configuração Google</h3>
                                 <ol class="pl-3 mb-0 text-muted small">
                                     <li>Acesse o <a href="https://console.cloud.google.com/" target="_blank"
                                             class="text-danger">Google Cloud Console</a>.</li>
@@ -1798,7 +1798,7 @@
                         </div>
                         <div class="card-body" style="display: none;">
                             <div class="alert alert-light border-primary">
-                                <h5><i class="icon fas fa-info-circle text-primary"></i> Configuração Facebook</h5>
+                                <h5><i class="icon fas fa-info-circle text-primary"></i> Configuração Facebook</h3>
                                 <ol class="pl-3 mb-0 text-muted small">
                                     <li>Acesse o <a href="https://developers.facebook.com/" target="_blank"
                                             class="text-primary">Facebook for Developers</a>.</li>
@@ -1842,7 +1842,7 @@
                         </div>
                         <div class="card-body" style="display: none;">
                             <div class="alert alert-light border-info">
-                                <h5><i class="icon fas fa-info-circle text-info"></i> Configuração LinkedIn</h5>
+                                <h5><i class="icon fas fa-info-circle text-info"></i> Configuração LinkedIn</h3>
                                 <ol class="pl-3 mb-0 text-muted small">
                                     <li>Acesse o <a href="https://www.linkedin.com/developers/" target="_blank"
                                             class="text-info">LinkedIn Developers</a>.</li>
