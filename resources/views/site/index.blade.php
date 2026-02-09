@@ -15,7 +15,7 @@
             <div class="max-w-7xl mx-auto">
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <div>
-                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient unn-title-max">
+                        <h1 class="unn-title-gradient unn-title-hero mb-6">
                             {{ $heroTitle }}<br />
                             <span class="unn-title-gradient">{{ $heroSubtitle }}</span>
                         </h1>
@@ -391,15 +391,31 @@
             background-clip: text;
             color: transparent;
         }
-        .unn-title-max {
-            max-width: 700px;
-            word-break: break-word;
-            margin-left: auto;
-            margin-right: auto;
+        .unn-title-hero {
+            max-width: 540px;
+            font-size: 2.6rem;
+            line-height: 1.1;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            margin-left: 0;
+            margin-right: 0;
+            word-break: normal;
+            hyphens: auto;
         }
-        @media (max-width: 640px) {
-            .unn-title-max {
-                font-size: 2.2rem !important;
+        @media (min-width: 640px) {
+            .unn-title-hero {
+                font-size: 3.2rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .unn-title-hero {
+                font-size: 3.8rem;
+                max-width: 600px;
+            }
+        }
+        @media (max-width: 480px) {
+            .unn-title-hero {
+                font-size: 2rem;
                 max-width: 95vw;
             }
         }
