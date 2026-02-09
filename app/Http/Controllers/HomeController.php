@@ -70,14 +70,22 @@ class HomeController extends Controller
     public function portal()
     {
         $mentorings = collect();
+        $featuredCourses = collect();
         if (view()->shared('unnDbAvailable')) {
             try {
                 $mentorings = Mentorship::where('slots', '>', 0)
                     ->orderBy('schedule')
                     ->limit(6)
                     ->get();
+
+                // Cursos em destaque: status published OU paused, is_featured = true
+                $featuredCourses = \App\Models\Course::where('is_featured', true)
+                    ->whereIn('status', ['published', 'paused'])
+                    ->inRandomOrder()
+                    ->limit(6)
+                    ->get();
             } catch (\Throwable $e) {
-                Log::warning('Falha ao carregar mentorias: ' . $e->getMessage());
+                Log::warning('Falha ao carregar mentorias/cursos em destaque: ' . $e->getMessage());
             }
         }
 
@@ -85,6 +93,7 @@ class HomeController extends Controller
 
         return view('site.portal', [
             'mentorings' => $mentorings,
+            'featuredCourses' => $featuredCourses,
             'levelSummary' => $overview['levelSummary'],
             'topRankings' => $overview['leaderboard'],
             'isDemo' => config('app.demo_mode') && $mentorings->isEmpty(),
