@@ -37,13 +37,14 @@
                                 @enderror
                             </div>
                         </div>
+                        @if($hasCategory ?? false)
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="category">Categoria</label>
                                 <select name="category" id="category" class="form-control @error('category') is-invalid @enderror">
                                     <option value="">Selecione...</option>
                                     @foreach($categories as $key => $cat)
-                                        <option value="{{ $key }}" {{ old('category', $rule->category) == $key ? 'selected' : '' }}>
+                                        <option value="{{ $key }}" {{ old('category', $rule->category ?? '') == $key ? 'selected' : '' }}>
                                             {{ $cat['label'] }}
                                         </option>
                                     @endforeach
@@ -53,6 +54,18 @@
                                 @enderror
                             </div>
                         </div>
+                        @else
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="points">Pontos <span class="text-danger">*</span></label>
+                                <input type="number" name="points" id="points" class="form-control @error('points') is-invalid @enderror" 
+                                    value="{{ old('points', $rule->points ?? 10) }}" required>
+                                @error('points')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        @endif
                     </div>
 
                     <div class="form-group">
@@ -65,10 +78,11 @@
                         @enderror
                     </div>
 
+                    @if($hasCategory ?? false)
                     <div class="form-group">
                         <label for="description">Descrição</label>
                         <input type="text" name="description" id="description" class="form-control @error('description') is-invalid @enderror" 
-                            value="{{ old('description', $rule->description) }}" 
+                            value="{{ old('description', $rule->description ?? '') }}" 
                             placeholder="Descrição detalhada da ação que concede os pontos">
                         @error('description')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -92,10 +106,10 @@
                                 <label for="icon">Ícone (FontAwesome)</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><i id="iconPreview" class="{{ $rule->icon ?: 'fas fa-star' }}"></i></span>
+                                        <span class="input-group-text"><i id="iconPreview" class="{{ $rule->icon ?? 'fas fa-star' }}"></i></span>
                                     </div>
                                     <input type="text" name="icon" id="icon" class="form-control" 
-                                        value="{{ old('icon', $rule->icon) }}" 
+                                        value="{{ old('icon', $rule->icon ?? '') }}" 
                                         placeholder="fas fa-star">
                                 </div>
                             </div>
@@ -104,7 +118,7 @@
                             <div class="form-group">
                                 <label for="max_daily">Limite diário</label>
                                 <input type="number" name="max_daily" id="max_daily" class="form-control" 
-                                    value="{{ old('max_daily', $rule->max_daily) }}" 
+                                    value="{{ old('max_daily', $rule->max_daily ?? '') }}" 
                                     min="1" placeholder="Sem limite">
                                 <small class="text-muted">Deixe vazio para ilimitado</small>
                             </div>
@@ -128,7 +142,7 @@
                             <div class="form-group">
                                 <div class="custom-control custom-switch">
                                     <input type="checkbox" name="repeatable" id="repeatable" class="custom-control-input" 
-                                        {{ old('repeatable', $rule->repeatable) ? 'checked' : '' }}>
+                                        {{ old('repeatable', $rule->repeatable ?? false) ? 'checked' : '' }}>
                                     <label class="custom-control-label" for="repeatable">
                                         <strong>Repetível</strong>
                                         <br><small class="text-muted">Pode ser ganho múltiplas vezes</small>
@@ -137,6 +151,18 @@
                             </div>
                         </div>
                     </div>
+                    @else
+                    {{-- Versão simples sem campos avançados --}}
+                    <div class="form-group">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" name="active" id="active" class="custom-control-input" 
+                                {{ old('active', $rule->active ?? true) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="active">
+                                <strong>Regra ativa</strong>
+                            </label>
+                        </div>
+                    </div>
+                    @endif
 
                     <hr>
 

@@ -79,14 +79,14 @@
                         @foreach($rules->sortBy('sort_order') as $r)
                         <tr class="{{ !$r->active ? 'table-secondary' : '' }}">
                             <td class="text-center">
-                                <i class="{{ $r->icon ?: 'fas fa-star' }} text-{{ $cat['color'] }}"></i>
+                                <i class="{{ $r->icon ?? 'fas fa-star' }} text-{{ $cat['color'] }}"></i>
                             </td>
                             <td>
                                 <code>{{ $r->key }}</code>
                             </td>
                             <td>
                                 <strong>{{ $r->label }}</strong>
-                                @if($r->description)
+                                @if($r->description ?? null)
                                     <br><small class="text-muted">{{ $r->description }}</small>
                                 @endif
                             </td>
@@ -96,10 +96,10 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                @if($r->repeatable)
+                                @if($r->repeatable ?? false)
                                     <span class="badge badge-info" title="Pode ser ganho múltiplas vezes">
                                         <i class="fas fa-sync-alt mr-1"></i>Sim
-                                        @if($r->max_daily)
+                                        @if($r->max_daily ?? null)
                                             <br><small>(máx {{ $r->max_daily }}/dia)</small>
                                         @endif
                                     </span>
@@ -137,8 +137,14 @@
     @endif
 @endforeach
 
-{{-- Regras sem categoria --}}
-@php $uncategorized = $rulesGrouped->get(null, collect())->merge($rulesGrouped->except(array_keys($categories))->flatten(1)); @endphp
+{{-- Regras sem categoria (inclui 'outros' do fallback) --}}
+@php 
+    $uncategorizedKeys = array_diff($rulesGrouped->keys()->toArray(), array_keys($categories));
+    $uncategorized = collect();
+    foreach ($uncategorizedKeys as $key) {
+        $uncategorized = $uncategorized->merge($rulesGrouped->get($key, collect()));
+    }
+@endphp
 @if($uncategorized->count() > 0)
 <div class="card mb-4 border-secondary">
     <div class="card-header bg-secondary text-white">
@@ -165,12 +171,12 @@
                     @foreach($uncategorized as $r)
                     <tr class="{{ !$r->active ? 'table-secondary' : '' }}">
                         <td class="text-center">
-                            <i class="{{ $r->icon ?: 'fas fa-star' }} text-secondary"></i>
+                            <i class="{{ $r->icon ?? 'fas fa-star' }} text-secondary"></i>
                         </td>
                         <td><code>{{ $r->key }}</code></td>
                         <td>
                             <strong>{{ $r->label }}</strong>
-                            @if($r->description)
+                            @if($r->description ?? null)
                                 <br><small class="text-muted">{{ $r->description }}</small>
                             @endif
                         </td>
@@ -180,7 +186,7 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            @if($r->repeatable)
+                            @if($r->repeatable ?? false)
                                 <span class="badge badge-info">Sim</span>
                             @else
                                 <span class="badge badge-secondary">Única vez</span>
