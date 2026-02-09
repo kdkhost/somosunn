@@ -98,7 +98,12 @@ class ChatController extends Controller
                     $q->where('user_id', '!=', Auth::id())->whereNull('read_at');
                 }
             ])
-            ->get();
+            ->get()
+            ->map(function($conv) {
+                // Garante que conv é objeto, não Collection
+                return $conv;
+            })
+            ->values();
         return response()->json($conversations);
     }
 
