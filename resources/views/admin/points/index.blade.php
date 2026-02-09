@@ -36,14 +36,12 @@
                     $totalPoints = $categoryRules->where('active', true)->sum('points');
                     $count = $categoryRules->count();
                 @endphp
-                <div class="col-md-4 col-lg-2 mb-2">
-                    <div class="small-box bg-{{ $cat['color'] }}">
-                        <div class="inner">
-                            <h4>{{ $count }}</h4>
-                            <p>{{ $cat['label'] }}</p>
-                        </div>
-                        <div class="icon">
-                            <i class="{{ $cat['icon'] }}"></i>
+                <div class="col-6 col-sm-4 col-md-3 col-lg mb-2">
+                    <div class="info-box bg-{{ $cat['color'] }} mb-0">
+                        <span class="info-box-icon"><i class="{{ $cat['icon'] }}"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">{{ $cat['label'] }}</span>
+                            <span class="info-box-number">{{ $count }} regras</span>
                         </div>
                     </div>
                 </div>
