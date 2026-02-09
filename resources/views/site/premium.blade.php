@@ -153,7 +153,7 @@
                                 @endforeach
                             </ul>
 
-                            <a href="{{ $plan->price > 0 ? route('subscription.checkout', $plan) : route('register') }}"
+                            <a href="{{ $plan->price > 0 ? route('subscription.checkout', ['plan' => $plan->id]) : route('register') }}"
                                 class="block w-full text-center py-4 rounded-xl font-bold transition {{ $plan->highlight ? 'btn-primary text-white shadow-lg hover:shadow-xl' : 'border-2 hover:bg-slate-50' }}"
                                 style="{{ !$plan->highlight ? 'border-color: var(--unn-azul-1); color: var(--unn-azul-1)' : '' }}">
                                 {{ $plan->price > 0 ? 'Assinar ' . ($plan->name) : 'Começar grátis' }}
@@ -605,7 +605,7 @@
                         ?? ($plans ?? collect())->first();
 
                     $ctaHref = $ctaPlan && (float) $ctaPlan->price > 0
-                        ? route('subscription.checkout', $ctaPlan)
+                        ? route('subscription.checkout', ['plan' => $ctaPlan->id])
                         : route('register');
                 @endphp
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
