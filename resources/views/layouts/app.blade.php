@@ -295,10 +295,15 @@
             --unn-text: #0f172a;
             @if($videoPlayerEnabled)
                 --plyr-color-main: {{ $videoPlyrColor }};
+                --plyr-range-fill-background: {{ $videoPlyrColor }};
+                --plyr-video-control-background-hover: {{ $videoPlyrColor }};
+                --plyr-audio-control-background-hover: {{ $videoPlyrColor }};
+                --plyr-control-toggle-checked-background: {{ $videoPlyrColor }};
+                --plyr-focus-visible-color: {{ $videoPlyrColor }};
                 --plyr-font-family: 'Inter', sans-serif;
                 --plyr-menu-background: rgba(15, 23, 42, 0.92);
                 --plyr-menu-color: #ffffff;
-                --plyr-tooltip-background: var(--unn-azul-1);
+                --plyr-tooltip-background: {{ $videoPlyrColor }};
                 --plyr-tooltip-color: #ffffff;
             @endif
         }
@@ -539,6 +544,24 @@
             /* Ensure controls are always visible initially */
             .unn-video-player .plyr__controls {
                 opacity: 1;
+            }
+
+            /* Apply custom color to Plyr elements */
+            .plyr--full-ui input[type=range] {
+                color: var(--plyr-color-main, {{ $videoPlyrColor }});
+            }
+
+            .plyr__control--overlaid {
+                background: var(--plyr-color-main, {{ $videoPlyrColor }});
+            }
+
+            .plyr__control:hover,
+            .plyr__control[aria-expanded=true] {
+                background: var(--plyr-color-main, {{ $videoPlyrColor }});
+            }
+
+            .plyr__menu__container .plyr__control[role=menuitemradio][aria-checked=true]:before {
+                background: var(--plyr-color-main, {{ $videoPlyrColor }});
             }
 
             .unn-video-float-placeholder {
