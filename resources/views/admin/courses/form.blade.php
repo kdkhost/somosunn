@@ -97,7 +97,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            @if($course->exists)
+                            @if($course->exists || (Auth::user() && (Auth::user()->isAdmin() || Auth::user()->role === 'superadmin')))
                                 <a class="nav-link" id="lessons-tab" data-toggle="tab" href="#lessons" role="tab"
                                     aria-controls="lessons" aria-selected="false">
                                     <i class="fas fa-layer-group mr-1"></i> Conteúdo / Aulas
@@ -110,7 +110,7 @@
                             @endif
                         </li>
                         <li class="nav-item">
-                            @if($course->exists)
+                            @if($course->exists || (Auth::user() && (Auth::user()->isAdmin() || Auth::user()->role === 'superadmin')))
                                 <a class="nav-link" id="cert-tab" data-toggle="tab" href="#certificate" role="tab"
                                     aria-controls="certificate" aria-selected="false">
                                     <i class="fas fa-certificate mr-1"></i> Certificado
@@ -310,9 +310,13 @@
                                             </div>
                                         @endif
 
-                                        @if(!$course->exists)
+                                        @if(!$course->exists && !(Auth::user() && (Auth::user()->isAdmin() || Auth::user()->role === 'superadmin')))
                                             <div class="alert alert-info mt-3 text-center">
                                                 <i class="fas fa-info-circle"></i> Salve para liberar a aba de Aulas.
+                                            </div>
+                                        @elseif(!$course->exists && Auth::user() && (Auth::user()->isAdmin() || Auth::user()->role === 'superadmin'))
+                                            <div class="alert alert-success mt-3 text-center">
+                                                <i class="fas fa-unlock"></i> Como admin, você pode cadastrar aulas e certificados a qualquer momento. O curso será salvo automaticamente ao adicionar conteúdo.
                                             </div>
                                         @endif
                                     </div>
