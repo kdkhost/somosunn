@@ -359,23 +359,23 @@
 
                                             <div class="mt-6 flex flex-col sm:flex-row gap-3">
                                                 <a href="{{ $courseShowUrl }}"
-                                                    class="w-full sm:w-auto flex-1 px-4 py-3 min-w-[140px] rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center whitespace-nowrap {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
+                                                    class="w-full flex-1 px-4 py-3 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center whitespace-nowrap {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
                                                     Saiba mais
                                                 </a>
 
                                                 @if($isPaused)
                                                     <button type="button" disabled
-                                                        class="w-full sm:w-auto flex-1 px-4 py-3 min-w-[140px] rounded-xl font-bold bg-slate-100 text-slate-500 inline-flex items-center justify-center cursor-not-allowed whitespace-nowrap">
+                                                        class="w-full flex-1 px-4 py-3 rounded-xl font-bold bg-slate-100 text-slate-500 inline-flex items-center justify-center cursor-not-allowed whitespace-nowrap">
                                                         Vendas pausadas
                                                     </button>
                                                 @elseif($hasAccess)
                                                     <a href="{{ $courseShowUrl }}"
-                                                        class="w-full sm:w-auto flex-1 px-4 py-3 min-w-[140px] rounded-xl font-bold btn-primary shadow-md hover:shadow-lg transition inline-flex items-center justify-center whitespace-nowrap {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
+                                                        class="w-full flex-1 px-4 py-3 rounded-xl font-bold btn-primary shadow-md hover:shadow-lg transition inline-flex items-center justify-center whitespace-nowrap {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
                                                         Acessar
                                                     </a>
                                                 @else
                                                     <a href="{{ $courseCheckoutUrl }}"
-                                                        class="w-full sm:w-auto flex-1 px-4 py-3 min-w-[140px] rounded-xl font-bold btn-primary shadow-md hover:shadow-lg transition inline-flex items-center justify-center whitespace-nowrap {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
+                                                        class="w-full flex-1 px-4 py-3 rounded-xl font-bold btn-primary shadow-md hover:shadow-lg transition inline-flex items-center justify-center whitespace-nowrap {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
                                                         Adquirir
                                                     </a>
                                                 @endif
