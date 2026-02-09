@@ -154,42 +154,39 @@
             </div>
             
             <div class="grid md:grid-cols-3 gap-6">
-                @php
-                    $topRankers = [
-                        ['name' => 'Marcelo Silva', 'score' => 9850, 'connections' => 234, 'level' => 'Mentor', 'position' => 1],
-                        ['name' => 'Juliana Costa', 'score' => 8720, 'connections' => 198, 'level' => 'Empresário', 'position' => 2],
-                        ['name' => 'Fernando Alves', 'score' => 7650, 'connections' => 176, 'level' => 'Empresário', 'position' => 3],
-                    ];
-                @endphp
-                
-                @foreach($topRankers as $ranker)
-                <div class="bg-gradient-to-br from-slate-50 to-white rounded-3xl p-6 border border-gray-100 relative overflow-hidden">
-                    @if($ranker['position'] === 1)
-                    <div class="absolute top-4 right-4">
-                        <i class="fas fa-trophy text-2xl text-yellow-500"></i>
-                    </div>
-                    @endif
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="w-14 h-14 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl">
-                            {{ substr($ranker['name'], 0, 1) }}
+                @forelse($topRankings as $rank)
+                    <div class="bg-gradient-to-br from-slate-50 to-white rounded-3xl p-6 border border-gray-100 relative overflow-hidden">
+                        @if($loop->index === 0)
+                        <div class="absolute top-4 right-4">
+                            <i class="fas fa-trophy text-2xl text-yellow-500"></i>
                         </div>
-                        <div>
-                            <h3 class="font-bold text-gray-900">{{ $ranker['name'] }}</h3>
-                            <p class="text-sm text-gray-500">{{ $ranker['level'] }}</p>
+                        @endif
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-14 h-14 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl">
+                                {{ substr(optional($rank->user)->name ?? 'E', 0, 1) }}
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900">{{ optional($rank->user)->name ?? 'Empreendedor' }}</h3>
+                                <p class="text-sm text-gray-500">{{ ucfirst($rank->level) }}</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mt-4">
-                        <div class="text-center p-3 bg-slate-50 rounded-xl">
-                            <p class="text-xl font-bold" style="color: var(--unn-azul-1)">{{ number_format($ranker['score'], 0, '', '.') }}</p>
-                            <p class="text-xs text-gray-500">Pontos</p>
-                        </div>
-                        <div class="text-center p-3 bg-slate-50 rounded-xl">
-                            <p class="text-xl font-bold" style="color: var(--unn-azul-1)">{{ $ranker['connections'] }}</p>
-                            <p class="text-xs text-gray-500">Conexões</p>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div class="text-center p-3 bg-slate-50 rounded-xl">
+                                <p class="text-xl font-bold" style="color: var(--unn-azul-1)">{{ number_format($rank->score, 0, '', '.') }}</p>
+                                <p class="text-xs text-gray-500">Pontos</p>
+                            </div>
+                            <div class="text-center p-3 bg-slate-50 rounded-xl">
+                                <p class="text-xl font-bold" style="color: var(--unn-azul-1)">{{ $rank->interactions_count }}</p>
+                                <p class="text-xs text-gray-500">Conexões</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                @endforeach
+                @empty
+                    <div class="col-span-3 text-center py-12 text-gray-500 text-lg">
+                        Nenhum ranking disponível ainda.<br>
+                        Participe de conexões e avaliações para aparecer aqui!
+                    </div>
+                @endforelse
             </div>
         </div>
     </section>
