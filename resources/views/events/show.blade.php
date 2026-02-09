@@ -152,7 +152,22 @@
                             <i class="fas fa-flag-checkered"></i> Evento encerrado
                         </span>
                     @endif
+
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-3 md:mb-4 drop-shadow-lg">{{ $event->title }}</h1>
                     
+                    @if($event->speaker)
+                    <p class="text-lg sm:text-xl font-semibold mb-4 md:mb-6 text-white/90 drop-shadow">
+                        <i class="fas fa-user-tie mr-2"></i> {{ $event->speaker }}
+                    </p>
+                    @endif
+
+                    @if($event->description)
+                    <p class="text-base sm:text-lg text-white/80 leading-relaxed mb-6 md:mb-8 drop-shadow">{{ $event->description }}</p>
+                    @endif
+
+                    <div class="grid sm:grid-cols-2 gap-4 mb-8">
+                        <div class="bg-white rounded-2xl p-5 shadow-lg">
+                            <div class="flex items-center gap-4">
                                 <div class="w-14 h-14 btn-primary rounded-xl flex items-center justify-center">
                                     <i class="fas fa-calendar-alt text-white text-xl"></i>
                                 </div>
