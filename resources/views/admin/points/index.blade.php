@@ -5,6 +5,27 @@
 <li class="breadcrumb-item active">Pontuação</li>
 @endsection
 
+@push('styles')
+<style>
+    /* Esconder colunas em mobile */
+    @media (max-width: 767px) {
+        .hide-mobile { display: none !important; }
+        .points-table td, .points-table th { padding: 0.5rem 0.4rem; font-size: 0.85rem; }
+        .points-table .btn-sm { padding: 0.2rem 0.4rem; }
+    }
+    /* Badge de categoria compacto */
+    .category-badge { 
+        display: inline-flex; 
+        align-items: center; 
+        padding: 0.4rem 0.8rem; 
+        border-radius: 0.5rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+    .category-badge i { margin-right: 0.4rem; }
+</style>
+@endpush
+
 @section('content')
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show">
@@ -13,38 +34,32 @@
     </div>
 @endif
 
-<div class="card mb-4">
+<div class="card mb-3">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-star mr-2"></i>Regras de Pontuação</h3>
         <div class="card-tools">
             <a href="{{ route('admin.points-rules.create') }}" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus mr-1"></i>Nova Regra
+                <i class="fas fa-plus mr-1"></i><span class="d-none d-sm-inline">Nova Regra</span><span class="d-sm-none">Novo</span>
             </a>
         </div>
     </div>
-    <div class="card-body">
-        <p class="text-muted mb-3">
+    <div class="card-body py-3">
+        <p class="text-muted mb-3 small">
             <i class="fas fa-info-circle mr-1"></i>
-            Configure as ações que concedem pontos aos usuários. Os pontos são usados para o ranking da comunidade.
+            Configure as ações que concedem pontos aos usuários.
         </p>
 
-        {{-- Estatísticas rápidas --}}
-        <div class="row mb-4">
+        {{-- Estatísticas compactas --}}
+        <div class="d-flex flex-wrap gap-2" style="gap: 0.5rem;">
             @foreach($categories as $key => $cat)
                 @php
                     $categoryRules = $rulesGrouped->get($key, collect());
-                    $totalPoints = $categoryRules->where('active', true)->sum('points');
                     $count = $categoryRules->count();
                 @endphp
-                <div class="col-6 col-sm-4 col-md-3 col-lg mb-2">
-                    <div class="info-box bg-{{ $cat['color'] }} mb-0">
-                        <span class="info-box-icon"><i class="{{ $cat['icon'] }}"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">{{ $cat['label'] }}</span>
-                            <span class="info-box-number">{{ $count }} regras</span>
-                        </div>
-                    </div>
-                </div>
+                <span class="category-badge bg-{{ $cat['color'] }} {{ in_array($cat['color'], ['warning', 'light']) ? 'text-dark' : 'text-white' }}">
+                    <i class="{{ $cat['icon'] }}"></i>
+                    <span class="d-none d-sm-inline">{{ $cat['label'] }}:</span> {{ $count }}
+                </span>
             @endforeach
         </div>
     </div>
@@ -54,71 +69,65 @@
 @foreach($categories as $catKey => $cat)
     @php $rules = $rulesGrouped->get($catKey, collect()); @endphp
     @if($rules->count() > 0)
-    <div class="card mb-4 border-{{ $cat['color'] }}">
-        <div class="card-header bg-{{ $cat['color'] }} {{ in_array($cat['color'], ['warning', 'light']) ? 'text-dark' : 'text-white' }}">
-            <h3 class="card-title mb-0">
+    <div class="card mb-3">
+        <div class="card-header bg-{{ $cat['color'] }} {{ in_array($cat['color'], ['warning', 'light']) ? 'text-dark' : 'text-white' }} py-2">
+            <h3 class="card-title mb-0" style="font-size: 1rem;">
                 <i class="{{ $cat['icon'] }} mr-2"></i>{{ $cat['label'] }}
-                <span class="badge badge-light ml-2">{{ $rules->count() }} regras</span>
+                <span class="badge badge-light ml-1">{{ $rules->count() }}</span>
             </h3>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table table-hover table-sm mb-0 points-table">
                     <thead class="thead-light">
                         <tr>
-                            <th style="width:40px"></th>
-                            <th style="width:150px">Chave</th>
-                            <th>Descrição</th>
-                            <th style="width:100px" class="text-center">Pontos</th>
-                            <th style="width:100px" class="text-center">Repetível</th>
-                            <th style="width:80px" class="text-center">Status</th>
-                            <th style="width:120px" class="text-right">Ações</th>
+                            <th class="hide-mobile" style="width:35px"></th>
+                            <th>Regra</th>
+                            <th style="width:70px" class="text-center">Pontos</th>
+                            <th style="width:70px" class="text-center hide-mobile">Repetível</th>
+                            <th style="width:60px" class="text-center hide-mobile">Status</th>
+                            <th style="width:80px" class="text-right">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($rules->sortBy('sort_order') as $r)
                         <tr class="{{ !$r->active ? 'table-secondary' : '' }}">
-                            <td class="text-center">
+                            <td class="text-center hide-mobile">
                                 <i class="{{ $r->icon ?? 'fas fa-star' }} text-{{ $cat['color'] }}"></i>
                             </td>
                             <td>
-                                <code>{{ $r->key }}</code>
-                            </td>
-                            <td>
                                 <strong>{{ $r->label }}</strong>
+                                <br><code class="small">{{ $r->key }}</code>
                                 @if($r->description ?? null)
-                                    <br><small class="text-muted">{{ $r->description }}</small>
+                                    <span class="d-none d-md-inline text-muted"> - {{ Str::limit($r->description, 40) }}</span>
                                 @endif
                             </td>
                             <td class="text-center">
-                                <span class="badge badge-{{ $r->points > 0 ? 'success' : 'danger' }} px-3 py-2" style="font-size: 1rem;">
+                                <span class="badge badge-{{ $r->points > 0 ? 'success' : 'danger' }} px-2 py-1">
                                     {{ $r->points > 0 ? '+' : '' }}{{ $r->points }}
                                 </span>
                             </td>
-                            <td class="text-center">
+                            <td class="text-center hide-mobile">
                                 @if($r->repeatable ?? false)
-                                    <span class="badge badge-info" title="Pode ser ganho múltiplas vezes">
-                                        <i class="fas fa-sync-alt mr-1"></i>Sim
-                                        @if($r->max_daily ?? null)
-                                            <br><small>(máx {{ $r->max_daily }}/dia)</small>
-                                        @endif
+                                    <span class="badge badge-info" title="Repetível{{ ($r->max_daily ?? null) ? ' (máx '.$r->max_daily.'/dia)' : '' }}">
+                                        <i class="fas fa-sync-alt"></i>
                                     </span>
                                 @else
-                                    <span class="badge badge-secondary">Única vez</span>
+                                    <span class="text-muted">-</span>
                                 @endif
                             </td>
-                            <td class="text-center">
+                            <td class="text-center hide-mobile">
                                 @if($r->active)
-                                    <span class="badge badge-success"><i class="fas fa-check mr-1"></i>Ativa</span>
+                                    <i class="fas fa-check text-success" title="Ativa"></i>
                                 @else
-                                    <span class="badge badge-secondary"><i class="fas fa-pause mr-1"></i>Inativa</span>
+                                    <i class="fas fa-pause text-secondary" title="Inativa"></i>
                                 @endif
                             </td>
-                            <td class="text-right">
+                            <td class="text-right text-nowrap">
                                 <a href="{{ route('admin.points-rules.edit', $r) }}" class="btn btn-sm btn-outline-secondary" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('admin.points-rules.destroy', $r) }}" method="POST" style="display:inline">
+                                <form action="{{ route('admin.points-rules.destroy', $r) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover"
@@ -137,7 +146,7 @@
     @endif
 @endforeach
 
-{{-- Regras sem categoria (inclui 'outros' do fallback) --}}
+{{-- Regras sem categoria --}}
 @php 
     $uncategorizedKeys = array_diff($rulesGrouped->keys()->toArray(), array_keys($categories));
     $uncategorized = collect();
@@ -146,64 +155,60 @@
     }
 @endphp
 @if($uncategorized->count() > 0)
-<div class="card mb-4 border-secondary">
-    <div class="card-header bg-secondary text-white">
-        <h3 class="card-title mb-0">
+<div class="card mb-3">
+    <div class="card-header bg-secondary text-white py-2">
+        <h3 class="card-title mb-0" style="font-size: 1rem;">
             <i class="fas fa-folder mr-2"></i>Outras Regras
-            <span class="badge badge-light ml-2">{{ $uncategorized->count() }} regras</span>
+            <span class="badge badge-light ml-1">{{ $uncategorized->count() }}</span>
         </h3>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover table-sm mb-0 points-table">
                 <thead class="thead-light">
                     <tr>
-                        <th style="width:40px"></th>
-                        <th style="width:150px">Chave</th>
-                        <th>Descrição</th>
-                        <th style="width:100px" class="text-center">Pontos</th>
-                        <th style="width:100px" class="text-center">Repetível</th>
-                        <th style="width:80px" class="text-center">Status</th>
-                        <th style="width:120px" class="text-right">Ações</th>
+                        <th class="hide-mobile" style="width:35px"></th>
+                        <th>Regra</th>
+                        <th style="width:70px" class="text-center">Pontos</th>
+                        <th style="width:70px" class="text-center hide-mobile">Repetível</th>
+                        <th style="width:60px" class="text-center hide-mobile">Status</th>
+                        <th style="width:80px" class="text-right">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($uncategorized as $r)
                     <tr class="{{ !$r->active ? 'table-secondary' : '' }}">
-                        <td class="text-center">
+                        <td class="text-center hide-mobile">
                             <i class="{{ $r->icon ?? 'fas fa-star' }} text-secondary"></i>
                         </td>
-                        <td><code>{{ $r->key }}</code></td>
                         <td>
                             <strong>{{ $r->label }}</strong>
-                            @if($r->description ?? null)
-                                <br><small class="text-muted">{{ $r->description }}</small>
-                            @endif
+                            <br><code class="small">{{ $r->key }}</code>
                         </td>
                         <td class="text-center">
-                            <span class="badge badge-{{ $r->points > 0 ? 'success' : 'danger' }} px-3 py-2" style="font-size: 1rem;">
+                            <span class="badge badge-{{ $r->points > 0 ? 'success' : 'danger' }} px-2 py-1">
                                 {{ $r->points > 0 ? '+' : '' }}{{ $r->points }}
                             </span>
                         </td>
-                        <td class="text-center">
+                        <td class="text-center hide-mobile">
                             @if($r->repeatable ?? false)
-                                <span class="badge badge-info">Sim</span>
+                                <span class="badge badge-info"><i class="fas fa-sync-alt"></i></span>
                             @else
-                                <span class="badge badge-secondary">Única vez</span>
+                                <span class="text-muted">-</span>
                             @endif
                         </td>
-                        <td class="text-center">
+                        <td class="text-center hide-mobile">
                             @if($r->active)
-                                <span class="badge badge-success">Ativa</span>
+                                <i class="fas fa-check text-success"></i>
                             @else
-                                <span class="badge badge-secondary">Inativa</span>
+                                <i class="fas fa-pause text-secondary"></i>
                             @endif
                         </td>
-                        <td class="text-right">
+                        <td class="text-right text-nowrap">
                             <a href="{{ route('admin.points-rules.edit', $r) }}" class="btn btn-sm btn-outline-secondary">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <form action="{{ route('admin.points-rules.destroy', $r) }}" method="POST" style="display:inline">
+                            <form action="{{ route('admin.points-rules.destroy', $r) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-outline-danger"
@@ -224,12 +229,12 @@
 {{-- Info box se não houver regras --}}
 @if($rulesGrouped->flatten(1)->count() == 0)
 <div class="card">
-    <div class="card-body text-center py-5">
-        <i class="fas fa-star fa-4x text-muted mb-3"></i>
-        <h4 class="text-muted">Nenhuma regra de pontuação cadastrada</h4>
-        <p class="text-muted mb-4">Crie regras para recompensar a participação dos usuários.</p>
-        <a href="{{ route('admin.points-rules.create') }}" class="btn btn-primary btn-lg">
-            <i class="fas fa-plus mr-2"></i>Criar primeira regra
+    <div class="card-body text-center py-4">
+        <i class="fas fa-star fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">Nenhuma regra de pontuação cadastrada</h5>
+        <p class="text-muted mb-3 small">Crie regras para recompensar a participação dos usuários.</p>
+        <a href="{{ route('admin.points-rules.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus mr-1"></i>Criar primeira regra
         </a>
     </div>
 </div>
