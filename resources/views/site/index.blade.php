@@ -16,8 +16,7 @@
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <div>
                         <h1 class="unn-title-gradient unn-title-hero mb-6">
-                            {{ $heroTitle }}<br />
-                            <span class="unn-title-gradient">{{ $heroSubtitle }}</span>
+                            {{ $heroTitle }} {{ $heroSubtitle }}
                         </h1>
                         <p class="text-base sm:text-lg text-gray-600 mb-6 md:mb-8 leading-relaxed max-w-xl">
                             {{ $heroText }}
@@ -392,15 +391,16 @@
             color: transparent;
         }
         .unn-title-hero {
-            max-width: 520px;
+            max-width: 95vw;
             font-size: 2.1rem;
             line-height: 1.12;
             font-weight: 900;
             letter-spacing: -0.02em;
             margin-left: 0;
             margin-right: 0;
-            word-break: normal;
-            hyphens: auto;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         @media (min-width: 640px) {
             .unn-title-hero {
