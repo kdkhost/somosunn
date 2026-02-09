@@ -314,6 +314,18 @@
             border: none;
         }
 
+        /* Garantir que botões e links não quebrem texto */
+        a.inline-flex,
+        button.inline-flex,
+        a[class*="btn-"],
+        button[class*="btn-"],
+        a[class*="rounded-xl"],
+        button[class*="rounded-xl"],
+        a[class*="rounded-full"],
+        button[class*="rounded-full"] {
+            white-space: nowrap;
+        }
+
         .ui-tooltip {
             position: relative;
         }

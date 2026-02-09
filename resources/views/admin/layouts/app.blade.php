@@ -78,6 +78,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Garantir que botões e links não quebrem texto */
+        a.inline-flex,
+        button.inline-flex,
+        a.btn,
+        button.btn,
+        a[class*="rounded-"],
+        button[class*="rounded-"] {
+            white-space: nowrap;
+        }
+
         :root {
             --main-header-height: 3.5rem;
             /* 56px default AdminLTE */
