@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('page_title', 'Regras de Pontuação')
-@section('breadcrumb')
+@section('breadcrumb_items')
 <li class="breadcrumb-item active">Pontuação</li>
 @endsection
 
