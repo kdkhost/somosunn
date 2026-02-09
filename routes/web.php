@@ -1,8 +1,6 @@
+<?php
 // Rota para checkout de assinatura (compatível com premium.blade.php) — sempre no início para garantir visibilidade
 Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('subscription.checkout');
-// Rota para checkout de assinatura (compatível com premium.blade.php)
-Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('subscription.checkout');
-<?php
 /**
  * =============================================================================
  * AVISO LEGAL DE DIREITOS AUTORAIS E PROPRIEDADE INTELECTUAL
