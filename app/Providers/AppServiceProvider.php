@@ -186,6 +186,51 @@ class AppServiceProvider extends ServiceProvider
                 // Silently fail if table doesnt exist yet
             }
 
+            // Carregar configurações de SMTP do banco de dados (sobrescreve .env)
+            try {
+                $smtpSettings = DB::table('settings')->whereIn('key', [
+                    'smtp_host',
+                    'smtp_port',
+                    'smtp_username',
+                    'smtp_password',
+                    'smtp_encryption',
+                    'smtp_from_email',
+                    'smtp_from_name',
+                ])->pluck('value', 'key');
+
+                $smtpHost = trim((string) ($smtpSettings['smtp_host'] ?? ''));
+                if ($smtpHost !== '') {
+                    $encryption = $smtpSettings['smtp_encryption'] ?? 'tls';
+                    if ($encryption === 'null' || $encryption === '') {
+                        $encryption = null;
+                    }
+
+                    config([
+                        'mail.default' => 'smtp',
+                        'mail.mailers.smtp.transport' => 'smtp',
+                        'mail.mailers.smtp.host' => $smtpHost,
+                        'mail.mailers.smtp.port' => trim((string) ($smtpSettings['smtp_port'] ?? '587')),
+                        'mail.mailers.smtp.username' => trim((string) ($smtpSettings['smtp_username'] ?? '')),
+                        'mail.mailers.smtp.password' => trim((string) ($smtpSettings['smtp_password'] ?? '')),
+                        'mail.mailers.smtp.encryption' => $encryption,
+                        'mail.mailers.smtp.timeout' => null,
+                        'mail.mailers.smtp.auth_mode' => null,
+                    ]);
+
+                    $fromEmail = trim((string) ($smtpSettings['smtp_from_email'] ?? ''));
+                    if ($fromEmail !== '') {
+                        config(['mail.from.address' => $fromEmail]);
+                    }
+
+                    $fromName = trim((string) ($smtpSettings['smtp_from_name'] ?? ''));
+                    if ($fromName !== '') {
+                        config(['mail.from.name' => $fromName]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Silently fail if table doesnt exist yet
+            }
+
         } catch (\Throwable $e) {
             Log::warning('Banco de dados indisponível: '.$e->getMessage());
             View::share('unnDbAvailable', false);
