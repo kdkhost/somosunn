@@ -391,16 +391,16 @@
             color: transparent;
         }
         .unn-title-hero {
-            max-width: 95vw;
+            max-width: 520px;
             font-size: 2.1rem;
             line-height: 1.12;
             font-weight: 900;
             letter-spacing: -0.02em;
             margin-left: 0;
             margin-right: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            overflow-wrap: break-word;
+            word-break: normal;
+            hyphens: auto;
         }
         @media (min-width: 640px) {
             .unn-title-hero {
