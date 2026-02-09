@@ -111,6 +111,8 @@ class SettingController extends Controller
             'remove_seo_twitter_image',
             'hero_image',
             'remove_hero_image',
+            'site_bg_image',
+            'remove_site_bg_image',
             'smtp_test_email', // Não salvar e-mail de teste
         ]);
 
@@ -158,6 +160,7 @@ class SettingController extends Controller
             'logo_front',
             'watermark_image',
             'hero_image',
+            'site_bg_image',
             'seo_og_image',
             'seo_twitter_image',
         ];
@@ -202,6 +205,9 @@ class SettingController extends Controller
         }
         if ($request->hasFile('hero_image')) {
             $this->replaceFile('hero_image', $this->storePublic($request->file('hero_image'), 'uploads/imagens/frontend'));
+        }
+        if ($request->hasFile('site_bg_image')) {
+            $this->replaceFile('site_bg_image', $this->storePublic($request->file('site_bg_image'), 'uploads/imagens/frontend'));
         }
         if ($request->hasFile('seo_og_image')) {
             $this->replaceFile('seo_og_image', $this->storePublic($request->file('seo_og_image'), 'uploads/imagens/seo'));
@@ -429,6 +435,7 @@ class SettingController extends Controller
             'pwa_splash' => ['uploads/imagens/pwa', 'uploads/imagens'],
             'pwa_banner' => ['uploads/imagens/pwa', 'uploads/imagens'],
             'hero_image' => ['uploads/imagens/frontend', 'uploads/imagens'],
+            'site_bg_image' => ['uploads/imagens/frontend', 'uploads/imagens'],
             'seo_og_image' => ['uploads/imagens/seo', 'uploads/imagens'],
             'seo_twitter_image' => ['uploads/imagens/seo', 'uploads/imagens'],
         ];
