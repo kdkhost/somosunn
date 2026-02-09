@@ -6,7 +6,7 @@ Plataforma de cursos/eventos online Laravel. UI em português brasileiro.
 - **PSR-12** para PHP. Controllers em `app/Http/Controllers/`, Models em `app/Models/`.
 - Models usam `$fillable` (nunca `$guarded`), `$casts` para tipos, traits customizados (`HasRoles`, `HasFeatureAccess`).
 - Validação inline: `$request->validate([...])` com mensagens em pt-BR.
-- Exemplos: [Course.php](app/Models/Course.php), [User.php](app/Models/User.php), [CheckoutController.php](app/Http/Controllers/CheckoutController.php)
+- Exemplos: consulte os Models e Controllers reais do projeto.
 
 ## Arquitetura
 - **Monolito Laravel** com service layer em `app/Services/` (PaymentService, CouponService, InvoiceService).

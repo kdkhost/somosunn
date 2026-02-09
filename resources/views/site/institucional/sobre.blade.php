@@ -9,8 +9,9 @@
         <div class="max-w-7xl mx-auto">
             <div class="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
                 <div>
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
-                        Conheça a <span class="text-gradient">UNN</span>
+                    <!-- HERO TITLE -->
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient unn-title-max">
+                        Conheça a <span class="unn-title-gradient">UNN</span>
                     </h1>
                     <p class="text-xl text-gray-600 leading-relaxed mb-8">
                         A União Nacional de Networking é a maior comunidade de empreendedores do Brasil, 
@@ -123,6 +124,25 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+.unn-title-gradient {
+    background: linear-gradient(90deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
+.unn-title-max {
+    max-width: 700px;
+    word-break: break-word;
+    margin-left: auto;
+    margin-right: auto;
+}
+@media (max-width: 640px) {
+    .unn-title-max {
+        font-size: 2.2rem !important;
+        max-width: 95vw;
+    }
 }
 </style>
 @endsection

@@ -7,8 +7,8 @@
     <!-- Hero Section -->
     <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
         <div class="max-w-4xl mx-auto text-center">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
-                Nosso <span class="text-gradient">Manifesto</span>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient unn-title-max">
+                Nosso <span class="unn-title-gradient">Manifesto</span>
             </h1>
             <p class="text-lg sm:text-xl text-gray-600 leading-relaxed">
                 O que acreditamos e por que existimos.
@@ -123,6 +123,25 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+.unn-title-gradient {
+    background: linear-gradient(90deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
+.unn-title-max {
+    max-width: 700px;
+    word-break: break-word;
+    margin-left: auto;
+    margin-right: auto;
+}
+@media (max-width: 640px) {
+    .unn-title-max {
+        font-size: 2.2rem !important;
+        max-width: 95vw;
+    }
 }
 </style>
 @endsection

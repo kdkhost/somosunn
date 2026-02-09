@@ -15,7 +15,7 @@
             <div class="max-w-7xl mx-auto">
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <div>
-                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient">
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient unn-title-max">
                             {{ $heroTitle }}<br />
                             <span class="unn-title-gradient">{{ $heroSubtitle }}</span>
                         </h1>
@@ -390,6 +390,18 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             color: transparent;
+        }
+        .unn-title-max {
+            max-width: 700px;
+            word-break: break-word;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (max-width: 640px) {
+            .unn-title-max {
+                font-size: 2.2rem !important;
+                max-width: 95vw;
+            }
         }
     </style>
 @endsection

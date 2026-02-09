@@ -7,8 +7,8 @@
     <!-- Hero Section -->
     <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
-                <span class="text-gradient">Como</span> Funciona
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient unn-title-max">
+                <span class="unn-title-gradient">Como</span> Funciona
             </h1>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Entenda como a UNN pode transformar sua rede de contatos e impulsionar seus negócios.
@@ -204,4 +204,27 @@
     background-clip: text;
 }
 </style>
+
+<!-- HERO TITLE -->
+<style>
+        .unn-title-gradient {
+            background: linear-gradient(90deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+        .unn-title-max {
+            max-width: 700px;
+            word-break: break-word;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (max-width: 640px) {
+            .unn-title-max {
+                font-size: 2.2rem !important;
+                max-width: 95vw;
+            }
+        }
+    </style>
 @endsection
