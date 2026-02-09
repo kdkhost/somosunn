@@ -10,37 +10,67 @@ class PointsRuleController extends Controller
 {
     public function index()
     {
-        $rules = PointsRule::paginate(20);
-        return view('admin.points.index', compact('rules'));
+        $rulesGrouped = PointsRule::grouped();
+        $categories = PointsRule::CATEGORIES;
+        return view('admin.points.index', compact('rulesGrouped', 'categories'));
     }
 
     public function create()
     {
-        return view('admin.points.form', ['rule' => new PointsRule]);
+        $categories = PointsRule::CATEGORIES;
+        return view('admin.points.form', ['rule' => new PointsRule, 'categories' => $categories]);
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate(['key'=>'required|alpha_dash|unique:points_rules,key','label'=>'required','points'=>'required|integer']);
+        $data = $request->validate([
+            'key' => 'required|alpha_dash|unique:points_rules,key',
+            'label' => 'required|string|max:100',
+            'category' => 'nullable|string|max:50',
+            'description' => 'nullable|string|max:255',
+            'points' => 'required|integer',
+            'icon' => 'nullable|string|max:50',
+            'repeatable' => 'nullable',
+            'max_daily' => 'nullable|integer|min:1',
+        ]);
+
+        $data['active'] = true;
+        $data['repeatable'] = $request->has('repeatable');
+        $data['sort_order'] = PointsRule::max('sort_order') + 1;
+
         PointsRule::create($data);
-        return redirect()->route('admin.points-rules.index')->with('success','Regra salva');
+        return redirect()->route('admin.points-rules.index')->with('success', 'Regra criada com sucesso!');
     }
 
     public function edit(PointsRule $points_rule)
     {
-        return view('admin.points.form', ['rule' => $points_rule]);
+        $categories = PointsRule::CATEGORIES;
+        return view('admin.points.form', ['rule' => $points_rule, 'categories' => $categories]);
     }
 
     public function update(Request $request, PointsRule $points_rule)
     {
-        $data = $request->validate(['label'=>'required','points'=>'required|integer','active'=>'nullable']);
-        $points_rule->update(array_merge($data, ['active' => $request->has('active')]));
-        return redirect()->route('admin.points-rules.index')->with('success','Regra atualizada');
+        $data = $request->validate([
+            'label' => 'required|string|max:100',
+            'category' => 'nullable|string|max:50',
+            'description' => 'nullable|string|max:255',
+            'points' => 'required|integer',
+            'icon' => 'nullable|string|max:50',
+            'active' => 'nullable',
+            'repeatable' => 'nullable',
+            'max_daily' => 'nullable|integer|min:1',
+        ]);
+
+        $data['active'] = $request->has('active');
+        $data['repeatable'] = $request->has('repeatable');
+
+        $points_rule->update($data);
+        return redirect()->route('admin.points-rules.index')->with('success', 'Regra atualizada!');
     }
 
     public function destroy(PointsRule $points_rule)
     {
         $points_rule->delete();
-        return redirect()->route('admin.points-rules.index')->with('success','Regra removida');
+        return redirect()->route('admin.points-rules.index')->with('success', 'Regra removida!');
     }
 }
