@@ -20,12 +20,20 @@ class UserController extends Controller
         'mentorships' => 'Mentorias',
     ];
 
+    /**
+     * Check if current user is superadmin.
+     */
+    private function isSuperadmin(): bool
+    {
+        return auth()->check() && auth()->user()->role === 'superadmin';
+    }
+
     public function index()
     {
         $query = User::latest();
 
-        // Se não for super admin, não pode ver super admin
-        if (auth()->check() && auth()->user()->role !== 'superadmin') {
+        // Admin não pode ver superadmins
+        if (!$this->isSuperadmin()) {
             $query->where('role', '!=', 'superadmin');
         }
 
@@ -39,6 +47,7 @@ class UserController extends Controller
         return view('admin.users.form', [
             'user' => $user,
             'userFeatures' => self::USER_FEATURES,
+            'canSetSuperadmin' => $this->isSuperadmin(),
         ]);
     }
 
@@ -55,6 +64,17 @@ class UserController extends Controller
             'extra_features' => 'nullable|array',
             'extra_features.*' => 'string|in:' . implode(',', array_keys(self::USER_FEATURES)),
         ]);
+
+        // Admin não pode criar superadmin (role ou level)
+        if (!$this->isSuperadmin()) {
+            if (($data['role'] ?? '') === 'superadmin') {
+                return redirect()->back()->withInput()->with('error', 'Você não tem permissão para criar um Super Admin.');
+            }
+            if (($data['level'] ?? '') === 'superadmin') {
+                $data['level'] = 'sucesso'; // Fallback para o nível mais alto permitido
+            }
+        }
+
         $data['password'] = Hash::make($data['password']);
         $data['extra_features'] = $data['extra_features'] ?? [];
         User::create($data);
@@ -63,14 +83,25 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        // Admin não pode editar superadmin
+        if (!$this->isSuperadmin() && $user->role === 'superadmin') {
+            return redirect()->route('admin.users.index')->with('error', 'Você não tem permissão para editar este usuário.');
+        }
+
         return view('admin.users.form', [
             'user' => $user,
             'userFeatures' => self::USER_FEATURES,
+            'canSetSuperadmin' => $this->isSuperadmin(),
         ]);
     }
 
     public function update(Request $request, User $user)
     {
+        // Admin não pode editar superadmin
+        if (!$this->isSuperadmin() && $user->role === 'superadmin') {
+            return redirect()->route('admin.users.index')->with('error', 'Você não tem permissão para editar este usuário.');
+        }
+
         $data = $request->validate([
             'name' => 'required|string|max:120',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -82,6 +113,17 @@ class UserController extends Controller
             'extra_features' => 'nullable|array',
             'extra_features.*' => 'string|in:' . implode(',', array_keys(self::USER_FEATURES)),
         ]);
+
+        // Admin não pode promover alguém a superadmin (role ou level)
+        if (!$this->isSuperadmin()) {
+            if (($data['role'] ?? '') === 'superadmin') {
+                return redirect()->back()->withInput()->with('error', 'Você não tem permissão para definir este papel.');
+            }
+            if (($data['level'] ?? '') === 'superadmin') {
+                $data['level'] = 'sucesso'; // Fallback para o nível mais alto permitido
+            }
+        }
+
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         } else {
@@ -94,7 +136,8 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        if ($user->role === 'superadmin' && auth()->user()->role !== 'superadmin') {
+        // Admin não pode excluir superadmin
+        if (!$this->isSuperadmin() && $user->role === 'superadmin') {
             return response()->json(['message' => 'Você não pode excluir um Super Admin.'], 403);
         }
         $user->delete();

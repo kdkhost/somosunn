@@ -39,7 +39,14 @@
                         <div class="form-group col-md-3">
                             <label>Nível</label>
                             <select name="level" class="form-control">
-                                @foreach(['iniciante', 'intermediario', 'avancado', 'sucesso', 'superadmin'] as $lvl)
+                                @php
+                                    $levels = ['iniciante', 'intermediario', 'avancado', 'sucesso'];
+                                    // Apenas superadmin pode ver/atribuir o nível superadmin
+                                    if (auth()->user()->role === 'superadmin') {
+                                        $levels[] = 'superadmin';
+                                    }
+                                @endphp
+                                @foreach($levels as $lvl)
                                     <option value="{{ $lvl }}" {{ (old('level', $user->level) ?? 'iniciante') == $lvl ? 'selected' : '' }}>{{ ucfirst($lvl) }}</option>
                                 @endforeach
                             </select>
