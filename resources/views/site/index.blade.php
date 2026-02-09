@@ -392,11 +392,11 @@
             color: transparent;
         }
         .unn-title-hero {
-            max-width: 540px;
-            font-size: 2.6rem;
-            line-height: 1.1;
+            max-width: 520px;
+            font-size: 2.1rem;
+            line-height: 1.12;
             font-weight: 900;
-            letter-spacing: -0.03em;
+            letter-spacing: -0.02em;
             margin-left: 0;
             margin-right: 0;
             word-break: normal;
@@ -404,18 +404,18 @@
         }
         @media (min-width: 640px) {
             .unn-title-hero {
-                font-size: 3.2rem;
+                font-size: 2.4rem;
             }
         }
         @media (min-width: 1024px) {
             .unn-title-hero {
-                font-size: 3.8rem;
-                max-width: 600px;
+                font-size: 2.8rem;
+                max-width: 560px;
             }
         }
         @media (max-width: 480px) {
             .unn-title-hero {
-                font-size: 2rem;
+                font-size: 1.5rem;
                 max-width: 95vw;
             }
         }
