@@ -647,6 +647,8 @@
             }
         @endif
     </style>
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
 </head>
 
 <body class="bg-slate-50 min-h-screen">
@@ -1339,6 +1341,26 @@
             });
         </script>
     @endif
+    <!-- Toastr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
+    <script>
+        toastr.options = { positionClass: 'toast-top-right', timeOut: 4000, progressBar: true };
+        @if(session('success'))
+            toastr.success(@json(session('success')));
+        @endif
+        @if(session('status'))
+            toastr.success(@json(session('status')));
+        @endif
+        @if(session('error'))
+            toastr.error(@json(session('error')));
+        @endif
+        @if(session('warning'))
+            toastr.warning(@json(session('warning')));
+        @endif
+        @if(session('info'))
+            toastr.info(@json(session('info')));
+        @endif
+    </script>
 </body>
 
 </html>
