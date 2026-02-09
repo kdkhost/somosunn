@@ -12,6 +12,11 @@ class ContactController extends Controller
 {
     public function send(Request $request)
     {
+        Log::info('Contato: formulario recebido', [
+            'ip' => $request->ip(),
+            'has_token' => $request->filled('recaptcha_token'),
+        ]);
+
         $data = $request->validate([
             'name' => 'required|string|max:120',
             'email' => 'required|email|max:190',
@@ -21,11 +26,16 @@ class ContactController extends Controller
             'recaptcha_token' => 'nullable|string|max:5000',
         ]);
 
+        Log::info('Contato: validacao passou');
+
         if (!$this->verifyRecaptchaV3($request)) {
+            Log::warning('Contato: reCAPTCHA falhou');
             return back()
                 ->withInput()
                 ->with('error', 'Falha na verificacao de seguranca (reCAPTCHA). Tente novamente.');
         }
+
+        Log::info('Contato: reCAPTCHA OK');
 
         $this->applySmtpSettingsFromDatabase();
 
@@ -94,13 +104,22 @@ class ContactController extends Controller
         $siteKey = trim((string) (Setting::get('recaptcha_v3_site_key') ?: config('services.recaptcha.site_key', '')));
         $secret = trim((string) (Setting::get('recaptcha_v3_secret_key') ?: config('services.recaptcha.v3_secret', '')));
 
+        Log::info('Contato: verificando reCAPTCHA', [
+            'has_site_key' => $siteKey !== '',
+            'has_secret' => $secret !== '',
+        ]);
+
         if ($siteKey === '' || $secret === '') {
+            Log::info('Contato: reCAPTCHA nao configurado, permitindo');
             return true;
         }
 
         $token = trim((string) $request->input('recaptcha_token', ''));
         if ($token === '') {
-            return false;
+            // Token vazio = reCAPTCHA falhou no cliente (bloqueador, timeout, etc)
+            // Permitir envio mas logar para monitoramento
+            Log::warning('Contato: token vazio (reCAPTCHA pode ter falhado no cliente), permitindo com aviso');
+            return true;
         }
 
         $minScoreRaw = (string) (Setting::get('recaptcha_v3_min_score') ?: config('services.recaptcha.v3_min_score', 0.5));

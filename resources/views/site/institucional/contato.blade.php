@@ -260,7 +260,13 @@
             const tokenInput = document.getElementById('recaptcha_token');
             const siteKey = @json($recaptchaSiteKey);
 
-            if (!form || !tokenInput || !siteKey || typeof grecaptcha === 'undefined') {
+            if (!form || !tokenInput || !siteKey) {
+                return;
+            }
+
+            // Se grecaptcha não carregou, permitir envio normal
+            if (typeof grecaptcha === 'undefined') {
+                console.warn('reCAPTCHA não carregou, enviando sem token');
                 return;
             }
 
@@ -268,9 +274,23 @@
                 if (form.dataset.recaptchaReady === '1') return;
 
                 e.preventDefault();
+
+                // Timeout de segurança: se reCAPTCHA demorar, enviar mesmo assim
+                const timeout = setTimeout(function() {
+                    console.warn('reCAPTCHA timeout, enviando sem token');
+                    form.dataset.recaptchaReady = '1';
+                    form.submit();
+                }, 5000);
+
                 grecaptcha.ready(function () {
                     grecaptcha.execute(siteKey, { action: 'contact' }).then(function (token) {
+                        clearTimeout(timeout);
                         tokenInput.value = token;
+                        form.dataset.recaptchaReady = '1';
+                        form.submit();
+                    }).catch(function(err) {
+                        clearTimeout(timeout);
+                        console.warn('reCAPTCHA erro:', err);
                         form.dataset.recaptchaReady = '1';
                         form.submit();
                     });
