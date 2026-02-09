@@ -1,24 +1,41 @@
 @php
     $siteName = \App\Models\Setting::get('app_name') ?: config('app.name', 'UNN');
 @endphp
-<div style="font-family: Arial, Helvetica, sans-serif; line-height: 1.5; color: #0f172a;">
-    <h2 style="margin: 0 0 12px 0;">Nova mensagem de contato — {{ $siteName }}</h2>
+<h2 style="margin: 0 0 20px 0; color: #1a1a1a; font-size: 22px;">Nova mensagem de contato</h2>
 
-    <p style="margin: 0 0 6px 0;"><strong>Nome:</strong> {{ $data['name'] }}</p>
-    <p style="margin: 0 0 6px 0;"><strong>E-mail:</strong> {{ $data['email'] }}</p>
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+    <tr>
+        <td style="padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; font-weight: bold; width: 120px;">Nome</td>
+        <td style="padding: 8px 12px; background: #ffffff; border: 1px solid #e2e8f0;">{{ $data['name'] }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; font-weight: bold;">E-mail</td>
+        <td style="padding: 8px 12px; background: #ffffff; border: 1px solid #e2e8f0;">
+            <a href="mailto:{{ $data['email'] }}" style="color: #1F5EDB;">{{ $data['email'] }}</a>
+        </td>
+    </tr>
     @if(!empty($data['phone']))
-        <p style="margin: 0 0 6px 0;"><strong>Telefone:</strong> {{ $data['phone'] }}</p>
+    <tr>
+        <td style="padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; font-weight: bold;">Telefone</td>
+        <td style="padding: 8px 12px; background: #ffffff; border: 1px solid #e2e8f0;">{{ $data['phone'] }}</td>
+    </tr>
     @endif
-    <p style="margin: 0 0 12px 0;"><strong>Assunto:</strong> {{ $data['subject'] }}</p>
+    <tr>
+        <td style="padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; font-weight: bold;">Assunto</td>
+        <td style="padding: 8px 12px; background: #ffffff; border: 1px solid #e2e8f0;">{{ $data['subject'] }}</td>
+    </tr>
+</table>
 
-    <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:14px;border-radius:10px;">
+<div style="margin-bottom: 20px;">
+    <strong style="display: block; margin-bottom: 8px; color: #374151;">Mensagem:</strong>
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 8px; line-height: 1.6;">
         {!! nl2br(e($data['message'])) !!}
     </div>
+</div>
 
-    <hr style="border:none;border-top:1px solid #e2e8f0;margin:18px 0;">
-    <p style="font-size: 12px; color: #64748b; margin: 0;">
-        IP: {{ $data['ip'] }}<br>
-        User-Agent: {{ $data['userAgent'] }}
-    </p>
+<div style="font-size: 11px; color: #9ca3af; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+    <strong>Informações técnicas:</strong><br>
+    IP: {{ $data['ip'] }}<br>
+    User-Agent: {{ $data['userAgent'] }}
 </div>
 

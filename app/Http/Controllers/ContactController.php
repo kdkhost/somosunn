@@ -67,7 +67,14 @@ class ContactController extends Controller
         $subjectText = $subjectLabels[$data['subject']] ?? $data['subject'];
         $mailSubject = "[Contato] {$subjectText} - {$siteName}";
 
-        $html = view('emails.contact', [
+        // Busca configurações visuais do site
+        $logo = Setting::get('logo_admin') ?: Setting::get('logo_front') ?: Setting::get('logo_image');
+        $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
+        $primaryColor = Setting::get('site_color_primary') ?? '#1F5EDB';
+        $secondaryColor = Setting::get('site_color_secondary') ?? '#177FD6';
+
+        // Renderiza o conteúdo do email
+        $content = view('emails.contact', [
             'data' => [
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -78,6 +85,9 @@ class ContactController extends Controller
                 'userAgent' => (string) $request->userAgent(),
             ],
         ])->render();
+
+        // Wrap com layout do sistema (mesmo padrão dos outros emails)
+        $html = $this->wrapWithSystemLayout($content, $siteName, $logoUrl, $primaryColor, $secondaryColor);
 
         // Carregar CC e BCC das configurações
         $ccEmails = $this->parseEmailList(Setting::get('smtp_cc', ''));
@@ -262,5 +272,48 @@ class ContactController extends Controller
         }
 
         return $valid;
+    }
+
+    /**
+     * Wrap email content with system layout (header with logo, footer)
+     */
+    private function wrapWithSystemLayout(string $content, string $siteName, string $logoUrl, string $primaryColor, string $secondaryColor): string
+    {
+        $year = date('Y');
+        
+        return '
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f4f6f9; font-family: Arial, Helvetica, sans-serif;">
+            <div style="background-color: #f4f6f9; padding: 20px; min-height: 100%;">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td align="center">
+                            <div style="background-color: #ffffff; max-width: 600px; padding: 0px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
+                                <!-- Header -->
+                                <div style="background: linear-gradient(135deg, ' . $primaryColor . ' 0%, ' . $secondaryColor . ' 100%); padding: 30px 20px; text-align: center;">
+                                    <img src="' . $logoUrl . '" alt="' . $siteName . '" style="max-height: 60px; max-width: 200px;">
+                                </div>
+                                
+                                <!-- Body -->
+                                <div style="padding: 30px; color: #333333; line-height: 1.6;">
+                                    ' . $content . '
+                                </div>
+                                
+                                <!-- Footer -->
+                                <div style="background-color: #f8f9fa; padding: 20px; text-align: center; color: #777777; font-size: 12px; border-top: 1px solid #eeeeee;">
+                                    <p style="margin: 0;">&copy; ' . $year . ' ' . $siteName . '. Todos os direitos reservados.</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </body>
+        </html>';
     }
 }
