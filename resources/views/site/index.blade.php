@@ -13,9 +13,9 @@
         <!-- Hero Section -->
         <section class="pt-10 md:pt-24 pb-12 md:pb-16 px-4 md:px-12 lg:px-24">
             <div class="max-w-7xl mx-auto">
-                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="grid lg:grid-cols-2 gap-8 md:gap-16 lg:gap-24 items-center">
                     <div>
-                        <h1 class="unn-title-gradient unn-title-hero mb-6">
+                        <h1 class="unn-title-gradient unn-title-hero mb-6" style="word-break: keep-all; hyphens: none; max-width: 650px;">
                             {{ $heroTitle }} {{ $heroSubtitle }}
                         </h1>
                         <p class="text-base sm:text-lg text-gray-600 mb-6 md:mb-8 leading-relaxed max-w-xl">
@@ -391,16 +391,16 @@
             color: transparent;
         }
         .unn-title-hero {
-            max-width: 520px;
+            max-width: 650px;
             font-size: 2.1rem;
             line-height: 1.12;
             font-weight: 900;
             letter-spacing: -0.02em;
             margin-left: 0;
             margin-right: 0;
-            overflow-wrap: break-word;
-            word-break: normal;
-            hyphens: auto;
+            overflow-wrap: normal;
+            word-break: keep-all;
+            hyphens: none;
         }
         @media (min-width: 640px) {
             .unn-title-hero {
@@ -410,13 +410,13 @@
         @media (min-width: 1024px) {
             .unn-title-hero {
                 font-size: 2.8rem;
-                max-width: 560px;
+                max-width: 700px;
             }
         }
         @media (max-width: 480px) {
             .unn-title-hero {
                 font-size: 1.5rem;
-                max-width: 95vw;
+                max-width: 98vw;
             }
         }
     </style>
