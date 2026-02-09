@@ -143,24 +143,36 @@
                     <h3 class="card-title">Recursos do Plano (Site)</h3>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        @forelse($planFeatures as $featureKey => $featureLabel)
-                            <div class="col-md-4 col-lg-3">
-                                <div class="custom-control custom-checkbox mb-2">
-                                    <input type="checkbox" class="custom-control-input" id="feature-{{ $featureKey }}"
-                                        name="permissions[]" value="{{ $featureKey }}"
-                                        {{ in_array($featureKey, $selectedFeatures, true) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="feature-{{ $featureKey }}">{{ $featureLabel }}</label>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="col-12">
-                                <div class="alert alert-warning mb-0">
-                                    Nenhum recurso configurado para planos. Atualize o código do painel.
-                                </div>
-                            </div>
-                        @endforelse
-                    </div>
+                    @php
+                        // Agrupar features por categoria
+                        $featureGroups = [
+                            'Acesso Básico' => ['community', 'chat', 'connections', 'connections.unlimited'],
+                            'Cursos' => ['courses', 'courses.certificates', 'courses.downloads'],
+                            'Eventos' => ['events', 'events.recordings', 'events.vip'],
+                            'Mentorias' => ['mentorships', 'mentorships.group', 'mentorships.individual'],
+                            'Extras' => ['rankings', 'support.priority', 'early.access'],
+                        ];
+                    @endphp
+
+                    @foreach($featureGroups as $groupName => $groupKeys)
+                        <h6 class="font-weight-bold text-primary mb-2 {{ !$loop->first ? 'mt-3' : '' }}">
+                            <i class="fas fa-folder mr-1"></i> {{ $groupName }}
+                        </h6>
+                        <div class="row mb-2">
+                            @foreach($groupKeys as $featureKey)
+                                @if(isset($planFeatures[$featureKey]))
+                                    <div class="col-md-4 col-lg-3">
+                                        <div class="custom-control custom-checkbox mb-2">
+                                            <input type="checkbox" class="custom-control-input" id="feature-{{ $featureKey }}"
+                                                name="permissions[]" value="{{ $featureKey }}"
+                                                {{ in_array($featureKey, $selectedFeatures, true) ? 'checked' : '' }}>
+                                            <label class="custom-control-label" for="feature-{{ $featureKey }}">{{ $planFeatures[$featureKey] }}</label>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    @endforeach
 
                     <small class="text-muted d-block mt-2">
                         Esses recursos controlam o acesso no site (ex.: Comunidade/Chat) e alimentam o comparativo em <code>/premium</code>.

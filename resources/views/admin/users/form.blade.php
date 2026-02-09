@@ -105,24 +105,37 @@
                         Libere recursos específicos para este usuário, independente do plano atribuído.
                         Esses recursos se somam aos do plano.
                     </p>
-                    <div class="row">
-                        @forelse($userFeatures as $featureKey => $featureLabel)
-                            <div class="col-md-4 col-lg-3">
-                                <div class="custom-control custom-checkbox mb-2">
-                                    <input type="checkbox" class="custom-control-input" id="extra-feature-{{ $featureKey }}"
-                                        name="extra_features[]" value="{{ $featureKey }}"
-                                        {{ in_array($featureKey, $selectedFeatures, true) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="extra-feature-{{ $featureKey }}">{{ $featureLabel }}</label>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="col-12">
-                                <div class="alert alert-warning mb-0">
-                                    Nenhum recurso configurado.
-                                </div>
-                            </div>
-                        @endforelse
-                    </div>
+                    
+                    @php
+                        // Agrupar features por categoria
+                        $featureGroups = [
+                            'Acesso Básico' => ['community', 'chat', 'connections', 'connections.unlimited'],
+                            'Cursos' => ['courses', 'courses.certificates', 'courses.downloads'],
+                            'Eventos' => ['events', 'events.recordings', 'events.vip'],
+                            'Mentorias' => ['mentorships', 'mentorships.group', 'mentorships.individual'],
+                            'Extras' => ['rankings', 'support.priority', 'early.access'],
+                        ];
+                    @endphp
+
+                    @foreach($featureGroups as $groupName => $groupKeys)
+                        <h6 class="font-weight-bold text-success mb-2 {{ !$loop->first ? 'mt-3' : '' }}">
+                            <i class="fas fa-folder mr-1"></i> {{ $groupName }}
+                        </h6>
+                        <div class="row mb-2">
+                            @foreach($groupKeys as $featureKey)
+                                @if(isset($userFeatures[$featureKey]))
+                                    <div class="col-md-4 col-lg-3">
+                                        <div class="custom-control custom-checkbox mb-2">
+                                            <input type="checkbox" class="custom-control-input" id="extra-feature-{{ $featureKey }}"
+                                                name="extra_features[]" value="{{ $featureKey }}"
+                                                {{ in_array($featureKey, $selectedFeatures, true) ? 'checked' : '' }}>
+                                            <label class="custom-control-label" for="extra-feature-{{ $featureKey }}">{{ $userFeatures[$featureKey] }}</label>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    @endforeach
                 </div>
             </div>
         @endif

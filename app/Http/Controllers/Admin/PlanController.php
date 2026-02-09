@@ -12,12 +12,36 @@ use Illuminate\Validation\Rule;
 
 class PlanController extends Controller
 {
+    /**
+     * Recursos disponíveis para planos.
+     * Esses controlam o que o MEMBRO pode acessar no site.
+     */
     private const PLAN_FEATURES = [
+        // Acesso básico
         'community' => 'Comunidade (perfil/feed)',
         'chat' => 'Chat (mensagens)',
-        'courses' => 'Cursos',
-        'events' => 'Eventos',
-        'mentorships' => 'Mentorias',
+        'connections' => 'Networking (conexões)',
+        'connections.unlimited' => 'Conexões ilimitadas',
+        
+        // Cursos
+        'courses' => 'Acesso a cursos',
+        'courses.certificates' => 'Certificados de cursos',
+        'courses.downloads' => 'Downloads de materiais',
+        
+        // Eventos
+        'events' => 'Acesso a eventos',
+        'events.recordings' => 'Gravações de eventos',
+        'events.vip' => 'Eventos VIP/exclusivos',
+        
+        // Mentorias
+        'mentorships' => 'Acesso a mentorias',
+        'mentorships.group' => 'Mentorias em grupo',
+        'mentorships.individual' => 'Mentorias individuais',
+        
+        // Extras
+        'rankings' => 'Participar do ranking',
+        'support.priority' => 'Suporte prioritário',
+        'early.access' => 'Acesso antecipado a novidades',
     ];
 
     public function index()
