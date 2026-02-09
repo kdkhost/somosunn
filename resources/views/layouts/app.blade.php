@@ -510,11 +510,35 @@
 
         @if($videoPlayerEnabled)
             .unn-video-player {
-                position: relative;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                height: 100%;
             }
 
-            .unn-video-player .plyr {
+            .unn-video-player .plyr,
+            .unn-video-player .plyr--video {
+                width: 100% !important;
+                height: 100% !important;
                 border-radius: 0.75rem;
+            }
+
+            .unn-video-player .plyr__video-wrapper {
+                height: 100%;
+            }
+
+            .unn-video-player video {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+
+            /* Ensure controls are always visible initially */
+            .unn-video-player .plyr__controls {
+                opacity: 1;
             }
 
             .unn-video-float-placeholder {
@@ -828,26 +852,49 @@
                 function buildPlyrOptions() {
                     const plyr = (config && config.plyr) ? config.plyr : {};
 
+                    // Default controls if not specified
+                    const defaultControls = ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'];
+
                     const base = {
                         autoplay: !!plyr.autoplay,
                         muted: !!plyr.muted,
                         clickToPlay: plyr.clickToPlay !== false,
                         disableContextMenu: plyr.disableContextMenu !== false,
                         seekTime: Number.isFinite(plyr.seekTime) ? plyr.seekTime : 10,
+                        fullscreen: { enabled: true, fallback: true, iosNative: true },
                     };
 
-                    if (Array.isArray(plyr.controls) && plyr.controls.length) {
-                        let controls = [...plyr.controls];
-                        if (plyr.rewindEnabled === false) controls = controls.filter(c => c !== 'rewind');
-                        if (plyr.fastForwardEnabled === false) controls = controls.filter(c => c !== 'fast-forward');
-                        if (plyr.volumeEnabled === false) controls = controls.filter(c => c !== 'mute' && c !== 'volume');
-                        
-                        // Ensure buttons are present if enabled
-                        if (plyr.rewindEnabled && !controls.includes('rewind')) controls.splice(1, 0, 'rewind');
-                        if (plyr.fastForwardEnabled && !controls.includes('fast-forward')) controls.splice(2, 0, 'fast-forward');
+                    // Use configured controls or default
+                    let controls = Array.isArray(plyr.controls) && plyr.controls.length 
+                        ? [...plyr.controls] 
+                        : [...defaultControls];
 
-                        base.controls = controls;
+                    // Ensure play-large (big play button) is always present
+                    if (!controls.includes('play-large')) {
+                        controls.unshift('play-large');
                     }
+
+                    // Filter based on enabled settings
+                    if (plyr.rewindEnabled === false) controls = controls.filter(c => c !== 'rewind');
+                    if (plyr.fastForwardEnabled === false) controls = controls.filter(c => c !== 'fast-forward');
+                    if (plyr.volumeEnabled === false) controls = controls.filter(c => c !== 'mute' && c !== 'volume');
+                    
+                    // Ensure buttons are present if enabled
+                    if (plyr.rewindEnabled && !controls.includes('rewind')) {
+                        const playIdx = controls.indexOf('play');
+                        controls.splice(playIdx + 1, 0, 'rewind');
+                    }
+                    if (plyr.fastForwardEnabled && !controls.includes('fast-forward')) {
+                        const rewindIdx = controls.indexOf('rewind');
+                        if (rewindIdx >= 0) {
+                            controls.splice(rewindIdx + 1, 0, 'fast-forward');
+                        } else {
+                            const playIdx = controls.indexOf('play');
+                            controls.splice(playIdx + 1, 0, 'fast-forward');
+                        }
+                    }
+
+                    base.controls = controls;
                     if (Array.isArray(plyr.settings) && plyr.settings.length) {
                         base.settings = plyr.settings;
                     }

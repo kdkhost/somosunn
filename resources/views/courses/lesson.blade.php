@@ -83,7 +83,7 @@
                 <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ $lesson->title }}</h1>
 
                 <div class="relative w-full overflow-hidden shadow-2xl mb-8 bg-black rounded-xl"
-                    style="aspect-ratio: 16/9; max-height: 500px;" data-unn-video-host>
+                    style="aspect-ratio: 16/9;" data-unn-video-host>
                     @if($lesson->video_url)
                         @php
                             $normalizedVideoUrl = trim((string) $lesson->video_url);
@@ -109,7 +109,7 @@
                         @endphp
                         @php $usePlyr = (string) \App\Models\Setting::get('video_player_enabled', '1') === '1'; @endphp
                         @if($usePlyr)
-                            <div class="w-full h-full min-h-[400px]" data-unn-video-player
+                            <div class="absolute inset-0" data-unn-video-player
                                 data-video-url="{{ $normalizedVideoUrl }}"
                                 data-progress-url="{{ route('courses.lessons.progress.update', [$course->id, $lesson->id]) }}"
                                 data-bookmark-store-url="{{ route('courses.lessons.bookmarks.store', [$course->id, $lesson->id]) }}"
@@ -126,7 +126,7 @@
                         @else
                             <iframe src="{{ str_replace('youtu.be/', 'youtube.com/embed/', $normalizedVideoUrl) }}" frameborder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen class="w-full h-full"></iframe>
+                                allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
                         @endif
                     @else
                         <div class="flex items-center justify-center h-full text-white">
