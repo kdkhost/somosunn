@@ -13,6 +13,14 @@
         <div class="p-10 flex flex-col justify-center">
             <h3 class="text-3xl font-bold mb-8 text-slate-900">Redefinir Senha</h3>
             
+            @if ($errors->any())
+                <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                    @foreach ($errors->all() as $error)
+                        <p>{{ $error }}</p>
+                    @endforeach
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('password.update') }}" class="space-y-5">
                 @csrf
                 <input type="hidden" name="token" value="{{ $token ?? '' }}">

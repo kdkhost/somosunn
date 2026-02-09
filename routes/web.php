@@ -169,11 +169,11 @@ Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'logo
 Route::get('/register', fn() => view('auth.register'))->name('register');
 Route::post('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'store']);
 
-// Password reset (feedback visual simples)
-Route::get('/password/forgot', fn() => view('auth.passwords.email'))->name('password.request');
-Route::post('/password/email', fn() => back()->with('status', 'Link de redefinição enviado (simulado).'))->name('password.email');
-Route::get('/password/reset/{token?}', fn($token = null) => view('auth.passwords.reset', ['token' => $token]))->name('password.reset');
-Route::post('/password/reset', fn(\Illuminate\Http\Request $request) => redirect()->route('login')->with('status', 'Senha redefinida com sucesso (simulado).'))->name('password.update');
+// Password reset
+Route::get('/password/forgot', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/password/email', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/password/reset/{token}', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/password/reset', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
 
 // Social Auth
 Route::get('/auth/redirect/{provider}', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])->name('social.redirect');

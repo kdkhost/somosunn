@@ -282,4 +282,12 @@ class User extends Authenticatable
     {
         return app(ProfilePhotoService::class)->urlFor($this);
     }
+
+    /**
+     * Envia notificação de reset de senha em português.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
 }
