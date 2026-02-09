@@ -38,13 +38,14 @@ Principais instruções rápidas:
    - `php artisan migrate --seed`
    - `php artisan storage:link`
 
-## Atualização recente (Player de vídeo)
 
-- Corrigido erro de inicialização do player que impedia marca d'água, marcador de aula e bloqueios.
-- Normalização de URL de vídeo reforçada para registros antigos (`storage/app/public/...`).
-- Retomada de aula e salvamento de marcadores com mais robustez no frontend.
-- Proteções de mídia reforçadas: bloqueio de menu de contexto, `nodownload`, `disablePictureInPicture` e `disableRemotePlayback`.
-- Download de materiais de apoio ajustado para resposta forçada de anexo.
+## Atualização recente (Fevereiro 2026)
+
+- Aplicação da paleta UNN (Azul Royal #2E3192, Azul Oceano #0071BC, Ciano Vivo #29ABE2) em todo o front-end público (portal, home, cursos, eventos, botões, backgrounds, títulos, links).
+- Painel administrativo mantido com cores originais, apenas melhorias de responsividade e organização visual.
+- Seção de cursos em destaque exibe carrossel automático (3 na tela, passando 1 por vez, looping infinito), só aparece se houver cursos destacados.
+- Sidebar e configurações do painel admin organizadas, modernas e responsivas.
+- Layout e responsividade aprimorados em todas as páginas públicas.
 
 ## Deploy em hospedagem compartilhada (cPanel)
 

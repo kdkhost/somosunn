@@ -29,15 +29,13 @@
         \Log::error('Erro ao carregar logo da sidebar: ' . $e->getMessage());
     }
 @endphp
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center justify-content-center p-0"
+<aside class="main-sidebar sidebar-dark-primary elevation-4" style="font-family: 'Inter', sans-serif;">
+    <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center justify-content-center p-0 bg-white border-b border-gray-200"
         style="height:60px; overflow:hidden;">
-        {{-- Logo Grande (Padrão) --}}
-        <img src="{{ $brandLogo }}" alt="UNN" class="brand-logo-img"
-            style="max-height: 50px; width: auto; max-width: 90%; object-fit: contain;">
-        {{-- Favicon (Mini) --}}
-        <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img"
-            style="max-height: 50px; width: auto; max-width: 90%; object-fit: contain;">
+        <img src="{{ $brandLogo }}" alt="UNN" class="brand-logo-img transition-all duration-300"
+            style="max-height: 44px; width: auto; max-width: 80%; object-fit: contain;">
+        <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img transition-all duration-300"
+            style="max-height: 44px; width: auto; max-width: 80%; object-fit: contain;">
     </a>
     <style>
         /* Estado Padrão (Aberto): Logo Visível, Favicon Oculto */
@@ -67,16 +65,16 @@
             display: none !important;
         }
     </style>
-    <div class="sidebar">
+    <div class="sidebar" style="padding-bottom: 1.5rem;">
         {{-- User Panel with Plan --}}
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
-            <div class="image">
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center bg-gradient-to-r from-blue-50 to-white rounded-xl shadow-sm mx-2 px-2">
+            <div class="image mr-2">
                 <img src="{{ auth()->user()->photo ? asset(auth()->user()->photo) : asset('img/user.png') }}"
-                    class="img-circle elevation-2" alt="User Image"
-                    style="width: 34px; height: 34px; object-fit: cover;">
+                    class="img-circle elevation-2 border border-blue-200" alt="User Image"
+                    style="width: 38px; height: 38px; object-fit: cover;">
             </div>
             <div class="info">
-                <a href="{{ route('admin.profile.edit') }}" class="d-block text-wrap"
+                <a href="{{ route('admin.profile.edit') }}" class="d-block text-wrap font-bold text-blue-900"
                     style="max-width: 160px;">{{ auth()->user()->name }}</a>
                 <span class="text-muted small"><i
                         class="fas fa-crown text-warning mr-1"></i>{{ auth()->user()->activePlan() ? auth()->user()->activePlan()->name : 'Acesso Limitado' }}</span>
@@ -85,9 +83,9 @@
 
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" data-accordion="true"
-                id="sidebar-tree" role="menu">
+                id="sidebar-tree" role="menu" style="gap: 2px;">
                 <li class="nav-item">
-                    <a href="{{ route('admin.dashboard') }}" class="nav-link {{ $is('admin.dashboard') }}">
+                    <a href="{{ route('admin.dashboard') }}" class="nav-link {{ $is('admin.dashboard') }} rounded-lg font-semibold">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Dashboard</p>
                     </a>
@@ -103,7 +101,7 @@
                             <i class="nav-icon fas fa-graduation-cap"></i>
                             <p>Cursos<i class="right fas fa-angle-left"></i></p>
                         </a>
-                        <ul class="nav nav-treeview pl-4">
+                        <ul class="nav nav-treeview pl-4" style="background: #f8fafc; border-radius: 0 0 12px 12px;">
                             <li class="nav-item"><a href="{{ route('admin.courses.available') }}" class="nav-link"><i
                                         class="fas fa-list nav-icon"></i>
                                     <p>Meus Cursos</p>
@@ -345,5 +343,50 @@
 
 
         </nav>
+        <style>
+        /* Sidebar custom UX */
+        .main-sidebar {
+            font-size: 1rem;
+        }
+        .main-sidebar .nav-link {
+            transition: background 0.18s, color 0.18s;
+        }
+        .main-sidebar .nav-link.active, .main-sidebar .nav-link:hover {
+            background: linear-gradient(90deg, #2563eb 0%, #60a5fa 100%);
+            color: #fff !important;
+        }
+        .main-sidebar .nav-link.active i, .main-sidebar .nav-link:hover i {
+            color: #fff !important;
+        }
+        .main-sidebar .nav-link i {
+            color: #2563eb;
+            transition: color 0.18s;
+        }
+        .main-sidebar .nav-treeview .nav-link {
+            font-size: 0.97em;
+            padding-left: 2.2rem;
+        }
+        @media (max-width: 900px) {
+            .main-sidebar {
+                font-size: 0.97rem;
+            }
+            .user-panel .info a {
+                font-size: 0.97rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .main-sidebar {
+                font-size: 0.93rem;
+            }
+            .user-panel {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 0.2rem;
+            }
+            .user-panel .image {
+                margin-bottom: 0.2rem;
+            }
+        }
+        </style>
     </div>
 </aside>
