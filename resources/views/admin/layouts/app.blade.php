@@ -122,6 +122,25 @@
             background: transparent;
         }
 
+        /* Mobile responsivo para header */
+        @media (max-width: 575px) {
+            .content-header .container-fluid > div {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 0.25rem;
+            }
+            .content-header h1 {
+                font-size: 1.1rem;
+            }
+            .content-header .breadcrumb {
+                font-size: 0.75rem;
+                padding: 0;
+            }
+            .content-header .breadcrumb-item + .breadcrumb-item::before {
+                padding: 0 0.3rem;
+            }
+        }
+
         /* Upload UI */
         .upload-box {
             border: 1px dashed #cbd5e0;
