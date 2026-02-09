@@ -15,9 +15,9 @@
             <div class="max-w-7xl mx-auto">
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <div>
-                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-gradient-title">
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient">
                             {{ $heroTitle }}<br />
-                            <span class="unn-gradient-title">{{ $heroSubtitle }}</span>
+                            <span class="unn-title-gradient">{{ $heroSubtitle }}</span>
                         </h1>
                         <p class="text-base sm:text-lg text-gray-600 mb-6 md:mb-8 leading-relaxed max-w-xl">
                             {{ $heroText }}
@@ -78,7 +78,7 @@
         <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-12">
-                    <h2 class="text-4xl font-black text-gray-900 mb-4">O que é a UNN</h2>
+                    <h2 class="text-4xl font-black unn-title-gradient mb-4">O que é a UNN</h2>
                     <p class="text-gray-600 text-lg max-w-2xl mx-auto">A UNN nasceu para unir empreendedores que acreditam
                         no crescimento colaborativo.</p>
                 </div>
@@ -88,7 +88,7 @@
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-handshake text-white text-2xl"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">Conexões reais</h3>
+                        <h3 class="text-lg font-bold unn-title-gradient mb-2">Conexões reais</h3>
                         <p class="text-sm text-gray-600">Networking genuíno com empreendedores que compartilham seus valores
                         </p>
                     </div>
@@ -96,21 +96,21 @@
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-chart-line text-white text-2xl"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">Crescimento coletivo</h3>
+                        <h3 class="text-lg font-bold unn-title-gradient mb-2">Crescimento coletivo</h3>
                         <p class="text-sm text-gray-600">Juntos somos mais fortes e alcançamos resultados maiores</p>
                     </div>
                     <div class="bg-slate-50 rounded-3xl p-8 text-center">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-lightbulb text-white text-2xl"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">Troca de experiências</h3>
+                        <h3 class="text-lg font-bold unn-title-gradient mb-2">Troca de experiências</h3>
                         <p class="text-sm text-gray-600">Aprenda com quem já passou pelos desafios que você enfrenta</p>
                     </div>
                     <div class="bg-slate-50 rounded-3xl p-8 text-center">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-briefcase text-white text-2xl"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">Oportunidades</h3>
+                        <h3 class="text-lg font-bold unn-title-gradient mb-2">Oportunidades</h3>
                         <p class="text-sm text-gray-600">Parcerias estratégicas que geram resultados concretos</p>
                     </div>
                 </div>
@@ -383,6 +383,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+        .unn-title-gradient {
+            background: linear-gradient(90deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
         }
     </style>
 @endsection

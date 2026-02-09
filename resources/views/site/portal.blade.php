@@ -7,8 +7,8 @@
     <!-- Hero Section -->
     <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
-                <span class="unn-gradient-title">Portal de Networking</span>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient">
+                Portal de Networking
             </h1>
             <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.
@@ -83,7 +83,7 @@
         <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center mb-2">
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-black text-gray-900">Cursos em Destaque</h2>
+                    <h2 class="text-2xl md:text-3xl font-black unn-title-gradient">Cursos em Destaque</h2>
                     <p class="text-gray-500 text-sm md:text-base">Desenvolva novas habilidades com os especialistas</p>
                 </div>
                 <a href="{{ route('courses.index') }}" class="text-sm font-bold text-white bg-blue-700 hover:bg-blue-800 px-5 py-2 rounded-full shadow transition">Ver Todos</a>
@@ -127,7 +127,7 @@
         <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center mb-2">
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-black text-gray-900">Palestras Gratuitas</h2>
+                    <h2 class="text-2xl md:text-3xl font-black unn-title-gradient">Palestras Gratuitas</h2>
                     <p class="text-gray-500 text-sm md:text-base">Aprenda com os melhores empresários</p>
                 </div>
                 <a href="{{ route('events.index') }}" class="text-sm font-bold text-white bg-blue-700 hover:bg-blue-800 px-5 py-2 rounded-full shadow transition">Ver Todas</a>
@@ -357,6 +357,13 @@
     /* Mantém fundo claro */
     .bg-gradient-to-br {
         background: linear-gradient(135deg, #f8fafc 0%, #fff 100%);
+    }
+    .unn-title-gradient {
+        background: linear-gradient(90deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
     }
 </style>
 <script src="/js/featured-courses-carousel.js"></script>

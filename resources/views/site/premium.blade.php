@@ -64,6 +64,14 @@
             font-size: 16px;
             font-weight: 900;
         }
+
+        .unn-title-gradient {
+            background: linear-gradient(90deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
     </style>
 @endpush
 
@@ -78,8 +86,8 @@
                             style="background: var(--unn-azul-1); color: white">
                             <i class="fas fa-crown mr-2"></i> Associação Premium
                         </span>
-                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-gradient-title">
-                            Invista no seu <span class="unn-gradient-title">crescimento</span>
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient">
+                            Invista no seu <span class="unn-title-gradient">crescimento</span>
                         </h1>
                         <p class="text-xl text-gray-600 leading-relaxed mb-8">
                             Escolha o plano ideal para você e desbloqueie todo o potencial da maior comunidade de networking
@@ -109,7 +117,7 @@
         <section class="py-16 px-6 md:px-12 lg:px-24" id="planos">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-12">
-                    <h2 class="text-4xl font-black text-gray-900 mb-4">Escolha seu Plano</h2>
+                    <h2 class="text-4xl font-black unn-title-gradient mb-4">Escolha seu Plano</h2>
                     <p class="text-gray-600 max-w-2xl mx-auto">Todos os planos incluem acesso à comunidade. Quanto maior o
                         plano, mais recursos exclusivos.</p>
                 </div>

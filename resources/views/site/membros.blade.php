@@ -7,8 +7,8 @@
     <!-- Hero Section -->
     <section class="pt-10 md:pt-24 pb-8 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-gradient-title">
-                <span class="unn-gradient-title">Membros</span> UNN
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient">
+                <span class="unn-title-gradient">Membros</span> UNN
             </h1>
             <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Conheça os empreendedores que fazem parte da nossa comunidade exclusiva de networking empresarial.
@@ -163,4 +163,13 @@
     overflow: hidden;
 }
 </style>
+<style>
+        .unn-title-gradient {
+            background: linear-gradient(90deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
 @endsection
