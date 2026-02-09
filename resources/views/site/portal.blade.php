@@ -8,7 +8,7 @@
     <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto text-center">
             <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6">
-                Portal de <span class="text-gradient">Networking</span>
+                <span class="unn-gradient-title">Portal de Networking</span>
             </h1>
             <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.
@@ -317,11 +317,13 @@
         --unn-azul-oceano: #0071BC;
         --unn-ciano-vivo: #29ABE2;
     }
-    .text-gradient {
-        background: linear-gradient(135deg, var(--unn-azul-royal) 0%, var(--unn-azul-oceano) 60%, var(--unn-ciano-vivo) 100%);
+    .unn-gradient-title {
+        background: linear-gradient(90deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+        color: transparent;
+        font-weight: 900;
     }
     .btn-primary {
         background: linear-gradient(90deg, var(--unn-azul-royal) 0%, var(--unn-azul-oceano) 60%, var(--unn-ciano-vivo) 100%);
@@ -352,11 +354,9 @@
     .shadow-xl {
         box-shadow: 0 12px 32px rgba(41,171,226,0.12);
     }
-    .font-black {
-        color: var(--unn-azul-royal);
-    }
+    /* Mantém fundo claro */
     .bg-gradient-to-br {
-        background: linear-gradient(135deg, var(--unn-azul-royal) 0%, var(--unn-azul-oceano) 60%, var(--unn-ciano-vivo) 100%);
+        background: linear-gradient(135deg, #f8fafc 0%, #fff 100%);
     }
 </style>
 <script src="/js/featured-courses-carousel.js"></script>
