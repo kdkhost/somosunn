@@ -922,993 +922,216 @@
                         <label class="custom-control-label" for="video_player_enabled">Ativar Plyr no site</label>
                     </div>
 
-                    <div class="form-group">
-                        <label>Controles do player</label>
-                        <div class="mb-2" id="plyr-controls-list">
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="play" checked> Play</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="progress" checked> Barra de progresso</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="current-time" checked> Tempo atual</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="mute" checked> Mudo</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="volume" checked> Volume</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="settings" checked> Configurações</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="fullscreen" checked> Tela cheia</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="rewind" checked> Retroceder</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="fast-forward" checked> Avançar</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="captions"> Legendas</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="quality"> Qualidade</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="speed"> Velocidade</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="loop"> Loop</label>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Cor principal do player</label>
+                                <div class="input-group colorpicker-element">
+                                    <input name="video_plyr_color" class="form-control"
+                                        value="{{ $settings['video_plyr_color'] ?? ($settings['site_color_primary'] ?? '#1F5EDB') }}">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text"><i class="fas fa-square"
+                                                style="color: {{ $settings['video_plyr_color'] ?? ($settings['site_color_primary'] ?? '#1F5EDB') }}"></i></span>
+                                    </div>
+                                </div>
+                                <small class="text-muted">Define a cor dos botões/controles (CSS:
+                                    <code>--plyr-color-main</code>).</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Seek (segundos)</label>
+                                <input name="video_plyr_seek_time" class="form-control"
+                                    value="{{ $settings['video_plyr_seek_time'] ?? '10' }}" placeholder="Ex: 10">
+                                <small class="text-muted">Tempo de avanço/retrocesso nos atalhos.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Volume inicial (0 a 1)</label>
+                                <input name="video_plyr_volume" class="form-control"
+                                    value="{{ $settings['video_plyr_volume'] ?? '0.8' }}" placeholder="Ex: 0.8">
+                                <small class="text-muted">Opcional. Use 0.0 a 1.0.</small>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Tooltips</label>
-                        <div class="mb-2">
-                            <label class="mr-3"><input type="checkbox" class="plyr-tooltip-check" data-key="controls" checked> Tooltips dos controles</label>
-                            <label class="mr-3"><input type="checkbox" class="plyr-tooltip-check" data-key="seek" checked> Tooltips do seek</label>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
+                                <input type="hidden" name="video_plyr_autoplay" value="0">
+                                <input type="checkbox" class="custom-control-input" id="video_plyr_autoplay"
+                                    name="video_plyr_autoplay" value="1" {{ ($settings['video_plyr_autoplay'] ?? 0) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="video_plyr_autoplay">Autoplay</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
+                                <input type="hidden" name="video_plyr_muted" value="0">
+                                <input type="checkbox" class="custom-control-input" id="video_plyr_muted"
+                                    name="video_plyr_muted" value="1" {{ ($settings['video_plyr_muted'] ?? 0) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="video_plyr_muted">Iniciar mudo</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
+                                <input type="hidden" name="video_plyr_click_to_play" value="0">
+                                <input type="checkbox" class="custom-control-input" id="video_plyr_click_to_play"
+                                    name="video_plyr_click_to_play" value="1" {{ ($settings['video_plyr_click_to_play'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="video_plyr_click_to_play">Clique para reproduzir</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
+                                <input type="hidden" name="video_plyr_disable_context_menu" value="0">
+                                <input type="checkbox" class="custom-control-input" id="video_plyr_disable_context_menu"
+                                    name="video_plyr_disable_context_menu" value="1" {{ ($settings['video_plyr_disable_context_menu'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="video_plyr_disable_context_menu">Bloquear menu do botão direito</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                <input type="hidden" name="video_plyr_rewind_enabled" value="0">
+                                <input type="checkbox" class="custom-control-input" id="video_plyr_rewind_enabled"
+                                    name="video_plyr_rewind_enabled" value="1" {{ ($settings['video_plyr_rewind_enabled'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="video_plyr_rewind_enabled">Botão Retroceder</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                <input type="hidden" name="video_plyr_fast_forward_enabled" value="0">
+                                <input type="checkbox" class="custom-control-input" id="video_plyr_fast_forward_enabled"
+                                    name="video_plyr_fast_forward_enabled" value="1" {{ ($settings['video_plyr_fast_forward_enabled'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="video_plyr_fast_forward_enabled">Botão Avançar</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                <input type="hidden" name="video_plyr_volume_enabled" value="0">
+                                <input type="checkbox" class="custom-control-input" id="video_plyr_volume_enabled"
+                                    name="video_plyr_volume_enabled" value="1" {{ ($settings['video_plyr_volume_enabled'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="video_plyr_volume_enabled">Controle de Volume</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Controles (separados por vírgula)</label>
+                                <input name="video_plyr_controls" class="form-control"
+                                    value="{{ $settings['video_plyr_controls'] ?? 'play,progress,current-time,mute,volume,settings,fullscreen' }}">
+                                <small class="text-muted">Ex:
+                                    <code>play,progress,current-time,mute,volume,settings,fullscreen</code></small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Menu “Configurações” (separado por vírgula)</label>
+                                <input name="video_plyr_settings" class="form-control"
+                                    value="{{ $settings['video_plyr_settings'] ?? 'captions,quality,speed,loop' }}">
+                                <small class="text-muted">Ex: <code>captions,quality,speed,loop</code></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Velocidades disponíveis (separadas por vírgula)</label>
+                                <input name="video_plyr_speed_options" class="form-control"
+                                    value="{{ $settings['video_plyr_speed_options'] ?? '0.5,0.75,1,1.25,1.5,2' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Velocidade padrão</label>
+                                <input name="video_plyr_speed_selected" class="form-control"
+                                    value="{{ $settings['video_plyr_speed_selected'] ?? '1' }}">
+                            </div>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Opções avançadas (JSON)</label>
-                        <textarea name="video_plyr_options_json" class="form-control" rows="6" id="plyr-options-json"
+                        <textarea name="video_plyr_options_json" class="form-control" rows="6"
                             placeholder='{"controls":["play","progress","current-time","mute","volume","settings","fullscreen"],"tooltips":{"controls":true,"seek":true}}'>{{ $settings['video_plyr_options_json'] ?? '' }}</textarea>
-                        <small class="text-muted">O JSON é montado automaticamente conforme as opções acima.</small>
-                    </div>
-
-                    <script>
-                        function updatePlyrOptionsJson() {
-                            const controls = [];
-                            document.querySelectorAll('.plyr-control-check').forEach(chk => {
-                                if (chk.checked) controls.push(chk.dataset.key);
-                            });
-                            const tooltips = {};
-                            document.querySelectorAll('.plyr-tooltip-check').forEach(chk => {
-                                tooltips[chk.dataset.key] = chk.checked;
-                            });
-                            const json = JSON.stringify({ controls, tooltips }, null, 2);
-                            document.getElementById('plyr-options-json').value = json;
-                        }
-                        document.querySelectorAll('.plyr-control-check, .plyr-tooltip-check').forEach(chk => {
-                            chk.addEventListener('change', updatePlyrOptionsJson);
-                        });
-                        updatePlyrOptionsJson();
-                    </script>
-                </div>
-
-                {{-- PWA --}}
-                <div class="tab-pane fade" id="tab-pwa" role="tabpanel">
-                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
-                        <input type="hidden" name="pwa_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input" id="pwa_enabled" name="pwa_enabled"
-                            value="1" {{ ($settings['pwa_enabled'] ?? 1) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="pwa_enabled">PWA habilitado</label>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Nome</label><input name="pwa_name" class="form-control"
-                                    value="{{ $settings['pwa_name'] ?? '' }}"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Nome curto</label><input name="pwa_short_name"
-                                    class="form-control" value="{{ $settings['pwa_short_name'] ?? '' }}"></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-md-6"><label>Theme color</label><input name="pwa_theme_color"
-                                class="form-control colorpicker-element"
-                                value="{{ $settings['pwa_theme_color'] ?? '#0C6BF7' }}"></div>
-                        <div class="form-group col-md-6"><label>Background color</label><input
-                                name="pwa_background_color" class="form-control colorpicker-element"
-                                value="{{ $settings['pwa_background_color'] ?? '#FFFFFF' }}"></div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-md-3">
-                            <label>Icon 192x192</label>
-                            <input type="hidden" name="remove_pwa_icon_192" value="0">
-                            <div class="upload-box" data-max-size="{{ 2 * 1024 * 1024 }}"
-                                data-existing-url="{{ $pwa192 }}" data-remove-input="[name='remove_pwa_icon_192']">
-                                <input type="file" name="pwa_icon_192" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small"></div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label>Icon 512x512</label>
-                            <input type="hidden" name="remove_pwa_icon_512" value="0">
-                            <div class="upload-box" data-max-size="{{ 3 * 1024 * 1024 }}"
-                                data-existing-url="{{ $pwa512 }}" data-remove-input="[name='remove_pwa_icon_512']">
-                                <input type="file" name="pwa_icon_512" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small"></div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label>Splash (full-screen)</label>
-                            <input type="hidden" name="remove_pwa_splash" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $pwaSplash }}" data-remove-input="[name='remove_pwa_splash']">
-                                <input type="file" name="pwa_splash" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small"></div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label>Banner</label>
-                            <input type="hidden" name="remove_pwa_banner" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $pwaBanner }}" data-remove-input="[name='remove_pwa_banner']">
-                                <input type="file" name="pwa_banner" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small"></div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- GATEWAY --}}
-                <div class="tab-pane fade" id="tab-gateway" role="tabpanel">
-                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="pills-mp-tab" data-toggle="pill" href="#pills-mp"
-                                role="tab">MercadoPago</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="pills-ps-tab" data-toggle="pill" href="#pills-ps"
-                                role="tab">PagSeguro</a>
-                        </li>
-                    </ul>
-                    <div class="tab-content" id="pills-tabContent">
-                        {{-- MERCADO PAGO --}}
-                        <div class="tab-pane fade show active" id="pills-mp" role="tabpanel">
-                            <h5 class="text-primary"><i class="fas fa-credit-card mr-2"></i>Configurações MercadoPago
-                            </h5>
-
-                            <div class="form-group mt-3">
-                                <label>Ambiente</label>
-                                <div class="btn-group btn-group-toggle d-block" data-toggle="buttons">
-                                    <label
-                                        class="btn btn-outline-success {{ ($settings['payments_mercadopago_env'] ?? 'sandbox') == 'sandbox' ? 'active' : '' }}">
-                                        <input type="radio" name="payments_mercadopago_env" class="gateway-env-toggle"
-                                            data-gateway="mercadopago" value="sandbox" {{ ($settings['payments_mercadopago_env'] ?? 'sandbox') == 'sandbox' ? 'checked' : '' }}> Sandbox (Testes)
-                                    </label>
-                                    <label
-                                        class="btn btn-outline-danger {{ ($settings['payments_mercadopago_env'] ?? '') == 'production' ? 'active' : '' }}">
-                                        <input type="radio" name="payments_mercadopago_env" class="gateway-env-toggle"
-                                            data-gateway="mercadopago" value="production" {{ ($settings['payments_mercadopago_env'] ?? '') == 'production' ? 'checked' : '' }}> Produção
-                                    </label>
-                                </div>
-                            </div>
-
-                            {{-- Sandbox Fields --}}
-                            <div
-                                class="card card-outline card-success env-section env-mercadopago-sandbox {{ ($settings['payments_mercadopago_env'] ?? 'sandbox') == 'sandbox' ? '' : 'd-none' }}">
-                                <div class="card-header">
-                                    <h3 class="card-title">Credenciais de Teste (Sandbox)</h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group"><label>Public Key (Teste)</label><input
-                                            name="payments_mercadopago_sandbox_public_key" class="form-control"
-                                            value="{{ $settings['payments_mercadopago_sandbox_public_key'] ?? '' }}">
-                                    </div>
-                                    <div class="form-group"><label>Access Token (Teste)</label><input
-                                            name="payments_mercadopago_sandbox_access_token" class="form-control"
-                                            value="{{ $settings['payments_mercadopago_sandbox_access_token'] ?? '' }}">
-                                    </div>
-                                    <small class="text-muted"><i class="fas fa-info-circle"></i> Use estas credenciais
-                                        para simular pagamentos sem cobrança real.</small>
-                                </div>
-                            </div>
-
-                            {{-- Production Fields --}}
-                            <div
-                                class="card card-outline card-danger env-section env-mercadopago-production {{ ($settings['payments_mercadopago_env'] ?? '') == 'production' ? '' : 'd-none' }}">
-                                <div class="card-header">
-                                    <h3 class="card-title">Credenciais de Produção</h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group"><label>Public Key (Produção)</label><input
-                                            name="payments_mercadopago_production_public_key" class="form-control"
-                                            value="{{ $settings['payments_mercadopago_production_public_key'] ?? '' }}">
-                                    </div>
-                                    <div class="form-group"><label>Access Token (Produção)</label><input
-                                            name="payments_mercadopago_production_access_token" class="form-control"
-                                            value="{{ $settings['payments_mercadopago_production_access_token'] ?? '' }}">
-                                    </div>
-                                    <div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i>
-                                        Cuidado! Alterações aqui afetam pagamentos reais.</div>
-                                </div>
-                            </div>
-
-                            <div class="row mt-4">
-                                <div class="col-md-6">
-                                    <div class="card">
-                                        <div class="card-header bg-light">Taxas e Parcelamento</div>
-                                        <div class="card-body">
-                                            <div class="form-group">
-                                                <label>Máximo de Parcelas (Geral)</label>
-                                                <select name="payments_mercadopago_max_installments"
-                                                    class="form-control">
-                                                    @foreach(range(1, 12) as $i)
-                                                        <option value="{{ $i }}" {{ ($settings['payments_mercadopago_max_installments'] ?? 12) == $i ? 'selected' : '' }}>{{ $i }}x</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Parcelas para Comunidade (Associação)</label>
-                                                <select name="payments_mercadopago_community_installments"
-                                                    class="form-control">
-                                                    @foreach(range(1, 12) as $i)
-                                                        <option value="{{ $i }}" {{ ($settings['payments_mercadopago_community_installments'] ?? 1) == $i ? 'selected' : '' }}>{{ $i }}x</option>
-                                                    @endforeach
-                                                </select>
-                                                <small class="text-muted">Defina em quantas vezes a anuidade da
-                                                    comunidade pode ser dividida.</small>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group"><label>Taxa Gateway (%)</label><input
-                                                            name="payments_mercadopago_fee_percentage"
-                                                            class="form-control mask-money"
-                                                            value="{{ $settings['payments_mercadopago_fee_percentage'] ?? '' }}">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group"><label>Taxa Fixa (R$)</label><input
-                                                            name="payments_mercadopago_fee_fixed"
-                                                            class="form-control mask-money"
-                                                            value="{{ $settings['payments_mercadopago_fee_fixed'] ?? '' }}">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="custom-control custom-switch">
-                                                    <input type="hidden" name="payments_mercadopago_pass_fee" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="mp_pass_fee"
-                                                        name="payments_mercadopago_pass_fee" value="1" {{ ($settings['payments_mercadopago_pass_fee'] ?? 0) ? 'checked' : '' }}>
-                                                    <label class="custom-control-label" for="mp_pass_fee">Repassar custo
-                                                        da taxa ao cliente (Você recebe o valor cheio)</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card">
-                                        <div class="card-header bg-light">Métodos de Pagamento</div>
-                                        <div class="card-body">
-                                            <div class="form-group">
-                                                <div
-                                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments_mercadopago_enable_credit"
-                                                        value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="mp_credit"
-                                                        name="payments_mercadopago_enable_credit" value="1" {{ ($settings['payments_mercadopago_enable_credit'] ?? 1) ? 'checked' : '' }}>
-                                                    <label class="custom-control-label" for="mp_credit"><i
-                                                            class="fas fa-credit-card mr-2"></i>Cartão de
-                                                        Crédito</label>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div
-                                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments_mercadopago_enable_debit"
-                                                        value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="mp_debit"
-                                                        name="payments_mercadopago_enable_debit" value="1" {{ ($settings['payments_mercadopago_enable_debit'] ?? 0) ? 'checked' : '' }}>
-                                                    <label class="custom-control-label" for="mp_debit"><i
-                                                            class="far fa-credit-card mr-2"></i>Cartão de Débito</label>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div
-                                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments_mercadopago_enable_pix"
-                                                        value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="mp_pix"
-                                                        name="payments_mercadopago_enable_pix" value="1" {{ ($settings['payments_mercadopago_enable_pix'] ?? 1) ? 'checked' : '' }}>
-                                                    <label class="custom-control-label" for="mp_pix"><i
-                                                            class="fab fa-pix mr-2"></i>PIX (Aprovação Imediata)</label>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div
-                                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments_mercadopago_enable_boleto"
-                                                        value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="mp_boleto"
-                                                        name="payments_mercadopago_enable_boleto" value="1" {{ ($settings['payments_mercadopago_enable_boleto'] ?? 1) ? 'checked' : '' }}>
-                                                    <label class="custom-control-label" for="mp_boleto"><i
-                                                            class="fas fa-barcode mr-2"></i>Boleto Bancário</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- PAGSEGURO --}}
-                        <div class="tab-pane fade" id="pills-ps" role="tabpanel">
-                            <h5 class="text-primary"><i class="fas fa-money-bill-wave mr-2"></i>Configurações PagSeguro
-                            </h5>
-
-                            <div class="form-group mt-3">
-                                <label>Ambiente</label>
-                                <div class="btn-group btn-group-toggle d-block" data-toggle="buttons">
-                                    <label
-                                        class="btn btn-outline-success {{ ($settings['payments_pagseguro_env'] ?? 'sandbox') == 'sandbox' ? 'active' : '' }}">
-                                        <input type="radio" name="payments_pagseguro_env" class="gateway-env-toggle"
-                                            data-gateway="pagseguro" value="sandbox" {{ ($settings['payments_pagseguro_env'] ?? 'sandbox') == 'sandbox' ? 'checked' : '' }}> Sandbox (Testes)
-                                    </label>
-                                    <label
-                                        class="btn btn-outline-danger {{ ($settings['payments_pagseguro_env'] ?? '') == 'production' ? 'active' : '' }}">
-                                        <input type="radio" name="payments_pagseguro_env" class="gateway-env-toggle"
-                                            data-gateway="pagseguro" value="production" {{ ($settings['payments_pagseguro_env'] ?? '') == 'production' ? 'checked' : '' }}> Produção
-                                    </label>
-                                </div>
-                            </div>
-
-                            {{-- Sandbox Fields --}}
-                            <div
-                                class="card card-outline card-success env-section env-pagseguro-sandbox {{ ($settings['payments_pagseguro_env'] ?? 'sandbox') == 'sandbox' ? '' : 'd-none' }}">
-                                <div class="card-header">
-                                    <h3 class="card-title">Credenciais de Teste (Sandbox)</h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group"><label>E-mail (Teste)</label><input
-                                            name="payments_pagseguro_sandbox_email" class="form-control"
-                                            value="{{ $settings['payments_pagseguro_sandbox_email'] ?? '' }}"></div>
-                                    <div class="form-group"><label>Token (Teste)</label><input
-                                            name="payments_pagseguro_sandbox_token" class="form-control"
-                                            value="{{ $settings['payments_pagseguro_sandbox_token'] ?? '' }}"></div>
-                                </div>
-                            </div>
-
-                            {{-- Production Fields --}}
-                            <div
-                                class="card card-outline card-danger env-section env-pagseguro-production {{ ($settings['payments_pagseguro_env'] ?? '') == 'production' ? '' : 'd-none' }}">
-                                <div class="card-header">
-                                    <h3 class="card-title">Credenciais de Produção</h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group"><label>E-mail (Produção)</label><input
-                                            name="payments_pagseguro_production_email" class="form-control"
-                                            value="{{ $settings['payments_pagseguro_production_email'] ?? '' }}"></div>
-                                    <div class="form-group"><label>Token (Produção)</label><input
-                                            name="payments_pagseguro_production_token" class="form-control"
-                                            value="{{ $settings['payments_pagseguro_production_token'] ?? '' }}"></div>
-                                </div>
-                            </div>
-
-                            <div class="row mt-4">
-                                <div class="col-md-6">
-                                    <div class="card">
-                                        <div class="card-header bg-light">Taxas e Parcelamento</div>
-                                        <div class="card-body">
-                                            <div class="form-group">
-                                                <label>Máximo de Parcelas (Geral)</label>
-                                                <select name="payments_pagseguro_max_installments" class="form-control">
-                                                    @foreach(range(1, 12) as $i)
-                                                        <option value="{{ $i }}" {{ ($settings['payments_pagseguro_max_installments'] ?? 12) == $i ? 'selected' : '' }}>{{ $i }}x</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Parcelas para Comunidade (Associação)</label>
-                                                <select name="payments_pagseguro_community_installments"
-                                                    class="form-control">
-                                                    @foreach(range(1, 12) as $i)
-                                                        <option value="{{ $i }}" {{ ($settings['payments_pagseguro_community_installments'] ?? 1) == $i ? 'selected' : '' }}>{{ $i }}x</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group"><label>Taxa Gateway (%)</label><input
-                                                            name="payments_pagseguro_fee_percentage"
-                                                            class="form-control mask-money"
-                                                            value="{{ $settings['payments_pagseguro_fee_percentage'] ?? '' }}">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group"><label>Taxa Fixa (R$)</label><input
-                                                            name="payments_pagseguro_fee_fixed"
-                                                            class="form-control mask-money"
-                                                            value="{{ $settings['payments_pagseguro_fee_fixed'] ?? '' }}">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="custom-control custom-switch">
-                                                    <input type="hidden" name="payments_pagseguro_pass_fee" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="ps_pass_fee"
-                                                        name="payments_pagseguro_pass_fee" value="1" {{ ($settings['payments_pagseguro_pass_fee'] ?? 0) ? 'checked' : '' }}>
-                                                    <label class="custom-control-label" for="ps_pass_fee">Repassar custo
-                                                        da taxa ao cliente</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card">
-                                        <div class="card-header bg-light">Métodos de Pagamento</div>
-                                        <div class="card-body">
-                                            <div class="form-group">
-                                                <div
-                                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments_pagseguro_enable_credit"
-                                                        value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="ps_credit"
-                                                        name="payments_pagseguro_enable_credit" value="1" {{ ($settings['payments_pagseguro_enable_credit'] ?? 1) ? 'checked' : '' }}>
-                                                    <label class="custom-control-label" for="ps_credit">Cartão de
-                                                        Crédito</label>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div
-                                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments_pagseguro_enable_debit"
-                                                        value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="ps_debit"
-                                                        name="payments_pagseguro_enable_debit" value="1" {{ ($settings['payments_pagseguro_enable_debit'] ?? 0) ? 'checked' : '' }}>
-                                                    <label class="custom-control-label" for="ps_debit">Cartão de
-                                                        Débito</label>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div
-                                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments_pagseguro_enable_pix" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="ps_pix"
-                                                        name="payments_pagseguro_enable_pix" value="1" {{ ($settings['payments_pagseguro_enable_pix'] ?? 1) ? 'checked' : '' }}>
-                                                    <label class="custom-control-label" for="ps_pix">PIX</label>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div
-                                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                                    <input type="hidden" name="payments_pagseguro_enable_boleto"
-                                                        value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="ps_boleto"
-                                                        name="payments_pagseguro_enable_boleto" value="1" {{ ($settings['payments_pagseguro_enable_boleto'] ?? 1) ? 'checked' : '' }}>
-                                                    <label class="custom-control-label" for="ps_boleto">Boleto
-                                                        Bancário</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- PRELOADER --}}
-                <div class="tab-pane fade" id="tab-preloader" role="tabpanel">
-                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
-                        <input type="hidden" name="preloader_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input" id="preloader_enabled"
-                            name="preloader_enabled" value="1" {{ ($settings['preloader_enabled'] ?? 1) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="preloader_enabled">Preloader habilitado</label>
-                    </div>
-                    <div class="form-group">
-                        <label>Imagem do preloader</label>
-                        <input type="hidden" name="remove_preloader_image" value="0">
-                        <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                            data-existing-url="{{ $getUrl('preloader_image') }}"
-                            data-remove-input="[name='remove_preloader_image']">
-                            <input type="file" name="preloader_image" accept="image/*" class="d-none">
-                            <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                            <div class="upload-help text-muted small"></div>
-                            <div class="upload-meta text-muted small"></div>
-                            <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
-                            <div class="progress upload-progress d-none mt-2">
-                                <div class="progress-bar bg-primary" style="width:0%"></div>
-                            </div>
-                            <button type="button"
-                                class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- SMTP --}}
-                <div class="tab-pane fade" id="tab-smtp" role="tabpanel">
-                    <div class="form-row">
-                        <div class="form-group col-md-6"><label>Host SMTP</label><input name="smtp_host"
-                                class="form-control" value="{{ $settings['smtp_host'] ?? '' }}"></div>
-                        <div class="form-group col-md-2"><label>Porta</label><input name="smtp_port"
-                                class="form-control" value="{{ $settings['smtp_port'] ?? '' }}"></div>
-                        <div class="form-group col-md-4"><label>Criptografia</label><select name="smtp_encryption"
-                                class="form-control">
-                                <option value="tls" {{ ($settings['smtp_encryption'] ?? '') === 'tls' ? 'selected' : '' }}>TLS
-                                </option>
-                                <option value="ssl" {{ ($settings['smtp_encryption'] ?? '') === 'ssl' ? 'selected' : '' }}>SSL
-                                </option>
-                                <option value="" {{ empty($settings['smtp_encryption'] ?? '') ? 'selected' : '' }}>
-                                    Nenhuma
-                                </option>
-                            </select></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6"><label>Usuário</label><input name="smtp_username"
-                                class="form-control" value="{{ $settings['smtp_username'] ?? '' }}"></div>
-                        <div class="form-group col-md-6"><label>Senha</label><input name="smtp_password" type="password"
-                                class="form-control" value="{{ $settings['smtp_password'] ?? '' }}"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6"><label>From nome</label><input name="smtp_from_name"
-                                class="form-control" value="{{ $settings['smtp_from_name'] ?? '' }}"></div>
-                        <div class="form-group col-md-6"><label>From e-mail</label><input name="smtp_from_email"
-                                class="form-control" value="{{ $settings['smtp_from_email'] ?? '' }}"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label>CC (Cópia) <small class="text-muted">- separar múltiplos por vírgula</small></label>
-                            <input name="smtp_cc" class="form-control" value="{{ $settings['smtp_cc'] ?? '' }}" placeholder="email1@exemplo.com, email2@exemplo.com">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label>BCC (Cópia Oculta) <small class="text-muted">- separar múltiplos por vírgula</small></label>
-                            <input name="smtp_bcc" class="form-control" value="{{ $settings['smtp_bcc'] ?? '' }}" placeholder="email1@exemplo.com, email2@exemplo.com">
-                        </div>
-                    </div>
-                    <div class="form-row align-items-end">
-                        <div class="form-group col-md-4">
-                            <label>Enviar teste para</label>
-                            <input name="smtp_test_email" class="form-control" value="">
-                        </div>
-                        <div class="form-group col-md-6 d-flex align-items-end gap-2">
-                            <button type="button" class="btn btn-secondary mr-2" id="btnTestSmtp"><i
-                                    class="fas fa-paper-plane"></i> Enviar teste</button>
-
-                            @if($smtpTemplateId = \App\Models\MailTemplate::where('slug', 'smtp_test')->value('id'))
-                                <a href="{{ route('admin.mailtemplates.edit', $smtpTemplateId) }}"
-                                    class="btn btn-outline-info"><i class="fas fa-edit"></i> Editar Template de Teste</a>
-                            @else
-                                <span class="text-muted text-sm">(Salve uma vez para criar o template)</span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-                {{-- LOGIN SOCIAL --}}
-                <div class="tab-pane fade" id="tab-social" role="tabpanel">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle mr-1"></i> URLs de Callback (Adicione no App):
-                        <br>Google: <code>{{ config('app.url') . '/auth/callback/google' }}</code>
-                        <br>Facebook: <code>{{ config('app.url') . '/auth/callback/facebook' }}</code>
-                        <br>LinkedIn: <code>{{ config('app.url') . '/auth/callback/linkedin' }}</code>
-                    </div>
-
-                    {{-- Google --}}
-                    <div class="card card-outline card-danger">
-                        <div class="card-header">
-                            <h3 class="card-title text-danger"><i class="fab fa-google mr-2"></i>Google</h3>
-                            <div class="card-tools">
-                                <div
-                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                    <input type="hidden" name="social_google_active" value="0">
-                                    <input type="checkbox" class="custom-control-input" id="social_google_active"
-                                        name="social_google_active" value="1" {{ ($settings['social_google_active'] ?? 0) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="social_google_active">Ativo</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="alert alert-light border-danger">
-                                <h5><i class="icon fas fa-info-circle text-danger"></i> Configuração Google</h3>
-                                <ol class="pl-3 mb-0 text-muted small">
-                                    <li>Acesse o <a href="https://console.cloud.google.com/" target="_blank"
-                                            class="text-danger">Google Cloud Console</a>.</li>
-                                    <li>Crie um projeto e vá em <strong>APIs & Services > Credentials</strong>.</li>
-                                    <li>Crie uma credencial <strong>OAuth Client ID</strong> (Web Application).</li>
-                                    <li>Em <strong>Authorized redirect URIs</strong>, adicione: <code
-                                            class="user-select-all bg-white p-1 rounded border">{{ url('/auth/callback/google') }}</code>
-                                    </li>
-                                    <li>Copie o <strong>Client ID</strong> e <strong>Client Secret</strong> abaixo.</li>
-                                </ol>
-                            </div>
-                            <div class="form-group">
-                                <label>Client ID</label>
-                                <input name="social_google_client_id" class="form-control"
-                                    value="{{ $settings['social_google_client_id'] ?? '' }}"
-                                    placeholder="ex: 123456789-abc...apps.googleusercontent.com">
-                            </div>
-                            <div class="form-group">
-                                <label>Client Secret</label>
-                                <input name="social_google_client_secret" class="form-control"
-                                    value="{{ $settings['social_google_client_secret'] ?? '' }}"
-                                    placeholder="ex: GOCSPX-...">
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Facebook --}}
-                    <div class="card card-outline card-primary collapsed-card">
-                        <div class="card-header">
-                            <h3 class="card-title text-primary"><i class="fab fa-facebook mr-2"></i>Facebook</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
-                                        class="fas fa-plus"></i></button>
-                                <div
-                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success d-inline-block ml-2">
-                                    <input type="hidden" name="social_facebook_active" value="0">
-                                    <input type="checkbox" class="custom-control-input" id="social_facebook_active"
-                                        name="social_facebook_active" value="1" {{ ($settings['social_facebook_active'] ?? 0) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="social_facebook_active"></label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body" style="display: none;">
-                            <div class="alert alert-light border-primary">
-                                <h5><i class="icon fas fa-info-circle text-primary"></i> Configuração Facebook</h3>
-                                <ol class="pl-3 mb-0 text-muted small">
-                                    <li>Acesse o <a href="https://developers.facebook.com/" target="_blank"
-                                            class="text-primary">Facebook for Developers</a>.</li>
-                                    <li>Crie um App (Tipo: Consumidor ou Nenhum) e vá em <strong>Configurações >
-                                            Básico</strong>.</li>
-                                    <li>Adicione o produto <strong>Login do Facebook</strong>.</li>
-                                    <li>Nas configurações do Login, em <strong>Valid OAuth Redirect URIs</strong>,
-                                        adicione: <code
-                                            class="user-select-all bg-white p-1 rounded border">{{ url('/auth/callback/facebook') }}</code>
-                                    </li>
-                                </ol>
-                            </div>
-                            <div class="form-group">
-                                <label>App ID</label>
-                                <input name="social_facebook_client_id" class="form-control"
-                                    value="{{ $settings['social_facebook_client_id'] ?? '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label>App Secret</label>
-                                <input name="social_facebook_client_secret" class="form-control"
-                                    value="{{ $settings['social_facebook_client_secret'] ?? '' }}">
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- LinkedIn --}}
-                    <div class="card card-outline card-info collapsed-card">
-                        <div class="card-header">
-                            <h3 class="card-title text-info"><i class="fab fa-linkedin mr-2"></i>LinkedIn</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
-                                        class="fas fa-plus"></i></button>
-                                <div
-                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success d-inline-block ml-2">
-                                    <input type="hidden" name="social_linkedin_active" value="0">
-                                    <input type="checkbox" class="custom-control-input" id="social_linkedin_active"
-                                        name="social_linkedin_active" value="1" {{ ($settings['social_linkedin_active'] ?? 0) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="social_linkedin_active"></label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body" style="display: none;">
-                            <div class="alert alert-light border-info">
-                                <h5><i class="icon fas fa-info-circle text-info"></i> Configuração LinkedIn</h3>
-                                <ol class="pl-3 mb-0 text-muted small">
-                                    <li>Acesse o <a href="https://www.linkedin.com/developers/" target="_blank"
-                                            class="text-info">LinkedIn Developers</a>.</li>
-                                    <li>Crie um App e vá em <strong>Auth</strong>.</li>
-                                    <li>Em <strong>Authorized redirect URLs for your app</strong>, adicione: <code
-                                            class="user-select-all bg-white p-1 rounded border">{{ url('/auth/callback/linkedin') }}</code>
-                                    </li>
-                                    <li>Certifique-se de ter o produto <strong>Sign In with LinkedIn</strong>
-                                        habilitado.</li>
-                                </ol>
-                            </div>
-                            <div class="form-group">
-                                <label>Client ID</label>
-                                <input name="social_linkedin_client_id" class="form-control"
-                                    value="{{ $settings['social_linkedin_client_id'] ?? '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label>Client Secret</label>
-                                <input name="social_linkedin_client_secret" class="form-control"
-                                    value="{{ $settings['social_linkedin_client_secret'] ?? '' }}">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- SEO & Analytics --}}
-                <div class="tab-pane fade" id="tab-seo" role="tabpanel">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        Configure aqui os padrões de SEO do site, imagens para redes sociais e códigos de rastreamento.
-                        <div class="mt-2 text-sm">
-                            <strong>Recomendado:</strong> OpenGraph (Facebook/WhatsApp/LinkedIn) <code>1200×630</code> ·
-                            Twitter <code>1200×628</code>.
-                        </div>
-                    </div>
-
-                    <div class="card card-outline card-primary mb-3">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-map-signs mr-1"></i> Guia rápido de configuração
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6 class="font-weight-bold">Google Analytics 4 (GA4)</h6>
-                                    <ol class="pl-3 text-muted small">
-                                        <li>Acesse <a href="https://analytics.google.com/" target="_blank"
-                                                rel="noopener">analytics.google.com</a> e crie uma propriedade GA4.</li>
-                                        <li>Abra <strong>Administrador &gt; Fluxos de dados &gt; Web</strong>.</li>
-                                        <li>Copie a tag/trecho e cole em <strong>Código no &lt;head&gt;</strong>.</li>
-                                    </ol>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6 class="font-weight-bold">Google Tag Manager (GTM)</h6>
-                                    <ol class="pl-3 text-muted small">
-                                        <li>Acesse <a href="https://tagmanager.google.com/" target="_blank"
-                                                rel="noopener">tagmanager.google.com</a> e crie o container Web.</li>
-                                        <li>Cole o script principal em <strong>Código no &lt;head&gt;</strong>.</li>
-                                        <li>Cole o trecho <code>&lt;noscript&gt;</code> em <strong>Código no
-                                                &lt;body&gt;</strong>.</li>
-                                    </ol>
-                                </div>
-                            </div>
-                            <div class="row mt-2">
-                                <div class="col-md-6">
-                                    <h6 class="font-weight-bold">Meta Pixel</h6>
-                                    <ol class="pl-3 text-muted small">
-                                        <li>No Meta Business, abra <strong>Gerenciador de Eventos</strong>.</li>
-                                        <li>Crie ou selecione o Pixel.</li>
-                                        <li>Copie o código base e cole em <strong>Código no &lt;head&gt;</strong>.</li>
-                                    </ol>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6 class="font-weight-bold">Google Search Console</h6>
-                                    <ol class="pl-3 text-muted small">
-                                        <li>Acesse <a href="https://search.google.com/search-console" target="_blank"
-                                                rel="noopener">search.google.com/search-console</a>.</li>
-                                        <li>Adicione a propriedade do domínio.</li>
-                                        <li>Escolha validação por meta tag e cole somente o valor em <strong>Google site
-                                                verification</strong>.</li>
-                                    </ol>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    @if(($analytics['enabled'] ?? false))
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-primary"><i class="fas fa-eye"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Visitas hoje</span>
-                                        <span class="info-box-number">{{ $analytics['today'] ?? 0 }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-info"><i class="fas fa-calendar-week"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Últimos 7 dias</span>
-                                        <span class="info-box-number">{{ $analytics['last7'] ?? 0 }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-success"><i class="fas fa-calendar-alt"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Últimos 30 dias</span>
-                                        <span class="info-box-number">{{ $analytics['last30'] ?? 0 }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="card card-outline card-primary">
-                                    <div class="card-header">
-                                        <h3 class="card-title">Top páginas (30 dias)</h3>
-                                    </div>
-                                    <div class="card-body p-0">
-                                        <table class="table table-sm mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Página</th>
-                                                    <th class="text-right">Visitas</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse(($analytics['top_pages'] ?? collect()) as $row)
-                                                    <tr>
-                                                        <td><code>{{ $row->path }}</code></td>
-                                                        <td class="text-right">{{ $row->total }}</td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="2" class="text-muted text-center py-3">Sem dados ainda.
-                                                        </td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card card-outline card-success">
-                                    <div class="card-header">
-                                        <h3 class="card-title">Top países (30 dias)</h3>
-                                    </div>
-                                    <div class="card-body p-0">
-                                        <table class="table table-sm mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>País</th>
-                                                    <th class="text-right">Visitas</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse(($analytics['top_countries'] ?? collect()) as $row)
-                                                    <tr>
-                                                        <td>{{ $row->country }}</td>
-                                                        <td class="text-right">{{ $row->total }}</td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="2" class="text-muted text-center py-3">Sem dados ainda.
-                                                        </td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <div class="alert alert-light border">
-                            <i class="fas fa-chart-bar mr-1"></i>
-                            O contador de visitas aparece aqui após rodar as migrations (tabela <code>visitor_logs</code>).
-                            Para localização precisa, configure <code>IPINFO_TOKEN</code> no <code>.env</code>.
-                        </div>
-                    @endif
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Meta Title (padrão)</label>
-                                <input name="seo_meta_title" class="form-control"
-                                    value="{{ $settings['seo_meta_title'] ?? '' }}"
-                                    placeholder="Ex: UNN — Universidade de Negócios e Networking">
-                                <small class="text-muted">Usado quando a página não define um título próprio.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Meta Description (padrão)</label>
-                                <textarea name="seo_meta_description" class="form-control" rows="2"
-                                    placeholder="Resumo do site (até ~160 caracteres)">{{ $settings['seo_meta_description'] ?? '' }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Meta Keywords (opcional)</label>
-                                <input name="seo_meta_keywords" class="form-control"
-                                    value="{{ $settings['seo_meta_keywords'] ?? '' }}"
-                                    placeholder="negócios, networking, empreendedorismo">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Twitter @ (opcional)</label>
-                                <input name="seo_twitter_site" class="form-control"
-                                    value="{{ $settings['seo_twitter_site'] ?? '' }}" placeholder="@somosunn">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Robots (padrão)</label>
-                                <select name="seo_robots" class="form-control">
-                                    @php($robots = $settings['seo_robots'] ?? 'index,follow')
-                                    <option value="index,follow" {{ $robots === 'index,follow' ? 'selected' : '' }}>
-                                        Indexar (index,follow)</option>
-                                    <option value="noindex,nofollow" {{ $robots === 'noindex,nofollow' ? 'selected' : '' }}>Não indexar (noindex,nofollow)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="form-group">
-                                <label>Google site verification (opcional)</label>
-                                <input name="seo_google_verification" class="form-control"
-                                    value="{{ $settings['seo_google_verification'] ?? '' }}"
-                                    placeholder="Conteúdo da meta verification">
-                            </div>
-                        </div>
+                        <small class="text-muted">Se preenchido, o JSON será mesclado às opções acima (o JSON tem prioridade).</small>
                     </div>
 
                     <hr>
 
-                    <h5 class="mb-3"><i class="fas fa-share-alt mr-1"></i> Imagens sociais</h5>
+                    <h5 class="text-primary mb-3"><i class="fas fa-water mr-2"></i>Marca d'água (Cursos)</h5>
+
                     <div class="row">
-                        <div class="form-group col-md-6">
-                            <label>OpenGraph image (1200×630)</label>
-                            <input type="hidden" name="remove_seo_og_image" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $seoOg }}" data-remove-input="[name='remove_seo_og_image']">
-                                <input type="file" name="seo_og_image" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small"></div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
+                        <div class="col-md-6">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                                <input type="hidden" name="video_watermark_enabled" value="0">
+                                <input type="checkbox" class="custom-control-input" id="video_watermark_enabled"
+                                    name="video_watermark_enabled" value="1" {{ ($settings['video_watermark_enabled'] ?? 0) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="video_watermark_enabled">Exibir marca d'água no player</label>
+                            </div>
+
+                            @if($watermarkUrl)
+                                <div class="mb-2">
+                                    <img src="{{ $watermarkUrl }}" alt="Marca d'água"
+                                        style="max-height: 72px; max-width: 240px;">
                                 </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                            @else
+                                <p class="text-muted mb-2">Nenhuma imagem configurada. Envie em <strong>Geral</strong> → “Marca d'água (vídeos de cursos)”.</p>
+                            @endif
+                        </div>
+                        <div class="col-md-6">
+                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-2">
+                                <input type="hidden" name="video_watermark_text_enabled" value="0">
+                                <input type="checkbox" class="custom-control-input" id="video_watermark_text_enabled"
+                                    name="video_watermark_text_enabled" value="1" {{ ($settings['video_watermark_text_enabled'] ?? 0) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="video_watermark_text_enabled">Exibir texto dinâmico (anti-pirataria)</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Template do texto</label>
+                                <input name="video_watermark_text_template" class="form-control"
+                                    value="{{ $settings['video_watermark_text_template'] ?? '{name} • {email} • #{id}' }}">
+                                <small class="text-muted">Placeholders: <code>{name}</code>, <code>{email}</code>, <code>{id}</code>.</small>
                             </div>
                         </div>
-                        <div class="form-group col-md-6">
-                            <label>Twitter image (1200×628)</label>
-                            <input type="hidden" name="remove_seo_twitter_image" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $seoTwitter }}"
-                                data-remove-input="[name='remove_seo_twitter_image']">
-                                <input type="file" name="seo_twitter_image" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small"></div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Opacidade (0 a 1)</label>
+                                        <input name="video_watermark_opacity" class="form-control"
+                                            value="{{ $settings['video_watermark_opacity'] ?? '0.15' }}"
+                                            placeholder="Ex: 0.15">
+                                    </div>
                                 </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Tamanho (% da largura)</label>
+                                        <input name="video_watermark_size_percent" class="form-control"
+                                            value="{{ $settings['video_watermark_size_percent'] ?? '18' }}"
+                                            placeholder="Ex: 18">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Posição</label>
+                                        <select name="video_watermark_position" class="form-control">
+                                            <option value="top-left" @selected($wmPos === 'top-left')>Topo esquerdo</option>
+                                            <option value="top-right" @selected($wmPos === 'top-right')>Topo direito</option>
+                                            <option value="bottom-left" @selected($wmPos === 'bottom-left')>Inferior esquerdo</option>
+                                            <option value="bottom-right" @selected($wmPos === 'bottom-right')>Inferior direito</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <small class="text-muted d-block">Dica: use imagens leves (JPG/WEBP) e com textos centralizados para
-                        não cortar nas redes.</small>
 
                     <hr>
 
