@@ -908,12 +908,11 @@
                 </div>
 
                 {{-- VÍDEO PLAYER (PLYR) --}}
-                <div class="tab-pane fade" id="tab-video" role="tabpanel">
+                <div class="tab-pane fade show active" id="tab-video" role="tabpanel">
                     <h5 class="text-primary mb-3"><i class="fas fa-play-circle mr-2"></i>Player de Vídeo (Plyr)</h5>
 
                     <div class="alert alert-info">
-                        Configure o player de vídeo usado nas aulas/cursos. As opções avançadas aceitam o JSON de
-                        configuração do Plyr (qualquer opção suportada pela biblioteca).
+                        Configure o player de vídeo usado nas aulas/cursos. As opções avançadas aceitam o JSON de configuração do Plyr (qualquer opção suportada pela biblioteca).
                     </div>
 
                     <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
@@ -923,281 +922,58 @@
                         <label class="custom-control-label" for="video_player_enabled">Ativar Plyr no site</label>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Cor principal do player</label>
-                                <div class="input-group colorpicker-element">
-                                    <input name="video_plyr_color" class="form-control"
-                                        value="{{ $settings['video_plyr_color'] ?? ($settings['site_color_primary'] ?? '#1F5EDB') }}">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fas fa-square"
-                                                style="color: {{ $settings['video_plyr_color'] ?? ($settings['site_color_primary'] ?? '#1F5EDB') }}"></i></span>
-                                    </div>
-                                </div>
-                                <small class="text-muted">Define a cor dos botões/controles (CSS:
-                                    <code>--plyr-color-main</code>).</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Seek (segundos)</label>
-                                <input name="video_plyr_seek_time" class="form-control"
-                                    value="{{ $settings['video_plyr_seek_time'] ?? '10' }}" placeholder="Ex: 10">
-                                <small class="text-muted">Tempo de avanço/retrocesso nos atalhos.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Volume inicial (0 a 1)</label>
-                                <input name="video_plyr_volume" class="form-control"
-                                    value="{{ $settings['video_plyr_volume'] ?? '0.8' }}" placeholder="Ex: 0.8">
-                                <small class="text-muted">Opcional. Use 0.0 a 1.0.</small>
-                            </div>
+                    <div class="form-group">
+                        <label>Controles do player</label>
+                        <div class="mb-2" id="plyr-controls-list">
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="play" checked> Play</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="progress" checked> Barra de progresso</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="current-time" checked> Tempo atual</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="mute" checked> Mudo</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="volume" checked> Volume</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="settings" checked> Configurações</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="fullscreen" checked> Tela cheia</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="rewind" checked> Retroceder</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="fast-forward" checked> Avançar</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="captions"> Legendas</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="quality"> Qualidade</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="speed"> Velocidade</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-control-check" data-key="loop"> Loop</label>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
-                                <input type="hidden" name="video_plyr_autoplay" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_autoplay"
-                                    name="video_plyr_autoplay" value="1" {{ ($settings['video_plyr_autoplay'] ?? 0) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_autoplay">Autoplay</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
-                                <input type="hidden" name="video_plyr_muted" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_muted"
-                                    name="video_plyr_muted" value="1" {{ ($settings['video_plyr_muted'] ?? 0) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_muted">Iniciar mudo</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
-                                <input type="hidden" name="video_plyr_click_to_play" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_click_to_play"
-                                    name="video_plyr_click_to_play" value="1" {{ ($settings['video_plyr_click_to_play'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_click_to_play">Clique para
-                                    reproduzir</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
-                                <input type="hidden" name="video_plyr_disable_context_menu" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_disable_context_menu"
-                                    name="video_plyr_disable_context_menu" value="1" {{ ($settings['video_plyr_disable_context_menu'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_disable_context_menu">Bloquear menu
-                                    do botão direito</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-3">
-                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                <input type="hidden" name="video_plyr_rewind_enabled" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_rewind_enabled"
-                                    name="video_plyr_rewind_enabled" value="1" {{ ($settings['video_plyr_rewind_enabled'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_rewind_enabled">Botão
-                                    Retroceder</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                <input type="hidden" name="video_plyr_fast_forward_enabled" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_fast_forward_enabled"
-                                    name="video_plyr_fast_forward_enabled" value="1" {{ ($settings['video_plyr_fast_forward_enabled'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_fast_forward_enabled">Botão
-                                    Avançar</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                <input type="hidden" name="video_plyr_volume_enabled" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_volume_enabled"
-                                    name="video_plyr_volume_enabled" value="1" {{ ($settings['video_plyr_volume_enabled'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_volume_enabled">Controle de
-                                    Volume</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Controles (separados por vírgula)</label>
-                                <input name="video_plyr_controls" class="form-control"
-                                    value="{{ $settings['video_plyr_controls'] ?? 'play,progress,current-time,mute,volume,settings,fullscreen' }}">
-                                <small class="text-muted">Ex:
-                                    <code>play,progress,current-time,mute,volume,settings,fullscreen</code></small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Menu “Configurações” (separado por vírgula)</label>
-                                <input name="video_plyr_settings" class="form-control"
-                                    value="{{ $settings['video_plyr_settings'] ?? 'captions,quality,speed,loop' }}">
-                                <small class="text-muted">Ex: <code>captions,quality,speed,loop</code></small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Velocidades disponíveis (separadas por vírgula)</label>
-                                <input name="video_plyr_speed_options" class="form-control"
-                                    value="{{ $settings['video_plyr_speed_options'] ?? '0.5,0.75,1,1.25,1.5,2' }}">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Velocidade padrão</label>
-                                <input name="video_plyr_speed_selected" class="form-control"
-                                    value="{{ $settings['video_plyr_speed_selected'] ?? '1' }}">
-                            </div>
+                    <div class="form-group">
+                        <label>Tooltips</label>
+                        <div class="mb-2">
+                            <label class="mr-3"><input type="checkbox" class="plyr-tooltip-check" data-key="controls" checked> Tooltips dos controles</label>
+                            <label class="mr-3"><input type="checkbox" class="plyr-tooltip-check" data-key="seek" checked> Tooltips do seek</label>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Opções avançadas (JSON)</label>
-                        <textarea name="video_plyr_options_json" class="form-control" rows="6"
+                        <textarea name="video_plyr_options_json" class="form-control" rows="6" id="plyr-options-json"
                             placeholder='{"controls":["play","progress","current-time","mute","volume","settings","fullscreen"],"tooltips":{"controls":true,"seek":true}}'>{{ $settings['video_plyr_options_json'] ?? '' }}</textarea>
-                        <small class="text-muted">Se preenchido, o JSON será mesclado às opções acima (o JSON tem
-                            prioridade).</small>
+                        <small class="text-muted">O JSON é montado automaticamente conforme as opções acima.</small>
                     </div>
 
-                    <hr>
-
-                    <h5 class="text-primary mb-3"><i class="fas fa-water mr-2"></i>Marca d'água (Cursos)</h5>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
-                                <input type="hidden" name="video_watermark_enabled" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_watermark_enabled"
-                                    name="video_watermark_enabled" value="1" {{ ($settings['video_watermark_enabled'] ?? 0) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_watermark_enabled">Exibir marca d'água no
-                                    player</label>
-                            </div>
-
-                            @if($watermarkUrl)
-                                <div class="mb-2">
-                                    <img src="{{ $watermarkUrl }}" alt="Marca d'água"
-                                        style="max-height: 72px; max-width: 240px;">
-                                </div>
-                            @else
-                                <p class="text-muted mb-2">Nenhuma imagem configurada. Envie em <strong>Geral</strong> →
-                                    “Marca d'água (vídeos de cursos)”.</p>
-                            @endif
-
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-2">
-                                <input type="hidden" name="video_watermark_text_enabled" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_watermark_text_enabled"
-                                    name="video_watermark_text_enabled" value="1" {{ ($settings['video_watermark_text_enabled'] ?? 0) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_watermark_text_enabled">Exibir texto
-                                    dinâmico (anti-pirataria)</label>
-                            </div>
-                            <div class="form-group">
-                                <label>Template do texto</label>
-                                <input name="video_watermark_text_template" class="form-control"
-                                    value="{{ $settings['video_watermark_text_template'] ?? '{name} • {email} • #{id}' }}">
-                                <small class="text-muted">Placeholders: <code>{name}</code>, <code>{email}</code>,
-                                    <code>{id}</code>.</small>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Opacidade (0 a 1)</label>
-                                        <input name="video_watermark_opacity" class="form-control"
-                                            value="{{ $settings['video_watermark_opacity'] ?? '0.15' }}"
-                                            placeholder="Ex: 0.15">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Tamanho (% da largura)</label>
-                                        <input name="video_watermark_size_percent" class="form-control"
-                                            value="{{ $settings['video_watermark_size_percent'] ?? '18' }}"
-                                            placeholder="Ex: 18">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Posição</label>
-                                        <select name="video_watermark_position" class="form-control">
-                                            <option value="top-left" @selected($wmPos === 'top-left')>Topo esquerdo
-                                            </option>
-                                            <option value="top-right" @selected($wmPos === 'top-right')>Topo direito
-                                            </option>
-                                            <option value="bottom-left" @selected($wmPos === 'bottom-left')>Inferior
-                                                esquerdo</option>
-                                            <option value="bottom-right" @selected($wmPos === 'bottom-right')>Inferior
-                                                direito</option>
-                                            <option value="center" @selected($wmPos === 'center')>Centro</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Margem (px)</label>
-                                        <input name="video_watermark_margin" class="form-control"
-                                            value="{{ $settings['video_watermark_margin'] ?? '16' }}"
-                                            placeholder="Ex: 16">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Rotação (graus)</label>
-                                        <input name="video_watermark_rotate" class="form-control"
-                                            value="{{ $settings['video_watermark_rotate'] ?? '0' }}"
-                                            placeholder="Ex: 0">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Blend mode</label>
-                                        <select name="video_watermark_blend" class="form-control">
-                                            <option value="normal" @selected(($settings['video_watermark_blend'] ?? 'normal') === 'normal')>Normal</option>
-                                            <option value="multiply" @selected(($settings['video_watermark_blend'] ?? 'normal') === 'multiply')>Multiply</option>
-                                            <option value="screen" @selected(($settings['video_watermark_blend'] ?? 'normal') === 'screen')>Screen</option>
-                                            <option value="overlay" @selected(($settings['video_watermark_blend'] ?? 'normal') === 'overlay')>Overlay</option>
-                                            <option value="lighten" @selected(($settings['video_watermark_blend'] ?? 'normal') === 'lighten')>Lighten</option>
-                                            <option value="darken" @selected(($settings['video_watermark_blend'] ?? 'normal') === 'darken')>Darken</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-2">
-                                <input type="hidden" name="video_watermark_animate" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_watermark_animate"
-                                    name="video_watermark_animate" value="1" {{ ($settings['video_watermark_animate'] ?? 0) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_watermark_animate">Animar (drift
-                                    leve)</label>
-                            </div>
-                            <small class="text-muted">Obs: marca d'água não impede gravação de tela, mas ajuda a
-                                desencorajar reuploads.</small>
-                        </div>
-                    </div>
+                    <script>
+                        function updatePlyrOptionsJson() {
+                            const controls = [];
+                            document.querySelectorAll('.plyr-control-check').forEach(chk => {
+                                if (chk.checked) controls.push(chk.dataset.key);
+                            });
+                            const tooltips = {};
+                            document.querySelectorAll('.plyr-tooltip-check').forEach(chk => {
+                                tooltips[chk.dataset.key] = chk.checked;
+                            });
+                            const json = JSON.stringify({ controls, tooltips }, null, 2);
+                            document.getElementById('plyr-options-json').value = json;
+                        }
+                        document.querySelectorAll('.plyr-control-check, .plyr-tooltip-check').forEach(chk => {
+                            chk.addEventListener('change', updatePlyrOptionsJson);
+                        });
+                        updatePlyrOptionsJson();
+                    </script>
                 </div>
 
                 {{-- PWA --}}
