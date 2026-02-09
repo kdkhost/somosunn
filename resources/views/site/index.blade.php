@@ -134,35 +134,39 @@
                 <div class="grid md:grid-cols-3 gap-8">
                     @foreach($freeEvents as $event)
                         <article
-                            class="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition {{ ($event->is_demo ?? false) ? 'ring-2 ring-yellow-400' : '' }}">
-                            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4"
-                                style="background: var(--unn-azul-1); color: white">
-                                GRATUITA
-                            </span>
-                            <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $event->title }}</h3>
-                            <p class="text-gray-600 text-sm mb-4">{{ Str::limit($event->description, 100) }}</p>
-                            <div class="flex items-center gap-4 text-sm text-gray-500 mb-6">
-                                <span><i class="fas fa-calendar mr-1"></i>
-                                    {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y H:i') }}</span>
+                            class="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition flex flex-col justify-between {{ ($event->is_demo ?? false) ? 'ring-2 ring-yellow-400' : '' }}" style="height: 100%">
+                            <div>
+                                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4"
+                                    style="background: var(--unn-azul-1); color: white">
+                                    GRATUITA
+                                </span>
+                                <h3 class="text-xl font-bold unn-title-gradient mb-3">{{ $event->title }}</h3>
+                                <p class="text-gray-600 text-sm mb-4">{{ Str::limit($event->description, 100) }}</p>
+                                <div class="flex items-center gap-4 text-sm text-gray-500 mb-6">
+                                    <span><i class="fas fa-calendar mr-1"></i>
+                                        {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y H:i') }}</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+                                    <i class="fas fa-map-marker-alt"></i> {{ $event->location }}
+                                </div>
                             </div>
-                            <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                                <i class="fas fa-map-marker-alt"></i> {{ $event->location }}
-                            </div>
-                            @if($event->is_demo ?? false)
-                                <button onclick="Swal.fire({
-                                    title: 'Evento Demo',
-                                    text: 'Este é um evento de demonstração.',
-                                    icon: 'info',
-                                    confirmButtonColor: '#1F5EDB'
-                                })" class="w-full btn-primary text-white py-3 rounded-xl font-semibold opacity-75">
+                            <div class="mt-auto">
+                                @if($event->is_demo ?? false)
+                                    <button onclick="Swal.fire({
+                                        title: 'Evento Demo',
+                                        text: 'Este é um evento de demonstração.',
+                                        icon: 'info',
+                                        confirmButtonColor: '#1F5EDB'
+                                    })" class="w-full btn-primary text-white py-3 rounded-xl font-semibold opacity-75">
                                     Quero participar
                                 </button>
-                            @else
-                                <a href="{{ route('events.show', $event->id) }}"
-                                    class="block w-full btn-primary text-white py-3 rounded-xl font-semibold text-center">
+                                @else
+                                    <a href="{{ route('events.show', $event->id) }}"
+                                        class="block w-full btn-primary text-white py-3 rounded-xl font-semibold text-center">
                                     Quero participar
                                 </a>
-                            @endif
+                                @endif
+                            </div>
                         </article>
                     @endforeach
                 </div>
