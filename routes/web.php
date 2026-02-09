@@ -127,20 +127,35 @@ Route::post('/contato', [ContactController::class, 'send'])->middleware('throttl
 // Members
 Route::get('/membros', [\App\Http\Controllers\MemberController::class, 'index'])->name('membros');
 
-// Events
-Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('subscription.checkout');
-Route::post('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'process'])->name('subscription.process');
-Route::get('/assinar/sucesso/{order}', [\App\Http\Controllers\SubscriptionController::class, 'success'])->name('subscription.success');
-
-// Public Events (Site)
-Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
-Route::get('/eventos/{event}/checkout', [\App\Http\Controllers\EventReservationController::class, 'checkout'])->name('events.checkout');
-Route::post('/eventos/{event}/reservar', [\App\Http\Controllers\EventReservationController::class, 'reserve'])->name('events.reserve');
-Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
-
-Route::get('/eventos/pagamento/sucesso/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentSuccess'])->name('events.payment.success');
-Route::get('/eventos/pagamento/pendente/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentPending'])->name('events.payment.pending');
-Route::get('/eventos/pagamento/falha/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentFailure'])->name('events.payment.failure');
+// Events (granular)
+Route::middleware(['check.feature:events_access'])->group(function () {
+    Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
+    Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
+});
+Route::middleware(['auth', 'check.feature:events_create'])->group(function () {
+    Route::get('/eventos/create', [\App\Http\Controllers\EventController::class, 'create'])->name('events.create');
+    Route::post('/eventos', [\App\Http\Controllers\EventController::class, 'store'])->name('events.store');
+});
+Route::middleware(['auth', 'check.feature:events_edit'])->group(function () {
+    Route::get('/eventos/{event}/edit', [\App\Http\Controllers\EventController::class, 'edit'])->name('events.edit');
+    Route::put('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'update'])->name('events.update');
+});
+Route::middleware(['auth', 'check.feature:events_delete'])->group(function () {
+    Route::delete('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'destroy'])->name('events.destroy');
+});
+Route::middleware(['auth', 'check.feature:events_reserve'])->group(function () {
+    Route::get('/eventos/{event}/checkout', [\App\Http\Controllers\EventReservationController::class, 'checkout'])->name('events.checkout');
+    Route::post('/eventos/{event}/reservar', [\App\Http\Controllers\EventReservationController::class, 'reserve'])->name('events.reserve');
+});
+Route::get('/eventos/pagamento/sucesso/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentSuccess'])
+    ->middleware(['auth', 'check.feature:events_access'])
+    ->name('events.payment.success');
+Route::get('/eventos/pagamento/pendente/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentPending'])
+    ->middleware(['auth', 'check.feature:events_access'])
+    ->name('events.payment.pending');
+Route::get('/eventos/pagamento/falha/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentFailure'])
+    ->middleware(['auth', 'check.feature:events_access'])
+    ->name('events.payment.failure');
 
 // PWA static files to avoid 404 in production
 Route::get('/service-worker.js', function () {
@@ -206,36 +221,88 @@ Route::get('/offline', fn() => view('offline'))->name('offline');
 
 
 
-// Public & Creator Course Routes
-// Public & Creator Course Routes
-Route::resource('courses', \App\Http\Controllers\CourseController::class);
-
-// Feature: Mentorships
-Route::middleware(['check.feature:mentorships'])->group(function () {
-    Route::resource('mentorships', \App\Http\Controllers\MentorshipController::class)->only(['index', 'show']);
+// Public & Creator Course Routes (granular)
+Route::middleware(['check.feature:courses_access'])->group(function () {
+    Route::get('courses', [\App\Http\Controllers\CourseController::class, 'index'])->name('courses.index');
+    Route::get('courses/{course}', [\App\Http\Controllers\CourseController::class, 'show'])->name('courses.show');
 });
+Route::middleware(['auth', 'check.feature:courses_create'])->group(function () {
+    Route::get('courses/create', [\App\Http\Controllers\CourseController::class, 'create'])->name('courses.create');
+    Route::post('courses', [\App\Http\Controllers\CourseController::class, 'store'])->name('courses.store');
+});
+Route::middleware(['auth', 'check.feature:courses_edit'])->group(function () {
+    Route::get('courses/{course}/edit', [\App\Http\Controllers\CourseController::class, 'edit'])->name('courses.edit');
+    Route::put('courses/{course}', [\App\Http\Controllers\CourseController::class, 'update'])->name('courses.update');
+});
+Route::middleware(['auth', 'check.feature:courses_delete'])->group(function () {
+    Route::delete('courses/{course}', [\App\Http\Controllers\CourseController::class, 'destroy'])->name('courses.destroy');
+});
+
+// Feature: Mentorships (granular)
+Route::middleware(['check.feature:mentorships_access'])->group(function () {
+    Route::get('mentorships', [\App\Http\Controllers\MentorshipController::class, 'index'])->name('mentorships.index');
+    Route::get('mentorships/{mentorship}', [\App\Http\Controllers\MentorshipController::class, 'show'])->name('mentorships.show');
+});
+Route::middleware(['auth', 'check.feature:mentorships_create'])->group(function () {
+    Route::get('mentorships/create', [\App\Http\Controllers\MentorshipController::class, 'create'])->name('mentorships.create');
+    Route::post('mentorships', [\App\Http\Controllers\MentorshipController::class, 'store'])->name('mentorships.store');
+});
+Route::middleware(['auth', 'check.feature:mentorships_edit'])->group(function () {
+    Route::get('mentorships/{mentorship}/edit', [\App\Http\Controllers\MentorshipController::class, 'edit'])->name('mentorships.edit');
+    Route::put('mentorships/{mentorship}', [\App\Http\Controllers\MentorshipController::class, 'update'])->name('mentorships.update');
+});
+Route::middleware(['auth', 'check.feature:mentorships_delete'])->group(function () {
+    Route::delete('mentorships/{mentorship}', [\App\Http\Controllers\MentorshipController::class, 'destroy'])->name('mentorships.destroy');
+});
+
+// Reviews (granular)
 Route::post('courses/{course}/reviews', [\App\Http\Controllers\ItemReviewController::class, 'storeCourse'])
-    ->middleware('auth')
+    ->middleware(['auth', 'check.feature:courses_review'])
     ->name('courses.reviews.store');
 Route::post('mentorships/{mentorship}/reviews', [\App\Http\Controllers\ItemReviewController::class, 'storeMentorship'])
-    ->middleware('auth')
+    ->middleware(['auth', 'check.feature:mentorships_review'])
     ->name('mentorships.reviews.store');
 
-Route::post('courses/{course}/lessons', [\App\Http\Controllers\LessonController::class, 'store'])->name('courses.lessons.store');
-Route::put('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'update'])->name('courses.lessons.update');
-Route::delete('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'destroy'])->name('courses.lessons.destroy');
-Route::get('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'show'])->name('courses.lessons.show');
+// Lessons (granular)
+Route::post('courses/{course}/lessons', [\App\Http\Controllers\LessonController::class, 'store'])
+    ->middleware(['auth', 'check.feature:courses_lessons_create'])
+    ->name('courses.lessons.store');
+Route::put('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'update'])
+    ->middleware(['auth', 'check.feature:courses_lessons_edit'])
+    ->name('courses.lessons.update');
+Route::delete('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'destroy'])
+    ->middleware(['auth', 'check.feature:courses_lessons_delete'])
+    ->name('courses.lessons.destroy');
+Route::get('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'show'])
+    ->middleware(['check.feature:courses_lessons_access'])
+    ->name('courses.lessons.show');
 
-// Attachments
-Route::post('courses/{course}/lessons/{lesson}/attachments', [\App\Http\Controllers\LessonController::class, 'uploadAttachment'])->name('courses.lessons.attachments.upload');
-Route::get('courses/{course}/lessons/{lesson}/attachments/{attachment}/download', [\App\Http\Controllers\LessonController::class, 'downloadAttachment'])->name('courses.lessons.attachments.download');
-Route::delete('courses/{course}/lessons/{lesson}/attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'deleteAttachment'])->name('courses.lessons.attachments.destroy');
-Route::put('courses/{course}/lessons/{lesson}/attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'renameAttachment'])->name('courses.lessons.attachments.rename');
-Route::get('courses/{course}/lessons/{lesson}/details', [\App\Http\Controllers\LessonController::class, 'getDetails'])->name('courses.lessons.details');
+// Attachments (granular)
+Route::post('courses/{course}/lessons/{lesson}/attachments', [\App\Http\Controllers\LessonController::class, 'uploadAttachment'])
+    ->middleware(['auth', 'check.feature:courses_lessons_attachments_upload'])
+    ->name('courses.lessons.attachments.upload');
+Route::get('courses/{course}/lessons/{lesson}/attachments/{attachment}/download', [\App\Http\Controllers\LessonController::class, 'downloadAttachment'])
+    ->middleware(['auth', 'check.feature:courses_lessons_attachments_download'])
+    ->name('courses.lessons.attachments.download');
+Route::delete('courses/{course}/lessons/{lesson}/attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'deleteAttachment'])
+    ->middleware(['auth', 'check.feature:courses_lessons_attachments_delete'])
+    ->name('courses.lessons.attachments.destroy');
+Route::put('courses/{course}/lessons/{lesson}/attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'renameAttachment'])
+    ->middleware(['auth', 'check.feature:courses_lessons_attachments_edit'])
+    ->name('courses.lessons.attachments.rename');
+Route::get('courses/{course}/lessons/{lesson}/details', [\App\Http\Controllers\LessonController::class, 'getDetails'])
+    ->middleware(['auth', 'check.feature:courses_lessons_access'])
+    ->name('courses.lessons.details');
 Route::middleware('auth')->group(function () {
-    Route::post('courses/{course}/lessons/{lesson}/progress', [\App\Http\Controllers\LessonController::class, 'updatePlaybackProgress'])->name('courses.lessons.progress.update');
-    Route::post('courses/{course}/lessons/{lesson}/bookmarks', [\App\Http\Controllers\LessonController::class, 'storeBookmark'])->name('courses.lessons.bookmarks.store');
-    Route::delete('courses/{course}/lessons/{lesson}/bookmarks/{bookmark}', [\App\Http\Controllers\LessonController::class, 'destroyBookmark'])->name('courses.lessons.bookmarks.destroy');
+    Route::post('courses/{course}/lessons/{lesson}/progress', [\App\Http\Controllers\LessonController::class, 'updatePlaybackProgress'])
+        ->middleware('check.feature:courses_lessons_access')
+        ->name('courses.lessons.progress.update');
+    Route::post('courses/{course}/lessons/{lesson}/bookmarks', [\App\Http\Controllers\LessonController::class, 'storeBookmark'])
+        ->middleware('check.feature:courses_lessons_access')
+        ->name('courses.lessons.bookmarks.store');
+    Route::delete('courses/{course}/lessons/{lesson}/bookmarks/{bookmark}', [\App\Http\Controllers\LessonController::class, 'destroyBookmark'])
+        ->middleware('check.feature:courses_lessons_access')
+        ->name('courses.lessons.bookmarks.destroy');
 });
 
 // (events.show/events.index defined above as public routes)
@@ -294,17 +361,17 @@ Route::get('/checkout/pending/{order}', fn() => view('checkout.pending'))->name(
 
 Route::post('/webhook/mercadopago/{seller_id}', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])->name('webhook.mercadopago');
 
-// Admin routes (simple scaffold)
+// Admin routes (granular)
 Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class, 'check.plan'])->group(function () {
     // Rotas de Membro (Comum a todos no painel)
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/portal', [\App\Http\Controllers\Admin\MemberController::class, 'portal'])->name('portal.index');
-    Route::get('/comunidade', [\App\Http\Controllers\Admin\MemberController::class, 'socialFeed'])->middleware('check.feature:community')->name('social.feed.internal');
-    Route::get('/courses/available', [\App\Http\Controllers\Admin\CourseController::class, 'available'])->name('courses.available');
-    Route::get('/mentorships/available', [\App\Http\Controllers\Admin\MentorshipController::class, 'available'])->name('mentorships.available');
+    Route::get('/comunidade', [\App\Http\Controllers\Admin\MemberController::class, 'socialFeed'])->middleware('check.feature:community_access')->name('social.feed.internal');
+    Route::get('/courses/available', [\App\Http\Controllers\Admin\CourseController::class, 'available'])->middleware('check.feature:courses_access')->name('courses.available');
+    Route::get('/mentorships/available', [\App\Http\Controllers\Admin\MentorshipController::class, 'available'])->middleware('check.feature:mentorships_access')->name('mentorships.available');
 
     // Chat interno (mantém layout do painel)
-    Route::middleware(['check.feature:chat', 'check.connection'])->group(function () {
+    Route::middleware(['check.feature:chat_access', 'check.connection'])->group(function () {
         Route::get('/chat', [\App\Http\Controllers\Admin\ChatController::class, 'index'])->name('chat.index');
         Route::get('/chat/start/{user}', [\App\Http\Controllers\Admin\ChatController::class, 'start'])->name('chat.start');
         Route::get('/chat/list', [\App\Http\Controllers\Admin\ChatController::class, 'list'])->name('chat.list');
@@ -323,18 +390,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     });
 
     // Depoimentos (moderação por permissões)
-    Route::get('/testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'index'])->name('testimonials.index');
-    Route::get('/testimonials/{testimonial}/edit', [\App\Http\Controllers\Admin\TestimonialController::class, 'edit'])->name('testimonials.edit');
-    Route::put('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'update'])->name('testimonials.update');
-    Route::post('/testimonials/{testimonial}/approve', [\App\Http\Controllers\Admin\TestimonialController::class, 'approve'])->name('testimonials.approve');
-    Route::post('/testimonials/{testimonial}/reject', [\App\Http\Controllers\Admin\TestimonialController::class, 'reject'])->name('testimonials.reject');
-    Route::delete('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'destroy'])->name('testimonials.destroy');
+    Route::get('/testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'index'])->middleware('check.feature:testimonials_access')->name('testimonials.index');
+    Route::get('/testimonials/{testimonial}/edit', [\App\Http\Controllers\Admin\TestimonialController::class, 'edit'])->middleware('check.feature:testimonials_edit')->name('testimonials.edit');
+    Route::put('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'update'])->middleware('check.feature:testimonials_edit')->name('testimonials.update');
+    Route::post('/testimonials/{testimonial}/approve', [\App\Http\Controllers\Admin\TestimonialController::class, 'approve'])->middleware('check.feature:testimonials_approve')->name('testimonials.approve');
+    Route::post('/testimonials/{testimonial}/reject', [\App\Http\Controllers\Admin\TestimonialController::class, 'reject'])->middleware('check.feature:testimonials_reject')->name('testimonials.reject');
+    Route::delete('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'destroy'])->middleware('check.feature:testimonials_delete')->name('testimonials.destroy');
 
     // Avaliações de cursos e mentorias (moderação)
-    Route::get('/reviews', [\App\Http\Controllers\Admin\ItemReviewController::class, 'index'])->name('reviews.index');
-    Route::post('/reviews/{review}/approve', [\App\Http\Controllers\Admin\ItemReviewController::class, 'approve'])->name('reviews.approve');
-    Route::post('/reviews/{review}/reject', [\App\Http\Controllers\Admin\ItemReviewController::class, 'reject'])->name('reviews.reject');
-    Route::delete('/reviews/{review}', [\App\Http\Controllers\Admin\ItemReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::get('/reviews', [\App\Http\Controllers\Admin\ItemReviewController::class, 'index'])->middleware('check.feature:reviews_access')->name('reviews.index');
+    Route::post('/reviews/{review}/approve', [\App\Http\Controllers\Admin\ItemReviewController::class, 'approve'])->middleware('check.feature:reviews_approve')->name('reviews.approve');
+    Route::post('/reviews/{review}/reject', [\App\Http\Controllers\Admin\ItemReviewController::class, 'reject'])->middleware('check.feature:reviews_reject')->name('reviews.reject');
+    Route::delete('/reviews/{review}', [\App\Http\Controllers\Admin\ItemReviewController::class, 'destroy'])->middleware('check.feature:reviews_delete')->name('reviews.destroy');
 
     // Impersonate Stop (disponível se estiver impersonando, sessão controla)
     Route::get('/stop-impersonating', [\App\Http\Controllers\Admin\ImpersonateController::class, 'stop'])->name('impersonate.stop');
@@ -352,77 +419,111 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         // Usuários
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('users');
         // Permissões / Papéis
-        Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class)->names('permissions');
+        Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class)
+            ->middleware('check.feature:permissions_access')->names('permissions');
 
         // Plans CRUD
-        Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)->names('plans');
+        Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)
+            ->middleware('check.feature:plans_access')->names('plans');
 
         // Coupons
-        Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class)->names('coupons');
+        Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class)
+            ->middleware('check.feature:coupons_access')->names('coupons');
 
         // Courses CRUD
-        Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class)->names('courses');
+        Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class)
+            ->middleware('check.feature:courses_access')->names('courses');
 
         // Custom Fonts
-        Route::get('/fonts', [\App\Http\Controllers\Admin\CustomFontController::class, 'index'])->name('fonts.index');
-        Route::post('/fonts', [\App\Http\Controllers\Admin\CustomFontController::class, 'store'])->name('fonts.store');
-        Route::delete('/fonts/{font}', [\App\Http\Controllers\Admin\CustomFontController::class, 'destroy'])->name('fonts.destroy');
-        Route::get('/fonts/api/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])->name('fonts.api.active');
+        Route::get('/fonts', [\App\Http\Controllers\Admin\CustomFontController::class, 'index'])
+            ->middleware('check.feature:fonts_access')->name('fonts.index');
+        Route::post('/fonts', [\App\Http\Controllers\Admin\CustomFontController::class, 'store'])
+            ->middleware('check.feature:fonts_create')->name('fonts.store');
+        Route::delete('/fonts/{font}', [\App\Http\Controllers\Admin\CustomFontController::class, 'destroy'])
+            ->middleware('check.feature:fonts_delete')->name('fonts.destroy');
+        Route::get('/fonts/api/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])
+            ->middleware('check.feature:fonts_access')->name('fonts.api.active');
 
         // FAQ (Perguntas frequentes)
-        Route::resource('faqs', \App\Http\Controllers\Admin\FaqController::class)->names('faqs');
+        Route::resource('faqs', \App\Http\Controllers\Admin\FaqController::class)
+            ->middleware('check.feature:faqs_access')->names('faqs');
 
         // Events CRUD
-        Route::get('events/feed', [\App\Http\Controllers\Admin\EventController::class, 'feed'])->name('events.feed');
-        Route::post('events/calendar/settings', [\App\Http\Controllers\Admin\EventController::class, 'updateCalendarSettings'])->name('events.calendar.settings');
-        Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');
+        Route::get('events/feed', [\App\Http\Controllers\Admin\EventController::class, 'feed'])
+            ->middleware('check.feature:events_access')->name('events.feed');
+        Route::post('events/calendar/settings', [\App\Http\Controllers\Admin\EventController::class, 'updateCalendarSettings'])
+            ->middleware('check.feature:events_edit')->name('events.calendar.settings');
+        Route::resource('events', \App\Http\Controllers\Admin\EventController::class)
+            ->middleware('check.feature:events_access')->names('events');
 
         // Points Rules
-        Route::resource('points-rules', \App\Http\Controllers\Admin\PointsRuleController::class)->names('points-rules');
+        Route::resource('points-rules', \App\Http\Controllers\Admin\PointsRuleController::class)
+            ->middleware('check.feature:points_access')->names('points-rules');
 
         // Mentorships CRUD
-        Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class)->names('mentorships');
+        Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class)
+            ->middleware('check.feature:mentorships_access')->names('mentorships');
 
         // Certificates
-        Route::get('/certificates/create', [\App\Http\Controllers\Admin\CertificateController::class, 'createForm'])->name('certificates.create');
-        Route::post('/certificates/generate', [\App\Http\Controllers\Admin\CertificateController::class, 'generate'])->name('certificates.generate');
-        Route::get('/certificates/view/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'view'])->name('certificates.view');
+        Route::get('/certificates/create', [\App\Http\Controllers\Admin\CertificateController::class, 'createForm'])
+            ->middleware('check.feature:certificates_create')->name('certificates.create');
+        Route::post('/certificates/generate', [\App\Http\Controllers\Admin\CertificateController::class, 'generate'])
+            ->middleware('check.feature:certificates_generate')->name('certificates.generate');
+        Route::get('/certificates/view/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'view'])
+            ->middleware('check.feature:certificates_access')->name('certificates.view');
 
         // Ranking
-        Route::get('/ranking', [\App\Http\Controllers\Admin\RankingController::class, 'index'])->name('ranking');
-
+        Route::get('/ranking', [\App\Http\Controllers\Admin\RankingController::class, 'index'])
+            ->middleware('check.feature:ranking_access')->name('ranking');
 
         // FAILSAFE ROUTES (DO NOT REMOVE)
-        // Essas rotas existem para prevenir erros de cache em produção
-        Route::get('/upload/test', fn() => null)->name('upload.test');
-        Route::get('/mailtest', fn() => null)->name('mailtest');
+        Route::get('/upload/test', fn() => null)->middleware('check.feature:uploads_access')->name('upload.test');
+        Route::get('/mailtest', fn() => null)->middleware('check.feature:mailtest_access')->name('mailtest');
 
         // Chunked uploads
-        Route::post('/upload/chunk', [\App\Http\Controllers\UploadChunkController::class, 'storeChunk'])->name('upload.chunk');
-        Route::post('/upload/assemble', [\App\Http\Controllers\UploadChunkController::class, 'assemble'])->name('upload.assemble');
+        Route::post('/upload/chunk', [\App\Http\Controllers\UploadChunkController::class, 'storeChunk'])
+            ->middleware('check.feature:uploads_chunk')->name('upload.chunk');
+        Route::post('/upload/assemble', [\App\Http\Controllers\UploadChunkController::class, 'assemble'])
+            ->middleware('check.feature:uploads_assemble')->name('upload.assemble');
 
         // Mail templates
-        Route::get('/mailtemplates', [\App\Http\Controllers\Admin\MailTemplateController::class, 'index'])->name('mailtemplates.index');
-        Route::get('/mailtemplates/create', [\App\Http\Controllers\Admin\MailTemplateController::class, 'create'])->name('mailtemplates.create');
-        Route::post('/mailtemplates', [\App\Http\Controllers\Admin\MailTemplateController::class, 'store'])->name('mailtemplates.store');
-        Route::get('/mailtemplates/{mailtemplate}/edit', [\App\Http\Controllers\Admin\MailTemplateController::class, 'edit'])->name('mailtemplates.edit');
-        Route::put('/mailtemplates/{mailtemplate}', [\App\Http\Controllers\Admin\MailTemplateController::class, 'update'])->name('mailtemplates.update');
-        Route::delete('/mailtemplates/{mailtemplate}', [\App\Http\Controllers\Admin\MailTemplateController::class, 'destroy'])->name('mailtemplates.destroy');
-        Route::get('/mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('mailtemplates.preview');
-        Route::post('/mailtemplates/{mailtemplate}/send-preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
+        Route::get('/mailtemplates', [\App\Http\Controllers\Admin\MailTemplateController::class, 'index'])
+            ->middleware('check.feature:mailtemplates_access')->name('mailtemplates.index');
+        Route::get('/mailtemplates/create', [\App\Http\Controllers\Admin\MailTemplateController::class, 'create'])
+            ->middleware('check.feature:mailtemplates_create')->name('mailtemplates.create');
+        Route::post('/mailtemplates', [\App\Http\Controllers\Admin\MailTemplateController::class, 'store'])
+            ->middleware('check.feature:mailtemplates_store')->name('mailtemplates.store');
+        Route::get('/mailtemplates/{mailtemplate}/edit', [\App\Http\Controllers\Admin\MailTemplateController::class, 'edit'])
+            ->middleware('check.feature:mailtemplates_edit')->name('mailtemplates.edit');
+        Route::put('/mailtemplates/{mailtemplate}', [\App\Http\Controllers\Admin\MailTemplateController::class, 'update'])
+            ->middleware('check.feature:mailtemplates_update')->name('mailtemplates.update');
+        Route::delete('/mailtemplates/{mailtemplate}', [\App\Http\Controllers\Admin\MailTemplateController::class, 'destroy'])
+            ->middleware('check.feature:mailtemplates_delete')->name('mailtemplates.destroy');
+        Route::get('/mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])
+            ->middleware('check.feature:mailtemplates_preview')->name('mailtemplates.preview');
+        Route::post('/mailtemplates/{mailtemplate}/send-preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])
+            ->middleware('check.feature:mailtemplates_sendpreview')->name('mailtemplates.sendpreview');
 
         // Plans
-        Route::post('orders/{order}/refund', [\App\Http\Controllers\Admin\OrderController::class, 'refund'])->name('orders.refund');
-        Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show'])->names('orders');
+        Route::post('orders/{order}/refund', [\App\Http\Controllers\Admin\OrderController::class, 'refund'])
+            ->middleware('check.feature:orders_refund')->name('orders.refund');
+        Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)
+            ->middleware('check.feature:orders_access')->only(['index', 'show'])->names('orders');
 
         // Faturas (PDF)
-        Route::post('orders/{order}/invoice', [\App\Http\Controllers\Admin\InvoiceController::class, 'issueForOrder'])->name('orders.invoice');
-        Route::post('invoices/{invoice}/send', [\App\Http\Controllers\Admin\InvoiceController::class, 'send'])->name('invoices.send');
-        Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'pdf'])->name('invoices.pdf');
-        Route::resource('invoices', \App\Http\Controllers\Admin\InvoiceController::class)->names('invoices');
+        Route::post('orders/{order}/invoice', [\App\Http\Controllers\Admin\InvoiceController::class, 'issueForOrder'])
+            ->middleware('check.feature:invoices_issue')->name('orders.invoice');
+        Route::post('invoices/{invoice}/send', [\App\Http\Controllers\Admin\InvoiceController::class, 'send'])
+            ->middleware('check.feature:invoices_send')->name('invoices.send');
+        Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'pdf'])
+            ->middleware('check.feature:invoices_pdf')->name('invoices.pdf');
+        Route::resource('invoices', \App\Http\Controllers\Admin\InvoiceController::class)
+            ->middleware('check.feature:invoices_access')->names('invoices');
 
         // Social / Comunidade Moderação
-        Route::get('/social', [\App\Http\Controllers\Admin\SocialController::class, 'index'])->name('social.index');
-        Route::delete('/social/{post}', [\App\Http\Controllers\Admin\SocialController::class, 'destroy'])->name('social.destroy');
+        Route::get('/social', [\App\Http\Controllers\Admin\SocialController::class, 'index'])
+            ->middleware('check.feature:social_access')->name('social.index');
+        Route::delete('/social/{post}', [\App\Http\Controllers\Admin\SocialController::class, 'destroy'])
+            ->middleware('check.feature:social_delete')->name('social.destroy');
     });
 });

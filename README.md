@@ -1,3 +1,29 @@
+# Granularidade de Permissões (Fevereiro 2026)
+
+O sistema agora possui controle total e granular de permissões para todas as áreas (cursos, mentorias, eventos, marketplace, uploads, faturas, certificados, pontos, cupons, planos, permissões, usuários, FAQ, fontes, mailtemplates, ranking, social, orders, invoices, reviews, depoimentos, comunidade, chat, etc).
+
+Cada rota e ação está protegida por middleware `check.feature:<feature>`, permitindo máxima flexibilidade para upgrades, downgrades e personalização de planos.
+
+## Testes Automatizados
+
+Execute os testes para validar granularidade:
+```
+php vendor/bin/phpunit --filter=GranularPermissionTest
+```
+
+## Seeder de Plano Granular
+Para criar um plano com todas as permissões:
+```
+php artisan db:seed --class=GranularPlanSeeder
+```
+
+## Deploy
+
+1. Faça o pull do repositório
+2. Rode as migrations se necessário
+3. Rode os seeders para planos/permissões
+4. Execute os testes para validar permissões
+
 # UNN — Plataforma de Networking (Scaffold)
 
 Este diretório contém o scaffold inicial para um projeto Laravel 10 preparado para PHP 8.4 e hospedagem em cPanel.

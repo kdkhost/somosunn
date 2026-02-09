@@ -22,26 +22,43 @@ class PlanController extends Controller
         'chat' => 'Chat (mensagens)',
         'connections' => 'Networking (conexões)',
         'connections.unlimited' => 'Conexões ilimitadas',
-        
+
         // Cursos
         'courses' => 'Acesso a cursos',
+        'courses.create' => 'Criar cursos',
+        'courses.edit' => 'Editar cursos',
+        'courses.delete' => 'Excluir cursos',
         'courses.certificates' => 'Certificados de cursos',
         'courses.downloads' => 'Downloads de materiais',
-        
+
         // Eventos
         'events' => 'Acesso a eventos',
+        'events.create' => 'Criar eventos',
+        'events.edit' => 'Editar eventos',
+        'events.delete' => 'Excluir eventos',
         'events.recordings' => 'Gravações de eventos',
         'events.vip' => 'Eventos VIP/exclusivos',
-        
+
         // Mentorias
         'mentorships' => 'Acesso a mentorias',
+        'mentorships.create' => 'Criar mentorias',
+        'mentorships.edit' => 'Editar mentorias',
+        'mentorships.delete' => 'Excluir mentorias',
         'mentorships.group' => 'Mentorias em grupo',
         'mentorships.individual' => 'Mentorias individuais',
-        
+
+        // Marketplace
+        'marketplace' => 'Acesso ao marketplace',
+        'marketplace.sales' => 'Ver histórico de vendas',
+        'marketplace.buy' => 'Comprar produtos/serviços',
+
         // Extras
         'rankings' => 'Participar do ranking',
         'support.priority' => 'Suporte prioritário',
         'early.access' => 'Acesso antecipado a novidades',
+
+        // Admin
+        'admin.panel' => 'Acesso ao painel admin',
     ];
 
     public function index()
