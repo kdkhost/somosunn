@@ -96,32 +96,22 @@
                                 <i class="fas fa-info-circle mr-1"></i> Informações Básicas
                             </a>
                         </li>
-                        <li class="nav-item">
-                            @if($course->exists || (Auth::user() && (Auth::user()->isAdmin() || Auth::user()->role === 'superadmin')))
+                        @if($course->exists)
+                            <li class="nav-item">
                                 <a class="nav-link" id="lessons-tab" data-toggle="tab" href="#lessons" role="tab"
                                     aria-controls="lessons" aria-selected="false">
                                     <i class="fas fa-layer-group mr-1"></i> Conteúdo / Aulas
                                 </a>
-                            @else
-                                <a class="nav-link disabled" href="#" title="Salve o curso primeiro">
-                                    <i class="fas fa-layer-group mr-1"></i> Conteúdo / Aulas <i
-                                        class="fas fa-lock ml-1 text-muted"></i>
-                                </a>
+                            </li>
+                            @if($course->lessons->count() > 0 && $course->is_certificate_enabled)
+                                <li class="nav-item">
+                                    <a class="nav-link" id="cert-tab" data-toggle="tab" href="#certificate" role="tab"
+                                        aria-controls="certificate" aria-selected="false">
+                                        <i class="fas fa-certificate mr-1"></i> Certificado
+                                    </a>
+                                </li>
                             @endif
-                        </li>
-                        <li class="nav-item">
-                            @if($course->exists || (Auth::user() && (Auth::user()->isAdmin() || Auth::user()->role === 'superadmin')))
-                                <a class="nav-link" id="cert-tab" data-toggle="tab" href="#certificate" role="tab"
-                                    aria-controls="certificate" aria-selected="false">
-                                    <i class="fas fa-certificate mr-1"></i> Certificado
-                                </a>
-                            @else
-                                <a class="nav-link disabled" href="#" title="Salve o curso primeiro">
-                                    <i class="fas fa-certificate mr-1"></i> Certificado <i
-                                        class="fas fa-lock ml-1 text-muted"></i>
-                                </a>
-                            @endif
-                        </li>
+                        @endif
                     </ul>
                 </div>
                 <div class="card-body">
@@ -329,9 +319,56 @@
                             <div class="tab-pane fade" id="lessons" role="tabpanel" aria-labelledby="lessons-tab">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <h4 class="mb-0 text-dark">Grade Curricular</h4>
-                                    <button class="btn btn-success shadow-sm" onclick="openLessonModal()">
+                                    <button class="btn btn-success shadow-sm" id="btnNovaAula" type="button">
                                         <i class="fas fa-plus mr-1"></i> Nova Aula
                                     </button>
+                                @push('scripts')
+                                <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const btnNovaAula = document.getElementById('btnNovaAula');
+                                    if (!btnNovaAula) return;
+                                    btnNovaAula.addEventListener('click', function(e) {
+                                        e.preventDefault();
+                                        // Se já existe course_id, apenas abre o modal normalmente
+                                        const courseId = {{ $course->exists ? $course->id : 'null' }};
+                                        if (courseId) {
+                                            if (typeof openLessonModal === 'function') openLessonModal();
+                                            return;
+                                        }
+                                        // Auto-save do formulário de curso via AJAX
+                                        const form = btnNovaAula.closest('form');
+                                        if (!form) return;
+                                        const formData = new FormData(form);
+                                        formData.append('status', 'draft');
+                                        btnNovaAula.disabled = true;
+                                        btnNovaAula.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Salvando...';
+                                        fetch(form.action, {
+                                            method: 'POST',
+                                            headers: {
+                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                            },
+                                            body: formData
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data && data.id) {
+                                                // Redireciona para a edição do curso já salvo
+                                                window.location.href = `/admin/courses/${data.id}/edit?openLesson=1`;
+                                            } else {
+                                                alert('Erro ao salvar curso. Tente novamente.');
+                                                btnNovaAula.disabled = false;
+                                                btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
+                                            }
+                                        })
+                                        .catch(() => {
+                                            alert('Erro ao salvar curso. Tente novamente.');
+                                            btnNovaAula.disabled = false;
+                                            btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
+                                        });
+                                    });
+                                });
+                                </script>
+                                @endpush
                                 </div>
 
                                 <div id="lessons-list">
