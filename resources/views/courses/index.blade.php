@@ -366,7 +366,7 @@
                                                 @if($isPaused)
                                                     <button type="button" disabled
                                                         class="w-full flex-1 px-4 py-3 rounded-xl font-bold bg-slate-100 text-slate-500 inline-flex items-center justify-center cursor-not-allowed whitespace-nowrap">
-                                                        Vendas pausadas
+                                                        Pausado
                                                     </button>
                                                 @elseif($hasAccess)
                                                     <a href="{{ $courseShowUrl }}"
@@ -376,7 +376,7 @@
                                                 @else
                                                     <a href="{{ $courseCheckoutUrl }}"
                                                         class="w-full flex-1 px-4 py-3 rounded-xl font-bold btn-primary shadow-md hover:shadow-lg transition inline-flex items-center justify-center whitespace-nowrap {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
-                                                        Adquirir
+                                                        Comprar
                                                     </a>
                                                 @endif
                                             </div>
