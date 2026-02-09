@@ -204,14 +204,18 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Mensagem</label>
-                            <textarea name="message" rows="5" required 
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Mensagem <span class="text-gray-400 font-normal">(mínimo 10 caracteres)</span></label>
+                            <textarea name="message" id="contact-message" rows="5" required minlength="10" maxlength="4000"
                                       class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition resize-none" 
                                       style="--tw-ring-color: var(--unn-azul-1)"
-                                      placeholder="Como podemos ajudar?">{{ old('message') }}</textarea>
+                                      placeholder="Como podemos ajudar? (mínimo 10 caracteres)">{{ old('message') }}</textarea>
+                            <div class="flex justify-between mt-1 text-xs text-gray-500">
+                                <span id="char-counter" class="text-red-500">0/10 caracteres</span>
+                                <span id="char-max">Máximo: 4000</span>
+                            </div>
                         </div>
 
-                        <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
+                        <button type="submit" id="submit-btn" disabled class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                             <i class="fas fa-paper-plane"></i>
                             Enviar mensagem
                         </button>
@@ -251,6 +255,35 @@
 @endsection
 
 @push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const messageInput = document.getElementById('contact-message');
+        const charCounter = document.getElementById('char-counter');
+        const submitBtn = document.getElementById('submit-btn');
+        const minChars = 10;
+
+        function updateCounter() {
+            const len = messageInput.value.length;
+            charCounter.textContent = len + '/' + minChars + ' caracteres';
+            
+            if (len >= minChars) {
+                charCounter.classList.remove('text-red-500');
+                charCounter.classList.add('text-green-600');
+                submitBtn.disabled = false;
+            } else {
+                charCounter.classList.remove('text-green-600');
+                charCounter.classList.add('text-red-500');
+                submitBtn.disabled = true;
+            }
+        }
+
+        if (messageInput && charCounter && submitBtn) {
+            messageInput.addEventListener('input', updateCounter);
+            // Verificar estado inicial (para quando há old() preenchido)
+            updateCounter();
+        }
+    });
+</script>
 @php($recaptchaSiteKey = (string) (\App\Models\Setting::get('recaptcha_v3_site_key') ?: config('services.recaptcha.site_key', '')))
 @if($recaptchaSiteKey !== '')
     <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}"></script>
