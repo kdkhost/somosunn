@@ -8,6 +8,7 @@
 
 @php
     $categoryColors = [
+        // Nomes de categoria quando migration foi rodada
         'Dashboard' => 'primary',
         'Usuários' => 'info',
         'Cursos' => 'success',
@@ -29,12 +30,38 @@
         'Configurações' => 'danger',
         'Fontes' => 'secondary',
         'Permissões' => 'dark',
+        'Outros' => 'light',
+        // Prefixos quando migration não foi rodada (fallback)
+        'dashboard' => 'primary',
+        'users' => 'info',
+        'courses' => 'success',
+        'mentorships' => 'warning',
+        'events' => 'danger',
+        'plans' => 'secondary',
+        'orders' => 'dark',
+        'invoices' => 'primary',
+        'coupons' => 'info',
+        'certificates' => 'success',
+        'points' => 'warning',
+        'ranking' => 'warning',
+        'community' => 'danger',
+        'mailtemplates' => 'secondary',
+        'mail' => 'secondary',
+        'testimonials' => 'dark',
+        'faq' => 'primary',
+        'uploads' => 'info',
+        'gateways' => 'success',
+        'reports' => 'warning',
+        'settings' => 'danger',
+        'fonts' => 'secondary',
+        'permissions' => 'dark',
+        'roles' => 'dark',
     ];
 
     // Mapeia nome da permissão para sua categoria
     $permissionCategories = [];
     foreach($permissions as $p) {
-        $permissionCategories[$p->name] = $p->category ?? 'Outros';
+        $permissionCategories[$p->name] = $p->category ?? explode('.', $p->name)[0] ?? 'Outros';
     }
 @endphp
 
@@ -63,15 +90,15 @@
           <td>{{ $role->label }}</td>
           <td>
             @php
-                // Agrupa as permissões do papel por categoria
+                // Agrupa as permissões do papel por categoria (com fallback para prefixo)
                 $rolePermsByCategory = $role->permissions->groupBy(function($p) {
-                    return $p->category ?? 'Outros';
+                    return $p->category ?? explode('.', $p->name)[0] ?? 'Outros';
                 });
             @endphp
             @foreach($rolePermsByCategory as $category => $perms)
                 @php $color = $categoryColors[$category] ?? 'secondary'; @endphp
                 <div class="mb-1">
-                    <small class="text-muted d-block"><strong>{{ $category }}:</strong></small>
+                    <small class="text-muted d-block"><strong>{{ ucfirst($category) }}:</strong></small>
                     @foreach($perms as $p)
                         <span class="badge badge-{{ $color }} mb-1" title="{{ $p->label }}">{{ $p->name }}</span>
                     @endforeach

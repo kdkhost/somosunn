@@ -17,10 +17,22 @@ class PermissionController extends Controller
 
     public function create()
     {
-        $permissionsGrouped = Permission::grouped();
+        // Compatibilidade: verifica se a coluna category existe
+        $hasCategory = \Schema::hasColumn('permissions', 'category');
+        
+        if ($hasCategory) {
+            $permissionsGrouped = Permission::grouped();
+        } else {
+            // Fallback: agrupa por prefixo do nome
+            $permissionsGrouped = Permission::orderBy('name')->get()->groupBy(function ($p) {
+                return explode('.', $p->name)[0] ?? 'outros';
+            });
+        }
+        
         return view('admin.permissions.form', [
             'role' => new Role(),
-            'permissionsGrouped' => $permissionsGrouped
+            'permissionsGrouped' => $permissionsGrouped,
+            'hasCategory' => $hasCategory
         ]);
     }
 
@@ -41,10 +53,22 @@ class PermissionController extends Controller
 
     public function edit(Role $permission)
     {
-        $permissionsGrouped = Permission::grouped();
+        // Compatibilidade: verifica se a coluna category existe
+        $hasCategory = \Schema::hasColumn('permissions', 'category');
+        
+        if ($hasCategory) {
+            $permissionsGrouped = Permission::grouped();
+        } else {
+            // Fallback: agrupa por prefixo do nome
+            $permissionsGrouped = Permission::orderBy('name')->get()->groupBy(function ($p) {
+                return explode('.', $p->name)[0] ?? 'outros';
+            });
+        }
+        
         return view('admin.permissions.form', [
             'role' => $permission,
-            'permissionsGrouped' => $permissionsGrouped
+            'permissionsGrouped' => $permissionsGrouped,
+            'hasCategory' => $hasCategory
         ]);
     }
 

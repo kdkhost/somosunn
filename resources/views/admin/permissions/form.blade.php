@@ -38,6 +38,7 @@
 
             @php
                 $categoryColors = [
+                    // Nomes de categoria quando migration foi rodada
                     'Dashboard' => 'primary',
                     'Usuários' => 'info',
                     'Cursos' => 'success',
@@ -60,6 +61,31 @@
                     'Fontes' => 'secondary',
                     'Permissões' => 'dark',
                     'Outros' => 'light',
+                    // Prefixos quando migration não foi rodada (fallback)
+                    'dashboard' => 'primary',
+                    'users' => 'info',
+                    'courses' => 'success',
+                    'mentorships' => 'warning',
+                    'events' => 'danger',
+                    'plans' => 'secondary',
+                    'orders' => 'dark',
+                    'invoices' => 'primary',
+                    'coupons' => 'info',
+                    'certificates' => 'success',
+                    'points' => 'warning',
+                    'ranking' => 'warning',
+                    'community' => 'danger',
+                    'mailtemplates' => 'secondary',
+                    'mail' => 'secondary',
+                    'testimonials' => 'dark',
+                    'faq' => 'primary',
+                    'uploads' => 'info',
+                    'gateways' => 'success',
+                    'reports' => 'warning',
+                    'settings' => 'danger',
+                    'fonts' => 'secondary',
+                    'permissions' => 'dark',
+                    'roles' => 'dark',
                 ];
             @endphp
 
