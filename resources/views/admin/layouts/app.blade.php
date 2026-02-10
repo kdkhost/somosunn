@@ -102,6 +102,17 @@
         .px-2 { padding-left: .5rem !important; padding-right: .5rem !important; }
         .text-wrap { white-space: normal !important; }
         .bg-gradient-soft { background: linear-gradient(90deg, #f1f5f9 0%, #ffffff 100%) !important; }
+
+        /* Constrain upload previews and modal images to avoid overflow */
+        .upload-preview img, .upload-preview img[alt], .upload-preview .img-fluid {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .upload-preview { overflow: hidden; }
+        .card .nav-tabs { margin-bottom: .5rem; }
     </style>
     @stack('styles')
 </head>
@@ -579,7 +590,7 @@
                     }
 
                     function renderExisting(url) {
-                        preview.html('<img src="' + url + '" alt="imagem">');
+                        preview.html('<img src="' + url + '" alt="imagem" class="img-fluid">');
                         meta.text('Arquivo atual');
                         removeBtn.removeClass('d-none');
                     }
@@ -591,7 +602,7 @@
 
                     function setPreview(blobOrFile, name, url) {
                         const sizeMB = (blobOrFile.size / 1024 / 1024).toFixed(2);
-                        preview.html('<img src="' + url + '" alt="preview">');
+                        preview.html('<img src="' + url + '" alt="preview" class="img-fluid">');
                         meta.text((name || 'arquivo') + ' • ' + sizeMB + ' MB • ' + (blobOrFile.type || ''));
                         removeBtn.removeClass('d-none');
                     }
