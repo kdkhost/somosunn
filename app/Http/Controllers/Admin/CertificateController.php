@@ -322,7 +322,7 @@ class CertificateController extends Controller
                 }
 
                 if ($product) {
-                    $output = $this->generatePdfContent($user, $type, $product, $cert->cert_hash, $cert);
+                    $output = $this->generatePdfContent($user, $type, $product, $cert->cert_hash);
                     $newPath = "certificates/{$cert->cert_hash}.pdf";
                     \Storage::disk('public')->put($newPath, $output);
                     $cert->update(['pdf_path' => $newPath]);
