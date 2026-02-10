@@ -8,44 +8,82 @@
 @section('content')
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title">Histórico de Ações</h3>
+            <h3 class="card-title"><i class="fas fa-history mr-2"></i>Histórico de Ações</h3>
         </div>
-        <div class="card-body table-responsive p-0">
-            <table class="table table-hover text-nowrap">
+        <div class="card-body">
+            <table id="table_logs" class="table table-bordered table-striped table-hover">
                 <thead>
                     <tr>
-                        <th>Data/Hora</th>
-                        <th>Usuário</th>
-                        <th>Ação</th>
-                        <th>IP</th>
+                        <th style="width: 15%">Data/Hora</th>
+                        <th style="width: 20%">Usuário</th>
+                        <th style="width: 15%">Ação</th>
+                        <th style="width: 15%">IP</th>
                         <th>Descrição</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($logs as $log)
+                    @foreach($logs as $log)
                         <tr>
-                            <td>{{ $log->created_at->format('d/m/Y H:i:s') }}</td>
+                            <td data-sort="{{ $log->created_at->format('YmdHis') }}">
+                                {{ $log->created_at->format('d/m/Y H:i:s') }}
+                            </td>
                             <td>
                                 @if($log->user)
-                                    <a href="{{ route('admin.users.edit', $log->user_id) }}">{{ $log->user->name }}</a>
+                                    <a href="{{ route('admin.users.edit', $log->user_id) }}" class="font-weight-bold">
+                                        {{ $log->user->name }}
+                                    </a>
                                 @else
-                                    <span class="text-muted">Sistema / Visitante</span>
+                                    <span class="badge badge-secondary">Sistema / Visitante</span>
                                 @endif
                             </td>
-                            <td><span class="badge badge-info">{{ $log->action }}</span></td>
+                            <td>
+                                <span class="badge badge-info">{{ $log->action }}</span>
+                            </td>
                             <td>{{ $log->ip_address }}</td>
-                            <td>{{ Str::limit($log->description, 50) }}</td>
+                            <td>{{ $log->description }}</td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center text-muted">Nenhum registro encontrado.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
-        <div class="card-footer clearfix">
-            {{ $logs->links() }}
-        </div>
     </div>
 @endsection
+
+@push('styles')
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css">
+@endpush
+
+@push('scripts')
+    <!-- DataTables & Plugins -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+
+    <script>
+        $(function () {
+            $("#table_logs").DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "pageLength": 20,
+                "order": [[0, "desc"]],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
+                },
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#table_logs_wrapper .col-md-6:eq(0)');
+        });
+    </script>
+@endpush

@@ -10,7 +10,7 @@ class ActivityLogController extends Controller
 {
     public function index()
     {
-        $logs = ActivityLog::with('user')->latest()->paginate(20);
+        $logs = ActivityLog::with('user')->latest()->take(1000)->get();
         return view('admin.activity_logs.index', compact('logs'));
     }
 }
