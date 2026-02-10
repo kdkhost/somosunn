@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
         try {
             App::setLocale('pt_BR');
         } catch (\Throwable $e) {
-            Log::warning('Falha ao ajustar locale: '.$e->getMessage());
+            Log::warning('Falha ao ajustar locale: ' . $e->getMessage());
         }
 
         if (App::runningInConsole()) {
@@ -36,31 +36,43 @@ class AppServiceProvider extends ServiceProvider
 
         try {
             DB::connection()->getPdo();
-            
+
             // Carregar configurações sociais se existirem (sobrescreve .env)
             try {
                 $socialSettings = DB::table('settings')->whereIn('key', [
-                    'social_google_client_id', 'social_google_client_secret', 'social_google_redirect',
-                    'social_facebook_client_id', 'social_facebook_client_secret', 'social_facebook_redirect',
-                    'social_linkedin_client_id', 'social_linkedin_client_secret', 'social_linkedin_redirect'
-                ])->pluck('value', 'key');
+                    'social_google_client_id',
+                    'social_google_client_secret',
+                    'social_google_redirect',
+                    'social_facebook_client_id',
+                    'social_facebook_client_secret',
+                    'social_facebook_redirect',
+                    'social_linkedin_client_id',
+                    'social_linkedin_client_secret',
+                    'social_linkedin_redirect'
+                ])->pluck('value', 'key')->toArray();
 
-                if(isset($socialSettings['social_google_client_id']) && $socialSettings['social_google_client_id']){
+                if (isset($socialSettings['social_google_client_id']) && $socialSettings['social_google_client_id']) {
                     config(['services.google.client_id' => $socialSettings['social_google_client_id']]);
-                    if(isset($socialSettings['social_google_client_secret'])) config(['services.google.client_secret' => $socialSettings['social_google_client_secret']]);
-                    if(isset($socialSettings['social_google_redirect'])) config(['services.google.redirect' => $socialSettings['social_google_redirect']]);
+                    if (isset($socialSettings['social_google_client_secret']))
+                        config(['services.google.client_secret' => $socialSettings['social_google_client_secret']]);
+                    if (isset($socialSettings['social_google_redirect']))
+                        config(['services.google.redirect' => $socialSettings['social_google_redirect']]);
                 }
 
-                if(isset($socialSettings['social_facebook_client_id']) && $socialSettings['social_facebook_client_id']){
+                if (isset($socialSettings['social_facebook_client_id']) && $socialSettings['social_facebook_client_id']) {
                     config(['services.facebook.client_id' => $socialSettings['social_facebook_client_id']]);
-                    if(isset($socialSettings['social_facebook_client_secret'])) config(['services.facebook.client_secret' => $socialSettings['social_facebook_client_secret']]);
-                    if(isset($socialSettings['social_facebook_redirect'])) config(['services.facebook.redirect' => $socialSettings['social_facebook_redirect']]);
+                    if (isset($socialSettings['social_facebook_client_secret']))
+                        config(['services.facebook.client_secret' => $socialSettings['social_facebook_client_secret']]);
+                    if (isset($socialSettings['social_facebook_redirect']))
+                        config(['services.facebook.redirect' => $socialSettings['social_facebook_redirect']]);
                 }
 
-                if(isset($socialSettings['social_linkedin_client_id']) && $socialSettings['social_linkedin_client_id']){
+                if (isset($socialSettings['social_linkedin_client_id']) && $socialSettings['social_linkedin_client_id']) {
                     config(['services.linkedin.client_id' => $socialSettings['social_linkedin_client_id']]);
-                    if(isset($socialSettings['social_linkedin_client_secret'])) config(['services.linkedin.client_secret' => $socialSettings['social_linkedin_client_secret']]);
-                    if(isset($socialSettings['social_linkedin_redirect'])) config(['services.linkedin.redirect' => $socialSettings['social_linkedin_redirect']]);
+                    if (isset($socialSettings['social_linkedin_client_secret']))
+                        config(['services.linkedin.client_secret' => $socialSettings['social_linkedin_client_secret']]);
+                    if (isset($socialSettings['social_linkedin_redirect']))
+                        config(['services.linkedin.redirect' => $socialSettings['social_linkedin_redirect']]);
                 }
             } catch (\Throwable $e) {
                 // Silently fail if table doesnt exist yet
@@ -89,7 +101,7 @@ class AppServiceProvider extends ServiceProvider
                     's3_url',
                     's3_endpoint',
                     's3_path_style',
-                ])->pluck('value', 'key');
+                ])->pluck('value', 'key')->toArray();
 
                 $normalizeList = function ($value): array {
                     $raw = trim((string) $value);
@@ -98,8 +110,8 @@ class AppServiceProvider extends ServiceProvider
                     }
 
                     $parts = preg_split('/[,\s;]+/', $raw) ?: [];
-                    $parts = array_map(static fn ($p) => strtolower(trim((string) $p)), $parts);
-                    $parts = array_values(array_filter($parts, static fn ($p) => $p !== '' && preg_match('/^[a-z0-9]+$/', $p)));
+                    $parts = array_map(static fn($p) => strtolower(trim((string) $p)), $parts);
+                    $parts = array_values(array_filter($parts, static fn($p) => $p !== '' && preg_match('/^[a-z0-9]+$/', $p)));
                     $parts = array_values(array_unique($parts));
 
                     return $parts;
@@ -196,7 +208,7 @@ class AppServiceProvider extends ServiceProvider
                     'smtp_encryption',
                     'smtp_from_email',
                     'smtp_from_name',
-                ])->pluck('value', 'key');
+                ])->pluck('value', 'key')->toArray();
 
                 $smtpHost = trim((string) ($smtpSettings['smtp_host'] ?? ''));
                 if ($smtpHost !== '') {
@@ -231,8 +243,55 @@ class AppServiceProvider extends ServiceProvider
                 // Silently fail if table doesnt exist yet
             }
 
+            // Carregar configurações de Pagamento (MercadoPago / PagSeguro)
+            try {
+                $paymentSettings = DB::table('settings')->whereIn('key', [
+                    'gateway_mercadopago_sandbox',
+                    'gateway_mercadopago_access_token_prod',
+                    'gateway_mercadopago_public_key_prod',
+                    'gateway_mercadopago_access_token_sandbox',
+                    'gateway_mercadopago_public_key_sandbox',
+
+                    'gateway_pagseguro_sandbox',
+                    'gateway_pagseguro_token_prod',
+                    'gateway_pagseguro_token_sandbox',
+                    'gateway_pagseguro_email',
+                ])->pluck('value', 'key')->toArray();
+
+                // MercadoPago
+                $mpSandbox = (bool) ($paymentSettings['gateway_mercadopago_sandbox'] ?? 0);
+                $mpAccessToken = $mpSandbox
+                    ? ($paymentSettings['gateway_mercadopago_access_token_sandbox'] ?? '')
+                    : ($paymentSettings['gateway_mercadopago_access_token_prod'] ?? '');
+                $mpPublicKey = $mpSandbox
+                    ? ($paymentSettings['gateway_mercadopago_public_key_sandbox'] ?? '')
+                    : ($paymentSettings['gateway_mercadopago_public_key_prod'] ?? '');
+
+                if ($mpAccessToken) {
+                    config(['payments.mercadopago.access_token' => $mpAccessToken]);
+                    config(['payments.mercadopago.public_key' => $mpPublicKey]);
+                    config(['payments.mercadopago.sandbox' => $mpSandbox]);
+                }
+
+                // PagSeguro
+                $psSandbox = (bool) ($paymentSettings['gateway_pagseguro_sandbox'] ?? 0);
+                $psToken = $psSandbox
+                    ? ($paymentSettings['gateway_pagseguro_token_sandbox'] ?? '')
+                    : ($paymentSettings['gateway_pagseguro_token_prod'] ?? '');
+                $psEmail = $paymentSettings['gateway_pagseguro_email'] ?? '';
+
+                if ($psToken && $psEmail) {
+                    config(['payments.pagseguro.email' => $psEmail]);
+                    config(['payments.pagseguro.token' => $psToken]);
+                    config(['payments.pagseguro.sandbox' => $psSandbox]);
+                }
+
+            } catch (\Throwable $e) {
+                // Silently fail if table doesnt exist yet
+            }
+
         } catch (\Throwable $e) {
-            Log::warning('Banco de dados indisponível: '.$e->getMessage());
+            Log::warning('Banco de dados indisponível: ' . $e->getMessage());
             View::share('unnDbAvailable', false);
         }
     }

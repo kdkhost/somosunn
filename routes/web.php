@@ -450,6 +450,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         Route::resource('faqs', \App\Http\Controllers\Admin\FaqController::class)
             ->middleware('check.feature:faqs_access')->names('faqs');
 
+        // Logs de Atividade
+        Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])
+            ->name('activity_logs.index');
+
         // Events CRUD
         Route::get('events/feed', [\App\Http\Controllers\Admin\EventController::class, 'feed'])
             ->middleware('check.feature:events_access')->name('events.feed');

@@ -20,6 +20,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\TrackVisitor::class,
             \App\Http\Middleware\RunInternalCron::class,
+            \App\Http\Middleware\LogUserActivity::class,
         ],
         'api' => [
             'throttle:api',

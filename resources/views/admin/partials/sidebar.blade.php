@@ -85,7 +85,8 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" data-accordion="true"
                 id="sidebar-tree" role="menu" style="gap: 2px;">
                 <li class="nav-item">
-                    <a href="{{ route('admin.dashboard') }}" class="nav-link {{ $is('admin.dashboard') }} rounded-lg font-semibold">
+                    <a href="{{ route('admin.dashboard') }}"
+                        class="nav-link {{ $is('admin.dashboard') }} rounded-lg font-semibold">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Dashboard</p>
                     </a>
@@ -271,6 +272,13 @@
                                 <a href="{{ route('admin.settings') }}" class="nav-link {{ $is('admin.settings') }}">
                                     <i class="fas fa-cogs nav-icon"></i>
                                     <p>Configurações</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.activity_logs.index') }}"
+                                    class="nav-link {{ $is('admin.activity_logs.index') }}">
+                                    <i class="fas fa-history nav-icon"></i>
+                                    <p>Logs de Atividade</p>
                                 </a>
                             </li>
                         </ul>

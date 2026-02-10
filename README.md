@@ -1,3 +1,25 @@
+# Atualização - Webhooks e Logs (Fevereiro 2026)
+
+Esta atualização traz melhorias críticas de infraestrutura e segurança para o painel administrativo:
+
+## 1. Webhooks & Pagamentos
+- **Implementação Completa**: Lógica de webhook para MercadoPago e PagSeguro 100% funcional.
+- **Automação**: Matrículas em cursos/mentorias e criação de assinaturas são processadas automaticamente após a confirmação do pagamento.
+- **Credenciais Dinâmicas**: O sistema agora carrega tokens de produção/sandbox diretamente das configurações do banco de dados, sem necessidade de editar arquivos `.env`.
+
+## 2. Logs de Atividade
+- **Rastreabilidade Total**: O sistema agora registra ações críticas (criação, edição, exclusão) realizadas por usuários logados.
+- **Interface Admin**: Nova tela em `Administração > Logs de Atividade` para visualização e auditoria.
+- **Retenção Automática**: Logs com mais de 3 meses são excluídos automaticamente para otimizar o banco de dados.
+
+## 3. Melhorias no Admin
+- **Preloader Inteligente**: Otimizado para não ser exibido para Administradores, agilizando a navegação no painel.
+- **Configurações Refinadas**:
+    - **PWA**: Restauradas opções de ícones e temas.
+    - **Anúncios**: Adicionada opção de "Inter-feed" para maior controle de monetização.
+
+---
+
 # Novidades Fevereiro 2026
 
 - Todos os títulos principais das páginas públicas (Home, Portal, Membros, Premium) agora exibem efeito de gradiente azul (Azul Royal, Oceano, Ciano Vivo) para reforçar a identidade visual UNN.

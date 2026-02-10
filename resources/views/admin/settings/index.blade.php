@@ -689,6 +689,8 @@
                         </div>
                     </div>
 
+                    </div>
+
                     {{-- ANÚNCIOS --}}
                     <div class="tab-pane fade" id="tab-ads" role="tabpanel">
                         <h5 class="text-primary mb-3"><i class="fas fa-ad mr-2"></i>Monetização e Anúncios</h5>
@@ -745,154 +747,22 @@
                         </div>
 
                         <div class="form-group mt-3">
-                            <label>HTML/JS Personalizado (Outros Ads)</label>
-                            <textarea name="ads_code_html" class="form-control" rows="5"
+                            <label>HTML/JS Personalizado (Global)</label>
+                            <textarea name="ads_code_html" class="form-control" rows="4"
                                 placeholder="Cole aqui o código de embed">{{ $settings['ads_code_html'] ?? '' }}</textarea>
                              <small class="text-muted">Se usar AdSense acima, este campo pode ficar vazio.</small>
                         </div>
 
-                         <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-3 mb-3">
+                         <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-3 mb-2">
                             <input type="hidden" name="ads_inter_feed_enabled" value="0">
                             <input type="checkbox" class="custom-control-input" id="ads_inter_feed_enabled" name="ads_inter_feed_enabled" value="1" {{ ($settings['ads_inter_feed_enabled'] ?? 0) ? 'checked' : '' }}>
                             <label class="custom-control-label" for="ads_inter_feed_enabled">Exibir anúncios entre postagens do feed</label>
                         </div>
-                    </div>
-
-                    {{-- PWA --}}
-                    <div class="tab-pane fade" id="tab-pwa" role="tabpanel">
-                        <h5 class="text-primary mb-3"><i class="fas fa-mobile-alt mr-2"></i>Progressive Web App</h5>
+                        
                         <div class="form-group">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
-                                <input type="hidden" name="pwa_enabled" value="0">
-                                <input type="checkbox" class="custom-control-input" id="pwa_enabled" name="pwa_enabled"
-                                    value="1" {{ ($settings['pwa_enabled'] ?? 0) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="pwa_enabled">Ativar PWA</label>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 form-group">
-                                <label>Nome do aplicativo (PWA)</label>
-                                <input name="pwa_name" class="form-control"
-                                    value="{{ $settings['pwa_name'] ?? config('app.name') }}">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>Nome curto</label>
-                                <input name="pwa_short_name" class="form-control"
-                                    value="{{ $settings['pwa_short_name'] ?? ($settings['app_name'] ?? '') }}">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4 form-group">
-                                <label>Ícone 192 × 192</label>
-                                <div class="upload-box" data-max-size="{{ 200 * 1024 }}"
-                                    data-existing-url="{{ $getUrl('pwa_icon_192') }}"
-                                    data-remove-input="[name='remove_pwa_icon_192']">
-                                    <input type="hidden" name="remove_pwa_icon_192" value="0">
-                                    <input type="file" name="pwa_icon_192" accept="image/*" class="d-none">
-                                    <div class="upload-preview text-center text-muted"></div>
-                                    <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                    <button type="button"
-                                        class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                                </div>
-                            </div>
-                            <div class="col-md-4 form-group">
-                                <label>Ícone 512 × 512</label>
-                                <div class="upload-box" data-max-size="{{ 400 * 1024 }}"
-                                    data-existing-url="{{ $getUrl('pwa_icon_512') }}"
-                                    data-remove-input="[name='remove_pwa_icon_512']">
-                                    <input type="hidden" name="remove_pwa_icon_512" value="0">
-                                    <input type="file" name="pwa_icon_512" accept="image/*" class="d-none">
-                                    <div class="upload-preview text-center text-muted"></div>
-                                    <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                    <button type="button"
-                                        class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                                </div>
-                            </div>
-                            <div class="col-md-4 form-group">
-                                <label>Banner / Splash</label>
-                                <div class="upload-box" data-max-size="{{ 1024 * 1024 }}"
-                                    data-existing-url="{{ $getUrl('pwa_splash') }}"
-                                    data-remove-input="[name='remove_pwa_splash']">
-                                    <input type="hidden" name="remove_pwa_splash" value="0">
-                                    <input type="file" name="pwa_splash" accept="image/*" class="d-none">
-                                    <div class="upload-preview text-center text-muted"></div>
-                                    <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                    <button type="button"
-                                        class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Cor tema</label>
-                            <div class="input-group colorpicker-element">
-                                <input name="pwa_theme_color" class="form-control"
-                                    value="{{ $settings['pwa_theme_color'] ?? '#ffffff' }}">
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="fas fa-square"
-                                            style="color: {{ $settings['pwa_theme_color'] ?? '#ffffff' }}"></i></span>
-                                </div>
-                            </div>
-                            <small class="text-muted">Cor principal usada no manifest e barras do sistema.</small>
-                        </div>
-                        <input type="hidden" name="pwa_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input" id="pwa_enabled" name="pwa_enabled" value="1" {{ ($settings['pwa_enabled'] ?? 0) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="pwa_enabled">Ativar PWA</label>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 form-group">
-                            <label>Nome do App</label>
-                            <input name="pwa_name" class="form-control"
-                                value="{{ $settings['pwa_name'] ?? config('app.name') }}">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Nome Curto (Short Name)</label>
-                            <input name="pwa_short_name" class="form-control"
-                                value="{{ $settings['pwa_short_name'] ?? config('app.name') }}">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4 form-group">
-                            <label>Ícone 192px</label>
-                            <div class="upload-box" data-max-size="{{ 1 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('pwa_icon_192') }}"
-                                data-remove-input="[name='remove_pwa_icon_192']">
-                                <input type="hidden" name="remove_pwa_icon_192" value="0">
-                                <input type="file" name="pwa_icon_192" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                        <div class="col-md-4 form-group">
-                            <label>Ícone 512px</label>
-                            <div class="upload-box" data-max-size="{{ 1 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('pwa_icon_512') }}"
-                                data-remove-input="[name='remove_pwa_icon_512']">
-                                <input type="hidden" name="remove_pwa_icon_512" value="0">
-                                <input type="file" name="pwa_icon_512" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                        <div class="col-md-4 form-group">
-                            <label>Splash Screen</label>
-                            <div class="upload-box" data-max-size="{{ 2 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('pwa_splash') }}"
-                                data-remove-input="[name='remove_pwa_splash']">
-                                <input type="hidden" name="remove_pwa_splash" value="0">
-                                <input type="file" name="pwa_splash" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
+                            <label>HTML/JS Personalizado (Inter-feed)</label>
+                            <textarea name="ads_inter_feed_code" class="form-control" rows="4"
+                                placeholder="Código específico para o feed (opcional)">{{ $settings['ads_inter_feed_code'] ?? '' }}</textarea>
                         </div>
                     </div>
                 </div>

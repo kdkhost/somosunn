@@ -16,11 +16,16 @@ class Kernel extends ConsoleKernel
                 ->everyMinute()
                 ->withoutOverlapping(55);
         }
+
+        // Prune activity logs older than 3 months
+        $schedule->call(function () {
+            \App\Models\ActivityLog::where('created_at', '<', now()->subMonths(3))->delete();
+        })->daily()->name('prune_activity_logs');
     }
 
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
         require base_path('routes/console.php');
     }
 }

@@ -34,3 +34,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
     });
 });
+
+// Webhooks (Public)
+Route::prefix('v1/webhooks')->group(function () {
+    Route::post('/mercadopago', [App\Http\Controllers\Api\WebhookController::class, 'mercadopago'])->name('api.webhooks.mercadopago');
+    Route::post('/pagseguro', [App\Http\Controllers\Api\WebhookController::class, 'pagseguro'])->name('api.webhooks.pagseguro');
+});
+
