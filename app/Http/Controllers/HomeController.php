@@ -158,10 +158,10 @@ class HomeController extends Controller
                     ->orWhere('role', 'mentor');
             })->count();
 
-            $levels = [
+            $levels = collect([
                 'iniciante' => $inicianteCount,
                 'sucesso' => $sucessoCount
-            ];
+            ]);
 
             $leaderboard = Ranking::with([
                 'user' => function ($q) {

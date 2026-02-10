@@ -61,17 +61,37 @@
         @php
             $settings = $course->certificate_settings ?? [];
             
+            // Extract special fields that might be strings (not style arrays)
+            $certTitle = $settings['title'] ?? 'CERTIFICADO DE CONCLUSÃO';
+            $certPresentation = $settings['presentation_text'] ?? $course->default_presentation_text;
+            
             // Map keys used in editor to real data
             $dataMap = [
                 'student_name' => $user->name,
                 'course_name' => $course->title,
-                'completion_date' => ($type === 'event' ? 'Participou em: ' : 'Concluído em: ') . now()->format('d/m/Y'),
+                'completion_date' => ($type === 'event' ? 'Participou em: ' : 'Concluído em: ') . (\Carbon\Carbon::parse($user->enrollments()->where('enrollable_id', $course->id)->where('enrollable_type', get_class($course))->first()->completed_at ?? now())->format('d/m/Y')),
                 'certificate_code' => 'Validação: ' . $certHash,
                 'author_name' => $authorName,
                 'workload_hours' => $workload > 0 ? 'Carga Horária: ' . $workload . 'h' : ($type === 'event' ? 'Evento' : 'Mentoria'),
-                'platform_logo' => 'LOGO UNN'
+                'platform_logo' => 'LOGO UNN',
+                'title' => $certTitle,
+                'presentation_text' => $certPresentation
             ];
         @endphp
+
+        {{-- Render Fixed Title (if not in draggable elements) --}}
+        @if(!isset($settings['title']) || !is_array($settings['title']))
+            <div class="element" style="width: 100%; text-align: center; top: 15%; font-size: 40px; font-weight: bold; color: #222;">
+                {{ $certTitle }}
+            </div>
+        @endif
+
+        {{-- Render Fixed Presentation Text (if not in draggable elements) --}}
+        @if(!isset($settings['presentation_text']) || !is_array($settings['presentation_text']))
+             <div class="element" style="width: 100%; text-align: center; top: 25%; font-size: 18px; color: #555;">
+                {{ $certPresentation }}
+            </div>
+        @endif
 
         @foreach($settings as $key => $style)
             @continue($key === 'platform_logo')
@@ -84,6 +104,7 @@
                 color: {{ $style['color'] }};
                 font-weight: {{ $style['fontWeight'] }};
                 font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
+                transform: translate(-50%, -50%); /* Center based on coords */
             ">
                 {{ $dataMap[$key] ?? '' }}
             </div>
@@ -93,21 +114,22 @@
         @if(isset($settings['platform_logo']))
             @php 
                 $logoStyle = $settings['platform_logo'];
-                $logoRelPath = 'img/logo.png';
+                $logoRelPath = 'img/logo.png'; // Should be dynamic? admin logo?
+                // Try to find a real logo
+                if(file_exists(public_path('uploads/branding/logo_admin.png'))) {
+                    $logoRelPath = 'uploads/branding/logo_admin.png';
+                }
+                
                 $logoUrl = (isset($isPreview) && $isPreview) ? asset($logoRelPath) : public_path($logoRelPath);
-                $logoExists = (isset($isPreview) && $isPreview) ? true : file_exists($logoUrl);
             @endphp
             <div class="element" style="
                 left: {{ $logoStyle['x'] }}%;
                 top: {{ $logoStyle['y'] }}%;
                 width: {{ $logoStyle['width'] ?? 120 }}px;
                 height: {{ $logoStyle['height'] ?? 60 }}px;
+                transform: translate(-50%, -50%);
             ">
-                @if($logoExists)
-                    <img src="{{ $logoUrl }}" style="width: 100%; height: 100%; object-fit: contain;">
-                @else
-                    <span style="font-size: 20px; font-weight: bold; color: #0066cc;">{{ $dataMap['platform_logo'] }}</span>
-                @endif
+                <img src="{{ $logoUrl }}" style="width: 100%; height: 100%; object-fit: contain;">
             </div>
         @endif
         
