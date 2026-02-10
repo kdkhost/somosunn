@@ -6,6 +6,16 @@
 - Sidebar do admin modernizada e responsiva.
 - Correções de layout, responsividade e experiência visual em todas as páginas públicas.
 
+# Refatoração de Configurações (Fevereiro 2026)
+
+A página de configurações do administrador (`/admin/settings`) foi completamente reconstruída para organizar melhor as opções do sistema:
+
+- **Abas Organizadas:** Configurações separadas em categorias claras: Geral, Aparência, Imagens, Player, Anúncios, PWA, Gateway, SMTP, Login Social, SEO e Sistema.
+- **Uploads com Drag-and-drop:** Melhoria visual e funcional nos campos de upload (logos, favicons, etc.) com suporte a arrastar e soltar.
+- **Separação de Anúncios:** Configurações de Ads (AdSense e HTML personalizado) agora têm sua própria aba, separada das configurações do Video Player.
+- **Teste de SMTP:** Funcionalidade integrada para testar o envio de e-mails diretamente da aba SMTP.
+
+
 # Granularidade de Permissões (Fevereiro 2026)
 
 O sistema agora possui controle total e granular de permissões para todas as áreas (cursos, mentorias, eventos, marketplace, uploads, faturas, certificados, pontos, cupons, planos, permissões, usuários, FAQ, fontes, mailtemplates, ranking, social, orders, invoices, reviews, depoimentos, comunidade, chat, etc).
