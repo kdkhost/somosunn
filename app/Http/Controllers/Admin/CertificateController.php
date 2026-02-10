@@ -198,27 +198,40 @@ class CertificateController extends Controller
             $workload = $product->total_hours;
         } elseif ($type === 'mentorship') {
             $authorName = $product->mentor ? $product->mentor->name : 'Mentor';
-            $workload = 0; // Or fetch from a field if added
+            $workload = $product->total_hours ?? 0;
+            // Mentorships might not have certificate settings yet, use defaults or course structure
         } elseif ($type === 'event') {
             $authorName = $product->user ? $product->user->name : 'Organizador';
-            $workload = 0;
+            $workload = $product->duration_hours ?? 0;
+        }
+
+        // Configure DomPDF
+        $options = new Options();
+        $options->set('isRemoteEnabled', true); // Allow remote images (http/https)
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('chroot', public_path()); // Allow access to public folder
+
+        $dompdf = new Dompdf($options);
+
+        // Sanitize background path for Windows (DomPDF prefers forward slashes)
+        if ($product->certificate_bg) {
+            $product->certificate_bg = str_replace('\\', '/', $product->certificate_bg);
         }
 
         $html = view('admin.certificates.template', [
             'user' => $user,
-            'course' => $product,
+            'course' => $product, // $product is passed as $course to the view
             'certHash' => $certHash,
             'authorName' => $authorName,
             'workload' => $workload,
-            'type' => $type
+            'type' => $type,
+            'isPreview' => false // Explicitly set for PDF generation
         ])->render();
 
-        $options = new Options();
-        $options->set('isRemoteEnabled', true);
-        $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
+
         return $dompdf->output();
     }
 

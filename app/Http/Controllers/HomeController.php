@@ -155,7 +155,7 @@ class HomeController extends Controller
 
             $sucessoCount = User::where(function ($q) {
                 $q->where('level', 'sucesso')
-                    ->orWhere('role', 'mentor');
+                    ->orWhereIn('role', ['mentor', 'admin', 'superadmin']);
             })->count();
 
             $levels = collect([

@@ -110,17 +110,22 @@
             </div>
         @endforeach
 
-        {{-- Platform Logo --}}
-        @if(isset($settings['platform_logo']))
             @php 
                 $logoStyle = $settings['platform_logo'];
-                $logoRelPath = 'img/logo.png'; // Should be dynamic? admin logo?
+                $logoRelPath = 'img/logo.png'; 
+                
                 // Try to find a real logo
                 if(file_exists(public_path('uploads/branding/logo_admin.png'))) {
                     $logoRelPath = 'uploads/branding/logo_admin.png';
                 }
                 
-                $logoUrl = (isset($isPreview) && $isPreview) ? asset($logoRelPath) : public_path($logoRelPath);
+                // For PDF (DomPDF), use absolute filesystem path
+                // For Preview (Browser), use URL
+                if (isset($isPreview) && $isPreview) {
+                     $logoUrl = asset($logoRelPath);
+                } else {
+                     $logoUrl = public_path($logoRelPath);
+                }
             @endphp
             <div class="element" style="
                 left: {{ $logoStyle['x'] }}%;
@@ -131,7 +136,6 @@
             ">
                 <img src="{{ $logoUrl }}" style="width: 100%; height: 100%; object-fit: contain;">
             </div>
-        @endif
         
         {{-- Instructor Signature --}}
         @if($course->instructor_signature)

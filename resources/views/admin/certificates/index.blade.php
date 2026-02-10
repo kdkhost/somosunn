@@ -58,8 +58,8 @@
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-xs btn-default btn-view-cert"
-                                            data-url="{{ route('admin.certificates.preview-html', $cert->cert_hash) }}"
-                                            data-download="{{ route('admin.certificates.view', $cert->cert_hash) }}?download=1"
+                                            data-url="{{ route('admin.certificates.preview-html', $cert->cert_hash, false) }}"
+                                            data-download="{{ route('admin.certificates.view', $cert->cert_hash, false) }}?download=1"
                                             title="Visualizar">
                                             <i class="fas fa-eye text-primary"></i>
                                         </button>
