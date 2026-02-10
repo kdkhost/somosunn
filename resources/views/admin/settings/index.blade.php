@@ -1,651 +1,142 @@
 @extends('admin.layouts.app')
-@php
-    use Illuminate\Support\Str;
-    $getUrl = function ($key) use ($settings) {
-        $value = $settings[$key] ?? '';
-        if (!$value) {
-            return '';
-        }
-
-        $value = trim((string) $value);
-        if ($value === '') {
-            return '';
-        }
-
-        if (Str::startsWith($value, ['http://', 'https://'])) {
-            return $value;
-        }
-
-        $value = str_replace('\\', '/', $value);
-        $value = preg_replace('/[?#].*$/', '', $value);
-
-        // If stored as absolute path inside /public, make it relative again
-        $publicRoot = str_replace('\\', '/', public_path());
-        if (Str::startsWith($value, $publicRoot)) {
-            $value = ltrim(substr($value, strlen($publicRoot)), '/');
-        }
-
-        $value = ltrim($value, '/');
-        if (Str::startsWith($value, 'tmp/')) {
-            return '';
-        }
-
-        // Legacy prefixes sometimes end up stored in DB
-        if (Str::startsWith($value, 'public/')) {
-            $value = substr($value, strlen('public/'));
-        }
-        if (Str::startsWith($value, 'storage/app/public/')) {
-            $value = 'storage/' . substr($value, strlen('storage/app/public/'));
-        }
-
-        if (file_exists(public_path($value))) {
-            return asset($value);
-        }
-
-        return '';
-    };
-    $pwa192 = $getUrl('pwa_icon_192');
-    $pwa512 = $getUrl('pwa_icon_512');
-    $pwaSplash = $getUrl('pwa_splash');
-    $pwaBanner = $getUrl('pwa_banner');
-    $preloaderImage = $getUrl('preloader_image') ?? '';
-    $preloaderEnabled = (bool) ($settings['preloader_enabled'] ?? 0);
-    $seoOg = $getUrl('seo_og_image');
-    $seoTwitter = $getUrl('seo_twitter_image');
-    $watermarkUrl = $getUrl('watermark_image');
-    $heroUrl = $getUrl('hero_image');
-    $wmPos = (string) ($settings['video_watermark_position'] ?? 'top-right');
-    $recaptchaStatus = $recaptchaStatus ?? [
-        'is_configured' => false,
-        'site_key_masked' => '-',
-        'secret_key_masked' => '-',
-        'min_score' => '0.5',
-    ];
-    $storageStatus = $storageStatus ?? [
-        'disk' => (string) ($settings['uploads_storage_disk'] ?? 'public'),
-        'is_configured' => false,
-        's3_configured' => false,
-        's3_bucket' => '-',
-        's3_region' => '-',
-        's3_endpoint' => '-',
-        'uploaded_files' => 0,
-        'uploaded_bytes' => 0,
-        'uploaded_size_human' => '0 B',
-        'stats_error' => '',
-    ];
-    $uploadLimitsStatus = $uploadLimitsStatus ?? [
-        'video_max_mb' => (int) ($settings['video_max_mb'] ?? 1024),
-        'document_max_mb' => (int) ($settings['document_max_mb'] ?? 50),
-        'allowed_video_formats' => (string) ($settings['allowed_video_formats'] ?? '-'),
-        'allowed_document_formats' => (string) ($settings['allowed_document_formats'] ?? '-'),
-    ];
-@endphp
-
-@section('page_title', 'Configurações')
-@section('breadcrumb')<li class="breadcrumb-item active">Configurações</li>@endsection
-
-@section('content')
 <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
     @csrf
     <div class="card card-primary card-outline">
         <div class="card-header p-0 border-bottom-0">
             <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tab-geral"
-                        role="tab">Geral</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-appearance"
-                        role="tab">Aparência</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-video" role="tab">Vídeo
-                        Player</a></li>
+                <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tab-geral" role="tab">Geral</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-appearance" role="tab">Aparência</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-video" role="tab">Vídeo Player</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-pwa" role="tab">PWA</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-gateway" role="tab">Gateway</a>
-                </li>
-                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-preloader"
-                        role="tab">Preloader</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-gateway" role="tab">Gateway</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-preloader" role="tab">Preloader</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-smtp" role="tab">SMTP</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-social" role="tab">Login
-                        Social</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-seo" role="tab">SEO &
-                        Analytics</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-social" role="tab">Login Social</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-seo" role="tab">SEO & Analytics</a></li>
             </ul>
         </div>
+
         <div class="card-body">
             <div class="tab-content">
 
-                {{-- GERAL --}}
+                {{-- GERAL: apenas configurações básicas do site --}}
                 <div class="tab-pane fade show active" id="tab-geral" role="tabpanel">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Nome do site</label>
-                                <input name="app_name" class="form-control"
-                                    value="{{ $settings['app_name'] ?? config('app.name') }}">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Tema do site</label>
-                                <select name="site_theme" class="form-control">
-                                    <option value="light" {{ ($settings['site_theme'] ?? 'light') === 'light' ? 'selected' : '' }}>Light</option>
-                                    <option value="dark" {{ ($settings['site_theme'] ?? '') === 'dark' ? 'selected' : '' }}>
-                                        Dark</option>
-                                </select>
-                            </div>
-                        </div>
+                        <div class="col-md-6 form-group"><label>Nome do site</label><input name="app_name" class="form-control" value="{{ $settings['app_name'] ?? config('app.name') }}"></div>
+                        <div class="col-md-6 form-group"><label>Tema do site</label><select name="site_theme" class="form-control"><option value="light" {{ ($settings['site_theme'] ?? 'light') === 'light' ? 'selected' : '' }}>Light</option><option value="dark" {{ ($settings['site_theme'] ?? '') === 'dark' ? 'selected' : '' }}>Dark</option></select></div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Nome da empresa</label><input name="company_name"
-                                    class="form-control" value="{{ $settings['company_name'] ?? '' }}"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Telefone</label><input name="company_phone"
-                                    class="form-control mask-phone" value="{{ $settings['company_phone'] ?? '' }}">
-                            </div>
-                        </div>
+                        <div class="col-md-4 form-group"><label>Empresa</label><input name="company_name" class="form-control" value="{{ $settings['company_name'] ?? '' }}"></div>
+                        <div class="col-md-4 form-group"><label>Telefone</label><input name="company_phone" class="form-control mask-phone" value="{{ $settings['company_phone'] ?? '' }}"></div>
+                        <div class="col-md-4 form-group"><label>E-mail</label><input name="company_email" class="form-control" value="{{ $settings['company_email'] ?? '' }}"></div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group"><label>E-mail</label><input name="company_email"
-                                    class="form-control" value="{{ $settings['company_email'] ?? '' }}"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group"><label>CEP</label><input id="company_zip" name="company_zip"
-                                    class="form-control mask-cep" data-target-number="#company_number"
-                                    data-target-complement="#company_complement"
-                                    data-target-district="#company_district"
-                                    value="{{ $settings['company_zip'] ?? '' }}"></div>
-                        </div>
+                        <div class="col-md-3 form-group"><label>CEP</label><input id="company_zip" name="company_zip" class="form-control mask-cep" value="{{ $settings['company_zip'] ?? '' }}"></div>
+                        <div class="col-md-5 form-group"><label>Endereço</label><input name="company_address" class="form-control" value="{{ $settings['company_address'] ?? '' }}"></div>
+                        <div class="col-md-2 form-group"><label>Número</label><input id="company_number" name="company_number" class="form-control" value="{{ $settings['company_number'] ?? '' }}"></div>
+                        <div class="col-md-2 form-group"><label>Estado</label><input name="company_state" class="form-control" value="{{ $settings['company_state'] ?? '' }}"></div>
                     </div>
 
+                    <hr>
+                    <h5 class="mb-2">Imagens principais</h5>
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Endereço</label><input name="company_address"
-                                    class="form-control" value="{{ $settings['company_address'] ?? '' }}"></div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group"><label>Número</label><input id="company_number"
-                                    name="company_number" class="form-control"
-                                    value="{{ $settings['company_number'] ?? '' }}"></div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group"><label>Complemento</label><input id="company_complement"
-                                    name="company_complement" class="form-control"
-                                    value="{{ $settings['company_complement'] ?? '' }}"></div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group"><label>Bairro</label><input id="company_district"
-                                    name="company_district" class="form-control"
-                                    value="{{ $settings['company_district'] ?? '' }}"></div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group"><label>Cidade</label><input name="company_city" class="form-control"
-                                    value="{{ $settings['company_city'] ?? '' }}"></div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group"><label>Estado</label><input name="company_state"
-                                    class="form-control" value="{{ $settings['company_state'] ?? '' }}"></div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6 form-group">
                             <label>Logo (principal)</label>
                             <input type="hidden" name="remove_logo_image" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('logo_image') }}"
-                                data-remove-input="[name='remove_logo_image']">
+                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}" data-existing-url="{{ $getUrl('logo_image') }}" data-remove-input="[name='remove_logo_image']">
                                 <input type="file" name="logo_image" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small"></div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                                <div class="upload-preview text-center text-muted"></div>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
+                                <div class="progress upload-progress d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 form-group">
                             <label>Favicon</label>
                             <input type="hidden" name="remove_favicon_image" value="0">
-                            <div class="upload-box" data-max-size="{{ 2 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('favicon_image') }}"
-                                data-remove-input="[name='remove_favicon_image']">
+                            <div class="upload-box" data-max-size="{{ 2 * 1024 * 1024 }}" data-existing-url="{{ $getUrl('favicon_image') }}" data-remove-input="[name='remove_favicon_image']">
                                 <input type="file" name="favicon_image" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small"></div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-4">
-                            <label>Logo painel administrativo</label>
-                            <input type="hidden" name="remove_logo_admin" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('logo_admin') }}"
-                                data-remove-input="[name='remove_logo_admin']">
-                                <input type="file" name="logo_admin" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small"></div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label>Logo páginas de login/registro</label>
-                            <input type="hidden" name="remove_logo_auth" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('logo_auth') }}"
-                                data-remove-input="[name='remove_logo_auth']">
-                                <input type="file" name="logo_auth" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small"></div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label>Logo front-end/site</label>
-                            <input type="hidden" name="remove_logo_front" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('logo_front') }}"
-                                data-remove-input="[name='remove_logo_front']">
-                                <input type="file" name="logo_front" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small"></div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <label>Marca d'água (vídeos de cursos)</label>
-                            <input type="hidden" name="remove_watermark_image" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('watermark_image') }}"
-                                data-remove-input="[name='remove_watermark_image']">
-                                <input type="file" name="watermark_image" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small"></div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="my-4">
-
-                    <div class="card card-outline card-secondary collapsed-card">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-shield-alt mr-2"></i>Segurança (reCAPTCHA v3)</h3>
-                            <div class="card-tools d-flex align-items-center">
-                                <span
-                                    class="badge {{ $recaptchaStatus['is_configured'] ? 'badge-success' : 'badge-warning' }} mr-2">
-                                    {{ $recaptchaStatus['is_configured'] ? 'Configurado' : 'Nao configurado' }}
-                                </span>
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
-                                        class="fas fa-plus"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body" style="display: none;">
-                            <div
-                                class="alert {{ $recaptchaStatus['is_configured'] ? 'alert-success' : 'alert-warning' }}">
-                                <div class="small">
-                                    <strong>Status:</strong>
-                                    {{ $recaptchaStatus['is_configured'] ? 'Ativo para uso' : 'Pendente de configuracao' }}<br>
-                                    <strong>Site Key:</strong>
-                                    <code>{{ $recaptchaStatus['site_key_masked'] }}</code><br>
-                                    <strong>Secret:</strong>
-                                    <code>{{ $recaptchaStatus['secret_key_masked'] }}</code><br>
-                                    <strong>Score minimo:</strong> {{ $recaptchaStatus['min_score'] }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Site Key</label>
-                                        <input name="recaptcha_v3_site_key" class="form-control"
-                                            value="{{ $settings['recaptcha_v3_site_key'] ?? (string) config('services.recaptcha.site_key', '') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Secret Key</label>
-                                        <input name="recaptcha_v3_secret_key" type="password" class="form-control"
-                                            value="{{ $settings['recaptcha_v3_secret_key'] ?? (string) config('services.recaptcha.v3_secret', '') }}">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Score mínimo (0.0–1.0)</label>
-                                        <input name="recaptcha_v3_min_score" class="form-control"
-                                            value="{{ $settings['recaptcha_v3_min_score'] ?? (string) config('services.recaptcha.v3_min_score', 0.5) }}"
-                                            placeholder="0.5">
-                                        <small class="text-muted">Recomendado: 0.5. Quanto maior, mais rígido.</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="alert alert-light border mb-0">
-                                        <div class="small text-muted">
-                                            Usado principalmente em formulários públicos (ex.: <code>/contato</code>).
-                                            Se ficar vazio, o sistema usa as variáveis do <code>.env</code>.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card card-outline card-info collapsed-card">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-cloud mr-2"></i>Armazenamento (S3 compatível)</h3>
-                            <div class="card-tools d-flex align-items-center">
-                                <span
-                                    class="badge badge-secondary mr-2">{{ strtoupper((string) $storageStatus['disk']) }}</span>
-                                <span
-                                    class="badge {{ $storageStatus['is_configured'] ? 'badge-success' : 'badge-warning' }} mr-2">
-                                    {{ $storageStatus['is_configured'] ? 'Configurado' : 'Nao configurado' }}
-                                </span>
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
-                                        class="fas fa-plus"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body" style="display: none;">
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <div class="small text-muted">Arquivos enviados para o repositorio</div>
-                                    <div class="h5 mb-0">
-                                        {{ number_format((int) $storageStatus['uploaded_files'], 0, ',', '.') }}
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="small text-muted">Volume total enviado</div>
-                                    <div class="h5 mb-0">{{ $storageStatus['uploaded_size_human'] }}</div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="small text-muted">Bucket/Regiao</div>
-                                    <div class="h6 mb-0">
-                                        {{ $storageStatus['s3_bucket'] }} / {{ $storageStatus['s3_region'] }}
-                                    </div>
-                                </div>
-                            </div>
-                            @if(!empty($storageStatus['stats_error']))
-                                <div class="alert alert-warning">
-                                    <strong>Aviso:</strong> nao foi possivel ler o uso do repositorio agora.
-                                </div>
-                            @endif
-                            @php($uploadsDisk = $settings['uploads_storage_disk'] ?? (string) config('uploads.disk', 'public'))
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Disco para uploads (vídeos/documentos)</label>
-                                        <select name="uploads_storage_disk" class="form-control">
-                                            <option value="public" {{ $uploadsDisk === 'public' ? 'selected' : '' }}>Local
-                                                (public)</option>
-                                            <option value="s3" {{ $uploadsDisk === 's3' ? 'selected' : '' }}>S3</option>
-                                        </select>
-                                        <small class="text-muted">Ajusta endpoints de upload do sistema (ex.:
-                                            <code>/upload</code> e uploads em partes).</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="alert alert-light border mb-0">
-                                        <div class="small text-muted">
-                                            Compatível com AWS S3, Wasabi, DigitalOcean Spaces, MinIO etc. Para S3
-                                            “compatível”, preencha <strong>Endpoint</strong> e marque
-                                            <strong>Path-style</strong> se necessário.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Access Key ID</label>
-                                        <input name="s3_key" class="form-control"
-                                            value="{{ $settings['s3_key'] ?? (string) config('filesystems.disks.s3.key', '') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Secret Access Key</label>
-                                        <input name="s3_secret" type="password" class="form-control"
-                                            value="{{ $settings['s3_secret'] ?? (string) config('filesystems.disks.s3.secret', '') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Região</label>
-                                        <input name="s3_region" class="form-control"
-                                            value="{{ $settings['s3_region'] ?? (string) config('filesystems.disks.s3.region', '') }}"
-                                            placeholder="us-east-1">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Bucket</label>
-                                        <input name="s3_bucket" class="form-control"
-                                            value="{{ $settings['s3_bucket'] ?? (string) config('filesystems.disks.s3.bucket', '') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>URL pública/CDN (opcional)</label>
-                                        <input name="s3_url" class="form-control"
-                                            value="{{ $settings['s3_url'] ?? (string) config('filesystems.disks.s3.url', '') }}"
-                                            placeholder="https://...">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Endpoint (opcional)</label>
-                                        <input name="s3_endpoint" class="form-control"
-                                            value="{{ $settings['s3_endpoint'] ?? (string) config('filesystems.disks.s3.endpoint', '') }}"
-                                            placeholder="https://s3.us-east-1.amazonaws.com">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group mb-0">
-                                @php($s3PathStyle = (int) ($settings['s3_path_style'] ?? (int) config('filesystems.disks.s3.use_path_style_endpoint', 0)))
-                                <div class="custom-control custom-switch">
-                                    <input type="hidden" name="s3_path_style" value="0">
-                                    <input type="checkbox" class="custom-control-input" id="s3_path_style"
-                                        name="s3_path_style" value="1" {{ $s3PathStyle ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="s3_path_style">Usar endpoint
-                                        path-style</label>
-                                </div>
-                                <small class="text-muted">Alguns provedores/MinIO exigem isso.</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card card-outline card-warning collapsed-card">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-upload mr-2"></i>Limites de Upload</h3>
-                            <div class="card-tools d-flex align-items-center">
-                                <span class="badge badge-info mr-2">Video:
-                                    {{ (int) $uploadLimitsStatus['video_max_mb'] }} MB</span>
-                                <span class="badge badge-info mr-2">Doc:
-                                    {{ (int) $uploadLimitsStatus['document_max_mb'] }} MB</span>
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
-                                        class="fas fa-plus"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body" style="display: none;">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>VIDEO_MAX_MB</label>
-                                        <input name="video_max_mb" type="number" min="1" max="10240"
-                                            class="form-control"
-                                            value="{{ $settings['video_max_mb'] ?? (int) config('uploads.video_max_mb', 1024) }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>DOCUMENT_MAX_MB</label>
-                                        <input name="document_max_mb" type="number" min="1" max="1024"
-                                            class="form-control"
-                                            value="{{ $settings['document_max_mb'] ?? (int) config('uploads.document_max_mb', 50) }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="alert alert-light border mb-0">
-                                        <div class="small text-muted">
-                                            Se os campos ficarem vazios, o sistema usa os valores do <code>.env</code>.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>ALLOWED_VIDEO_FORMATS</label>
-                                        <input name="allowed_video_formats" class="form-control"
-                                            value="{{ $settings['allowed_video_formats'] ?? implode(',', (array) config('uploads.allowed_video_formats', [])) }}"
-                                            placeholder="mp4,webm,mkv">
-                                        <small class="text-muted">Separar por vírgula. Ex:
-                                            <code>mp4,webm,mkv</code></small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>ALLOWED_DOCUMENT_FORMATS</label>
-                                        <input name="allowed_document_formats" class="form-control"
-                                            value="{{ $settings['allowed_document_formats'] ?? implode(',', (array) config('uploads.allowed_document_formats', [])) }}"
-                                            placeholder="pdf,docx,pptx">
-                                        <small class="text-muted">Separar por vírgula. Ex:
-                                            <code>pdf,docx,pptx</code></small>
-                                    </div>
-                                </div>
+                                <div class="upload-preview text-center text-muted"></div>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
+                                <div class="progress upload-progress d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- APARÊNCIA (NOVO) --}}
+                {{-- APARÊNCIA: apenas campos relacionados ao visual do site --}}
                 <div class="tab-pane fade" id="tab-appearance" role="tabpanel">
-                    <h5 class="text-primary mb-3"><i class="fas fa-home mr-2"></i>Hero (Página Inicial)</h5>
+                    <h5 class="mb-2">Cores e Tipografia</h5>
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Título Principal</label>
-                                <input name="hero_title" class="form-control"
-                                    value="{{ $settings['hero_title'] ?? 'Transforme sua carreira' }}">
-                            </div>
-                            <div class="form-group">
-                                <label>Subtítulo</label>
-                                <textarea name="hero_subtitle" class="form-control"
-                                    rows="3">{{ $settings['hero_subtitle'] ?? 'Junte-se a milhares de membros e aprenda com os melhores.' }}</textarea>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label>Imagem de Fundo (Hero)</label>
-                            <input type="hidden" name="remove_hero_image" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $heroUrl ?? '' }}" data-remove-input="[name='remove_hero_image']">
-                                <input type="file" name="hero_image" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-help text-muted small">Recomendado: 1920x1080px</div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    arquivo</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
+                        <div class="col-md-6 form-group"><label>Cor primária</label><input name="site_color_primary" class="form-control" value="{{ $settings['site_color_primary'] ?? '#1F5EDB' }}"></div>
+                        <div class="col-md-6 form-group"><label>Cor secundária</label><input name="site_color_secondary" class="form-control" value="{{ $settings['site_color_secondary'] ?? '#6c757d' }}"></div>
                     </div>
+                    <div class="form-group"><label>Fonte do site</label><input name="site_font_family" class="form-control" value="{{ $settings['site_font_family'] ?? 'Inter, sans-serif' }}"></div>
+                </div>
 
-                    <hr>
+                {{-- VÍDEO PLAYER: somente opções do player --}}
+                <div class="tab-pane fade" id="tab-video" role="tabpanel">
+                    <h5 class="mb-2">Player de Vídeo (Plyr)</h5>
+                    <div class="form-group"><div class="custom-control custom-switch"><input type="hidden" name="video_player_enabled" value="0"><input type="checkbox" class="custom-control-input" id="video_player_enabled" name="video_player_enabled" value="1" {{ ($settings['video_player_enabled'] ?? 1) ? 'checked' : '' }}><label class="custom-control-label" for="video_player_enabled">Ativar Plyr</label></div></div>
+                    <div class="row"><div class="col-md-6 form-group"><label>Cor do player</label><input name="video_plyr_color" class="form-control" value="{{ $settings['video_plyr_color'] ?? ($settings['site_color_primary'] ?? '#1F5EDB') }}"></div><div class="col-md-6 form-group"><label>Volume inicial</label><input name="video_plyr_volume" class="form-control" value="{{ $settings['video_plyr_volume'] ?? '0.8' }}"></div></div>
+                    <div class="form-group"><label>Controles</label><input name="video_plyr_controls" class="form-control" value="{{ $settings['video_plyr_controls'] ?? 'play,progress,current-time,mute,volume,settings,fullscreen' }}"></div>
+                    <div class="form-group"><label>Opções avançadas (JSON)</label><textarea name="video_plyr_options_json" class="form-control" rows="4">{{ $settings['video_plyr_options_json'] ?? '' }}</textarea></div>
+                </div>
 
-                    <h5 class="text-primary mb-3"><i class="fas fa-image mr-2"></i>Fundo do Portal</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label>Imagem de Fundo Global</label>
-                            <input type="hidden" name="remove_site_bg_image" value="0">
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('site_bg_image') }}"
-                                data-remove-input="[name='remove_site_bg_image']">
-                                <input type="file" name="site_bg_image" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted">Arraste ou clique para enviar</div>
-                                <div class="upload-meta text-muted small"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar
-                                    imagem</button>
-                                <div class="progress upload-progress d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Opacidade do Degradê (%)</label>
-                                <input name="site_bg_gradient_opacity" type="number" min="0" max="100"
-                                    class="form-control" value="{{ $settings['site_bg_gradient_opacity'] ?? 85 }}">
-                                <small class="text-muted">Opacidade da camada de degradê sobre a imagem de fundo
-                                    (0-100%).</small>
-                            </div>
-                            <div class="form-group">
-                                <label>Cor do Degradê (Início)</label>
-                                <div class="input-group colorpicker-element">
-                                    <input name="site_bg_gradient_start" class="form-control"
-                                        value="{{ $settings['site_bg_gradient_start'] ?? '#000000' }}">
+                {{-- PWA --}}
+                <div class="tab-pane fade" id="tab-pwa" role="tabpanel">
+                    <h5 class="mb-2">Progressive Web App (PWA)</h5>
+                    <div class="form-group"><div class="custom-control custom-switch"><input type="hidden" name="pwa_enabled" value="0"><input type="checkbox" class="custom-control-input" id="pwa_enabled" name="pwa_enabled" value="1" {{ ($settings['pwa_enabled'] ?? 0) ? 'checked' : '' }}><label class="custom-control-label" for="pwa_enabled">Ativar PWA</label></div></div>
+                    <div class="row"><div class="col-md-6 form-group"><label>Nome</label><input name="pwa_name" class="form-control" value="{{ $settings['pwa_name'] ?? '' }}"></div><div class="col-md-6 form-group"><label>Short name</label><input name="pwa_short_name" class="form-control" value="{{ $settings['pwa_short_name'] ?? '' }}"></div></div>
+                    <div class="row"><div class="col-md-4 form-group"><label>Ícone 192×192</label><div class="upload-box" data-max-size="204800" data-existing-url="{{ $pwa192 }}" data-remove-input="[name='remove_pwa_icon_192']"><input type="file" name="pwa_icon_192" class="d-none" accept="image/*"><div class="upload-preview text-center text-muted"></div><button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar</button></div></div><div class="col-md-4 form-group"><label>Ícone 512×512</label><div class="upload-box" data-max-size="409600" data-existing-url="{{ $pwa512 }}" data-remove-input="[name='remove_pwa_icon_512']"><input type="file" name="pwa_icon_512" class="d-none" accept="image/*"><div class="upload-preview text-center text-muted"></div><button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar</button></div></div><div class="col-md-4 form-group"><label>Banner</label><div class="upload-box" data-max-size="1048576" data-existing-url="{{ $pwaSplash }}" data-remove-input="[name='remove_pwa_splash']"><input type="file" name="pwa_splash" class="d-none" accept="image/*"><div class="upload-preview text-center text-muted"></div><button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar</button></div></div></div>
+                </div>
+
+                {{-- GATEWAY --}}
+                <div class="tab-pane fade" id="tab-gateway" role="tabpanel">
+                    <h5 class="mb-2">Gateways de Pagamento</h5>
+                    <div class="form-group"><label>MercadoPago - Access Token</label><input name="mercadopago_access_token" class="form-control" value="{{ $settings['mercadopago_access_token'] ?? '' }}"></div>
+                    <div class="form-group"><label>PagSeguro - Token</label><input name="pagseguro_token" class="form-control" value="{{ $settings['pagseguro_token'] ?? '' }}"></div>
+                </div>
+
+                {{-- PRELOADER --}}
+                <div class="tab-pane fade" id="tab-preloader" role="tabpanel">
+                    <h5 class="mb-2">Preloader</h5>
+                    <div class="form-group"><div class="custom-control custom-switch"><input type="hidden" name="preloader_enabled" value="0"><input type="checkbox" class="custom-control-input" id="preloader_enabled" name="preloader_enabled" value="1" {{ ($preloaderEnabled ?? 0) ? 'checked' : '' }}><label class="custom-control-label" for="preloader_enabled">Ativar preloader</label></div></div>
+                    <div class="form-group"><label>Imagem do Preloader</label><div class="upload-box" data-max-size="204800" data-existing-url="{{ $preloaderImage }}" data-remove-input="[name='remove_preloader_image']"><input type="file" name="preloader_image" class="d-none" accept="image/*"><div class="upload-preview text-center text-muted"></div><button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar</button></div></div>
+                </div>
+
+                {{-- SMTP --}}
+                <div class="tab-pane fade" id="tab-smtp" role="tabpanel">
+                    <h5 class="mb-2">SMTP</h5>
+                    <div class="row"><div class="col-md-6 form-group"><label>Host</label><input name="smtp_host" class="form-control" value="{{ $settings['smtp_host'] ?? '' }}"></div><div class="col-md-3 form-group"><label>Porta</label><input name="smtp_port" class="form-control" value="{{ $settings['smtp_port'] ?? '' }}"></div><div class="col-md-3 form-group"><label>Encriptação</label><select name="smtp_encryption" class="form-control"><option value="" {{ ($settings['smtp_encryption'] ?? '')==''? 'selected':'' }}>Nenhuma</option><option value="ssl" {{ ($settings['smtp_encryption'] ?? '')=='ssl'? 'selected':'' }}>SSL</option><option value="tls" {{ ($settings['smtp_encryption'] ?? '')=='tls'? 'selected':'' }}>TLS</option></select></div></div>
+                    <div class="row"><div class="col-md-6 form-group"><label>Usuário</label><input name="smtp_username" class="form-control" value="{{ $settings['smtp_username'] ?? '' }}"></div><div class="col-md-6 form-group"><label>Senha</label><input name="smtp_password" type="password" class="form-control" value="{{ $settings['smtp_password'] ?? '' }}"></div></div>
+                    <div class="form-group text-right"><button type="button" id="btnTestSmtp" class="btn btn-outline-primary">Testar conexão SMTP</button></div>
+                </div>
+
+                {{-- LOGIN SOCIAL --}}
+                <div class="tab-pane fade" id="tab-social" role="tabpanel">
+                    <h5 class="mb-2">Login Social</h5>
+                    <div class="row"><div class="col-md-6 form-group"><label>Google Client ID</label><input name="social_google_client_id" class="form-control" value="{{ $settings['social_google_client_id'] ?? '' }}"></div><div class="col-md-6 form-group"><label>Google Client Secret</label><input name="social_google_client_secret" class="form-control" value="{{ $settings['social_google_client_secret'] ?? '' }}"></div></div>
+                    <div class="row"><div class="col-md-6 form-group"><label>Facebook App ID</label><input name="social_facebook_app_id" class="form-control" value="{{ $settings['social_facebook_app_id'] ?? '' }}"></div><div class="col-md-6 form-group"><label>Facebook App Secret</label><input name="social_facebook_app_secret" class="form-control" value="{{ $settings['social_facebook_app_secret'] ?? '' }}"></div></div>
+                </div>
+
+                {{-- SEO & ANALYTICS --}}
+                <div class="tab-pane fade" id="tab-seo" role="tabpanel">
+                    <h5 class="mb-2">SEO & Analytics</h5>
+                    <div class="form-group"><label>Open Graph Image</label><div class="upload-box" data-max-size="1048576" data-existing-url="{{ $seoOg ?? '' }}" data-remove-input="[name='remove_seo_og_image']"><input type="file" name="seo_og_image" class="d-none" accept="image/*"><div class="upload-preview text-center text-muted"></div><button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar</button></div></div>
+                    <div class="form-group"><label>Twitter Image</label><div class="upload-box" data-max-size="1048576" data-existing-url="{{ $seoTwitter ?? '' }}" data-remove-input="[name='remove_seo_twitter_image']"><input type="file" name="seo_twitter_image" class="d-none" accept="image/*"><div class="upload-preview text-center text-muted"></div><button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar</button></div></div>
+                    <div class="form-group"><label>Tracking HEAD</label><textarea name="tracking_head" class="form-control" rows="3">{{ $settings['tracking_head'] ?? '' }}</textarea></div>
+                    <div class="form-group"><label>Tracking BODY</label><textarea name="tracking_body" class="form-control" rows="3">{{ $settings['tracking_body'] ?? '' }}</textarea></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card-footer text-right"><button class="btn btn-primary">Salvar</button></div>
+    </div>
+</form>
+@endsection
                                     <div class="input-group-append">
                                         <span class="input-group-text"><i class="fas fa-square"
                                                 style="color: {{ $settings['site_bg_gradient_start'] ?? '#000000' }}"></i></span>
