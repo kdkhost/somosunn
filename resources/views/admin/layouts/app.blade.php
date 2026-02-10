@@ -85,6 +85,24 @@
         @media (max-width:575px){ .content-header .container-fluid>div{flex-direction:column;align-items:flex-start!important;gap:.25rem} }
         /* Keep any cosmetic colors to AdminLTE CSS; minimal helpers only */
     </style>
+    <style>
+        /* Small neutral utilities to restore layout helpers used across admin views
+           These are intentionally minimal and do NOT override AdminLTE theme colors. */
+        .bg-white { background-color: #ffffff !important; }
+        .bg-light { background-color: #f8f9fa !important; }
+        .rounded-xl { border-radius: .75rem !important; }
+        .shadow-sm { box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important; }
+        .text-blue-900 { color: #1e3a8a !important; }
+        .font-bold { font-weight: 700 !important; }
+        .border-b { border-bottom: 1px solid rgba(0,0,0,.06) !important; }
+        .border-gray-200 { border-color: #e5e7eb !important; }
+        .transition-all { transition: all .2s ease-in-out !important; }
+        .duration-300 { transition-duration: .3s !important; }
+        .mx-2 { margin-left: .5rem !important; margin-right: .5rem !important; }
+        .px-2 { padding-left: .5rem !important; padding-right: .5rem !important; }
+        .text-wrap { white-space: normal !important; }
+        .bg-gradient-soft { background: linear-gradient(90deg, #f1f5f9 0%, #ffffff 100%) !important; }
+    </style>
     @stack('styles')
 </head>
 
