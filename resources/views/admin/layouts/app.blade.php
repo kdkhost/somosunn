@@ -99,14 +99,34 @@
             transition: margin-left .3s ease-in-out;
         }
 
-        /* AdminLTE 3.2 navbar-fixed handles padding automatically via body class, no need for overriding here unless using custom implementation */
-        body.layout-navbar-fixed .content-wrapper {
-            margin-top: calc(4.5rem + 1px);
-            /* Increased spacing for breadcrumb overlap fix */
+        /* AdminLTE 3.2 original: sidebar/navbar escuros, menus/submenus azul padrão, cards e conteúdo branco */
+        .main-sidebar, .sidebar, .main-header, .navbar {
+            background-color: #343a40 !important;
+            color: #fff !important;
         }
-
-        .content-wrapper>.content {
-            padding: 0 1rem 1rem 1rem;
+        .nav-sidebar .nav-item > .nav-link.active {
+            background-color: #007bff !important;
+            color: #fff !important;
+        }
+        .nav-sidebar .nav-item > .nav-link:hover {
+            background-color: #0069d9 !important;
+            color: #fff !important;
+        }
+        .nav-sidebar .nav-treeview > .nav-item > .nav-link {
+            background-color: #23272b !important;
+            color: #c2c7d0 !important;
+        }
+        .nav-sidebar .nav-treeview > .nav-item > .nav-link.active {
+            background-color: #007bff !important;
+            color: #fff !important;
+        }
+        .nav-sidebar .nav-treeview > .nav-item > .nav-link:hover {
+            background-color: #0069d9 !important;
+            color: #fff !important;
+        }
+        .content-wrapper, .content-header, .content-header .breadcrumb, .upload-box, .upload-box.dragover, .upload-preview img {
+            background-color: #fff !important;
+            color: #222d32 !important;
         }
 
         .content-header {
