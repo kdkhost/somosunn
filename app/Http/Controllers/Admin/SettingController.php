@@ -177,41 +177,38 @@ class SettingController extends Controller
             $this->replaceFile('seo_twitter_image', $this->storePublic($request->file('seo_twitter_image'), 'uploads/imagens/seo'));
         }
 
-        $bools = [
-            'pwa_enabled',
-            'preloader_enabled',
-            'ads_enabled',
-            'ads_inter_feed_enabled',
-            'gateway_transparent_checkout',
-            'gateway_pass_tax_to_client',
-            'social_login_enabled',
-            'social_google_enabled',
-            'social_facebook_enabled',
-            'social_twitter_enabled',
+        // Mapeamento de booleanos por grupo para garantir que desativar (unchecked) funcione
+        $groupBools = [
+            'pwa' => ['pwa_enabled'],
+            'appearance' => ['preloader_enabled'],
+            'player' => [
+                'video_player_enabled',
+                'video_plyr_autoplay',
+                'video_plyr_muted',
+                'video_plyr_click_to_play',
+                'video_plyr_disable_context_menu',
+                'video_plyr_rewind_enabled',
+                'video_plyr_fast_forward_enabled',
+                'video_plyr_volume_enabled',
+                'video_watermark_enabled',
+                'video_watermark_text_enabled',
+                'video_watermark_animate'
+            ],
+            'ads' => ['ads_enabled', 'ads_inter_feed_enabled'],
+            'gateway' => ['gateway_transparent_checkout', 'gateway_pass_tax_to_client'],
+            'social' => [
+                'social_login_enabled',
+                'social_google_enabled',
+                'social_facebook_enabled',
+                'social_twitter_enabled'
+            ],
+            'system' => ['s3_path_style'],
         ];
 
-        foreach ($bools as $b) {
-            if ($request->has($b)) {
-                $data[$b] = $request->boolean($b) ? 1 : 0;
-            }
-        }
-
-        $videoBools = [
-            'video_player_enabled',
-            'video_plyr_autoplay',
-            'video_plyr_muted',
-            'video_plyr_click_to_play',
-            'video_plyr_disable_context_menu',
-            'video_plyr_rewind_enabled',
-            'video_plyr_fast_forward_enabled',
-            'video_plyr_volume_enabled',
-            'video_watermark_enabled',
-            'video_watermark_text_enabled',
-            'video_watermark_animate',
-        ];
-        foreach ($videoBools as $b) {
-            if ($request->has($b)) {
-                $data[$b] = $request->boolean($b) ? 1 : 0;
+        $currentGroup = $request->input('current_group', 'general');
+        if (isset($groupBools[$currentGroup])) {
+            foreach ($groupBools[$currentGroup] as $b) {
+                $data[$b] = $request->has($b) ? 1 : 0;
             }
         }
 
