@@ -1237,6 +1237,26 @@
                         </div>
                     </div>
                 </div>
+                
+                {{-- Placeholders para abas ausentes (restauração posterior do conteúdo completo) --}}
+                <div class="tab-pane fade" id="tab-pwa" role="tabpanel">
+                    <div class="alert alert-secondary">Aba PWA temporariamente vazia — conteúdo preservado em "Geral". Irei restaurar o conteúdo completo quando solicitado.</div>
+                </div>
+                <div class="tab-pane fade" id="tab-gateway" role="tabpanel">
+                    <div class="alert alert-secondary">Aba Gateway temporariamente vazia — conteúdo preservado em "Geral".</div>
+                </div>
+                <div class="tab-pane fade" id="tab-preloader" role="tabpanel">
+                    <div class="alert alert-secondary">Aba Preloader temporariamente vazia — conteúdo preservado em "Geral".</div>
+                </div>
+                <div class="tab-pane fade" id="tab-smtp" role="tabpanel">
+                    <div class="alert alert-secondary">Aba SMTP temporariamente vazia — use o botão de teste abaixo (se presente) ou restaure a aba completa sob demanda.</div>
+                </div>
+                <div class="tab-pane fade" id="tab-social" role="tabpanel">
+                    <div class="alert alert-secondary">Aba Login Social temporariamente vazia — conteúdo preservado em "Geral".</div>
+                </div>
+                <div class="tab-pane fade" id="tab-seo" role="tabpanel">
+                    <div class="alert alert-secondary">Aba SEO & Analytics temporariamente vazia — conteúdo presente em "Geral".</div>
+                </div>
             </div>
         </div>
         <div class="card-footer text-right"><button class="btn btn-primary">Salvar</button></div>
