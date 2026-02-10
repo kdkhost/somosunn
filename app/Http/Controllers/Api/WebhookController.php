@@ -21,6 +21,10 @@ class WebhookController extends Controller
      */
     public function mercadopago(Request $request)
     {
+        if ($request->isMethod('GET')) {
+            return response()->json(['status' => 'online', 'message' => 'MercadoPago Webhook is active and waiting for POST requests.'], 200);
+        }
+
         Log::info('MercadoPago Webhook received: ' . json_encode($request->all()));
 
         $type = $request->input('type');
@@ -72,6 +76,10 @@ class WebhookController extends Controller
      */
     public function pagseguro(Request $request)
     {
+        if ($request->isMethod('GET')) {
+            return response()->json(['status' => 'online', 'message' => 'PagSeguro Webhook is active and waiting for POST notifications.'], 200);
+        }
+
         Log::info('PagSeguro Webhook received: ' . json_encode($request->all()));
 
         $notificationCode = $request->input('notificationCode');

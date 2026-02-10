@@ -66,10 +66,10 @@
                                             <i class="fas fa-download text-danger"></i>
                                         </a>
                                         <form action="{{ route('admin.certificates.send', $cert->id) }}" method="POST"
-                                            class="d-inline"
-                                            onsubmit="return confirm('Enviar certificado por e-mail para {{ $cert->user->email }}?')">
+                                            class="d-inline form-send-email">
                                             @csrf
-                                            <button type="submit" class="btn btn-xs btn-primary" title="Enviar por Email">
+                                            <button type="button" class="btn btn-xs btn-primary btn-send-email"
+                                                data-email="{{ $cert->user->email }}" title="Enviar por Email">
                                                 <i class="fas fa-envelope"></i>
                                             </button>
                                         </form>
@@ -217,6 +217,28 @@
             // Clear iframe on close
             $('#modalViewCert').on('hidden.bs.modal', function () {
                 $('#iframeCert').attr('src', '');
+            });
+
+            // SweetAlert2 for Email Sending
+            $('.btn-send-email').on('click', function (e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+                var email = $(this).data('email');
+
+                Swal.fire({
+                    title: 'Enviar Certificado?',
+                    text: "O certificado será enviado por e-mail para " + email,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#aaa',
+                    confirmButtonText: 'Sim, enviar!',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
             });
         });
     </script>

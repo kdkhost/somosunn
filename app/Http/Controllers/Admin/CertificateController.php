@@ -204,12 +204,28 @@ class CertificateController extends Controller
     public function view($hash)
     {
         $cert = Certificate::where('cert_hash', $hash)->firstOrFail();
-        $path = storage_path('app/public/' . $cert->pdf_path);
+
+        $pdfPath = $cert->pdf_path;
+        // Construct path manually to avoid static analysis warnings with generic Filesystem disk
+        $path = storage_path('app/public/' . $pdfPath);
+
+        if (!file_exists($path)) {
+            // Check if public/storage is a real dir (common in some hostings)
+            $altPath = public_path('storage/' . $pdfPath);
+            if (file_exists($altPath)) {
+                $path = $altPath;
+            } else {
+                return response()->json(['error' => 'Arquivo do certificado não encontrado no servidor.'], 404);
+            }
+        }
 
         if (request()->has('download')) {
             return response()->download($path, "certificado_{$hash}.pdf");
         }
 
-        return response()->file($path);
+        return response()->file($path, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="certificado.pdf"'
+        ]);
     }
 }
