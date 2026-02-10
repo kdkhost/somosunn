@@ -11,69 +11,30 @@ use Illuminate\Support\Str;
 
 class SettingController extends Controller
 {
-    public function index()
+    public function index($group = 'general')
     {
-        $settings = Setting::all()->pluck('value', 'key')->toArray();
-        $settings = $this->normalizeFileSettings($settings);
-        $recaptchaStatus = $this->buildRecaptchaStatus($settings);
-        $storageStatus = $this->buildStorageStatus($settings);
-        $uploadLimitsStatus = $this->buildUploadLimitsStatus($settings);
-
-        $analytics = [
-            'enabled' => false,
-            'today' => 0,
-            'last7' => 0,
-            'last30' => 0,
-            'top_pages' => collect(),
-            'top_countries' => collect(),
+        $allowedGroups = [
+            'general',
+            'appearance',
+            'images',
+            'player',
+            'ads',
+            'pwa',
+            'gateway',
+            'smtp',
+            'social',
+            'seo',
+            'system'
         ];
 
-        try {
-            if (Schema::hasTable('visitor_logs')) {
-                $analytics['enabled'] = true;
-                $now = now();
-
-                $analytics['today'] = (int) DB::table('visitor_logs')
-                    ->whereDate('created_at', $now->toDateString())
-                    ->count();
-
-                $analytics['last7'] = (int) DB::table('visitor_logs')
-                    ->where('created_at', '>=', $now->copy()->subDays(7))
-                    ->count();
-
-                $analytics['last30'] = (int) DB::table('visitor_logs')
-                    ->where('created_at', '>=', $now->copy()->subDays(30))
-                    ->count();
-
-                $analytics['top_pages'] = DB::table('visitor_logs')
-                    ->select('path', DB::raw('count(*) as total'))
-                    ->where('created_at', '>=', $now->copy()->subDays(30))
-                    ->groupBy('path')
-                    ->orderByDesc('total')
-                    ->limit(10)
-                    ->get();
-
-                $analytics['top_countries'] = DB::table('visitor_logs')
-                    ->select('country', DB::raw('count(*) as total'))
-                    ->where('created_at', '>=', $now->copy()->subDays(30))
-                    ->whereNotNull('country')
-                    ->where('country', '!=', '')
-                    ->groupBy('country')
-                    ->orderByDesc('total')
-                    ->limit(10)
-                    ->get();
-            }
-        } catch (\Throwable $e) {
-            // analytics é opcional; não bloqueia a tela de settings
+        if (!in_array($group, $allowedGroups)) {
+            return redirect()->route('admin.settings', ['group' => 'general']);
         }
 
-        return view('admin.settings.index', compact(
-            'settings',
-            'analytics',
-            'recaptchaStatus',
-            'storageStatus',
-            'uploadLimitsStatus'
-        ));
+        $settings = Setting::all()->pluck('value', 'key')->toArray();
+        $settings = $this->normalizeFileSettings($settings);
+
+        return view('admin.settings.index', compact('settings', 'group'));
     }
 
     public function update(Request $request)

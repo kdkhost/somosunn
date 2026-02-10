@@ -185,7 +185,7 @@
                             'admin.certificates.*',
                             'admin.fonts.*',
                             'admin.faqs.*',
-                            'admin.settings',
+                            'admin.settings*',
                         ];
                     @endphp
 
@@ -268,11 +268,90 @@
                                     <p>FAQ</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings') }}" class="nav-link {{ $is('admin.settings') }}">
-                                    <i class="fas fa-cogs nav-icon"></i>
-                                    <p>Configurações</p>
+                            <li class="nav-item has-treeview {{ $open('admin.settings*') }}">
+                                <a href="#" class="nav-link {{ $is('admin.settings*') }}">
+                                    <i class="nav-icon fas fa-cogs"></i>
+                                    <p>Configurações<i class="right fas fa-angle-left"></i></p>
                                 </a>
+                                <ul class="nav nav-treeview pl-4">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.settings', ['group' => 'general']) }}"
+                                            class="nav-link {{ request()->route('group') == 'general' || !request()->route('group') && request()->routeIs('admin.settings') ? 'active' : '' }}">
+                                            <i class="fas fa-info-circle nav-icon"></i>
+                                            <p>Geral</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.settings', ['group' => 'appearance']) }}"
+                                            class="nav-link {{ request()->route('group') == 'appearance' ? 'active' : '' }}">
+                                            <i class="fas fa-paint-brush nav-icon"></i>
+                                            <p>Aparência</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.settings', ['group' => 'images']) }}"
+                                            class="nav-link {{ request()->route('group') == 'images' ? 'active' : '' }}">
+                                            <i class="fas fa-images nav-icon"></i>
+                                            <p>Imagens</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.settings', ['group' => 'player']) }}"
+                                            class="nav-link {{ request()->route('group') == 'player' ? 'active' : '' }}">
+                                            <i class="fas fa-play-circle nav-icon"></i>
+                                            <p>Player</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.settings', ['group' => 'ads']) }}"
+                                            class="nav-link {{ request()->route('group') == 'ads' ? 'active' : '' }}">
+                                            <i class="fas fa-ad nav-icon"></i>
+                                            <p>Anúncios</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.settings', ['group' => 'pwa']) }}"
+                                            class="nav-link {{ request()->route('group') == 'pwa' ? 'active' : '' }}">
+                                            <i class="fas fa-mobile-alt nav-icon"></i>
+                                            <p>PWA</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.settings', ['group' => 'gateway']) }}"
+                                            class="nav-link {{ request()->route('group') == 'gateway' ? 'active' : '' }}">
+                                            <i class="fas fa-credit-card nav-icon"></i>
+                                            <p>Pagamentos</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.settings', ['group' => 'smtp']) }}"
+                                            class="nav-link {{ request()->route('group') == 'smtp' ? 'active' : '' }}">
+                                            <i class="fas fa-envelope nav-icon"></i>
+                                            <p>SMTP</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.settings', ['group' => 'social']) }}"
+                                            class="nav-link {{ request()->route('group') == 'social' ? 'active' : '' }}">
+                                            <i class="fas fa-users nav-icon"></i>
+                                            <p>Social</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.settings', ['group' => 'seo']) }}"
+                                            class="nav-link {{ request()->route('group') == 'seo' ? 'active' : '' }}">
+                                            <i class="fas fa-search nav-icon"></i>
+                                            <p>SEO</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.settings', ['group' => 'system']) }}"
+                                            class="nav-link {{ request()->route('group') == 'system' ? 'active' : '' }}">
+                                            <i class="fas fa-server nav-icon"></i>
+                                            <p>Sistema</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('admin.activity_logs.index') }}"
