@@ -257,6 +257,11 @@ class User extends Authenticatable
         return $this->hasMany(ItemReview::class);
     }
 
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
     public function isProfileComplete(): bool
     {
         $requiredValues = [
