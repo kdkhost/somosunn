@@ -597,12 +597,15 @@
                                         $currentControls = explode(',', $settings['video_plyr_controls'] ?? 'play,progress,current-time,mute,volume,settings,fullscreen');
                                         $availableControls = ['play-large', 'restart', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'download', 'fullscreen'];
                                     @endphp
-                                    <input type="hidden" name="video_plyr_controls" value="{{ implode(',', $currentControls) }}">
+                                    <input type="hidden" name="video_plyr_controls"
+                                        value="{{ implode(',', $currentControls) }}">
                                     @foreach($availableControls as $control)
                                         <div class="col-md-4 mb-2">
                                             <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input plyr-control-checkbox" id="control_{{ $control }}" value="{{ $control }}" {{ in_array($control, $currentControls) ? 'checked' : '' }}>
-                                                <label class="custom-control-label" for="control_{{ $control }}">{{ ucfirst($control) }}</label>
+                                                <input type="checkbox" class="custom-control-input plyr-control-checkbox"
+                                                    id="control_{{ $control }}" value="{{ $control }}" {{ in_array($control, $currentControls) ? 'checked' : '' }}>
+                                                <label class="custom-control-label"
+                                                    for="control_{{ $control }}">{{ ucfirst($control) }}</label>
                                             </div>
                                         </div>
                                     @endforeach
@@ -611,9 +614,25 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Menu Config (CSVs)</label>
-                                <input name="video_plyr_settings" class="form-control"
-                                    value="{{ $settings['video_plyr_settings'] ?? 'captions,quality,speed,loop' }}">
+                                <label>Menu Config</label>
+                                <div class="row">
+                                    @php
+                                        $currentSettings = explode(',', $settings['video_plyr_settings'] ?? 'captions,quality,speed,loop');
+                                        $availableSettings = ['captions', 'quality', 'speed', 'loop'];
+                                    @endphp
+                                    <input type="hidden" name="video_plyr_settings"
+                                        value="{{ implode(',', $currentSettings) }}">
+                                    @foreach($availableSettings as $setting)
+                                        <div class="col-md-6 mb-2">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input plyr-setting-checkbox"
+                                                    id="setting_{{ $setting }}" value="{{ $setting }}" {{ in_array($setting, $currentSettings) ? 'checked' : '' }}>
+                                                <label class="custom-control-label"
+                                                    for="setting_{{ $setting }}">{{ ucfirst($setting) }}</label>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -881,7 +900,8 @@
                     <div class="card-body" style="display: none;">
                         <div class="form-group">
                             <label>Ambiente</label>
-                            <select name="mercadopago_env" class="form-control gateway-env-select" data-gateway="mercadopago">
+                            <select name="mercadopago_env" class="form-control gateway-env-select"
+                                data-gateway="mercadopago">
                                 <option value="sandbox" {{ ($settings['mercadopago_env'] ?? 'sandbox') == 'sandbox' ? 'selected' : '' }}>Sandbox (Testes)</option>
                                 <option value="production" {{ ($settings['mercadopago_env'] ?? 'sandbox') == 'production' ? 'selected' : '' }}>Produção</option>
                             </select>
@@ -941,7 +961,8 @@
                     <div class="card-body" style="display: none;">
                         <div class="form-group">
                             <label>Ambiente</label>
-                            <select name="pagseguro_env" class="form-control gateway-env-select" data-gateway="pagseguro">
+                            <select name="pagseguro_env" class="form-control gateway-env-select"
+                                data-gateway="pagseguro">
                                 <option value="sandbox" {{ ($settings['pagseguro_env'] ?? 'sandbox') == 'sandbox' ? 'selected' : '' }}>Sandbox (Testes)</option>
                                 <option value="production" {{ ($settings['pagseguro_env'] ?? 'sandbox') == 'production' ? 'selected' : '' }}>Produção</option>
                             </select>
@@ -1098,13 +1119,14 @@
             {{-- LOGIN SOCIAL --}}
             <div class="tab-pane fade" id="tab-social" role="tabpanel">
                 <h5 class="text-primary mb-3"><i class="fas fa-users mr-2"></i>Login Social</h5>
-                
+
                 <div id="social-accordion">
                     {{-- Google --}}
                     <div class="card card-outline card-danger social-card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <button type="button" class="btn btn-link py-0 text-danger" data-toggle="collapse" data-target="#collapseGoogle" aria-expanded="true" aria-controls="collapseGoogle">
+                                <button type="button" class="btn btn-link py-0 text-danger" data-toggle="collapse"
+                                    data-target="#collapseGoogle" aria-expanded="true" aria-controls="collapseGoogle">
                                     <i class="fab fa-google mr-1"></i> Google
                                 </button>
                             </h3>
@@ -1113,12 +1135,18 @@
                             <div class="card-body">
                                 <div class="custom-control custom-switch mb-3">
                                     <input type="hidden" name="social_google_enabled" value="0">
-                                    <input type="checkbox" class="custom-control-input" id="social_google_enabled" name="social_google_enabled" value="1" {{ ($settings['social_google_enabled'] ?? 0) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="social_google_enabled">Ativar Login com Google</label>
+                                    <input type="checkbox" class="custom-control-input" id="social_google_enabled"
+                                        name="social_google_enabled" value="1" {{ ($settings['social_google_enabled'] ?? 0) ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="social_google_enabled">Ativar Login com
+                                        Google</label>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-6 form-group"><label>Client ID</label><input name="social_google_client_id" class="form-control" value="{{ $settings['social_google_client_id'] ?? '' }}"></div>
-                                    <div class="col-md-6 form-group"><label>Client Secret</label><input name="social_google_client_secret" class="form-control" value="{{ $settings['social_google_client_secret'] ?? '' }}"></div>
+                                    <div class="col-md-6 form-group"><label>Client ID</label><input
+                                            name="social_google_client_id" class="form-control"
+                                            value="{{ $settings['social_google_client_id'] ?? '' }}"></div>
+                                    <div class="col-md-6 form-group"><label>Client Secret</label><input
+                                            name="social_google_client_secret" class="form-control"
+                                            value="{{ $settings['social_google_client_secret'] ?? '' }}"></div>
                                 </div>
                             </div>
                         </div>
@@ -1128,7 +1156,9 @@
                     <div class="card card-outline card-primary social-card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <button type="button" class="btn btn-link py-0" data-toggle="collapse" data-target="#collapseFacebook" aria-expanded="false" aria-controls="collapseFacebook">
+                                <button type="button" class="btn btn-link py-0" data-toggle="collapse"
+                                    data-target="#collapseFacebook" aria-expanded="false"
+                                    aria-controls="collapseFacebook">
                                     <i class="fab fa-facebook mr-1"></i> Facebook
                                 </button>
                             </h3>
@@ -1137,12 +1167,18 @@
                             <div class="card-body">
                                 <div class="custom-control custom-switch mb-3">
                                     <input type="hidden" name="social_facebook_enabled" value="0">
-                                    <input type="checkbox" class="custom-control-input" id="social_facebook_enabled" name="social_facebook_enabled" value="1" {{ ($settings['social_facebook_enabled'] ?? 0) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="social_facebook_enabled">Ativar Login com Facebook</label>
+                                    <input type="checkbox" class="custom-control-input" id="social_facebook_enabled"
+                                        name="social_facebook_enabled" value="1" {{ ($settings['social_facebook_enabled'] ?? 0) ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="social_facebook_enabled">Ativar Login com
+                                        Facebook</label>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-6 form-group"><label>App ID</label><input name="social_facebook_app_id" class="form-control" value="{{ $settings['social_facebook_app_id'] ?? '' }}"></div>
-                                    <div class="col-md-6 form-group"><label>App Secret</label><input name="social_facebook_app_secret" class="form-control" value="{{ $settings['social_facebook_app_secret'] ?? '' }}"></div>
+                                    <div class="col-md-6 form-group"><label>App ID</label><input
+                                            name="social_facebook_app_id" class="form-control"
+                                            value="{{ $settings['social_facebook_app_id'] ?? '' }}"></div>
+                                    <div class="col-md-6 form-group"><label>App Secret</label><input
+                                            name="social_facebook_app_secret" class="form-control"
+                                            value="{{ $settings['social_facebook_app_secret'] ?? '' }}"></div>
                                 </div>
                             </div>
                         </div>
@@ -1152,7 +1188,9 @@
                     <div class="card card-outline card-info social-card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <button type="button" class="btn btn-link py-0 text-info" data-toggle="collapse" data-target="#collapseTwitter" aria-expanded="false" aria-controls="collapseTwitter">
+                                <button type="button" class="btn btn-link py-0 text-info" data-toggle="collapse"
+                                    data-target="#collapseTwitter" aria-expanded="false"
+                                    aria-controls="collapseTwitter">
                                     <i class="fab fa-twitter mr-1"></i> Twitter / X
                                 </button>
                             </h3>
@@ -1161,12 +1199,18 @@
                             <div class="card-body">
                                 <div class="custom-control custom-switch mb-3">
                                     <input type="hidden" name="social_twitter_enabled" value="0">
-                                    <input type="checkbox" class="custom-control-input" id="social_twitter_enabled" name="social_twitter_enabled" value="1" {{ ($settings['social_twitter_enabled'] ?? 0) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="social_twitter_enabled">Ativar Login com Twitter / X</label>
+                                    <input type="checkbox" class="custom-control-input" id="social_twitter_enabled"
+                                        name="social_twitter_enabled" value="1" {{ ($settings['social_twitter_enabled'] ?? 0) ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="social_twitter_enabled">Ativar Login com
+                                        Twitter / X</label>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-6 form-group"><label>Client ID (API Key)</label><input name="social_twitter_client_id" class="form-control" value="{{ $settings['social_twitter_client_id'] ?? '' }}"></div>
-                                    <div class="col-md-6 form-group"><label>Client Secret (API Secret)</label><input name="social_twitter_client_secret" class="form-control" value="{{ $settings['social_twitter_client_secret'] ?? '' }}"></div>
+                                    <div class="col-md-6 form-group"><label>Client ID (API Key)</label><input
+                                            name="social_twitter_client_id" class="form-control"
+                                            value="{{ $settings['social_twitter_client_id'] ?? '' }}"></div>
+                                    <div class="col-md-6 form-group"><label>Client Secret (API Secret)</label><input
+                                            name="social_twitter_client_secret" class="form-control"
+                                            value="{{ $settings['social_twitter_client_secret'] ?? '' }}"></div>
                                 </div>
                             </div>
                         </div>
@@ -1176,7 +1220,9 @@
                     <div class="card card-outline card-dark social-card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <button type="button" class="btn btn-link py-0 text-dark" data-toggle="collapse" data-target="#collapseLinkedin" aria-expanded="false" aria-controls="collapseLinkedin">
+                                <button type="button" class="btn btn-link py-0 text-dark" data-toggle="collapse"
+                                    data-target="#collapseLinkedin" aria-expanded="false"
+                                    aria-controls="collapseLinkedin">
                                     <i class="fab fa-linkedin mr-1"></i> LinkedIn
                                 </button>
                             </h3>
@@ -1185,12 +1231,18 @@
                             <div class="card-body">
                                 <div class="custom-control custom-switch mb-3">
                                     <input type="hidden" name="social_linkedin_enabled" value="0">
-                                    <input type="checkbox" class="custom-control-input" id="social_linkedin_enabled" name="social_linkedin_enabled" value="1" {{ ($settings['social_linkedin_enabled'] ?? 0) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="social_linkedin_enabled">Ativar Login com LinkedIn</label>
+                                    <input type="checkbox" class="custom-control-input" id="social_linkedin_enabled"
+                                        name="social_linkedin_enabled" value="1" {{ ($settings['social_linkedin_enabled'] ?? 0) ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="social_linkedin_enabled">Ativar Login com
+                                        LinkedIn</label>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-6 form-group"><label>Client ID</label><input name="social_linkedin_client_id" class="form-control" value="{{ $settings['social_linkedin_client_id'] ?? '' }}"></div>
-                                    <div class="col-md-6 form-group"><label>Client Secret</label><input name="social_linkedin_client_secret" class="form-control" value="{{ $settings['social_linkedin_client_secret'] ?? '' }}"></div>
+                                    <div class="col-md-6 form-group"><label>Client ID</label><input
+                                            name="social_linkedin_client_id" class="form-control"
+                                            value="{{ $settings['social_linkedin_client_id'] ?? '' }}"></div>
+                                    <div class="col-md-6 form-group"><label>Client Secret</label><input
+                                            name="social_linkedin_client_secret" class="form-control"
+                                            value="{{ $settings['social_linkedin_client_secret'] ?? '' }}"></div>
                                 </div>
                             </div>
                         </div>
@@ -1362,10 +1414,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Gateway Environment Toggle
-            $('.gateway-env-select').change(function() {
+            $('.gateway-env-select').change(function () {
                 var env = $(this).val();
                 var cardBody = $(this).closest('.card-body');
-                if(env === 'sandbox') {
+                if (env === 'sandbox') {
                     cardBody.find('.env-sandbox').show();
                     cardBody.find('.env-production').hide();
                 } else {
@@ -1375,12 +1427,36 @@
             }).trigger('change');
 
             // Player Controls Sync
-            $('.plyr-control-checkbox').change(function() {
-                var selected = [];
-                $('.plyr-control-checkbox:checked').each(function() {
-                    selected.push($(this).val());
+            function updatePlyrJson() {
+                var controls = [];
+                $('.plyr-control-checkbox:checked').each(function () {
+                    controls.push($(this).val());
                 });
-                $('[name="video_plyr_controls"]').val(selected.join(','));
+                $('[name="video_plyr_controls"]').val(controls.join(','));
+
+                var settings = [];
+                $('.plyr-setting-checkbox:checked').each(function () {
+                    settings.push($(this).val());
+                });
+                $('[name="video_plyr_settings"]').val(settings.join(','));
+
+                // Update JSON
+                var jsonText = $('[name="video_plyr_options_json"]').val();
+                var jsonObj = {};
+                try {
+                    jsonObj = JSON.parse(jsonText || '{}');
+                } catch (e) {
+                    console.error('Invalid JSON, starting fresh');
+                }
+
+                jsonObj.controls = controls;
+                jsonObj.settings = settings;
+
+                $('[name="video_plyr_options_json"]').val(JSON.stringify(jsonObj, null, 4));
+            }
+
+            $('.plyr-control-checkbox, .plyr-setting-checkbox').change(function () {
+                updatePlyrJson();
             });
 
             // Test SMTP
