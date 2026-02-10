@@ -22,7 +22,7 @@ class ChatController extends Controller
             ->latest()
             ->get();
 
-        return view('chat.index', [
+        return view('admin.chat.index', [
             'conversations' => $conversations,
             'extends' => 'admin.layouts.app',
             'routeNamePrefix' => 'admin.chat',
@@ -85,7 +85,7 @@ class ChatController extends Controller
             ->latest()
             ->get();
 
-        return view('chat.show', [
+        return view('admin.chat.show', [
             'conversation' => $conversation,
             'messages' => $messages,
             'conversations' => $conversations,

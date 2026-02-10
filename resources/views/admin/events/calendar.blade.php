@@ -178,46 +178,46 @@
                 </div>
             </div>
             @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('events.create'))
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Eventos Arrastáveis</h3>
-                </div>
-                <div class="card-body">
-                    <div id="external-events" class="external-events">
-                        @foreach($calendarTemplates as $tpl)
-                            <div class="external-event" data-title="{{ $tpl['title'] }}" data-color="{{ $tpl['color'] }}"
-                                style="background:{{ $tpl['color'] }};">
-                                {{ $tpl['title'] }}
-                            </div>
-                        @endforeach
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Eventos Arrastáveis</h3>
                     </div>
-                    <div class="form-check mt-2">
-                        <input type="checkbox" class="form-check-input" id="drop-remove" {{ $defaultRemoveAfterDrop ? 'checked' : '' }}>
-                        <label class="form-check-label" for="drop-remove">Remover após soltar</label>
+                    <div class="card-body">
+                        <div id="external-events" class="external-events">
+                            @foreach($calendarTemplates as $tpl)
+                                <div class="external-event" data-title="{{ $tpl['title'] }}" data-color="{{ $tpl['color'] }}"
+                                    style="background:{{ $tpl['color'] }};">
+                                    {{ $tpl['title'] }}
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="form-check mt-2">
+                            <input type="checkbox" class="form-check-input" id="drop-remove" {{ $defaultRemoveAfterDrop ? 'checked' : '' }}>
+                            <label class="form-check-label" for="drop-remove">Remover após soltar</label>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Criar Evento Rápido</h3>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="new-event-title" placeholder="Título do evento">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Criar Evento Rápido</h3>
                     </div>
-                    <div class="color-chooser mb-3" id="new-event-colors">
-                        @foreach($calendarQuickColors as $idx => $color)
-                            <span class="color-item {{ $idx === 0 ? 'active' : '' }}" data-color="{{ $color }}"
-                                style="background:{{ $color }};"></span>
-                        @endforeach
+                    <div class="card-body">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="new-event-title" placeholder="Título do evento">
+                        </div>
+                        <div class="color-chooser mb-3" id="new-event-colors">
+                            @foreach($calendarQuickColors as $idx => $color)
+                                <span class="color-item {{ $idx === 0 ? 'active' : '' }}" data-color="{{ $color }}"
+                                    style="background:{{ $color }};"></span>
+                            @endforeach
+                        </div>
+                        <button id="add-new-event" class="btn btn-primary btn-block"><i class="fas fa-plus"></i>
+                            Adicionar</button>
+                        <button class="btn btn-outline-secondary btn-block mt-2" data-toggle="modal" data-target="#eventModal">
+                            <i class="fas fa-pen"></i> Novo Evento Completo
+                        </button>
                     </div>
-                    <button id="add-new-event" class="btn btn-primary btn-block"><i class="fas fa-plus"></i>
-                        Adicionar</button>
-                    <button class="btn btn-outline-secondary btn-block mt-2" data-toggle="modal" data-target="#eventModal">
-                        <i class="fas fa-pen"></i> Novo Evento Completo
-                    </button>
                 </div>
-            </div>
             @endif
         </div>
         <div class="col-md-9">
@@ -225,10 +225,10 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title m-0">Calendário</h3>
                     @if(auth()->user()->isAdmin())
-                    <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal"
-                        data-target="#calendarSettingsModal">
-                        <i class="fas fa-sliders-h"></i> Personalizar
-                    </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal"
+                            data-target="#calendarSettingsModal">
+                            <i class="fas fa-sliders-h"></i> Personalizar
+                        </button>
                     @endif
                 </div>
                 <div class="card-body p-0">
@@ -663,6 +663,14 @@
                             remove: $('#drop-remove').is(':checked'),
                             el: info.draggedEl
                         };
+
+                        // Pre-populate form safely
+                        $('#eventForm')[0].reset();
+                        $('#title').val(info.event.title);
+                        if (info.event.backgroundColor) {
+                            $('#color').val(info.event.backgroundColor);
+                        }
+
                         openModal(info.event);
                     }
                 });
@@ -693,6 +701,7 @@
 
                     setEventImageExisting(null);
 
+                    // Apply values from the event object (standard or dropped)
                     if (event && event.title) {
                         $('#title').val(event.title);
                     }

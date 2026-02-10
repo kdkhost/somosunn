@@ -102,7 +102,7 @@
                             <i class="nav-icon fas fa-graduation-cap"></i>
                             <p>Cursos<i class="right fas fa-angle-left"></i></p>
                         </a>
-                        <ul class="nav nav-treeview pl-4" style="background: #f8fafc; border-radius: 0 0 12px 12px;">
+                        <ul class="nav nav-treeview pl-4">
                             <li class="nav-item"><a href="{{ route('admin.courses.available') }}" class="nav-link"><i
                                         class="fas fa-list nav-icon"></i>
                                     <p>Meus Cursos</p>
