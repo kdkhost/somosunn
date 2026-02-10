@@ -216,9 +216,54 @@ class InvoiceService
                 (string) (Setting::get('company_city') ?: ''),
                 (string) (Setting::get('company_state') ?: ''),
                 (string) (Setting::get('company_zip') ?: ''),
-            ], static fn ($v) => trim($v) !== ''))),
+            ], static fn($v) => trim($v) !== ''))),
             'site' => url('/'),
+            'logo' => $this->resolveLogoPath(),
+            'logo_url' => $this->resolveLogoUrl(),
+            'primary_color' => (string) (Setting::get('site_color_primary') ?: '#1F5EDB'),
         ];
+    }
+
+    private function resolveLogoPath(): ?string
+    {
+        $logo = Setting::get('logo_image');
+        if (!$logo) {
+            return null;
+        }
+
+        $path = public_path($logo);
+        if (file_exists($path)) {
+            return $path;
+        }
+
+        // Check if it's already a full path
+        if (file_exists($logo)) {
+            return $logo;
+        }
+
+        // Try storage/ if it starts with it
+        if (str_starts_with($logo, 'storage/')) {
+            $storagePath = public_path($logo);
+            if (file_exists($storagePath)) {
+                return $storagePath;
+            }
+        }
+
+        return null;
+    }
+
+    private function resolveLogoUrl(): ?string
+    {
+        $logo = Setting::get('logo_image');
+        if (!$logo) {
+            return null;
+        }
+
+        if (filter_var($logo, FILTER_VALIDATE_URL)) {
+            return $logo;
+        }
+
+        return asset($logo);
     }
 
     public function normalizeMoney($value): float

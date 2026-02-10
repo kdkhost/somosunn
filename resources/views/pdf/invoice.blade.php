@@ -1,155 +1,393 @@
 @php
     $company = $company ?? [];
+    $primaryColor = $company['primary_color'] ?? '#1F5EDB';
     $invoice->loadMissing(['items', 'user', 'order']);
 
     $number = $invoice->number ?: ('#' . $invoice->id);
-    $issuedAt = $invoice->issued_at ? $invoice->issued_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i');
+    $issuedAt = $invoice->issued_at ? $invoice->issued_at->format('d/m/Y') : now()->format('d/m/Y');
     $dueAt = $invoice->due_at ? $invoice->due_at->format('d/m/Y') : null;
     $status = (string) ($invoice->status ?? 'issued');
 
     $fmtMoney = function ($v) {
         return 'R$ ' . number_format((float) $v, 2, ',', '.');
     };
+
+    $logo = $company['logo'] ?? null;
 @endphp
 
 <!doctype html>
 <html lang="pt-br">
+
 <head>
     <meta charset="utf-8">
     <title>Fatura {{ $number }}</title>
     <style>
-        * { font-family: DejaVu Sans, Arial, Helvetica, sans-serif; }
-        body { font-size: 12px; color: #111827; margin: 0; padding: 0; }
-        .wrap { padding: 28px; }
-        .topbar { background: #1F5EDB; color: #fff; padding: 18px 20px; border-radius: 10px; }
-        .topbar h1 { margin: 0; font-size: 18px; }
-        .muted { color: #6b7280; }
-        .card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-top: 14px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px 8px; vertical-align: top; }
-        th { text-align: left; font-size: 11px; color: #374151; border-bottom: 1px solid #e5e7eb; }
-        td { border-bottom: 1px solid #f3f4f6; }
-        .right { text-align: right; }
-        .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
-        .badge-paid { background: #dcfce7; color: #166534; }
-        .badge-issued { background: #dbeafe; color: #1e40af; }
-        .badge-cancelled { background: #fee2e2; color: #991b1b; }
-        .no-border td { border-bottom: 0; }
-        .totals td { border-bottom: 0; padding: 6px 8px; }
-        .totals .label { color: #6b7280; }
-        .footer { margin-top: 18px; font-size: 10px; color: #6b7280; }
+        @page {
+            margin: 0;
+        }
+
+        * {
+            font-family: DejaVu Sans, Arial, Helvetica, sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-size: 13px;
+            color: #1f2937;
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+            background: #fff;
+        }
+
+        .header {
+            background: #f9fafb;
+            padding: 40px 50px;
+            border-bottom: 2px solid
+                {{ $primaryColor }}
+            ;
+        }
+
+        .header-content {
+            display: table;
+            width: 100%;
+        }
+
+        .header-left {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .header-right {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: right;
+        }
+
+        .logo {
+            max-height: 60px;
+            max-width: 200px;
+        }
+
+        .invoice-title {
+            font-size: 28px;
+            font-weight: 800;
+            color:
+                {{ $primaryColor }}
+            ;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        .invoice-number {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+
+        .content {
+            padding: 40px 50px;
+        }
+
+        .info-grid {
+            display: table;
+            width: 100%;
+            border-spacing: 0;
+            margin-bottom: 40px;
+        }
+
+        .info-col {
+            display: table-cell;
+            width: 33.33%;
+            vertical-align: top;
+        }
+
+        .info-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 13px;
+            color: #111827;
+        }
+
+        .info-sub {
+            color: #6b7280;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-paid {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .status-issued {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .status-cancelled {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .table-container {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f9fafb;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #4b5563;
+            border-bottom: 1px solid #e5e7eb;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 15px;
+            vertical-align: top;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .item-desc {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .item-sub {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .summary-container {
+            margin-top: 30px;
+            display: table;
+            width: 100%;
+        }
+
+        .summary-notes {
+            display: table-cell;
+            width: 60%;
+            vertical-align: top;
+            padding-right: 40px;
+        }
+
+        .summary-totals {
+            display: table-cell;
+            width: 40%;
+            vertical-align: top;
+        }
+
+        .total-row {
+            display: table;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .total-label {
+            display: table-cell;
+            font-size: 13px;
+            color: #6b7280;
+            text-align: right;
+            padding-right: 15px;
+        }
+
+        .total-value {
+            display: table-cell;
+            font-size: 13px;
+            color: #111827;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .grand-total {
+            border-top: 2px solid #f3f4f6;
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+
+        .grand-total .total-label {
+            color: #111827;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .grand-total .total-value {
+            color:
+                {{ $primaryColor }}
+            ;
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .notes-content {
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #4b5563;
+            border: 1px dashed #e5e7eb;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 40px;
+            left: 50px;
+            right: 50px;
+            border-top: 1px solid #f3f4f6;
+            padding-top: 20px;
+            color: #9ca3af;
+            font-size: 11px;
+            text-align: center;
+        }
     </style>
 </head>
+
 <body>
-    <div class="wrap">
-        <div class="topbar">
-            <h1>Fatura {{ $number }}</h1>
-            <div style="margin-top:6px;font-size:11px;opacity:.95;">
-                {{ $company['name'] ?? 'UNN' }}
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                @if($logo && file_exists($logo))
+                    <img src="{{ $logo }}" class="logo">
+                @else
+                    <div style="font-size: 24px; font-weight: 800; color: {{ $primaryColor }};">
+                        {{ $company['name'] ?? 'SOMOS UNN' }}</div>
+                @endif
+            </div>
+            <div class="header-right">
+                <h1 class="invoice-title">FATURA</h1>
+                <div class="invoice-number">{{ $number }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="info-grid">
+            <div class="info-col">
+                <div class="info-label">Emitente</div>
+                <div class="info-value" style="font-weight: 700;">{{ $company['name'] }}</div>
+                @if(!empty($company['address']))
+                    <div class="info-sub">{{ $company['address'] }}</div>
+                @endif
+                @if(!empty($company['phone']))
+                    <div class="info-sub">{{ $company['phone'] }}</div>
+                @endif
+            </div>
+            <div class="info-col">
+                <div class="info-label">Cliente</div>
+                <div class="info-value" style="font-weight: 700;">{{ $invoice->user->name ?? 'N/A' }}</div>
+                @if(!empty($invoice->user->email))
+                    <div class="info-sub">{{ $invoice->user->email }}</div>
+                @endif
+            </div>
+            <div class="info-col" style="text-align: right;">
+                <div class="info-label">Detalhes</div>
+                <div class="info-value"><span style="color: #9ca3af;">Data:</span> {{ $issuedAt }}</div>
+                @if($dueAt)
+                    <div class="info-value"><span style="color: #9ca3af;">Vencimento:</span> {{ $dueAt }}</div>
+                @endif
+                <div style="margin-top: 12px;">
+                    @php
+                        $statusClass = $status === 'paid' ? 'status-paid' : ($status === 'cancelled' ? 'status-cancelled' : 'status-issued');
+                        $statusText = $status === 'paid' ? 'Paga' : ($status === 'cancelled' ? 'Cancelada' : 'Pendente');
+                    @endphp
+                    <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
+                </div>
             </div>
         </div>
 
-        <div class="card">
-            <table class="no-border">
-                <tr>
-                    <td style="width:55%;">
-                        <div style="font-weight:700;">Emitente</div>
-                        <div>{{ $company['name'] ?? '' }}</div>
-                        @if(!empty($company['address']))
-                            <div class="muted">{{ $company['address'] }}</div>
-                        @endif
-                        @if(!empty($company['email']))
-                            <div class="muted">{{ $company['email'] }}</div>
-                        @endif
-                        @if(!empty($company['phone']))
-                            <div class="muted">{{ $company['phone'] }}</div>
-                        @endif
-                    </td>
-                    <td style="width:45%;">
-                        <div style="font-weight:700;">Cliente</div>
-                        <div>{{ $invoice->user?->name ?? '' }}</div>
-                        @if(!empty($invoice->user?->email))
-                            <div class="muted">{{ $invoice->user->email }}</div>
-                        @endif
-
-                        <div style="margin-top:10px;">
-                            <div><span class="muted">Emissão:</span> {{ $issuedAt }}</div>
-                            @if($dueAt)
-                                <div><span class="muted">Vencimento:</span> {{ $dueAt }}</div>
-                            @endif
-                            <div style="margin-top:6px;">
-                                @php
-                                    $badgeClass = $status === 'paid' ? 'badge-paid' : ($status === 'cancelled' ? 'badge-cancelled' : 'badge-issued');
-                                    $badgeText = $status === 'paid' ? 'PAGA' : ($status === 'cancelled' ? 'CANCELADA' : 'EMITIDA');
-                                @endphp
-                                <span class="badge {{ $badgeClass }}">{{ $badgeText }}</span>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="card">
-            <div style="font-weight:700;margin-bottom:10px;">Itens</div>
+        <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Descrição</th>
-                        <th class="right" style="width:70px;">Qtd</th>
-                        <th class="right" style="width:120px;">Valor</th>
-                        <th class="right" style="width:120px;">Total</th>
+                        <th>DESCRIÇÃO</th>
+                        <th class="text-right" style="width: 60px;">QTD</th>
+                        <th class="text-right" style="width: 110px;">PREÇO</th>
+                        <th class="text-right" style="width: 120px;">TOTAL</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($invoice->items->sortBy('sort_order') as $item)
                         <tr>
                             <td>
-                                <div style="font-weight:700;">{{ $item->description }}</div>
+                                <div class="item-desc">{{ $item->description }}</div>
                                 @if(!empty($item->item_type))
-                                    <div class="muted">Tipo: {{ $item->item_type }}@if(!empty($item->item_id)) #{{ $item->item_id }}@endif</div>
+                                    <div class="item-sub">{{ ucfirst($item->item_type) }} @if(!empty($item->item_id))
+                                    #{{ $item->item_id }} @endif</div>
                                 @endif
                             </td>
-                            <td class="right">{{ (int) $item->quantity }}</td>
-                            <td class="right">{{ $fmtMoney($item->unit_price) }}</td>
-                            <td class="right">{{ $fmtMoney($item->total_price) }}</td>
+                            <td class="text-right" style="color: #6b7280;">{{ (int) $item->quantity }}</td>
+                            <td class="text-right">{{ $fmtMoney($item->unit_price) }}</td>
+                            <td class="text-right" style="font-weight: 600;">{{ $fmtMoney($item->total_price) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
-
-            <table class="totals" style="margin-top:10px;">
-                <tr>
-                    <td></td>
-                    <td class="right label" style="width:160px;">Subtotal</td>
-                    <td class="right" style="width:120px;">{{ $fmtMoney($invoice->subtotal) }}</td>
-                </tr>
-                @if((float) $invoice->discount_amount > 0)
-                    <tr>
-                        <td></td>
-                        <td class="right label">Desconto</td>
-                        <td class="right">- {{ $fmtMoney($invoice->discount_amount) }}</td>
-                    </tr>
-                @endif
-                <tr>
-                    <td></td>
-                    <td class="right label" style="font-weight:700;color:#111827;">Total</td>
-                    <td class="right" style="font-weight:700;">{{ $fmtMoney($invoice->total_amount) }}</td>
-                </tr>
-            </table>
         </div>
 
-        @if(!empty($invoice->notes))
-            <div class="card">
-                <div style="font-weight:700;margin-bottom:8px;">Observações</div>
-                <div class="muted">{!! nl2br(e($invoice->notes)) !!}</div>
+        <div class="summary-container">
+            <div class="summary-notes">
+                @if(!empty($invoice->notes))
+                    <div class="info-label" style="margin-bottom: 10px;">Observações</div>
+                    <div class="notes-content">
+                        {!! nl2br(e($invoice->notes)) !!}
+                    </div>
+                @endif
             </div>
-        @endif
-
-        <div class="footer">
-            Documento gerado automaticamente pelo sistema. {{ $company['site'] ?? '' }}
+            <div class="summary-totals">
+                <div class="total-row">
+                    <div class="total-label">Subtotal</div>
+                    <div class="total-value">{{ $fmtMoney($invoice->subtotal) }}</div>
+                </div>
+                @if((float) $invoice->discount_amount > 0)
+                    <div class="total-row">
+                        <div class="total-label">Desconto</div>
+                        <div class="total-value">- {{ $fmtMoney($invoice->discount_amount) }}</div>
+                    </div>
+                @endif
+                <div class="total-row grand-total">
+                    <div class="total-label">Total da Fatura</div>
+                    <div class="total-value">{{ $fmtMoney($invoice->total_amount) }}</div>
+                </div>
+            </div>
         </div>
     </div>
-</body>
-</html>
 
+    <div class="footer">
+        Obrigado pela sua preferência!<br>
+        {{ $company['site'] }} • {{ $company['email'] }}
+    </div>
+</body>
+
+</html>
