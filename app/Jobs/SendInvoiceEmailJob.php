@@ -12,6 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Queue\Middleware\RateLimited;
 
 class SendInvoiceEmailJob implements ShouldQueue
 {
@@ -24,6 +25,11 @@ class SendInvoiceEmailJob implements ShouldQueue
     {
         $this->invoiceId = $invoiceId;
         $this->force = $force;
+    }
+
+    public function middleware()
+    {
+        return [new RateLimited('invoices_email')];
     }
 
     public function handle(InvoiceService $service): void

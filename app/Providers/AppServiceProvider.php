@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Cache\RateLimiting\Limit;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        RateLimiter::for('invoices_email', function ($job) {
+            return Limit::perHour(100);
+        });
+
         \App\Models\User::observe(\App\Observers\UserObserver::class);
 
         View::composer(['admin.partials.navbar', 'admin.partials.sidebar'], \App\Http\View\Composers\NavbarComposer::class);
