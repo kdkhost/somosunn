@@ -309,4 +309,30 @@ class CertificateController extends Controller
             'isPreview' => true
         ]);
     }
+
+    public function destroy(Certificate $certificate)
+    {
+        // Permission Check: ONLY SUPERADMIN
+        $user = auth()->user();
+        if (!$user->isAdmin()) {
+            abort(403, 'Acesso negado. Apenas administradores podem excluir certificados.');
+        }
+
+        // Optional: Stricter check if you have a 'superadmin' string column
+        // if ($user->role !== 'superadmin') ...
+
+        try {
+            // 1. Delete PDF file
+            if ($certificate->pdf_path && Storage::disk('public')->exists($certificate->pdf_path)) {
+                Storage::disk('public')->delete($certificate->pdf_path);
+            }
+
+            // 2. Delete Record
+            $certificate->delete();
+
+            return redirect()->back()->with('success', 'Certificado excluído com sucesso! O aluno agora aparece como pendente.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erro ao excluir: ' . $e->getMessage());
+        }
+    }
 }

@@ -406,6 +406,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         ->middleware('check.feature:certificates_access')->name('certificates.view');
     Route::get('/certificates/preview-html/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'previewHtml'])
         ->middleware('check.feature:certificates_access')->name('certificates.preview-html');
+    Route::delete('/certificates/{certificate}', [\App\Http\Controllers\Admin\CertificateController::class, 'destroy'])
+        ->middleware('check.feature:certificates_delete')->name('certificates.destroy');
 
     // Atalho para Membros (membro/perfil)
     Route::prefix('membro')->group(function () {

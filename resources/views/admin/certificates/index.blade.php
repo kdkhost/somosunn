@@ -83,6 +83,17 @@
                                                 <i class="fas fa-envelope"></i>
                                             </button>
                                         </form>
+                                        @if(auth()->user()->isAdmin())
+                                            <form action="{{ route('admin.certificates.destroy', $cert->id) }}" method="POST"
+                                                class="d-inline form-delete-cert">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn btn-xs btn-danger btn-delete-cert"
+                                                    title="Excluir (Permite emitir novamente)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -265,6 +276,30 @@
                     confirmButtonColor: '#ffc107',
                     cancelButtonColor: '#aaa',
                     confirmButtonText: 'Sim, regenerar!',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
+            // SweetAlert2 for Delete
+            $('.btn-delete-cert').on('click', function (e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+
+                Swal.fire({
+                    title: 'Excluir Certificado?',
+                    text: "Ao excluir, o registro será removido permanentemente e o aluno voltará para a lista de PENDENTES. Você poderá emitir um novo certificado para ele com o design atualizado.",
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#aaa',
+                    confirmButtonText: 'Sim, excluir!',
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
