@@ -689,7 +689,7 @@
                         </div>
                     </div>
 
-                    </div>
+
 
                     {{-- ANÚNCIOS --}}
                     <div class="tab-pane fade" id="tab-ads" role="tabpanel">
