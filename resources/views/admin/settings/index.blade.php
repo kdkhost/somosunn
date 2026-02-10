@@ -1240,22 +1240,172 @@
                 
                 {{-- Placeholders para abas ausentes (restauração posterior do conteúdo completo) --}}
                 <div class="tab-pane fade" id="tab-pwa" role="tabpanel">
-                    <div class="alert alert-secondary">Aba PWA temporariamente vazia — conteúdo preservado em "Geral". Irei restaurar o conteúdo completo quando solicitado.</div>
+                    <h5 class="text-primary mb-3"><i class="fas fa-mobile-alt mr-2"></i>PWA (Progressive Web App)</h5>
+                    <div class="form-group">
+                        <div class="custom-control custom-switch">
+                            <input type="hidden" name="pwa_enabled" value="0">
+                            <input type="checkbox" class="custom-control-input" id="pwa_enabled" name="pwa_enabled" value="1" {{ ($settings['pwa_enabled'] ?? 0) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="pwa_enabled">Ativar PWA</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Nome do aplicativo (PWA)</label>
+                            <input name="pwa_name" class="form-control" value="{{ $settings['pwa_name'] ?? config('app.name') }}">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Nome curto</label>
+                            <input name="pwa_short_name" class="form-control" value="{{ $settings['pwa_short_name'] ?? ($settings['app_name'] ?? '') }}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            <label>Ícone 192 × 192</label>
+                            <div class="upload-box" data-max-size="{{ 200 * 1024 }}" data-existing-url="{{ $pwa192 }}" data-remove-input="[name='remove_pwa_icon_192']">
+                                <input type="hidden" name="remove_pwa_icon_192" value="0">
+                                <input type="file" name="pwa_icon_192" accept="image/*" class="d-none">
+                                <div class="upload-preview text-center text-muted"></div>
+                                <div class="upload-help text-muted small"></div>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
+                                <div class="progress upload-progress d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
+                                <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>Ícone 512 × 512</label>
+                            <div class="upload-box" data-max-size="{{ 400 * 1024 }}" data-existing-url="{{ $pwa512 }}" data-remove-input="[name='remove_pwa_icon_512']">
+                                <input type="hidden" name="remove_pwa_icon_512" value="0">
+                                <input type="file" name="pwa_icon_512" accept="image/*" class="d-none">
+                                <div class="upload-preview text-center text-muted"></div>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
+                                <div class="progress upload-progress d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
+                                <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>Banner / Splash</label>
+                            <div class="upload-box" data-max-size="{{ 1024 * 1024 }}" data-existing-url="{{ $pwaSplash }}" data-remove-input="[name='remove_pwa_splash']">
+                                <input type="hidden" name="remove_pwa_splash" value="0">
+                                <input type="file" name="pwa_splash" accept="image/*" class="d-none">
+                                <div class="upload-preview text-center text-muted"></div>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
+                                <div class="progress upload-progress d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
+                                <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Cor tema</label>
+                        <input name="pwa_theme_color" class="form-control" value="{{ $settings['pwa_theme_color'] ?? '#ffffff' }}">
+                        <small class="text-muted">Cor principal usada no manifest e barras do sistema.</small>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="tab-gateway" role="tabpanel">
-                    <div class="alert alert-secondary">Aba Gateway temporariamente vazia — conteúdo preservado em "Geral".</div>
+                    <h5 class="text-primary mb-3"><i class="fas fa-credit-card mr-2"></i>Gateways de Pagamento</h5>
+                    <p class="text-muted">Configure credenciais e opções dos gateways suportados (MercadoPago, PagSeguro, etc.).</p>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>MercadoPago - Access Token</label>
+                            <input name="mercadopago_access_token" class="form-control" value="{{ $settings['mercadopago_access_token'] ?? '' }}">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>MercadoPago - Public Key</label>
+                            <input name="mercadopago_public_key" class="form-control" value="{{ $settings['mercadopago_public_key'] ?? '' }}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>PagSeguro - Email</label>
+                            <input name="pagseguro_email" class="form-control" value="{{ $settings['pagseguro_email'] ?? '' }}">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>PagSeguro - Token</label>
+                            <input name="pagseguro_token" class="form-control" value="{{ $settings['pagseguro_token'] ?? '' }}">
+                        </div>
+                    </div>
+                    <small class="text-muted">Se precisar adicionar outros gateways, eu ajusto os campos conforme integração existente.</small>
                 </div>
                 <div class="tab-pane fade" id="tab-preloader" role="tabpanel">
-                    <div class="alert alert-secondary">Aba Preloader temporariamente vazia — conteúdo preservado em "Geral".</div>
+                    <h5 class="text-primary mb-3"><i class="fas fa-spinner mr-2"></i>Preloader</h5>
+                    <div class="custom-control custom-switch mb-3">
+                        <input type="hidden" name="preloader_enabled" value="0">
+                        <input type="checkbox" class="custom-control-input" id="preloader_enabled" name="preloader_enabled" value="1" {{ ($preloaderEnabled ?? 0) ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="preloader_enabled">Ativar preloader</label>
+                    </div>
+                    <div class="form-group">
+                        <label>Imagem do Preloader</label>
+                        <div class="upload-box" data-max-size="{{ 200 * 1024 }}" data-existing-url="{{ $preloaderImage }}" data-remove-input="[name='remove_preloader_image']">
+                            <input type="hidden" name="remove_preloader_image" value="0">
+                            <input type="file" name="preloader_image" accept="image/*" class="d-none">
+                            <div class="upload-preview text-center text-muted"></div>
+                            <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
+                            <div class="progress upload-progress d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Texto do Preloader</label>
+                        <input name="preloader_text" class="form-control" value="{{ $settings['preloader_text'] ?? '' }}">
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="tab-smtp" role="tabpanel">
-                    <div class="alert alert-secondary">Aba SMTP temporariamente vazia — use o botão de teste abaixo (se presente) ou restaure a aba completa sob demanda.</div>
+                    <h5 class="text-primary mb-3"><i class="fas fa-envelope mr-2"></i>SMTP</h5>
+                    <div class="row">
+                        <div class="col-md-6 form-group"><label>Host SMTP</label><input name="smtp_host" class="form-control" value="{{ $settings['smtp_host'] ?? '' }}"></div>
+                        <div class="col-md-3 form-group"><label>Porta</label><input name="smtp_port" class="form-control" value="{{ $settings['smtp_port'] ?? '' }}"></div>
+                        <div class="col-md-3 form-group"><label>Encriptação</label><select name="smtp_encryption" class="form-control"><option value="" {{ ($settings['smtp_encryption'] ?? '')==''? 'selected':'' }}>Nenhuma</option><option value="ssl" {{ ($settings['smtp_encryption'] ?? '')=='ssl'? 'selected':'' }}>SSL</option><option value="tls" {{ ($settings['smtp_encryption'] ?? '')=='tls'? 'selected':'' }}>TLS</option></select></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group"><label>Usuário</label><input name="smtp_username" class="form-control" value="{{ $settings['smtp_username'] ?? '' }}"></div>
+                        <div class="col-md-6 form-group"><label>Senha</label><input name="smtp_password" type="password" class="form-control" value="{{ $settings['smtp_password'] ?? '' }}"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group"><label>From Email</label><input name="smtp_from_email" class="form-control" value="{{ $settings['smtp_from_email'] ?? '' }}"></div>
+                        <div class="col-md-6 form-group"><label>From Name</label><input name="smtp_from_name" class="form-control" value="{{ $settings['smtp_from_name'] ?? '' }}"></div>
+                    </div>
+                    <div class="form-group text-right">
+                        <button type="button" id="btnTestSmtp" class="btn btn-outline-primary">Testar conexão SMTP</button>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="tab-social" role="tabpanel">
-                    <div class="alert alert-secondary">Aba Login Social temporariamente vazia — conteúdo preservado em "Geral".</div>
+                    <h5 class="text-primary mb-3"><i class="fab fa-google mr-2"></i>Login Social</h5>
+                    <div class="row">
+                        <div class="col-md-6 form-group"><label>Google - Client ID</label><input name="social_google_client_id" class="form-control" value="{{ $settings['social_google_client_id'] ?? '' }}"></div>
+                        <div class="col-md-6 form-group"><label>Google - Client Secret</label><input name="social_google_client_secret" class="form-control" value="{{ $settings['social_google_client_secret'] ?? '' }}"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group"><label>Facebook - App ID</label><input name="social_facebook_app_id" class="form-control" value="{{ $settings['social_facebook_app_id'] ?? '' }}"></div>
+                        <div class="col-md-6 form-group"><label>Facebook - App Secret</label><input name="social_facebook_app_secret" class="form-control" value="{{ $settings['social_facebook_app_secret'] ?? '' }}"></div>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="tab-seo" role="tabpanel">
-                    <div class="alert alert-secondary">Aba SEO & Analytics temporariamente vazia — conteúdo presente em "Geral".</div>
+                    <h5 class="text-primary mb-3"><i class="fas fa-chart-line mr-2"></i>SEO & Analytics</h5>
+                    <div class="form-group">
+                        <label>Imagem Open Graph</label>
+                        <div class="upload-box" data-max-size="{{ 1024 * 1024 }}" data-existing-url="{{ $seoOg ?? '' }}" data-remove-input="[name='remove_seo_og_image']">
+                            <input type="hidden" name="remove_seo_og_image" value="0">
+                            <input type="file" name="seo_og_image" accept="image/*" class="d-none">
+                            <div class="upload-preview text-center text-muted"></div>
+                            <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
+                            <div class="progress upload-progress d-none mt-2"><div class="progress-bar bg-primary" style="width:0%"></div></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Imagem Twitter</label>
+                        <div class="upload-box" data-max-size="{{ 1024 * 1024 }}" data-existing-url="{{ $seoTwitter ?? '' }}" data-remove-input="[name='remove_seo_twitter_image']">
+                            <input type="hidden" name="remove_seo_twitter_image" value="0">
+                            <input type="file" name="seo_twitter_image" accept="image/*" class="d-none">
+                            <div class="upload-preview text-center text-muted"></div>
+                            <button type="button" class="btn btn-sm btn-primary upload-btn">Selecionar arquivo</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Códigos de rastreamento (HEAD)</label>
+                        <textarea name="tracking_head" class="form-control" rows="4">{{ $settings['tracking_head'] ?? '' }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Códigos de rastreamento (BODY)</label>
+                        <textarea name="tracking_body" class="form-control" rows="4">{{ $settings['tracking_body'] ?? '' }}</textarea>
+                    </div>
                 </div>
             </div>
         </div>
