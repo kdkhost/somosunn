@@ -293,10 +293,48 @@ class CertificateController extends Controller
             }
         }
 
+        // If PDF doesn't exist, regenerate it automatically (for legacy certificates)
         if (!$path) {
+            $type = null;
+            $id = null;
+
+            if ($cert->course_id) {
+                $type = 'course';
+                $id = $cert->course_id;
+            } elseif ($cert->mentorship_id) {
+                $type = 'mentorship';
+                $id = $cert->mentorship_id;
+            } elseif ($cert->event_id) {
+                $type = 'event';
+                $id = $cert->event_id;
+            }
+
+            if ($type && $id) {
+                $user = $cert->user;
+                $product = null;
+
+                if ($type === 'course') {
+                    $product = \App\Models\Course::find($id);
+                } elseif ($type === 'mentorship') {
+                    $product = \App\Models\Mentorship::find($id);
+                } elseif ($type === 'event') {
+                    $product = \App\Models\Event::find($id);
+                }
+
+                if ($product) {
+                    $output = $this->generatePdfContent($user, $type, $product, $cert->cert_hash, $cert);
+                    $newPath = "certificates/{$cert->cert_hash}.pdf";
+                    \Storage::disk('public')->put($newPath, $output);
+                    $cert->update(['pdf_path' => $newPath]);
+                    $path = storage_path('app/public/' . $newPath);
+                }
+            }
+        }
+
+        if (!$path || !file_exists($path)) {
             return response()->json([
-                'error' => 'Arquivo do certificado não encontrado no servidor.',
-                'searched_paths' => $possiblePaths
+                'error' => 'Não foi possível gerar o certificado.',
+                'cert_id' => $cert->id
             ], 404);
         }
 
