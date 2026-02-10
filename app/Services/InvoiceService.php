@@ -219,10 +219,31 @@ class InvoiceService
                 (string) (Setting::get('company_zip') ?: ''),
             ], static fn($v) => trim($v) !== ''))),
             'site' => url('/'),
-            'logo' => $this->resolveLogoPath(),
+            'logo' => $this->resolveLogoBase64(),
             'logo_url' => $this->resolveLogoUrl(),
             'primary_color' => (string) (Setting::get('site_color_primary') ?: '#1F5EDB'),
         ];
+    }
+
+    private function resolveLogoBase64(): ?string
+    {
+        $path = $this->resolveLogoPath();
+        if (!$path || !file_exists($path)) {
+            return null;
+        }
+
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        if ($type === 'svg') {
+            $type = 'svg+xml';
+        }
+
+        try {
+            $data = file_get_contents($path);
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            return $base64;
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     private function resolveLogoPath(): ?string

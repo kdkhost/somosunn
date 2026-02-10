@@ -205,7 +205,7 @@
 
         .summary-totals {
             display: table-cell;
-            width: 40%;
+            width: 48%;
             vertical-align: top;
         }
 
@@ -229,6 +229,7 @@
             color: #111827;
             text-align: right;
             font-weight: 500;
+            white-space: nowrap;
         }
 
         .grand-total {
@@ -241,6 +242,7 @@
             color: #111827;
             font-weight: 700;
             font-size: 16px;
+            vertical-align: middle;
         }
 
         .grand-total .total-value {
@@ -249,6 +251,8 @@
             ;
             font-weight: 800;
             font-size: 20px;
+            vertical-align: middle;
+            white-space: nowrap;
         }
 
         .notes-content {
@@ -278,11 +282,12 @@
     <div class="header">
         <div class="header-content">
             <div class="header-left">
-                @if($logo && file_exists($logo))
+                @if($logo)
                     <img src="{{ $logo }}" class="logo">
                 @else
                     <div style="font-size: 24px; font-weight: 800; color: {{ $primaryColor }};">
-                        {{ $company['name'] ?? 'SOMOS UNN' }}</div>
+                        {{ $company['name'] ?? 'SOMOS UNN' }}
+                    </div>
                 @endif
             </div>
             <div class="header-right">
