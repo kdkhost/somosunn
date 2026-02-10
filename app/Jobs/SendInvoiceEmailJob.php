@@ -24,7 +24,6 @@ class SendInvoiceEmailJob implements ShouldQueue
     {
         $this->invoiceId = $invoiceId;
         $this->force = $force;
-        $this->onQueue('emails');
     }
 
     public function handle(InvoiceService $service): void

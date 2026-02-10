@@ -193,6 +193,7 @@ class InvoiceService
 
         $options = new Options();
         $options->set('isRemoteEnabled', true);
+        $options->set('isHtml5ParserEnabled', true);
         $options->set('defaultFont', 'DejaVu Sans');
 
         $dompdf = new Dompdf($options);
@@ -226,7 +227,16 @@ class InvoiceService
 
     private function resolveLogoPath(): ?string
     {
-        $logo = Setting::get('logo_image');
+        $keys = ['logo_image', 'logo_admin', 'logo_front', 'logo_auth'];
+        $logo = null;
+
+        foreach ($keys as $key) {
+            $logo = Setting::get($key);
+            if ($logo) {
+                break;
+            }
+        }
+
         if (!$logo) {
             return null;
         }
@@ -254,7 +264,16 @@ class InvoiceService
 
     private function resolveLogoUrl(): ?string
     {
-        $logo = Setting::get('logo_image');
+        $keys = ['logo_image', 'logo_admin', 'logo_front', 'logo_auth'];
+        $logo = null;
+
+        foreach ($keys as $key) {
+            $logo = Setting::get($key);
+            if ($logo) {
+                break;
+            }
+        }
+
         if (!$logo) {
             return null;
         }
