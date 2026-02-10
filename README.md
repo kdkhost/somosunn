@@ -85,5 +85,20 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
   - **Correção Geral:** Resolvido erro 500 na edição/criação de faturas (`Undefined variable $rows`).
   - **Emails:** Template de notificação de fatura modernizado e alinhado com a identidade visual.
 
+### 10/02/2026 (Tarde) — Conclusão de Cursos e Certificação
+- **Certificados Automáticos:**
+  - Geração automática ao atingir **89% de progresso** do curso.
+  - Cálculo dinâmico da carga horária real assistida (armazenada no banco).
+  - Coluna `workload` adicionada à tabela de certificados.
+- **Botão "Concluir Curso":**
+  - Exibição condicional: só aparece quando o aluno atinge 89% de conclusão.
+  - Validação backend robusta (impede bypass da regra dos 89%).
+  - Confirmação elegante via **SweetAlert2** (substituindo alert nativo do navegador).
+  - Redirecionamento para o Dashboard do aluno após conclusão.
+- **Enrollment Polimórfico:**
+  - Correção no registro de conclusão usando `enrollable_id` e `enrollable_type`.
+  - Atualização de status para "completed" ao finalizar curso.
+
+
 ---
 © 2026 UNN Networking. Todos os direitos reservados.
