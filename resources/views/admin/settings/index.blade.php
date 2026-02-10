@@ -178,659 +178,655 @@
                     </div>
                 </div>
 
-                {{-- APARÊNCIA --}}
-                <div class="tab-pane fade" id="tab-appearance" role="tabpanel">
-                    <h5 class="text-primary mb-3"><i class="fas fa-home mr-2"></i>Hero (Página Inicial)</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Título Principal</label>
-                                <input name="hero_title" class="form-control"
-                                    value="{{ $settings['hero_title'] ?? 'Transforme sua carreira' }}">
-                            </div>
-                            <div class="form-group">
-                                <label>Subtítulo</label>
-                                <textarea name="hero_subtitle" class="form-control"
-                                    rows="3">{{ $settings['hero_subtitle'] ?? 'Junte-se a milhares de membros e aprenda com os melhores.' }}</textarea>
-                            </div>
+            </div>
+
+            {{-- APARÊNCIA --}}
+            <div class="tab-pane fade" id="tab-appearance" role="tabpanel">
+                <h5 class="text-primary mb-3"><i class="fas fa-home mr-2"></i>Hero (Página Inicial)</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Título Principal</label>
+                            <input name="hero_title" class="form-control"
+                                value="{{ $settings['hero_title'] ?? 'Transforme sua carreira' }}">
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Opacidade do Degradê (%)</label>
-                                <input name="site_bg_gradient_opacity" type="number" min="0" max="100"
-                                    class="form-control" value="{{ $settings['site_bg_gradient_opacity'] ?? 85 }}">
-                            </div>
-                            <div class="form-group">
-                                <label>Cor do Degradê (Início)</label>
-                                <div class="input-group colorpicker-element">
-                                    <input name="site_bg_gradient_start" class="form-control"
-                                        value="{{ $settings['site_bg_gradient_start'] ?? '#000000' }}">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fas fa-square"
-                                                style="color: {{ $settings['site_bg_gradient_start'] ?? '#000000' }}"></i></span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label>Subtítulo</label>
+                            <textarea name="hero_subtitle" class="form-control"
+                                rows="3">{{ $settings['hero_subtitle'] ?? 'Junte-se a milhares de membros e aprenda com os melhores.' }}</textarea>
                         </div>
                     </div>
-
-                    <hr>
-                    <h5 class="text-primary mb-3"><i class="fas fa-calendar-alt mr-2"></i>Eventos e Mentorias (Fundo
-                        Hero)</h5>
-                    <div class="row">
-                        <div class="col-md-6 form-group">
-                            <label>Desfoque (Blur px)</label>
-                            <input name="events_hero_bg_blur_px" type="number" class="form-control"
-                                value="{{ $settings['events_hero_bg_blur_px'] ?? 64 }}">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Opacidade do Degradê (%)</label>
+                            <input name="site_bg_gradient_opacity" type="number" min="0" max="100" class="form-control"
+                                value="{{ $settings['site_bg_gradient_opacity'] ?? 85 }}">
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label>Intensidade da Película (%)</label>
-                            <input name="events_hero_film_strength_percent" type="number" min="0" max="100"
-                                class="form-control"
-                                value="{{ $settings['events_hero_film_strength_percent'] ?? 100 }}">
-                        </div>
-                    </div>
-
-                    <hr>
-                    <h5 class="text-primary mb-3"><i class="fas fa-palette mr-2"></i>Identidade Visual</h5>
-                    <div class="row">
-                        <div class="col-md-4 form-group">
-                            <label>Tema Padrão</label>
-                            <select name="site_theme" class="form-control">
-                                <option value="light" {{ ($settings['site_theme'] ?? 'light') === 'light' ? 'selected' : '' }}>Light (Claro)</option>
-                                <option value="dark" {{ ($settings['site_theme'] ?? '') === 'dark' ? 'selected' : '' }}>
-                                    Dark (Escuro)</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 form-group">
-                            <label>Cor Primária</label>
+                        <div class="form-group">
+                            <label>Cor do Degradê (Início)</label>
                             <div class="input-group colorpicker-element">
-                                <input name="site_color_primary" class="form-control"
-                                    value="{{ $settings['site_color_primary'] ?? '#007bff' }}">
+                                <input name="site_bg_gradient_start" class="form-control"
+                                    value="{{ $settings['site_bg_gradient_start'] ?? '#000000' }}">
                                 <div class="input-group-append">
                                     <span class="input-group-text"><i class="fas fa-square"
-                                            style="color: {{ $settings['site_color_primary'] ?? '#007bff' }}"></i></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 form-group">
-                            <label>Cor Secundária</label>
-                            <div class="input-group colorpicker-element">
-                                <input name="site_color_secondary" class="form-control"
-                                    value="{{ $settings['site_color_secondary'] ?? '#6c757d' }}">
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="fas fa-square"
-                                            style="color: {{ $settings['site_color_secondary'] ?? '#6c757d' }}"></i></span>
+                                            style="color: {{ $settings['site_bg_gradient_start'] ?? '#000000' }}"></i></span>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="row">
-                        <div class="col-md-6 form-group">
-                            <label>Font Family</label>
-                            <input name="site_font_family" class="form-control"
-                                value="{{ $settings['site_font_family'] ?? 'Inter, sans-serif' }}">
-                            <small class="text-muted">Ex: 'Inter', sans-serif</small>
-                        </div>
+                <hr>
+                <h5 class="text-primary mb-3"><i class="fas fa-calendar-alt mr-2"></i>Eventos e Mentorias (Fundo
+                    Hero)</h5>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Desfoque (Blur px)</label>
+                        <input name="events_hero_bg_blur_px" type="number" class="form-control"
+                            value="{{ $settings['events_hero_bg_blur_px'] ?? 64 }}">
                     </div>
-
-                    <hr>
-                    <h5 class="text-primary mb-3"><i class="fas fa-window-maximize mr-2"></i>Rodapé</h5>
-                    <div class="form-group">
-                        <label>Texto do Rodapé</label>
-                        <textarea name="footer_text" class="form-control"
-                            rows="3">{{ $settings['footer_text'] ?? '' }}</textarea>
+                    <div class="col-md-6 form-group">
+                        <label>Intensidade da Película (%)</label>
+                        <input name="events_hero_film_strength_percent" type="number" min="0" max="100"
+                            class="form-control" value="{{ $settings['events_hero_film_strength_percent'] ?? 100 }}">
                     </div>
+                </div>
 
-                    <div class="row">
-                        <div class="col-md-3 form-group">
-                            <label><i class="fab fa-instagram mr-1"></i>Instagram URL</label>
-                            <input name="social_instagram" class="form-control"
-                                value="{{ $settings['social_instagram'] ?? '' }}">
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label><i class="fab fa-facebook mr-1"></i>Facebook URL</label>
-                            <input name="social_facebook" class="form-control"
-                                value="{{ $settings['social_facebook'] ?? '' }}">
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label><i class="fab fa-youtube mr-1"></i>Youtube URL</label>
-                            <input name="social_youtube" class="form-control"
-                                value="{{ $settings['social_youtube'] ?? '' }}">
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label><i class="fab fa-linkedin mr-1"></i>LinkedIn URL</label>
-                            <input name="social_linkedin" class="form-control"
-                                value="{{ $settings['social_linkedin'] ?? '' }}">
-                        </div>
+                <hr>
+                <h5 class="text-primary mb-3"><i class="fas fa-palette mr-2"></i>Identidade Visual</h5>
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>Tema Padrão</label>
+                        <select name="site_theme" class="form-control">
+                            <option value="light" {{ ($settings['site_theme'] ?? 'light') === 'light' ? 'selected' : '' }}>Light (Claro)</option>
+                            <option value="dark" {{ ($settings['site_theme'] ?? '') === 'dark' ? 'selected' : '' }}>
+                                Dark (Escuro)</option>
+                        </select>
                     </div>
-
-                    <hr>
-                    <h5 class="text-primary mb-3"><i class="fas fa-quote-left mr-2"></i>Depoimentos (Carrossel)</h5>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
-                                <input type="hidden" name="testimonials_carousel_enabled" value="0">
-                                <input type="checkbox" class="custom-control-input" id="testimonials_carousel_enabled"
-                                    name="testimonials_carousel_enabled" value="1" {{ ($settings['testimonials_carousel_enabled'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="testimonials_carousel_enabled">Ativar
-                                    Carrossel</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
-                                <input type="hidden" name="testimonials_carousel_show_arrows" value="0">
-                                <input type="checkbox" class="custom-control-input"
-                                    id="testimonials_carousel_show_arrows" name="testimonials_carousel_show_arrows"
-                                    value="1" {{ ($settings['testimonials_carousel_show_arrows'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="testimonials_carousel_show_arrows">Exibir
-                                    Setas</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
-                                <input type="hidden" name="testimonials_carousel_show_dots" value="0">
-                                <input type="checkbox" class="custom-control-input" id="testimonials_carousel_show_dots"
-                                    name="testimonials_carousel_show_dots" value="1" {{ ($settings['testimonials_carousel_show_dots'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="testimonials_carousel_show_dots">Exibir
-                                    Bolinhas</label>
+                    <div class="col-md-4 form-group">
+                        <label>Cor Primária</label>
+                        <div class="input-group colorpicker-element">
+                            <input name="site_color_primary" class="form-control"
+                                value="{{ $settings['site_color_primary'] ?? '#007bff' }}">
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fas fa-square"
+                                        style="color: {{ $settings['site_color_primary'] ?? '#007bff' }}"></i></span>
                             </div>
                         </div>
                     </div>
-
-                    <hr>
-                    <h5 class="text-primary mb-3"><i class="fas fa-spinner mr-2"></i>Preloader</h5>
-                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
-                        <input type="hidden" name="preloader_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input" id="preloader_enabled"
-                            name="preloader_enabled" value="1" {{ ($settings['preloader_enabled'] ?? 0) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="preloader_enabled">Ativar Preloader</label>
+                    <div class="col-md-4 form-group">
+                        <label>Cor Secundária</label>
+                        <div class="input-group colorpicker-element">
+                            <input name="site_color_secondary" class="form-control"
+                                value="{{ $settings['site_color_secondary'] ?? '#6c757d' }}">
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fas fa-square"
+                                        style="color: {{ $settings['site_color_secondary'] ?? '#6c757d' }}"></i></span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group" style="max-width: 300px;">
-                        <label>Imagem do Preloader</label>
-                        <div class="upload-box" data-max-size="{{ 1 * 1024 * 1024 }}"
-                            data-existing-url="{{ $getUrl('preloader_image') }}"
-                            data-remove-input="[name='remove_preloader_image']">
-                            <input type="hidden" name="remove_preloader_image" value="0">
-                            <input type="file" name="preloader_image" accept="image/*" class="d-none">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Font Family</label>
+                        <input name="site_font_family" class="form-control"
+                            value="{{ $settings['site_font_family'] ?? 'Inter, sans-serif' }}">
+                        <small class="text-muted">Ex: 'Inter', sans-serif</small>
+                    </div>
+                </div>
+
+                <hr>
+                <h5 class="text-primary mb-3"><i class="fas fa-window-maximize mr-2"></i>Rodapé</h5>
+                <div class="form-group">
+                    <label>Texto do Rodapé</label>
+                    <textarea name="footer_text" class="form-control"
+                        rows="3">{{ $settings['footer_text'] ?? '' }}</textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 form-group">
+                        <label><i class="fab fa-instagram mr-1"></i>Instagram URL</label>
+                        <input name="social_instagram" class="form-control"
+                            value="{{ $settings['social_instagram'] ?? '' }}">
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label><i class="fab fa-facebook mr-1"></i>Facebook URL</label>
+                        <input name="social_facebook" class="form-control"
+                            value="{{ $settings['social_facebook'] ?? '' }}">
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label><i class="fab fa-youtube mr-1"></i>Youtube URL</label>
+                        <input name="social_youtube" class="form-control"
+                            value="{{ $settings['social_youtube'] ?? '' }}">
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label><i class="fab fa-linkedin mr-1"></i>LinkedIn URL</label>
+                        <input name="social_linkedin" class="form-control"
+                            value="{{ $settings['social_linkedin'] ?? '' }}">
+                    </div>
+                </div>
+
+                <hr>
+                <h5 class="text-primary mb-3"><i class="fas fa-quote-left mr-2"></i>Depoimentos (Carrossel)</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div
+                            class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                            <input type="hidden" name="testimonials_carousel_enabled" value="0">
+                            <input type="checkbox" class="custom-control-input" id="testimonials_carousel_enabled"
+                                name="testimonials_carousel_enabled" value="1" {{ ($settings['testimonials_carousel_enabled'] ?? 1) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="testimonials_carousel_enabled">Ativar
+                                Carrossel</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div
+                            class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                            <input type="hidden" name="testimonials_carousel_show_arrows" value="0">
+                            <input type="checkbox" class="custom-control-input" id="testimonials_carousel_show_arrows"
+                                name="testimonials_carousel_show_arrows" value="1" {{ ($settings['testimonials_carousel_show_arrows'] ?? 1) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="testimonials_carousel_show_arrows">Exibir
+                                Setas</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div
+                            class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                            <input type="hidden" name="testimonials_carousel_show_dots" value="0">
+                            <input type="checkbox" class="custom-control-input" id="testimonials_carousel_show_dots"
+                                name="testimonials_carousel_show_dots" value="1" {{ ($settings['testimonials_carousel_show_dots'] ?? 1) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="testimonials_carousel_show_dots">Exibir
+                                Bolinhas</label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <h5 class="text-primary mb-3"><i class="fas fa-spinner mr-2"></i>Preloader</h5>
+                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                    <input type="hidden" name="preloader_enabled" value="0">
+                    <input type="checkbox" class="custom-control-input" id="preloader_enabled" name="preloader_enabled"
+                        value="1" {{ ($settings['preloader_enabled'] ?? 0) ? 'checked' : '' }}>
+                    <label class="custom-control-label" for="preloader_enabled">Ativar Preloader</label>
+                </div>
+                <div class="form-group" style="max-width: 300px;">
+                    <label>Imagem do Preloader</label>
+                    <div class="upload-box" data-max-size="{{ 1 * 1024 * 1024 }}"
+                        data-existing-url="{{ $getUrl('preloader_image') }}"
+                        data-remove-input="[name='remove_preloader_image']">
+                        <input type="hidden" name="remove_preloader_image" value="0">
+                        <input type="file" name="preloader_image" accept="image/*" class="d-none">
+                        <div class="upload-preview text-center text-muted"></div>
+                        <div class="upload-help text-muted small mt-2">GIF, SVG ou PNG</div>
+                        <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar
+                            arquivo</button>
+                        <button type="button"
+                            class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                    </div>
+                </div>
+            </div>
+
+            {{-- IMAGENS --}}
+            <div class="tab-pane fade" id="tab-images" role="tabpanel">
+                <h5 class="text-primary mb-3"><i class="fas fa-images mr-2"></i>Logotipos e Ícones</h5>
+                <div class="row">
+                    <div class="col-md-3 form-group">
+                        <label>Logo Principal</label>
+                        <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
+                            data-existing-url="{{ $getUrl('logo_image') }}"
+                            data-remove-input="[name='remove_logo_image']">
+                            <input type="hidden" name="remove_logo_image" value="0">
+                            <input type="file" name="logo_image" accept="image/*" class="d-none">
                             <div class="upload-preview text-center text-muted"></div>
-                            <div class="upload-help text-muted small mt-2">GIF, SVG ou PNG</div>
-                            <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar
-                                arquivo</button>
+                            <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
+                            <button type="button"
+                                class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                        </div>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>Favicon</label>
+                        <div class="upload-box" data-max-size="{{ 1 * 1024 * 1024 }}"
+                            data-existing-url="{{ $getUrl('favicon_image') }}"
+                            data-remove-input="[name='remove_favicon_image']">
+                            <input type="hidden" name="remove_favicon_image" value="0">
+                            <input type="file" name="favicon_image" accept="image/*" class="d-none">
+                            <div class="upload-preview text-center text-muted"></div>
+                            <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
+                            <button type="button"
+                                class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                        </div>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>Logo (Painel Admin)</label>
+                        <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
+                            data-existing-url="{{ $getUrl('logo_admin') }}"
+                            data-remove-input="[name='remove_logo_admin']">
+                            <input type="hidden" name="remove_logo_admin" value="0">
+                            <input type="file" name="logo_admin" accept="image/*" class="d-none">
+                            <div class="upload-preview text-center text-muted"></div>
+                            <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
+                            <button type="button"
+                                class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                        </div>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>Logo (Login/Auth)</label>
+                        <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
+                            data-existing-url="{{ $getUrl('logo_auth') }}"
+                            data-remove-input="[name='remove_logo_auth']">
+                            <input type="hidden" name="remove_logo_auth" value="0">
+                            <input type="file" name="logo_auth" accept="image/*" class="d-none">
+                            <div class="upload-preview text-center text-muted"></div>
+                            <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
+                            <button type="button"
+                                class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                        </div>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>Logo (Frontend/Site)</label>
+                        <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
+                            data-existing-url="{{ $getUrl('logo_front') }}"
+                            data-remove-input="[name='remove_logo_front']">
+                            <input type="hidden" name="remove_logo_front" value="0">
+                            <input type="file" name="logo_front" accept="image/*" class="d-none">
+                            <div class="upload-preview text-center text-muted"></div>
+                            <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
                             <button type="button"
                                 class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
                         </div>
                     </div>
                 </div>
 
-                {{-- IMAGENS --}}
-                <div class="tab-pane fade" id="tab-images" role="tabpanel">
-                    <h5 class="text-primary mb-3"><i class="fas fa-images mr-2"></i>Logotipos e Ícones</h5>
-                    <div class="row">
-                        <div class="col-md-3 form-group">
-                            <label>Logo Principal</label>
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('logo_image') }}"
-                                data-remove-input="[name='remove_logo_image']">
-                                <input type="hidden" name="remove_logo_image" value="0">
-                                <input type="file" name="logo_image" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                <hr>
+                <h5 class="text-primary mb-3"><i class="fas fa-image mr-2"></i>Backgrounds</h5>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Hero Image (Frente)</label>
+                        <div class="upload-box" data-max-size="{{ 10 * 1024 * 1024 }}"
+                            data-existing-url="{{ $getUrl('hero_image') }}"
+                            data-remove-input="[name='remove_hero_image']">
+                            <input type="hidden" name="remove_hero_image" value="0">
+                            <input type="file" name="hero_image" accept="image/*" class="d-none">
+                            <div class="upload-preview text-center text-muted"></div>
+                            <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
+                            <button type="button"
+                                class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Background do Site</label>
+                        <div class="upload-box" data-max-size="{{ 10 * 1024 * 1024 }}"
+                            data-existing-url="{{ $getUrl('site_bg_image') }}"
+                            data-remove-input="[name='remove_site_bg_image']">
+                            <input type="hidden" name="remove_site_bg_image" value="0">
+                            <input type="file" name="site_bg_image" accept="image/*" class="d-none">
+                            <div class="upload-preview text-center text-muted"></div>
+                            <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
+                            <button type="button"
+                                class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- VÍDEO PLAYER (PLYR) --}}
+            <div class="tab-pane fade" id="tab-player" role="tabpanel">
+                <h5 class="text-primary mb-3"><i class="fas fa-play-circle mr-2"></i>Player de Vídeo (Plyr)</h5>
+
+                <div class="alert alert-info">
+                    Configure o player de vídeo usado nas aulas/cursos. As opções avançadas aceitam o JSON de
+                    configuração do Plyr.
+                </div>
+
+                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                    <input type="hidden" name="video_player_enabled" value="0">
+                    <input type="checkbox" class="custom-control-input" id="video_player_enabled"
+                        name="video_player_enabled" value="1" {{ ($settings['video_player_enabled'] ?? 1) ? 'checked' : '' }}>
+                    <label class="custom-control-label" for="video_player_enabled">Ativar Plyr no site</label>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Cor principal do player</label>
+                            <div class="input-group colorpicker-element">
+                                <input name="video_plyr_color" class="form-control"
+                                    value="{{ $settings['video_plyr_color'] ?? ($settings['site_color_primary'] ?? '#1F5EDB') }}">
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="fas fa-square"
+                                            style="color: {{ $settings['video_plyr_color'] ?? ($settings['site_color_primary'] ?? '#1F5EDB') }}"></i></span>
+                                </div>
+                            </div>
+                            <small class="text-muted">CSS: <code>--plyr-color-main</code>.</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Seek (segundos)</label>
+                            <input name="video_plyr_seek_time" class="form-control"
+                                value="{{ $settings['video_plyr_seek_time'] ?? '10' }}" placeholder="Ex: 10">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Volume inicial (0 a 1)</label>
+                            <input name="video_plyr_volume" class="form-control"
+                                value="{{ $settings['video_plyr_volume'] ?? '0.8' }}" placeholder="Ex: 0.8">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div
+                            class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
+                            <input type="hidden" name="video_plyr_autoplay" value="0">
+                            <input type="checkbox" class="custom-control-input" id="video_plyr_autoplay"
+                                name="video_plyr_autoplay" value="1" {{ ($settings['video_plyr_autoplay'] ?? 0) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="video_plyr_autoplay">Autoplay</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div
+                            class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
+                            <input type="hidden" name="video_plyr_muted" value="0">
+                            <input type="checkbox" class="custom-control-input" id="video_plyr_muted"
+                                name="video_plyr_muted" value="1" {{ ($settings['video_plyr_muted'] ?? 0) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="video_plyr_muted">Iniciar mudo</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div
+                            class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
+                            <input type="hidden" name="video_plyr_click_to_play" value="0">
+                            <input type="checkbox" class="custom-control-input" id="video_plyr_click_to_play"
+                                name="video_plyr_click_to_play" value="1" {{ ($settings['video_plyr_click_to_play'] ?? 1) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="video_plyr_click_to_play">Clique p/
+                                tocar</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div
+                            class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
+                            <input type="hidden" name="video_plyr_disable_context_menu" value="0">
+                            <input type="checkbox" class="custom-control-input" id="video_plyr_disable_context_menu"
+                                name="video_plyr_disable_context_menu" value="1" {{ ($settings['video_plyr_disable_context_menu'] ?? 1) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="video_plyr_disable_context_menu">Bloquear
+                                Menu</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-3">
+                        <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                            <input type="hidden" name="video_plyr_rewind_enabled" value="0">
+                            <input type="checkbox" class="custom-control-input" id="video_plyr_rewind_enabled"
+                                name="video_plyr_rewind_enabled" value="1" {{ ($settings['video_plyr_rewind_enabled'] ?? 1) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="video_plyr_rewind_enabled">Botão
+                                Retroceder</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                            <input type="hidden" name="video_plyr_fast_forward_enabled" value="0">
+                            <input type="checkbox" class="custom-control-input" id="video_plyr_fast_forward_enabled"
+                                name="video_plyr_fast_forward_enabled" value="1" {{ ($settings['video_plyr_fast_forward_enabled'] ?? 1) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="video_plyr_fast_forward_enabled">Botão
+                                Avançar</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                            <input type="hidden" name="video_plyr_volume_enabled" value="0">
+                            <input type="checkbox" class="custom-control-input" id="video_plyr_volume_enabled"
+                                name="video_plyr_volume_enabled" value="1" {{ ($settings['video_plyr_volume_enabled'] ?? 1) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="video_plyr_volume_enabled">Controle
+                                Volume</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Controles do Player</label>
+                            <div class="row">
+                                @php
+                                    $currentControls = explode(',', $settings['video_plyr_controls'] ?? 'play,progress,current-time,mute,volume,settings,fullscreen');
+                                    $availableControls = ['play-large', 'restart', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'download', 'fullscreen'];
+                                @endphp
+                                <input type="hidden" name="video_plyr_controls"
+                                    value="{{ implode(',', $currentControls) }}">
+                                @foreach($availableControls as $control)
+                                    <div class="col-md-4 mb-2">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input plyr-control-checkbox"
+                                                id="control_{{ $control }}" value="{{ $control }}" {{ in_array($control, $currentControls) ? 'checked' : '' }}>
+                                            <label class="custom-control-label"
+                                                for="control_{{ $control }}">{{ ucfirst($control) }}</label>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
-                        <div class="col-md-3 form-group">
-                            <label>Favicon</label>
-                            <div class="upload-box" data-max-size="{{ 1 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('favicon_image') }}"
-                                data-remove-input="[name='remove_favicon_image']">
-                                <input type="hidden" name="remove_favicon_image" value="0">
-                                <input type="file" name="favicon_image" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label>Logo (Painel Admin)</label>
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('logo_admin') }}"
-                                data-remove-input="[name='remove_logo_admin']">
-                                <input type="hidden" name="remove_logo_admin" value="0">
-                                <input type="file" name="logo_admin" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label>Logo (Login/Auth)</label>
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('logo_auth') }}"
-                                data-remove-input="[name='remove_logo_auth']">
-                                <input type="hidden" name="remove_logo_auth" value="0">
-                                <input type="file" name="logo_auth" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label>Logo (Frontend/Site)</label>
-                            <div class="upload-box" data-max-size="{{ 5 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('logo_front') }}"
-                                data-remove-input="[name='remove_logo_front']">
-                                <input type="hidden" name="remove_logo_front" value="0">
-                                <input type="file" name="logo_front" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Menu Config</label>
+                            <div class="row">
+                                @php
+                                    $currentSettings = explode(',', $settings['video_plyr_settings'] ?? 'captions,quality,speed,loop');
+                                    $availableSettings = ['captions', 'quality', 'speed', 'loop'];
+                                @endphp
+                                <input type="hidden" name="video_plyr_settings"
+                                    value="{{ implode(',', $currentSettings) }}">
+                                @foreach($availableSettings as $setting)
+                                    <div class="col-md-6 mb-2">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input plyr-setting-checkbox"
+                                                id="setting_{{ $setting }}" value="{{ $setting }}" {{ in_array($setting, $currentSettings) ? 'checked' : '' }}>
+                                            <label class="custom-control-label"
+                                                for="setting_{{ $setting }}">{{ ucfirst($setting) }}</label>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
 
-                    <hr>
-                    <h5 class="text-primary mb-3"><i class="fas fa-image mr-2"></i>Backgrounds</h5>
+
                     <div class="row">
-                        <div class="col-md-6 form-group">
-                            <label>Hero Image (Frente)</label>
-                            <div class="upload-box" data-max-size="{{ 10 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('hero_image') }}"
-                                data-remove-input="[name='remove_hero_image']">
-                                <input type="hidden" name="remove_hero_image" value="0">
-                                <input type="file" name="hero_image" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Velocidades (CSVs)</label>
+                                <input name="video_plyr_speed_options" class="form-control"
+                                    value="{{ $settings['video_plyr_speed_options'] ?? '0.5,0.75,1,1.25,1.5,2' }}">
                             </div>
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label>Background do Site</label>
-                            <div class="upload-box" data-max-size="{{ 10 * 1024 * 1024 }}"
-                                data-existing-url="{{ $getUrl('site_bg_image') }}"
-                                data-remove-input="[name='remove_site_bg_image']">
-                                <input type="hidden" name="remove_site_bg_image" value="0">
-                                <input type="file" name="site_bg_image" accept="image/*" class="d-none">
-                                <div class="upload-preview text-center text-muted"></div>
-                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Velocidade Padrão</label>
+                                <input name="video_plyr_speed_selected" class="form-control"
+                                    value="{{ $settings['video_plyr_speed_selected'] ?? '1' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Opções avançadas (JSON)</label>
+                        <textarea name="video_plyr_options_json" class="form-control" rows="4"
+                            placeholder='{"tooltips":{"controls":true,"seek":true}}'>{{ $settings['video_plyr_options_json'] ?? '' }}</textarea>
+                        <small class="text-muted">JSON puro para sobrescrever configs.</small>
+                    </div>
+
+                    <hr>
+                    <h5 class="text-primary mb-3"><i class="fas fa-water mr-2"></i>Marca d'água (Cursos)</h5>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div
+                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                                <input type="hidden" name="video_watermark_enabled" value="0">
+                                <input type="checkbox" class="custom-control-input" id="video_watermark_enabled"
+                                    name="video_watermark_enabled" value="1" {{ ($settings['video_watermark_enabled'] ?? 0) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="video_watermark_enabled">Exibir
+                                    imagem</label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Imagem</label>
+                                <div class="upload-box" data-max-size="{{ 1 * 1024 * 1024 }}"
+                                    data-existing-url="{{ $getUrl('watermark_image') }}"
+                                    data-remove-input="[name='remove_watermark_image']">
+                                    <input type="hidden" name="remove_watermark_image" value="0">
+                                    <input type="file" name="watermark_image" accept="image/*" class="d-none">
+                                    <div class="upload-preview text-center text-muted"></div>
+                                    <button type="button"
+                                        class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
+                                    <button type="button"
+                                        class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div
+                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-2">
+                                <input type="hidden" name="video_watermark_text_enabled" value="0">
+                                <input type="checkbox" class="custom-control-input" id="video_watermark_text_enabled"
+                                    name="video_watermark_text_enabled" value="1" {{ ($settings['video_watermark_text_enabled'] ?? 0) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="video_watermark_text_enabled">Texto
+                                    dinâmico
+                                    (Anti-pirataria)</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Template</label>
+                                <input name="video_watermark_text_template" class="form-control"
+                                    value="{{ $settings['video_watermark_text_template'] ?? '{name} - {email}' }}">
+                                <small class="text-muted">Tags: {name}, {email}, {cpf}, {id}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Opacidade (0-1)</label>
+                                <input name="video_watermark_opacity" class="form-control"
+                                    value="{{ $settings['video_watermark_opacity'] ?? '0.5' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Tamanho (%)</label>
+                                <input name="video_watermark_size_percent" class="form-control"
+                                    value="{{ $settings['video_watermark_size_percent'] ?? '15' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Posição</label>
+                                <select name="video_watermark_position" class="form-control">
+                                    <option value="top-right" {{ ($settings['video_watermark_position'] ?? 'top-right') === 'top-right' ? 'selected' : '' }}>Topo Dir</option>
+                                    <option value="top-left" {{ ($settings['video_watermark_position'] ?? '') === 'top-left' ? 'selected' : '' }}>Topo Esq</option>
+                                    <option value="bottom-right" {{ ($settings['video_watermark_position'] ?? '') === 'bottom-right' ? 'selected' : '' }}>Inf Dir</option>
+                                    <option value="bottom-left" {{ ($settings['video_watermark_position'] ?? '') === 'bottom-left' ? 'selected' : '' }}>Inf Esq</option>
+                                </select>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- VÍDEO PLAYER (PLYR) --}}
-                <div class="tab-pane fade" id="tab-player" role="tabpanel">
-                    <h5 class="text-primary mb-3"><i class="fas fa-play-circle mr-2"></i>Player de Vídeo (Plyr)</h5>
 
+
+                {{-- ANÚNCIOS --}}
+                <div class="tab-pane fade" id="tab-ads" role="tabpanel">
+                    <h5 class="text-primary mb-3"><i class="fas fa-ad mr-2"></i>Monetização e Anúncios</h5>
                     <div class="alert alert-info">
-                        Configure o player de vídeo usado nas aulas/cursos. As opções avançadas aceitam o JSON de
-                        configuração do Plyr.
+                        Configure aqui os anúncios que aparecem na comunidade e entre lições.
+                        <br><b>Global:</b> Exibido em todas as páginas (ex: rodapé ou lateral).
+                        <br><b>Inter-feed:</b> Exibido entre postagens da comunidade (feed).
                     </div>
 
                     <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
-                        <input type="hidden" name="video_player_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input" id="video_player_enabled"
-                            name="video_player_enabled" value="1" {{ ($settings['video_player_enabled'] ?? 1) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="video_player_enabled">Ativar Plyr no site</label>
+                        <input type="hidden" name="ads_enabled" value="0">
+                        <input type="checkbox" class="custom-control-input" id="ads_enabled" name="ads_enabled"
+                            value="1" {{ ($settings['ads_enabled'] ?? 0) ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="ads_enabled">Ativar Anúncios Globais</label>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Cor principal do player</label>
-                                <div class="input-group colorpicker-element">
-                                    <input name="video_plyr_color" class="form-control"
-                                        value="{{ $settings['video_plyr_color'] ?? ($settings['site_color_primary'] ?? '#1F5EDB') }}">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fas fa-square"
-                                                style="color: {{ $settings['video_plyr_color'] ?? ($settings['site_color_primary'] ?? '#1F5EDB') }}"></i></span>
-                                    </div>
+                    <div class="card card-outline card-warning">
+                        <div class="card-header">
+                            <h3 class="card-title">Google AdSense</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label>Publisher ID (ca-pub-...)</label>
+                                    <input name="adsense_publisher_id" class="form-control"
+                                        value="{{ $settings['adsense_publisher_id'] ?? '' }}"
+                                        placeholder="ca-pub-000000000000">
                                 </div>
-                                <small class="text-muted">CSS: <code>--plyr-color-main</code>.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Seek (segundos)</label>
-                                <input name="video_plyr_seek_time" class="form-control"
-                                    value="{{ $settings['video_plyr_seek_time'] ?? '10' }}" placeholder="Ex: 10">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Volume inicial (0 a 1)</label>
-                                <input name="video_plyr_volume" class="form-control"
-                                    value="{{ $settings['video_plyr_volume'] ?? '0.8' }}" placeholder="Ex: 0.8">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
-                                <input type="hidden" name="video_plyr_autoplay" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_autoplay"
-                                    name="video_plyr_autoplay" value="1" {{ ($settings['video_plyr_autoplay'] ?? 0) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_autoplay">Autoplay</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
-                                <input type="hidden" name="video_plyr_muted" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_muted"
-                                    name="video_plyr_muted" value="1" {{ ($settings['video_plyr_muted'] ?? 0) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_muted">Iniciar mudo</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
-                                <input type="hidden" name="video_plyr_click_to_play" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_click_to_play"
-                                    name="video_plyr_click_to_play" value="1" {{ ($settings['video_plyr_click_to_play'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_click_to_play">Clique p/
-                                    tocar</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div
-                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-2">
-                                <input type="hidden" name="video_plyr_disable_context_menu" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_disable_context_menu"
-                                    name="video_plyr_disable_context_menu" value="1" {{ ($settings['video_plyr_disable_context_menu'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_disable_context_menu">Bloquear
-                                    Menu</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-3">
-                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                <input type="hidden" name="video_plyr_rewind_enabled" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_rewind_enabled"
-                                    name="video_plyr_rewind_enabled" value="1" {{ ($settings['video_plyr_rewind_enabled'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_rewind_enabled">Botão
-                                    Retroceder</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                <input type="hidden" name="video_plyr_fast_forward_enabled" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_fast_forward_enabled"
-                                    name="video_plyr_fast_forward_enabled" value="1" {{ ($settings['video_plyr_fast_forward_enabled'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_fast_forward_enabled">Botão
-                                    Avançar</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                <input type="hidden" name="video_plyr_volume_enabled" value="0">
-                                <input type="checkbox" class="custom-control-input" id="video_plyr_volume_enabled"
-                                    name="video_plyr_volume_enabled" value="1" {{ ($settings['video_plyr_volume_enabled'] ?? 1) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="video_plyr_volume_enabled">Controle
-                                    Volume</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Controles do Player</label>
-                                <div class="row">
-                                    @php
-                                        $currentControls = explode(',', $settings['video_plyr_controls'] ?? 'play,progress,current-time,mute,volume,settings,fullscreen');
-                                        $availableControls = ['play-large', 'restart', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'download', 'fullscreen'];
-                                    @endphp
-                                    <input type="hidden" name="video_plyr_controls"
-                                        value="{{ implode(',', $currentControls) }}">
-                                    @foreach($availableControls as $control)
-                                        <div class="col-md-4 mb-2">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input plyr-control-checkbox"
-                                                    id="control_{{ $control }}" value="{{ $control }}" {{ in_array($control, $currentControls) ? 'checked' : '' }}>
-                                                <label class="custom-control-label"
-                                                    for="control_{{ $control }}">{{ ucfirst($control) }}</label>
-                                            </div>
-                                        </div>
-                                    @endforeach
+                                <div class="col-md-6 form-group">
+                                    <label>Slot ID</label>
+                                    <input name="adsense_slot_id" class="form-control"
+                                        value="{{ $settings['adsense_slot_id'] ?? '' }}" placeholder="1234567890">
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Menu Config</label>
-                                <div class="row">
-                                    @php
-                                        $currentSettings = explode(',', $settings['video_plyr_settings'] ?? 'captions,quality,speed,loop');
-                                        $availableSettings = ['captions', 'quality', 'speed', 'loop'];
-                                    @endphp
-                                    <input type="hidden" name="video_plyr_settings"
-                                        value="{{ implode(',', $currentSettings) }}">
-                                    @foreach($availableSettings as $setting)
-                                        <div class="col-md-6 mb-2">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input plyr-setting-checkbox"
-                                                    id="setting_{{ $setting }}" value="{{ $setting }}" {{ in_array($setting, $currentSettings) ? 'checked' : '' }}>
-                                                <label class="custom-control-label"
-                                                    for="setting_{{ $setting }}">{{ ucfirst($setting) }}</label>
-                                            </div>
-                                        </div>
-                                    @endforeach
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label>Formato</label>
+                                    <select name="adsense_format" class="form-control">
+                                        @php($adsFormat = $settings['adsense_format'] ?? 'auto')
+                                        <option value="auto" {{ $adsFormat === 'auto' ? 'selected' : '' }}>Automático
+                                        </option>
+                                        <option value="fluid" {{ $adsFormat === 'fluid' ? 'selected' : '' }}>In-feed
+                                            (Fluido)</option>
+                                        <option value="rectangle" {{ $adsFormat === 'rectangle' ? 'selected' : '' }}>
+                                            Retângulo</option>
+                                        <option value="horizontal" {{ $adsFormat === 'horizontal' ? 'selected' : '' }}>
+                                            Horizontal</option>
+                                    </select>
                                 </div>
-                            </div>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Velocidades (CSVs)</label>
-                                    <input name="video_plyr_speed_options" class="form-control"
-                                        value="{{ $settings['video_plyr_speed_options'] ?? '0.5,0.75,1,1.25,1.5,2' }}">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Velocidade Padrão</label>
-                                    <input name="video_plyr_speed_selected" class="form-control"
-                                        value="{{ $settings['video_plyr_speed_selected'] ?? '1' }}">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Opções avançadas (JSON)</label>
-                            <textarea name="video_plyr_options_json" class="form-control" rows="4"
-                                placeholder='{"tooltips":{"controls":true,"seek":true}}'>{{ $settings['video_plyr_options_json'] ?? '' }}</textarea>
-                            <small class="text-muted">JSON puro para sobrescrever configs.</small>
-                        </div>
-
-                        <hr>
-                        <h5 class="text-primary mb-3"><i class="fas fa-water mr-2"></i>Marca d'água (Cursos)</h5>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div
-                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
-                                    <input type="hidden" name="video_watermark_enabled" value="0">
-                                    <input type="checkbox" class="custom-control-input" id="video_watermark_enabled"
-                                        name="video_watermark_enabled" value="1" {{ ($settings['video_watermark_enabled'] ?? 0) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="video_watermark_enabled">Exibir
-                                        imagem</label>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Imagem</label>
-                                    <div class="upload-box" data-max-size="{{ 1 * 1024 * 1024 }}"
-                                        data-existing-url="{{ $getUrl('watermark_image') }}"
-                                        data-remove-input="[name='remove_watermark_image']">
-                                        <input type="hidden" name="remove_watermark_image" value="0">
-                                        <input type="file" name="watermark_image" accept="image/*" class="d-none">
-                                        <div class="upload-preview text-center text-muted"></div>
-                                        <button type="button"
-                                            class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
-                                        <button type="button"
-                                            class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div
-                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-2">
-                                    <input type="hidden" name="video_watermark_text_enabled" value="0">
-                                    <input type="checkbox" class="custom-control-input"
-                                        id="video_watermark_text_enabled" name="video_watermark_text_enabled" value="1"
-                                        {{ ($settings['video_watermark_text_enabled'] ?? 0) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="video_watermark_text_enabled">Texto
-                                        dinâmico
-                                        (Anti-pirataria)</label>
-                                </div>
-                                <div class="form-group">
-                                    <label>Template</label>
-                                    <input name="video_watermark_text_template" class="form-control"
-                                        value="{{ $settings['video_watermark_text_template'] ?? '{name} - {email}' }}">
-                                    <small class="text-muted">Tags: {name}, {email}, {cpf}, {id}</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Opacidade (0-1)</label>
-                                    <input name="video_watermark_opacity" class="form-control"
-                                        value="{{ $settings['video_watermark_opacity'] ?? '0.5' }}">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Tamanho (%)</label>
-                                    <input name="video_watermark_size_percent" class="form-control"
-                                        value="{{ $settings['video_watermark_size_percent'] ?? '15' }}">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Posição</label>
-                                    <select name="video_watermark_position" class="form-control">
-                                        <option value="top-right" {{ ($settings['video_watermark_position'] ?? 'top-right') === 'top-right' ? 'selected' : '' }}>Topo Dir</option>
-                                        <option value="top-left" {{ ($settings['video_watermark_position'] ?? '') === 'top-left' ? 'selected' : '' }}>Topo Esq</option>
-                                        <option value="bottom-right" {{ ($settings['video_watermark_position'] ?? '') === 'bottom-right' ? 'selected' : '' }}>Inf Dir</option>
-                                        <option value="bottom-left" {{ ($settings['video_watermark_position'] ?? '') === 'bottom-left' ? 'selected' : '' }}>Inf Esq</option>
+                                <div class="col-md-6 form-group">
+                                    <label>Frequência (Inter-feed)</label>
+                                    <select name="adsense_frequency" class="form-control">
+                                        @php($adsFreq = (int) ($settings['adsense_frequency'] ?? 5))
+                                        <option value="3" {{ $adsFreq === 3 ? 'selected' : '' }}>A cada 3 posts
+                                        </option>
+                                        <option value="5" {{ $adsFreq === 5 ? 'selected' : '' }}>A cada 5 posts
+                                        </option>
+                                        <option value="10" {{ $adsFreq === 10 ? 'selected' : '' }}>A cada 10 posts
+                                        </option>
                                     </select>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-
-
-                    {{-- ANÚNCIOS --}}
-                    <div class="tab-pane fade" id="tab-ads" role="tabpanel">
-                        <h5 class="text-primary mb-3"><i class="fas fa-ad mr-2"></i>Monetização e Anúncios</h5>
-                        <div class="alert alert-info">
-                            Configure aqui os anúncios que aparecem na comunidade e entre lições.
-                            <br><b>Global:</b> Exibido em todas as páginas (ex: rodapé ou lateral).
-                            <br><b>Inter-feed:</b> Exibido entre postagens da comunidade (feed).
-                        </div>
-
-                        <div
-                            class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
-                            <input type="hidden" name="ads_enabled" value="0">
-                            <input type="checkbox" class="custom-control-input" id="ads_enabled" name="ads_enabled"
-                                value="1" {{ ($settings['ads_enabled'] ?? 0) ? 'checked' : '' }}>
-                            <label class="custom-control-label" for="ads_enabled">Ativar Anúncios Globais</label>
-                        </div>
-
-                        <div class="card card-outline card-warning">
-                            <div class="card-header">
-                                <h3 class="card-title">Google AdSense</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6 form-group">
-                                        <label>Publisher ID (ca-pub-...)</label>
-                                        <input name="adsense_publisher_id" class="form-control"
-                                            value="{{ $settings['adsense_publisher_id'] ?? '' }}"
-                                            placeholder="ca-pub-000000000000">
-                                    </div>
-                                    <div class="col-md-6 form-group">
-                                        <label>Slot ID</label>
-                                        <input name="adsense_slot_id" class="form-control"
-                                            value="{{ $settings['adsense_slot_id'] ?? '' }}" placeholder="1234567890">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 form-group">
-                                        <label>Formato</label>
-                                        <select name="adsense_format" class="form-control">
-                                            @php($adsFormat = $settings['adsense_format'] ?? 'auto')
-                                            <option value="auto" {{ $adsFormat === 'auto' ? 'selected' : '' }}>Automático
-                                            </option>
-                                            <option value="fluid" {{ $adsFormat === 'fluid' ? 'selected' : '' }}>In-feed
-                                                (Fluido)</option>
-                                            <option value="rectangle" {{ $adsFormat === 'rectangle' ? 'selected' : '' }}>
-                                                Retângulo</option>
-                                            <option value="horizontal" {{ $adsFormat === 'horizontal' ? 'selected' : '' }}>
-                                                Horizontal</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 form-group">
-                                        <label>Frequência (Inter-feed)</label>
-                                        <select name="adsense_frequency" class="form-control">
-                                            @php($adsFreq = (int) ($settings['adsense_frequency'] ?? 5))
-                                            <option value="3" {{ $adsFreq === 3 ? 'selected' : '' }}>A cada 3 posts
-                                            </option>
-                                            <option value="5" {{ $adsFreq === 5 ? 'selected' : '' }}>A cada 5 posts
-                                            </option>
-                                            <option value="10" {{ $adsFreq === 10 ? 'selected' : '' }}>A cada 10 posts
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group mt-3">
-                            <label>HTML/JS Personalizado (Global)</label>
-                            <textarea name="ads_code_html" class="form-control" rows="4"
-                                placeholder="Cole aqui o código de embed">{{ $settings['ads_code_html'] ?? '' }}</textarea>
-                            <small class="text-muted">Se usar AdSense acima, este campo pode ficar vazio.</small>
-                        </div>
-
-                        <div
-                            class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-3 mb-2">
-                            <input type="hidden" name="ads_inter_feed_enabled" value="0">
-                            <input type="checkbox" class="custom-control-input" id="ads_inter_feed_enabled"
-                                name="ads_inter_feed_enabled" value="1" {{ ($settings['ads_inter_feed_enabled'] ?? 0) ? 'checked' : '' }}>
-                            <label class="custom-control-label" for="ads_inter_feed_enabled">Exibir anúncios entre
-                                postagens
-                                do feed</label>
-                        </div>
-
-                        <div class="form-group">
-                            <label>HTML/JS Personalizado (Inter-feed)</label>
-                            <textarea name="ads_inter_feed_code" class="form-control" rows="4"
-                                placeholder="Código específico para o feed (opcional)">{{ $settings['ads_inter_feed_code'] ?? '' }}</textarea>
-                        </div>
+                    <div class="form-group mt-3">
+                        <label>HTML/JS Personalizado (Global)</label>
+                        <textarea name="ads_code_html" class="form-control" rows="4"
+                            placeholder="Cole aqui o código de embed">{{ $settings['ads_code_html'] ?? '' }}</textarea>
+                        <small class="text-muted">Se usar AdSense acima, este campo pode ficar vazio.</small>
                     </div>
 
+                    <div
+                        class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-3 mb-2">
+                        <input type="hidden" name="ads_inter_feed_enabled" value="0">
+                        <input type="checkbox" class="custom-control-input" id="ads_inter_feed_enabled"
+                            name="ads_inter_feed_enabled" value="1" {{ ($settings['ads_inter_feed_enabled'] ?? 0) ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="ads_inter_feed_enabled">Exibir anúncios entre
+                            postagens
+                            do feed</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>HTML/JS Personalizado (Inter-feed)</label>
+                        <textarea name="ads_inter_feed_code" class="form-control" rows="4"
+                            placeholder="Código específico para o feed (opcional)">{{ $settings['ads_inter_feed_code'] ?? '' }}</textarea>
+                    </div>
                 </div>
 
                 {{-- PWA --}}
@@ -887,6 +883,62 @@
                                 <option value="minimal-ui" {{ ($settings['pwa_display'] ?? '') === 'minimal-ui' ? 'selected' : '' }}>Minimal UI</option>
                                 <option value="browser" {{ ($settings['pwa_display'] ?? '') === 'browser' ? 'selected' : '' }}>Browser</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3 form-group">
+                            <label>Ícone (192x192)</label>
+                            <div class="upload-box" data-max-size="{{ 1 * 1024 * 1024 }}"
+                                data-existing-url="{{ $getUrl('pwa_icon_192') }}"
+                                data-remove-input="[name='remove_pwa_icon_192']">
+                                <input type="hidden" name="remove_pwa_icon_192" value="0">
+                                <input type="file" name="pwa_icon_192" accept="image/png" class="d-none">
+                                <div class="upload-preview text-center text-muted"></div>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
+                                <button type="button"
+                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                            </div>
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label>Ícone (512x512)</label>
+                            <div class="upload-box" data-max-size="{{ 1 * 1024 * 1024 }}"
+                                data-existing-url="{{ $getUrl('pwa_icon_512') }}"
+                                data-remove-input="[name='remove_pwa_icon_512']">
+                                <input type="hidden" name="remove_pwa_icon_512" value="0">
+                                <input type="file" name="pwa_icon_512" accept="image/png" class="d-none">
+                                <div class="upload-preview text-center text-muted"></div>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
+                                <button type="button"
+                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                            </div>
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label>Splash Screen (Capa)</label>
+                            <div class="upload-box" data-max-size="{{ 2 * 1024 * 1024 }}"
+                                data-existing-url="{{ $getUrl('pwa_splash_image') }}"
+                                data-remove-input="[name='remove_pwa_splash_image']">
+                                <input type="hidden" name="remove_pwa_splash_image" value="0">
+                                <input type="file" name="pwa_splash_image" accept="image/*" class="d-none">
+                                <div class="upload-preview text-center text-muted"></div>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
+                                <button type="button"
+                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                            </div>
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label>Banner (Restrito PWA)</label>
+                            <div class="upload-box" data-max-size="{{ 2 * 1024 * 1024 }}"
+                                data-existing-url="{{ $getUrl('pwa_banner_image') }}"
+                                data-remove-input="[name='remove_pwa_banner_image']">
+                                <input type="hidden" name="remove_pwa_banner_image" value="0">
+                                <input type="file" name="pwa_banner_image" accept="image/*" class="d-none">
+                                <div class="upload-preview text-center text-muted"></div>
+                                <button type="button" class="btn btn-sm btn-primary upload-btn mt-2">Selecionar</button>
+                                <button type="button"
+                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                            </div>
+                            <small class="text-muted">Exibido apenas no App.</small>
                         </div>
                     </div>
                 </div>
