@@ -148,16 +148,29 @@ class HomeController extends Controller
         }
 
         try {
-            $levels = User::select('level', DB::raw('count(*) as total'))
-                ->groupBy('level')
-                ->pluck('total', 'level');
+            // Contagem explícita para agrupar roles/levels
+            $inicianteCount = User::where('level', 'iniciante')
+                ->whereNotIn('role', ['admin', 'superadmin', 'mentor'])
+                ->count();
 
-            $leaderboard = Ranking::with(['user' => function($q) {
-                $q->whereNotIn('role', ['admin', 'superadmin']);
-            }])
+            $sucessoCount = User::where(function ($q) {
+                $q->where('level', 'sucesso')
+                    ->orWhere('role', 'mentor');
+            })->count();
+
+            $levels = [
+                'iniciante' => $inicianteCount,
+                'sucesso' => $sucessoCount
+            ];
+
+            $leaderboard = Ranking::with([
+                'user' => function ($q) {
+                    $q->whereNotIn('role', ['admin', 'superadmin']);
+                }
+            ])
                 ->orderByDesc('score')
                 ->get()
-                ->filter(function($rank) {
+                ->filter(function ($rank) {
                     // Exclui se não tem user ou se user é admin/superadmin
                     return $rank->user && !in_array($rank->user->role, ['admin', 'superadmin']);
                 })
