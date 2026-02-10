@@ -486,13 +486,30 @@
 
             // Persistência de aba ativa (nav-tabs)
             const tabKey = 'admin-active-tab-' + (location.pathname || 'root');
-            $('a[data-toggle="pill"], a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
+            // Use delegation to support PJAX/dynamic content
+            $(document).on('shown.bs.tab', 'a[data-toggle="pill"], a[data-toggle="tab"]', function (e) {
                 localStorage.setItem(tabKey, $(e.target).attr('href'));
             });
-            const savedTab = localStorage.getItem(tabKey);
-            if (savedTab && $(savedTab).length) {
-                $('a[href="' + savedTab + '"][data-toggle="pill"], a[href="' + savedTab + '"][data-toggle="tab"]').tab('show');
+
+            function restoreActiveTab() {
+                const savedTab = localStorage.getItem(tabKey);
+                if (savedTab) {
+                    const $tab = $('a[href="' + savedTab + '"]');
+                    if ($tab.length) {
+                        // Use bootstrap tab show
+                        $tab.tab('show');
+                    }
+                }
             }
+
+            // Restore on load
+            restoreActiveTab();
+
+            // Restore on PJAX end
+            $(document).on('pjax:end', function () {
+                restoreActiveTab();
+            });
 
             function initColorPickers() {
                 $('.colorpicker-element').colorpicker();

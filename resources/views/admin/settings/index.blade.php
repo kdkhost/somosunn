@@ -79,27 +79,27 @@
         <div class="card card-primary card-outline card-outline-tabs">
             <div class="card-header p-0 border-bottom-0">
                 <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tab-general" role="tab"><i
+                    <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tab-general" role="tab"><i
                                 class="fas fa-cogs mr-1"></i> Geral</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-appearance" role="tab"><i
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-appearance" role="tab"><i
                                 class="fas fa-paint-brush mr-1"></i> Aparência</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-images" role="tab"><i
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-images" role="tab"><i
                                 class="fas fa-images mr-1"></i> Imagens</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-player" role="tab"><i
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-player" role="tab"><i
                                 class="fas fa-play-circle mr-1"></i> Player</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-ads" role="tab"><i
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-ads" role="tab"><i
                                 class="fas fa-ad mr-1"></i> Anúncios</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-pwa" role="tab"><i
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-pwa" role="tab"><i
                                 class="fas fa-mobile-alt mr-1"></i> PWA</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-gateway" role="tab"><i
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-gateway" role="tab"><i
                                 class="fas fa-credit-card mr-1"></i> Gateway</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-smtp" role="tab"><i
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-smtp" role="tab"><i
                                 class="fas fa-envelope mr-1"></i> SMTP</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-social" role="tab"><i
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-social" role="tab"><i
                                 class="fas fa-share-alt mr-1"></i> Login Social</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-seo" role="tab"><i
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-seo" role="tab"><i
                                 class="fas fa-search mr-1"></i> SEO</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-system" role="tab"><i
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-system" role="tab"><i
                                 class="fas fa-server mr-1"></i> Sistema</a></li>
                 </ul>
             </div>
