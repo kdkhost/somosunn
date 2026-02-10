@@ -216,9 +216,23 @@ class SettingController extends Controller
             $this->replaceFile('seo_twitter_image', $this->storePublic($request->file('seo_twitter_image'), 'uploads/imagens/seo'));
         }
 
-        $bools = ['pwa_enabled', 'preloader_enabled'];
+        $bools = [
+            'pwa_enabled',
+            'preloader_enabled',
+            'ads_enabled',
+            'ads_inter_feed_enabled',
+            'gateway_transparent_checkout',
+            'gateway_pass_tax_to_client',
+            'social_login_enabled',
+            'social_google_enabled',
+            'social_facebook_enabled',
+            'social_twitter_enabled',
+        ];
+
         foreach ($bools as $b) {
-            $data[$b] = $request->boolean($b) ? 1 : 0;
+            if ($request->has($b)) {
+                $data[$b] = $request->boolean($b) ? 1 : 0;
+            }
         }
 
         $videoBools = [
@@ -353,8 +367,8 @@ class SettingController extends Controller
             }
 
             $parts = preg_split('/[,\s;]+/', $raw) ?: [];
-            $parts = array_map(static fn ($p) => strtolower(trim((string) $p)), $parts);
-            $parts = array_values(array_filter($parts, static fn ($p) => $p !== '' && preg_match('/^[a-z0-9]+$/', $p)));
+            $parts = array_map(static fn($p) => strtolower(trim((string) $p)), $parts);
+            $parts = array_values(array_filter($parts, static fn($p) => $p !== '' && preg_match('/^[a-z0-9]+$/', $p)));
             $parts = array_values(array_unique($parts));
 
             $data[$key] = implode(',', $parts);
@@ -640,17 +654,18 @@ class SettingController extends Controller
         ]);
 
         $encryption = $request->smtp_encryption;
-        if($encryption === 'null' || $encryption === '') $encryption = null;
+        if ($encryption === 'null' || $encryption === '')
+            $encryption = null;
 
         $config = [
             'transport' => 'smtp',
-            'host'       => trim($request->smtp_host),
-            'port'       => trim($request->smtp_port),
-            'username'   => trim($request->smtp_username),
-            'password'   => trim($request->smtp_password),
+            'host' => trim($request->smtp_host),
+            'port' => trim($request->smtp_port),
+            'username' => trim($request->smtp_username),
+            'password' => trim($request->smtp_password),
             'encryption' => $encryption,
-            'timeout'    => null,
-            'auth_mode'  => null,
+            'timeout' => null,
+            'auth_mode' => null,
         ];
 
         \Config::set('mail.mailers.smtp', $config);
@@ -673,15 +688,19 @@ class SettingController extends Controller
 
             // Prioritize Admin Logo (Sidebar/Header) for Emails
             $logo = Setting::where('key', 'logo_admin')->value('value');
-            if(!$logo) $logo = Setting::where('key', 'logo_front')->value('value');
-            if(!$logo) $logo = Setting::where('key', 'logo_image')->value('value');
-            
+            if (!$logo)
+                $logo = Setting::where('key', 'logo_front')->value('value');
+            if (!$logo)
+                $logo = Setting::where('key', 'logo_image')->value('value');
+
             $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
 
             // Fetch Site Name from Database
             $siteName = Setting::where('key', 'app_name')->value('value');
-            if(!$siteName) $siteName = Setting::where('key', 'company_name')->value('value');
-            if(!$siteName) $siteName = config('app.name');
+            if (!$siteName)
+                $siteName = Setting::where('key', 'company_name')->value('value');
+            if (!$siteName)
+                $siteName = config('app.name');
 
             $data = [
                 'user' => ['name' => 'Administrador'],
@@ -694,7 +713,7 @@ class SettingController extends Controller
             // Render logic simple for test
             $rendered = $template->body;
             $subject = $template->subject ?? 'Teste SMTP';
-            
+
             foreach ($data as $key => $values) {
                 foreach ($values as $k => $v) {
                     $pattern = '/\{\{\s*' . $key . '\.' . $k . '\s*\}\}/';
@@ -706,7 +725,7 @@ class SettingController extends Controller
             // System Colors
             $primaryColor = Setting::where('key', 'site_color_primary')->value('value') ?? '#007bff';
             $secondaryColor = Setting::where('key', 'site_color_secondary')->value('value') ?? '#6c757d';
-            
+
             // Wrap with layout
             $layout = '
             <div style="background-color: #f4f6f9; padding: 20px; font-family: sans-serif; min-height: 100%;">
@@ -715,18 +734,18 @@ class SettingController extends Controller
                         <td align="center">
                             <div style="background-color: #ffffff; max-width: 600px; padding: 0px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
                                 <!-- Header -->
-                                <div style="background: linear-gradient(135deg, '.$primaryColor.' 0%, '.$secondaryColor.' 100%); padding: 30px 20px; text-align: center;">
-                                    <img src="'.$logoUrl.'" alt="'.$data['site']['name'].'" style="max-height: 60px; max-width: 200px;">
+                                <div style="background: linear-gradient(135deg, ' . $primaryColor . ' 0%, ' . $secondaryColor . ' 100%); padding: 30px 20px; text-align: center;">
+                                    <img src="' . $logoUrl . '" alt="' . $data['site']['name'] . '" style="max-height: 60px; max-width: 200px;">
                                 </div>
                                 
                                 <!-- Body -->
                                 <div style="padding: 30px; color: #333333; line-height: 1.6;">
-                                    '.$rendered.'
+                                    ' . $rendered . '
                                 </div>
                                 
                                 <!-- Footer -->
                                 <div style="background-color: #f8f9fa; padding: 20px; text-align: center; color: #777777; font-size: 12px; border-top: 1px solid #eeeeee;">
-                                    <p>&copy; '.date('Y').' '.$data['site']['name'].'. Todos os direitos reservados.</p>
+                                    <p>&copy; ' . date('Y') . ' ' . $data['site']['name'] . '. Todos os direitos reservados.</p>
                                 </div>
                             </div>
                         </td>
@@ -736,7 +755,7 @@ class SettingController extends Controller
 
             \Mail::html($layout, function ($message) use ($request, $subject) {
                 $message->to($request->smtp_test_email)
-                        ->subject($subject);
+                    ->subject($subject);
             });
 
             return response()->json(['success' => true, 'message' => 'E-mail de teste enviado com sucesso!']);
