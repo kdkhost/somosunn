@@ -365,19 +365,9 @@ class CourseController extends Controller
         $existingCert = $course->certificates()->where('user_id', $user->id)->first();
 
         if (!$existingCert && $course->is_certificate_enabled) {
-            // Create Certificate
-            $workloadHours = $watchedSeconds > 0 ? round($watchedSeconds / 3600, 1) : 0;
-            if ($workloadHours < 1) {
-                $workloadHours = 1; // Minimum 1h
-            }
-
-            \App\Models\Certificate::create([
-                'user_id' => $user->id,
-                'course_id' => $course->id,
-                'cert_hash' => Str::uuid(), // simplified hash
-                'workload' => $workloadHours,
-                'issued_at' => now(),
-            ]);
+            // Generate certificate with PDF using the proper method
+            $certificateController = new \App\Http\Controllers\Admin\CertificateController();
+            $existingCert = $certificateController->generate($user, 'course', $course->id);
         }
 
         // Mark enrollment as completed (using polymorphic relationship)
