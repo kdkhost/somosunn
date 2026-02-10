@@ -113,8 +113,10 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureUserIsAdmin::class])->grou
             $log[] = "Artisan error: " . $e->getMessage();
         }
 
-        return "<h1>Limpeza Concluída</h1><pre>" . implode("\n", $log) . "</pre><br><a href='/admin'>Voltar ao Admin</a>";
+
     });
+});
+
 
 
 
