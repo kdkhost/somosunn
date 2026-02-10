@@ -131,11 +131,17 @@ class CertificateController extends Controller
         // 2. Regenerate PDF content
         $output = $this->generatePdfContent($certificate->user, $type, $product, $certificate->cert_hash);
 
-        // 3. Overwrite existing file
+        // 3. Ensure pdf_path exists, create if null (for legacy certificates)
+        if (!$certificate->pdf_path) {
+            $certificate->pdf_path = "certificates/{$certificate->cert_hash}.pdf";
+        }
+
+        // Overwrite or create file
         Storage::disk('public')->put($certificate->pdf_path, $output);
 
-        // 4. Update timestamp
+        // 4. Update timestamp and save path
         $certificate->touch();
+        $certificate->save();
 
         return redirect()->back()->with('success', 'Certificado regenerado com o design atual!');
     }
