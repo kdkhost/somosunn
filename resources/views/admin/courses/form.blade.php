@@ -977,20 +977,20 @@
             attachments.forEach(att => {
                 const size = (att.file_size / 1024 / 1024).toFixed(2) + ' MB';
                 const item = `
-                                                                        <li class="attachment-item" id="att-${att.id}">
-                                                                            <div class="d-flex align-items-center">
-                                                                                <i class="fas fa-file attachment-icon"></i>
-                                                                                <div>
-                                                                                    <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
-                                                                                    <small class="text-muted">${size}</small>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div>
-                                                                                <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
-                                                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
-                                                                            </div>
-                                                                        </li>
-                                                                    `;
+                                                                                <li class="attachment-item" id="att-${att.id}">
+                                                                                    <div class="d-flex align-items-center">
+                                                                                        <i class="fas fa-file attachment-icon"></i>
+                                                                                        <div>
+                                                                                            <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
+                                                                                            <small class="text-muted">${size}</small>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
+                                                                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                                                    </div>
+                                                                                </li>
+                                                                            `;
                 list.append(item);
             });
         }
@@ -1410,6 +1410,13 @@
             // Initial Settings from DB (or defaults)
             let certSettings = {!! $course->certificate_settings ? json_encode($course->certificate_settings) : '{}' !!};
 
+            // Get Logo URL from PHP
+            @php
+                $logoAuth = \App\Models\Setting::get('logo_auth') ?: \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
+                $logoAuthSrc = $logoAuth ? asset(ltrim($logoAuth, '/')) : asset('img/logo.svg');
+            @endphp
+            const platformLogoUrl = "{{ $logoAuthSrc }}";
+
             // Default Tags (with mandatory logo and auto-populated fields)
             const defaultTags = {
                 'student_name': { x: 50, y: 40, text: '[Nome do Aluno]', fontSize: 30, color: '#000000', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' },
@@ -1481,8 +1488,22 @@
                             whiteSpace: 'nowrap',
                             border: '1px dashed transparent',
                             padding: '5px'
-                        })
-                        .text(data.text);
+                        });
+
+                    if (key === 'platform_logo') {
+                        $el.css({
+                            width: (data.width || 120) + 'px',
+                            height: (data.height || 60) + 'px',
+                            backgroundImage: 'url("' + platformLogoUrl + '")',
+                            backgroundSize: 'contain',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center'
+                        });
+                        $el.text(''); // Clear text
+                    } else {
+                        $el.text(data.text);
+                        $el.css({ width: 'auto', height: 'auto' });
+                    }
 
                     // Click to Select
                     $el.on('mousedown', function (e) {
@@ -1490,8 +1511,10 @@
                         $(this).css('border-color', '#007bff');
                         activeElementId = key;
 
-                        // Populate Tools
-                        $('#selected-elem-name').text(data.text);
+                        // Populate Tools;
+                        // For logo, we might want to hide text input or font controls?
+                        // For now keep it simple.
+                        $('#selected-elem-name').text(key === 'platform_logo' ? 'Logo da Plataforma' : data.text);
                         $('#style-font-size').val(data.fontSize);
                         $('#style-color').val(data.color);
                         $('#style-font-weight').val(data.fontWeight);

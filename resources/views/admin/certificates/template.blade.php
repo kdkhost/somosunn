@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Certificado</title>
@@ -7,11 +8,13 @@
         @page {
             margin: 0px;
         }
+
         body {
             font-family: Arial, Helvetica, sans-serif;
             margin: 0px;
             padding: 0px;
-            width: 1122px; /* A4 Landscape at 96 DPI approx */
+            width: 1122px;
+            /* A4 Landscape at 96 DPI approx */
             height: 793px;
             overflow: hidden;
         }
@@ -28,10 +31,11 @@
                 padding: 40px 0;
                 overflow: auto;
             }
+
             .container {
                 width: 1122px !important;
                 height: 793px !important;
-                box-shadow: 0 0 20px rgba(0,0,0,0.5);
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
                 transform-origin: top center;
             }
         }
@@ -50,17 +54,19 @@
                 background-repeat: no-repeat;
             @endif
         }
+
         .element {
             position: absolute;
             white-space: nowrap;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         @php
             $settings = $course->certificate_settings ?? [];
-            
+
             // Extract special fields that might be strings (not style arrays)
             // If settings['title'] is an array (style), we look for 'custom_title' used for text.
             if (isset($settings['custom_title'])) {
@@ -78,7 +84,7 @@
             } else {
                 $certPresentation = $course->default_presentation_text;
             }
-            
+
             // Map keys used in editor to real data
             $dataMap = [
                 'student_name' => $user->name,
@@ -95,14 +101,15 @@
 
         {{-- Render Fixed Title (if not in draggable elements) --}}
         @if(!isset($settings['title']) || !is_array($settings['title']))
-            <div class="element" style="width: 100%; text-align: center; top: 15%; font-size: 40px; font-weight: bold; color: #222;">
+            <div class="element"
+                style="width: 100%; text-align: center; top: 15%; font-size: 40px; font-weight: bold; color: #222;">
                 {{ $certTitle }}
             </div>
         @endif
 
         {{-- Render Fixed Presentation Text (if not in draggable elements) --}}
         @if(!isset($settings['presentation_text']) || !is_array($settings['presentation_text']))
-             <div class="element" style="width: 100%; text-align: center; top: 25%; font-size: 18px; color: #555;">
+            <div class="element" style="width: 100%; text-align: center; top: 25%; font-size: 18px; color: #555;">
                 {{ $certPresentation }}
             </div>
         @endif
@@ -110,44 +117,46 @@
         @foreach($settings as $key => $style)
             @continue($key === 'platform_logo')
             @continue(!is_array($style))
-            
+
             <div class="element" style="
-                left: {{ $style['x'] }}%;
-                top: {{ $style['y'] }}%;
-                font-size: {{ $style['fontSize'] }}px;
-                color: {{ $style['color'] }};
-                font-weight: {{ $style['fontWeight'] }};
-                font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
-                transform: translate(-50%, -50%); /* Center based on coords */
-            ">
+                    left: {{ $style['x'] }}%;
+                    top: {{ $style['y'] }}%;
+                    font-size: {{ $style['fontSize'] }}px;
+                    color: {{ $style['color'] }};
+                    font-weight: {{ $style['fontWeight'] }};
+                    font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
+                    transform: translate(-50%, -50%); /* Center based on coords */
+                ">
                 {{ $dataMap[$key] ?? '' }}
             </div>
         @endforeach
 
-            @php 
-                $logoStyle = $settings['platform_logo'];
-                $logoRelPath = 'img/logo.png'; 
-                
-                // Try to find a real logo
-                if(file_exists(public_path('uploads/branding/logo_admin.png'))) {
-                    $logoRelPath = 'uploads/branding/logo_admin.png';
-                }
-                
-                // For PDF (DomPDF), use absolute filesystem path
-                // For Preview (Browser), use URL
-                if (isset($isPreview) && $isPreview) {
-                     $logoUrl = asset($logoRelPath);
-                } else {
-                     $logoUrl = public_path($logoRelPath);
-                }
-            @endphp
+        @php 
+                            $logoStyle = $settings['platform_logo'];
+
+            // Use the same logic as Auth Visual component
+            $logoPath = \App\Models\Setting::get('logo_auth') ?: \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
+            $logoRelPath = $logoPath ? ltrim($logoPath, '/') : 'img/logo.png';
+
+            // For PDF (DomPDF), use absolute filesystem path
+            // For Preview (Browser), force relative URL to avoid connection refused
+            if (isset($isPreview) && $isPreview) {
+                $logoUrl = asset($logoRelPath);
+                // If asset returns full URL, ensure its reachable or use relative
+                // But we decided to use relative path for preview to avoid domain issues
+                $logoUrl = '/' . $logoRelPath;
+            } else {
+                $logoUrl = public_path($logoRelPath);
+            }
+        @endphp
             <div class="element" style="
-                left: {{ $logoStyle['x'] }}%;
-                top: {{ $logoStyle['y'] }}%;
-                width: {{ $logoStyle['width'] ?? 120 }}px;
+            left: {{ $logoStyle['x'] }}%;
+            top: {{ $logoStyle['y'] }}%;
+            width: {{ $logoStyle['width'] ?? 120 }}px;
                 height: {{ $logoStyle['height'] ?? 60 }}px;
                 transform: translate(-50%, -50%);
-            ">
+       
+     ">
                 <img src="{{ $logoUrl }}" style="width: 100%; height: 100%; object-fit: contain;">
             </div>
         
