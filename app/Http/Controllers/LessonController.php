@@ -312,25 +312,39 @@ class LessonController extends Controller
         if ($totalLessons === 0)
             return false;
 
-        $completedCount = LessonProgress::query()
+        // Get completed lessons progress
+        $completedProgress = LessonProgress::query()
             ->where('user_id', $user->id)
             ->whereIn('lesson_id', $course->lessons()->pluck('id'))
             ->whereNotNull('completed_at')
-            ->count();
+            ->with('lesson') // Eager load lessons to get duration
+            ->get();
 
-        if ($completedCount >= $totalLessons) {
-            // Course is 100% complete
+        $completedCount = $completedProgress->count();
+
+        // Rule: 89% completion required
+        $completionRatio = $completedCount / $totalLessons;
+
+        if ($completionRatio >= 0.89) {
             if ($course->is_certificate_enabled) {
                 // Check if already issued
                 $existing = $course->certificates()->where('user_id', $user->id)->first();
                 if (!$existing) {
                     try {
+                        // Calculate actual watched workload (sum of completed lessons duration)
+                        $watchedSeconds = $completedProgress->sum(function ($progress) {
+                            return $progress->lesson->duration ?? 0;
+                        });
+
+                        // Convert to hours (decimal)
+                        $workloadHours = $watchedSeconds > 0 ? round($watchedSeconds / 3600, 2) : 0;
+
                         // Trigger certificate generation
-                        // Using the existing admin controller logic if possible or creating a record
                         $course->certificates()->create([
                             'user_id' => $user->id,
                             'cert_hash' => \Illuminate\Support\Str::random(12),
                             'issued_at' => now(),
+                            'workload' => $workloadHours
                         ]);
                     } catch (\Exception $e) {
                         \Log::error("Failed to issue certificate for user {$user->id} in course {$course->id}: " . $e->getMessage());

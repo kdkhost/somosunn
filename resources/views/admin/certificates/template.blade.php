@@ -92,7 +92,7 @@
                 'completion_date' => ($type === 'event' ? 'Participou em: ' : 'Concluído em: ') . (\Carbon\Carbon::parse($user->enrollments()->where('enrollable_id', $course->id)->where('enrollable_type', get_class($course))->first()->completed_at ?? now())->format('d/m/Y')),
                 'certificate_code' => 'Validação: ' . $certHash,
                 'author_name' => $authorName,
-                'workload_hours' => $workload > 0 ? 'Carga Horária: ' . $workload . 'h' : ($type === 'event' ? 'Evento' : 'Mentoria'),
+                'workload_hours' => $workload > 0 ? 'Carga Horária: ' . str_replace('.', ',', $workload) . 'h' : ($type === 'event' ? 'Evento' : 'Mentoria'),
                 'platform_logo' => 'LOGO UNN',
                 'title' => $certTitle,
                 'presentation_text' => $certPresentation

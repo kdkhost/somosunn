@@ -195,14 +195,33 @@ class CertificateController extends Controller
 
         if ($type === 'course') {
             $authorName = $product->author_name;
-            $workload = $product->total_hours;
+            // Use stored workload from certificate if available (passed via $product if it was a certificate object, but here $product is Course)
+            // Wait, $product is the Course/Mentorship model. We need the Certificate object to get the stored workload.
+            // The method signature is generatePdfContent($user, $type, $product, $certHash).
+            // We can look up the certificate by hash to get the workload.
+            $cert = Certificate::where('cert_hash', $certHash)->first();
+            if ($cert && $cert->workload) {
+                $workload = $cert->workload;
+            } else {
+                $workload = $product->total_hours;
+            }
         } elseif ($type === 'mentorship') {
             $authorName = $product->mentor ? $product->mentor->name : 'Mentor';
-            $workload = $product->total_hours ?? 0;
+            $cert = Certificate::where('cert_hash', $certHash)->first();
+            if ($cert && $cert->workload) {
+                $workload = $cert->workload;
+            } else {
+                $workload = $product->total_hours ?? 0;
+            }
             // Mentorships might not have certificate settings yet, use defaults or course structure
         } elseif ($type === 'event') {
             $authorName = $product->user ? $product->user->name : 'Organizador';
-            $workload = $product->duration_hours ?? 0;
+            $cert = Certificate::where('cert_hash', $certHash)->first();
+            if ($cert && $cert->workload) {
+                $workload = $cert->workload;
+            } else {
+                $workload = $product->duration_hours ?? 0;
+            }
         }
 
         // Configure DomPDF
@@ -292,11 +311,13 @@ class CertificateController extends Controller
 
         if ($type === 'course') {
             $authorName = $product->author_name;
-            $workload = $product->total_hours;
+            $workload = $cert->workload > 0 ? $cert->workload : $product->total_hours;
         } elseif ($type === 'mentorship') {
             $authorName = $product->mentor ? $product->mentor->name : 'Mentor';
+            $workload = $cert->workload > 0 ? $cert->workload : ($product->total_hours ?? 0);
         } elseif ($type === 'event') {
             $authorName = $product->user ? $product->user->name : 'Organizador';
+            $workload = $cert->workload > 0 ? $cert->workload : ($product->duration_hours ?? 0);
         }
 
         return view('admin.certificates.template', [

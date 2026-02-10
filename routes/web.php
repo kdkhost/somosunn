@@ -243,6 +243,7 @@ Route::middleware(['auth', 'check.feature:courses_edit'])->group(function () {
 });
 Route::middleware(['auth', 'check.feature:courses_delete'])->group(function () {
     Route::delete('courses/{course}', [\App\Http\Controllers\CourseController::class, 'destroy'])->name('courses.destroy');
+    Route::post('courses/{course}/complete', [\App\Http\Controllers\CourseController::class, 'complete'])->name('courses.complete');
 });
 
 // Feature: Mentorships (granular)

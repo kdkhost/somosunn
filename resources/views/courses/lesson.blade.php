@@ -82,8 +82,8 @@
             <div class="max-w-4xl mx-auto">
                 <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ $lesson->title }}</h1>
 
-                <div class="relative w-full overflow-hidden shadow-2xl mb-8 bg-black rounded-xl"
-                    style="aspect-ratio: 16/9;" data-unn-video-host>
+                <div class="relative w-full overflow-hidden shadow-2xl mb-8 bg-black rounded-xl" style="aspect-ratio: 16/9;"
+                    data-unn-video-host>
                     @if($lesson->video_url)
                         @php
                             $normalizedVideoUrl = trim((string) $lesson->video_url);
@@ -109,8 +109,7 @@
                         @endphp
                         @php $usePlyr = (string) \App\Models\Setting::get('video_player_enabled', '1') === '1'; @endphp
                         @if($usePlyr)
-                            <div class="absolute inset-0" data-unn-video-player
-                                data-video-url="{{ $normalizedVideoUrl }}"
+                            <div class="absolute inset-0" data-unn-video-player data-video-url="{{ $normalizedVideoUrl }}"
                                 data-progress-url="{{ route('courses.lessons.progress.update', [$course->id, $lesson->id]) }}"
                                 data-bookmark-store-url="{{ route('courses.lessons.bookmarks.store', [$course->id, $lesson->id]) }}"
                                 data-bookmark-delete-url-template="{{ route('courses.lessons.bookmarks.destroy', [$course->id, $lesson->id, '__BOOKMARK_ID__']) }}"
@@ -245,10 +244,21 @@
                                 Download Certificado <i class="fas fa-file-download ml-2"></i>
                             </a>
                         @else
-                            <button id="btn-complete-course"
-                                class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition cursor-pointer">
-                                Concluir Curso <i class="fas fa-check ml-2"></i>
-                            </button>
+                            @if($percentage >= 89)
+                                <form action="{{ route('courses.complete', $course->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit"
+                                        class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition cursor-pointer"
+                                        onclick="return confirm('Tem certeza que deseja concluir o curso?')">
+                                        Concluir Curso <i class="fas fa-check ml-2"></i>
+                                    </button>
+                                </form>
+                            @else
+                                <button type="button" disabled title="Conclua pelo menos 89% do curso"
+                                    class="px-5 py-2 bg-gray-400 text-white rounded-lg font-medium cursor-not-allowed opacity-70">
+                                    Concluir Curso <i class="fas fa-lock ml-2"></i>
+                                </button>
+                            @endif
                         @endif
                     @endif
                 </div>
@@ -435,14 +445,14 @@
                                 row.dataset.bookmarkId = String(result.bookmark.id);
                                 row.dataset.bookmarkSeconds = String(result.bookmark.position_seconds || 0);
                                 row.innerHTML = `
-                                                            <div class="min-w-0">
-                                                                <button type="button" class="text-sm font-bold text-[#1F5EDB] hover:underline text-left lesson-bookmark-jump">
-                                                                    <i class="fas fa-play-circle mr-1"></i>${formatSeconds(result.bookmark.position_seconds || 0)}
-                                                                </button>
-                                                                <p class="text-sm text-gray-700 mt-1 break-words"></p>
-                                                            </div>
-                                                            <button type="button" class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 lesson-bookmark-delete">Excluir</button>
-                                                        `;
+                                                                    <div class="min-w-0">
+                                                                        <button type="button" class="text-sm font-bold text-[#1F5EDB] hover:underline text-left lesson-bookmark-jump">
+                                                                            <i class="fas fa-play-circle mr-1"></i>${formatSeconds(result.bookmark.position_seconds || 0)}
+                                                                        </button>
+                                                                        <p class="text-sm text-gray-700 mt-1 break-words"></p>
+                                                                    </div>
+                                                                    <button type="button" class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 lesson-bookmark-delete">Excluir</button>
+                                                                `;
                                 row.querySelector('p').textContent = result.bookmark.note || '';
                                 bookmarkList.prepend(row);
                                 bookmarkNote.value = '';
@@ -546,21 +556,7 @@
 
                 renderEmptyState();
 
-                // Course Completion Handler
-                const btnComplete = document.getElementById('btn-complete-course');
-                if (btnComplete) {
-                    btnComplete.addEventListener('click', function () {
-                        Swal.fire({
-                            title: 'Parabéns!',
-                            text: 'Você concluiu o curso com sucesso.',
-                            icon: 'success',
-                            confirmButtonColor: '#1F5EDB',
-                            confirmButtonText: 'Continuar'
-                        }).then(() => {
-                            window.location.href = "{{ route('portal') }}";
-                        });
-                    });
-                }
+
             })();
         </script>
     @endauth
