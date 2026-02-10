@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('page_title', ($invoice->id ? 'Editar' : 'Nova').' fatura')
+@section('page_title', ($invoice->id ? 'Editar' : 'Nova') . ' fatura')
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('admin.invoices.index') }}" data-pjax>Faturas</a></li>
     <li class="breadcrumb-item active">{{ $invoice->id ? 'Editar' : 'Nova' }}</li>
@@ -13,7 +13,8 @@
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
-        <form method="POST" action="{{ $invoice->id ? route('admin.invoices.update',$invoice) : route('admin.invoices.store') }}">
+        <form method="POST"
+            action="{{ $invoice->id ? route('admin.invoices.update', $invoice) : route('admin.invoices.store') }}">
             @csrf
             @if($invoice->id) @method('PUT') @endif
 
@@ -28,23 +29,25 @@
                             </option>
                         @endforeach
                     </select>
-                    <small class="text-muted">Se o usuário não estiver na lista, abra a tela de usuários e crie/edite o cadastro primeiro.</small>
+                    <small class="text-muted">Se o usuário não estiver na lista, abra a tela de usuários e crie/edite o
+                        cadastro primeiro.</small>
                 </div>
 
                 <div class="form-group col-md-3">
                     <label>Status</label>
                     @php($status = old('status', $invoice->status ?: 'issued'))
                     <select name="status" class="form-control" required>
-                        <option value="draft" {{ $status==='draft'?'selected':'' }}>Rascunho</option>
-                        <option value="issued" {{ $status==='issued'?'selected':'' }}>Emitida</option>
-                        <option value="paid" {{ $status==='paid'?'selected':'' }}>Paga</option>
-                        <option value="cancelled" {{ $status==='cancelled'?'selected':'' }}>Cancelada</option>
+                        <option value="draft" {{ $status === 'draft' ? 'selected' : '' }}>Rascunho</option>
+                        <option value="issued" {{ $status === 'issued' ? 'selected' : '' }}>Emitida</option>
+                        <option value="paid" {{ $status === 'paid' ? 'selected' : '' }}>Paga</option>
+                        <option value="cancelled" {{ $status === 'cancelled' ? 'selected' : '' }}>Cancelada</option>
                     </select>
                 </div>
 
                 <div class="form-group col-md-3">
                     <label>Moeda</label>
-                    <input name="currency" class="form-control" value="{{ old('currency', $invoice->currency ?: 'BRL') }}" placeholder="BRL">
+                    <input name="currency" class="form-control"
+                        value="{{ old('currency', $invoice->currency ?: 'BRL') }}" placeholder="BRL">
                 </div>
             </div>
 
@@ -69,7 +72,8 @@
                 <div class="form-group col-md-3 d-flex align-items-end">
                     <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-2">
                         <input type="hidden" name="send_email" value="0">
-                        <input type="checkbox" class="custom-control-input" id="send_email" name="send_email" value="1" {{ old('send_email') ? 'checked' : '' }}>
+                        <input type="checkbox" class="custom-control-input" id="send_email" name="send_email" value="1"
+                            {{ old('send_email') ? 'checked' : '' }}>
                         <label class="custom-control-label" for="send_email">Enviar por e-mail ao salvar</label>
                     </div>
                 </div>
@@ -95,47 +99,25 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php
-                            $oldDesc = old('items_description');
-                            $oldQty = old('items_quantity');
-                            $oldPrice = old('items_unit_price');
-
-                            $rows = [];
-                            if (is_array($oldDesc)) {
-                                foreach ($oldDesc as $i => $d) {
-                                    $rows[] = [
-                                        'description' => $d,
-                                        'quantity' => $oldQty[$i] ?? 1,
-                                        'unit_price' => $oldPrice[$i] ?? '',
-                                    ];
-                                }
-                            } elseif ($invoice->id) {
-                                foreach (($invoice->items ?? collect())->sortBy('sort_order') as $it) {
-                                    $rows[] = [
-                                        'description' => $it->description,
-                                        'quantity' => $it->quantity,
-                                        'unit_price' => $it->unit_price,
-                                    ];
-                                }
-                            }
-                            if (count($rows) === 0) {
-                                $rows[] = ['description' => '', 'quantity' => 1, 'unit_price' => ''];
-                            }
-                        @endphp
+                        {{-- $rows is now passed from the InvoiceController --}}
 
                         @foreach($rows as $r)
                             <tr>
                                 <td>
-                                    <input name="items_description[]" class="form-control" value="{{ $r['description'] }}" required>
+                                    <input name="items_description[]" class="form-control" value="{{ $r['description'] }}"
+                                        required>
                                 </td>
                                 <td>
-                                    <input name="items_quantity[]" class="form-control" type="number" min="1" value="{{ $r['quantity'] ?? 1 }}">
+                                    <input name="items_quantity[]" class="form-control" type="number" min="1"
+                                        value="{{ $r['quantity'] ?? 1 }}">
                                 </td>
                                 <td>
-                                    <input name="items_unit_price[]" class="form-control mask-money" value="{{ $r['unit_price'] }}" required>
+                                    <input name="items_unit_price[]" class="form-control mask-money"
+                                        value="{{ $r['unit_price'] }}" required>
                                 </td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-outline-danger btnRemoveItem" title="Remover">
+                                    <button type="button" class="btn btn-sm btn-outline-danger btnRemoveItem"
+                                        title="Remover">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -147,7 +129,8 @@
 
             <div class="form-group">
                 <label>Observações (opcional)</label>
-                <textarea name="notes" class="form-control" rows="4" maxlength="5000">{{ old('notes', $invoice->notes) }}</textarea>
+                <textarea name="notes" class="form-control" rows="4"
+                    maxlength="5000">{{ old('notes', $invoice->notes) }}</textarea>
             </div>
 
             <div class="text-right">
@@ -160,68 +143,67 @@
 @endsection
 
 @push('scripts')
-<script>
-    (function () {
-        function bindRemoveButtons(scope) {
-            (scope || document).querySelectorAll('.btnRemoveItem').forEach(function (btn) {
-                if (btn.dataset.bound) return;
-                btn.dataset.bound = '1';
-                btn.addEventListener('click', function () {
-                    const tr = btn.closest('tr');
-                    const tbody = tr && tr.parentElement;
-                    if (!tr || !tbody) return;
-                    if (tbody.querySelectorAll('tr').length <= 1) {
-                        // Mantém pelo menos 1 linha
-                        tr.querySelectorAll('input').forEach(i => i.value = '');
-                        const qty = tr.querySelector('input[name="items_quantity[]"]');
-                        if (qty) qty.value = 1;
-                        return;
-                    }
-                    tr.remove();
-                });
-            });
-        }
-
-        function addRow() {
-            const tbody = document.querySelector('#itemsTable tbody');
-            if (!tbody) return;
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><input name="items_description[]" class="form-control" required></td>
-                <td><input name="items_quantity[]" class="form-control" type="number" min="1" value="1"></td>
-                <td><input name="items_unit_price[]" class="form-control mask-money" required></td>
-                <td class="text-center">
-                    <button type="button" class="btn btn-sm btn-outline-danger btnRemoveItem" title="Remover">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-
-            // Reaplica máscaras e binds (admin layout já expõe initMask / initDateTimePickers via document ready)
-            try {
-                if (window.jQuery && jQuery.fn && jQuery.fn.inputmask) {
-                    jQuery(tr).find('.mask-money').inputmask('currency', {
-                        prefix: 'R$ ',
-                        radixPoint: ',',
-                        groupSeparator: '.',
-                        autoGroup: true,
-                        digits: 2,
-                        rightAlign: false,
-                        substituteRadixPoint: true
+    <script>
+        (function () {
+            function bindRemoveButtons(scope) {
+                (scope || document).querySelectorAll('.btnRemoveItem').forEach(function (btn) {
+                    if (btn.dataset.bound) return;
+                    btn.dataset.bound = '1';
+                    btn.addEventListener('click', function () {
+                        const tr = btn.closest('tr');
+                        const tbody = tr && tr.parentElement;
+                        if (!tr || !tbody) return;
+                        if (tbody.querySelectorAll('tr').length <= 1) {
+                            // Mantém pelo menos 1 linha
+                            tr.querySelectorAll('input').forEach(i => i.value = '');
+                            const qty = tr.querySelector('input[name="items_quantity[]"]');
+                            if (qty) qty.value = 1;
+                            return;
+                        }
+                        tr.remove();
                     });
-                }
-            } catch (e) {}
+                });
+            }
 
-            bindRemoveButtons(tr);
-        }
+            function addRow() {
+                const tbody = document.querySelector('#itemsTable tbody');
+                if (!tbody) return;
 
-        const btn = document.getElementById('btnAddItem');
-        if (btn) btn.addEventListener('click', addRow);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input name="items_description[]" class="form-control" required></td>
+                    <td><input name="items_quantity[]" class="form-control" type="number" min="1" value="1"></td>
+                    <td><input name="items_unit_price[]" class="form-control mask-money" required></td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-outline-danger btnRemoveItem" title="Remover">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
 
-        bindRemoveButtons(document);
-    })();
-</script>
+                // Reaplica máscaras e binds (admin layout já expõe initMask / initDateTimePickers via document ready)
+                try {
+                    if (window.jQuery && jQuery.fn && jQuery.fn.inputmask) {
+                        jQuery(tr).find('.mask-money').inputmask('currency', {
+                            prefix: 'R$ ',
+                            radixPoint: ',',
+                            groupSeparator: '.',
+                            autoGroup: true,
+                            digits: 2,
+                            rightAlign: false,
+                            substituteRadixPoint: true
+                        });
+                    }
+                } catch (e) { }
+
+                bindRemoveButtons(tr);
+            }
+
+            const btn = document.getElementById('btnAddItem');
+            if (btn) btn.addEventListener('click', addRow);
+
+            bindRemoveButtons(document);
+        })();
+    </script>
 @endpush
-

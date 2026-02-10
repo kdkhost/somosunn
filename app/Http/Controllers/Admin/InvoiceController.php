@@ -40,9 +40,12 @@ class InvoiceController extends Controller
             ->limit(200)
             ->get();
 
+        $rows = old('items_description') ? $this->getRowsFromOld() : [['description' => '', 'quantity' => 1, 'unit_price' => '']];
+
         return view('admin.invoices.form', [
             'invoice' => new Invoice(),
             'users' => $users,
+            'rows' => $rows,
         ]);
     }
 
@@ -81,7 +84,17 @@ class InvoiceController extends Controller
             ->limit(200)
             ->get();
 
-        return view('admin.invoices.form', compact('invoice', 'users'));
+        $rows = old('items_description') ? $this->getRowsFromOld() : $invoice->items->map(fn($it) => [
+            'description' => $it->description,
+            'quantity' => $it->quantity,
+            'unit_price' => $it->unit_price,
+        ])->toArray();
+
+        if (empty($rows)) {
+            $rows = [['description' => '', 'quantity' => 1, 'unit_price' => '']];
+        }
+
+        return view('admin.invoices.form', compact('invoice', 'users', 'rows'));
     }
 
     public function update(Request $request, Invoice $invoice, InvoiceService $service)
@@ -214,5 +227,22 @@ class InvoiceController extends Controller
         }
 
         return $items;
+    }
+
+    private function getRowsFromOld(): array
+    {
+        $oldDesc = old('items_description', []);
+        $oldQty = old('items_quantity', []);
+        $oldPrice = old('items_unit_price', []);
+
+        $rows = [];
+        foreach ($oldDesc as $i => $d) {
+            $rows[] = [
+                'description' => $d,
+                'quantity' => $oldQty[$i] ?? 1,
+                'unit_price' => $oldPrice[$i] ?? '',
+            ];
+        }
+        return $rows;
     }
 }
