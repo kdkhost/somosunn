@@ -1,0 +1,162 @@
+@extends('admin.layouts.app')
+
+@section('page_title', 'Gerenciar Certificados')
+@section('breadcrumb_items')
+    <li class="breadcrumb-item active">Certificados</li>
+@endsection
+
+@section('content')
+    <div class="card card-primary card-outline card-tabs">
+        <div class="card-header p-0 pt-1 border-bottom-0">
+            <ul class="nav nav-tabs" id="certificate-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="tabs-issued-tab" data-toggle="pill" href="#tabs-issued" role="tab"
+                        aria-controls="tabs-issued" aria-selected="true">
+                        <i class="fas fa-check-circle mr-1"></i> Emitidos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tabs-pending-tab" data-toggle="pill" href="#tabs-pending" role="tab"
+                        aria-controls="tabs-pending" aria-selected="false">
+                        <i class="fas fa-clock mr-1"></i> Pendentes
+                        @if($pendingEnrollments->count() > 0)
+                            <span class="badge badge-warning ml-1">{{ $pendingEnrollments->count() }}</span>
+                        @endif
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="certificate-tabs-content">
+                <!-- TAB EMITIDOS -->
+                <div class="tab-pane fade show active" id="tabs-issued" role="tabpanel" aria-labelledby="tabs-issued-tab">
+                    <table id="table_issued" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Aluno</th>
+                                <th>Curso</th>
+                                <th>Hash</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($issuedCertificates as $cert)
+                                <tr>
+                                    <td data-sort="{{ $cert->issued_at->format('YmdHis') }}">
+                                        {{ $cert->issued_at->format('d/m/Y H:i') }}
+                                    </td>
+                                    <td>{{ $cert->user->name }}</td>
+                                    <td>{{ $cert->course->title }}</td>
+                                    <td><small>{{ $cert->cert_hash }}</small></td>
+                                    <td>
+                                        <a href="{{ route('certificates.view', $cert->cert_hash) }}" target="_blank"
+                                            class="btn btn-xs btn-default" title="Visualizar/Baixar">
+                                            <i class="fas fa-file-pdf text-danger"></i>
+                                        </a>
+                                        <form action="{{ route('admin.certificates.send', $cert->id) }}" method="POST"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Enviar certificado por e-mail para {{ $cert->user->email }}?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-xs btn-primary" title="Enviar por Email">
+                                                <i class="fas fa-envelope"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- TAB PENDENTES -->
+                <div class="tab-pane fade" id="tabs-pending" role="tabpanel" aria-labelledby="tabs-pending-tab">
+                    @if($pendingEnrollments->isEmpty())
+                        <div class="alert alert-success">
+                            <i class="fas fa-check mr-2"></i> Todos os alunos que concluíram cursos já possuem certificados
+                            emitidos.
+                        </div>
+                    @else
+                        <table id="table_pending" class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Conclusão</th>
+                                    <th>Aluno</th>
+                                    <th>Curso</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($pendingEnrollments as $enrollment)
+                                    <tr>
+                                        <td>{{ $enrollment->completed_at ? $enrollment->completed_at->format('d/m/Y') : '-' }}</td>
+                                        <td>{{ $enrollment->user->name }}</td>
+                                        <td>{{ $enrollment->enrollable->title }}</td>
+                                        <td>
+                                            <form action="{{ route('admin.certificates.generate') }}" method="POST"
+                                                class="d-inline">
+                                                @csrf
+                                                <input type="hidden" name="user_id" value="{{ $enrollment->user_id }}">
+                                                <input type="hidden" name="course_id" value="{{ $enrollment->enrollable_id }}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-certificate mr-1"></i> Emitir Certificado
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@push('styles')
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css">
+@endpush
+
+@push('scripts')
+    <!-- DataTables & Plugins -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+
+    <script>
+        $(function () {
+            // Common settings
+            var dtSettings = {
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "language": { "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json" },
+                "pageLength": 10
+            };
+
+            // Issued Table
+            $("#table_issued").DataTable(Object.assign({}, dtSettings, {
+                "order": [[0, "desc"]],
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            })).buttons().container().appendTo('#table_issued_wrapper .col-md-6:eq(0)');
+
+            // Pending Table
+            $("#table_pending").DataTable(Object.assign({}, dtSettings, {
+                "order": [[0, "desc"]] // Sort by completion date newest
+            }));
+        });
+    </script>
+@endpush

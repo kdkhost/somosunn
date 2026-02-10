@@ -141,6 +141,16 @@
                     </li>
                 @endif
 
+                @if(auth()->user()->isAdmin() || auth()->user()->canAccessFeature('courses'))
+                    <li class="nav-item">
+                        <a href="{{ route('admin.certificates.index') }}"
+                            class="nav-link {{ $is('admin.certificates.*') }}">
+                            <i class="nav-icon fas fa-certificate"></i>
+                            <p>Certificados</p>
+                        </a>
+                    </li>
+                @endif
+
                 @if(auth()->user()->canAccessFeature('mentorships'))
                     <li class="nav-item has-treeview {{ $open('admin.mentorships.*') }}">
                         <a href="#" class="nav-link {{ $is('admin.mentorships.*') }}">
@@ -249,13 +259,7 @@
                                     <p>E-mails</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.certificates.create') }}"
-                                    class="nav-link {{ $is('admin.certificates.*') }}">
-                                    <i class="fas fa-certificate nav-icon"></i>
-                                    <p>Certificados</p>
-                                </a>
-                            </li>
+                            {{-- Certificates moved to shared section below --}}
                             <li class="nav-item">
                                 <a href="{{ route('admin.fonts.index') }}" class="nav-link {{ $is('admin.fonts.*') }}">
                                     <i class="fas fa-font nav-icon"></i>

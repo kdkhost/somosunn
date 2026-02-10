@@ -391,6 +391,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
 
+    // Certificates (Acessível a Admin e Instrutores)
+    Route::get('/certificates', [\App\Http\Controllers\Admin\CertificateController::class, 'index'])
+        ->middleware('check.feature:certificates_access')->name('certificates.index');
+    Route::post('/certificates/send/{certificate}', [\App\Http\Controllers\Admin\CertificateController::class, 'sendEmail'])
+        ->middleware('check.feature:certificates_create')->name('certificates.send');
+    Route::get('/certificates/create', [\App\Http\Controllers\Admin\CertificateController::class, 'createForm'])
+        ->middleware('check.feature:certificates_create')->name('certificates.create');
+    Route::post('/certificates/generate', [\App\Http\Controllers\Admin\CertificateController::class, 'generate'])
+        ->middleware('check.feature:certificates_generate')->name('certificates.generate');
+    Route::get('/certificates/view/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'view'])
+        ->middleware('check.feature:certificates_access')->name('certificates.view');
+
     // Atalho para Membros (membro/perfil)
     Route::prefix('membro')->group(function () {
         Route::get('/perfil', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('membro.perfil');
@@ -474,14 +486,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         // Mentorships CRUD
         Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class)
             ->middleware('check.feature:mentorships_access')->names('mentorships');
-
-        // Certificates
-        Route::get('/certificates/create', [\App\Http\Controllers\Admin\CertificateController::class, 'createForm'])
-            ->middleware('check.feature:certificates_create')->name('certificates.create');
-        Route::post('/certificates/generate', [\App\Http\Controllers\Admin\CertificateController::class, 'generate'])
-            ->middleware('check.feature:certificates_generate')->name('certificates.generate');
-        Route::get('/certificates/view/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'view'])
-            ->middleware('check.feature:certificates_access')->name('certificates.view');
 
         // Ranking
         Route::get('/ranking', [\App\Http\Controllers\Admin\RankingController::class, 'index'])
