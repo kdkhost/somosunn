@@ -96,21 +96,7 @@
 
     <div class="content">
         <div class="container-fluid">
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show">
-                    {{ session('success') }}
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                </div>
-            @endif
-
-            @if($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <ul class="mb-0">
-                        @foreach($errors->all() as $error) <li>{{ $error }}</li> @endforeach
-                    </ul>
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                </div>
-            @endif
+            {{-- Redundant alerts removed as toastr is global in app.blade.php --}}
 
             <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf

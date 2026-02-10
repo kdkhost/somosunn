@@ -4,8 +4,7 @@
 @section('breadcrumb')<li class="breadcrumb-item active">Usuários</li>@endsection
 
 @section('content')
-    @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>@endif
+    {{-- Toastr global --}}
 
     <div class="card">
         <div class="card-header">
@@ -53,7 +52,8 @@
                                 <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-info" title="Editar"
                                     data-pjax="true"><i class="fas fa-edit"></i></a>
                                 <button class="btn btn-sm btn-danger btn-delete" title="Excluir"
-                                    data-action="{{ route('admin.users.destroy', $user) }}"><i class="fas fa-trash"></i></button>
+                                    data-action="{{ route('admin.users.destroy', $user) }}"><i
+                                        class="fas fa-trash"></i></button>
                             </td>
                         </tr>
                     @endforeach

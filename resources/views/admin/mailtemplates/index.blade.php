@@ -13,9 +13,7 @@
                 <a href="{{ route('admin.mailtemplates.create') }}" class="btn btn-primary">Novo Modelo</a>
             </div>
 
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
+            {{-- Toastr global --}}
 
             <table class="table table-striped">
                 <thead>
@@ -44,8 +42,7 @@
                                     style="display:inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-danger" data-confirm-delete
-                                        data-confirm-title="Remover?"
+                                    <button class="btn btn-sm btn-danger" data-confirm-delete data-confirm-title="Remover?"
                                         data-confirm-text="Esta ação não pode ser desfeita.">Remover</button>
                                 </form>
                             </td>

@@ -4,8 +4,7 @@
 @section('breadcrumb')<li class="breadcrumb-item active">Fontes</li>@endsection
 
 @section('content')
-    @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>@endif
+    {{-- Toastr global --}}
 
     <div class="card">
         <div class="card-header">

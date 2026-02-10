@@ -6,9 +6,7 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
+            {{-- Toastr global --}}
 
             <div class="card">
                 <div class="card-header">
@@ -27,7 +25,8 @@
                         </li>
                     </ul>
                 </div>
-                <form method="POST" action="{{ route('admin.cms.update', ['slug' => $slug]) }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('admin.cms.update', ['slug' => $slug]) }}"
+                    enctype="multipart/form-data">
                     @csrf
                     <div class="card-body">
                         @if($slug === 'home')
@@ -38,7 +37,8 @@
                             </div>
                             <div class="form-group">
                                 <label>Subtitulo do Hero</label>
-                                <textarea name="hero_subtitle" rows="3" class="form-control">{{ old('hero_subtitle', $contents['hero_subtitle'] ?? '') }}</textarea>
+                                <textarea name="hero_subtitle" rows="3"
+                                    class="form-control">{{ old('hero_subtitle', $contents['hero_subtitle'] ?? '') }}</textarea>
                             </div>
                             <div class="form-group">
                                 <label>Imagem de Fundo (Hero)</label>
@@ -58,15 +58,18 @@
                         @elseif($slug === 'about')
                             <div class="form-group">
                                 <label>Manifesto</label>
-                                <textarea name="manifesto" rows="4" class="form-control">{{ old('manifesto', $contents['manifesto'] ?? '') }}</textarea>
+                                <textarea name="manifesto" rows="4"
+                                    class="form-control">{{ old('manifesto', $contents['manifesto'] ?? '') }}</textarea>
                             </div>
                             <div class="form-group">
                                 <label>Visao</label>
-                                <textarea name="vision" rows="4" class="form-control">{{ old('vision', $contents['vision'] ?? '') }}</textarea>
+                                <textarea name="vision" rows="4"
+                                    class="form-control">{{ old('vision', $contents['vision'] ?? '') }}</textarea>
                             </div>
                             <div class="form-group mb-0">
                                 <label>Valores</label>
-                                <textarea name="values" rows="4" class="form-control">{{ old('values', $contents['values'] ?? '') }}</textarea>
+                                <textarea name="values" rows="4"
+                                    class="form-control">{{ old('values', $contents['values'] ?? '') }}</textarea>
                             </div>
                         @else
                             <div class="form-group">
