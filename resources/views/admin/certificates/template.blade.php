@@ -24,19 +24,22 @@
             body {
                 width: 100%;
                 height: auto;
-                background: #525659;
+                background: transparent;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                padding: 40px 0;
-                overflow: auto;
+                padding: 0;
+                overflow: visible;
             }
 
             .container {
-                width: 1122px !important;
-                height: 793px !important;
-                box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-                transform-origin: top center;
+                max-width: 100%;
+                max-height: 70vh;
+                width: auto !important;
+                height: auto !important;
+                aspect-ratio: 1122 / 793;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+                transform-origin: center;
             }
         }
 
