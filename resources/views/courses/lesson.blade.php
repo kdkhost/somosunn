@@ -245,11 +245,11 @@
                             </a>
                         @else
                             @if($percentage >= 89)
-                                <form action="{{ route('courses.complete', $course->id) }}" method="POST" class="d-inline">
+                                <form action="{{ route('courses.complete', $course->id) }}" method="POST" class="d-inline"
+                                    id="form-complete-course">
                                     @csrf
-                                    <button type="submit"
-                                        class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition cursor-pointer"
-                                        onclick="return confirm('Tem certeza que deseja concluir o curso?')">
+                                    <button type="button" id="btn-complete-course"
+                                        class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition cursor-pointer">
                                         Concluir Curso <i class="fas fa-check ml-2"></i>
                                     </button>
                                 </form>
@@ -445,14 +445,14 @@
                                 row.dataset.bookmarkId = String(result.bookmark.id);
                                 row.dataset.bookmarkSeconds = String(result.bookmark.position_seconds || 0);
                                 row.innerHTML = `
-                                                                    <div class="min-w-0">
-                                                                        <button type="button" class="text-sm font-bold text-[#1F5EDB] hover:underline text-left lesson-bookmark-jump">
-                                                                            <i class="fas fa-play-circle mr-1"></i>${formatSeconds(result.bookmark.position_seconds || 0)}
-                                                                        </button>
-                                                                        <p class="text-sm text-gray-700 mt-1 break-words"></p>
-                                                                    </div>
-                                                                    <button type="button" class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 lesson-bookmark-delete">Excluir</button>
-                                                                `;
+                                                                            <div class="min-w-0">
+                                                                                <button type="button" class="text-sm font-bold text-[#1F5EDB] hover:underline text-left lesson-bookmark-jump">
+                                                                                    <i class="fas fa-play-circle mr-1"></i>${formatSeconds(result.bookmark.position_seconds || 0)}
+                                                                                </button>
+                                                                                <p class="text-sm text-gray-700 mt-1 break-words"></p>
+                                                                            </div>
+                                                                            <button type="button" class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 lesson-bookmark-delete">Excluir</button>
+                                                                        `;
                                 row.querySelector('p').textContent = result.bookmark.note || '';
                                 bookmarkList.prepend(row);
                                 bookmarkNote.value = '';
@@ -556,6 +556,28 @@
 
                 renderEmptyState();
 
+                // Course Completion Handler with SweetAlert2
+                const btnComplete = document.getElementById('btn-complete-course');
+                const formComplete = document.getElementById('form-complete-course');
+                if (btnComplete && formComplete) {
+                    btnComplete.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        Swal.fire({
+                            title: 'Concluir Curso?',
+                            text: 'Tem certeza que deseja marcar este curso como concluído?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#16a34a',
+                            cancelButtonColor: '#6b7280',
+                            confirmButtonText: 'Sim, concluir!',
+                            cancelButtonText: 'Cancelar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                formComplete.submit();
+                            }
+                        });
+                    });
+                }
 
             })();
         </script>

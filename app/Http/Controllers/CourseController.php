@@ -356,13 +356,9 @@ class CourseController extends Controller
             ->whereIn('lesson_id', $lessons->pluck('id'))
             ->with('lesson') // optimize
             ->get();
-
         $watchedSeconds = $lessonProgresses->sum(function ($progress) {
             return $progress->lesson->duration ?? 0;
         });
-
-        // Add duration of lessons marked as completed but maybe missing strict progress tracking?
-        // Actually the previous logic relied on `completed_at`.
 
         // Let's simplify: If we are here, we are > 89%.
         // Check if certificate exists.
@@ -371,8 +367,9 @@ class CourseController extends Controller
         if (!$existingCert && $course->is_certificate_enabled) {
             // Create Certificate
             $workloadHours = $watchedSeconds > 0 ? round($watchedSeconds / 3600, 1) : 0;
-            if ($workloadHours < 1)
+            if ($workloadHours < 1) {
                 $workloadHours = 1; // Minimum 1h
+            }
 
             \App\Models\Certificate::create([
                 'user_id' => $user->id,
@@ -381,24 +378,21 @@ class CourseController extends Controller
                 'workload' => $workloadHours,
                 'issued_at' => now(),
             ]);
-
-            // Note: The original LessonController logic might satisfy specific business rules (hashing, PDF generation queueing).
-            // A better approach would be to refactor `checkCourseAndIssueCertificate` to a Service or Trait,
-            // BUT given the constraints, and that I previously edited `LessonController`, checking it again might be needed 
-            // if I want to be 100% consistent. 
-
-            // WAIT, `checkCourseAndIssueCertificate` IS WHAT I MODIFIED. 
-            // I should check if I can make it public or if I should just copy the logic.
-            // Copying is safer to avoid breaking existing flow if I change visibility.
-            // But code duplication is bad.
-
-            // Let's implement the redirect first, and handling the completion mark.
-            // Enrollment 'completed_at' should be set.
-            \App\Models\Enrollment::updateOrCreate(
-                ['user_id' => $user->id, 'course_id' => $course->id],
-                ['completed_at' => now(), 'progress' => round($percentage * 100)]
-            );
         }
+
+        // Mark enrollment as completed (using polymorphic relationship)
+        \App\Models\Enrollment::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'enrollable_id' => $course->id,
+                'enrollable_type' => 'App\\Models\\Course'
+            ],
+            [
+                'completed_at' => now(),
+                'progress' => round($percentage * 100),
+                'status' => 'completed'
+            ]
+        );
 
         // Redirect to Student Dashboard (Meus Cursos)
         return redirect()->route('admin.dashboard')
