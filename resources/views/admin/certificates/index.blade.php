@@ -57,7 +57,8 @@
                                     <td><small>{{ $cert->cert_hash }}</small></td>
                                     <td>
                                         <button type="button" class="btn btn-xs btn-default btn-view-cert"
-                                            data-url="{{ route('admin.certificates.view', $cert->cert_hash) }}"
+                                            data-url="{{ route('admin.certificates.preview-html', $cert->cert_hash) }}"
+                                            data-download="{{ route('admin.certificates.view', $cert->cert_hash) }}?download=1"
                                             title="Visualizar">
                                             <i class="fas fa-eye text-primary"></i>
                                         </button>
@@ -209,8 +210,9 @@
             // Modal Logic
             $('.btn-view-cert').on('click', function () {
                 var url = $(this).data('url');
+                var downloadUrl = $(this).data('download');
                 $('#iframeCert').attr('src', url);
-                $('#btnDownloadCert').attr('href', url + '?download=1');
+                $('#btnDownloadCert').attr('href', downloadUrl);
                 $('#modalViewCert').modal('show');
             });
 

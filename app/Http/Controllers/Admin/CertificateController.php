@@ -228,4 +228,35 @@ class CertificateController extends Controller
             'Content-Disposition' => 'inline; filename="certificado.pdf"'
         ]);
     }
+
+    public function previewHtml($hash)
+    {
+        $cert = Certificate::where('cert_hash', $hash)->firstOrFail();
+        $user = $cert->user;
+
+        $product = $cert->course ?? $cert->mentorship ?? $cert->event;
+        $type = $cert->course ? 'course' : ($cert->mentorship ? 'mentorship' : 'event');
+
+        $authorName = 'Instrutor';
+        $workload = 0;
+
+        if ($type === 'course') {
+            $authorName = $product->author_name;
+            $workload = $product->total_hours;
+        } elseif ($type === 'mentorship') {
+            $authorName = $product->mentor ? $product->mentor->name : 'Mentor';
+        } elseif ($type === 'event') {
+            $authorName = $product->user ? $product->user->name : 'Organizador';
+        }
+
+        return view('admin.certificates.template', [
+            'user' => $user,
+            'course' => $product,
+            'certHash' => $cert->cert_hash,
+            'authorName' => $authorName,
+            'workload' => $workload,
+            'type' => $type,
+            'isPreview' => true
+        ]);
+    }
 }

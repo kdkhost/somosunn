@@ -1,3 +1,23 @@
+# Atualização - Experiência do Curso e Certificados (Fevereiro 2026)
+
+Esta atualização foca na robustez da entrega de conteúdo e na personalização da experiência do aluno:
+
+## 1. Visualização Real de Certificados
+- **Preview em HTML**: O modal de visualização de certificados agora utiliza renderização HTML/CSS em vez de PDF direto. Isso garante que o admin veja a "imagem real" do que será enviado ao aluno, com posicionamento preciso, fontes e assinaturas, sem problemas de compatibilidade do navegador com visualizações de PDF.
+- **Compatibilidade de Caminhos**: Template de certificado atualizado para gerenciar caminhos de imagens de forma inteligente (URLs para web e caminhos locais para geração de PDF).
+
+## 2. Proteção de Conteúdo (Player de Vídeo)
+- **Bloqueio de Download**: Implementação de proteções avançadas no player de vídeo (`nodownload`, desativação de menu de contexto).
+- **Atalhos Protegidos**: Bloqueio de atalhos de teclado comuns (Ctrl+S, Ctrl+U, F12) para dificultar o download não autorizado de conteúdos.
+
+## 3. Refinamento da Edição de Cursos
+- **Acesso Rápido ao Certificado**: O switch "Habilitar Certificado" foi movido para a barra lateral de publicação do curso, permitindo ativar a funcionalidade de forma muito mais intuitiva.
+- **Correções de UI na Listagem de Aulas**:
+    - Alinhamento perfeito dos cards de aulas.
+    - Remoção de artefatos visuais (linhas verticais residuais) na timeline.
+    - Estilização de botões refinada para evitar sombras de foco excessivas.
+
+---
 # Atualização - Webhooks e Logs (Fevereiro 2026)
 
 Esta atualização traz melhorias críticas de infraestrutura e segurança para o painel administrativo:

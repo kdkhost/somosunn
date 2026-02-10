@@ -402,6 +402,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         ->middleware('check.feature:certificates_generate')->name('certificates.generate');
     Route::get('/certificates/view/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'view'])
         ->middleware('check.feature:certificates_access')->name('certificates.view');
+    Route::get('/certificates/preview-html/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'previewHtml'])
+        ->middleware('check.feature:certificates_access')->name('certificates.preview-html');
 
     // Atalho para Membros (membro/perfil)
     Route::prefix('membro')->group(function () {
