@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Certificate;
 use App\Models\Course;
+use App\Models\Mentorship;
+use App\Models\Event;
 use App\Models\User;
 use App\Models\Enrollment;
 use Dompdf\Dompdf;
@@ -22,75 +24,144 @@ class CertificateController extends Controller
         $user = auth()->user();
 
         // 1. Issued Certificates
-        $queryIssued = Certificate::with(['user', 'course'])->latest();
+        $queryIssued = Certificate::with(['user', 'course', 'mentorship', 'event'])->latest();
 
         // 2. Pending Certificates (Enrollment completed but no Certificate)
+        // We look for all completion types (Course, Mentorship, Event)
         $queryPending = Enrollment::with(['user', 'enrollable'])
-            ->where('enrollable_type', Course::class)
-            ->whereNotNull('completed_at')
-            ->whereDoesntHave('user.certificates', function ($q) {
-                // Ensure check matches the specific course of the enrollment
-                // This complex check is easier done in PHP for collection filtering or raw query 
-                // but let's try a standard Eloquent approach:
-                // We want enrollments where NO certificate exists for (user_id, course_id)
-            });
+            ->whereNotNull('completed_at');
 
         // REFINING ACCESS CONTROL
         if (!$user->isAdmin()) {
-            // Instructor Mode: Show only certificates/pending for courses created by this user
+            // Instructor Mode: Show only for courses/mentorships/events created by this user
             $myCourseIds = Course::where('user_id', $user->id)->pluck('id');
+            $myMentorshipIds = Mentorship::where('mentor_id', $user->id)->pluck('id');
+            $myEventIds = Event::where('user_id', $user->id)->pluck('id');
 
-            $queryIssued->whereIn('course_id', $myCourseIds);
+            $queryIssued->where(function ($q) use ($myCourseIds, $myMentorshipIds, $myEventIds) {
+                $q->whereIn('course_id', $myCourseIds)
+                    ->orWhereIn('mentorship_id', $myMentorshipIds)
+                    ->orWhereIn('event_id', $myEventIds);
+            });
 
-            $queryPending->whereHasMorph('enrollable', [Course::class], function ($q) use ($myCourseIds) {
-                $q->whereIn('id', $myCourseIds);
+            $queryPending->where(function ($q) use ($myCourseIds, $myMentorshipIds, $myEventIds) {
+                $q->where(function ($sub) use ($myCourseIds) {
+                    $sub->where('enrollable_type', Course::class)->whereIn('enrollable_id', $myCourseIds);
+                })->orWhere(function ($sub) use ($myMentorshipIds) {
+                    $sub->where('enrollable_type', Mentorship::class)->whereIn('enrollable_id', $myMentorshipIds);
+                })->orWhere(function ($sub) use ($myEventIds) {
+                    $sub->where('enrollable_type', Event::class)->whereIn('enrollable_id', $myEventIds);
+                });
             });
         }
 
-        $issuedCertificates = $queryIssued->get(); // Limit if too many?
+        $issuedCertificates = $queryIssued->get();
 
-        // Fetch pending candidates
-        // It's tricky to filter "DoesntHave certificate for THIS course" efficiently in one go without a join.
-        // Let's fetch completed enrollments (filtered by permissions) and filter in PHP.
-        // Since "completed" students shouldn't be huge in number (vs started), this is acceptable for now.
+        // Better Pending Logic: filter out those who already have a certificate for that specific enrollment
         $pendingEnrollments = $queryPending->get()->filter(function ($enrollment) {
-            // Check if certificate already exists for this enrollment's course/user
-            return !Certificate::where('user_id', $enrollment->user_id)
-                ->where('course_id', $enrollment->enrollable_id)
-                ->exists();
+            $query = Certificate::where('user_id', $enrollment->user_id);
+
+            if ($enrollment->enrollable_type === Course::class) {
+                $query->where('course_id', $enrollment->enrollable_id);
+            } elseif ($enrollment->enrollable_type === Mentorship::class) {
+                $query->where('mentorship_id', $enrollment->enrollable_id);
+            } elseif ($enrollment->enrollable_type === Event::class) {
+                $query->where('event_id', $enrollment->enrollable_id);
+            }
+
+            return !$query->exists();
         });
 
         return view('admin.certificates.index', compact('issuedCertificates', 'pendingEnrollments'));
     }
 
-    public function createForm()
-    {
-        $courses = Course::all();
-        $users = User::all();
-        return view('admin.certificates.form', compact('courses', 'users'));
-    }
-
     public function generate(Request $request)
     {
-        $data = $request->validate(['user_id' => 'required|exists:users,id', 'course_id' => 'required|exists:courses,id']);
-        $this->issueCertificate($data['user_id'], $data['course_id']);
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'course_id' => 'nullable|exists:courses,id',
+            'mentorship_id' => 'nullable|exists:mentorships,id',
+            'event_id' => 'nullable|exists:events,id',
+        ]);
+
+        // Identify type and ID
+        $type = null;
+        $id = null;
+
+        if ($request->filled('course_id')) {
+            $type = 'course';
+            $id = $data['course_id'];
+        } elseif ($request->filled('mentorship_id')) {
+            $type = 'mentorship';
+            $id = $data['mentorship_id'];
+        } elseif ($request->filled('event_id')) {
+            $type = 'event';
+            $id = $data['event_id'];
+        }
+
+        if (!$type) {
+            return redirect()->back()->with('error', 'Selecione um produto para o certificado.');
+        }
+
+        $this->issueCertificate($data['user_id'], $type, $id);
 
         return redirect()->back()->with('success', 'Certificado gerado com sucesso!');
     }
 
-    // Reuse logic for both manual form and "Pending" list
-    private function issueCertificate($userId, $courseId)
+    // Updated to support multiple types
+    private function issueCertificate($userId, $type, $id)
     {
         $user = User::find($userId);
-        $course = Course::find($courseId);
+
+        $course = null;
+        $mentorship = null;
+        $event = null;
+        $product = null;
+
+        $certQuery = Certificate::where('user_id', $user->id);
+
+        if ($type === 'course') {
+            $product = $course = Course::find($id);
+            $certQuery->where('course_id', $id);
+        } elseif ($type === 'mentorship') {
+            $product = $mentorship = Mentorship::find($id);
+            $certQuery->where('mentorship_id', $id);
+        } elseif ($type === 'event') {
+            $product = $event = Event::find($id);
+            $certQuery->where('event_id', $id);
+        }
 
         // Check duplicate
-        $exists = Certificate::where('user_id', $user->id)->where('course_id', $course->id)->first();
+        $exists = $certQuery->first();
         if ($exists)
             return $exists;
 
         $certHash = Str::random(24);
-        $html = view('admin.certificates.template', compact('user', 'course', 'certHash'))->render();
+
+        // Use the same template, but it needs a unified "product" object for background/settings
+        // We'll prepare specific labels for different product types
+        $authorName = 'Instrutor';
+        $workload = 0;
+
+        if ($type === 'course') {
+            $authorName = $product->author_name;
+            $workload = $product->total_hours;
+        } elseif ($type === 'mentorship') {
+            $authorName = $product->mentor ? $product->mentor->name : 'Mentor';
+            $workload = 0; // Or fetch from a field if added
+        } elseif ($type === 'event') {
+            $authorName = $product->user ? $product->user->name : 'Organizador';
+            $workload = 0;
+        }
+
+        $html = view('admin.certificates.template', [
+            'user' => $user,
+            'course' => $product,
+            'certHash' => $certHash,
+            'authorName' => $authorName,
+            'workload' => $workload,
+            'type' => $type
+        ])->render();
 
         $options = new Options();
         $options->set('isRemoteEnabled', true);
@@ -103,15 +174,15 @@ class CertificateController extends Controller
         $path = "certificates/{$certHash}.pdf";
         Storage::disk('public')->put($path, $output);
 
-        $cert = Certificate::create([
+        return Certificate::create([
             'user_id' => $user->id,
-            'course_id' => $course->id,
+            'course_id' => $type === 'course' ? $id : null,
+            'mentorship_id' => $type === 'mentorship' ? $id : null,
+            'event_id' => $type === 'event' ? $id : null,
             'cert_hash' => $certHash,
             'pdf_path' => $path,
             'issued_at' => now()
         ]);
-
-        return $cert;
     }
 
     public function sendEmail(Certificate $certificate)
@@ -133,6 +204,12 @@ class CertificateController extends Controller
     public function view($hash)
     {
         $cert = Certificate::where('cert_hash', $hash)->firstOrFail();
-        return response()->file(storage_path('app/public/' . $cert->pdf_path));
+        $path = storage_path('app/public/' . $cert->pdf_path);
+
+        if (request()->has('download')) {
+            return response()->download($path, "certificado_{$hash}.pdf");
+        }
+
+        return response()->file($path);
     }
 }

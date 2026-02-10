@@ -119,14 +119,14 @@ class EventController extends Controller
 
             $request->merge([$field => $this->normalizeMoneyInput($request->input($field))]);
         }
-        
+
         // Sanitize dates (remove T)
-        foreach(['start_at', 'end_at', 'batch_1_deadline', 'batch_2_deadline', 'batch_3_deadline'] as $dateField){
-            if($request->has($dateField) && $request->$dateField){
+        foreach (['start_at', 'end_at', 'batch_1_deadline', 'batch_2_deadline', 'batch_3_deadline'] as $dateField) {
+            if ($request->has($dateField) && $request->$dateField) {
                 $request->merge([$dateField => str_replace('T', ' ', $request->$dateField)]);
             }
         }
-        
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'start_at' => 'required|date',
@@ -149,6 +149,10 @@ class EventController extends Controller
             'batch_2_deadline' => 'nullable|date',
             'batch_3_price' => 'nullable|numeric|min:0',
             'batch_3_deadline' => 'nullable|date',
+            'is_certificate_enabled' => 'nullable|boolean',
+            'certificate_settings' => 'nullable|json',
+            'certificate_bg' => 'nullable|image|max:5120',
+            'instructor_signature' => 'nullable|image|max:5120',
         ]);
 
         $validated['published'] = $request->has('published')
@@ -178,9 +182,29 @@ class EventController extends Controller
         }
 
         // Define o criador do evento
-        $validated['user_id'] = Auth::id();
+        $data = $validated;
+        $data['user_id'] = Auth::id();
+        $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
 
-        $event = Event::create($validated);
+        if ($request->hasFile('certificate_bg')) {
+            $file = $request->file('certificate_bg');
+            $fileName = 'cert_bg_e_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/certificates'), $fileName);
+            $data['certificate_bg'] = 'uploads/certificates/' . $fileName;
+        }
+
+        if ($request->hasFile('instructor_signature')) {
+            $file = $request->file('instructor_signature');
+            $fileName = 'sig_e_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/signatures'), $fileName);
+            $data['instructor_signature'] = 'uploads/signatures/' . $fileName;
+        }
+
+        if ($request->has('certificate_settings')) {
+            $data['certificate_settings'] = is_string($request->certificate_settings) ? json_decode($request->certificate_settings, true) : $request->certificate_settings;
+        }
+
+        $event = Event::create($data);
 
         if (!$request->ajax() && !$request->wantsJson() && !$request->expectsJson()) {
             return redirect()->route('admin.events.index')->with('success', 'Evento criado com sucesso');
@@ -201,10 +225,10 @@ class EventController extends Controller
 
             $request->merge([$field => $this->normalizeMoneyInput($request->input($field))]);
         }
-        
+
         // Sanitize dates (remove T from datetime-local)
-        foreach(['start_at', 'end_at', 'batch_1_deadline', 'batch_2_deadline', 'batch_3_deadline'] as $dateField){
-            if($request->has($dateField) && $request->$dateField){
+        foreach (['start_at', 'end_at', 'batch_1_deadline', 'batch_2_deadline', 'batch_3_deadline'] as $dateField) {
+            if ($request->has($dateField) && $request->$dateField) {
                 $request->merge([$dateField => str_replace('T', ' ', $request->$dateField)]);
             }
         }
@@ -231,6 +255,10 @@ class EventController extends Controller
             'batch_2_deadline' => 'nullable|date',
             'batch_3_price' => 'nullable|numeric|min:0',
             'batch_3_deadline' => 'nullable|date',
+            'is_certificate_enabled' => 'nullable|boolean',
+            'certificate_settings' => 'nullable|json',
+            'certificate_bg' => 'nullable|image|max:5120',
+            'instructor_signature' => 'nullable|image|max:5120',
         ]);
 
         if ($request->has('published')) {
@@ -266,7 +294,30 @@ class EventController extends Controller
             $validated['image'] = $request->file('image')->store('event-images', 'public');
         }
 
-        $event->update($validated);
+        $data = $validated;
+        if ($request->has('is_certificate_enabled')) {
+            $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+        }
+
+        if ($request->hasFile('certificate_bg')) {
+            $file = $request->file('certificate_bg');
+            $fileName = 'cert_bg_e_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/certificates'), $fileName);
+            $data['certificate_bg'] = 'uploads/certificates/' . $fileName;
+        }
+
+        if ($request->hasFile('instructor_signature')) {
+            $file = $request->file('instructor_signature');
+            $fileName = 'sig_e_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/signatures'), $fileName);
+            $data['instructor_signature'] = 'uploads/signatures/' . $fileName;
+        }
+
+        if ($request->has('certificate_settings')) {
+            $data['certificate_settings'] = is_string($request->certificate_settings) ? json_decode($request->certificate_settings, true) : $request->certificate_settings;
+        }
+
+        $event->update($data);
 
         if (!$request->ajax() && !$request->wantsJson() && !$request->expectsJson()) {
             return redirect()->route('admin.events.index')->with('success', 'Evento atualizado');

@@ -19,6 +19,10 @@ class Mentorship extends Model
         'type',
         'video_platform',
         'video_link',
+        'is_certificate_enabled',
+        'certificate_bg',
+        'instructor_signature',
+        'certificate_settings',
         'demo_link'
     ];
 
@@ -32,6 +36,8 @@ class Mentorship extends Model
 
     protected $casts = [
         'schedule' => 'array',
+        'is_certificate_enabled' => 'boolean',
+        'certificate_settings' => 'array',
     ];
 
     public function mentor()
@@ -47,5 +53,10 @@ class Mentorship extends Model
     public function reviews()
     {
         return $this->morphMany(ItemReview::class, 'reviewable');
+    }
+
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class);
     }
 }

@@ -11,11 +11,31 @@ class Event extends Model
 
     protected $fillable = [
         'user_id',
-        'title','speaker','description','image','start_at','end_at','location','address','latitude','longitude',
-        'price','capacity','published', 'color', 'all_day',
-        'batch_1_price', 'batch_1_deadline',
-        'batch_2_price', 'batch_2_deadline',
-        'batch_3_price', 'batch_3_deadline'
+        'title',
+        'speaker',
+        'description',
+        'image',
+        'start_at',
+        'end_at',
+        'location',
+        'address',
+        'latitude',
+        'longitude',
+        'price',
+        'capacity',
+        'published',
+        'color',
+        'all_day',
+        'batch_1_price',
+        'batch_1_deadline',
+        'batch_2_price',
+        'batch_2_deadline',
+        'batch_3_price',
+        'batch_3_deadline',
+        'is_certificate_enabled',
+        'certificate_bg',
+        'instructor_signature',
+        'certificate_settings'
     ];
 
     protected $casts = [
@@ -25,7 +45,9 @@ class Event extends Model
         'batch_2_deadline' => 'datetime',
         'batch_3_deadline' => 'datetime',
         'all_day' => 'boolean',
-        'published' => 'boolean'
+        'published' => 'boolean',
+        'is_certificate_enabled' => 'boolean',
+        'certificate_settings' => 'array'
     ];
 
     protected $appends = ['start', 'end'];
@@ -37,7 +59,8 @@ class Event extends Model
 
     public function getEndAttribute()
     {
-        if (!$this->end_at) return null;
+        if (!$this->end_at)
+            return null;
         return $this->end_at instanceof \DateTime ? $this->end_at->toIso8601String() : \Carbon\Carbon::parse($this->end_at)->toIso8601String();
     }
 
@@ -67,9 +90,12 @@ class Event extends Model
     public function getCurrentBatchLabelAttribute()
     {
         $now = now();
-        if ($this->batch_1_price && (!$this->batch_1_deadline || $now->lte($this->batch_1_deadline))) return '1º Lote';
-        if ($this->batch_2_price && (!$this->batch_2_deadline || $now->lte($this->batch_2_deadline))) return '2º Lote';
-        if ($this->batch_3_price) return '3º Lote';
+        if ($this->batch_1_price && (!$this->batch_1_deadline || $now->lte($this->batch_1_deadline)))
+            return '1º Lote';
+        if ($this->batch_2_price && (!$this->batch_2_deadline || $now->lte($this->batch_2_deadline)))
+            return '2º Lote';
+        if ($this->batch_3_price)
+            return '3º Lote';
         return 'Entrada';
     }
 
@@ -114,5 +140,10 @@ class Event extends Model
         }
 
         return ((int) $this->confirmed_seats + $quantity) <= (int) $this->capacity;
+    }
+
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class);
     }
 }

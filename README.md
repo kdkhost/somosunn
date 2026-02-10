@@ -18,7 +18,22 @@ Esta atualização traz melhorias críticas de infraestrutura e segurança para 
     - **PWA**: Restauradas opções de ícones e temas.
     - **Anúncios**: Adicionada opção de "Inter-feed" para maior controle de monetização.
 
+## Gestão de Certificados e Templates (Fevereiro 2026)
+
+O sistema de certificados foi completamente unificado e modernizado para suportar Cursos, Mentorias e Eventos:
+
+- **Editor Visual Integrado**: Cada produto (Curso, Mentoria, Evento) possui agora um editor visual "Drag-and-drop" no painel administrativo para configurar o layout do certificado em tempo real.
+- **Configuração por Produto**: 
+  - Upload de imagem de fundo personalizada.
+  - Upload de assinatura digital do instrutor/organizador.
+  - Posicionamento dinâmico de elementos (Nome do aluno, título, data, código, logos).
+  - Controle de estilo (Tamanho da fonte, cor, peso, família tipográfica).
+- **Visualização em Modal**: A listagem de certificados permite visualizar o PDF gerado diretamente em um modal, sem sair da página, com opção de download imediato.
+- **Acesso Granular**: Instrutores e Mentores gerenciam apenas os certificados de seus respectivos produtos, enquanto Administradores possuem controle global.
+- **Migração de Dados**: Atualização do schema para incluir campos de certificado em `mentorships` e `events`, e suporte a chaves estrangeiras polimórficas (opcionais) na tabela `certificates`.
+
 ---
+
 
 # Novidades Fevereiro 2026
 

@@ -35,24 +35,35 @@
                             <tr>
                                 <th>Data</th>
                                 <th>Aluno</th>
-                                <th>Curso</th>
+                                <th>Tipo</th>
+                                <th>Produto</th>
                                 <th>Hash</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($issuedCertificates as $cert)
+                                @php
+                                    $product = $cert->course ?? $cert->mentorship ?? $cert->event;
+                                    $type = $cert->course ? 'Curso' : ($cert->mentorship ? 'Mentoria' : 'Evento');
+                                @endphp
                                 <tr>
                                     <td data-sort="{{ $cert->issued_at->format('YmdHis') }}">
                                         {{ $cert->issued_at->format('d/m/Y H:i') }}
                                     </td>
                                     <td>{{ $cert->user->name }}</td>
-                                    <td>{{ $cert->course->title }}</td>
+                                    <td><span class="badge badge-info">{{ $type }}</span></td>
+                                    <td>{{ $product->title ?? 'N/A' }}</td>
                                     <td><small>{{ $cert->cert_hash }}</small></td>
                                     <td>
-                                        <a href="{{ route('admin.certificates.view', $cert->cert_hash) }}" target="_blank"
-                                            class="btn btn-xs btn-default" title="Visualizar/Baixar">
-                                            <i class="fas fa-file-pdf text-danger"></i>
+                                        <button type="button" class="btn btn-xs btn-default btn-view-cert"
+                                            data-url="{{ route('admin.certificates.view', $cert->cert_hash) }}"
+                                            title="Visualizar">
+                                            <i class="fas fa-eye text-primary"></i>
+                                        </button>
+                                        <a href="{{ route('admin.certificates.view', $cert->cert_hash) }}?download=1"
+                                            class="btn btn-xs btn-default" title="Baixar">
+                                            <i class="fas fa-download text-danger"></i>
                                         </a>
                                         <form action="{{ route('admin.certificates.send', $cert->id) }}" method="POST"
                                             class="d-inline"
@@ -73,8 +84,8 @@
                 <div class="tab-pane fade" id="tabs-pending" role="tabpanel" aria-labelledby="tabs-pending-tab">
                     @if($pendingEnrollments->isEmpty())
                         <div class="alert alert-success">
-                            <i class="fas fa-check mr-2"></i> Todos os alunos que concluíram cursos já possuem certificados
-                            emitidos.
+                            <i class="fas fa-check mr-2"></i> Todos os alunos que concluíram cursos/mentorias/eventos já possuem
+                            certificados emitidos.
                         </div>
                     @else
                         <table id="table_pending" class="table table-bordered table-striped table-hover">
@@ -82,22 +93,36 @@
                                 <tr>
                                     <th>Conclusão</th>
                                     <th>Aluno</th>
-                                    <th>Curso</th>
+                                    <th>Tipo</th>
+                                    <th>Produto</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($pendingEnrollments as $enrollment)
+                                    @php
+                                        $type = class_basename($enrollment->enrollable_type);
+                                        $typeLabel = $type === 'Course' ? 'Curso' : ($type === 'Mentorship' ? 'Mentoria' : 'Evento');
+                                    @endphp
                                     <tr>
                                         <td>{{ $enrollment->completed_at ? $enrollment->completed_at->format('d/m/Y') : '-' }}</td>
                                         <td>{{ $enrollment->user->name }}</td>
+                                        <td><span class="badge badge-secondary">{{ $typeLabel }}</span></td>
                                         <td>{{ $enrollment->enrollable->title }}</td>
                                         <td>
                                             <form action="{{ route('admin.certificates.generate') }}" method="POST"
                                                 class="d-inline">
                                                 @csrf
                                                 <input type="hidden" name="user_id" value="{{ $enrollment->user_id }}">
-                                                <input type="hidden" name="course_id" value="{{ $enrollment->enrollable_id }}">
+
+                                                @if($type === 'Course')
+                                                    <input type="hidden" name="course_id" value="{{ $enrollment->enrollable_id }}">
+                                                @elseif($type === 'Mentorship')
+                                                    <input type="hidden" name="mentorship_id" value="{{ $enrollment->enrollable_id }}">
+                                                @elseif($type === 'Event')
+                                                    <input type="hidden" name="event_id" value="{{ $enrollment->enrollable_id }}">
+                                                @endif
+
                                                 <button type="submit" class="btn btn-sm btn-success">
                                                     <i class="fas fa-certificate mr-1"></i> Emitir Certificado
                                                 </button>
@@ -108,6 +133,29 @@
                             </tbody>
                         </table>
                     @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Visualização -->
+    <div class="modal fade" id="modalViewCert" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h5 class="modal-title text-white"><i class="fas fa-certificate mr-2"></i> Visualizar Certificado</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0" style="background: #525659;">
+                    <iframe id="iframeCert" src="" frameborder="0" style="width: 100%; height: 80vh;"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <a id="btnDownloadCert" href="#" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-download mr-1"></i> Baixar PDF
+                    </a>
                 </div>
             </div>
         </div>
@@ -157,6 +205,19 @@
             $("#table_pending").DataTable(Object.assign({}, dtSettings, {
                 "order": [[0, "desc"]] // Sort by completion date newest
             }));
+
+            // Modal Logic
+            $('.btn-view-cert').on('click', function () {
+                var url = $(this).data('url');
+                $('#iframeCert').attr('src', url);
+                $('#btnDownloadCert').attr('href', url + '?download=1');
+                $('#modalViewCert').modal('show');
+            });
+
+            // Clear iframe on close
+            $('#modalViewCert').on('hidden.bs.modal', function () {
+                $('#iframeCert').attr('src', '');
+            });
         });
     </script>
 @endpush

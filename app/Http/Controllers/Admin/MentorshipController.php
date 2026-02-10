@@ -69,6 +69,25 @@ class MentorshipController extends Controller
         $data = $this->validatedData($request);
         $data['mentor_id'] = $this->resolveMentorId($request, $data['mentor_id'] ?? null);
         $data['schedule'] = $this->parseSchedule($request->input('schedule_json'));
+        $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+
+        if ($request->hasFile('certificate_bg')) {
+            $file = $request->file('certificate_bg');
+            $fileName = 'cert_bg_m_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/certificates'), $fileName);
+            $data['certificate_bg'] = 'uploads/certificates/' . $fileName;
+        }
+
+        if ($request->hasFile('instructor_signature')) {
+            $file = $request->file('instructor_signature');
+            $fileName = 'sig_m_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/signatures'), $fileName);
+            $data['instructor_signature'] = 'uploads/signatures/' . $fileName;
+        }
+
+        if ($request->has('certificate_settings')) {
+            $data['certificate_settings'] = is_string($request->certificate_settings) ? json_decode($request->certificate_settings, true) : $request->certificate_settings;
+        }
 
         Mentorship::create($data);
 
@@ -101,8 +120,31 @@ class MentorshipController extends Controller
         $data = $this->validatedData($request);
         $data['mentor_id'] = $this->resolveMentorId($request, $data['mentor_id'] ?? null);
         $data['schedule'] = $this->parseSchedule($request->input('schedule_json'));
+        $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+
+        if ($request->hasFile('certificate_bg')) {
+            $file = $request->file('certificate_bg');
+            $fileName = 'cert_bg_m_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/certificates'), $fileName);
+            $data['certificate_bg'] = 'uploads/certificates/' . $fileName;
+        }
+
+        if ($request->hasFile('instructor_signature')) {
+            $file = $request->file('instructor_signature');
+            $fileName = 'sig_m_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/signatures'), $fileName);
+            $data['instructor_signature'] = 'uploads/signatures/' . $fileName;
+        }
+
+        if ($request->has('certificate_settings')) {
+            $data['certificate_settings'] = is_string($request->certificate_settings) ? json_decode($request->certificate_settings, true) : $request->certificate_settings;
+        }
 
         $mentorship->update($data);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
 
         return redirect()->route('admin.mentorships.index')->with('success', 'Mentoria atualizada com sucesso.');
     }
