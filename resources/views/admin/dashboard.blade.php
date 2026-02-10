@@ -46,7 +46,7 @@
     <div class="row">
         @if($isAdmin)
             <!-- Balance -->
-            <div class="col-lg-3 col-6">
+            <div class="col-lg-3 col-sm-6 col-12">
                 <div class="small-box bg-success">
                     <div class="inner">
                         <h3>R$ {{ number_format($totalRevenue, 2, ',', '.') }}</h3>
@@ -59,7 +59,7 @@
             </div>
 
             <!-- Refunds -->
-            <div class="col-lg-3 col-6">
+            <div class="col-lg-3 col-sm-6 col-12">
                 <div class="small-box bg-danger">
                     <div class="inner">
                         <h3>R$ {{ number_format($refundedAmount, 2, ',', '.') }}</h3>
@@ -72,7 +72,7 @@
             </div>
 
             <!-- Users -->
-            <div class="col-lg-3 col-6">
+            <div class="col-lg-3 col-sm-6 col-12">
                 <div class="small-box bg-warning">
                     <div class="inner">
                         <h3>{{ $totalUsers }}</h3>
@@ -85,7 +85,7 @@
             </div>
 
             <!-- Orders -->
-            <div class="col-lg-3 col-6">
+            <div class="col-lg-3 col-sm-6 col-12">
                 <div class="small-box bg-info">
                     <div class="inner">
                         <h3>{{ $totalOrders }}</h3>

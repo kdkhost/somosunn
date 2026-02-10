@@ -11,66 +11,101 @@ class HasFeatureAccessTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function admin_can_access_any_feature()
+    public function test_admin_can_access_any_feature()
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'admin'
+        ]);
 
         $this->assertTrue($admin->canAccessFeature('non_existent_feature'));
-        $this->assertTrue($admin->canAccessFeature('courses'));
+        $this->assertTrue($admin->canAccessFeature('events_create'));
     }
 
-    /** @test */
-    public function member_without_plan_cannot_access_features()
+    public function test_superadmin_can_access_any_feature()
     {
-        $member = User::factory()->create(['role' => 'member']);
-
-        $this->assertFalse($member->canAccessFeature('courses'));
-    }
-
-    /** @test */
-    public function member_with_plan_can_access_plan_features()
-    {
-        $plan = Plan::factory()->create([
-            'permissions' => ['events', 'courses']
+        $super = User::create([
+            'name' => 'Super Admin',
+            'email' => 'super@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'superadmin'
         ]);
 
-        $member = User::factory()->create([
+        $this->assertTrue($super->canAccessFeature('anything'));
+    }
+
+    public function test_user_without_plan_cannot_access_feature()
+    {
+        $user = User::create([
+            'name' => 'Member User',
+            'email' => 'member@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'member',
+            'plan_id' => null
+        ]);
+
+        $this->assertFalse($user->canAccessFeature('events_create'));
+    }
+
+    public function test_user_with_plan_can_access_plan_features()
+    {
+        // Create a plan with specific permissions
+        $plan = Plan::create([
+            'name' => 'Basic Plan',
+            'price' => 100,
+            'duration_days' => 30,
+            'permissions' => ['events_access', 'community_access']
+        ]);
+
+        $user = User::create([
+            'name' => 'Plan User',
+            'email' => 'plan@test.com',
+            'password' => bcrypt('password'),
             'role' => 'member',
             'plan_id' => $plan->id,
-            'plan_expires_at' => now()->addMonth()
+            'plan_expires_at' => now()->addDays(30)
         ]);
 
-        $this->assertTrue($member->canAccessFeature('events'));
-        $this->assertTrue($member->canAccessFeature('courses'));
-        $this->assertFalse($member->canAccessFeature('mentorships'));
+        $this->assertTrue($user->canAccessFeature('events_access'));
+        $this->assertTrue($user->canAccessFeature('community_access'));
+        $this->assertFalse($user->canAccessFeature('events_create')); // Not in plan
     }
 
-    /** @test */
-    public function member_with_extra_features_can_access_them()
+    public function test_user_with_expired_plan_cannot_access_features()
     {
-        $member = User::factory()->create([
-            'role' => 'member',
-            'extra_features' => ['whatsapp']
+        $plan = Plan::create([
+            'name' => 'Basic Plan',
+            'price' => 100,
+            'duration_days' => 30,
+            'permissions' => ['events_access']
         ]);
 
-        $this->assertTrue($member->canAccessFeature('whatsapp'));
-        $this->assertFalse($member->canAccessFeature('courses'));
-    }
-
-    /** @test */
-    public function expired_plan_revokes_access()
-    {
-        $plan = Plan::factory()->create([
-            'permissions' => ['events']
-        ]);
-
-        $member = User::factory()->create([
+        $user = User::create([
+            'name' => 'Expired User',
+            'email' => 'expired@test.com',
+            'password' => bcrypt('password'),
             'role' => 'member',
             'plan_id' => $plan->id,
             'plan_expires_at' => now()->subDay() // Expired
         ]);
 
-        $this->assertFalse($member->canAccessFeature('events'));
+        $this->assertFalse($user->canAccessFeature('events_access'));
+    }
+
+    public function test_user_can_access_extra_assigned_features()
+    {
+        $user = User::create([
+            'name' => 'Extra User',
+            'email' => 'extra@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'member',
+            'plan_id' => null,
+            'extra_features' => ['special_access']
+        ]);
+
+        $this->assertTrue($user->canAccessFeature('special_access'));
+        $this->assertFalse($user->canAccessFeature('other_feature'));
     }
 }
