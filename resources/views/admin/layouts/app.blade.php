@@ -95,7 +95,6 @@
 
         /* layout espaçamentos padrão AdminLTE */
         .content-wrapper {
-            background: #f4f6f9;
             /* min-height calculation handled by AdminLTE JS */
             transition: margin-left .3s ease-in-out;
         }
