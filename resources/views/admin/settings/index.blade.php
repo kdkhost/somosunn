@@ -48,6 +48,8 @@
     $pwa512 = $getUrl('pwa_icon_512');
     $pwaSplash = $getUrl('pwa_splash');
     $pwaBanner = $getUrl('pwa_banner');
+    $preloaderImage = $getUrl('preloader_image') ?? '';
+    $preloaderEnabled = (bool) ($settings['preloader_enabled'] ?? 0);
     $seoOg = $getUrl('seo_og_image');
     $seoTwitter = $getUrl('seo_twitter_image');
     $watermarkUrl = $getUrl('watermark_image');
