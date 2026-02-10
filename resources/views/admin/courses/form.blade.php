@@ -716,6 +716,18 @@
                                                             </div>
                                                             <div class="col-6">
                                                                 <div class="form-group mb-2">
+                                                                    <label class="small text-muted mb-0">Camada
+                                                                        (Z-Index)</label>
+                                                                    <input type="number" id="style-z-index"
+                                                                        class="form-control form-control-sm" value="10"
+                                                                        step="1">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <div class="form-group mb-2">
                                                                     <label class="small text-muted mb-0">Cor</label>
                                                                     <input type="color" id="style-color"
                                                                         class="form-control form-control-sm h-auto"
@@ -977,20 +989,20 @@
             attachments.forEach(att => {
                 const size = (att.file_size / 1024 / 1024).toFixed(2) + ' MB';
                 const item = `
-                                                                                    <li class="attachment-item" id="att-${att.id}">
-                                                                                        <div class="d-flex align-items-center">
-                                                                                            <i class="fas fa-file attachment-icon"></i>
-                                                                                            <div>
-                                                                                                <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
-                                                                                                <small class="text-muted">${size}</small>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div>
-                                                                                            <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
-                                                                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                `;
+                                                                                                        <li class="attachment-item" id="att-${att.id}">
+                                                                                                            <div class="d-flex align-items-center">
+                                                                                                                <i class="fas fa-file attachment-icon"></i>
+                                                                                                                <div>
+                                                                                                                    <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
+                                                                                                                    <small class="text-muted">${size}</small>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            <div>
+                                                                                                                <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
+                                                                                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                                                                            </div>
+                                                                                                        </li>
+                                                                                                    `;
                 list.append(item);
             });
         }
@@ -1423,9 +1435,9 @@
                 'course_name': { x: 50, y: 55, text: '[Nome do Curso]', fontSize: 24, color: '#333333', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' },
                 'completion_date': { x: 50, y: 65, text: 'Concluído em: 01/01/2024', fontSize: 16, color: '#555555', fontWeight: 'normal', fontFamily: 'Arial, sans-serif' },
                 'certificate_code': { x: 50, y: 85, text: 'Validação: ABC-123', fontSize: 12, color: '#999999', fontWeight: 'normal', fontFamily: 'Arial, sans-serif' },
-                'author_name': { x: 30, y: 90, text: '{{ $course->author_name ?? "Instrutor" }}', fontSize: 18, color: '#333333', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' },
-                'workload_hours': { x: 70, y: 90, text: 'Carga Horária: {{ $course->total_hours }}h', fontSize: 14, color: '#666666', fontWeight: 'normal', fontFamily: 'Arial, sans-serif' },
-                'platform_logo': { x: 50, y: 10, text: 'LOGO UNN', fontSize: 36, color: '#0066cc', fontWeight: 'bold', fontFamily: 'Georgia, serif', width: 120, height: 60, mandatory: true }
+                'author_name': { x: 30, y: 90, text: '{{ $course->author_name ?? "Instrutor" }}', fontSize: 18, color: '#333333', fontWeight: 'bold', fontFamily: 'Arial, sans-serif', zIndex: 10 },
+                'workload_hours': { x: 70, y: 90, text: 'Carga Horária: {{ $course->total_hours }}h', fontSize: 14, color: '#666666', fontWeight: 'normal', fontFamily: 'Arial, sans-serif', zIndex: 10 },
+                'platform_logo': { x: 50, y: 10, text: 'LOGO UNN', fontSize: 36, color: '#0066cc', fontWeight: 'bold', fontFamily: 'Georgia, serif', width: 120, height: 60, mandatory: true, zIndex: 20 }
             };
 
             // Merge defaults
@@ -1487,7 +1499,8 @@
                             cursor: 'move',
                             whiteSpace: 'nowrap',
                             border: '1px dashed transparent',
-                            padding: '5px'
+                            padding: '5px',
+                            zIndex: data.zIndex || 10
                         });
 
                     if (key === 'platform_logo') {
@@ -1495,7 +1508,7 @@
                             width: (data.width || 120) + 'px',
                             height: (data.height || 60) + 'px',
                             backgroundImage: 'url("' + platformLogoUrl + '")',
-                            backgroundSize: 'contain',
+                            backgroundSize: '100% 100%', // Allow full stretch to match container
                             backgroundRepeat: 'no-repeat',
                             backgroundPosition: 'center'
                         });
@@ -1518,6 +1531,7 @@
                         // If logo, switch context of tools if needed, but for now just show standard
 
                         $('#style-font-size').val(data.fontSize);
+                        $('#style-z-index').val(data.zIndex || 10);
                         $('#style-color').val(data.color);
                         $('#style-font-weight').val(data.fontWeight);
                         $('#style-font-family').val(data.fontFamily || 'Arial, sans-serif');
@@ -1531,7 +1545,7 @@
                     // Initialize Resizable ONLY for Logo
                     if (key === 'platform_logo') {
                         $el.resizable({
-                            aspectRatio: true, // Maintain aspect ratio
+                            aspectRatio: false, // User requested free resize ("quadrado x retangulo")
                             handles: 'n, e, s, w, ne, se, sw, nw',
                             stop: function (event, ui) {
                                 let w = ui.size.width;
@@ -1553,7 +1567,7 @@
 
                 // Init Draggable
                 $('.cert-element').draggable({
-                    containment: "#cert-canvas",
+                    containment: false, // Allow dragging outside
                     scroll: false,
                     stop: function (event, ui) {
                         let key = $(this).data('tag');
@@ -1603,6 +1617,13 @@
                     let val = $(this).val();
                     certSettings[activeElementId].fontSize = val;
                     $('#el-' + activeElementId).css('font-size', val + 'px');
+                }
+            });
+            $('#style-z-index').on('input', function () {
+                if (activeElementId) {
+                    let val = $(this).val();
+                    certSettings[activeElementId].zIndex = val;
+                    $('#el-' + activeElementId).css('z-index', val);
                 }
             });
             $('#style-color').on('input', function () {

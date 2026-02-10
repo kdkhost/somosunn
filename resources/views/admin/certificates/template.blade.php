@@ -126,6 +126,7 @@
                     font-weight: {{ $style['fontWeight'] }};
                     font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
                     transform: translate(-50%, -50%); /* Center based on coords */
+                    z-index: {{ $style['zIndex'] ?? 10 }};
                 ">
                 {{ $dataMap[$key] ?? '' }}
             </div>
@@ -155,6 +156,7 @@
             width: {{ $logoStyle['width'] ?? 120 }}px;
                 height: {{ $logoStyle['height'] ?? 60 }}px;
                 transform: translate(-50%, -50%);
+                z-index: {{ $logoStyle['zIndex'] ?? 20 }};
        
      ">
                 <img src="{{ $logoUrl }}" style="width: 100%; height: 100%; object-fit: contain;">
