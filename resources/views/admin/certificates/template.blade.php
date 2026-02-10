@@ -43,7 +43,7 @@
             background-color: white;
             @if($course->certificate_bg)
                 @php 
-                    $bgPath = (isset($isPreview) && $isPreview) ? asset($course->certificate_bg) : public_path($course->certificate_bg);
+                    $bgPath = (isset($isPreview) && $isPreview) ? '/' . ltrim($course->certificate_bg, '/') : public_path($course->certificate_bg);
                 @endphp
                 background-image: url("{{ $bgPath }}");
                 background-size: 100% 100%;
@@ -62,8 +62,22 @@
             $settings = $course->certificate_settings ?? [];
             
             // Extract special fields that might be strings (not style arrays)
-            $certTitle = $settings['title'] ?? 'CERTIFICADO DE CONCLUSÃO';
-            $certPresentation = $settings['presentation_text'] ?? $course->default_presentation_text;
+            // If settings['title'] is an array (style), we look for 'custom_title' used for text.
+            if (isset($settings['custom_title'])) {
+                $certTitle = $settings['custom_title'];
+            } elseif (isset($settings['title']) && is_string($settings['title'])) {
+                $certTitle = $settings['title'];
+            } else {
+                $certTitle = 'CERTIFICADO DE CONCLUSÃO';
+            }
+
+            if (isset($settings['custom_presentation_text'])) {
+                $certPresentation = $settings['custom_presentation_text'];
+            } elseif (isset($settings['presentation_text']) && is_string($settings['presentation_text'])) {
+                $certPresentation = $settings['presentation_text'];
+            } else {
+                $certPresentation = $course->default_presentation_text;
+            }
             
             // Map keys used in editor to real data
             $dataMap = [

@@ -448,13 +448,13 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="d-flex align-items-center">
-                                                <button class="btn btn-sm btn-outline-primary btn-edit-lesson mr-1"
+                                            <div class="d-flex align-items-center flex-nowrap">
+                                                <button type="button" class="btn btn-sm btn-outline-primary btn-edit-lesson mr-1"
                                                     data-id="{{ $lesson->id }}" title="Editar"><i class="fas fa-edit"></i></button>
                                                 <form action="{{ route('courses.lessons.destroy', [$course, $lesson]) }}"
-                                                    method="POST" class="d-inline ajax-delete">
+                                                    method="POST" class="d-inline ajax-delete ml-1">
                                                     @csrf @method('DELETE')
-                                                    <button class="btn btn-sm btn-outline-danger" title="Excluir"><i
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir"><i
                                                             class="fas fa-trash"></i></button>
                                                 </form>
                                             </div>
@@ -977,20 +977,20 @@
             attachments.forEach(att => {
                 const size = (att.file_size / 1024 / 1024).toFixed(2) + ' MB';
                 const item = `
-                                                                    <li class="attachment-item" id="att-${att.id}">
-                                                                        <div class="d-flex align-items-center">
-                                                                            <i class="fas fa-file attachment-icon"></i>
-                                                                            <div>
-                                                                                <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
-                                                                                <small class="text-muted">${size}</small>
+                                                                        <li class="attachment-item" id="att-${att.id}">
+                                                                            <div class="d-flex align-items-center">
+                                                                                <i class="fas fa-file attachment-icon"></i>
+                                                                                <div>
+                                                                                    <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
+                                                                                    <small class="text-muted">${size}</small>
+                                                                                </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <div>
-                                                                            <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
-                                                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
-                                                                        </div>
-                                                                    </li>
-                                                                `;
+                                                                            <div>
+                                                                                <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
+                                                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                                            </div>
+                                                                        </li>
+                                                                    `;
                 list.append(item);
             });
         }
