@@ -23,6 +23,18 @@
             return '';
         if (filter_var($val, FILTER_VALIDATE_URL))
             return $val;
+
+        // Se o valor já começar com 'storage/', usa direto no asset
+        if (str_starts_with($val, 'storage/')) {
+            return asset($val);
+        }
+
+        // Se começar com 'uploads/', assume que precisa do prefixo storage
+        if (str_starts_with($val, 'uploads/')) {
+            return asset('storage/' . $val);
+        }
+
+        // Fallback genérico
         return asset('storage/' . $val);
     };
 @endphp
