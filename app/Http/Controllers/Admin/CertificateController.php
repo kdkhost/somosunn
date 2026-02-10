@@ -248,7 +248,8 @@ class CertificateController extends Controller
         ])->render();
 
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape');
+        // Set exact A4 landscape dimensions: 297mm x 210mm
+        $dompdf->setPaper([0, 0, 841.89, 595.28], 'landscape'); // A4 in points (1mm = 2.83465 points)
         $dompdf->render();
 
         return $dompdf->output();
@@ -275,17 +276,28 @@ class CertificateController extends Controller
         $cert = Certificate::where('cert_hash', $hash)->firstOrFail();
 
         $pdfPath = $cert->pdf_path;
-        // Construct path manually to avoid static analysis warnings with generic Filesystem disk
-        $path = storage_path('app/public/' . $pdfPath);
 
-        if (!file_exists($path)) {
-            // Check if public/storage is a real dir (common in some hostings)
-            $altPath = public_path('storage/' . $pdfPath);
-            if (file_exists($altPath)) {
-                $path = $altPath;
-            } else {
-                return response()->json(['error' => 'Arquivo do certificado não encontrado no servidor.'], 404);
+        // Try multiple path resolution strategies
+        $possiblePaths = [
+            storage_path('app/public/' . $pdfPath),
+            public_path('storage/' . $pdfPath),
+            storage_path('app/' . $pdfPath),
+            public_path($pdfPath)
+        ];
+
+        $path = null;
+        foreach ($possiblePaths as $testPath) {
+            if (file_exists($testPath)) {
+                $path = $testPath;
+                break;
             }
+        }
+
+        if (!$path) {
+            return response()->json([
+                'error' => 'Arquivo do certificado não encontrado no servidor.',
+                'searched_paths' => $possiblePaths
+            ], 404);
         }
 
         if (request()->has('download')) {

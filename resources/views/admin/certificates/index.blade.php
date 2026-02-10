@@ -58,7 +58,7 @@
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-xs btn-default btn-view-cert"
-                                            data-url="{{ route('admin.certificates.preview-html', $cert->cert_hash, false) }}"
+                                            data-hash="{{ $cert->cert_hash }}"
                                             data-download="{{ route('admin.certificates.view', $cert->cert_hash, false) }}?download=1"
                                             title="Visualizar">
                                             <i class="fas fa-eye text-primary"></i>
@@ -169,8 +169,11 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body p-0" style="background: #525659;">
-                    <iframe id="iframeCert" src="" frameborder="0" style="width: 100%; height: 80vh;"></iframe>
+                <div class="modal-body p-0"
+                    style="background: #f5f5f5; min-height: 80vh; display: flex; align-items: center; justify-content: center;">
+                    <div id="certPreviewContainer" style="width: 100%; max-width: 1200px; padding: 20px;">
+                        <!-- Certificate HTML will be loaded here -->
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
@@ -227,18 +230,33 @@
                 "order": [[0, "desc"]] // Sort by completion date newest
             }));
 
-            // Modal Logic
+            // Modal Logic - Load HTML Preview
             $('.btn-view-cert').on('click', function () {
-                var url = $(this).data('url');
+                var hash = $(this).data('hash');
                 var downloadUrl = $(this).data('download');
-                $('#iframeCert').attr('src', url);
+                var previewUrl = "{{ route('admin.certificates.preview', ':hash') }}".replace(':hash', hash);
+                
+                // Show loading state
+                $('#certPreviewContainer').html('<div class="text-center p-5"><i class="fas fa-spinner fa-spin fa-3x text-primary"></i><p class="mt-3">Carregando certificado...</p></div>');
                 $('#btnDownloadCert').attr('href', downloadUrl);
                 $('#modalViewCert').modal('show');
+                
+                // Fetch HTML preview
+                $.ajax({
+                    url: previewUrl,
+                    method: 'GET',
+                    success: function(html) {
+                        $('#certPreviewContainer').html(html);
+                    },
+                    error: function() {
+                        $('#certPreviewContainer').html('<div class="alert alert-danger m-3">Erro ao carregar preview do certificado.</div>');
+                    }
+                });
             });
 
-            // Clear iframe on close
+            // Clear preview on close
             $('#modalViewCert').on('hidden.bs.modal', function () {
-                $('#iframeCert').attr('src', '');
+                $('#certPreviewContainer').html('');
             });
 
             // SweetAlert2 for Email Sending
