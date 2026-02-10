@@ -108,6 +108,38 @@ class CertificateController extends Controller
         return redirect()->back()->with('success', 'Certificado gerado com sucesso!');
     }
 
+    public function regenerate(Certificate $certificate)
+    {
+        // 1. Check permissions (Admin or Instructor Owner)
+        $user = auth()->user();
+        $isOwner = false;
+
+        $product = $certificate->course ?? $certificate->mentorship ?? $certificate->event;
+        $type = $certificate->course ? 'course' : ($certificate->mentorship ? 'mentorship' : 'event');
+
+        if ($type === 'course' && $product->user_id === $user->id)
+            $isOwner = true;
+        if ($type === 'mentorship' && $product->mentor_id === $user->id)
+            $isOwner = true;
+        if ($type === 'event' && $product->user_id === $user->id)
+            $isOwner = true;
+
+        if (!$user->isAdmin() && !$isOwner) {
+            abort(403, 'Você não tem permissão para regenerar este certificado.');
+        }
+
+        // 2. Regenerate PDF content
+        $output = $this->generatePdfContent($certificate->user, $type, $product, $certificate->cert_hash);
+
+        // 3. Overwrite existing file
+        Storage::disk('public')->put($certificate->pdf_path, $output);
+
+        // 4. Update timestamp
+        $certificate->touch();
+
+        return redirect()->back()->with('success', 'Certificado regenerado com o design atual!');
+    }
+
     // Updated to support multiple types
     private function issueCertificate($userId, $type, $id)
     {
@@ -138,6 +170,24 @@ class CertificateController extends Controller
 
         $certHash = Str::random(24);
 
+        $output = $this->generatePdfContent($user, $type, $product, $certHash);
+
+        $path = "certificates/{$certHash}.pdf";
+        Storage::disk('public')->put($path, $output);
+
+        return Certificate::create([
+            'user_id' => $user->id,
+            'course_id' => $type === 'course' ? $id : null,
+            'mentorship_id' => $type === 'mentorship' ? $id : null,
+            'event_id' => $type === 'event' ? $id : null,
+            'cert_hash' => $certHash,
+            'pdf_path' => $path,
+            'issued_at' => now()
+        ]);
+    }
+
+    private function generatePdfContent($user, $type, $product, $certHash)
+    {
         // Use the same template, but it needs a unified "product" object for background/settings
         // We'll prepare specific labels for different product types
         $authorName = 'Instrutor';
@@ -169,20 +219,7 @@ class CertificateController extends Controller
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
-        $output = $dompdf->output();
-
-        $path = "certificates/{$certHash}.pdf";
-        Storage::disk('public')->put($path, $output);
-
-        return Certificate::create([
-            'user_id' => $user->id,
-            'course_id' => $type === 'course' ? $id : null,
-            'mentorship_id' => $type === 'mentorship' ? $id : null,
-            'event_id' => $type === 'event' ? $id : null,
-            'cert_hash' => $certHash,
-            'pdf_path' => $path,
-            'issued_at' => now()
-        ]);
+        return $dompdf->output();
     }
 
     public function sendEmail(Certificate $certificate)

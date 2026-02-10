@@ -400,6 +400,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         ->middleware('check.feature:certificates_create')->name('certificates.create');
     Route::post('/certificates/generate', [\App\Http\Controllers\Admin\CertificateController::class, 'generate'])
         ->middleware('check.feature:certificates_generate')->name('certificates.generate');
+    Route::post('/certificates/{certificate}/regenerate', [\App\Http\Controllers\Admin\CertificateController::class, 'regenerate'])
+        ->middleware('check.feature:certificates_generate')->name('certificates.regenerate');
     Route::get('/certificates/view/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'view'])
         ->middleware('check.feature:certificates_access')->name('certificates.view');
     Route::get('/certificates/preview-html/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'previewHtml'])

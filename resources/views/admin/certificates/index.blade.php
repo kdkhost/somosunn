@@ -55,6 +55,7 @@
                                     <td><span class="badge badge-info">{{ $type }}</span></td>
                                     <td>{{ $product->title ?? 'N/A' }}</td>
                                     <td><small>{{ $cert->cert_hash }}</small></td>
+                                    </td>
                                     <td>
                                         <button type="button" class="btn btn-xs btn-default btn-view-cert"
                                             data-url="{{ route('admin.certificates.preview-html', $cert->cert_hash) }}"
@@ -62,6 +63,14 @@
                                             title="Visualizar">
                                             <i class="fas fa-eye text-primary"></i>
                                         </button>
+                                        <form action="{{ route('admin.certificates.regenerate', $cert->id) }}" method="POST"
+                                            class="d-inline form-regenerate-cert">
+                                            @csrf
+                                            <button type="button" class="btn btn-xs btn-default btn-regenerate"
+                                                title="Regenerar PDF (Aplicar novo design)">
+                                                <i class="fas fa-sync text-warning"></i>
+                                            </button>
+                                        </form>
                                         <a href="{{ route('admin.certificates.view', $cert->cert_hash) }}?download=1"
                                             class="btn btn-xs btn-default" title="Baixar">
                                             <i class="fas fa-download text-danger"></i>
@@ -235,6 +244,27 @@
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#aaa',
                     confirmButtonText: 'Sim, enviar!',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
+            // SweetAlert2 for Regenerate
+            $('.btn-regenerate').on('click', function (e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+
+                Swal.fire({
+                    title: 'Regenerar PDF?',
+                    text: "Isso atualizará o arquivo PDF com as configurações atuais do curso (fundo, assinatura, locais). O arquivo antigo será substituído.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ffc107',
+                    cancelButtonColor: '#aaa',
+                    confirmButtonText: 'Sim, regenerar!',
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
