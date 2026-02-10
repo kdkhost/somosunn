@@ -75,6 +75,7 @@
 
         @foreach($settings as $key => $style)
             @continue($key === 'platform_logo')
+            @continue(!is_array($style))
             
             <div class="element" style="
                 left: {{ $style['x'] }}%;
