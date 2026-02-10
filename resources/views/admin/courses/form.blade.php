@@ -977,20 +977,20 @@
             attachments.forEach(att => {
                 const size = (att.file_size / 1024 / 1024).toFixed(2) + ' MB';
                 const item = `
-                                                                                <li class="attachment-item" id="att-${att.id}">
-                                                                                    <div class="d-flex align-items-center">
-                                                                                        <i class="fas fa-file attachment-icon"></i>
-                                                                                        <div>
-                                                                                            <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
-                                                                                            <small class="text-muted">${size}</small>
+                                                                                    <li class="attachment-item" id="att-${att.id}">
+                                                                                        <div class="d-flex align-items-center">
+                                                                                            <i class="fas fa-file attachment-icon"></i>
+                                                                                            <div>
+                                                                                                <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
+                                                                                                <small class="text-muted">${size}</small>
+                                                                                            </div>
                                                                                         </div>
-                                                                                    </div>
-                                                                                    <div>
-                                                                                        <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
-                                                                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
-                                                                                    </div>
-                                                                                </li>
-                                                                            `;
+                                                                                        <div>
+                                                                                            <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
+                                                                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                `;
                 list.append(item);
             });
         }
@@ -1511,10 +1511,12 @@
                         $(this).css('border-color', '#007bff');
                         activeElementId = key;
 
-                        // Populate Tools;
+                        // Populate Tools
                         // For logo, we might want to hide text input or font controls?
                         // For now keep it simple.
                         $('#selected-elem-name').text(key === 'platform_logo' ? 'Logo da Plataforma' : data.text);
+                        // If logo, switch context of tools if needed, but for now just show standard
+
                         $('#style-font-size').val(data.fontSize);
                         $('#style-color').val(data.color);
                         $('#style-font-weight').val(data.fontWeight);
@@ -1525,6 +1527,28 @@
                     });
 
                     $canvas.append($el);
+
+                    // Initialize Resizable ONLY for Logo
+                    if (key === 'platform_logo') {
+                        $el.resizable({
+                            aspectRatio: true, // Maintain aspect ratio
+                            handles: 'n, e, s, w, ne, se, sw, nw',
+                            stop: function (event, ui) {
+                                let w = ui.size.width;
+                                let h = ui.size.height;
+
+                                // Update Settings
+                                certSettings['platform_logo'].width = w;
+                                certSettings['platform_logo'].height = h;
+
+                                // Update Inputs
+                                $('#logo-width').val(Math.round(w));
+                                $('#logo-height').val(Math.round(h));
+
+                                toastr.info('Tamanho atualizado: ' + Math.round(w) + 'x' + Math.round(h));
+                            }
+                        });
+                    }
                 });
 
                 // Init Draggable

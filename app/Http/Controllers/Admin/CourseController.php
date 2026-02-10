@@ -204,66 +204,6 @@ class CourseController extends Controller
             // Only update text, preserve other styling/position if it's an array
             if (isset($data['certificate_settings']['title']) && is_array($data['certificate_settings']['title'])) {
                 $data['certificate_settings']['title']['text'] = $request->certificate_title;
-                // Update specific text key if your frontend stores it there, 
-                // OR if your structure splits text from style. 
-                // Based on previous template analysis: $dataMap['title'] is used. 
-                // But wait, the Template uses $certTitle = $settings['title'] ?? 'DEFAULT';
-                // And checks is_array($settings['title']). 
-                // If it IS an array, it renders the dragging element.
-                // The dragging element uses {{ $dataMap[$key] }} which comes from... $certTitle!
-
-                // So, we actually DON'T need to store the text inside $settings['title'] array 
-                // because the template pulls the text from $dataMap['title'] which comes from $certTitle 
-                // which comes from $settings['title'] (if string) or fallback.
-
-                // WAIT! The template logic:
-                // $certTitle = $settings['title'] ?? 'DEF'; (This might get the ARRAY if available)
-                // $dataMap['title'] = $certTitle;
-                // Loop renders $dataMap[$key].
-
-                // If $settings['title'] is an array, $certTitle becomes that array.
-                // $dataMap['title'] becomes that array.
-                // Blade {{ $array }} throws error!
-
-                // Correct Logic:
-                // The frontend 'title' element in certSettings probably DOES NOT contain the text itself,
-                // just the style/position. The text is likely expected to be static or passed separately.
-                // However, users want to CUSTOMIZE the text.
-                // So we should store the text differently or the template handles it.
-
-                // Let's look at template again.
-                // $certTitle = $settings['title'] ?? '...'; 
-                // If $settings['title'] is array (from Draggable), $certTitle is Array.
-                // $dataMap['title'] = $certTitle (Array).
-                // <div ...> {{ $dataMap[$key] ?? '' }} </div>
-                // {{ Array }} -> Error.
-
-                // THIS explains why it might be failing or defaulting.
-                // If the user drags 'title', $settings['title'] is saved as Array.
-                // The Template crashes or behaves weirdly.
-
-                // Fix: properties 'title' and 'presentation_text' in settings should ONLY be used for STYLE.
-                // The actual TEXT should be stored in specific string keys like 'title_text' or handled via the separate inputs.
-
-                // BUT, the Controller overwrites $settings['title'] with string.
-                // This makes it work as text, but breaks positioning.
-
-                // PROPOSED FIX:
-                // 1. Save 'certificate_title' input into a NEW key, e.g., $settings['title_text'].
-                // 2. Or, if we must use 'title', we ensure the template handles $settings['title'] as style, 
-                //    and uses a separate source for the inner text.
-
-                // Let's assume we want to save the text in a separate field in the JSON or use the column.
-                // The $request->certificate_title IS the text.
-                // We should NOT overwrite $settings['title'] (the style object).
-                // We should save the text in $settings['title_text'] or simply rely on the text input being passed to the view?
-                // The view sets $certTitle = $settings['title'] ?? ...
-
-                // View Fix is needed too.
-                // Controller should NOT touch $settings['title'] if it is an array.
-                // Only save text if we have a place for it.
-                // Let's save it as $settings['custom_title'] and $settings['custom_presentation_text'].
-
                 $data['certificate_settings']['custom_title'] = $request->certificate_title;
             } else {
                 $data['certificate_settings']['title'] = $request->certificate_title;
