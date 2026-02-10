@@ -471,7 +471,7 @@
                     </div>
 
                     {{-- VÍDEO PLAYER (PLYR) --}}
-                    <div class="tab-pane fade" id="tab-video" role="tabpanel">
+                    <div class="tab-pane fade" id="tab-player" role="tabpanel">
                         <h5 class="text-primary mb-3"><i class="fas fa-play-circle mr-2"></i>Player de Vídeo (Plyr)</h5>
 
                         <div class="alert alert-info">
@@ -765,9 +765,8 @@
                                 placeholder="Código específico para o feed (opcional)">{{ $settings['ads_inter_feed_code'] ?? '' }}</textarea>
                         </div>
                     </div>
-                </div>
 
-                {{-- GATEWAY --}}
+                    {{-- GATEWAY --}}
                 <div class="tab-pane fade" id="tab-gateway" role="tabpanel">
                     <h5 class="text-primary mb-3"><i class="fas fa-credit-card mr-2"></i>Gateways de Pagamento</h5>
                             <p class="text-muted">Configure credenciais e opções dos gateways suportados. <b>Webhooks</b> são URLs que você deve configurar no painel do gateway para receber atualizações de pagamento.</p>
