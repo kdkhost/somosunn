@@ -29,12 +29,12 @@
         \Log::error('Erro ao carregar logo da sidebar: ' . $e->getMessage());
     }
 @endphp
-<aside class="main-sidebar sidebar-dark-primary elevation-4" style="font-family: 'Inter', sans-serif;">
-    <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center justify-content-center p-0 bg-white border-b border-gray-200"
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center justify-content-center p-0"
         style="height:60px; overflow:hidden;">
-        <img src="{{ $brandLogo }}" alt="UNN" class="brand-logo-img transition-all duration-300"
+        <img src="{{ $brandLogo }}" alt="UNN" class="brand-logo-img"
             style="max-height: 44px; width: auto; max-width: 80%; object-fit: contain;">
-        <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img transition-all duration-300"
+        <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img"
             style="max-height: 44px; width: auto; max-width: 80%; object-fit: contain;">
     </a>
     <style>
@@ -67,14 +67,14 @@
     </style>
     <div class="sidebar" style="padding-bottom: 1.5rem;">
         {{-- User Panel with Plan --}}
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center bg-gradient-to-r from-blue-50 to-white rounded-xl shadow-sm mx-2 px-2">
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
             <div class="image mr-2">
                 <img src="{{ auth()->user()->photo ? asset(auth()->user()->photo) : asset('img/user.png') }}"
                     class="img-circle elevation-2 border border-blue-200" alt="User Image"
                     style="width: 38px; height: 38px; object-fit: cover;">
             </div>
             <div class="info">
-                <a href="{{ route('admin.profile.edit') }}" class="d-block text-wrap font-bold text-blue-900"
+                <a href="{{ route('admin.profile.edit') }}" class="d-block text-wrap"
                     style="max-width: 160px;">{{ auth()->user()->name }}</a>
                 <span class="text-muted small"><i
                         class="fas fa-crown text-warning mr-1"></i>{{ auth()->user()->activePlan() ? auth()->user()->activePlan()->name : 'Acesso Limitado' }}</span>
@@ -343,50 +343,6 @@
 
 
         </nav>
-        <style>
-        /* Sidebar custom UX */
-        .main-sidebar {
-            font-size: 1rem;
-        }
-        .main-sidebar .nav-link {
-            transition: background 0.18s, color 0.18s;
-        }
-        .main-sidebar .nav-link.active, .main-sidebar .nav-link:hover {
-            background: linear-gradient(90deg, #2563eb 0%, #60a5fa 100%);
-            color: #fff !important;
-        }
-        .main-sidebar .nav-link.active i, .main-sidebar .nav-link:hover i {
-            color: #fff !important;
-        }
-        .main-sidebar .nav-link i {
-            color: #2563eb;
-            transition: color 0.18s;
-        }
-        .main-sidebar .nav-treeview .nav-link {
-            font-size: 0.97em;
-            padding-left: 2.2rem;
-        }
-        @media (max-width: 900px) {
-            .main-sidebar {
-                font-size: 0.97rem;
-            }
-            .user-panel .info a {
-                font-size: 0.97rem;
-            }
-        }
-        @media (max-width: 600px) {
-            .main-sidebar {
-                font-size: 0.93rem;
-            }
-            .user-panel {
-                flex-direction: column;
-                align-items: flex-start !important;
-                gap: 0.2rem;
-            }
-            .user-panel .image {
-                margin-bottom: 0.2rem;
-            }
-        }
-        </style>
+        {{-- Remove custom color overrides so AdminLTE default styles apply --}}
     </div>
 </aside>
