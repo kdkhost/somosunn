@@ -141,7 +141,7 @@ class CertificateController extends Controller
     }
 
     // Updated to support multiple types
-    private function issueCertificate($userId, $type, $id)
+    public function issueCertificate($userId, $type, $id)
     {
         $user = User::find($userId);
 

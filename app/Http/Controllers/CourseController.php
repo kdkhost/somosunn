@@ -367,7 +367,7 @@ class CourseController extends Controller
         if (!$existingCert && $course->is_certificate_enabled) {
             // Generate certificate with PDF using the proper method
             $certificateController = new \App\Http\Controllers\Admin\CertificateController();
-            $existingCert = $certificateController->generate($user, 'course', $course->id);
+            $existingCert = $certificateController->issueCertificate($user->id, 'course', $course->id);
         }
 
         // Mark enrollment as completed (using polymorphic relationship)
