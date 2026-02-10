@@ -29,12 +29,12 @@
             return asset($val);
         }
 
-        // Se começar com 'uploads/', assume que precisa do prefixo storage
+        // Se começar com 'uploads/', é provável que esteja na raiz pública (legacy ou custom)
         if (str_starts_with($val, 'uploads/')) {
-            return asset('storage/' . $val);
+            return asset($val);
         }
 
-        // Fallback genérico
+        // Fallback genérico para storage (padrão Laravel)
         return asset('storage/' . $val);
     };
 @endphp
