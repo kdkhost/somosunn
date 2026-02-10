@@ -50,7 +50,7 @@
                                     <td>{{ $cert->course->title }}</td>
                                     <td><small>{{ $cert->cert_hash }}</small></td>
                                     <td>
-                                        <a href="{{ route('certificates.view', $cert->cert_hash) }}" target="_blank"
+                                        <a href="{{ route('admin.certificates.view', $cert->cert_hash) }}" target="_blank"
                                             class="btn btn-xs btn-default" title="Visualizar/Baixar">
                                             <i class="fas fa-file-pdf text-danger"></i>
                                         </a>
