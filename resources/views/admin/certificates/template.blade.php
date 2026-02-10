@@ -102,41 +102,28 @@
             ];
         @endphp
 
-        {{-- Render Fixed Title (if not in draggable elements) --}}
-        @if(!isset($settings['title']) || !is_array($settings['title']))
-            <div class="element"
-                style="width: 100%; text-align: center; top: 15%; font-size: 40px; font-weight: bold; color: #222;">
-                {{ $certTitle }}
-            </div>
-        @endif
-
-        {{-- Render Fixed Presentation Text (if not in draggable elements) --}}
-        @if(!isset($settings['presentation_text']) || !is_array($settings['presentation_text']))
-            <div class="element" style="width: 100%; text-align: center; top: 25%; font-size: 18px; color: #555;">
-                {{ $certPresentation }}
-            </div>
-        @endif
+        {{-- Only render draggable elements from saved settings --}}
 
         @foreach($settings as $key => $style)
             @continue($key === 'platform_logo')
             @continue(!is_array($style))
 
             <div class="element" style="
-                    left: {{ $style['x'] }}%;
-                    top: {{ $style['y'] }}%;
-                    font-size: {{ $style['fontSize'] }}px;
-                    color: {{ $style['color'] }};
-                    font-weight: {{ $style['fontWeight'] }};
-                    font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
-                    transform: translate(-50%, -50%); /* Center based on coords */
-                    z-index: {{ $style['zIndex'] ?? 10 }};
-                ">
+                        left: {{ $style['x'] }}%;
+                        top: {{ $style['y'] }}%;
+                        font-size: {{ $style['fontSize'] }}px;
+                        color: {{ $style['color'] }};
+                        font-weight: {{ $style['fontWeight'] }};
+                        font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
+                        transform: translate(-50%, -50%); /* Center based on coords */
+                        z-index: {{ $style['zIndex'] ?? 10 }};
+                    ">
                 {{ $dataMap[$key] ?? '' }}
             </div>
         @endforeach
 
         @php 
-                            $logoStyle = $settings['platform_logo'];
+                                        $logoStyle = $settings['platform_logo'];
 
             // Use the same logic as Auth Visual component
             $logoPath = \App\Models\Setting::get('logo_auth') ?: \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
@@ -156,12 +143,13 @@
             <div class="element" style="
             left: {{ $logoStyle['x'] }}%;
             top: {{ $logoStyle['y'] }}%;
-            width: {{ $logoStyle['width'] ?? 120 }}px;
-                height: {{ $logoStyle['height'] ?? 60 }}px;
-                transform: translate(-50%, -50%);
+        width: {{ $logoStyle['width'] ?? 120 }}px;
+            height: {{ $logoStyle['height'] ?? 60 }}px;
+            transform: translate(-50%, -50%);
                 z-index: {{ $logoStyle['zIndex'] ?? 20 }};
        
      ">
+
                 <img src="{{ $logoUrl }}" style="width: 100%; height: 100%; object-fit: contain;">
             </div>
         
