@@ -331,11 +331,22 @@ class CertificateController extends Controller
             }
         }
 
+
         if (!$path || !file_exists($path)) {
+            \Log::error('Certificate PDF not found or regeneration failed', [
+                'cert_id' => $cert->id,
+                'cert_hash' => $cert->cert_hash,
+                'pdf_path' => $cert->pdf_path,
+                'type' => $type ?? 'unknown',
+                'product_id' => $id ?? null,
+                'path_attempted' => $path
+            ]);
+
             return response()->json([
                 'error' => 'Não foi possível gerar o certificado.',
+                'details' => 'O PDF não pôde ser criado. Verifique os logs do servidor.',
                 'cert_id' => $cert->id
-            ], 404);
+            ], 500);
         }
 
         if (request()->has('download')) {
