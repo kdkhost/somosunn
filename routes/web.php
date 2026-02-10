@@ -74,45 +74,47 @@ Route::get('/portal', [HomeController::class, 'portal'])->name('portal');
 Route::get('/premium', [HomeController::class, 'premium'])->name('premium');
 Route::post('/depoimentos', [\App\Http\Controllers\TestimonialController::class, 'store'])->middleware('auth')->name('testimonials.store');
 
-// Rota de Emergência para Diagnóstico
-Route::get('/debug-test', function () {
-    return "<h1>Laravel is Running!</h1> PHP Version: " . phpversion();
-});
+// Rota de Emergência para Diagnóstico (Protegida)
+Route::middleware(['auth', \App\Http\Middleware\EnsureUserIsAdmin::class])->group(function () {
+    Route::get('/debug-test', function () {
+        return "<h1>Laravel is Running!</h1> PHP Version: " . phpversion();
+    });
 
-// Rota de Emergência para Limpeza de Cache (Brute Force)
-Route::get('/limpar-cache', function () {
-    $log = [];
+    // Rota de Emergência para Limpeza de Cache
+    Route::get('/limpar-cache', function () {
+        $log = [];
 
-    // 1. View Cache
-    $viewPath = storage_path('framework/views');
-    $files = glob("$viewPath/*.php");
-    foreach ($files as $file) {
-        @unlink($file);
-        $log[] = "View deletada: " . basename($file);
-    }
-
-    // 2. Route/Config Cache
-    $bootstrapCache = base_path('bootstrap/cache');
-    $caches = ['routes-v7.php', 'routes.php', 'config.php', 'data.php'];
-    foreach ($caches as $c) {
-        $f = "$bootstrapCache/$c";
-        if (file_exists($f)) {
-            @unlink($f);
-            $log[] = "Cache deletado: $c";
+        // 1. View Cache
+        $viewPath = storage_path('framework/views');
+        $files = glob("$viewPath/*.php");
+        foreach ($files as $file) {
+            @unlink($file);
+            $log[] = "View deletada: " . basename($file);
         }
-    }
 
-    // 3. Artisan commands (fallback)
-    try {
-        \Artisan::call('view:clear');
-        \Artisan::call('route:clear');
-        \Artisan::call('cache:clear');
-        $log[] = "Artisan commands executed.";
-    } catch (\Exception $e) {
-        $log[] = "Artisan error: " . $e->getMessage();
-    }
+        // 2. Route/Config Cache
+        $bootstrapCache = base_path('bootstrap/cache');
+        $caches = ['routes-v7.php', 'routes.php', 'config.php', 'data.php'];
+        foreach ($caches as $c) {
+            $f = "$bootstrapCache/$c";
+            if (file_exists($f)) {
+                @unlink($f);
+                $log[] = "Cache deletado: $c";
+            }
+        }
 
-    return "<h1>Limpeza Concluída</h1><pre>" . implode("\n", $log) . "</pre><br><a href='/admin'>Voltar ao Admin</a>";
+        // 3. Artisan commands (fallback)
+        try {
+            \Artisan::call('view:clear');
+            \Artisan::call('route:clear');
+            \Artisan::call('cache:clear');
+            $log[] = "Artisan commands executed.";
+        } catch (\Exception $e) {
+            $log[] = "Artisan error: " . $e->getMessage();
+        }
+
+        return "<h1>Limpeza Concluída</h1><pre>" . implode("\n", $log) . "</pre><br><a href='/admin'>Voltar ao Admin</a>";
+    });
 });
 
 

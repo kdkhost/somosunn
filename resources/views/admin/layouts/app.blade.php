@@ -105,6 +105,33 @@
         }
 
         /* Keep any cosmetic colors to AdminLTE CSS; minimal helpers only */
+        /* Global Table Responsiveness Override */
+        @media (max-width: 768px) {
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .card-body.p-0 .table tbody>tr>td:first-of-type,
+            .card-body.p-0 .table tbody>tr>th:first-of-type,
+            .card-body.p-0 .table tfoot>tr>td:first-of-type,
+            .card-body.p-0 .table tfoot>tr>th:first-of-type,
+            .card-body.p-0 .table thead>tr>td:first-of-type,
+            .card-body.p-0 .table thead>tr>th:first-of-type {
+                padding-left: 0.75rem;
+            }
+
+            .card-body.p-0 .table tbody>tr>td:last-of-type,
+            .card-body.p-0 .table tbody>tr>th:last-of-type,
+            .card-body.p-0 .table tfoot>tr>td:last-of-type,
+            .card-body.p-0 .table tfoot>tr>th:last-of-type,
+            .card-body.p-0 .table thead>tr>td:last-of-type,
+            .card-body.p-0 .table thead>tr>th:last-of-type {
+                padding-right: 0.75rem;
+            }
+        }
     </style>
     <style>
         /* Small neutral utilities to restore layout helpers used across admin views
