@@ -22,18 +22,61 @@
             border: 1px solid #dee2e6;
             padding: 12px 15px;
             background: #fff;
-            margin-bottom: 8px;
-            border-radius: 4px;
+            margin-bottom: 15px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+            /* Keep above potential artifacts */
         }
 
         .lesson-item:hover {
-            background: #f8f9fa;
-            transform: translateX(2px);
-            border-color: #adb5bd;
+            border-color: #007bff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+            transform: translateY(-2px);
+            background: #fff !important;
+        }
+
+        .lesson-item .btn {
+            border-radius: 6px;
+            padding: 5px 10px;
+            border-width: 1.5px;
+        }
+
+        .lesson-item .btn:focus {
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        #lessons-list {
+            position: relative;
+        }
+
+        /* Suppress potential timeline artifacts from theme */
+        #lessons-list::before,
+        #lessons-list::after,
+        .lesson-item::before,
+        .lesson-item::after {
+            display: none !important;
+            content: none !important;
+        }
+
+        .lesson-item .d-flex:first-child {
+            flex: 1;
+            min-width: 0;
+            /* Allow title to truncate if needed */
+        }
+
+        .lesson-item .d-flex:last-child {
+            flex-shrink: 0;
+            margin-left: 15px;
+        }
+
+        .lesson-item .fa-grip-vertical {
+            flex-shrink: 0;
         }
 
         .dropzone {
@@ -103,14 +146,13 @@
                                     <i class="fas fa-layer-group mr-1"></i> Conteúdo / Aulas
                                 </a>
                             </li>
-                            @if($course->lessons->count() > 0 && $course->is_certificate_enabled)
-                                <li class="nav-item">
-                                    <a class="nav-link" id="cert-tab" data-toggle="tab" href="#certificate" role="tab"
-                                        aria-controls="certificate" aria-selected="false">
-                                        <i class="fas fa-certificate mr-1"></i> Certificado
-                                    </a>
-                                </li>
-                            @endif
+                            <li class="nav-item" id="nav-item-cert"
+                                style="{{ $course->is_certificate_enabled ? '' : 'display:none;' }}">
+                                <a class="nav-link" id="cert-tab" data-toggle="tab" href="#certificate" role="tab"
+                                    aria-controls="certificate" aria-selected="false">
+                                    <i class="fas fa-certificate mr-1"></i> Certificado
+                                </a>
+                            </li>
                         @endif
                     </ul>
                 </div>
@@ -230,36 +272,49 @@
                                                 </div>
 
                                                 <div class="form-group mb-4">
-                                                    <h6 class="text-muted mb-2"><i class="fas fa-play-circle mr-2"></i>Player de Vídeo</h6>
+                                                    <h6 class="text-muted mb-2"><i
+                                                            class="fas fa-play-circle mr-2"></i>Player de Vídeo</h6>
 
                                                     <div class="custom-control custom-switch">
                                                         <input type="checkbox" class="custom-control-input"
-                                                            name="video_block_download" id="video_block_download" value="1" {{ $course->video_block_download ? 'checked' : '' }}>
+                                                            name="video_block_download" id="video_block_download" value="1"
+                                                            {{ $course->video_block_download ? 'checked' : '' }}>
                                                         <label class="custom-control-label font-weight-bold"
                                                             for="video_block_download">Bloquear download do vídeo</label>
                                                     </div>
                                                     <small class="text-muted d-block mt-1">
-                                                        Remove botões/menus de download (não impede download via ferramentas do navegador).
+                                                        Remove botões/menus de download (não impede download via ferramentas
+                                                        do navegador).
                                                     </small>
 
                                                     <div class="custom-control custom-switch mt-3">
                                                         <input type="checkbox" class="custom-control-input"
-                                                            name="video_floating_enabled" id="video_floating_enabled" value="1" {{ $course->video_floating_enabled ? 'checked' : '' }}>
+                                                            name="video_floating_enabled" id="video_floating_enabled"
+                                                            value="1" {{ $course->video_floating_enabled ? 'checked' : '' }}>
                                                         <label class="custom-control-label font-weight-bold"
                                                             for="video_floating_enabled">Mini player flutuante</label>
                                                     </div>
 
-                                                    <div class="row mt-3" id="video_floating_size_group" style="{{ $course->video_floating_enabled ? '' : 'display:none;' }}">
+                                                    <div class="custom-control custom-switch mt-3">
+                                                        <input type="checkbox" class="custom-control-input"
+                                                            name="is_certificate_enabled" id="is_certificate_enabled"
+                                                            value="1" {{ $course->is_certificate_enabled ? 'checked' : '' }}>
+                                                        <label class="custom-control-label font-weight-bold"
+                                                            for="is_certificate_enabled">Habilitar Certificado</label>
+                                                    </div>
+
+                                                    <div class="row mt-3" id="video_floating_size_group"
+                                                        style="{{ $course->video_floating_enabled ? '' : 'display:none;' }}">
                                                         <div class="col-6">
                                                             <label class="small text-muted">Largura (px)</label>
-                                                            <input type="number" min="260" max="960" name="video_floating_width"
-                                                                class="form-control"
+                                                            <input type="number" min="260" max="960"
+                                                                name="video_floating_width" class="form-control"
                                                                 value="{{ old('video_floating_width', $course->video_floating_width ?? 420) }}">
                                                         </div>
                                                         <div class="col-6">
                                                             <label class="small text-muted">Altura (px)</label>
-                                                            <input type="number" min="160" max="720" name="video_floating_height"
-                                                                class="form-control"
+                                                            <input type="number" min="160" max="720"
+                                                                name="video_floating_height" class="form-control"
                                                                 value="{{ old('video_floating_height', $course->video_floating_height ?? 236) }}">
                                                         </div>
                                                         <div class="col-12">
@@ -284,7 +339,8 @@
                                                     <label class="mb-2">Link do Curso</label>
                                                     <div class="input-group mb-2">
                                                         <input type="text" class="form-control form-control-sm" id="courseLink"
-                                                            value="{{ route('courses.show', $course->slug ?: $course->id) }}" readonly>
+                                                            value="{{ route('courses.show', $course->slug ?: $course->id) }}"
+                                                            readonly>
                                                         <div class="input-group-append">
                                                             <button class="btn btn-outline-secondary btn-sm" type="button"
                                                                 onclick="copyLink()">
@@ -292,8 +348,8 @@
                                                             </button>
                                                         </div>
                                                     </div>
-                                                    <a href="{{ route('courses.show', $course->slug ?: $course->id) }}" target="_blank"
-                                                        class="btn btn-sm btn-outline-info btn-block">
+                                                    <a href="{{ route('courses.show', $course->slug ?: $course->id) }}"
+                                                        target="_blank" class="btn btn-sm btn-outline-info btn-block">
                                                         Visualizar Página <i class="fas fa-external-link-alt ml-1"></i>
                                                     </a>
                                                 </div>
@@ -306,7 +362,9 @@
                                             </div>
                                         @elseif(!$course->exists && Auth::user() && (Auth::user()->isAdmin() || Auth::user()->role === 'superadmin'))
                                             <div class="alert alert-success mt-3 text-center">
-                                                <i class="fas fa-unlock"></i> Como admin, você pode cadastrar aulas e certificados a qualquer momento. O curso será salvo automaticamente ao adicionar conteúdo.
+                                                <i class="fas fa-unlock"></i> Como admin, você pode cadastrar aulas e
+                                                certificados a qualquer momento. O curso será salvo automaticamente ao adicionar
+                                                conteúdo.
                                             </div>
                                         @endif
                                     </div>
@@ -322,53 +380,53 @@
                                     <button class="btn btn-success shadow-sm" id="btnNovaAula" type="button">
                                         <i class="fas fa-plus mr-1"></i> Nova Aula
                                     </button>
-                                @push('scripts')
-                                <script>
-                                document.addEventListener('DOMContentLoaded', function() {
-                                    const btnNovaAula = document.getElementById('btnNovaAula');
-                                    if (!btnNovaAula) return;
-                                    btnNovaAula.addEventListener('click', function(e) {
-                                        e.preventDefault();
-                                        // Se já existe course_id, apenas abre o modal normalmente
-                                        const courseId = {{ $course->exists ? $course->id : 'null' }};
-                                        if (courseId) {
-                                            if (typeof openLessonModal === 'function') openLessonModal();
-                                            return;
-                                        }
-                                        // Auto-save do formulário de curso via AJAX
-                                        const form = btnNovaAula.closest('form');
-                                        if (!form) return;
-                                        const formData = new FormData(form);
-                                        formData.append('status', 'draft');
-                                        btnNovaAula.disabled = true;
-                                        btnNovaAula.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Salvando...';
-                                        fetch(form.action, {
-                                            method: 'POST',
-                                            headers: {
-                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-                                            },
-                                            body: formData
-                                        })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data && data.id) {
-                                                // Redireciona para a edição do curso já salvo
-                                                window.location.href = `/admin/courses/${data.id}/edit?openLesson=1`;
-                                            } else {
-                                                alert('Erro ao salvar curso. Tente novamente.');
-                                                btnNovaAula.disabled = false;
-                                                btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
-                                            }
-                                        })
-                                        .catch(() => {
-                                            alert('Erro ao salvar curso. Tente novamente.');
-                                            btnNovaAula.disabled = false;
-                                            btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
-                                        });
-                                    });
-                                });
-                                </script>
-                                @endpush
+                                    @push('scripts')
+                                        <script>
+                                            document.addEventListener('DOMContentLoaded', function () {
+                                                const btnNovaAula = document.getElementById('btnNovaAula');
+                                                if (!btnNovaAula) return;
+                                                btnNovaAula.addEventListener('click', function (e) {
+                                                    e.preventDefault();
+                                                    // Se já existe course_id, apenas abre o modal normalmente
+                                                    const courseId = {{ $course->exists ? $course->id : 'null' }};
+                                                    if (courseId) {
+                                                        if (typeof openLessonModal === 'function') openLessonModal();
+                                                        return;
+                                                    }
+                                                    // Auto-save do formulário de curso via AJAX
+                                                    const form = btnNovaAula.closest('form');
+                                                    if (!form) return;
+                                                    const formData = new FormData(form);
+                                                    formData.append('status', 'draft');
+                                                    btnNovaAula.disabled = true;
+                                                    btnNovaAula.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Salvando...';
+                                                    fetch(form.action, {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                                        },
+                                                        body: formData
+                                                    })
+                                                        .then(response => response.json())
+                                                        .then(data => {
+                                                            if (data && data.id) {
+                                                                // Redireciona para a edição do curso já salvo
+                                                                window.location.href = `/admin/courses/${data.id}/edit?openLesson=1`;
+                                                            } else {
+                                                                alert('Erro ao salvar curso. Tente novamente.');
+                                                                btnNovaAula.disabled = false;
+                                                                btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
+                                                            }
+                                                        })
+                                                        .catch(() => {
+                                                            alert('Erro ao salvar curso. Tente novamente.');
+                                                            btnNovaAula.disabled = false;
+                                                            btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
+                                                        });
+                                                });
+                                            });
+                                        </script>
+                                    @endpush
                                 </div>
 
                                 <div id="lessons-list">
@@ -390,7 +448,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div>
+                                            <div class="d-flex align-items-center">
                                                 <button class="btn btn-sm btn-outline-primary btn-edit-lesson mr-1"
                                                     data-id="{{ $lesson->id }}" title="Editar"><i class="fas fa-edit"></i></button>
                                                 <form action="{{ route('courses.lessons.destroy', [$course, $lesson]) }}"
@@ -462,12 +520,10 @@
                                                 <div class="card-header bg-dark text-white font-weight-bold">Configurações</div>
                                                 <div class="card-body">
 
-                                                    <div class="custom-control custom-switch mb-4">
-                                                        <input type="checkbox" name="is_certificate_enabled" value="1"
-                                                            class="custom-control-input" id="is_certificate_enabled_tab" {{ $course->is_certificate_enabled ? 'checked' : '' }}>
-                                                        <label class="custom-control-label font-weight-bold"
-                                                            for="is_certificate_enabled_tab">Habilitar Certificado</label>
-                                                    </div>
+                                                    {{-- O switch foi movido para a barra lateral "Publicação" --}}
+                                                    <input type="hidden" name="is_certificate_enabled"
+                                                        value="{{ $course->is_certificate_enabled ? '1' : '0' }}"
+                                                        id="is_certificate_enabled_hidden">
 
                                                     <div class="form-group">
                                                         <label class="small text-muted text-uppercase font-weight-bold">Fundo do
@@ -921,20 +977,20 @@
             attachments.forEach(att => {
                 const size = (att.file_size / 1024 / 1024).toFixed(2) + ' MB';
                 const item = `
-                                                <li class="attachment-item" id="att-${att.id}">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="fas fa-file attachment-icon"></i>
-                                                        <div>
-                                                            <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
-                                                            <small class="text-muted">${size}</small>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
-                                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
-                                                    </div>
-                                                </li>
-                                            `;
+                                                                    <li class="attachment-item" id="att-${att.id}">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <i class="fas fa-file attachment-icon"></i>
+                                                                            <div>
+                                                                                <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
+                                                                                <small class="text-muted">${size}</small>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div>
+                                                                            <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
+                                                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                                        </div>
+                                                                    </li>
+                                                                `;
                 list.append(item);
             });
         }

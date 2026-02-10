@@ -1121,6 +1121,17 @@
                         return;
                     }
 
+                    // Keyboard protections
+                    target.addEventListener('keydown', function (e) {
+                        // Prevent Ctrl+S, Ctrl+U, Ctrl+Shift+I, F12
+                        if ((e.ctrlKey && (e.key === 's' || e.key === 'u' || e.key === 'S' || e.key === 'U')) ||
+                            (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'I' || e.key === 'c' || e.key === 'C' || e.key === 'j' || e.key === 'J')) ||
+                            (e.key === 'F12')) {
+                            e.preventDefault();
+                            return false;
+                        }
+                    }, true);
+
                     target.addEventListener('dragstart', function (event) {
                         event.preventDefault();
                     }, true);
@@ -1129,6 +1140,10 @@
                         target.setAttribute('controlsList', 'nodownload noplaybackrate noremoteplayback');
                         target.setAttribute('disablePictureInPicture', '');
                         target.setAttribute('disableRemotePlayback', '');
+                        // Prevent standard "Save Video As" in some older browsers
+                        target.addEventListener('mousedown', function (e) {
+                            if (e.button === 2) { e.preventDefault(); return false; }
+                        }, true);
                     }
                 }
 
