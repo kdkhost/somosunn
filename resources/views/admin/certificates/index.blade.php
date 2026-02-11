@@ -241,7 +241,8 @@
                 var downloadUrl = $(this).data('download');
 
                 // Use the view route which streams PDF inline
-                var pdfUrl = "{{ route('admin.certificates.view', ':hash') }}".replace(':hash', hash);
+                // Force regenerate to ensure styling changes (landscape) applied
+                var pdfUrl = "{{ route('admin.certificates.view', ':hash') }}".replace(':hash', hash) + "?regenerate=true";
 
                 $('#btnDownloadCert').attr('href', downloadUrl);
 

@@ -299,8 +299,8 @@ class CertificateController extends Controller
             }
         }
 
-        // If PDF doesn't exist, regenerate it automatically (for legacy certificates)
-        if (!$path) {
+        // If PDF doesn't exist OR regeneration is forced
+        if (!$path || request()->has('regenerate')) {
             $type = null;
             $id = null;
 
