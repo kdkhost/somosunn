@@ -92,6 +92,40 @@
                     </a>
                 </li>
 
+                @php
+                    $canMarketplaceSeller = auth()->user()->canSellOnMarketplace();
+                @endphp
+
+                @if($canMarketplaceSeller)
+                    <li class="nav-header">MARKETPLACE</li>
+                    <li class="nav-item has-treeview {{ $open('admin.marketplace.*') }}">
+                        <a href="#" class="nav-link {{ $is('admin.marketplace.*') }}">
+                            <i class="nav-icon fas fa-store"></i>
+                            <p>Marketplace<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.marketplace.index') }}" class="nav-link {{ $is('admin.marketplace.index') }}">
+                                    <i class="fas fa-chart-line nav-icon"></i>
+                                    <p>Painel</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.marketplace.payments') }}" class="nav-link {{ $is('admin.marketplace.payments') }}">
+                                    <i class="fas fa-credit-card nav-icon"></i>
+                                    <p>Pagamentos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.marketplace.sales') }}" class="nav-link {{ $is('admin.marketplace.sales') }}">
+                                    <i class="fas fa-receipt nav-icon"></i>
+                                    <p>Minhas vendas</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+
                 {{-- Menu para Membros --}}
                 {{-- Menu para Membros (Removido: Portal e Comunidade) --}}
 

@@ -48,13 +48,13 @@ class MarketplaceController extends Controller
         $canSellByUserId = [];
 
         foreach ($courses->pluck('creator')->filter()->unique('id') as $seller) {
-            $canSellByUserId[(int) $seller->id] = (bool) $seller->canAccessFeature('marketplace.sell');
+            $canSellByUserId[(int) $seller->id] = (bool) $seller->canSellOnMarketplace();
         }
         foreach ($mentorships->pluck('mentor')->filter()->unique('id') as $seller) {
-            $canSellByUserId[(int) $seller->id] = (bool) $seller->canAccessFeature('marketplace.sell');
+            $canSellByUserId[(int) $seller->id] = (bool) $seller->canSellOnMarketplace();
         }
         foreach ($events->pluck('user')->filter()->unique('id') as $seller) {
-            $canSellByUserId[(int) $seller->id] = (bool) $seller->canAccessFeature('marketplace.sell');
+            $canSellByUserId[(int) $seller->id] = (bool) $seller->canSellOnMarketplace();
         }
 
         return view('marketplace.index', compact(

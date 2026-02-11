@@ -453,7 +453,7 @@ class EventReservationController extends Controller
             return $this->resolveEventsGatewayAccount();
         }
 
-        if (!$seller->canAccessFeature('marketplace.sell')) {
+        if (!$seller->canSellOnMarketplace()) {
             return null;
         }
 

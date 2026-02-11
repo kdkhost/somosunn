@@ -358,10 +358,14 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
     });
 });
 
-// Payments & Checkout
-Route::middleware(['check.feature:marketplace.sell'])->group(function () {
-    Route::get('/settings/payment', [\App\Http\Controllers\GatewayAccountController::class, 'index'])->name('settings.payment');
-    Route::post('/settings/payment', [\App\Http\Controllers\GatewayAccountController::class, 'update'])->name('settings.payment.update');
+// Payments (legacy) - redireciona para o painel do marketplace (admin)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/settings/payment', function () {
+        return redirect()->route('admin.marketplace.payments');
+    })->name('settings.payment');
+    Route::post('/settings/payment', function () {
+        return redirect()->route('admin.marketplace.payments');
+    })->name('settings.payment.update');
 });
 
 Route::get('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show');
@@ -379,8 +383,12 @@ Route::post('/webhook/mercadopago/{seller_id}', [\App\Http\Controllers\PaymentWe
 Route::middleware(['check.feature:marketplace.buy'])->group(function () {
     Route::get('/marketplace', [\App\Http\Controllers\MarketplaceController::class, 'index'])->name('marketplace.index');
 });
-Route::middleware(['check.feature:marketplace.sales'])->group(function () {
-    Route::get('/marketplace/vendas', [\App\Http\Controllers\MarketplaceController::class, 'sales'])->name('marketplace.sales');
+
+// Marketplace (legado: vendas) - vendedores agora tratam tudo via painel admin
+Route::middleware(['auth'])->group(function () {
+    Route::get('/marketplace/vendas', function () {
+        return redirect()->route('admin.marketplace.sales');
+    })->name('marketplace.sales');
 });
 
 // Admin routes (granular)
@@ -405,6 +413,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     // Perfil (Acessível a membros para completar cadastro)
     Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+
+    // Marketplace (Painel do vendedor)
+    Route::prefix('marketplace')->name('marketplace.')->middleware('check.marketplace.seller')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\MarketplaceController::class, 'index'])->name('index');
+        Route::get('/pagamentos', [\App\Http\Controllers\Admin\MarketplaceController::class, 'payments'])->name('payments');
+        Route::post('/pagamentos', [\App\Http\Controllers\Admin\MarketplaceController::class, 'updatePayments'])->name('payments.update');
+        Route::get('/vendas', [\App\Http\Controllers\Admin\MarketplaceController::class, 'sales'])->name('sales');
+    });
 
     // Certificates (Acessível a Admin e Instrutores)
     Route::get('/certificates', [\App\Http\Controllers\Admin\CertificateController::class, 'index'])

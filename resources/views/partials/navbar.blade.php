@@ -132,15 +132,15 @@
                                     </a>
                                 @endif
 
-                                @if(Auth::user()->canAccessFeature('marketplace.sell'))
-                                    <a href="{{ route('settings.payment') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                @if(Auth::user()->canSellOnMarketplace())
+                                    <a href="{{ route('admin.marketplace.payments') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
                                         <i class="fas fa-credit-card w-5 opacity-70"></i>
                                         Configurar pagamentos
                                     </a>
                                 @endif
 
-                                @if(Auth::user()->canAccessFeature('marketplace.sales'))
-                                    <a href="{{ route('marketplace.sales') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                @if(Auth::user()->canSellOnMarketplace())
+                                    <a href="{{ route('admin.marketplace.sales') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
                                         <i class="fas fa-receipt w-5 opacity-70"></i>
                                         Minhas vendas
                                     </a>
@@ -235,14 +235,14 @@
                     </a>
                 @endif
 
-                @if(Auth::user()->canAccessFeature('marketplace.sell'))
-                    <a href="{{ route('settings.payment') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                @if(Auth::user()->canSellOnMarketplace())
+                    <a href="{{ route('admin.marketplace.payments') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                         <i class="fas fa-credit-card w-5 opacity-70"></i> Configurar pagamentos
                     </a>
                 @endif
 
-                @if(Auth::user()->canAccessFeature('marketplace.sales'))
-                    <a href="{{ route('marketplace.sales') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                @if(Auth::user()->canSellOnMarketplace())
+                    <a href="{{ route('admin.marketplace.sales') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                         <i class="fas fa-receipt w-5 opacity-70"></i> Minhas vendas
                     </a>
                 @endif

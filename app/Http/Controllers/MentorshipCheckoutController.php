@@ -23,7 +23,7 @@ class MentorshipCheckoutController extends Controller
         }
 
         $seller = $mentorship->mentor ?: User::find($mentorship->mentor_id);
-        if (!$seller || !$seller->canAccessFeature('marketplace.sell')) {
+        if (!$seller || !$seller->canSellOnMarketplace()) {
             return redirect()
                 ->route('mentorships.show', $mentorship)
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
@@ -49,7 +49,7 @@ class MentorshipCheckoutController extends Controller
         }
 
         $seller = $mentorship->mentor ?: User::find($mentorship->mentor_id);
-        if (!$seller || !$seller->canAccessFeature('marketplace.sell')) {
+        if (!$seller || !$seller->canSellOnMarketplace()) {
             return redirect()
                 ->route('mentorships.show', $mentorship)
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
@@ -157,4 +157,3 @@ class MentorshipCheckoutController extends Controller
         return back()->with('error', 'Gateway não suportado.');
     }
 }
-

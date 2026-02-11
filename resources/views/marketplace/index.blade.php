@@ -11,7 +11,7 @@
         $canSellByUserId = $canSellByUserId ?? [];
 
         $user = auth()->user();
-        $canSell = $user ? $user->canAccessFeature('marketplace.sell') : false;
+        $canSell = $user ? $user->canSellOnMarketplace() : false;
         $canBuy = $user ? $user->canAccessFeature('marketplace.buy') : false;
 
         $hasGateway = function (int $userId) use ($gatewayEnabledUserIds): bool {
@@ -84,11 +84,11 @@
                                             <div class="text-sm text-blue-800">Configure seu meio de cobrança e publique seus produtos digitais.</div>
                                         </div>
                                         <div class="flex flex-col sm:flex-row gap-2">
-                                            <a href="{{ route('settings.payment') }}"
+                                            <a href="{{ route('admin.marketplace.payments') }}"
                                                 class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white px-5 py-2.5 font-bold text-sm transition">
                                                 <i class="fas fa-credit-card"></i> Configurar pagamentos
                                             </a>
-                                            <a href="{{ route('admin.dashboard') }}"
+                                            <a href="{{ route('admin.marketplace.index') }}"
                                                 class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-blue-200 bg-white text-blue-800 px-5 py-2.5 font-bold text-sm hover:bg-blue-50 transition">
                                                 <i class="fas fa-chart-line"></i> Ir para o painel
                                             </a>
@@ -99,7 +99,7 @@
                                 <div class="rounded-2xl border border-slate-200 bg-white p-5">
                                     <div class="text-sm font-black text-slate-900">Venda no marketplace</div>
                                     <div class="text-sm text-slate-600">
-                                        Para vender, seu usuário precisa estar com a permissão <strong>marketplace.sell</strong> habilitada no seu plano ou liberada individualmente.
+                                        Para vender, seu usuário precisa estar habilitado como vendedor (instrutor/mentor/palestrante) no seu plano ou liberado individualmente.
                                     </div>
                                 </div>
                             @endif
@@ -116,9 +116,11 @@
                         <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Destaques</h2>
                         <p class="text-slate-600 mb-0">Alguns produtos e serviços disponíveis agora.</p>
                     </div>
-                    <a href="{{ route('marketplace.sales') }}" class="text-sm font-bold text-slate-600 hover:text-blue-700 transition">
-                        <i class="fas fa-receipt mr-1"></i> Minhas vendas
-                    </a>
+                    @if($canSell)
+                        <a href="{{ route('admin.marketplace.sales') }}" class="text-sm font-bold text-slate-600 hover:text-blue-700 transition">
+                            <i class="fas fa-receipt mr-1"></i> Minhas vendas
+                        </a>
+                    @endif
                 </div>
 
                 <div class="grid lg:grid-cols-3 gap-6">

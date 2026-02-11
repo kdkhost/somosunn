@@ -36,5 +36,6 @@ class Kernel extends HttpKernel
         'check.feature' => \App\Http\Middleware\CheckFeature::class,
         'check.connection' => \App\Http\Middleware\EnsureConnectionIsAccepted::class,
         'check.plan' => \App\Http\Middleware\EnsureUserHasActivePlan::class,
+        'check.marketplace.seller' => \App\Http\Middleware\CheckMarketplaceSeller::class,
     ];
 }

@@ -1,15 +1,27 @@
 @php
     $quickLinks = [];
 
-    if (auth()->check() && auth()->user()->isAdmin()) {
-        $quickLinks = [
-            ['label' => 'Configurações', 'icon' => 'fas fa-cogs', 'route' => route('admin.settings')],
-            ['label' => 'FAQ (Perguntas)', 'icon' => 'fas fa-question-circle', 'route' => route('admin.faqs.index')],
-            ['label' => 'Fontes (Site)', 'icon' => 'fas fa-font', 'route' => route('admin.fonts.index')],
-            ['label' => 'Cupons', 'icon' => 'fas fa-ticket-alt', 'route' => route('admin.coupons.index')],
-            ['label' => 'Vendas', 'icon' => 'fas fa-shopping-cart', 'route' => route('admin.orders.index')],
-            ['label' => 'Usuários', 'icon' => 'fas fa-users-cog', 'route' => route('admin.users.index')],
-        ];
+    if (auth()->check()) {
+        $user = auth()->user();
+
+        if ($user->isAdmin()) {
+            $quickLinks = [
+                ['label' => 'Configurações', 'icon' => 'fas fa-cogs', 'route' => route('admin.settings')],
+                ['label' => 'FAQ (Perguntas)', 'icon' => 'fas fa-question-circle', 'route' => route('admin.faqs.index')],
+                ['label' => 'Fontes (Site)', 'icon' => 'fas fa-font', 'route' => route('admin.fonts.index')],
+                ['label' => 'Cupons', 'icon' => 'fas fa-ticket-alt', 'route' => route('admin.coupons.index')],
+                ['label' => 'Vendas', 'icon' => 'fas fa-shopping-cart', 'route' => route('admin.orders.index')],
+                ['label' => 'Usuários', 'icon' => 'fas fa-users-cog', 'route' => route('admin.users.index')],
+            ];
+        }
+
+        $canMarketplaceSeller = $user->canSellOnMarketplace();
+
+        if ($canMarketplaceSeller) {
+            $quickLinks[] = ['label' => 'Marketplace', 'icon' => 'fas fa-store', 'route' => route('admin.marketplace.index')];
+            $quickLinks[] = ['label' => 'Pagamentos', 'icon' => 'fas fa-credit-card', 'route' => route('admin.marketplace.payments')];
+            $quickLinks[] = ['label' => 'Minhas vendas', 'icon' => 'fas fa-receipt', 'route' => route('admin.marketplace.sales')];
+        }
     }
 @endphp
 

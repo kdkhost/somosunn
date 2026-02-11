@@ -23,7 +23,7 @@ class CheckoutController extends Controller
         }
 
         $seller = $course->creator ?: User::find($course->user_id);
-        if (!$seller || !$seller->canAccessFeature('marketplace.sell')) {
+        if (!$seller || !$seller->canSellOnMarketplace()) {
             return redirect()
                 ->route('courses.show', $course->slug ?: $course->id)
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
@@ -49,7 +49,7 @@ class CheckoutController extends Controller
         }
 
         $seller = $course->creator ?: User::find($course->user_id);
-        if (!$seller || !$seller->canAccessFeature('marketplace.sell')) {
+        if (!$seller || !$seller->canSellOnMarketplace()) {
             return redirect()
                 ->route('courses.show', $course->slug ?: $course->id)
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
@@ -155,4 +155,3 @@ class CheckoutController extends Controller
         return back()->with('error', 'Gateway não suportado.');
     }
 }
-
