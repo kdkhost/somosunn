@@ -35,11 +35,11 @@
 
             .container {
                 max-width: 100%;
-                max-height: 70vh;
+                max-height: 100%;
                 width: auto !important;
                 height: auto !important;
                 aspect-ratio: 1122 / 793;
-                box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
                 transform-origin: center;
             }
         }

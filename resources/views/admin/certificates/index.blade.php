@@ -159,31 +159,34 @@
         </div>
     </div>
 
-    <!-- Modal Visualização -->
-    <div class="modal fade" id="modalViewCert" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
+    <!-- Certificate Preview Modal -->
+    <div class="modal fade" id="certificateModal" tabindex="-1" role="dialog" aria-labelledby="certificateModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document" style="max-width: 95vw;">
             <div class="modal-content">
-                <div class="modal-header bg-dark">
-                    <h5 class="modal-title text-white"><i class="fas fa-certificate mr-2"></i> Visualizar Certificado</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="certificateModalLabel">
+                        <i class="fas fa-certificate mr-2"></i> Visualizar Certificado
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-            </div>
-            <div class="modal-body p-0" style="background: #f5f5f5; overflow: auto; max-height: 80vh;">
-                <div id="certPreviewContainer"
-                    style="width: 100%; padding: 20px; display: flex; justify-content: center; align-items: center;">
-                    <!-- Certificate HTML will be loaded here -->
+                <div class="modal-body p-0"
+                    style="background: #f5f5f5; height: 80vh; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    <div id="certPreviewContainer"
+                        style="width: 100%; padding: 20px; display: flex; justify-content: center; align-items: center;">
+                        <!-- Certificate HTML will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <a id="btnDownloadCert" href="#" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-download mr-1"></i> Baixar PDF
+                    </a>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                <a id="btnDownloadCert" href="#" class="btn btn-primary" target="_blank">
-                    <i class="fas fa-download mr-1"></i> Baixar PDF
-                </a>
-            </div>
         </div>
-    </div>
     </div>
 @endsection
 
