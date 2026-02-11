@@ -19,26 +19,27 @@
             overflow: hidden;
         }
 
-        /* Web Preview Scaling */
+        /* Web Preview Scaling - Fit like image in container */
         @media screen {
             body {
                 width: 100%;
-                height: auto;
+                height: 100%;
                 background: transparent;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 padding: 0;
-                overflow: visible;
+                margin: 0;
+                overflow: hidden;
             }
 
             .container {
                 max-width: 100%;
-                max-height: 70vh;
+                max-height: 65vh;
                 width: auto !important;
                 height: auto !important;
                 aspect-ratio: 1122 / 793;
-                box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
                 transform-origin: center;
             }
         }
@@ -109,21 +110,21 @@
             @continue(!is_array($style))
 
             <div class="element" style="
-                        left: {{ $style['x'] }}%;
-                        top: {{ $style['y'] }}%;
-                        font-size: {{ $style['fontSize'] }}px;
-                        color: {{ $style['color'] }};
-                        font-weight: {{ $style['fontWeight'] }};
-                        font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
-                        transform: translate(-50%, -50%); /* Center based on coords */
-                        z-index: {{ $style['zIndex'] ?? 10 }};
-                    ">
+                            left: {{ $style['x'] }}%;
+                            top: {{ $style['y'] }}%;
+                            font-size: {{ $style['fontSize'] }}px;
+                            color: {{ $style['color'] }};
+                            font-weight: {{ $style['fontWeight'] }};
+                            font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
+                            transform: translate(-50%, -50%); /* Center based on coords */
+                            z-index: {{ $style['zIndex'] ?? 10 }};
+                        ">
                 {{ $dataMap[$key] ?? '' }}
             </div>
         @endforeach
 
         @php 
-                                        $logoStyle = $settings['platform_logo'];
+                                                    $logoStyle = $settings['platform_logo'];
 
             // Use the same logic as Auth Visual component
             $logoPath = \App\Models\Setting::get('logo_auth') ?: \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
@@ -144,11 +145,12 @@
             left: {{ $logoStyle['x'] }}%;
             top: {{ $logoStyle['y'] }}%;
         width: {{ $logoStyle['width'] ?? 120 }}px;
-            height: {{ $logoStyle['height'] ?? 60 }}px;
-            transform: translate(-50%, -50%);
-                z-index: {{ $logoStyle['zIndex'] ?? 20 }};
+        height: {{ $logoStyle['height'] ?? 60 }}px;
+        transform: translate(-50%, -50%);
+            z-index: {{ $logoStyle['zIndex'] ?? 20 }};
        
      ">
+
 
                 <img src="{{ $logoUrl }}" style="width: 100%; height: 100%; object-fit: contain;">
             </div>
