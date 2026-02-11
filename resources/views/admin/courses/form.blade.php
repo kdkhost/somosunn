@@ -479,7 +479,7 @@
                                     @method('PUT')
 
                                     <div class="row">
-                                        <div class="col-xl-9 col-lg-8">
+                                        <div class="col-xl-7 col-lg-8">
                                             <!-- CANVAS AREA -->
                                             <div class="card shadow-sm border-0">
                                                 <div class="card-header bg-secondary text-white small py-2">
@@ -496,6 +496,9 @@
                                                                     <option value="1" selected>100%</option>
                                                                     <option value="1.25">125%</option>
                                                                     <option value="1.5">150%</option>
+                                                                    <option value="2">200%</option>
+                                                                    <option value="2.5">250%</option>
+                                                                    <option value="3">300%</option>
                                                                 </select>
                                                                 <div class="input-group-append">
                                                                     <button type="button" class="btn btn-outline-light" id="cert-fit">
@@ -540,10 +543,12 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-xl-3 col-lg-4">
+                                        <div class="col-xl-5 col-lg-4">
                                             <div class="card shadow-sm border-0">
                                                 <div class="card-header bg-dark text-white font-weight-bold">Configurações</div>
                                                 <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-12 col-xl-6">
 
                                                     {{-- O switch foi movido para a barra lateral "Publicação" --}}
                                                     <input type="hidden" name="is_certificate_enabled"
@@ -679,10 +684,13 @@
                                                             automaticamente)</small>
                                                     </div>
 
-                                                    <hr>
+                                                        </div>
 
-                                                    <h6 class="small text-muted text-uppercase font-weight-bold mb-3">Elementos
-                                                        Visíveis</h6>
+                                                        <div class="col-12 col-xl-6 mt-3 mt-xl-0">
+                                                            <hr class="d-xl-none">
+
+                                                            <h6 class="small text-muted text-uppercase font-weight-bold mb-3">Elementos
+                                                                Visíveis</h6>
                                                     <div class="list-group mb-3" id="cert-available-tags">
                                                         <!-- Checkboxes to toggle visibility of elements -->
                                                         <div class="list-group-item p-2 border-0">
@@ -853,10 +861,11 @@
                                                         </div>
                                                     </div>
 
-                                                    <input type="hidden" name="certificate_settings"
-                                                        id="certificate_settings_input">
-                                                    <button type="submit" class="btn btn-primary btn-block mt-4"
-                                                        id="btn-save-cert">
+                                                        </div>
+                                                    </div>
+
+                                                    <input type="hidden" name="certificate_settings" id="certificate_settings_input">
+                                                    <button type="submit" class="btn btn-primary btn-block mt-4" id="btn-save-cert">
                                                         <i class="fas fa-save mr-1"></i> Salvar Certificado
                                                     </button>
                                                 </div>
@@ -1591,10 +1600,10 @@
             const tagLabels = {
                 'student_name': 'Nome do Aluno',
                 'course_name': 'Nome do Curso',
-                'completion_date': 'Data de ConclusÃ£o',
-                'certificate_code': 'CÃ³digo de ValidaÃ§Ã£o',
+                'completion_date': 'Data de Conclusão',
+                'certificate_code': 'Código de Validação',
                 'author_name': 'Nome do Autor',
-                'workload_hours': 'Carga HorÃ¡ria',
+                'workload_hours': 'Carga Horária',
                 'platform_logo': 'Logo da Plataforma'
             };
 
@@ -1653,6 +1662,20 @@
                 fitCanvas();
             });
             applyZoom(parseFloat($('#cert-zoom').val()) || 1);
+
+            function scheduleFitCanvas() {
+                setTimeout(function () {
+                    const $tab = $('#certificate');
+                    if ($tab.length && ($tab.hasClass('active') || $tab.hasClass('show'))) {
+                        fitCanvas();
+                    }
+                }, 50);
+            }
+
+            $('a[data-toggle="tab"][href="#certificate"]').on('shown.bs.tab', function () {
+                scheduleFitCanvas();
+            });
+            scheduleFitCanvas();
 
             function applyBackgroundFit() {
                 const fit = ($('#cert-bg-fit').val() || 'cover') === 'stretch' ? 'fill' : 'cover';

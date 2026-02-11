@@ -173,7 +173,7 @@
                             @method('PUT')
 
                             <div class="row">
-                                <div class="col-xl-9 col-lg-8">
+                                <div class="col-xl-7 col-lg-8">
                                     <div class="card shadow-sm border-0">
                                         <div class="card-header bg-secondary text-white small py-2">
                                             <div class="d-flex flex-wrap align-items-center justify-content-between">
@@ -189,6 +189,9 @@
                                                             <option value="1" selected>100%</option>
                                                             <option value="1.25">125%</option>
                                                             <option value="1.5">150%</option>
+                                                            <option value="2">200%</option>
+                                                            <option value="2.5">250%</option>
+                                                            <option value="3">300%</option>
                                                         </select>
                                                         <div class="input-group-append">
                                                             <button type="button" class="btn btn-outline-light" id="cert-fit">
@@ -227,10 +230,12 @@
                                     </div>
                                 </div>
 
-                                <div class="col-xl-3 col-lg-4">
+                                <div class="col-xl-5 col-lg-4">
                                     <div class="card shadow-sm border-0">
                                         <div class="card-header bg-dark text-white font-weight-bold">Configurações</div>
                                         <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-12 col-xl-6">
                                             <div class="form-group custom-control custom-switch mb-4">
                                                 <input type="checkbox" class="custom-control-input" id="is_certificate_enabled"
                                                     name="is_certificate_enabled" value="1" {{ $mentorship->is_certificate_enabled ? 'checked' : '' }}>
@@ -319,7 +324,12 @@
                                                 </div>
                                             </div>
 
-                                            <h6 class="small text-muted text-uppercase font-weight-bold mb-2">Camadas</h6>
+                                                </div>
+
+                                                <div class="col-12 col-xl-6 mt-3 mt-xl-0">
+                                                    <hr class="d-xl-none">
+
+                                                    <h6 class="small text-muted text-uppercase font-weight-bold mb-2">Camadas</h6>
                                             <div class="list-group mb-3" id="cert-layers"></div>
 
                                             <div id="cert-style-controls" style="display:none;">
@@ -407,6 +417,9 @@
                                                             </div>
                                                         </div>
                                                     @endforeach
+                                                </div>
+                                            </div>
+
                                                 </div>
                                             </div>
 
@@ -572,6 +585,20 @@
                 fitCanvas();
             });
             applyZoom(parseFloat($('#cert-zoom').val()) || 1);
+
+            function scheduleFitCanvas() {
+                setTimeout(function () {
+                    const $tab = $('#certificate');
+                    if ($tab.length && ($tab.hasClass('active') || $tab.hasClass('show'))) {
+                        fitCanvas();
+                    }
+                }, 50);
+            }
+
+            $('a[data-toggle="tab"][href="#certificate"]').on('shown.bs.tab', function () {
+                scheduleFitCanvas();
+            });
+            scheduleFitCanvas();
 
             function applyBackgroundFit() {
                 const fit = ($('#cert-bg-fit').val() || 'cover') === 'stretch' ? 'fill' : 'cover';
