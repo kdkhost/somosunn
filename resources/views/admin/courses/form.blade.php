@@ -1629,18 +1629,21 @@
                 'platform_logo': { x: 50, y: 10, text: 'LOGO UNN', fontSize: 36, color: '#0066cc', fontWeight: 'bold', fontFamily: 'Georgia, serif', width: 120, height: 60, mandatory: true, zIndex: 20 }
             };
 
-            const tagLabels = @json([
-                'student_name' => 'Nome do Aluno',
-                'course_name' => 'Nome do Curso',
-                'completion_date' => 'Data de Conclusão',
-                'certificate_code' => 'Código de Validação',
-                'author_name' => 'Nome do Autor',
-                'workload_hours' => 'Carga Horária',
-                'title' => 'Título do Certificado',
-                'presentation_text' => 'Texto de Apresentação',
-                'instructor_signature' => 'Assinatura do Instrutor',
-                'platform_logo' => 'Logo da Plataforma',
-            ]);
+            @php
+                $certificateTagLabels = [
+                    'student_name' => 'Nome do Aluno',
+                    'course_name' => 'Nome do Curso',
+                    'completion_date' => 'Data de Conclusão',
+                    'certificate_code' => 'Código de Validação',
+                    'author_name' => 'Nome do Autor',
+                    'workload_hours' => 'Carga Horária',
+                    'title' => 'Título do Certificado',
+                    'presentation_text' => 'Texto de Apresentação',
+                    'instructor_signature' => 'Assinatura do Instrutor',
+                    'platform_logo' => 'Logo da Plataforma',
+                ];
+            @endphp
+            const tagLabels = @json($certificateTagLabels);
 
             // Merge defaults
             $.each(defaultTags, function (key, val) {

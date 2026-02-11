@@ -579,18 +579,21 @@
                 'platform_logo': { x: 50, y: 10, text: 'LOGO', fontSize: 36, color: '#0066cc', fontWeight: 'bold', fontFamily: 'Georgia, serif', width: 120, height: 60, mandatory: true, zIndex: 20 }
             };
 
-            const tagLabels = @json([
-                'student_name' => 'Nome do Aluno',
-                'course_name' => 'Nome da Mentoria',
-                'completion_date' => 'Data Conclusão',
-                'certificate_code' => 'Cód. Validação',
-                'author_name' => 'Nome do Mentor',
-                'workload_hours' => 'Horas',
-                'title' => 'Título do Certificado',
-                'presentation_text' => 'Texto de Apresentação',
-                'instructor_signature' => 'Assinatura do Mentor',
-                'platform_logo' => 'Logo da Plataforma',
-            ]);
+            @php
+                $certificateTagLabels = [
+                    'student_name' => 'Nome do Aluno',
+                    'course_name' => 'Nome da Mentoria',
+                    'completion_date' => 'Data Conclusão',
+                    'certificate_code' => 'Cód. Validação',
+                    'author_name' => 'Nome do Mentor',
+                    'workload_hours' => 'Horas',
+                    'title' => 'Título do Certificado',
+                    'presentation_text' => 'Texto de Apresentação',
+                    'instructor_signature' => 'Assinatura do Mentor',
+                    'platform_logo' => 'Logo da Plataforma',
+                ];
+            @endphp
+            const tagLabels = @json($certificateTagLabels);
 
             $.each(defaultTags, function (key, val) {
                 if (!certSettings[key]) {
