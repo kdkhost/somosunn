@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CertificateIssued;
+use App\Services\Certificate\CertificateFontCssGenerator;
 
 class CertificateController extends Controller
 {
@@ -231,10 +232,25 @@ class CertificateController extends Controller
         }
 
         // Configure DomPDF
+        $dompdfStorageDir = storage_path('app/dompdf');
+        $fontDir = $dompdfStorageDir . DIRECTORY_SEPARATOR . 'fonts';
+        $fontCache = $dompdfStorageDir . DIRECTORY_SEPARATOR . 'font-cache';
+        $tempDir = $dompdfStorageDir . DIRECTORY_SEPARATOR . 'tmp';
+
+        foreach ([$fontDir, $fontCache, $tempDir] as $dir) {
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0775, true);
+            }
+        }
+
         $options = new Options();
         $options->set('isRemoteEnabled', true); // Allow remote images (http/https)
         $options->set('isHtml5ParserEnabled', true);
         $options->set('chroot', public_path()); // Allow access to public folder
+        $options->set('dpi', 72); // Align pixels with editor canvas (842x595)
+        $options->set('fontDir', $fontDir);
+        $options->set('fontCache', $fontCache);
+        $options->set('tempDir', $tempDir);
 
         $dompdf = new Dompdf($options);
 
@@ -243,6 +259,8 @@ class CertificateController extends Controller
             $product->certificate_bg = str_replace('\\', '/', $product->certificate_bg);
         }
 
+        $fontCss = app(CertificateFontCssGenerator::class)->buildFontCss($product->certificate_settings ?? [], false);
+
         $html = view('admin.certificates.template', [
             'user' => $user,
             'course' => $product, // $product is passed as $course to the view
@@ -250,6 +268,7 @@ class CertificateController extends Controller
             'authorName' => $authorName,
             'workload' => $workload,
             'type' => $type,
+            'fontCss' => $fontCss,
             'isPreview' => false // Explicitly set for PDF generation
         ])->render();
 
@@ -387,6 +406,8 @@ class CertificateController extends Controller
             $workload = $cert->workload > 0 ? $cert->workload : ($product->duration_hours ?? 0);
         }
 
+        $fontCss = app(CertificateFontCssGenerator::class)->buildFontCss($product->certificate_settings ?? [], true);
+
         return view('admin.certificates.template', [
             'user' => $user,
             'course' => $product,
@@ -394,6 +415,7 @@ class CertificateController extends Controller
             'authorName' => $authorName,
             'workload' => $workload,
             'type' => $type,
+            'fontCss' => $fontCss,
             'isPreview' => true
         ]);
     }

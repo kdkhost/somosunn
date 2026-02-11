@@ -482,8 +482,29 @@
                                         <div class="col-xl-9 col-lg-8">
                                             <!-- CANVAS AREA -->
                                             <div class="card shadow-sm border-0">
-                                                <div class="card-header bg-secondary text-white small py-1">
-                                                    Editor Visual (A4 Paisagem)
+                                                <div class="card-header bg-secondary text-white small py-2">
+                                                    <div class="d-flex flex-wrap align-items-center justify-content-between">
+                                                        <span>Editor Visual (A4 Paisagem)</span>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="input-group input-group-sm" style="width: 220px;">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">Zoom</span>
+                                                                </div>
+                                                                <select id="cert-zoom" class="custom-select custom-select-sm">
+                                                                    <option value="0.5">50%</option>
+                                                                    <option value="0.75">75%</option>
+                                                                    <option value="1" selected>100%</option>
+                                                                    <option value="1.25">125%</option>
+                                                                    <option value="1.5">150%</option>
+                                                                </select>
+                                                                <div class="input-group-append">
+                                                                    <button type="button" class="btn btn-outline-light" id="cert-fit">
+                                                                        Fit
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="card-body bg-dark d-flex justify-content-center align-items-center p-4"
                                                     style="min-height: 600px; overflow: auto;">
@@ -502,13 +523,17 @@
                                                                     <p class="small">Faça upload no painel lateral</p>
                                                                 </div>
                                                             </div>
-                                                        @endif
+                                                         @endif
 
-                                                        <!-- Draggable Container z-index 10 -->
-                                                        <div id="cert-elements-layer"
-                                                            style="position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10;">
-                                                            <!-- Elements will be injected here via JS -->
-                                                        </div>
+                                                        <!-- Grid Overlay (optional) -->
+                                                        <div id="cert-grid-overlay"
+                                                            style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:5; pointer-events:none; display:none;"></div>
+
+                                                         <!-- Draggable Container z-index 10 -->
+                                                         <div id="cert-elements-layer"
+                                                             style="position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10;">
+                                                             <!-- Elements will be injected here via JS -->
+                                                         </div>
                                                     </div>
 
                                                 </div>
@@ -534,6 +559,61 @@
                                                             <label class="custom-file-label">Escolher arquivo</label>
                                                         </div>
                                                         <small class="text-muted">Recomendado: 1920x1080px (PNG/JPG)</small>
+                                                    </div>
+
+
+                                                    <div class="form-group">
+                                                        <label class="small text-muted text-uppercase font-weight-bold">Ajuste do Fundo</label>
+                                                        <select id="cert-bg-fit" class="form-control form-control-sm">
+                                                            <option value="cover">Cover (cortar)</option>
+                                                            <option value="stretch">Stretch (esticar)</option>
+                                                        </select>
+                                                        <small class="text-muted">Mantém consistência entre editor e PDF</small>
+                                                    </div>
+
+                                                    <div class="border rounded p-2 mb-3 bg-light">
+                                                        <div class="small text-muted text-uppercase font-weight-bold mb-2">Ferramentas</div>
+
+                                                        <div class="custom-control custom-switch mb-2">
+                                                            <input type="checkbox" class="custom-control-input" id="cert-grid-enabled">
+                                                            <label class="custom-control-label" for="cert-grid-enabled">Mostrar grade</label>
+                                                        </div>
+
+                                                        <div class="form-group mb-2">
+                                                            <label class="small text-muted mb-0">Passo da grade</label>
+                                                            <select id="cert-grid-step" class="form-control form-control-sm">
+                                                                <option value="1">1%</option>
+                                                                <option value="2">2%</option>
+                                                                <option value="5" selected>5%</option>
+                                                                <option value="10">10%</option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="custom-control custom-switch mb-2">
+                                                            <input type="checkbox" class="custom-control-input" id="cert-snap-enabled" checked>
+                                                            <label class="custom-control-label" for="cert-snap-enabled">Snap na grade</label>
+                                                        </div>
+
+                                                        <div class="form-group mb-2">
+                                                            <label class="small text-muted mb-0">Passo do snap</label>
+                                                            <select id="cert-snap-step" class="form-control form-control-sm">
+                                                                <option value="0.25">0,25%</option>
+                                                                <option value="0.5">0,5%</option>
+                                                                <option value="1" selected>1%</option>
+                                                                <option value="2">2%</option>
+                                                                <option value="5">5%</option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="form-group mb-0">
+                                                            <label class="small text-muted mb-0">Nudge (setas)</label>
+                                                            <select id="cert-nudge-step" class="form-control form-control-sm">
+                                                                <option value="0.1">0,1%</option>
+                                                                <option value="0.25">0,25%</option>
+                                                                <option value="0.5" selected>0,5%</option>
+                                                                <option value="1">1%</option>
+                                                            </select>
+                                                        </div>
                                                     </div>
 
                                                     <div class="form-group">
@@ -689,11 +769,39 @@
                                                         </div>
                                                     </div>
 
+                                                    <hr>
+
+                                                    <h6 class="small text-muted text-uppercase font-weight-bold mb-3">Camadas</h6>
+                                                    <div class="list-group mb-3" id="cert-layers"></div>
+
                                                     <div id="cert-style-controls" style="display:none;"
                                                         class="bg-light p-3 rounded border">
                                                         <h6 class="font-weight-bold mb-3" style="font-size: 0.9rem;">Editar:
                                                             <span id="selected-elem-name" class="text-primary"></span>
                                                         </h6>
+
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                <div class="form-group mb-2">
+                                                                    <label class="small text-muted mb-0">X (%)</label>
+                                                                    <input type="number" id="style-x"
+                                                                        class="form-control form-control-sm" step="0.1">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <div class="form-group mb-2">
+                                                                    <label class="small text-muted mb-0">Y (%)</label>
+                                                                    <input type="number" id="style-y"
+                                                                        class="form-control form-control-sm" step="0.1">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="custom-control custom-switch mb-2">
+                                                            <input type="checkbox" class="custom-control-input" id="style-locked">
+                                                            <label class="custom-control-label" for="style-locked">Bloquear
+                                                                elemento</label>
+                                                        </div>
 
                                                         <div class="form-group mb-2">
                                                             <label class="small text-muted mb-0">Fonte</label>
@@ -1419,8 +1527,48 @@
         $(document).ready(function () {
             if ('{{ $course->exists }}' == '') return;
 
-            // Initial Settings from DB (or defaults)
-            let certSettings = {!! $course->certificate_settings ? json_encode($course->certificate_settings) : '{}' !!};
+            // Initial Settings from DB (legacy map or schema v2 document)
+            let rawCertSettings = {!! $course->certificate_settings ? json_encode($course->certificate_settings) : '{}' !!};
+
+            const isSchemaV2 = rawCertSettings && rawCertSettings.schemaVersion === 2 && rawCertSettings.elements;
+            let certDoc = isSchemaV2 ? rawCertSettings : { schemaVersion: 2, meta: {}, elements: {} };
+            certDoc.meta = certDoc.meta || {};
+            certDoc.elements = certDoc.elements || {};
+            certDoc.schemaVersion = 2;
+
+            // Legacy meta extraction (v1)
+            if (!isSchemaV2) {
+                if (rawCertSettings && typeof rawCertSettings.backgroundFit === 'string') {
+                    certDoc.meta.backgroundFit = rawCertSettings.backgroundFit;
+                }
+                if (rawCertSettings && typeof rawCertSettings.custom_title === 'string') {
+                    certDoc.meta.titleText = rawCertSettings.custom_title;
+                }
+                if (rawCertSettings && typeof rawCertSettings.title === 'string') {
+                    certDoc.meta.titleText = rawCertSettings.title;
+                }
+                if (rawCertSettings && typeof rawCertSettings.custom_presentation_text === 'string') {
+                    certDoc.meta.presentationText = rawCertSettings.custom_presentation_text;
+                }
+                if (rawCertSettings && typeof rawCertSettings.presentation_text === 'string') {
+                    certDoc.meta.presentationText = rawCertSettings.presentation_text;
+                }
+
+                // Copy legacy elements (arrays with x/y)
+                if (rawCertSettings && typeof rawCertSettings === 'object') {
+                    Object.keys(rawCertSettings).forEach((k) => {
+                        const v = rawCertSettings[k];
+                        if (v && typeof v === 'object' && v.x !== undefined && v.y !== undefined) {
+                            certDoc.elements[k] = v;
+                        }
+                    });
+                }
+            }
+
+            certDoc.meta.backgroundFit = certDoc.meta.backgroundFit || 'cover';
+
+            // Working map for elements (v1-compatible)
+            let certSettings = certDoc.elements;
 
             // Get Logo URL from PHP
             @php
@@ -1440,6 +1588,16 @@
                 'platform_logo': { x: 50, y: 10, text: 'LOGO UNN', fontSize: 36, color: '#0066cc', fontWeight: 'bold', fontFamily: 'Georgia, serif', width: 120, height: 60, mandatory: true, zIndex: 20 }
             };
 
+            const tagLabels = {
+                'student_name': 'Nome do Aluno',
+                'course_name': 'Nome do Curso',
+                'completion_date': 'Data de ConclusÃ£o',
+                'certificate_code': 'CÃ³digo de ValidaÃ§Ã£o',
+                'author_name': 'Nome do Autor',
+                'workload_hours': 'Carga HorÃ¡ria',
+                'platform_logo': 'Logo da Plataforma'
+            };
+
             // Merge defaults
             $.each(defaultTags, function (key, val) {
                 if (!certSettings[key]) {
@@ -1447,9 +1605,88 @@
                 }
             });
 
+            // Ensure deterministic defaults for v2 fields (without changing x/y)
+            $.each(certSettings, function (key, data) {
+                if (!data || typeof data !== 'object') return;
+                if (data.visible === undefined) data.visible = true;
+                if (data.locked === undefined) data.locked = false;
+                if (data.zIndex === undefined) data.zIndex = (key === 'platform_logo') ? 20 : 10;
+            });
+            if (certSettings['platform_logo']) {
+                certSettings['platform_logo'].mandatory = true;
+                certSettings['platform_logo'].visible = true;
+            }
+
             const $canvas = $('#cert-elements-layer');
             let activeElementId = null;
             let customFonts = [];
+            const BASE_W = 842;
+            const BASE_H = 595;
+
+            function applyZoom(zoom) {
+                const z = Math.max(0.25, Math.min(zoom || 1, 3));
+                $('#cert-canvas').css({
+                    width: (BASE_W * z) + 'px',
+                    height: (BASE_H * z) + 'px'
+                });
+            }
+
+            function fitCanvas() {
+                const $wrap = $('#cert-canvas').parent();
+                const availW = $wrap.width() - 20;
+                const availH = $wrap.height() - 20;
+                const target = Math.max(0.25, Math.min(availW / BASE_W, availH / BASE_H));
+
+                const opts = $('#cert-zoom option').map(function () { return parseFloat($(this).val()); }).get();
+                let nearest = opts[0] || 1;
+                opts.forEach(function (v) {
+                    if (Math.abs(v - target) < Math.abs(nearest - target)) nearest = v;
+                });
+
+                $('#cert-zoom').val(nearest.toString()).trigger('change');
+            }
+
+            $('#cert-zoom').on('change', function () {
+                applyZoom(parseFloat($(this).val()));
+            });
+            $('#cert-fit').on('click', function () {
+                fitCanvas();
+            });
+            applyZoom(parseFloat($('#cert-zoom').val()) || 1);
+
+            function applyBackgroundFit() {
+                const fit = ($('#cert-bg-fit').val() || 'cover') === 'stretch' ? 'fill' : 'cover';
+                $('#cert-bg-img').css('object-fit', fit);
+            }
+
+            $('#cert-bg-fit').val((certDoc.meta && certDoc.meta.backgroundFit) ? certDoc.meta.backgroundFit : 'cover');
+            $('#cert-bg-fit').on('change', function () {
+                certDoc.meta.backgroundFit = $(this).val() || 'cover';
+                applyBackgroundFit();
+            });
+            applyBackgroundFit();
+
+            function updateGridOverlay() {
+                const enabled = $('#cert-grid-enabled').is(':checked');
+                const step = parseFloat($('#cert-grid-step').val()) || 5;
+                const $grid = $('#cert-grid-overlay');
+
+                if (!enabled) {
+                    $grid.hide();
+                    return;
+                }
+
+                $grid.show().css({
+                    backgroundImage:
+                        'linear-gradient(to right, rgba(0, 123, 255, 0.25) 1px, transparent 1px), ' +
+                        'linear-gradient(to bottom, rgba(0, 123, 255, 0.25) 1px, transparent 1px)',
+                    backgroundSize: step + '% ' + step + '%'
+                });
+            }
+
+            $('#cert-grid-enabled').on('change', updateGridOverlay);
+            $('#cert-grid-step').on('change', updateGridOverlay);
+            updateGridOverlay();
 
             // Load Custom Fonts
             $.ajax({
@@ -1475,12 +1712,56 @@
             });
 
 
+            function updateLayersList() {
+                const $list = $('#cert-layers');
+                if (!$list.length) return;
+
+                $list.empty();
+
+                const items = Object.keys(certSettings)
+                    .filter((k) => certSettings[k] && typeof certSettings[k] === 'object' && certSettings[k].x !== undefined && certSettings[k].y !== undefined)
+                    .map((k) => {
+                        const z = (certSettings[k].zIndex !== undefined) ? parseInt(certSettings[k].zIndex) : (k === 'platform_logo' ? 20 : 10);
+                        const visible = (k === 'platform_logo') ? true : (certSettings[k].visible !== false);
+                        const locked = !!certSettings[k].locked;
+                        return { key: k, zIndex: isNaN(z) ? 10 : z, visible, locked };
+                    })
+                    .sort((a, b) => (b.zIndex - a.zIndex));
+
+                items.forEach((item) => {
+                    const label = tagLabels[item.key] || item.key;
+                    const $btn = $('<button type="button">')
+                        .addClass('list-group-item list-group-item-action py-1 px-2 d-flex align-items-center justify-content-between')
+                        .toggleClass('active', activeElementId === item.key);
+
+                    const $left = $('<span>').addClass('text-truncate').text(label);
+                    const $right = $('<span>').addClass('d-flex align-items-center');
+
+                    if (item.key !== 'platform_logo' && !item.visible) {
+                        $right.append($('<span>').addClass('badge badge-secondary mr-1').text('Oculto'));
+                    }
+                    if (item.locked) {
+                        $right.append($('<span>').addClass('badge badge-warning mr-1').text('Lock'));
+                    }
+
+                    $right.append($('<span>').addClass('badge badge-light border').text('z:' + item.zIndex));
+
+                    $btn.append($left).append($right);
+                    $btn.on('click', function () {
+                        $('#el-' + item.key).trigger('mousedown');
+                    });
+
+                    $list.append($btn);
+                });
+            }
+
             // Render Elements
             function renderElements() {
                 $canvas.empty();
                 $.each(certSettings, function (key, data) {
                     // Check visibility based on toggle switch
                     // Only render if we assume it's visible or handle visibility via CSS
+                    if (!data || typeof data !== 'object' || data.x === undefined || data.y === undefined) return;
 
                     // Create Element
                     let $el = $('<div>')
@@ -1491,12 +1772,12 @@
                             position: 'absolute',
                             left: data.x + '%',
                             top: data.y + '%',
-                            transform: 'translate(-50%, -50%)', // Center based on coords
                             fontSize: data.fontSize + 'px',
                             color: data.color,
                             fontWeight: data.fontWeight,
                             fontFamily: data.fontFamily || 'Arial, sans-serif',
-                            cursor: 'move',
+                            cursor: data.locked ? 'not-allowed' : 'move',
+                            display: (key !== 'platform_logo' && data.visible === false) ? 'none' : 'block',
                             whiteSpace: 'nowrap',
                             border: '1px dashed transparent',
                             padding: '5px',
@@ -1527,15 +1808,19 @@
                         // Populate Tools
                         // For logo, we might want to hide text input or font controls?
                         // For now keep it simple.
-                        $('#selected-elem-name').text(key === 'platform_logo' ? 'Logo da Plataforma' : data.text);
+                        $('#selected-elem-name').text(tagLabels[key] || data.text || key);
                         // If logo, switch context of tools if needed, but for now just show standard
 
+                        $('#style-x').val(parseFloat(data.x ?? 0).toFixed(2));
+                        $('#style-y').val(parseFloat(data.y ?? 0).toFixed(2));
+                        $('#style-locked').prop('checked', !!data.locked);
                         $('#style-font-size').val(data.fontSize);
                         $('#style-z-index').val(data.zIndex || 10);
                         $('#style-color').val(data.color);
                         $('#style-font-weight').val(data.fontWeight);
                         $('#style-font-family').val(data.fontFamily || 'Arial, sans-serif');
                         $('#cert-style-controls').show();
+                        updateLayersList();
 
                         e.stopPropagation();
                     });
@@ -1546,6 +1831,7 @@
                     if (key === 'platform_logo') {
                         $el.resizable({
                             aspectRatio: false, // User requested free resize ("quadrado x retangulo")
+                            disabled: !!data.locked,
                             handles: 'n, e, s, w, ne, se, sw, nw',
                             stop: function (event, ui) {
                                 let w = ui.size.width;
@@ -1569,6 +1855,12 @@
                 $('.cert-element').draggable({
                     containment: false, // Allow dragging outside
                     scroll: false,
+                    start: function () {
+                        let key = $(this).data('tag');
+                        if (certSettings[key] && certSettings[key].locked) {
+                            return false;
+                        }
+                    },
                     stop: function (event, ui) {
                         let key = $(this).data('tag');
                         let parentW = $('#cert-canvas').width();
@@ -1578,35 +1870,51 @@
                         let leftPx = ui.position.left;
                         let topPx = ui.position.top;
 
-                        // Convert to %
-                        // Note: We use top-left anchoring here for simplicity in storage, 
-                        // but visual rendering uses translate(-50%,-50%) which might shift visual center.
-                        // A robust system would calculate text width. For now, simple % is enough.
-                        certSettings[key].x = (leftPx / parentW) * 100;
-                        certSettings[key].y = (topPx / parentH) * 100;
+                        // Convert to % (top-left anchored)
+                        let x = (leftPx / parentW) * 100;
+                        let y = (topPx / parentH) * 100;
+
+                        // Optional snap-to-grid
+                        if ($('#cert-snap-enabled').is(':checked')) {
+                            let step = parseFloat($('#cert-snap-step').val()) || 1;
+                            x = Math.round(x / step) * step;
+                            y = Math.round(y / step) * step;
+                            $(this).css({ left: x + '%', top: y + '%' });
+                        }
+
+                        certSettings[key].x = x;
+                        certSettings[key].y = y;
+
+                        if (activeElementId === key) {
+                            $('#style-x').val(parseFloat(x).toFixed(2));
+                            $('#style-y').val(parseFloat(y).toFixed(2));
+                        }
+
+                        updateLayersList();
                     }
                 });
 
-                // Remove transform for easier drag math in jQuery UI
-                $('.cert-element').css('transform', 'none');
-
-                // Apply visibility (except mandatory logo)
+                // Sync visibility toggles from persisted state
                 $('.cert-toggle').each(function () {
                     let key = $(this).data('tag');
-                    // Platform logo is mandatory and cannot be hidden
-                    if (key !== 'platform_logo' && !$(this).is(':checked')) {
-                        $('#el-' + key).hide();
+                    if (key === 'platform_logo') {
+                        $(this).prop('checked', true);
+                        $('#el-platform_logo').show();
+                        return;
                     }
-                });
 
-                // Ensure logo is ALWAYS visible
-                $('#el-platform_logo').show();
+                    const visible = certSettings[key] ? (certSettings[key].visible !== false) : true;
+                    $(this).prop('checked', visible);
+                });
 
                 // Load logo size from settings
                 if (certSettings['platform_logo']) {
                     $('#logo-width').val(certSettings['platform_logo'].width || 120);
                     $('#logo-height').val(certSettings['platform_logo'].height || 60);
+                    $('#logo-width, #logo-height').prop('disabled', !!certSettings['platform_logo'].locked);
                 }
+
+                updateLayersList();
             }
 
             renderElements();
@@ -1624,6 +1932,7 @@
                     let val = $(this).val();
                     certSettings[activeElementId].zIndex = val;
                     $('#el-' + activeElementId).css('z-index', val);
+                    updateLayersList();
                 }
             });
             $('#style-color').on('input', function () {
@@ -1649,22 +1958,132 @@
                 }
             });
 
+            $('#style-x').on('input', function () {
+                if (!activeElementId) return;
+                let val = parseFloat($(this).val());
+                if (isNaN(val)) return;
+                certSettings[activeElementId].x = val;
+                $('#el-' + activeElementId).css('left', val + '%');
+            });
+
+            $('#style-y').on('input', function () {
+                if (!activeElementId) return;
+                let val = parseFloat($(this).val());
+                if (isNaN(val)) return;
+                certSettings[activeElementId].y = val;
+                $('#el-' + activeElementId).css('top', val + '%');
+            });
+
+            $('#style-locked').on('change', function () {
+                if (!activeElementId) return;
+                const locked = $(this).is(':checked');
+                certSettings[activeElementId].locked = locked;
+
+                const $el = $('#el-' + activeElementId);
+                $el.css('cursor', locked ? 'not-allowed' : 'move');
+
+                try { locked ? $el.draggable('disable') : $el.draggable('enable'); } catch (e) { }
+                try { locked ? $el.resizable('disable') : $el.resizable('enable'); } catch (e) { }
+
+                if (activeElementId === 'platform_logo') {
+                    $('#logo-width, #logo-height').prop('disabled', locked);
+                }
+
+                updateLayersList();
+            });
+
+            // Keyboard nudging (arrow keys) for precise movement
+            function clampPercent(val) {
+                return Math.max(0, Math.min(100, val));
+            }
+
+            function nudgeSelected(dx, dy) {
+                if (!activeElementId) return;
+                const data = certSettings[activeElementId];
+                if (!data || data.locked) return;
+
+                let x = parseFloat(data.x);
+                let y = parseFloat(data.y);
+                if (isNaN(x)) x = 0;
+                if (isNaN(y)) y = 0;
+
+                x = clampPercent(x + dx);
+                y = clampPercent(y + dy);
+
+                if ($('#cert-snap-enabled').is(':checked')) {
+                    const snap = parseFloat($('#cert-snap-step').val()) || 1;
+                    x = Math.round(x / snap) * snap;
+                    y = Math.round(y / snap) * snap;
+                }
+
+                x = Math.round(x * 10000) / 10000;
+                y = Math.round(y * 10000) / 10000;
+
+                data.x = x;
+                data.y = y;
+
+                $('#el-' + activeElementId).css({ left: x + '%', top: y + '%' });
+                $('#style-x').val(parseFloat(x).toFixed(2));
+                $('#style-y').val(parseFloat(y).toFixed(2));
+            }
+
+            $(document).on('keydown.certNudge', function (e) {
+                if (!activeElementId) return;
+                if (!$('#certificate').hasClass('show')) return;
+
+                const $target = $(e.target);
+                if (
+                    $target.is('input, textarea, select') ||
+                    $target.closest('input, textarea, select').length ||
+                    $target.is('[contenteditable=true]') ||
+                    $target.closest('[contenteditable=true]').length
+                ) {
+                    return;
+                }
+
+                if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+                let step = parseFloat($('#cert-nudge-step').val());
+                if (isNaN(step) || step <= 0) step = 0.5;
+                if (e.shiftKey) step = step * 5;
+
+                const key = e.key || '';
+                const code = e.which || e.keyCode;
+
+                let dx = 0, dy = 0;
+                if (key === 'ArrowLeft' || code === 37) dx = -step;
+                else if (key === 'ArrowRight' || code === 39) dx = step;
+                else if (key === 'ArrowUp' || code === 38) dy = -step;
+                else if (key === 'ArrowDown' || code === 40) dy = step;
+                else return;
+
+                e.preventDefault();
+                nudgeSelected(dx, dy);
+            });
+
             // Logo Size Controls
             $('#logo-width').on('input', function () {
                 let val = parseInt($(this).val()) || 120;
                 // Clamp between min and max
                 val = Math.max(50, Math.min(400, val));
+                if (certSettings['platform_logo'] && certSettings['platform_logo'].locked) {
+                    $(this).val(certSettings['platform_logo'].width || 120);
+                    return;
+                }
                 certSettings['platform_logo'].width = val;
-                // Visual feedback - update element size
-                toastr.info('Largura da logo atualizada: ' + val + 'px');
+                $('#el-platform_logo').css('width', val + 'px');
             });
 
             $('#logo-height').on('input', function () {
                 let val = parseInt($(this).val()) || 60;
                 // Clamp between min and max
                 val = Math.max(30, Math.min(200, val));
+                if (certSettings['platform_logo'] && certSettings['platform_logo'].locked) {
+                    $(this).val(certSettings['platform_logo'].height || 60);
+                    return;
+                }
                 certSettings['platform_logo'].height = val;
-                toastr.info('Altura da logo atualizada: ' + val + 'px');
+                $('#el-platform_logo').css('height', val + 'px');
             });
 
             // Toggle Visibility (logo is MANDATORY and cannot be hidden)
@@ -1679,16 +2098,30 @@
                 }
 
                 if ($(this).is(':checked')) {
+                    certSettings[key].visible = true;
                     $('#el-' + key).show();
                 } else {
+                    certSettings[key].visible = false;
                     $('#el-' + key).hide();
                 }
+
+                updateLayersList();
             });
 
             // Sync Settings on Submit (AJAX)
             $('#certForm').on('submit', function (e) {
                 e.preventDefault();
-                $('#certificate_settings_input').val(JSON.stringify(certSettings));
+
+                certDoc.meta = certDoc.meta || {};
+                certDoc.meta.backgroundFit = $('#cert-bg-fit').val() || 'cover';
+                certDoc.meta.titleText = $('#certificate_title').val() || '';
+                certDoc.meta.presentationText = $('#presentation_text').val() || '';
+                if (certSettings['platform_logo']) {
+                    certSettings['platform_logo'].visible = true;
+                    certSettings['platform_logo'].mandatory = true;
+                }
+
+                $('#certificate_settings_input').val(JSON.stringify(certDoc));
 
                 var formData = new FormData(this);
                 var $btn = $('#btn-save-cert');
@@ -1725,6 +2158,10 @@
         // Preview Background
         window.previewCertBg = function (input) {
             if (input.files && input.files[0]) {
+                try {
+                    $(input).next('.custom-file-label').html(input.files[0].name);
+                } catch (e) { }
+
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     if ($('#cert-bg-img').length) {
@@ -1732,6 +2169,9 @@
                     } else {
                         $('#cert-bg-placeholder').replaceWith('<img src="' + e.target.result + '" id="cert-bg-img" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;">');
                     }
+
+                    const fit = ($('#cert-bg-fit').val() || 'cover') === 'stretch' ? 'fill' : 'cover';
+                    $('#cert-bg-img').css('object-fit', fit);
                 }
                 reader.readAsDataURL(input.files[0]);
             }
