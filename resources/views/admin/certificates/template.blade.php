@@ -108,24 +108,38 @@
         {{-- Render only saved draggable elements (no fallbacks) --}}
 
         @foreach($settings as $key => $style)
-            @continue($key === 'platform_logo')
+            @if($key === 'platform_logo') @continue @endif
             @continue(!is_array($style))
 
+            @php
+                // Keys that should be strictly horizontally centered as requested
+                $centerKeys = ['student_name', 'course_name', 'completion_date', 'certificate_code'];
+                $isCentered = in_array($key, $centerKeys);
+                
+                // For centered elements: Force Left 50% and Translate X -50%
+                // For others: Use saved X and no transform
+                $leftPos = $isCentered ? '50%' : ($style['x'] . '%');
+                $transform = $isCentered ? 'translateX(-50%)' : 'none';
+            @endphp
+
             <div class="element" style="
-                                        left: {{ $style['x'] }}%;
-                                        top: {{ $style['y'] }}%;
-                                        font-size: {{ $style['fontSize'] }}px;
-                                        color: {{ $style['color'] }};
-                                        font-weight: {{ $style['fontWeight'] }};
-                                        font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
-                                        z-index: {{ $style['zIndex'] ?? 10 }};
-                                    ">
+                    left: {{ $leftPos }};
+                    top: {{ $style['y'] }}%;
+                    font-size: {{ $style['fontSize'] }}px;
+                    color: {{ $style['color'] }};
+                    font-weight: {{ $style['fontWeight'] }};
+                    font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
+                    text-align: {{ $isCentered ? 'center' : 'left' }};
+                    transform: {{ $transform }};
+                    z-index: {{ $style['zIndex'] ?? 10 }};
+                    white-space: nowrap;
+                ">
                 {{ $dataMap[$key] ?? '' }}
             </div>
         @endforeach
 
         @php 
-                                                                                        $logoStyle = $settings['platform_logo'];
+            $logoStyle = $settings['platform_logo'];
 
             // Use the same logic as Auth Visual component
             $logoPath = \App\Models\Setting::get('logo_auth') ?: \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
