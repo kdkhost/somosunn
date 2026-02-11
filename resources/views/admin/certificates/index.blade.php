@@ -238,12 +238,15 @@
             $('.btn-view-cert').on('click', function () {
                 var hash = $(this).data('hash');
                 var downloadUrl = $(this).data('download');
+                // Use the correct route name
                 var previewUrl = "{{ route('admin.certificates.preview-html', ':hash') }}".replace(':hash', hash);
 
                 // Show loading state
                 $('#certPreviewContainer').html('<div class="text-center p-5"><i class="fas fa-spinner fa-spin fa-3x text-primary"></i><p class="mt-3">Carregando certificado...</p></div>');
                 $('#btnDownloadCert').attr('href', downloadUrl);
-                $('#modalViewCert').modal('show');
+
+                // Open the correct modal ID
+                $('#certificateModal').modal('show');
 
                 // Fetch HTML preview
                 $.ajax({
