@@ -170,10 +170,10 @@
                         <form id="certForm" method="POST" action="{{ route('admin.mentorships.update', $mentorship) }}"
                             enctype="multipart/form-data">
                             @csrf
-                            @method('PUT')
+                             @method('PUT')
 
-                            <div class="row">
-                                <div class="col-xl-7 col-lg-8">
+                             <div class="row">
+                                <div class="col-12">
                                     <div class="card shadow-sm border-0">
                                         <div class="card-header bg-secondary text-white small py-2">
                                             <div class="d-flex flex-wrap align-items-center justify-content-between">
@@ -215,7 +215,7 @@
                                                         <div class="text-center">
                                                             <i class="fas fa-image fa-3x mb-2"></i>
                                                             <h5>Sem imagem de fundo</h5>
-                                                            <p class="small">Faça upload no painel lateral</p>
+                                                            <p class="small">Faça upload no painel abaixo</p>
                                                         </div>
                                                     </div>
                                                 @endif
@@ -230,7 +230,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-xl-5 col-lg-4">
+                                <div class="col-12 mt-3">
                                     <div class="card shadow-sm border-0">
                                         <div class="card-header bg-dark text-white font-weight-bold">Configurações</div>
                                         <div class="card-body">
