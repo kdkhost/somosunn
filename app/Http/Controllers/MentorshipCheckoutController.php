@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\GatewayAccount;
 use App\Models\Mentorship;
 use App\Models\Order;
 use App\Models\User;
@@ -29,17 +28,17 @@ class MentorshipCheckoutController extends Controller
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
         }
 
-        $gateway = GatewayAccount::where('user_id', (int) $mentorship->mentor_id)
-            ->where('enabled', true)
-            ->first();
+        $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
+        $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
+        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
 
-        if (!$gateway) {
+        if (!$paymentsConfigured) {
             return redirect()
                 ->route('mentorships.show', $mentorship)
-                ->with('error', 'Este criador ainda não configurou o recebimento de pagamentos.');
+                ->with('error', 'Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.');
         }
 
-        return view('checkout.mentorship', compact('mentorship', 'gateway'));
+        return view('checkout.mentorship', compact('mentorship'));
     }
 
     public function process(Request $request, Mentorship $mentorship, MercadoPagoService $mpService, CouponService $couponService)
@@ -55,9 +54,15 @@ class MentorshipCheckoutController extends Controller
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
         }
 
-        $gateway = GatewayAccount::where('user_id', (int) $mentorship->mentor_id)
-            ->where('enabled', true)
-            ->firstOrFail();
+        $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
+        $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
+        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+
+        if (!$paymentsConfigured) {
+            return redirect()
+                ->route('mentorships.show', $mentorship)
+                ->with('error', 'Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.');
+        }
 
         $request->validate([
             'coupon_code' => 'nullable|string|max:40',
@@ -67,7 +72,7 @@ class MentorshipCheckoutController extends Controller
         $couponCode = $couponService->normalizeCode($request->input('coupon_code'));
 
         try {
-            DB::transaction(function () use ($mentorship, $gateway, $couponCode, $couponService, &$order) {
+            DB::transaction(function () use ($mentorship, $couponCode, $couponService, &$order) {
                 $originalTotal = round((float) $mentorship->price, 2);
 
                 $discountAmount = 0.0;
@@ -95,12 +100,11 @@ class MentorshipCheckoutController extends Controller
                     'fee_amount' => 0,
                     'platform_fee_amount' => 0,
                     'currency' => 'BRL',
-                    'gateway' => $gateway->provider,
-                    'gateway_account_id' => $gateway->id,
+                    'gateway' => 'mercadopago',
+                    'gateway_account_id' => null,
                     'metadata' => [
-                        // Reusa os back_urls do checkout padrão.
-                        'context' => 'course',
-                        'marketplace_context' => 'mentorship',
+                        'context' => 'mentorship',
+                        'sale_type' => 'mentorship',
                         'public_token' => Str::random(40),
                         'original_total_amount' => $originalTotal,
                     ],
@@ -141,15 +145,23 @@ class MentorshipCheckoutController extends Controller
 
         try {
             $order->load('items', 'user');
-            if ($gateway->provider === 'mercadopago') {
-                $preference = $mpService->createPreference($order, $gateway);
+            $preference = $mpService->createPreference($order, [
+                'statement_descriptor' => 'UNN MENTORIAS',
+            ]);
 
-                return view('checkout.transparent', [
-                    'order' => $order,
-                    'preferenceId' => $preference['id'],
-                    'publicKey' => $gateway->public_key,
-                ]);
-            }
+            $order->update([
+                'metadata' => array_merge($order->metadata ?? [], [
+                    'mercadopago_preference_id' => $preference['id'] ?? null,
+                    'mercadopago_init_point' => $preference['init_point'] ?? null,
+                    'mercadopago_sandbox_init_point' => $preference['sandbox_init_point'] ?? null,
+                ]),
+            ]);
+
+            return view('checkout.transparent', [
+                'order' => $order,
+                'preferenceId' => $preference['id'] ?? '',
+                'publicKey' => $mpPublicKey,
+            ]);
         } catch (\Exception $e) {
             return back()->with('error', 'Erro ao processar pagamento: ' . $e->getMessage());
         }

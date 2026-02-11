@@ -28,7 +28,7 @@
                     <div class="border-t border-gray-100 mt-6 pt-6">
                         <p class="text-sm text-gray-500">Total</p>
                         <p class="text-3xl font-black text-gray-900">R$ {{ number_format($course->price, 2, ',', '.') }}</p>
-                        <p class="text-xs text-gray-500 mt-2">Pagamento via {{ strtoupper($gateway->provider ?? 'gateway') }}.</p>
+                        <p class="text-xs text-gray-500 mt-2">Pagamento via MercadoPago.</p>
                     </div>
                 </div>
             </div>

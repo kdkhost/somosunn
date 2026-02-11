@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\GatewayAccount;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,60 +13,27 @@ class MarketplaceController extends Controller
     {
         $userId = (int) Auth::id();
 
-        $gateway = GatewayAccount::where('user_id', $userId)
-            ->where('provider', 'mercadopago')
-            ->first();
-
         $paidTotal = (float) Order::where('seller_id', $userId)->where('status', 'paid')->sum('total_amount');
         $paidCount = (int) Order::where('seller_id', $userId)->where('status', 'paid')->count();
         $pendingCount = (int) Order::where('seller_id', $userId)->where('status', 'pending')->count();
 
-        return view('admin.marketplace.index', compact('gateway', 'paidTotal', 'paidCount', 'pendingCount'));
+        $mpAccessToken = (string) (config('payments.mercadopago.access_token') ?? '');
+        $mpPublicKey = (string) (config('payments.mercadopago.public_key') ?? '');
+
+        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+
+        return view('admin.marketplace.index', compact('paidTotal', 'paidCount', 'pendingCount', 'paymentsConfigured'));
     }
 
     public function payments()
     {
-        $gateway = GatewayAccount::firstOrNew([
-            'user_id' => (int) Auth::id(),
-            'provider' => 'mercadopago',
-        ]);
+        $mpAccessToken = (string) (config('payments.mercadopago.access_token') ?? '');
+        $mpPublicKey = (string) (config('payments.mercadopago.public_key') ?? '');
 
-        return view('admin.marketplace.payments', compact('gateway'));
-    }
+        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+        $webhookUrl = url('/webhook/mercadopago');
 
-    public function updatePayments(Request $request)
-    {
-        $existing = GatewayAccount::where('user_id', (int) Auth::id())
-            ->where('provider', 'mercadopago')
-            ->first();
-
-        $rules = [
-            'public_key' => 'required|string',
-            'access_token' => ($existing && (string) $existing->access_token !== '')
-                ? 'nullable|string'
-                : 'required|string',
-        ];
-
-        $validated = $request->validate($rules);
-
-        $data = [
-            'public_key' => $validated['public_key'],
-            'enabled' => true,
-        ];
-
-        $accessToken = trim((string) ($validated['access_token'] ?? ''));
-        if ($accessToken !== '') {
-            $data['access_token'] = $accessToken;
-        }
-
-        GatewayAccount::updateOrCreate(
-            ['user_id' => (int) Auth::id(), 'provider' => 'mercadopago'],
-            $data
-        );
-
-        return redirect()
-            ->route('admin.marketplace.payments')
-            ->with('success', 'Credenciais do MercadoPago salvas com sucesso.');
+        return view('admin.marketplace.payments', compact('paymentsConfigured', 'webhookUrl'));
     }
 
     public function sales()
@@ -85,4 +51,3 @@ class MarketplaceController extends Controller
         return view('admin.marketplace.sales', compact('orders', 'paidTotal', 'paidCount'));
     }
 }
-

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Plan;
 use App\Models\User;
-use App\Models\GatewayAccount;
 use App\Services\Payment\MercadoPagoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,9 +32,9 @@ class SubscriptionController extends Controller
             return redirect()->route('portal')->with('info', 'Você já possui este plano ativo.');
         }
 
-        $gatewayAccount = $this->resolveSubscriptionGatewayAccount();
-        $publicKey = $gatewayAccount?->public_key ?? config('payments.mercadopago.public_key');
-        $paymentConfigured = (bool) ($gatewayAccount?->access_token && $publicKey);
+        $publicKey = (string) config('payments.mercadopago.public_key');
+        $accessToken = (string) config('payments.mercadopago.access_token');
+        $paymentConfigured = trim($accessToken) !== '' && trim($publicKey) !== '';
 
         return view('site.subscription.checkout', compact('plan', 'publicKey', 'paymentConfigured'));
     }
@@ -99,24 +98,28 @@ class SubscriptionController extends Controller
                 return redirect()->route('portal')->with('success', 'Plano ativado com sucesso!');
             }
 
-            $gatewayAccount = $this->resolveSubscriptionGatewayAccount();
-            if (!$gatewayAccount || !$gatewayAccount->access_token) {
+            $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
+            $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
+            $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+
+            if (!$paymentsConfigured) {
                 throw new \RuntimeException('MercadoPago não configurado para assinaturas.');
             }
 
             // Create order (snapshot)
             $order = Order::create([
                 'user_id' => $user->id,
-                'seller_id' => $gatewayAccount->user_id,
+                'seller_id' => null,
                 'status' => 'pending',
                 'total_amount' => $plan->price,
                 'fee_amount' => 0,
                 'platform_fee_amount' => 0,
                 'currency' => 'BRL',
                 'gateway' => 'mercadopago',
-                'gateway_account_id' => $gatewayAccount->exists ? $gatewayAccount->id : null,
+                'gateway_account_id' => null,
                 'metadata' => [
                     'context' => 'subscription',
+                    'sale_type' => 'subscription',
                     'public_token' => Str::random(40),
                 ],
             ]);
@@ -139,7 +142,7 @@ class SubscriptionController extends Controller
                     'email' => $user->email,
                     'name' => $user->name,
                     'cpf' => $request->cpf ?? $user->doc,
-                ], $gatewayAccount);
+                ]);
             } else {
                 $paymentResult = $this->mpService->createCreditCardPayment($order, [
                     'token' => $request->token,
@@ -148,7 +151,7 @@ class SubscriptionController extends Controller
                     'issuer_id' => $request->issuer_id,
                     'email' => $user->email,
                     'cpf' => $request->cpf ?? $user->doc,
-                ], $gatewayAccount);
+                ]);
             }
 
                 if (($paymentResult['status'] ?? '') === 'approved') {
@@ -206,36 +209,7 @@ class SubscriptionController extends Controller
         $order->load('items');
         $planName = optional($order->items->firstWhere('item_type', 'plan'))->title;
 
-        return view('site.subscription.success', compact('order', 'planName'));
-    }
-
-    private function resolveSubscriptionGatewayAccount(): ?GatewayAccount
-    {
-        $account = GatewayAccount::where('provider', 'mercadopago')
-            ->where('enabled', true)
-            ->whereHas('user', function ($q) {
-                $q->whereIn('role', ['admin', 'superadmin'])
-                    ->orWhereIn('level', ['superadmin', 'sucesso']);
-            })
-            ->orderBy('id')
-            ->first();
-
-        if ($account && $account->access_token) {
-            return $account;
-        }
-
-        $accessToken = config('payments.mercadopago.access_token');
-        if (!$accessToken) {
-            return null;
-        }
-
-        return new GatewayAccount([
-            'user_id' => 0,
-            'provider' => 'mercadopago',
-            'access_token' => $accessToken,
-            'public_key' => config('payments.mercadopago.public_key'),
-            'enabled' => true,
-        ]);
+            return view('site.subscription.success', compact('order', 'planName'));
     }
 
     private function planExpiresAt(Plan $plan): ?\Carbon\Carbon

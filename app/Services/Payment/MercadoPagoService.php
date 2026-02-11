@@ -3,44 +3,40 @@
 namespace App\Services\Payment;
 
 use App\Models\Order;
-use App\Models\GatewayAccount;
 use Illuminate\Support\Facades\Http;
 use Exception;
 
 class MercadoPagoService
 {
-    protected $baseUrl = 'https://api.mercadopago.com';
+    protected string $baseUrl = 'https://api.mercadopago.com';
 
     public function __construct()
     {
-        // Sandbox check can be done per request if account varies, 
-        // but base URL is usually same for MP, just tokens differ.
-        // However, we will respect the pattern.
+        //
     }
 
-    public function createPreference(Order $order, GatewayAccount $account)
+    public function createPreference(Order $order, array $options = []): array
     {
-        // ... (existing code)
-        $this->ensureAccessToken($account);
-        $preferenceData = $this->buildPreferenceData($order, $account);
+        $token = $this->accessToken();
+        $preferenceData = $this->buildPreferenceData($order, $options);
 
-        $response = Http::withToken($account->access_token)
+        $response = Http::withToken($token)
             ->post("{$this->baseUrl}/checkout/preferences", $preferenceData);
 
         if ($response->failed()) {
             throw new Exception('MercadoPago Preference Error: ' . $response->body());
         }
 
-        return $response->json();
+        return (array) $response->json();
     }
 
-    public function createPixPayment(Order $order, array $data, GatewayAccount $account)
+    public function createPixPayment(Order $order, array $data): array
     {
-        $this->ensureAccessToken($account);
+        $token = $this->accessToken();
 
         $paymentData = [
             'transaction_amount' => (float)$order->total_amount,
-            'description' => 'UNN - Pedido #' . $order->id,
+            'description' => $this->orderDescription($order),
             'payment_method_id' => 'pix',
             'payer' => [
                 'email' => $data['email'] ?? $order->user->email,
@@ -52,34 +48,34 @@ class MercadoPagoService
                 ]
             ],
             'external_reference' => (string)$order->id,
-            'notification_url' => route('webhook.mercadopago', ['seller_id' => $account->user_id]),
+            'notification_url' => $this->notificationUrl(),
         ];
 
-        $response = Http::withToken($account->access_token)
+        $response = Http::withToken($token)
             ->post("{$this->baseUrl}/v1/payments", $paymentData);
 
         if ($response->failed()) {
             throw new Exception('Falha ao criar Pix: ' . $response->body());
         }
         
-        $body = $response->json();
+        $body = (array) $response->json();
         
         return [
-            'status' => $body['status'],
-            'id' => $body['id'],
-            'qr_code' => $body['point_of_interaction']['transaction_data']['qr_code'],
-            'qr_code_base64' => $body['point_of_interaction']['transaction_data']['qr_code_base64'],
+            'status' => $body['status'] ?? null,
+            'id' => $body['id'] ?? null,
+            'qr_code' => data_get($body, 'point_of_interaction.transaction_data.qr_code'),
+            'qr_code_base64' => data_get($body, 'point_of_interaction.transaction_data.qr_code_base64'),
         ];
     }
 
-    public function createCreditCardPayment(Order $order, array $data, GatewayAccount $account)
+    public function createCreditCardPayment(Order $order, array $data): array
     {
-        $this->ensureAccessToken($account);
+        $token = $this->accessToken();
 
         $paymentData = [
             'transaction_amount' => (float)$order->total_amount,
             'token' => $data['token'],
-            'description' => 'UNN - Pedido #' . $order->id,
+            'description' => $this->orderDescription($order),
             'installments' => (int)$data['installments'],
             'payment_method_id' => $data['payment_method_id'],
             'issuer_id' => $data['issuer_id'],
@@ -91,34 +87,45 @@ class MercadoPagoService
                 ]
             ],
             'external_reference' => (string)$order->id,
-            'notification_url' => route('webhook.mercadopago', ['seller_id' => $account->user_id]),
+            'notification_url' => $this->notificationUrl(),
         ];
 
-        $response = Http::withToken($account->access_token)
+        $response = Http::withToken($token)
             ->post("{$this->baseUrl}/v1/payments", $paymentData);
 
         if ($response->failed()) {
             throw new Exception('Falha ao processar cartão: ' . $response->body());
         }
 
-        $body = $response->json();
+        $body = (array) $response->json();
         return [
-            'status' => $body['status'],
-            'id' => $body['id'],
-            'status_detail' => $body['status_detail']
+            'status' => $body['status'] ?? null,
+            'id' => $body['id'] ?? null,
+            'status_detail' => $body['status_detail'] ?? null,
         ];
     }
     
-    private function ensureAccessToken($account) {
-        if (!$account->access_token) {
-            // Em dev/demo, podemos usar credenciais de teste se não configurado
-            // Mas em prod deve falhar
-            $account->access_token = config('payments.mercadopago.access_token');
+    private function accessToken(): string
+    {
+        $token = trim((string) config('payments.mercadopago.access_token'));
+        if ($token === '') {
+            throw new Exception('MercadoPago não configurado. Verifique as configurações do gateway da plataforma.');
         }
+        return $token;
     }
     
-    // Helper para manter a compatibilidade com código existente
-    private function buildPreferenceData($order, $account) {
+    private function notificationUrl(): string
+    {
+        return url('/webhook/mercadopago');
+    }
+
+    private function orderDescription(Order $order): string
+    {
+        return 'UNN - Pedido #' . $order->id;
+    }
+
+    private function buildPreferenceData(Order $order, array $options = []): array
+    {
         $items = [];
         foreach ($order->items as $item) {
             $items[] = [
@@ -135,18 +142,38 @@ class MercadoPagoService
             $context = $firstType ?: 'unknown';
         }
 
+        $token = (string) data_get($order->metadata, 'public_token', '');
+
+        $fallbackPlanId = (int) optional($order->items->first())->item_id;
+        $subscriptionCheckoutUrl = $fallbackPlanId ? route('subscription.checkout', ['plan' => $fallbackPlanId]) : url('/');
+
         $backUrls = match ($context) {
-            'course' => [
+            'course', 'mentorship', 'marketplace' => [
                 'success' => route('checkout.success', ['order' => $order->id]),
                 'failure' => route('checkout.failure', ['order' => $order->id]),
                 'pending' => route('checkout.pending', ['order' => $order->id]),
             ],
-            default => [
+            'event' => [
+                'success' => route('events.payment.success', ['order' => $order->id, 'token' => $token]),
+                'failure' => route('events.payment.failure', ['order' => $order->id, 'token' => $token]),
+                'pending' => route('events.payment.pending', ['order' => $order->id, 'token' => $token]),
+            ],
+            'subscription' => [
                 'success' => route('subscription.success', ['order' => $order->id]),
-                'failure' => route('subscription.checkout', ['plan' => $order->items->first()->item_id]),
-                'pending' => route('subscription.checkout', ['plan' => $order->items->first()->item_id]),
+                'failure' => $subscriptionCheckoutUrl,
+                'pending' => $subscriptionCheckoutUrl,
+            ],
+            default => [
+                'success' => route('checkout.success', ['order' => $order->id]),
+                'failure' => route('checkout.failure', ['order' => $order->id]),
+                'pending' => route('checkout.pending', ['order' => $order->id]),
             ],
         };
+
+        $statementDescriptor = trim((string) ($options['statement_descriptor'] ?? 'UNN PLATAFORMA'));
+        if ($statementDescriptor === '') {
+            $statementDescriptor = 'UNN PLATAFORMA';
+        }
 
         return [
             'items' => $items,
@@ -154,15 +181,15 @@ class MercadoPagoService
                 'name' => $order->user->name,
                 'email' => $order->user->email,
             ],
-            'back_urls' => $backUrls,
+            'back_urls' => $options['back_urls'] ?? $backUrls,
             'auto_return' => 'approved',
             'external_reference' => (string)$order->id,
-            'statement_descriptor' => 'UNN PLATAFORMA',
-            'notification_url' => route('webhook.mercadopago', ['seller_id' => $account->user_id]),
+            'statement_descriptor' => $statementDescriptor,
+            'notification_url' => $this->notificationUrl(),
         ];
     }
 
-    public function refundPayment(Order $order, GatewayAccount $account)
+    public function refundPayment(Order $order): array
     {
         // For MercadoPago, we need the Payment ID (not Preference ID).
         // Assuming we stored the payment ID in the order or a transaction table.
@@ -172,7 +199,7 @@ class MercadoPagoService
             throw new Exception('ID da transação de pagamento não encontrado para este pedido.');
         }
 
-        $accessToken = $account->access_token;
+        $accessToken = $this->accessToken();
         $paymentId = $order->transaction_id;
 
         // Refund full amount
@@ -183,6 +210,6 @@ class MercadoPagoService
             throw new Exception('Falha ao processar reembolso no MercadoPago: ' . $response->body());
         }
 
-        return $response->json();
+        return (array) $response->json();
     }
 }

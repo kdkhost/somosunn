@@ -6,7 +6,6 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Event;
 use App\Models\EventRegistration;
-use App\Models\GatewayAccount;
 use App\Models\Mentorship;
 use App\Models\Order;
 use App\Models\Plan;
@@ -34,26 +33,10 @@ class PaymentWebhookController extends Controller
                 return response('OK', 200);
             }
 
-            $sellerId = (string) $seller_id;
-
-            $token = null;
-            if ($sellerId === 'platform') {
-                $token = config('payments.mercadopago.access_token');
-            } elseif (ctype_digit($sellerId)) {
-                $sellerAccount = GatewayAccount::where('user_id', (int) $sellerId)
-                    ->where('provider', 'mercadopago')
-                    ->where('enabled', true)
-                    ->first();
-
-                $token = $sellerAccount?->access_token;
-            }
+            $token = (string) config('payments.mercadopago.access_token');
 
             if (!$token) {
-                $token = config('payments.mercadopago.access_token');
-            }
-
-            if (!$token) {
-                Log::warning('MP Webhook: missing token for seller', ['seller_id' => $sellerId]);
+                Log::warning('MP Webhook: missing token', ['seller_id' => (string) $seller_id]);
                 return response('OK', 200);
             }
 

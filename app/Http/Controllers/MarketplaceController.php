@@ -4,46 +4,68 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Event;
-use App\Models\GatewayAccount;
 use App\Models\Mentorship;
 use App\Models\Order;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MarketplaceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $publicStatuses = ['published', 'paused'];
+        $q = trim((string) $request->query('q', ''));
 
-        $courses = Course::with('creator')
-            ->whereIn('status', $publicStatuses)
+        $coursesQuery = Course::with('creator')
+            ->whereIn('status', $publicStatuses);
+
+        if ($q !== '') {
+            $coursesQuery->where(function ($query) use ($q) {
+                $query->where('title', 'like', '%' . $q . '%')
+                    ->orWhere('short_description', 'like', '%' . $q . '%');
+            });
+        }
+
+        $courses = $coursesQuery
             ->orderByDesc('is_featured')
             ->orderByDesc('id')
-            ->limit(6)
+            ->limit(12)
             ->get();
 
-        $mentorships = Mentorship::with('mentor')
+        $mentorshipsQuery = Mentorship::with('mentor');
+
+        if ($q !== '') {
+            $mentorshipsQuery->where(function ($query) use ($q) {
+                $query->where('title', 'like', '%' . $q . '%')
+                    ->orWhere('description', 'like', '%' . $q . '%');
+            });
+        }
+
+        $mentorships = $mentorshipsQuery
             ->orderByDesc('id')
-            ->limit(6)
+            ->limit(12)
             ->get();
 
-        $events = Event::query()
+        $eventsQuery = Event::query()
             ->with('user')
             ->where('published', true)
-            ->orderByDesc('start_at')
-            ->limit(6)
+            ->orderByDesc('start_at');
+
+        if ($q !== '') {
+            $eventsQuery->where(function ($query) use ($q) {
+                $query->where('title', 'like', '%' . $q . '%')
+                    ->orWhere('description', 'like', '%' . $q . '%')
+                    ->orWhere('speaker', 'like', '%' . $q . '%');
+            });
+        }
+
+        $events = $eventsQuery
+            ->limit(12)
             ->get();
 
-        $courseSellerIds = $courses->pluck('user_id')->unique()->values()->all();
-        $mentorshipSellerIds = $mentorships->pluck('mentor_id')->unique()->values()->all();
-        $eventSellerIds = $events->pluck('user_id')->unique()->values()->all();
-
-        $gatewayEnabledUserIds = GatewayAccount::query()
-            ->where('enabled', true)
-            ->whereIn('user_id', array_values(array_unique(array_merge($courseSellerIds, $mentorshipSellerIds, $eventSellerIds))))
-            ->pluck('user_id')
-            ->map(fn ($id) => (int) $id)
-            ->all();
+        $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
+        $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
+        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
 
         $canSellByUserId = [];
 
@@ -61,8 +83,8 @@ class MarketplaceController extends Controller
             'courses',
             'mentorships',
             'events',
-            'gatewayEnabledUserIds',
-            'canSellByUserId'
+            'paymentsConfigured',
+            'canSellByUserId',
         ));
     }
 

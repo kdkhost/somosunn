@@ -8,7 +8,7 @@
         $paidTotal = (float) ($paidTotal ?? 0);
         $paidCount = (int) ($paidCount ?? 0);
         $pendingCount = (int) ($pendingCount ?? 0);
-        $gatewayEnabled = !empty($gateway) && (bool) ($gateway->enabled ?? false) && (string) ($gateway->access_token ?? '') !== '';
+        $paymentsConfigured = (bool) ($paymentsConfigured ?? false);
     @endphp
 
     <div class="row">
@@ -51,20 +51,19 @@
             <h3 class="card-title font-weight-bold"><i class="fas fa-store mr-2"></i>Configurações do vendedor</h3>
         </div>
         <div class="card-body">
-            @if($gatewayEnabled)
+            @if($paymentsConfigured)
                 <div class="alert alert-success">
-                    <i class="fas fa-check-circle mr-2"></i> Pagamentos configurados e habilitados para sua conta.
+                    <i class="fas fa-check-circle mr-2"></i> Pagamentos configurados e habilitados na plataforma.
                 </div>
             @else
                 <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle mr-2"></i> Para vender no marketplace, configure suas credenciais do MercadoPago.
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.
                 </div>
             @endif
 
             <a href="{{ route('admin.marketplace.payments') }}" class="btn btn-primary">
-                <i class="fas fa-credit-card mr-1"></i> Configurar pagamentos
+                <i class="fas fa-credit-card mr-1"></i> Ver pagamentos
             </a>
         </div>
     </div>
 @endsection
-

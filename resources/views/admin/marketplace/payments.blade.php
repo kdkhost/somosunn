@@ -5,88 +5,62 @@
 
 @section('content')
     @php
-        $gateway = $gateway ?? null;
-        $hasToken = $gateway && (string) ($gateway->access_token ?? '') !== '';
-        $webhookUrl = route('webhook.mercadopago', ['seller_id' => (string) auth()->id()]);
+        $paymentsConfigured = (bool) ($paymentsConfigured ?? false);
+        $webhookUrl = (string) ($webhookUrl ?? '');
+        $isAdmin = auth()->user() && auth()->user()->isAdmin();
     @endphp
 
-    @if(session('success'))
-        <div class="alert alert-success">
-            <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+    <div class="card card-outline card-primary">
+        <div class="card-header">
+            <h3 class="card-title font-weight-bold"><i class="fas fa-credit-card mr-2"></i>MercadoPago</h3>
         </div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger">
-            <i class="fas fa-exclamation-triangle mr-2"></i>{{ session('error') }}
-        </div>
-    @endif
-
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card card-outline card-primary">
-                <div class="card-header">
-                    <h3 class="card-title font-weight-bold"><i class="fas fa-credit-card mr-2"></i>MercadoPago</h3>
+        <div class="card-body">
+            @if($paymentsConfigured)
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle mr-2"></i> Pagamentos configurados e habilitados na plataforma.
                 </div>
-                <div class="card-body">
-                    <p class="text-muted mb-4">
-                        As vendas do marketplace são processadas na sua própria conta do MercadoPago.
-                    </p>
-
-                    <form action="{{ route('admin.marketplace.payments.update') }}" method="POST">
-                        @csrf
-
-                        <div class="form-group">
-                            <label>Public Key</label>
-                            <input type="text" name="public_key" value="{{ old('public_key', $gateway->public_key ?? '') }}"
-                                class="form-control @error('public_key') is-invalid @enderror" required>
-                            @error('public_key')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <small class="text-muted">Disponível no painel de desenvolvedores do MercadoPago.</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Access Token</label>
-                            <input type="password" name="access_token" value=""
-                                class="form-control @error('access_token') is-invalid @enderror" {{ $hasToken ? '' : 'required' }}>
-                            @error('access_token')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-
-                            @if($hasToken)
-                                <small class="text-muted">Deixe em branco para manter o token atual.</small>
-                            @else
-                                <small class="text-muted">Token de produção (obrigatório para receber pagamentos).</small>
-                            @endif
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save mr-1"></i> Salvar credenciais
-                        </button>
-                    </form>
+            @else
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.
                 </div>
-            </div>
-        </div>
+            @endif
 
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title font-weight-bold"><i class="fas fa-link mr-2"></i>URL de notificação</h3>
+            <p class="text-muted mb-3">
+                Este sistema utiliza <strong>uma única configuração</strong> do gateway (multi-tenant) para toda a plataforma.
+                Cada venda é registrada com <strong>vendedor</strong> e <strong>tipo</strong> (curso, mentoria, evento e marketplace).
+            </p>
+
+            @if($isAdmin)
+                <a href="{{ route('admin.settings', ['group' => 'gateway']) }}" class="btn btn-primary">
+                    <i class="fas fa-cogs mr-1"></i> Abrir configurações do gateway
+                </a>
+            @else
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle mr-2"></i> As credenciais do gateway são gerenciadas pelos administradores da plataforma.
                 </div>
-                <div class="card-body">
-                    <p class="text-muted">Caso precise informar manualmente no MercadoPago, utilize:</p>
-                    <div class="input-group">
-                        <input type="text" class="form-control" readonly value="{{ $webhookUrl }}">
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button"
-                                onclick="navigator.clipboard.writeText(this.parentElement.previousElementSibling.value); toastr.success('Copiado!')">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <small class="text-muted d-block mt-2">O sistema também envia esta URL automaticamente no checkout.</small>
-                </div>
-            </div>
+            @endif
         </div>
     </div>
+
+    @if($webhookUrl !== '')
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title font-weight-bold"><i class="fas fa-link mr-2"></i>URL de notificação (Webhook)</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Caso precise informar manualmente no painel do MercadoPago, utilize:</p>
+                <div class="input-group">
+                    <input type="text" class="form-control" readonly value="{{ $webhookUrl }}">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button"
+                            onclick="navigator.clipboard.writeText(this.parentElement.previousElementSibling.value); toastr.success('Copiado!')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <small class="text-muted d-block mt-2">O sistema também envia esta URL automaticamente no checkout.</small>
+            </div>
+        </div>
+    @endif
 @endsection
+

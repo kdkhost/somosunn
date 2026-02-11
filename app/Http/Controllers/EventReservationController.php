@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\EventRegistration;
-use App\Models\GatewayAccount;
 use App\Models\Order;
 use App\Models\CouponRedemption;
 use App\Models\User;
@@ -28,10 +27,23 @@ class EventReservationController extends Controller
         }
 
         $isPaid = (float) $event->current_price > 0;
-        if ($isPaid && !$this->resolveEventGatewayAccount($event)) {
-            return redirect()
-                ->route('events.show', $event)
-                ->with('error', 'Pagamento indisponível: o organizador precisa configurar o MercadoPago para vender este evento.');
+        if ($isPaid) {
+            $seller = $event->user ?: User::find($event->user_id);
+            if ($seller && !$seller->canSellOnMarketplace()) {
+                return redirect()
+                    ->route('events.show', $event)
+                    ->with('error', 'Este organizador não está habilitado para vender no marketplace.');
+            }
+
+            $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
+            $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
+            $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+
+            if (!$paymentsConfigured) {
+                return redirect()
+                    ->route('events.show', $event)
+                    ->with('error', 'Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.');
+            }
         }
 
         $registration = null;
@@ -64,11 +76,23 @@ class EventReservationController extends Controller
         ]);
 
         $isPaid = (float) $event->current_price > 0;
-        $gatewayAccount = $isPaid ? $this->resolveEventGatewayAccount($event) : null;
-        if ($isPaid && !$gatewayAccount) {
-            return redirect()
-                ->route('events.show', $event)
-                ->with('error', 'Pagamento indisponível: o organizador precisa configurar o MercadoPago para vender este evento.');
+        $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
+        $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
+        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+        $seller = $event->user ?: User::find($event->user_id);
+
+        if ($isPaid) {
+            if ($seller && !$seller->canSellOnMarketplace()) {
+                return redirect()
+                    ->route('events.show', $event)
+                    ->with('error', 'Este organizador não está habilitado para vender no marketplace.');
+            }
+
+            if (!$paymentsConfigured) {
+                return redirect()
+                    ->route('events.show', $event)
+                    ->with('error', 'Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.');
+            }
         }
 
         $user = Auth::user();
@@ -101,9 +125,10 @@ class EventReservationController extends Controller
         $order = null;
         $currentPrice = (float) $event->current_price;
         $couponCode = $isPaid ? $couponService->normalizeCode($request->input('coupon_code')) : '';
+        $sellerId = $seller ? (int) $seller->id : (int) ($event->user_id ?? 0);
 
         try {
-            DB::transaction(function () use ($event, $user, $quantity, $isPaid, $currentPrice, $couponCode, $couponService, &$registration, &$order) {
+            DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $currentPrice, $couponCode, $couponService, &$registration, &$order) {
             $registration = EventRegistration::where('event_id', $event->id)
                 ->where('user_id', $user->id)
                 ->lockForUpdate()
@@ -170,7 +195,7 @@ class EventReservationController extends Controller
             if (!$order) {
                 $order = Order::create([
                     'user_id' => $user->id,
-                    'seller_id' => null,
+                    'seller_id' => $sellerId > 0 ? $sellerId : null,
                     'status' => 'pending',
                     'total_amount' => $finalTotal,
                     'fee_amount' => 0,
@@ -180,6 +205,7 @@ class EventReservationController extends Controller
                     'gateway_account_id' => null,
                     'metadata' => [
                         'context' => 'event',
+                        'sale_type' => 'event',
                         'public_token' => Str::random(40),
                         'original_total_amount' => $originalTotal,
                     ],
@@ -187,12 +213,14 @@ class EventReservationController extends Controller
             } else {
                 $order->update([
                     'user_id' => $user->id,
+                    'seller_id' => $sellerId > 0 ? $sellerId : null,
                     'status' => 'pending',
                     'total_amount' => $finalTotal,
                     'currency' => 'BRL',
                     'gateway' => 'mercadopago',
                     'metadata' => array_merge($order->metadata ?? [], [
                         'context' => 'event',
+                        'sale_type' => 'event',
                         'original_total_amount' => $originalTotal,
                     ]),
                 ]);
@@ -287,12 +315,11 @@ class EventReservationController extends Controller
             return redirect()->route('events.show', $event)->with('success', 'Vaga confirmada com sucesso!');
         }
 
-        if (!$gatewayAccount) {
-            return redirect()->route('events.show', $event)->with('error', 'Pagamento indisponível: configure o MercadoPago no painel.');
+        if (!$paymentsConfigured) {
+            return redirect()->route('events.show', $event)->with('error', 'Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.');
         }
 
         $token = data_get($order->metadata, 'public_token');
-        $sellerId = $gatewayAccount->exists ? (string) $gatewayAccount->user_id : 'platform';
 
         $backUrls = [
             'success' => route('events.payment.success', ['order' => $order->id, 'token' => $token]),
@@ -315,10 +342,10 @@ class EventReservationController extends Controller
             'auto_return' => 'approved',
             'external_reference' => (string) $order->id,
             'statement_descriptor' => 'UNN EVENTOS',
-            'notification_url' => route('webhook.mercadopago', ['seller_id' => $sellerId]),
+            'notification_url' => url('/webhook/mercadopago'),
         ];
 
-        $response = Http::withToken($gatewayAccount->access_token)
+        $response = Http::withToken($mpAccessToken)
             ->post('https://api.mercadopago.com/checkout/preferences', $preferenceData);
 
         if ($response->failed()) {
@@ -327,9 +354,9 @@ class EventReservationController extends Controller
 
         $pref = $response->json();
         $order->update([
-            'seller_id' => $gatewayAccount->user_id,
+            'seller_id' => $sellerId > 0 ? $sellerId : null,
             'gateway' => 'mercadopago',
-            'gateway_account_id' => $gatewayAccount->exists ? $gatewayAccount->id : null,
+            'gateway_account_id' => null,
             'metadata' => array_merge($order->metadata ?? [], [
                 'mercadopago_preference_id' => $pref['id'] ?? null,
                 'mercadopago_init_point' => $pref['init_point'] ?? null,
@@ -340,8 +367,10 @@ class EventReservationController extends Controller
         $initPoint = $pref['init_point'] ?? null;
         $sandboxInitPoint = $pref['sandbox_init_point'] ?? null;
 
-        $accessToken = (string) $gatewayAccount->access_token;
-        $useSandbox = str_starts_with($accessToken, 'TEST') || config('app.env') !== 'production';
+        $useSandbox = (bool) config('payments.mercadopago.sandbox', false);
+        if (!$useSandbox) {
+            $useSandbox = str_starts_with($mpAccessToken, 'TEST');
+        }
         if ($useSandbox && $sandboxInitPoint) {
             $initPoint = $sandboxInitPoint;
         }
@@ -412,61 +441,6 @@ class EventReservationController extends Controller
 
         // If there's no end_at, consider the event closed only after the day has passed.
         return $start ? $start->lt($now->copy()->startOfDay()) : false;
-    }
-
-    private function resolveEventsGatewayAccount(): ?GatewayAccount
-    {
-        $account = GatewayAccount::where('provider', 'mercadopago')
-            ->where('enabled', true)
-            ->whereHas('user', function ($q) {
-                $q->whereIn('role', ['admin', 'superadmin'])
-                    ->orWhereIn('level', ['superadmin', 'sucesso']);
-            })
-            ->orderBy('id')
-            ->first();
-
-        if ($account && $account->access_token) {
-            return $account;
-        }
-
-        $accessToken = config('payments.mercadopago.access_token');
-        if (!$accessToken) {
-            return null;
-        }
-
-        return new GatewayAccount([
-            'provider' => 'mercadopago',
-            'access_token' => $accessToken,
-            'public_key' => config('payments.mercadopago.public_key'),
-            'enabled' => true,
-        ]);
-    }
-
-    private function resolveEventGatewayAccount(Event $event): ?GatewayAccount
-    {
-        $seller = $event->user ?: User::find($event->user_id);
-        if (!$seller) {
-            return $this->resolveEventsGatewayAccount();
-        }
-
-        if ($seller->isAdmin()) {
-            return $this->resolveEventsGatewayAccount();
-        }
-
-        if (!$seller->canSellOnMarketplace()) {
-            return null;
-        }
-
-        $account = GatewayAccount::where('user_id', $seller->id)
-            ->where('provider', 'mercadopago')
-            ->where('enabled', true)
-            ->first();
-
-        if ($account && $account->access_token) {
-            return $account;
-        }
-
-        return null;
     }
 
     private function abortIfOrderNotAccessible(Order $order, Request $request): void

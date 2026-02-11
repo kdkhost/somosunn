@@ -27,18 +27,17 @@ class OrderController extends Controller
         }
 
         try {
-            $account = $order->gatewayAccount;
-            if (!$account) {
-                 // Fallback: try to find seller's account for this gateway
-                 $account = \App\Models\GatewayAccount::where('user_id', $order->seller_id)
-                    ->where('gateway', $order->gateway)
-                    ->firstOrFail();
-            }
-
             if ($order->gateway === 'mercadopago') {
                 $service = new \App\Services\Payment\MercadoPagoService();
-                $service->refundPayment($order, $account);
+                $service->refundPayment($order);
             } elseif ($order->gateway === 'pagseguro') {
+                $account = $order->gatewayAccount;
+                if (!$account) {
+                    // Fallback: tenta conta do vendedor (legado)
+                    $account = \App\Models\GatewayAccount::where('user_id', $order->seller_id)
+                        ->where('provider', $order->gateway)
+                        ->firstOrFail();
+                }
                 $service = new \App\Services\Payment\PagSeguroService();
                 $service->refundPayment($order, $account);
             } else {

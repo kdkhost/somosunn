@@ -1,6 +1,7 @@
 <?php
 // Rota para checkout de assinatura (compatível com premium.blade.php) — sempre no início para garantir visibilidade
 Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('subscription.checkout');
+Route::get('/assinatura/sucesso/{order}', [\App\Http\Controllers\SubscriptionController::class, 'success'])->name('subscription.success');
 /**
  * =============================================================================
  * AVISO LEGAL DE DIREITOS AUTORAIS E PROPRIEDADE INTELECTUAL
@@ -379,6 +380,9 @@ Route::post('/checkout/mentorships/{mentorship}', [\App\Http\Controllers\Mentors
 
 Route::post('/webhook/mercadopago/{seller_id}', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])->name('webhook.mercadopago');
 
+// Short links (SEO/OG para compartilhamento)
+Route::get('/p/{code}', [\App\Http\Controllers\ShareController::class, 'product'])->name('share.product');
+
 // Marketplace (Feature: marketplace.buy / marketplace.sales)
 Route::middleware(['check.feature:marketplace.buy'])->group(function () {
     Route::get('/marketplace', [\App\Http\Controllers\MarketplaceController::class, 'index'])->name('marketplace.index');
@@ -418,7 +422,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::prefix('marketplace')->name('marketplace.')->middleware('check.marketplace.seller')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\MarketplaceController::class, 'index'])->name('index');
         Route::get('/pagamentos', [\App\Http\Controllers\Admin\MarketplaceController::class, 'payments'])->name('payments');
-        Route::post('/pagamentos', [\App\Http\Controllers\Admin\MarketplaceController::class, 'updatePayments'])->name('payments.update');
         Route::get('/vendas', [\App\Http\Controllers\Admin\MarketplaceController::class, 'sales'])->name('sales');
     });
 
