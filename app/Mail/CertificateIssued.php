@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class CertificateIssued extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
 
     public $certificate;
     public $user;
