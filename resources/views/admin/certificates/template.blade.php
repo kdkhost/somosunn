@@ -114,28 +114,18 @@
             @if($key === 'platform_logo') @continue @endif
             @continue(!is_array($style))
 
-            @php
-                // Keys that should be strictly horizontally centered as requested
-                $centerKeys = ['student_name', 'course_name', 'completion_date', 'certificate_code'];
-                $isCentered = in_array($key, $centerKeys);
-                
-                // For centered elements: Force Left 50% and Translate X -50%
-                // For others: Use saved X and no transform
-                $leftPos = $isCentered ? '50%' : ($style['x'] . '%');
-                $transform = $isCentered ? 'translateX(-50%)' : 'none';
-            @endphp
-
             <div class="element" style="
-                    left: {{ $leftPos }};
+                    left: {{ $style['x'] }}%;
                     top: {{ $style['y'] }}%;
                     font-size: {{ $style['fontSize'] }}px;
                     color: {{ $style['color'] }};
                     font-weight: {{ $style['fontWeight'] }};
                     font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
-                    text-align: {{ $isCentered ? 'center' : 'left' }};
-                    transform: {{ $transform }};
+                    text-align: left;
                     z-index: {{ $style['zIndex'] ?? 10 }};
                     white-space: nowrap;
+                    position: absolute;
+                    width: auto;
                 ">
                 {{ $dataMap[$key] ?? '' }}
             </div>
