@@ -254,8 +254,8 @@ class CertificateController extends Controller
         ])->render();
 
         $dompdf->loadHtml($html);
-        // Set exact A4 landscape dimensions: 297mm x 210mm
-        $dompdf->setPaper([0, 0, 841.89, 595.28], 'landscape'); // A4 in points (1mm = 2.83465 points)
+        // Set paper to standard A4 Landscape
+        $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
 
         return $dompdf->output();

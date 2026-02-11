@@ -43,6 +43,9 @@
                 transform-origin: center;
                 display: block;
                 position: relative;
+                padding: 0;
+                margin: 0;
+                overflow: hidden; /* Prevent spillover */
             }
         }
 
