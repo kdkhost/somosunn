@@ -355,6 +355,13 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
+                                        <a href="{{ route('admin.settings', ['group' => 'marketplace']) }}"
+                                            class="nav-link {{ request()->route('group') == 'marketplace' ? 'active' : '' }}">
+                                            <i class="fas fa-store nav-icon"></i>
+                                            <p>Marketplace</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a href="{{ route('admin.settings', ['group' => 'gateway']) }}"
                                             class="nav-link {{ request()->route('group') == 'gateway' ? 'active' : '' }}">
                                             <i class="fas fa-credit-card nav-icon"></i>

@@ -25,6 +25,7 @@ class ShareController extends Controller
         $imagePath = '';
         $targetUrl = '';
         $label = '';
+        $sellerName = '';
 
         if ($type === 'course') {
             $course = Course::with('creator')->findOrFail($id);
@@ -33,6 +34,7 @@ class ShareController extends Controller
             $description = (string) ($course->short_description ?: $course->full_description ?: '');
             $imagePath = (string) ($course->thumbnail ?? '');
             $targetUrl = route('courses.show', $course->slug ?: $course->id);
+            $sellerName = (string) (optional($course->creator)->name ?? '');
         } elseif ($type === 'mentorship') {
             $mentorship = Mentorship::with('mentor')->findOrFail($id);
             $label = 'Mentoria';
@@ -40,6 +42,7 @@ class ShareController extends Controller
             $description = (string) ($mentorship->description ?? '');
             $imagePath = (string) ($mentorship->image ?? '');
             $targetUrl = route('mentorships.show', $mentorship);
+            $sellerName = (string) (optional($mentorship->mentor)->name ?? '');
         } elseif ($type === 'event') {
             $event = Event::with('user')->findOrFail($id);
             $label = 'Evento';
@@ -47,8 +50,14 @@ class ShareController extends Controller
             $description = (string) ($event->description ?? '');
             $imagePath = (string) ($event->image ?? '');
             $targetUrl = route('events.show', $event);
+            $sellerName = (string) (optional($event->user)->name ?? '');
         } else {
             abort(404);
+        }
+
+        $sellerName = trim($sellerName);
+        if ($sellerName !== '') {
+            $description = 'Produzido e comercializado por: ' . $sellerName . '. ' . $description;
         }
 
         $metaTitle = trim($title) !== '' ? ($title . ' | Marketplace UNN') : 'Marketplace UNN';
@@ -101,4 +110,3 @@ class ShareController extends Controller
         return asset(ltrim($path, '/'));
     }
 }
-

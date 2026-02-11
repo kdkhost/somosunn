@@ -37,8 +37,8 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 
 ### Webhooks de Pagamento
 Configure as URLs no seu gateway (MercadoPago/PagSeguro):
-- `YOUR_DOMAIN/webhook/mercadopago`
-- `YOUR_DOMAIN/webhook/pagseguro`
+- `YOUR_DOMAIN/api/v1/webhooks/mercadopago`
+- `YOUR_DOMAIN/api/v1/webhooks/pagseguro`
 
 ### SMTP e Emails
 Configure as credenciais no painel admin em **Configurações > SMTP**. Use a ferramenta de "Teste de Envio" para validar.

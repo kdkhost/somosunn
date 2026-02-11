@@ -116,7 +116,7 @@ class MercadoPagoService
     
     private function notificationUrl(): string
     {
-        return url('/webhook/mercadopago');
+        return route('api.webhooks.mercadopago');
     }
 
     private function orderDescription(Order $order): string

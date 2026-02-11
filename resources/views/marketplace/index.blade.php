@@ -275,7 +275,7 @@
                                     {{ $course->title }}
                                 </div>
                                 <div class="text-xs text-slate-500 truncate mt-1">
-                                    por {{ $sellerName }}
+                                    Produzido e comercializado por: {{ $sellerName }}
                                 </div>
 
                                 @if(!empty($course->short_description))
@@ -346,6 +346,8 @@
                         $buyEnabled = $canBuy && $paymentsConfigured && $price > 0 && $sellerCanSell($sellerId);
                         $mentorName = optional($mentorship->mentor)->name ?? 'Mentor';
                         $desc = \Illuminate\Support\Str::limit(strip_tags((string) ($mentorship->description ?? '')), 90);
+                        $image = trim((string) ($mentorship->image ?? ''));
+                        $imageUrl = $image !== '' ? asset(ltrim($image, '/')) : '';
                         $shareCode = \App\Support\ShortLink::encodeProduct('mentorship', (int) $mentorship->id);
                         $shareUrl = $shareCode ? route('share.product', ['code' => $shareCode]) : '';
                     @endphp
@@ -353,14 +355,18 @@
                     <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden">
                         <a href="{{ route('mentorships.show', $mentorship) }}" class="block">
                             <div class="aspect-[16/9] bg-slate-100 relative">
-                                <div class="absolute inset-0 opacity-80"
-                                    style="background: radial-gradient(900px circle at 20% 10%, rgba(31, 94, 219, 0.18) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23, 127, 214, 0.12) 0%, transparent 55%);">
-                                </div>
-                                <div class="relative w-full h-full flex items-center justify-center">
-                                    <div class="w-16 h-16 rounded-2xl bg-white shadow flex items-center justify-center text-slate-400">
-                                        <i class="fas fa-user-tie text-2xl"></i>
+                                @if($imageUrl !== '')
+                                    <img src="{{ $imageUrl }}" alt="{{ $mentorship->title }}" class="w-full h-full object-cover">
+                                @else
+                                    <div class="absolute inset-0 opacity-80"
+                                        style="background: radial-gradient(900px circle at 20% 10%, rgba(31, 94, 219, 0.18) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23, 127, 214, 0.12) 0%, transparent 55%);">
                                     </div>
-                                </div>
+                                    <div class="relative w-full h-full flex items-center justify-center">
+                                        <div class="w-16 h-16 rounded-2xl bg-white shadow flex items-center justify-center text-slate-400">
+                                            <i class="fas fa-user-tie text-2xl"></i>
+                                        </div>
+                                    </div>
+                                @endif
 
                                 <div class="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black text-white shadow"
                                     style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3));">
@@ -381,7 +387,7 @@
                                     {{ $mentorship->title }}
                                 </div>
                                 <div class="text-xs text-slate-500 truncate mt-1">
-                                    por {{ $mentorName }}
+                                    Produzido e comercializado por: {{ $mentorName }}
                                 </div>
 
                                 @if($desc !== '')
@@ -448,6 +454,7 @@
                         $image = trim((string) ($event->image ?? ''));
                         $imageUrl = $image !== '' ? asset(ltrim($image, '/')) : '';
                         $buyEnabled = $price <= 0 ? true : ($canBuy && $paymentsConfigured && $sellerCanSell($sellerId));
+                        $sellerName = optional($event->user)->name ?? 'Organizador';
                         $shareCode = \App\Support\ShortLink::encodeProduct('event', (int) $event->id);
                         $shareUrl = $shareCode ? route('share.product', ['code' => $shareCode]) : '';
                     @endphp
@@ -483,6 +490,9 @@
                                 </div>
                                 <div class="text-xs text-slate-500 truncate mt-1">
                                     {{ $dateLabel ? ('Data: ' . $dateLabel) : ($event->location ?? 'Evento') }}
+                                </div>
+                                <div class="text-xs text-slate-500 truncate mt-1">
+                                    Produzido e comercializado por: {{ $sellerName }}
                                 </div>
 
                                 <div class="mt-3 flex items-end justify-between gap-3">

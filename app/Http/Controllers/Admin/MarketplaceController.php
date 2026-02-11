@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,15 +15,18 @@ class MarketplaceController extends Controller
         $userId = (int) Auth::id();
 
         $paidTotal = (float) Order::where('seller_id', $userId)->where('status', 'paid')->sum('total_amount');
+        $platformFeeTotal = (float) Order::where('seller_id', $userId)->where('status', 'paid')->sum('platform_fee_amount');
+        $netTotal = (float) max(0, $paidTotal - $platformFeeTotal);
         $paidCount = (int) Order::where('seller_id', $userId)->where('status', 'paid')->count();
         $pendingCount = (int) Order::where('seller_id', $userId)->where('status', 'pending')->count();
+        $platformFeePercent = MarketplaceFee::percent();
 
         $mpAccessToken = (string) (config('payments.mercadopago.access_token') ?? '');
         $mpPublicKey = (string) (config('payments.mercadopago.public_key') ?? '');
 
         $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
 
-        return view('admin.marketplace.index', compact('paidTotal', 'paidCount', 'pendingCount', 'paymentsConfigured'));
+        return view('admin.marketplace.index', compact('paidTotal', 'platformFeeTotal', 'netTotal', 'paidCount', 'pendingCount', 'paymentsConfigured', 'platformFeePercent'));
     }
 
     public function payments()
@@ -31,7 +35,7 @@ class MarketplaceController extends Controller
         $mpPublicKey = (string) (config('payments.mercadopago.public_key') ?? '');
 
         $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
-        $webhookUrl = url('/webhook/mercadopago');
+        $webhookUrl = route('api.webhooks.mercadopago');
 
         return view('admin.marketplace.payments', compact('paymentsConfigured', 'webhookUrl'));
     }
@@ -46,8 +50,10 @@ class MarketplaceController extends Controller
             ->paginate(20);
 
         $paidTotal = (float) Order::where('seller_id', $userId)->where('status', 'paid')->sum('total_amount');
+        $platformFeeTotal = (float) Order::where('seller_id', $userId)->where('status', 'paid')->sum('platform_fee_amount');
+        $netTotal = (float) max(0, $paidTotal - $platformFeeTotal);
         $paidCount = (int) Order::where('seller_id', $userId)->where('status', 'paid')->count();
 
-        return view('admin.marketplace.sales', compact('orders', 'paidTotal', 'paidCount'));
+        return view('admin.marketplace.sales', compact('orders', 'paidTotal', 'platformFeeTotal', 'netTotal', 'paidCount'));
     }
 }

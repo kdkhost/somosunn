@@ -7,6 +7,8 @@
     @php
         $orders = $orders ?? null;
         $paidTotal = (float) ($paidTotal ?? 0);
+        $platformFeeTotal = (float) ($platformFeeTotal ?? 0);
+        $netTotal = (float) ($netTotal ?? 0);
         $paidCount = (int) ($paidCount ?? 0);
     @endphp
 
@@ -24,9 +26,11 @@
             <div class="info-box bg-info">
                 <span class="info-box-icon"><i class="fas fa-hand-holding-usd"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">Total recebido (pagos)</span>
-                    <span class="info-box-number">R$ {{ number_format($paidTotal, 2, ',', '.') }}</span>
-                    <span class="progress-description">Valor bruto somado no sistema (sem descontar taxas do gateway).</span>
+                    <span class="info-box-text">Total líquido (pagos)</span>
+                    <span class="info-box-number">R$ {{ number_format($netTotal, 2, ',', '.') }}</span>
+                    <span class="progress-description">
+                        Bruto: R$ {{ number_format($paidTotal, 2, ',', '.') }} | Comissão: R$ {{ number_format($platformFeeTotal, 2, ',', '.') }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -109,4 +113,3 @@
         @endif
     </div>
 @endsection
-

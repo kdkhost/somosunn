@@ -8,6 +8,7 @@
         'player' => 'Player',
         'ads' => 'Anúncios',
         'pwa' => 'PWA',
+        'marketplace' => 'Marketplace',
         'gateway' => 'Pagamentos',
         'smtp' => 'SMTP',
         'social' => 'Social Login',

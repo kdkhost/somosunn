@@ -7,6 +7,7 @@ use App\Models\Mentorship;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class MentorshipController extends Controller
 {
@@ -66,10 +67,21 @@ class MentorshipController extends Controller
     {
         $this->ensurePermission('mentorships.create');
 
-        $data = $this->validatedData($request);
+        $data = $this->validatedData($request, true);
         $data['mentor_id'] = $this->resolveMentorId($request, $data['mentor_id'] ?? null);
         $data['schedule'] = $this->parseSchedule($request->input('schedule_json'));
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+
+        if ($request->hasFile('image') && !Schema::hasColumn('mentorships', 'image')) {
+            return back()->with('error', 'Seu banco de dados está desatualizado: falta a coluna mentorships.image. Atualize o código e rode: php artisan migrate')->withInput();
+        }
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $fileName = 'mentorship_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/mentorship-images'), $fileName);
+            $data['image'] = 'uploads/mentorship-images/' . $fileName;
+        }
 
         if ($request->hasFile('certificate_bg')) {
             $file = $request->file('certificate_bg');
@@ -122,6 +134,30 @@ class MentorshipController extends Controller
         $data['schedule'] = $this->parseSchedule($request->input('schedule_json'));
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
 
+        if (($request->hasFile('image') || $request->boolean('remove_image')) && !Schema::hasColumn('mentorships', 'image')) {
+            $message = 'Seu banco de dados está desatualizado: falta a coluna mentorships.image. Atualize o código e rode: php artisan migrate';
+
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json(['status' => 'error', 'message' => $message], 422);
+            }
+
+            return back()->with('error', $message)->withInput();
+        }
+
+        if ($request->boolean('remove_image')) {
+            $this->deletePublicImageIfExists($mentorship->image);
+            $data['image'] = null;
+        }
+
+        if ($request->hasFile('image')) {
+            $this->deletePublicImageIfExists($mentorship->image);
+
+            $file = $request->file('image');
+            $fileName = 'mentorship_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/mentorship-images'), $fileName);
+            $data['image'] = 'uploads/mentorship-images/' . $fileName;
+        }
+
         if ($request->hasFile('certificate_bg')) {
             $file = $request->file('certificate_bg');
             $fileName = 'cert_bg_m_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
@@ -159,7 +195,7 @@ class MentorshipController extends Controller
         return redirect()->route('admin.mentorships.index')->with('success', 'Mentoria removida com sucesso.');
     }
 
-    private function validatedData(Request $request): array
+    private function validatedData(Request $request, bool $isCreate = false): array
     {
         return $request->validate([
             'title' => 'required|string|max:255',
@@ -167,12 +203,27 @@ class MentorshipController extends Controller
             'price' => 'nullable|numeric|min:0',
             'slots' => 'nullable|integer|min:1|max:100000',
             'description' => 'nullable|string|max:20000',
+            'image' => ($isCreate ? 'required' : 'nullable') . '|image|max:5120',
+            'remove_image' => 'nullable|boolean',
             'schedule_json' => 'nullable|string|max:20000',
             'type' => 'required|in:online,presencial',
             'video_platform' => 'nullable|string|max:255',
             'video_link' => 'nullable|string|max:2000',
             'demo_link' => 'nullable|string|max:2000',
         ]);
+    }
+
+    private function deletePublicImageIfExists(?string $path): void
+    {
+        $path = trim((string) $path);
+        if ($path === '') {
+            return;
+        }
+
+        $fullPath = public_path($path);
+        if (file_exists($fullPath)) {
+            @unlink($fullPath);
+        }
     }
 
     private function parseSchedule(?string $raw): ?array

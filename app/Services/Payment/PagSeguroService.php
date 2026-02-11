@@ -43,7 +43,7 @@ class PagSeguroService
                 'tax_id' => '12345678909', // Requires real CPF in V4
             ], 
             'notification_urls' => [
-               route('webhook.pagseguro')
+               route('api.webhooks.pagseguro')
             ]
         ];
 

@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Services\CouponService;
 use App\Services\Payment\MercadoPagoService;
+use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -91,6 +92,8 @@ class CheckoutController extends Controller
                 }
 
                 $finalTotal = max(0, round($originalTotal - $discountAmount, 2));
+                $platformFeePercent = MarketplaceFee::percent();
+                $platformFeeAmount = MarketplaceFee::amount($finalTotal);
 
                 $order = Order::create([
                     'user_id' => Auth::id(),
@@ -98,7 +101,7 @@ class CheckoutController extends Controller
                     'status' => 'pending',
                     'total_amount' => $finalTotal,
                     'fee_amount' => 0,
-                    'platform_fee_amount' => 0,
+                    'platform_fee_amount' => $platformFeeAmount,
                     'currency' => 'BRL',
                     'gateway' => 'mercadopago',
                     'gateway_account_id' => null,
@@ -107,6 +110,7 @@ class CheckoutController extends Controller
                         'sale_type' => 'course',
                         'public_token' => Str::random(40),
                         'original_total_amount' => $originalTotal,
+                        'platform_fee_percent' => $platformFeePercent,
                     ],
                 ]);
 

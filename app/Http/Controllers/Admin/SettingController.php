@@ -20,6 +20,7 @@ class SettingController extends Controller
             'player',
             'ads',
             'pwa',
+            'marketplace',
             'gateway',
             'smtp',
             'social',

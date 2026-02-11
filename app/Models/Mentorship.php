@@ -13,6 +13,7 @@ class Mentorship extends Model
         'title',
         'mentor_id',
         'description',
+        'image',
         'price',
         'slots',
         'schedule',

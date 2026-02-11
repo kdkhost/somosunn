@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\CouponRedemption;
 use App\Models\User;
 use App\Services\CouponService;
+use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -191,6 +192,8 @@ class EventReservationController extends Controller
             }
 
             $finalTotal = max(0, round($originalTotal - $discountAmount, 2));
+            $platformFeePercent = MarketplaceFee::percent();
+            $platformFeeAmount = MarketplaceFee::amount($finalTotal);
 
             if (!$order) {
                 $order = Order::create([
@@ -199,7 +202,7 @@ class EventReservationController extends Controller
                     'status' => 'pending',
                     'total_amount' => $finalTotal,
                     'fee_amount' => 0,
-                    'platform_fee_amount' => 0,
+                    'platform_fee_amount' => $platformFeeAmount,
                     'currency' => 'BRL',
                     'gateway' => 'mercadopago',
                     'gateway_account_id' => null,
@@ -208,6 +211,7 @@ class EventReservationController extends Controller
                         'sale_type' => 'event',
                         'public_token' => Str::random(40),
                         'original_total_amount' => $originalTotal,
+                        'platform_fee_percent' => $platformFeePercent,
                     ],
                 ]);
             } else {
@@ -216,12 +220,14 @@ class EventReservationController extends Controller
                     'seller_id' => $sellerId > 0 ? $sellerId : null,
                     'status' => 'pending',
                     'total_amount' => $finalTotal,
+                    'platform_fee_amount' => $platformFeeAmount,
                     'currency' => 'BRL',
                     'gateway' => 'mercadopago',
                     'metadata' => array_merge($order->metadata ?? [], [
                         'context' => 'event',
                         'sale_type' => 'event',
                         'original_total_amount' => $originalTotal,
+                        'platform_fee_percent' => $platformFeePercent,
                     ]),
                 ]);
 
@@ -339,11 +345,11 @@ class EventReservationController extends Controller
                 'email' => $order->user->email,
             ],
             'back_urls' => $backUrls,
-            'auto_return' => 'approved',
-            'external_reference' => (string) $order->id,
-            'statement_descriptor' => 'UNN EVENTOS',
-            'notification_url' => url('/webhook/mercadopago'),
-        ];
+             'auto_return' => 'approved',
+             'external_reference' => (string) $order->id,
+             'statement_descriptor' => 'UNN EVENTOS',
+             'notification_url' => route('api.webhooks.mercadopago'),
+         ];
 
         $response = Http::withToken($mpAccessToken)
             ->post('https://api.mercadopago.com/checkout/preferences', $preferenceData);

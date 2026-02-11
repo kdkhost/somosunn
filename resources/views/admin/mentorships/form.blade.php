@@ -99,6 +99,43 @@
                             @enderror
                         </div>
 
+                        <div class="card bg-light border-0 mb-4">
+                            <div class="card-body">
+                                <label class="mb-2"><i class="fas fa-image mr-1"></i> Foto de Capa</label>
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        @if($mentorship->image)
+                                            <img src="{{ asset($mentorship->image) }}" class="img-fluid rounded shadow-sm" alt="Capa da mentoria">
+                                        @else
+                                            <div class="bg-white rounded mb-2 d-flex align-items-center justify-content-center border"
+                                                style="height: 120px;">
+                                                <i class="fas fa-image fa-3x text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="custom-file mb-2">
+                                            <input type="file" name="image" class="custom-file-input" id="mentorshipImage"
+                                                accept="image/png, image/jpeg, image/jpg" {{ !$mentorship->exists ? 'required' : '' }}>
+                                            <label class="custom-file-label" for="mentorshipImage" data-browse="Buscar">Escolher imagem</label>
+                                        </div>
+                                        <small class="text-muted d-block">Recomendado: 1280x720px (JPG/PNG)</small>
+
+                                        @error('image')
+                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                        @enderror
+
+                                        @if($mentorship->image)
+                                            <div class="custom-control custom-switch mt-2">
+                                                <input type="checkbox" class="custom-control-input" id="remove_image" name="remove_image" value="1">
+                                                <label class="custom-control-label" for="remove_image">Remover imagem atual</label>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 <label for="type">Tipo</label>

@@ -593,11 +593,20 @@
                 var eventTextColor = '{{ $eventTextColor }}';
                 var recentLimit = {{ $recentLimit }};
                 var feedUrl = '{{ route("admin.events.feed") }}';
+                var canCreateEvents = @json(auth()->user()->isAdmin() || auth()->user()->hasPermission('events.create'));
+                var canEditEvents = @json(auth()->user()->isAdmin() || auth()->user()->hasPermission('events.edit'));
 
                 // External draggable events
                 var externalEventsEl = document.getElementById('external-events');
-                if (externalEventsEl && typeof FullCalendar.Draggable === 'function') {
-                    new FullCalendar.Draggable(externalEventsEl, {
+                var DraggableCtor = null;
+                if (typeof FullCalendar !== 'undefined' && typeof FullCalendar.Draggable === 'function') {
+                    DraggableCtor = FullCalendar.Draggable;
+                } else if (typeof window.FullCalendarInteraction !== 'undefined' && typeof FullCalendarInteraction.Draggable === 'function') {
+                    DraggableCtor = FullCalendarInteraction.Draggable;
+                }
+
+                if (externalEventsEl && typeof DraggableCtor === 'function') {
+                    new DraggableCtor(externalEventsEl, {
                         itemSelector: '.external-event',
                         eventData: function (eventEl) {
                             var title = eventEl.getAttribute('data-title') || eventEl.innerText.trim();
@@ -634,11 +643,11 @@
                     height: 'auto',
                     contentHeight: 700,
                     events: feedUrl,
-                    editable: @json(auth()->user()->isAdmin()),
-                    droppable: @json(auth()->user()->isAdmin()),
-                    eventStartEditable: @json(auth()->user()->isAdmin()),
-                    eventDurationEditable: @json(auth()->user()->isAdmin()),
-                    selectable: @json(auth()->user()->isAdmin()),
+                    editable: canEditEvents,
+                    droppable: canCreateEvents,
+                    eventStartEditable: canEditEvents,
+                    eventDurationEditable: canEditEvents,
+                    selectable: canCreateEvents,
                     selectMirror: true,
                     eventClick: function (info) {
                         openModal(info.event);
@@ -679,10 +688,10 @@
                 // Recent events list
                 loadRecentEvents();
 
-                // Modal Handling
-                function openModal(event) {
-                    $('#eventForm')[0].reset();
-                    $('#event_id').val('');
+                    // Modal Handling
+                    function openModal(event) {
+                        $('#eventForm')[0].reset();
+                        $('#event_id').val('');
                     $('#published').prop('checked', true);
                     $('#all_day').prop('checked', false);
                     $('#event_latitude').val('');
@@ -691,7 +700,10 @@
                     $('#modalMapContainer').hide();
 
                     const $form = $('#eventForm');
-                    if (!@json(auth()->user()->isAdmin())) {
+                    const isExistingEvent = !!(event && event.id);
+                    const canSubmit = isExistingEvent ? canEditEvents : canCreateEvents;
+
+                    if (!canSubmit) {
                         $form.find('input, select, textarea').prop('disabled', true);
                         $form.find('button[type="submit"]').hide();
                     } else {
@@ -742,9 +754,13 @@
                             showMap(event.extendedProps.latitude, event.extendedProps.longitude, event.extendedProps.address);
                         }
 
-                        $('#btnDelete').show().off('click').on('click', function () {
-                            deleteEvent(event.id);
-                        });
+                        if (canEditEvents) {
+                            $('#btnDelete').show().off('click').on('click', function () {
+                                deleteEvent(event.id);
+                            });
+                        } else {
+                            $('#btnDelete').hide().off('click');
+                        }
                     } else {
                         if (event && event.start) $('#start_at').val(formatDate(new Date(event.start)));
                         if (event && event.end) $('#end_at').val(formatDate(new Date(event.end)));

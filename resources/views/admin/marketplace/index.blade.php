@@ -6,9 +6,12 @@
 @section('content')
     @php
         $paidTotal = (float) ($paidTotal ?? 0);
+        $platformFeeTotal = (float) ($platformFeeTotal ?? 0);
+        $netTotal = (float) ($netTotal ?? 0);
         $paidCount = (int) ($paidCount ?? 0);
         $pendingCount = (int) ($pendingCount ?? 0);
         $paymentsConfigured = (bool) ($paymentsConfigured ?? false);
+        $platformFeePercent = (float) ($platformFeePercent ?? 0);
     @endphp
 
     <div class="row">
@@ -26,8 +29,13 @@
         <div class="col-lg-4 col-md-6">
             <div class="small-box bg-info">
                 <div class="inner">
-                    <h3>R$ {{ number_format($paidTotal, 2, ',', '.') }}</h3>
-                    <p>Total recebido (pagos)</p>
+                    <h3>R$ {{ number_format($netTotal, 2, ',', '.') }}</h3>
+                    <p>Total líquido (pagos)</p>
+                    <div class="text-white-50" style="font-size: 0.9rem;">
+                        Bruto: R$ {{ number_format($paidTotal, 2, ',', '.') }}<br>
+                        Comissão da plataforma{{ $platformFeePercent > 0 ? (' (' . rtrim(rtrim(number_format($platformFeePercent, 2, '.', ''), '0'), '.') . '%)') : '' }}:
+                        R$ {{ number_format($platformFeeTotal, 2, ',', '.') }}
+                    </div>
                 </div>
                 <div class="icon"><i class="fas fa-hand-holding-usd"></i></div>
                 <a href="{{ route('admin.marketplace.sales') }}" class="small-box-footer">Ver detalhes <i class="fas fa-arrow-circle-right"></i></a>
