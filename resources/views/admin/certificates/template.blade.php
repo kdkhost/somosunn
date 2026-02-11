@@ -161,6 +161,7 @@
             top: {{ $logoStyle['y'] }}%;
         width: {{ $logoStyle['width'] ?? 120 }}px;
         height: {{ $logoStyle['height'] ?? 60 }}px;
+        transform: translate(-50%, -50%);
 z-index: {{ $logoStyle['zIndex'] ?? 20 }};
  ">
 
