@@ -235,30 +235,21 @@
             }));
 
             // Modal Logic - Load HTML Preview
+            // Modal Logic - Load PDF Preview
             $('.btn-view-cert').on('click', function () {
                 var hash = $(this).data('hash');
                 var downloadUrl = $(this).data('download');
-                // Use the correct route name
-                var previewUrl = "{{ route('admin.certificates.preview-html', ':hash') }}".replace(':hash', hash);
 
-                // Show loading state
-                $('#certPreviewContainer').html('<div class="text-center p-5"><i class="fas fa-spinner fa-spin fa-3x text-primary"></i><p class="mt-3">Carregando certificado...</p></div>');
+                // Use the view route which streams PDF inline
+                var pdfUrl = "{{ route('admin.certificates.view', ':hash') }}".replace(':hash', hash);
+
                 $('#btnDownloadCert').attr('href', downloadUrl);
+
+                // Set iframe to container
+                $('#certPreviewContainer').html('<iframe src="' + pdfUrl + '" style="width: 100%; height: 100%; border: none;"></iframe>');
 
                 // Open the correct modal ID
                 $('#certificateModal').modal('show');
-
-                // Fetch HTML preview
-                $.ajax({
-                    url: previewUrl,
-                    method: 'GET',
-                    success: function (html) {
-                        $('#certPreviewContainer').html(html);
-                    },
-                    error: function () {
-                        $('#certPreviewContainer').html('<div class="alert alert-danger m-3">Erro ao carregar preview do certificado.</div>');
-                    }
-                });
             });
 
             // Clear preview on close
