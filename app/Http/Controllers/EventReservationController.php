@@ -27,6 +27,13 @@ class EventReservationController extends Controller
             return redirect()->route('events.show', $event)->with('error', 'Este evento já encerrou.');
         }
 
+        $isPaid = (float) $event->current_price > 0;
+        if ($isPaid && !$this->resolveEventGatewayAccount($event)) {
+            return redirect()
+                ->route('events.show', $event)
+                ->with('error', 'Pagamento indisponível: o organizador precisa configurar o MercadoPago para vender este evento.');
+        }
+
         $registration = null;
         if (Auth::check()) {
             $registration = EventRegistration::where('event_id', $event->id)
@@ -57,6 +64,12 @@ class EventReservationController extends Controller
         ]);
 
         $isPaid = (float) $event->current_price > 0;
+        $gatewayAccount = $isPaid ? $this->resolveEventGatewayAccount($event) : null;
+        if ($isPaid && !$gatewayAccount) {
+            return redirect()
+                ->route('events.show', $event)
+                ->with('error', 'Pagamento indisponível: o organizador precisa configurar o MercadoPago para vender este evento.');
+        }
 
         $user = Auth::user();
         if (!$user) {
@@ -274,7 +287,6 @@ class EventReservationController extends Controller
             return redirect()->route('events.show', $event)->with('success', 'Vaga confirmada com sucesso!');
         }
 
-        $gatewayAccount = $this->resolveEventsGatewayAccount();
         if (!$gatewayAccount) {
             return redirect()->route('events.show', $event)->with('error', 'Pagamento indisponível: configure o MercadoPago no painel.');
         }
@@ -428,6 +440,33 @@ class EventReservationController extends Controller
             'public_key' => config('payments.mercadopago.public_key'),
             'enabled' => true,
         ]);
+    }
+
+    private function resolveEventGatewayAccount(Event $event): ?GatewayAccount
+    {
+        $seller = $event->user ?: User::find($event->user_id);
+        if (!$seller) {
+            return $this->resolveEventsGatewayAccount();
+        }
+
+        if ($seller->isAdmin()) {
+            return $this->resolveEventsGatewayAccount();
+        }
+
+        if (!$seller->canAccessFeature('marketplace.sell')) {
+            return null;
+        }
+
+        $account = GatewayAccount::where('user_id', $seller->id)
+            ->where('provider', 'mercadopago')
+            ->where('enabled', true)
+            ->first();
+
+        if ($account && $account->access_token) {
+            return $account;
+        }
+
+        return null;
     }
 
     private function abortIfOrderNotAccessible(Order $order, Request $request): void

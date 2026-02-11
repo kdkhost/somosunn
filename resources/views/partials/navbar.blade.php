@@ -24,6 +24,7 @@
                 ['label' => 'Feed Social', 'href' => route('social.feed'), 'setting_key' => 'feature_social'],
                 ['label' => 'Cursos', 'href' => route('courses.index'), 'setting_key' => 'feature_courses'],
                 ['label' => 'Eventos', 'href' => route('events.index'), 'setting_key' => 'feature_events'],
+                ['label' => 'Marketplace', 'href' => route('marketplace.index'), 'requires_auth' => true],
                 ['label' => 'Membros', 'href' => route('membros')],
             ],
         ],
@@ -64,6 +65,10 @@
                                             @php
                                                 $childSettingKey = $child['setting_key'] ?? null;
                                                 $childEnabled = $childSettingKey ? \App\Models\Setting::get($childSettingKey, '1') === '1' : true;
+                                                $childRequiresAuth = (bool) ($child['requires_auth'] ?? false);
+                                                if ($childRequiresAuth && !Auth::check()) {
+                                                    $childEnabled = false;
+                                                }
                                             @endphp
                                             @if($childEnabled)
                                                 <a href="{{ $child['href'] }}" class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
@@ -120,6 +125,27 @@
                                     Meu perfil
                                 </a>
 
+                                @if(Auth::user()->canAccessFeature('marketplace.buy'))
+                                    <a href="{{ route('marketplace.index') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-store w-5 opacity-70"></i>
+                                        Marketplace
+                                    </a>
+                                @endif
+
+                                @if(Auth::user()->canAccessFeature('marketplace.sell'))
+                                    <a href="{{ route('settings.payment') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-credit-card w-5 opacity-70"></i>
+                                        Configurar pagamentos
+                                    </a>
+                                @endif
+
+                                @if(Auth::user()->canAccessFeature('marketplace.sales'))
+                                    <a href="{{ route('marketplace.sales') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-receipt w-5 opacity-70"></i>
+                                        Minhas vendas
+                                    </a>
+                                @endif
+
                                 @if(Auth::user()->canAccessFeature('admin_panel'))
                                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
                                         <i class="fas fa-th-large w-5 opacity-70"></i>
@@ -171,9 +197,14 @@
                     @if(isset($item['children']))
                         <div class="pl-4 space-y-1">
                             @foreach($item['children'] as $child)
-                                <a href="{{ $child['href'] }}" class="block rounded-xl px-3 py-1.5 text-sm text-gray-600 hover:bg-slate-100 transition-colors">
-                                    {{ $child['label'] }}
-                                </a>
+                                @php
+                                    $childRequiresAuth = (bool) ($child['requires_auth'] ?? false);
+                                @endphp
+                                @if(!$childRequiresAuth || Auth::check())
+                                    <a href="{{ $child['href'] }}" class="block rounded-xl px-3 py-1.5 text-sm text-gray-600 hover:bg-slate-100 transition-colors">
+                                        {{ $child['label'] }}
+                                    </a>
+                                @endif
                             @endforeach
                         </div>
                     @endif
@@ -197,6 +228,24 @@
                 <a href="{{ route('social.profile', Auth::id()) }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                     <i class="fas fa-user-circle w-5 opacity-70"></i> Meu perfil
                 </a>
+
+                @if(Auth::user()->canAccessFeature('marketplace.buy'))
+                    <a href="{{ route('marketplace.index') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                        <i class="fas fa-store w-5 opacity-70"></i> Marketplace
+                    </a>
+                @endif
+
+                @if(Auth::user()->canAccessFeature('marketplace.sell'))
+                    <a href="{{ route('settings.payment') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                        <i class="fas fa-credit-card w-5 opacity-70"></i> Configurar pagamentos
+                    </a>
+                @endif
+
+                @if(Auth::user()->canAccessFeature('marketplace.sales'))
+                    <a href="{{ route('marketplace.sales') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                        <i class="fas fa-receipt w-5 opacity-70"></i> Minhas vendas
+                    </a>
+                @endif
                 
                 @if(Auth::user()->canAccessFeature('admin_panel'))
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">

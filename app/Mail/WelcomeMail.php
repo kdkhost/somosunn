@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\User;
+use App\Services\Mail\SystemMailLayoutData;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -21,6 +22,10 @@ class WelcomeMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject('Bem-vindo à UNN!')->view('emails.welcome');
+        $layout = app(SystemMailLayoutData::class)->make();
+
+        return $this
+            ->subject('Bem-vindo à ' . $layout['siteName'] . '!')
+            ->view('emails.welcome', $layout);
     }
 }

@@ -205,7 +205,8 @@ Route::get('/auth/callback/{provider}', [\App\Http\Controllers\Auth\SocialAuthCo
 Route::post('/upload', [\App\Http\Controllers\UploadController::class, 'upload'])->name('upload.file');
 
 // Webhooks and payments endpoints (placeholders)
-Route::post('/webhook/mercadopago', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadoPago']);
+Route::post('/webhook/mercadopago', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])
+    ->defaults('seller_id', 'platform');
 Route::post('/webhook/pagseguro', [\App\Http\Controllers\PaymentWebhookController::class, 'pagSeguro']);
 
 // Installer
@@ -358,8 +359,10 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
 });
 
 // Payments & Checkout
-Route::get('/settings/payment', [\App\Http\Controllers\GatewayAccountController::class, 'index'])->name('settings.payment');
-Route::post('/settings/payment', [\App\Http\Controllers\GatewayAccountController::class, 'update'])->name('settings.payment.update');
+Route::middleware(['check.feature:marketplace.sell'])->group(function () {
+    Route::get('/settings/payment', [\App\Http\Controllers\GatewayAccountController::class, 'index'])->name('settings.payment');
+    Route::post('/settings/payment', [\App\Http\Controllers\GatewayAccountController::class, 'update'])->name('settings.payment.update');
+});
 
 Route::get('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show');
 Route::post('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
@@ -367,7 +370,18 @@ Route::get('/checkout/success/{order}', fn() => view('checkout.success'))->name(
 Route::get('/checkout/failure/{order}', fn() => view('checkout.failure'))->name('checkout.failure');
 Route::get('/checkout/pending/{order}', fn() => view('checkout.pending'))->name('checkout.pending');
 
+Route::get('/checkout/mentorships/{mentorship}', [\App\Http\Controllers\MentorshipCheckoutController::class, 'show'])->name('mentorships.checkout.show');
+Route::post('/checkout/mentorships/{mentorship}', [\App\Http\Controllers\MentorshipCheckoutController::class, 'process'])->name('mentorships.checkout.process');
+
 Route::post('/webhook/mercadopago/{seller_id}', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])->name('webhook.mercadopago');
+
+// Marketplace (Feature: marketplace.buy / marketplace.sales)
+Route::middleware(['check.feature:marketplace.buy'])->group(function () {
+    Route::get('/marketplace', [\App\Http\Controllers\MarketplaceController::class, 'index'])->name('marketplace.index');
+});
+Route::middleware(['check.feature:marketplace.sales'])->group(function () {
+    Route::get('/marketplace/vendas', [\App\Http\Controllers\MarketplaceController::class, 'sales'])->name('marketplace.sales');
+});
 
 // Admin routes (granular)
 Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class, 'check.plan'])->group(function () {

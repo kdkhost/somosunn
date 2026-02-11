@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Order;
+use App\Services\Mail\SystemMailLayoutData;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -21,6 +22,12 @@ class PaymentConfirmedMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject('Pagamento Confirmado - Pedido #' . $this->order->id)->view('emails.payment_confirmed');
+        $layout = app(SystemMailLayoutData::class)->make();
+
+        return $this
+            ->subject('Pagamento Confirmado - Pedido #' . $this->order->id)
+            ->view('emails.payment_confirmed', array_merge($layout, [
+                'order' => $this->order,
+            ]));
     }
 }

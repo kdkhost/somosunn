@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Course;
 use App\Models\GatewayAccount;
+use App\Models\Mentorship;
 use App\Models\Order;
 use App\Models\User;
 use App\Services\CouponService;
@@ -14,48 +14,48 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-class CheckoutController extends Controller
+class MentorshipCheckoutController extends Controller
 {
-    public function show(Course $course)
+    public function show(Mentorship $mentorship)
     {
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Faça login para finalizar a compra do curso.');
+            return redirect()->route('login')->with('error', 'Faça login para finalizar a compra da mentoria.');
         }
 
-        $seller = $course->creator ?: User::find($course->user_id);
+        $seller = $mentorship->mentor ?: User::find($mentorship->mentor_id);
         if (!$seller || !$seller->canAccessFeature('marketplace.sell')) {
             return redirect()
-                ->route('courses.show', $course->slug ?: $course->id)
+                ->route('mentorships.show', $mentorship)
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
         }
 
-        $gateway = GatewayAccount::where('user_id', $course->user_id)
+        $gateway = GatewayAccount::where('user_id', (int) $mentorship->mentor_id)
             ->where('enabled', true)
             ->first();
 
         if (!$gateway) {
             return redirect()
-                ->route('courses.show', $course->slug ?: $course->id)
+                ->route('mentorships.show', $mentorship)
                 ->with('error', 'Este criador ainda não configurou o recebimento de pagamentos.');
         }
 
-        return view('checkout.index', compact('course', 'gateway'));
+        return view('checkout.mentorship', compact('mentorship', 'gateway'));
     }
 
-    public function process(Request $request, Course $course, MercadoPagoService $mpService, CouponService $couponService)
+    public function process(Request $request, Mentorship $mentorship, MercadoPagoService $mpService, CouponService $couponService)
     {
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Faça login para finalizar a compra do curso.');
+            return redirect()->route('login')->with('error', 'Faça login para finalizar a compra da mentoria.');
         }
 
-        $seller = $course->creator ?: User::find($course->user_id);
+        $seller = $mentorship->mentor ?: User::find($mentorship->mentor_id);
         if (!$seller || !$seller->canAccessFeature('marketplace.sell')) {
             return redirect()
-                ->route('courses.show', $course->slug ?: $course->id)
+                ->route('mentorships.show', $mentorship)
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
         }
 
-        $gateway = GatewayAccount::where('user_id', $course->user_id)
+        $gateway = GatewayAccount::where('user_id', (int) $mentorship->mentor_id)
             ->where('enabled', true)
             ->firstOrFail();
 
@@ -67,8 +67,8 @@ class CheckoutController extends Controller
         $couponCode = $couponService->normalizeCode($request->input('coupon_code'));
 
         try {
-            DB::transaction(function () use ($course, $gateway, $couponCode, $couponService, &$order) {
-                $originalTotal = round((float) $course->price, 2);
+            DB::transaction(function () use ($mentorship, $gateway, $couponCode, $couponService, &$order) {
+                $originalTotal = round((float) $mentorship->price, 2);
 
                 $discountAmount = 0.0;
                 $coupon = null;
@@ -76,8 +76,8 @@ class CheckoutController extends Controller
                 if ($couponCode !== '') {
                     $result = $couponService->validateAndCalculateLocked(
                         $couponCode,
-                        CouponService::CONTEXT_COURSE,
-                        (int) $course->id,
+                        CouponService::CONTEXT_MENTORSHIP,
+                        (int) $mentorship->id,
                         (int) Auth::id(),
                         (float) $originalTotal
                     );
@@ -89,7 +89,7 @@ class CheckoutController extends Controller
 
                 $order = Order::create([
                     'user_id' => Auth::id(),
-                    'seller_id' => $course->user_id,
+                    'seller_id' => (int) $mentorship->mentor_id,
                     'status' => 'pending',
                     'total_amount' => $finalTotal,
                     'fee_amount' => 0,
@@ -98,20 +98,22 @@ class CheckoutController extends Controller
                     'gateway' => $gateway->provider,
                     'gateway_account_id' => $gateway->id,
                     'metadata' => [
+                        // Reusa os back_urls do checkout padrão.
                         'context' => 'course',
+                        'marketplace_context' => 'mentorship',
                         'public_token' => Str::random(40),
                         'original_total_amount' => $originalTotal,
                     ],
                 ]);
 
                 $order->items()->create([
-                    'item_type' => 'course',
-                    'item_id' => $course->id,
-                    'title' => $course->title,
+                    'item_type' => 'mentorship',
+                    'item_id' => $mentorship->id,
+                    'title' => $mentorship->title,
                     'price' => $finalTotal,
                     'quantity' => 1,
                     'data' => [
-                        'original_unit_price' => (float) $course->price,
+                        'original_unit_price' => (float) $mentorship->price,
                         'discount_amount' => $discountAmount,
                     ],
                 ]);

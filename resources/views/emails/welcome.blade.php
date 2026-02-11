@@ -1,78 +1,33 @@
-<!DOCTYPE html>
-<html>
+@extends('emails.layouts.system')
 
-<head>
-    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
-    <style>
-        body {
-            font-family: sans-serif;
-            background-color: #f8fbff;
-            margin: 0;
-            padding: 0;
-        }
+@section('content')
+    <h2 style="margin: 0 0 14px 0; font-size: 22px; line-height: 1.2; color: #111827;">
+        Bem-vindo(a), {{ $user->name }}!
+    </h2>
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+    <p style="margin: 0 0 14px 0;">
+        Sua conta foi criada com sucesso e você já pode acessar a plataforma.
+    </p>
 
-        .header {
-            background: linear-gradient(135deg, #1F5EDB 0%, #177FD6 100%);
-            padding: 30px;
-            text-align: center;
-            color: white;
-        }
+    <p style="margin: 0 0 22px 0;">
+        Aproveite para se conectar com outros membros, acessar conteúdos e explorar tudo o que a UNN oferece.
+    </p>
 
-        .content {
-            padding: 30px;
-            line-height: 1.6;
-            color: #334155;
-        }
+    @php
+        $buttonColor = $primaryColor ?? '#1F5EDB';
+        $loginUrl = route('login');
+    @endphp
 
-        .button {
-            display: inline-block;
-            background-color: #1F5EDB;
-            color: white;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
+    <p style="text-align: center; margin: 24px 0 26px 0;">
+        <a href="{{ $loginUrl }}"
+            style="display: inline-block; background-color: {{ $buttonColor }}; color: #ffffff; padding: 12px 22px; text-decoration: none; border-radius: 8px; font-weight: 700;">
+            Acessar minha conta
+        </a>
+    </p>
 
-        .footer {
-            background-color: #f1f5f9;
-            padding: 20px;
-            text-align: center;
-            font-size: 12px;
-            color: #64748b;
-        }
-    </style>
-</head>
+    <p style="margin: 0;">
+        Obrigado,<br>
+        {{ $siteName ?? config('app.name') }}
+    </p>
+@endsection
 
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Bem-vindo à UNN! 🚀</h1>
-        </div>
-        <div class="content">
-            <p>Olá, <strong>{{ $user->name }}</strong>!</p>
-            <p>Estamos muito felizes em ter você conosco. Sua conta foi criada com sucesso e agora você faz parte da
-                maior comunidade de networking estratégico.</p>
-            <p>Aproveite para conectar-se com outros empreendedores, acessar conteúdos exclusivos e expandir seus
-                negócios.</p>
-            <center>
-                <a href="{{ route('login') }}" class="button">Acessar minha conta</a>
-            </center>
-        </div>
-        <div class="footer">
-            &copy; {{ date('Y') }} UNN - Todos os direitos reservados.
-        </div>
-    </div>
-</body>
-
-</html>

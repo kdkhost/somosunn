@@ -204,10 +204,18 @@
                         </div>
 
                         <div class="mt-10 flex flex-col gap-4">
+                            @if($price > 0)
+                                <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
+                                    class="btn-primary text-white px-8 py-4 rounded-2xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_15px_30px_-10px_rgba(31,94,219,0.4)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
+                                    Comprar mentoria <i class="fas fa-lock"></i>
+                                </a>
+                            @endif
+
                             <a href="{{ route('premium') }}"
-                                class="btn-primary text-white px-8 py-4 rounded-2xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_15px_30px_-10px_rgba(31,94,219,0.4)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
-                                Ver planos Premium <i class="fas fa-crown"></i>
+                                class="px-8 py-4 rounded-2xl font-bold border-2 border-slate-100 text-slate-700 hover:bg-slate-50 hover:border-slate-200 transition-all duration-300 inline-flex items-center justify-center whitespace-nowrap">
+                                Ver planos Premium <i class="fas fa-crown ml-2"></i>
                             </a>
+
                             <a href="{{ route('mentorships.index') }}"
                                 class="px-8 py-4 rounded-2xl font-bold border-2 border-slate-100 text-slate-600 hover:bg-slate-50 hover:border-slate-200 transition-all duration-300 inline-flex items-center justify-center whitespace-nowrap">
                                 Ver outras mentorias
@@ -215,7 +223,7 @@
                         </div>
 
                         <p class="mt-8 text-xs text-slate-400 text-center leading-relaxed">
-                            Acesso exclusivo para membros. Planos Premium liberam mentorias ilimitadas.
+                            Acesso exclusivo para membros. Você pode comprar esta mentoria (quando disponível) ou acessar via planos Premium (conforme regras do seu plano).
                         </p>
                     </aside>
                 </div>

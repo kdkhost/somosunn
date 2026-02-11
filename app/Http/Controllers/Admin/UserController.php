@@ -48,6 +48,7 @@ class UserController extends Controller
         'marketplace' => 'Acesso ao marketplace',
         'marketplace.sales' => 'Ver histórico de vendas',
         'marketplace.buy' => 'Comprar produtos/serviços',
+        'marketplace.sell' => 'Vender no marketplace',
 
         // Extras
         'rankings' => 'Participar do ranking',

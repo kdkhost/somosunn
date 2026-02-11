@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Certificate;
+use App\Services\Mail\SystemMailLayoutData;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -15,7 +16,9 @@ class CertificateIssued extends Mailable
 
     public $certificate;
     public $user;
-    public $course;
+    public $product;
+    public $itemTypeLabel;
+    public $itemTitle;
     public $url;
 
     /**
@@ -27,7 +30,11 @@ class CertificateIssued extends Mailable
     {
         $this->certificate = $certificate;
         $this->user = $certificate->user;
-        $this->course = $certificate->course;
+        $this->product = $certificate->course ?? $certificate->mentorship ?? $certificate->event;
+        $this->itemTypeLabel = $certificate->course_id
+            ? 'o curso'
+            : ($certificate->mentorship_id ? 'a mentoria' : ($certificate->event_id ? 'o evento' : 'o conteúdo'));
+        $this->itemTitle = (string) ($this->product->title ?? 'UNN');
         $this->url = asset('storage/' . $certificate->pdf_path);
     }
 
@@ -78,12 +85,27 @@ class CertificateIssued extends Mailable
                 // Regenerate using public method
                 $newCert = $controller->issueCertificate($this->certificate->user_id, $type, $id);
                 $this->certificate->refresh(); // Reload from database
+                $this->product = $this->certificate->course ?? $this->certificate->mentorship ?? $this->certificate->event;
+                $this->itemTitle = (string) ($this->product->title ?? $this->itemTitle);
+                $this->url = asset('storage/' . $this->certificate->pdf_path);
                 $pdfPath = storage_path('app/public/' . $this->certificate->pdf_path);
             }
         }
 
-        $mail = $this->markdown('emails.certificates.issued')
-            ->subject('Seu Certificado do curso ' . $this->course->title);
+        $layout = app(SystemMailLayoutData::class)->make();
+
+        $subjectPrefix = $this->certificate->course_id
+            ? 'Seu Certificado do curso '
+            : ($this->certificate->mentorship_id ? 'Seu Certificado da mentoria ' : ($this->certificate->event_id ? 'Seu Certificado do evento ' : 'Seu Certificado - '));
+
+        $mail = $this
+            ->subject($subjectPrefix . $this->itemTitle)
+            ->view('emails.certificates.issued', array_merge($layout, [
+                'user' => $this->user,
+                'url' => $this->url,
+                'itemTypeLabel' => $this->itemTypeLabel,
+                'itemTitle' => $this->itemTitle,
+            ]));
 
         // Only attach if PDF exists
         if ($pdfPath && file_exists($pdfPath)) {

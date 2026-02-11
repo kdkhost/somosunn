@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Course;
+use App\Models\Enrollment;
 use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\GatewayAccount;
+use App\Models\Mentorship;
 use App\Models\Order;
 use App\Models\Plan;
 use App\Services\CouponService;
 use App\Services\InvoiceService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -17,90 +20,126 @@ use Illuminate\Support\Str;
 
 class PaymentWebhookController extends Controller
 {
-    public function mercadoPago(Request $request, $seller_id)
+    public function mercadopago(Request $request, $seller_id = 'platform')
     {
-        // Minimal validation of "topic" or type
         $type = $request->input('type') ?? $request->input('topic');
-        
-        if ($type === 'payment') {
-            try {
-                // Fetch payment info from API to verify status
-                $paymentId = $request->input('data.id') ?? $request->input('id');
-                if (!$paymentId) {
-                    Log::warning('MP Webhook: missing payment id', ['payload' => $request->all()]);
-                    return response('OK', 200);
-                }
-                
-                // We're blindly trusting the webhook ID presence, but ideally we query the API using the seller's token.
-                // Since we have multiple sellers, it's tricky without knowing which seller.
-                // However, internal logic: if we have the order ID in external_reference, use it.
-                // BUT MP webhook only sends ID. We need to query API.
-                // Simplification for now: Assume valid if signature check passes (TODO) or trust data.
-                
-                // Better approach: We can't query API without Token. 
-                // We can try to find Order by transaction_id if we saved it during checkout creation? 
-                // No, checkout creation yields Preference ID (MP). 
-                // MP sends 'external_reference' in the payment object.
-                // So we MUST query the payment.
-                // Limitation: We don't know which seller token to use unless we iterate or use a global token (not the case here).
-                
-                // ALTERNATIVE: Use the `seller_id` passed in the URL (we added this in service).
-                $sellerId = (string) $seller_id;
+        if ($type !== 'payment') {
+            return response('OK', 200);
+        }
 
-                $token = null;
-                if ($sellerId === 'platform') {
-                    $token = config('payments.mercadopago.access_token');
-                } elseif (ctype_digit($sellerId)) {
-                    $sellerAccount = GatewayAccount::where('user_id', (int) $sellerId)
-                        ->where('provider', 'mercadopago')
-                        ->where('enabled', true)
-                        ->first();
-
-                    $token = $sellerAccount?->access_token;
-                }
-
-                if (!$token) {
-                    $token = config('payments.mercadopago.access_token');
-                }
-                
-                if ($token) {
-                     $response = Http::withToken($token)->get('https://api.mercadopago.com/v1/payments/' . $paymentId);
-                     
-                     if ($response->successful()) {
-                         $data = $response->json();
-                         $orderId = $data['external_reference'] ?? null;
-                         $status = $data['status'] ?? '';
-                         
-                         if ($orderId && $status === 'approved') {
-                             $order = Order::find($orderId);
-                             if ($order) {
-                                 $wasPaid = $order->status === 'paid';
-
-                                 if (!$wasPaid) {
-                                     $order->update([
-                                         'status' => 'paid',
-                                         'transaction_id' => (string) $paymentId,
-                                         'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
-                                     ]);
-                                     Log::info("Order #{$orderId} marked as PAID via MP Webhook");
-                                 } else {
-                                     $order->update([
-                                         'transaction_id' => $order->transaction_id ?: (string) $paymentId,
-                                         'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
-                                     ]);
-                                 }
-
-                                 app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
-                                 $this->confirmEventRegistrationsForOrder($order);
-                                 $this->activatePlanForOrder($order);
-                                 app(InvoiceService::class)->issueAndQueueForOrder($order);
-                             }
-                         }
-                     }
-                }
-            } catch (\Exception $e) {
-                Log::error('MP Webhook Error: ' . $e->getMessage(), ['seller_id' => $seller_id]);
+        try {
+            $paymentId = $request->input('data.id') ?? $request->input('id');
+            if (!$paymentId) {
+                Log::warning('MP Webhook: missing payment id', ['payload' => $request->all()]);
+                return response('OK', 200);
             }
+
+            $sellerId = (string) $seller_id;
+
+            $token = null;
+            if ($sellerId === 'platform') {
+                $token = config('payments.mercadopago.access_token');
+            } elseif (ctype_digit($sellerId)) {
+                $sellerAccount = GatewayAccount::where('user_id', (int) $sellerId)
+                    ->where('provider', 'mercadopago')
+                    ->where('enabled', true)
+                    ->first();
+
+                $token = $sellerAccount?->access_token;
+            }
+
+            if (!$token) {
+                $token = config('payments.mercadopago.access_token');
+            }
+
+            if (!$token) {
+                Log::warning('MP Webhook: missing token for seller', ['seller_id' => $sellerId]);
+                return response('OK', 200);
+            }
+
+            $response = Http::withToken($token)->get('https://api.mercadopago.com/v1/payments/' . $paymentId);
+            if (!$response->successful()) {
+                Log::warning('MP Webhook: failed to fetch payment', ['payment_id' => $paymentId, 'status' => $response->status()]);
+                return response('OK', 200);
+            }
+
+            $data = $response->json();
+            $orderId = $data['external_reference'] ?? null;
+            $status = (string) ($data['status'] ?? '');
+
+            if (!$orderId || $status !== 'approved') {
+                return response('OK', 200);
+            }
+
+            $order = Order::find($orderId);
+            if (!$order) {
+                return response('OK', 200);
+            }
+
+            $wasPaid = (string) $order->status === 'paid';
+
+            if (!$wasPaid) {
+                $order->update([
+                    'status' => 'paid',
+                    'transaction_id' => (string) $paymentId,
+                    'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
+                ]);
+                Log::info("Order #{$orderId} marked as PAID via MP Webhook");
+            } else {
+                $order->update([
+                    'transaction_id' => $order->transaction_id ?: (string) $paymentId,
+                    'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
+                ]);
+            }
+
+            app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
+            $this->confirmEventRegistrationsForOrder($order);
+            $this->activatePlanForOrder($order);
+            $this->fulfillDigitalItemsForOrder($order);
+            app(InvoiceService::class)->issueAndQueueForOrder($order);
+        } catch (\Throwable $e) {
+            Log::error('MP Webhook Error: ' . $e->getMessage(), ['seller_id' => $seller_id]);
+        }
+
+        return response('OK', 200);
+    }
+
+    public function pagSeguro(Request $request)
+    {
+        Log::info('PagSeguro webhook', $request->all());
+
+        $referenceId = $request->input('reference_id');
+        $charges = $request->input('charges');
+
+        if (!$referenceId || !$charges || !is_array($charges)) {
+            return response('OK', 200);
+        }
+
+        $order = Order::find($referenceId);
+        if (!$order) {
+            return response('OK', 200);
+        }
+
+        foreach ($charges as $charge) {
+            if (($charge['status'] ?? '') !== 'PAID') {
+                continue;
+            }
+
+            if ((string) $order->status !== 'paid') {
+                $order->update([
+                    'status' => 'paid',
+                    'transaction_id' => $charge['id'] ?? null,
+                    'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $request->all()]),
+                ]);
+                Log::info("Order #{$referenceId} marked as PAID via PS Webhook");
+            }
+
+            app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
+            $this->confirmEventRegistrationsForOrder($order);
+            $this->activatePlanForOrder($order);
+            $this->fulfillDigitalItemsForOrder($order);
+            app(InvoiceService::class)->issueAndQueueForOrder($order);
+            break;
         }
 
         return response('OK', 200);
@@ -149,6 +188,47 @@ class PaymentWebhookController extends Controller
         });
     }
 
+    private function fulfillDigitalItemsForOrder(Order $order): void
+    {
+        $order->loadMissing('items');
+
+        foreach ($order->items as $item) {
+            if ($item->item_type === 'course') {
+                $course = Course::find($item->item_id);
+                if (!$course) {
+                    continue;
+                }
+
+                Enrollment::firstOrCreate([
+                    'user_id' => $order->user_id,
+                    'enrollable_id' => $course->id,
+                    'enrollable_type' => Course::class,
+                ], [
+                    'status' => 'active',
+                    'started_at' => now(),
+                    'progress' => [],
+                ]);
+            }
+
+            if ($item->item_type === 'mentorship') {
+                $mentorship = Mentorship::find($item->item_id);
+                if (!$mentorship) {
+                    continue;
+                }
+
+                Enrollment::firstOrCreate([
+                    'user_id' => $order->user_id,
+                    'enrollable_id' => $mentorship->id,
+                    'enrollable_type' => Mentorship::class,
+                ], [
+                    'status' => 'active',
+                    'started_at' => now(),
+                    'progress' => [],
+                ]);
+            }
+        }
+    }
+
     private function activatePlanForOrder(Order $order): void
     {
         $item = $order->items()->where('item_type', 'plan')->first();
@@ -192,38 +272,5 @@ class PaymentWebhookController extends Controller
             'anual' => now()->addYear(),
             default => now()->addMonth(),
         };
-    }
-
-    public function pagSeguro(Request $request)
-    {
-        // PagSeguro V4 sends 'reference_id' in the body directly often.
-        \Log::info('PagSeguro webhook', $request->all());
-        
-        $referenceId = $request->input('reference_id');
-        $charges = $request->input('charges');
-        
-        if ($referenceId && $charges) {
-            $order = \App\Models\Order::find($referenceId);
-            if ($order) {
-                // Check if any charge is PAID
-                foreach ($charges as $charge) {
-                    if (($charge['status'] ?? '') === 'PAID') {
-                         if ($order->status !== 'paid') {
-                             $order->update([
-                                 'status' => 'paid',
-                                 'transaction_id' => $charge['id'] ?? null, // Save Charge ID for refund
-                                 'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $request->all()])
-                             ]);
-                             \Log::info("Order #{$referenceId} marked as PAID via PS Webhook");
-                         }
-                         app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
-                         app(InvoiceService::class)->issueAndQueueForOrder($order);
-                         break;
-                    }
-                }
-            }
-        }
-        
-        return response('OK', 200);
     }
 }

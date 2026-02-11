@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MailTemplate;
 use App\Http\Controllers\MailTestController;
+use App\Services\Mail\SystemMailLayoutData;
 
 class MailTemplateController extends Controller
 {
@@ -145,39 +146,16 @@ class MailTemplateController extends Controller
         // Allowed tags
         $allowed = '<p><a><strong><em><ul><ol><li><br><img><table><tr><td><th><tbody><thead><h1><h2><h3><h4><h5><span><div><style><center>'; 
         $content = strip_tags($rendered, $allowed);
+        $layout = app(SystemMailLayoutData::class)->make();
+        if (!empty($data['site']['name'])) {
+            $layout['siteName'] = (string) $data['site']['name'];
+        }
+        if (!empty($data['site']['logo'])) {
+            $layout['logoUrl'] = (string) $data['site']['logo'];
+        }
 
-        // System Colors
-        $primaryColor = \App\Models\Setting::where('key', 'site_color_primary')->value('value') ?? '#007bff';
-        $secondaryColor = \App\Models\Setting::where('key', 'site_color_secondary')->value('value') ?? '#6c757d';
-        
-        // Wrap with layout
-        $layout = '
-        <div style="background-color: #f4f6f9; padding: 20px; font-family: sans-serif; min-height: 100%;">
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td align="center">
-                        <div style="background-color: #ffffff; max-width: 600px; padding: 0px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
-                            <!-- Header -->
-                            <div style="background: linear-gradient(135deg, '.$primaryColor.' 0%, '.$secondaryColor.' 100%); padding: 30px 20px; text-align: center;">
-                                <img src="'.$data['site']['logo'].'" alt="{{site.name}}" style="max-height: 60px; max-width: 200px;">
-                            </div>
-                            
-                            <!-- Body -->
-                            <div style="padding: 30px; color: #333333; line-height: 1.6;">
-                                '.$content.'
-                            </div>
-                            
-                            <!-- Footer -->
-                            <div style="background-color: #f8f9fa; padding: 20px; text-align: center; color: #777777; font-size: 12px; border-top: 1px solid #eeeeee;">
-                                <p>&copy; '.date('Y').' '.$data['site']['name'].'. Todos os direitos reservados.</p>
-                                <p><a href="'.$data['site']['url'].'" style="color: '.$primaryColor.'; text-decoration: none;">Visite nosso site</a></p>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>';
-
-        return $layout;
+        return view('emails.system', array_merge($layout, [
+            'content' => $content,
+        ]))->render();
     }
 }
