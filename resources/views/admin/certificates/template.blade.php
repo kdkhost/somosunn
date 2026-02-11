@@ -112,21 +112,20 @@
             @continue(!is_array($style))
 
             <div class="element" style="
-                                    left: {{ $style['x'] }}%;
-                                    top: {{ $style['y'] }}%;
-                                    font-size: {{ $style['fontSize'] }}px;
-                                    color: {{ $style['color'] }};
-                                    font-weight: {{ $style['fontWeight'] }};
-                                    font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
-                                    transform: translate(-50%, -50%); /* Center based on coords */
-                                    z-index: {{ $style['zIndex'] ?? 10 }};
-                                ">
+                                        left: {{ $style['x'] }}%;
+                                        top: {{ $style['y'] }}%;
+                                        font-size: {{ $style['fontSize'] }}px;
+                                        color: {{ $style['color'] }};
+                                        font-weight: {{ $style['fontWeight'] }};
+                                        font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
+                                        z-index: {{ $style['zIndex'] ?? 10 }};
+                                    ">
                 {{ $dataMap[$key] ?? '' }}
             </div>
         @endforeach
 
         @php 
-                                                                            $logoStyle = $settings['platform_logo'];
+                                                                                        $logoStyle = $settings['platform_logo'];
 
             // Use the same logic as Auth Visual component
             $logoPath = \App\Models\Setting::get('logo_auth') ?: \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
@@ -143,15 +142,14 @@
                 $logoUrl = public_path($logoRelPath);
             }
         @endphp
-    <div class="element" style="
+<div class="element" style="
         left: {{ $logoStyle['x'] }}%;
             top: {{ $logoStyle['y'] }}%;
         width: {{ $logoStyle['width'] ?? 120 }}px;
         height: {{ $logoStyle['height'] ?? 60 }}px;
-    transform: translate(-50%, -50%);
-    z-index: {{ $logoStyle['zIndex'] ?? 20 }};
+z-index: {{ $logoStyle['zIndex'] ?? 20 }};
+ ">
 
-     ">
 
 
 
