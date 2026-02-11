@@ -169,9 +169,9 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body p-0" style="background: #f5f5f5; overflow: auto; max-height: 80vh;">
-                    <div id="certPreviewContainer"
-                        style="width: 100%; padding: 20px; display: flex; justify-content: center; align-items: center;">
+                <div class="modal-body p-3"
+                    style="background: #f5f5f5; max-height: 75vh; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <div id="certPreviewContainer" style="max-width: 100%; max-height: 100%; overflow: hidden;">
                         <!-- Certificate HTML will be loaded here -->
                     </div>
                 </div>
