@@ -2,4 +2,5 @@ root = true
 
 [*]
 charset = utf-8
-
+# IMPORTANTE: este projeto usa UTF-8 SEM BOM.
+# NUNCA salve arquivos como "UTF-8 with BOM" (bytes EF BB BF no início do arquivo).

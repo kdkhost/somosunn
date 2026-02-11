@@ -1,4 +1,4 @@
-﻿@extends('admin.layouts.app')
+@extends('admin.layouts.app')
 @php
     use Illuminate\Support\Str;
     $getUrl = function ($key) use ($settings) {
