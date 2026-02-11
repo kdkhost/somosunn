@@ -183,6 +183,44 @@
                                                 </select>
                                             </div>
 
+                                            @php
+                                                $certTitleInput = data_get($event->certificate_settings, 'meta.titleText');
+                                                if (!is_string($certTitleInput) || trim($certTitleInput) === '') {
+                                                    $legacyCustom = data_get($event->certificate_settings, 'custom_title');
+                                                    $legacyTitle = data_get($event->certificate_settings, 'title');
+                                                    $certTitleInput = is_string($legacyCustom)
+                                                        ? $legacyCustom
+                                                        : (is_string($legacyTitle) ? $legacyTitle : 'CERTIFICADO DE PARTICIPAÇÃO');
+                                                }
+
+                                                $certPresentationInput = data_get($event->certificate_settings, 'meta.presentationText');
+                                                if (!is_string($certPresentationInput)) {
+                                                    $legacyCustomPres = data_get($event->certificate_settings, 'custom_presentation_text');
+                                                    $legacyPres = data_get($event->certificate_settings, 'presentation_text');
+                                                    $certPresentationInput = is_string($legacyCustomPres)
+                                                        ? $legacyCustomPres
+                                                        : (is_string($legacyPres) ? $legacyPres : '');
+                                                }
+                                            @endphp
+
+                                            <div class="form-group">
+                                                <label class="small text-muted text-uppercase font-weight-bold">Título do
+                                                    Certificado</label>
+                                                <input type="text" class="form-control" name="certificate_title"
+                                                    id="certificate_title"
+                                                    value="{{ old('certificate_title', $certTitleInput) }}"
+                                                    placeholder="CERTIFICADO DE PARTICIPAÇÃO">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="small text-muted text-uppercase font-weight-bold">Texto de
+                                                    Apresentação</label>
+                                                <textarea class="form-control" name="presentation_text" id="presentation_text"
+                                                    rows="2"
+                                                    placeholder="Texto de apresentação (opcional)">{{ old('presentation_text', $certPresentationInput) }}</textarea>
+                                                <small class="text-muted">Texto acima do nome do participante (opcional)</small>
+                                            </div>
+
                                             <div class="form-group mt-3">
                                                 <label class="small text-muted text-uppercase font-weight-bold">Assinatura do
                                                     Organizador</label>
@@ -326,7 +364,7 @@
                                                 <label
                                                     class="small text-muted text-uppercase font-weight-bold mb-2">Visibilidade</label>
                                                 <div class="list-group list-group-flush border rounded overflow-hidden">
-                                                    @foreach(['student_name' => 'Nome do Participante', 'course_name' => 'Nome do Evento', 'completion_date' => 'Data do Evento', 'certificate_code' => 'Cód. Validação', 'author_name' => 'Organizador', 'workload_hours' => 'Carga Horária', 'platform_logo' => 'Logo UNN'] as $tag => $label)
+                                                    @foreach(['student_name' => 'Nome do Participante', 'course_name' => 'Nome do Evento', 'completion_date' => 'Data do Evento', 'certificate_code' => 'Cód. Validação', 'author_name' => 'Organizador', 'workload_hours' => 'Carga Horária', 'title' => 'Título do Certificado', 'presentation_text' => 'Texto de Apresentação', 'instructor_signature' => 'Assinatura do Organizador', 'platform_logo' => 'Logo UNN'] as $tag => $label)
                                                         <div
                                                             class="list-group-item py-2 px-3 d-flex justify-content-between align-items-center bg-light">
                                                             <span class="small font-weight-bold">{{ $label }}</span>
@@ -442,6 +480,18 @@
                     certDoc.meta.backgroundFit = rawCertSettings.backgroundFit;
                 }
 
+                if (rawCertSettings && typeof rawCertSettings.custom_title === 'string') {
+                    certDoc.meta.titleText = rawCertSettings.custom_title;
+                } else if (rawCertSettings && typeof rawCertSettings.title === 'string') {
+                    certDoc.meta.titleText = rawCertSettings.title;
+                }
+
+                if (rawCertSettings && typeof rawCertSettings.custom_presentation_text === 'string') {
+                    certDoc.meta.presentationText = rawCertSettings.custom_presentation_text;
+                } else if (rawCertSettings && typeof rawCertSettings.presentation_text === 'string') {
+                    certDoc.meta.presentationText = rawCertSettings.presentation_text;
+                }
+
                 if (rawCertSettings && typeof rawCertSettings === 'object') {
                     Object.keys(rawCertSettings).forEach((k) => {
                         const v = rawCertSettings[k];
@@ -461,6 +511,11 @@
                 $logoAuthSrc = $logoAuth ? asset(ltrim($logoAuth, '/')) : asset('img/logo.svg');
             @endphp
             const platformLogoUrl = "{{ $logoAuthSrc }}";
+            const instructorSignatureUrl = "{{ $event->instructor_signature ? asset($event->instructor_signature) : '' }}";
+            let instructorSignaturePreviewUrl = instructorSignatureUrl;
+
+            const initialTitleText = ($('#certificate_title').length ? ($('#certificate_title').val() || certDoc.meta.titleText) : certDoc.meta.titleText) || 'CERTIFICADO DE PARTICIPAÇÃO';
+            const initialPresentationText = ($('#presentation_text').length ? ($('#presentation_text').val() || certDoc.meta.presentationText) : certDoc.meta.presentationText) || '';
 
             const defaultTags = {
                 'student_name': { x: 50, y: 40, text: '[Nome do Participante]', fontSize: 30, color: '#000000', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' },
@@ -469,18 +524,24 @@
                 'certificate_code': { x: 50, y: 85, text: 'Validação: ABC-123', fontSize: 12, color: '#999999', fontWeight: 'normal', fontFamily: 'Arial, sans-serif' },
                 'author_name': { x: 50, y: 90, text: 'UNN Eventos', fontSize: 18, color: '#333333', fontWeight: 'bold', fontFamily: 'Arial, sans-serif', zIndex: 10 },
                 'workload_hours': { x: 80, y: 90, text: 'Evento', fontSize: 14, color: '#666666', fontWeight: 'normal', fontFamily: 'Arial, sans-serif', zIndex: 10 },
+                'title': { x: 10, y: 18, text: initialTitleText, fontSize: 34, color: '#000000', fontWeight: 'bold', fontFamily: 'Arial, sans-serif', zIndex: 15, visible: false, multiline: true, maxWidth: 700, textAlign: 'center' },
+                'presentation_text': { x: 10, y: 28, text: initialPresentationText, fontSize: 16, color: '#333333', fontWeight: 'normal', fontFamily: 'Arial, sans-serif', zIndex: 15, visible: false, multiline: true, maxWidth: 700, textAlign: 'center' },
+                'instructor_signature': { x: 70, y: 80, text: 'Assinatura do Organizador', fontSize: 12, color: '#6c757d', fontWeight: 'normal', fontFamily: 'Arial, sans-serif', width: 200, height: 60, zIndex: 10, visible: !!instructorSignatureUrl },
                 'platform_logo': { x: 50, y: 10, text: 'LOGO', fontSize: 36, color: '#0066cc', fontWeight: 'bold', fontFamily: 'Georgia, serif', width: 120, height: 60, mandatory: true, zIndex: 20 }
             };
 
-            const tagLabels = {
-                'student_name': 'Nome do Participante',
-                'course_name': 'Nome do Evento',
-                'completion_date': 'Data do Evento',
-                'certificate_code': 'Cód. Validação',
-                'author_name': 'Organizador',
-                'workload_hours': 'Info Extra',
-                'platform_logo': 'Logo da Plataforma'
-            };
+            const tagLabels = @json([
+                'student_name' => 'Nome do Participante',
+                'course_name' => 'Nome do Evento',
+                'completion_date' => 'Data do Evento',
+                'certificate_code' => 'Cód. Validação',
+                'author_name' => 'Organizador',
+                'workload_hours' => 'Info Extra',
+                'title' => 'Título do Certificado',
+                'presentation_text' => 'Texto de Apresentação',
+                'instructor_signature' => 'Assinatura do Organizador',
+                'platform_logo' => 'Logo da Plataforma',
+            ]);
 
             $.each(defaultTags, function (key, val) {
                 if (!certSettings[key]) {
@@ -498,6 +559,17 @@
             if (certSettings['platform_logo']) {
                 certSettings['platform_logo'].mandatory = true;
                 certSettings['platform_logo'].visible = true;
+            }
+            if (certSettings['instructor_signature']) {
+                if (certSettings['instructor_signature'].width === undefined) certSettings['instructor_signature'].width = 200;
+                if (certSettings['instructor_signature'].height === undefined) certSettings['instructor_signature'].height = 60;
+            }
+
+            if (certSettings['title'] && $('#certificate_title').length) {
+                certSettings['title'].text = $('#certificate_title').val() || certSettings['title'].text || '';
+            }
+            if (certSettings['presentation_text'] && $('#presentation_text').length) {
+                certSettings['presentation_text'].text = $('#presentation_text').val() || certSettings['presentation_text'].text || '';
             }
 
             const $canvas = $('#cert-elements-layer');
@@ -666,7 +738,9 @@
                             fontWeight: data.fontWeight || 'normal',
                             fontFamily: data.fontFamily || 'Arial, sans-serif',
                             cursor: data.locked ? 'not-allowed' : 'move',
-                            whiteSpace: 'nowrap',
+                            whiteSpace: data.multiline ? 'pre-line' : 'nowrap',
+                            width: (data.multiline && data.maxWidth) ? (data.maxWidth + 'px') : 'auto',
+                            textAlign: data.textAlign || 'left',
                             border: '1px dashed transparent',
                             padding: '4px',
                             zIndex: data.zIndex || 10,
@@ -677,12 +751,37 @@
                         $el.css({
                             width: (data.width || 120) + 'px',
                             height: (data.height || 60) + 'px',
+                            padding: '0px',
                             backgroundImage: 'url(\"' + platformLogoUrl + '\")',
                             backgroundSize: '100% 100%',
                             backgroundRepeat: 'no-repeat',
                             backgroundPosition: 'center'
                         });
                         $el.text('');
+                    } else if (key === 'instructor_signature') {
+                        const w = (data.width || 200);
+                        const h = (data.height || 60);
+                        const url = instructorSignaturePreviewUrl || '';
+                        const isHidden = (data.visible === false);
+                        const showAs = isHidden ? 'none' : (url ? 'block' : 'flex');
+
+                        $el.css({
+                            width: w + 'px',
+                            height: h + 'px',
+                            padding: '0px',
+                            backgroundImage: url ? ('url(\"' + url + '\")') : 'none',
+                            backgroundSize: 'contain',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center',
+                            backgroundColor: url ? 'transparent' : '#f8f9fa',
+                            color: url ? 'transparent' : '#6c757d',
+                            fontSize: '12px',
+                            borderColor: url ? 'transparent' : '#adb5bd',
+                            display: showAs,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        });
+                        $el.text(url ? '' : 'Assinatura');
                     } else {
                         $el.text(data.text || '');
                     }
@@ -717,7 +816,7 @@
 
                     $canvas.append($el);
 
-                    if (key === 'platform_logo') {
+                    if (key === 'platform_logo' || key === 'instructor_signature') {
                         $el.resizable({
                             aspectRatio: false,
                             disabled: !!data.locked,
@@ -725,10 +824,13 @@
                             stop: function (event, ui) {
                                 let w = ui.size.width;
                                 let h = ui.size.height;
-                                certSettings['platform_logo'].width = w;
-                                certSettings['platform_logo'].height = h;
-                                $('#logo-width').val(Math.round(w));
-                                $('#logo-height').val(Math.round(h));
+                                certSettings[key].width = w;
+                                certSettings[key].height = h;
+
+                                if (key === 'platform_logo') {
+                                    $('#logo-width').val(Math.round(w));
+                                    $('#logo-height').val(Math.round(h));
+                                }
                             }
                         });
                     }
@@ -797,6 +899,58 @@
             }
 
             renderElements();
+
+            // Live sync: title/presentation in the canvas
+            $('#certificate_title').on('input', function () {
+                const val = $(this).val() || '';
+                certDoc.meta = certDoc.meta || {};
+                certDoc.meta.titleText = val;
+                if (certSettings['title']) {
+                    certSettings['title'].text = val;
+                    $('#el-title').text(val);
+                }
+            });
+
+            $('#presentation_text').on('input', function () {
+                const val = $(this).val() || '';
+                certDoc.meta = certDoc.meta || {};
+                certDoc.meta.presentationText = val;
+                if (certSettings['presentation_text']) {
+                    certSettings['presentation_text'].text = val;
+                    $('#el-presentation_text').text(val);
+                }
+            });
+
+            // Live preview: instructor signature in the canvas
+            $('input[name="instructor_signature"]').on('change', function () {
+                if (!this.files || !this.files[0]) return;
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    instructorSignaturePreviewUrl = e.target.result;
+
+                    if (certSettings['instructor_signature']) {
+                        certSettings['instructor_signature'].visible = true;
+                    }
+                    $('.cert-toggle[data-tag="instructor_signature"]').prop('checked', true);
+
+                    const $sig = $('#el-instructor_signature');
+                    if ($sig.length) {
+                        $sig.css({
+                            backgroundImage: 'url("' + instructorSignaturePreviewUrl + '")',
+                            backgroundSize: 'contain',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center',
+                            backgroundColor: 'transparent',
+                            borderColor: 'transparent',
+                            color: 'transparent',
+                            display: 'block',
+                        }).text('');
+                    }
+
+                    updateLayersList();
+                };
+                reader.readAsDataURL(this.files[0]);
+            });
 
             // Style Change Listeners
             $('#style-font-size').on('input', function () {
@@ -973,7 +1127,13 @@
 
                 if ($(this).is(':checked')) {
                     certSettings[key].visible = true;
-                    $('#el-' + key).show();
+
+                    if (key === 'instructor_signature') {
+                        const hasUrl = !!(instructorSignaturePreviewUrl || '');
+                        $('#el-' + key).css('display', hasUrl ? 'block' : 'flex');
+                    } else {
+                        $('#el-' + key).show();
+                    }
                 } else {
                     certSettings[key].visible = false;
                     $('#el-' + key).hide();
@@ -987,6 +1147,8 @@
 
                 certDoc.meta = certDoc.meta || {};
                 certDoc.meta.backgroundFit = $('#cert-bg-fit').val() || 'cover';
+                certDoc.meta.titleText = $('#certificate_title').val() || '';
+                certDoc.meta.presentationText = $('#presentation_text').val() || '';
 
                 if (certSettings['platform_logo']) {
                     certSettings['platform_logo'].visible = true;

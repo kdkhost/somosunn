@@ -272,7 +272,7 @@ class CertificateController extends Controller
             'isPreview' => false // Explicitly set for PDF generation
         ])->render();
 
-        $dompdf->loadHtml($html);
+        $dompdf->loadHtml($html, 'UTF-8');
         // Set paper to standard A4 Landscape
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();

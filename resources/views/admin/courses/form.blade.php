@@ -741,6 +741,30 @@
                                                                     Horária</label>
                                                             </div>
                                                         </div>
+                                                        <div class="list-group-item p-2 border-0">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input cert-toggle"
+                                                                    id="toggle-title" data-tag="title">
+                                                                <label class="custom-control-label" for="toggle-title">Título do
+                                                                    Certificado</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="list-group-item p-2 border-0">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input cert-toggle"
+                                                                    id="toggle-presentation" data-tag="presentation_text">
+                                                                <label class="custom-control-label" for="toggle-presentation">Texto de
+                                                                    Apresentação</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="list-group-item p-2 border-0">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input cert-toggle"
+                                                                    id="toggle-signature" data-tag="instructor_signature">
+                                                                <label class="custom-control-label" for="toggle-signature">Assinatura do
+                                                                    Instrutor</label>
+                                                            </div>
+                                                        </div>
                                                         <div class="list-group-item p-2 border-0 bg-warning rounded mt-2">
                                                             <div class="d-flex align-items-center justify-content-between">
                                                                 <div>
@@ -1585,6 +1609,11 @@
                 $logoAuthSrc = $logoAuth ? asset(ltrim($logoAuth, '/')) : asset('img/logo.svg');
             @endphp
             const platformLogoUrl = "{{ $logoAuthSrc }}";
+            const instructorSignatureUrl = "{{ $course->instructor_signature ? asset($course->instructor_signature) : '' }}";
+            let instructorSignaturePreviewUrl = instructorSignatureUrl;
+
+            const initialTitleText = ($('#certificate_title').length ? ($('#certificate_title').val() || certDoc.meta.titleText) : certDoc.meta.titleText) || 'CERTIFICADO DE CONCLUSÃO';
+            const initialPresentationText = ($('#presentation_text').length ? ($('#presentation_text').val() || certDoc.meta.presentationText) : certDoc.meta.presentationText) || '';
 
             // Default Tags (with mandatory logo and auto-populated fields)
             const defaultTags = {
@@ -1594,18 +1623,24 @@
                 'certificate_code': { x: 50, y: 85, text: 'Validação: ABC-123', fontSize: 12, color: '#999999', fontWeight: 'normal', fontFamily: 'Arial, sans-serif' },
                 'author_name': { x: 30, y: 90, text: '{{ $course->author_name ?? "Instrutor" }}', fontSize: 18, color: '#333333', fontWeight: 'bold', fontFamily: 'Arial, sans-serif', zIndex: 10 },
                 'workload_hours': { x: 70, y: 90, text: 'Carga Horária: {{ $course->total_hours }}h', fontSize: 14, color: '#666666', fontWeight: 'normal', fontFamily: 'Arial, sans-serif', zIndex: 10 },
+                'title': { x: 10, y: 18, text: initialTitleText, fontSize: 34, color: '#000000', fontWeight: 'bold', fontFamily: 'Arial, sans-serif', zIndex: 15, visible: false, multiline: true, maxWidth: 700, textAlign: 'center' },
+                'presentation_text': { x: 10, y: 28, text: initialPresentationText, fontSize: 16, color: '#333333', fontWeight: 'normal', fontFamily: 'Arial, sans-serif', zIndex: 15, visible: false, multiline: true, maxWidth: 700, textAlign: 'center' },
+                'instructor_signature': { x: 70, y: 80, text: 'Assinatura do Instrutor', fontSize: 12, color: '#6c757d', fontWeight: 'normal', fontFamily: 'Arial, sans-serif', width: 200, height: 60, zIndex: 10, visible: !!instructorSignatureUrl },
                 'platform_logo': { x: 50, y: 10, text: 'LOGO UNN', fontSize: 36, color: '#0066cc', fontWeight: 'bold', fontFamily: 'Georgia, serif', width: 120, height: 60, mandatory: true, zIndex: 20 }
             };
 
-            const tagLabels = {
-                'student_name': 'Nome do Aluno',
-                'course_name': 'Nome do Curso',
-                'completion_date': 'Data de Conclusão',
-                'certificate_code': 'Código de Validação',
-                'author_name': 'Nome do Autor',
-                'workload_hours': 'Carga Horária',
-                'platform_logo': 'Logo da Plataforma'
-            };
+            const tagLabels = @json([
+                'student_name' => 'Nome do Aluno',
+                'course_name' => 'Nome do Curso',
+                'completion_date' => 'Data de Conclusão',
+                'certificate_code' => 'Código de Validação',
+                'author_name' => 'Nome do Autor',
+                'workload_hours' => 'Carga Horária',
+                'title' => 'Título do Certificado',
+                'presentation_text' => 'Texto de Apresentação',
+                'instructor_signature' => 'Assinatura do Instrutor',
+                'platform_logo' => 'Logo da Plataforma',
+            ]);
 
             // Merge defaults
             $.each(defaultTags, function (key, val) {
@@ -1624,6 +1659,18 @@
             if (certSettings['platform_logo']) {
                 certSettings['platform_logo'].mandatory = true;
                 certSettings['platform_logo'].visible = true;
+            }
+            if (certSettings['instructor_signature']) {
+                if (certSettings['instructor_signature'].width === undefined) certSettings['instructor_signature'].width = 200;
+                if (certSettings['instructor_signature'].height === undefined) certSettings['instructor_signature'].height = 60;
+            }
+
+            // Keep element text in sync with meta inputs (WYSIWYG in editor)
+            if (certSettings['title'] && $('#certificate_title').length) {
+                certSettings['title'].text = $('#certificate_title').val() || certSettings['title'].text || '';
+            }
+            if (certSettings['presentation_text'] && $('#presentation_text').length) {
+                certSettings['presentation_text'].text = $('#presentation_text').val() || certSettings['presentation_text'].text || '';
             }
 
             const $canvas = $('#cert-elements-layer');
@@ -1795,13 +1842,15 @@
                             position: 'absolute',
                             left: data.x + '%',
                             top: data.y + '%',
-                            fontSize: data.fontSize + 'px',
-                            color: data.color,
-                            fontWeight: data.fontWeight,
+                            fontSize: (data.fontSize || 16) + 'px',
+                            color: data.color || '#000000',
+                            fontWeight: data.fontWeight || 'normal',
                             fontFamily: data.fontFamily || 'Arial, sans-serif',
                             cursor: data.locked ? 'not-allowed' : 'move',
                             display: (key !== 'platform_logo' && data.visible === false) ? 'none' : 'block',
-                            whiteSpace: 'nowrap',
+                            whiteSpace: data.multiline ? 'pre-line' : 'nowrap',
+                            width: (data.multiline && data.maxWidth) ? (data.maxWidth + 'px') : 'auto',
+                            textAlign: data.textAlign || 'left',
                             border: '1px dashed transparent',
                             padding: '5px',
                             zIndex: data.zIndex || 10
@@ -1811,15 +1860,40 @@
                         $el.css({
                             width: (data.width || 120) + 'px',
                             height: (data.height || 60) + 'px',
+                            padding: '0px',
                             backgroundImage: 'url("' + platformLogoUrl + '")',
                             backgroundSize: '100% 100%', // Allow full stretch to match container
                             backgroundRepeat: 'no-repeat',
                             backgroundPosition: 'center'
                         });
                         $el.text(''); // Clear text
+                    } else if (key === 'instructor_signature') {
+                        const w = (data.width || 200);
+                        const h = (data.height || 60);
+                        const url = instructorSignaturePreviewUrl || '';
+                        const isHidden = (data.visible === false);
+                        const showAs = isHidden ? 'none' : (url ? 'block' : 'flex');
+
+                        $el.css({
+                            width: w + 'px',
+                            height: h + 'px',
+                            padding: '0px',
+                            backgroundImage: url ? ('url("' + url + '")') : 'none',
+                            backgroundSize: 'contain',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center',
+                            backgroundColor: url ? 'transparent' : '#f8f9fa',
+                            color: url ? 'transparent' : '#6c757d',
+                            fontSize: '12px',
+                            borderColor: url ? 'transparent' : '#adb5bd',
+                            display: showAs,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        });
+
+                        $el.text(url ? '' : 'Assinatura (envie no painel abaixo)');
                     } else {
                         $el.text(data.text);
-                        $el.css({ width: 'auto', height: 'auto' });
                     }
 
                     // Click to Select
@@ -1850,8 +1924,8 @@
 
                     $canvas.append($el);
 
-                    // Initialize Resizable ONLY for Logo
-                    if (key === 'platform_logo') {
+                    // Initialize Resizable for image elements
+                    if (key === 'platform_logo' || key === 'instructor_signature') {
                         $el.resizable({
                             aspectRatio: false, // User requested free resize ("quadrado x retangulo")
                             disabled: !!data.locked,
@@ -1861,14 +1935,17 @@
                                 let h = ui.size.height;
 
                                 // Update Settings
-                                certSettings['platform_logo'].width = w;
-                                certSettings['platform_logo'].height = h;
+                                certSettings[key].width = w;
+                                certSettings[key].height = h;
 
-                                // Update Inputs
-                                $('#logo-width').val(Math.round(w));
-                                $('#logo-height').val(Math.round(h));
-
-                                toastr.info('Tamanho atualizado: ' + Math.round(w) + 'x' + Math.round(h));
+                                if (key === 'platform_logo') {
+                                    // Update Inputs
+                                    $('#logo-width').val(Math.round(w));
+                                    $('#logo-height').val(Math.round(h));
+                                    toastr.info('Tamanho da logo atualizado: ' + Math.round(w) + 'x' + Math.round(h));
+                                } else {
+                                    toastr.info('Tamanho da assinatura atualizado: ' + Math.round(w) + 'x' + Math.round(h));
+                                }
                             }
                         });
                     }
@@ -1941,6 +2018,58 @@
             }
 
             renderElements();
+
+            // Live sync: title/presentation/signature previews in the canvas
+            $('#certificate_title').on('input', function () {
+                const val = $(this).val() || '';
+                certDoc.meta = certDoc.meta || {};
+                certDoc.meta.titleText = val;
+                if (certSettings['title']) {
+                    certSettings['title'].text = val;
+                    $('#el-title').text(val);
+                }
+            });
+
+            $('#presentation_text').on('input', function () {
+                const val = $(this).val() || '';
+                certDoc.meta = certDoc.meta || {};
+                certDoc.meta.presentationText = val;
+                if (certSettings['presentation_text']) {
+                    certSettings['presentation_text'].text = val;
+                    $('#el-presentation_text').text(val);
+                }
+            });
+
+            $('#instructor_signature').on('change', function () {
+                if (!this.files || !this.files[0]) return;
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    instructorSignaturePreviewUrl = e.target.result;
+
+                    if (certSettings['instructor_signature']) {
+                        certSettings['instructor_signature'].visible = true;
+                    }
+                    $('.cert-toggle[data-tag="instructor_signature"]').prop('checked', true);
+
+                    const $sig = $('#el-instructor_signature');
+                    if ($sig.length) {
+                        const isHidden = certSettings['instructor_signature'] && certSettings['instructor_signature'].visible === false;
+                        $sig.css({
+                            backgroundImage: 'url("' + instructorSignaturePreviewUrl + '")',
+                            backgroundSize: 'contain',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center',
+                            backgroundColor: 'transparent',
+                            borderColor: 'transparent',
+                            color: 'transparent',
+                            display: isHidden ? 'none' : 'block',
+                        }).text('');
+                    }
+
+                    updateLayersList();
+                };
+                reader.readAsDataURL(this.files[0]);
+            });
 
             // Style Change Listeners
             $('#style-font-size').on('input', function () {
@@ -2122,7 +2251,13 @@
 
                 if ($(this).is(':checked')) {
                     certSettings[key].visible = true;
-                    $('#el-' + key).show();
+
+                    if (key === 'instructor_signature') {
+                        const hasUrl = !!(instructorSignaturePreviewUrl || '');
+                        $('#el-' + key).css('display', hasUrl ? 'block' : 'flex');
+                    } else {
+                        $('#el-' + key).show();
+                    }
                 } else {
                     certSettings[key].visible = false;
                     $('#el-' + key).hide();

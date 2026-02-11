@@ -125,6 +125,7 @@
             {{-- Render only saved elements (no fallbacks) --}}
             @foreach($elements as $key => $style)
                 @if($key === 'platform_logo') @continue @endif
+                @if($key === 'instructor_signature') @continue @endif
                 @continue(!is_array($style))
                 @continue(array_key_exists('visible', $style) && !$style['visible'])
 
@@ -146,7 +147,7 @@
                             font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
                             text-align: {{ $textAlign }};
                             z-index: {{ $style['zIndex'] ?? 10 }};
-                            white-space: {{ $isMultiline ? 'normal' : 'nowrap' }};
+                            white-space: {{ $isMultiline ? 'pre-line' : 'nowrap' }};
                             width: {{ $isMultiline && $maxWidth ? $maxWidth . 'px' : 'auto' }};
                             @if($lineHeight) line-height: {{ $lineHeight }}; @endif
                             @if($letterSpacing !== null) letter-spacing: {{ $letterSpacing }}px; @endif
@@ -178,19 +179,47 @@
                 <img src="{{ $logoUrl }}" style="width: 100%; height: 100%; object-fit: contain;">
             </div>
 
-            {{-- Instructor Signature --}}
+            {{-- Instructor Signature (optional, controlled by editor element visibility) --}}
             @if($course->instructor_signature)
                 @php
-                    $sigPath = (isset($isPreview) && $isPreview) ? '/' . ltrim($course->instructor_signature, '/') : public_path($course->instructor_signature);
+                    $sigStyle = $elements['instructor_signature'] ?? null;
+                    $sigHidden = is_array($sigStyle) && array_key_exists('visible', $sigStyle) && !$sigStyle['visible'];
                 @endphp
-                <div class="element" style="
-                    right: 10%;
-                    bottom: 10%;
-                    width: 200px;
-                ">
-                    <img src="{{ $sigPath }}" style="width: 100%; border-bottom: 1px solid #000;">
-                    <div style="text-align: center; font-size: 12px; margin-top: 5px;">{{ $course->author_name }}</div>
-                </div>
+
+                @if(!$sigHidden)
+                    @php
+                        $sigPath = (isset($isPreview) && $isPreview)
+                            ? '/' . ltrim($course->instructor_signature, '/')
+                            : public_path($course->instructor_signature);
+
+                        $sigX = (is_array($sigStyle) && isset($sigStyle['x'])) ? $sigStyle['x'] : null;
+                        $sigY = (is_array($sigStyle) && isset($sigStyle['y'])) ? $sigStyle['y'] : null;
+                        $sigW = (is_array($sigStyle) && isset($sigStyle['width'])) ? $sigStyle['width'] : 200;
+                        $sigH = (is_array($sigStyle) && isset($sigStyle['height'])) ? $sigStyle['height'] : 60;
+                        $sigZ = (is_array($sigStyle) && isset($sigStyle['zIndex'])) ? $sigStyle['zIndex'] : 10;
+                    @endphp
+
+                    @if($sigX !== null && $sigY !== null)
+                        <div class="element" style="
+                            left: {{ $sigX }}%;
+                            top: {{ $sigY }}%;
+                            width: {{ $sigW }}px;
+                            height: {{ $sigH }}px;
+                            z-index: {{ $sigZ }};
+                        ">
+                            <img src="{{ $sigPath }}" style="width: 100%; height: 100%; object-fit: contain;">
+                        </div>
+                    @else
+                        {{-- Backward compatible fallback if element isn't saved yet --}}
+                        <div class="element" style="
+                            right: 10%;
+                            bottom: 10%;
+                            width: 200px;
+                        ">
+                            <img src="{{ $sigPath }}" style="width: 100%; height: auto; object-fit: contain;">
+                        </div>
+                    @endif
+                @endif
             @endif
         </div>
     </div>
@@ -216,4 +245,3 @@
 </body>
 
 </html>
-
