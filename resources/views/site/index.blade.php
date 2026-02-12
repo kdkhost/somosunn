@@ -4,9 +4,13 @@
 
 @section('content')
     @php
-        $heroTitle = \App\Models\Setting::get('home_hero_title', 'Conectando empreendedores.');
-        $heroSubtitle = \App\Models\Setting::get('home_hero_subtitle', 'Criando oportunidades reais.');
-        $heroText = \App\Models\Setting::get('home_hero_text', 'A UNN é uma comunidade de networking estratégico onde empreendedores compartilham experiências, constroem conexões e crescem juntos.');
+        $heroTitleFallback = \App\Models\Setting::get('home_hero_title', 'Conectando empreendedores.');
+        $heroSubtitleFallback = \App\Models\Setting::get('home_hero_subtitle', 'Criando oportunidades reais.');
+        $heroTextFallback = \App\Models\Setting::get('home_hero_text', 'A UNN é uma comunidade de networking estratégico onde empreendedores compartilham experiências, constroem conexões e crescem juntos.');
+
+        $heroImagePath = \App\Models\SiteContent::getValue('home', 'hero_image');
+        $heroImageFallback = 'https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800';
+        $heroImageUrl = $heroImagePath ? asset('storage/' . ltrim((string) $heroImagePath, '/')) : $heroImageFallback;
     @endphp
 
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
@@ -16,10 +20,10 @@
                 <div class="grid lg:grid-cols-2 gap-8 md:gap-16 lg:gap-24 items-center">
                     <div>
                         <h1 class="unn-title-gradient unn-title-hero mb-6" style="word-break: keep-all; hyphens: none; max-width: 650px;">
-                            {{ $heroTitle }} {{ $heroSubtitle }}
+                            @site('home.hero_title', $heroTitleFallback) @site('home.hero_subtitle', $heroSubtitleFallback)
                         </h1>
                         <p class="text-base sm:text-lg text-gray-600 mb-6 md:mb-8 leading-relaxed max-w-xl">
-                            {{ $heroText }}
+                            @site('home.hero_text', $heroTextFallback)
                         </p>
                         <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
                             <a href="{{ route('register') }}"
@@ -36,7 +40,7 @@
                     <div class="hidden lg:block">
                         <div class="relative">
                             <div class="absolute inset-0 btn-primary rounded-3xl opacity-20 blur-3xl"></div>
-                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800"
+                            <img src="{{ $heroImageUrl }}"
                                 alt="Networking" class="relative w-full rounded-3xl shadow-2xl">
                         </div>
                     </div>

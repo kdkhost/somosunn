@@ -293,6 +293,13 @@
                                     <p>E-mails</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.cms.index', ['slug' => 'home']) }}"
+                                    class="nav-link {{ $is('admin.cms.*') }}">
+                                    <i class="fas fa-globe nav-icon"></i>
+                                    <p>Conteúdo do Site</p>
+                                </a>
+                            </li>
                             {{-- Certificates moved to shared section below --}}
                             <li class="nav-item">
                                 <a href="{{ route('admin.fonts.index') }}" class="nav-link {{ $is('admin.fonts.*') }}">

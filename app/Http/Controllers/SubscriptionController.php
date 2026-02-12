@@ -71,15 +71,23 @@ class SubscriptionController extends Controller
                     'phone' => $request->phone,
                     'level' => 'Iniciante',
                 ]);
-                Auth::login($user);
-                
-                // Enviar email de boas-vindas
-                try {
-                    Mail::to($user)->send(new WelcomeMail($user));
-                } catch (\Exception $e) {
-                    \Log::error('Erro ao enviar email de boas-vindas: ' . $e->getMessage());
-                }
-            }
+                 Auth::login($user);
+                 
+                 // Enviar email de boas-vindas
+                 try {
+                     $dispatch = function () use ($user) {
+                         Mail::to($user)->queue(new WelcomeMail($user));
+                     };
+
+                     try {
+                         DB::afterCommit($dispatch);
+                     } catch (\Throwable $e) {
+                         $dispatch();
+                     }
+                 } catch (\Exception $e) {
+                     \Log::error('Erro ao enviar email de boas-vindas: ' . $e->getMessage());
+                 }
+             }
 
             // Guarantee document if provided during checkout
             if ($request->filled('cpf') && !$user->doc) {
@@ -164,13 +172,21 @@ class SubscriptionController extends Controller
                     'plan_id' => $plan->id,
                     'plan_expires_at' => $this->planExpiresAt($plan),
                 ]);
-                
-                // Enviar email de confirmação
-                try {
-                    Mail::to($user)->send(new PaymentConfirmedMail($order));
-                } catch (\Exception $e) {
-                    \Log::error('Erro ao enviar email de pagamento: ' . $e->getMessage());
-                }
+                 
+                 // Enviar email de confirmação
+                 try {
+                     $dispatch = function () use ($user, $order) {
+                         Mail::to($user)->queue(new PaymentConfirmedMail($order));
+                     };
+
+                     try {
+                         DB::afterCommit($dispatch);
+                     } catch (\Throwable $e) {
+                         $dispatch();
+                     }
+                 } catch (\Exception $e) {
+                     \Log::error('Erro ao enviar email de pagamento: ' . $e->getMessage());
+                 }
 
                 // Emitir fatura em PDF (email)
                 app(InvoiceService::class)->issueAndQueueForOrder($order);

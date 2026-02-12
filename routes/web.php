@@ -503,6 +503,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
         Route::post('/settings/test-smtp', [\App\Http\Controllers\Admin\SettingController::class, 'testSmtp'])->name('settings.test-smtp');
 
+        // CMS (Conteúdo do Site)
+        Route::get('/cms/{slug?}', [\App\Http\Controllers\Admin\CMSController::class, 'index'])->name('cms.index');
+        Route::post('/cms/{slug}', [\App\Http\Controllers\Admin\CMSController::class, 'update'])->name('cms.update');
+
         // Usuários
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('users');
         // Permissões / Papéis

@@ -38,6 +38,41 @@
         </div>
     </div>
 
+    {{-- AGENDADOR INTERNO --}}
+    <div class="card card-outline card-info mb-4">
+        <div class="card-header">
+            <h3 class="card-title font-weight-bold"><i class="fas fa-clock mr-2"></i> Agendador Interno (sem cron da hospedagem)</h3>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-3">
+                Executa o <strong>Laravel Scheduler</strong> automaticamente com base em acessos ao site e processa filas (ex: e-mails/faturas).
+            </p>
+
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="hidden" name="internal_cron_enabled" value="0">
+                <input type="checkbox" class="custom-control-input" id="internal_cron_enabled" name="internal_cron_enabled"
+                    value="1" {{ ((int) ($settings['internal_cron_enabled'] ?? (config('internal_cron.enabled', true) ? 1 : 0))) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="internal_cron_enabled">Ativar agendador interno</label>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4 form-group mb-0">
+                    <label>Intervalo mínimo (segundos)</label>
+                    <input type="number" min="10" name="internal_cron_min_interval_seconds" class="form-control"
+                        value="{{ $settings['internal_cron_min_interval_seconds'] ?? config('internal_cron.min_interval_seconds', 60) }}">
+                    <small class="text-muted">Recomendado: 30–60. Mínimo: 10.</small>
+                </div>
+            </div>
+
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-3">
+                <input type="hidden" name="internal_cron_run_queue_worker" value="0">
+                <input type="checkbox" class="custom-control-input" id="internal_cron_run_queue_worker"
+                    name="internal_cron_run_queue_worker" value="1" {{ ((int) ($settings['internal_cron_run_queue_worker'] ?? (config('internal_cron.run_queue_worker', true) ? 1 : 0))) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="internal_cron_run_queue_worker">Processar fila automaticamente (e-mails/faturas)</label>
+            </div>
+        </div>
+    </div>
+
     {{-- LIMITES --}}
     <h5 class="text-primary mb-3"><i class="fas fa-server mr-2"></i> Limites e Uploads</h5>
     <div class="row">

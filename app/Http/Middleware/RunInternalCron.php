@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Setting;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -22,7 +23,8 @@ class RunInternalCron
                 return;
             }
 
-            if (!config('internal_cron.enabled', true)) {
+            $enabled = $this->boolSetting('internal_cron_enabled', (bool) config('internal_cron.enabled', true));
+            if (!$enabled) {
                 return;
             }
 
@@ -38,7 +40,7 @@ class RunInternalCron
                 return;
             }
 
-            if ($request->is('admin*') || $request->is('api*')) {
+            if ($request->is('api*')) {
                 return;
             }
 
@@ -51,7 +53,10 @@ class RunInternalCron
                 return;
             }
 
-            $minInterval = (int) config('internal_cron.min_interval_seconds', 60);
+            $runQueueWorker = $this->boolSetting('internal_cron_run_queue_worker', (bool) config('internal_cron.run_queue_worker', true));
+            config(['internal_cron.run_queue_worker' => $runQueueWorker]);
+
+            $minInterval = (int) Setting::get('internal_cron_min_interval_seconds', (int) config('internal_cron.min_interval_seconds', 60));
             if ($minInterval < 10) {
                 $minInterval = 10;
             }
@@ -74,6 +79,34 @@ class RunInternalCron
             }
         } catch (\Throwable $e) {
             Log::debug('RunInternalCron falhou: ' . $e->getMessage());
+        }
+    }
+
+    private function boolSetting(string $key, bool $default): bool
+    {
+        try {
+            $raw = Setting::get($key, null);
+            if ($raw === null || $raw === '') {
+                return $default;
+            }
+
+            if (is_bool($raw)) {
+                return $raw;
+            }
+
+            $rawString = trim((string) $raw);
+            if ($rawString === '') {
+                return $default;
+            }
+
+            $bool = filter_var($rawString, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+            if ($bool !== null) {
+                return $bool;
+            }
+
+            return (bool) ((int) $rawString);
+        } catch (\Throwable $e) {
+            return $default;
         }
     }
 }
