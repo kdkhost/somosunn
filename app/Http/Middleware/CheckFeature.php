@@ -53,7 +53,7 @@ class CheckFeature
 
                 // /courses (index) não tem {course}; libera somente se já comprou/enrolou em algum curso.
                 if ($courseParam === null) {
-                    return method_exists($user, 'hasPurchasedCourses') ? (bool) $user->hasPurchasedCourses() : false;
+                    return false;
                 }
 
                 $courseId = $this->resolveCourseId($courseParam);

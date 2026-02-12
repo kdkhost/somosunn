@@ -24,6 +24,8 @@ class PlansSeederUtf8 extends Seeder
                     'community',
                     'courses',
                     'events',
+                    'rankings',
+                    'marketplace.buy',
                 ],
             ],
             'pro' => [
@@ -40,6 +42,8 @@ class PlansSeederUtf8 extends Seeder
                     'courses',
                     'events',
                     'mentorships',
+                    'rankings',
+                    'marketplace.buy',
                 ],
             ],
             'elite' => [
@@ -56,6 +60,8 @@ class PlansSeederUtf8 extends Seeder
                     'courses',
                     'events',
                     'mentorships',
+                    'rankings',
+                    'marketplace.buy',
                 ],
             ],
         ];

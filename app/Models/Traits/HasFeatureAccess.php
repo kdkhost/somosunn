@@ -19,6 +19,11 @@ trait HasFeatureAccess
      */
     public function canAccessFeature($feature)
     {
+        $feature = trim((string) $feature);
+        if ($feature === '') {
+            return false;
+        }
+
         // 1. Admin Bypass
         if ($this->isAdmin()) {
             return true;
@@ -26,8 +31,16 @@ trait HasFeatureAccess
 
         // 2. Check individual extra_features (granted by admin/superadmin)
         $extraFeatures = $this->extra_features ?? [];
-        if (is_array($extraFeatures) && in_array($feature, $extraFeatures, true)) {
-            return true;
+        if (is_array($extraFeatures)) {
+            if (in_array($feature, $extraFeatures, true)) {
+                return true;
+            }
+
+            foreach (Plan::aliasesForFeature($feature) as $alias) {
+                if (in_array($alias, $extraFeatures, true)) {
+                    return true;
+                }
+            }
         }
 
         // 3. Check Active Plan
@@ -49,7 +62,26 @@ trait HasFeatureAccess
     public function hasExtraFeature($feature)
     {
         $extraFeatures = $this->extra_features ?? [];
-        return is_array($extraFeatures) && in_array($feature, $extraFeatures, true);
+        if (!is_array($extraFeatures)) {
+            return false;
+        }
+
+        $feature = trim((string) $feature);
+        if ($feature === '') {
+            return false;
+        }
+
+        if (in_array($feature, $extraFeatures, true)) {
+            return true;
+        }
+
+        foreach (Plan::aliasesForFeature($feature) as $alias) {
+            if (in_array($alias, $extraFeatures, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
