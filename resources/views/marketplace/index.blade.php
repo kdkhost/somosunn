@@ -146,7 +146,20 @@
     $marketplaceEventsPopupMaxPerSession = max(0, min(10, $marketplaceEventsPopupMaxPerSession));
 @endphp
 
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-24 pb-16 px-4 md:px-12 lg:px-24">
+@push('styles')
+    <style>
+        .mp-hscroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .mp-hscroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+@endpush
+
+<div class="min-h-screen bg-slate-50 pt-24 pb-16 px-4 md:px-6 lg:px-10">
     <div class="max-w-7xl mx-auto">
         <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 md:p-6">
             <div class="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
@@ -346,50 +359,6 @@
                                 </div>
                             @endif
                         </div>
-
-                        <div class="p-6 md:p-8">
-                            <div class="flex flex-col sm:flex-row gap-3">
-                                <a href="#marketplace-courses"
-                                    class="btn-primary text-white px-6 py-3 rounded-2xl font-black inline-flex items-center justify-center gap-2 shadow-md">
-                                    <i class="fas fa-book-open"></i> Ver cursos
-                                </a>
-                                <a href="#marketplace-mentorships"
-                                    class="px-6 py-3 rounded-2xl font-black border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center gap-2">
-                                    <i class="fas fa-user-tie"></i> Ver mentorias
-                                </a>
-                                <a href="#marketplace-events"
-                                    class="px-6 py-3 rounded-2xl font-black border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center gap-2">
-                                    <i class="fas fa-calendar-alt"></i> Ver eventos
-                                </a>
-                            </div>
-
-                            <div class="mt-7 grid sm:grid-cols-3 gap-3">
-                                <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                    <div class="text-sm font-black text-slate-900 mb-1">
-                                        <i class="fas fa-shield-alt mr-2 text-slate-500"></i> Compra segura
-                                    </div>
-                                    <div class="text-sm text-slate-600">
-                                        Pagamento integrado para você comprar sem sair do site.
-                                    </div>
-                                </div>
-                                <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                    <div class="text-sm font-black text-slate-900 mb-1">
-                                        <i class="fas fa-bolt mr-2 text-slate-500"></i> Acesso imediato
-                                    </div>
-                                    <div class="text-sm text-slate-600">
-                                        Após a confirmação, seu acesso aparece na sua conta.
-                                    </div>
-                                </div>
-                                <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                    <div class="text-sm font-black text-slate-900 mb-1">
-                                        <i class="fas fa-users mr-2 text-slate-500"></i> Comunidade UNN
-                                    </div>
-                                    <div class="text-sm text-slate-600">
-                                        Conteúdos publicados por mentores, instrutores e membros.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     @else
                         <div class="relative p-6 md:p-8">
                             <div class="absolute inset-0 opacity-60 pointer-events-none"
@@ -407,46 +376,11 @@
                                     Cursos, mentorias e eventos da comunidade para você comprar e acessar em um só lugar.
                                 </p>
 
-                                <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                                    <a href="#marketplace-courses"
+                                <div class="mt-6">
+                                    <a href="#marketplace-categories"
                                         class="btn-primary text-white px-6 py-3 rounded-2xl font-black inline-flex items-center justify-center gap-2 shadow-md">
-                                        <i class="fas fa-book-open"></i> Ver cursos
+                                        <i class="fas fa-compass"></i> Explorar ofertas
                                     </a>
-                                    <a href="#marketplace-mentorships"
-                                        class="px-6 py-3 rounded-2xl font-black border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center gap-2">
-                                        <i class="fas fa-user-tie"></i> Ver mentorias
-                                    </a>
-                                    <a href="#marketplace-events"
-                                        class="px-6 py-3 rounded-2xl font-black border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center gap-2">
-                                        <i class="fas fa-calendar-alt"></i> Ver eventos
-                                    </a>
-                                </div>
-
-                                <div class="mt-7 grid sm:grid-cols-3 gap-3">
-                                    <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                        <div class="text-sm font-black text-slate-900 mb-1">
-                                            <i class="fas fa-shield-alt mr-2 text-slate-500"></i> Compra segura
-                                        </div>
-                                        <div class="text-sm text-slate-600">
-                                            Pagamento integrado para você comprar sem sair do site.
-                                        </div>
-                                    </div>
-                                    <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                        <div class="text-sm font-black text-slate-900 mb-1">
-                                            <i class="fas fa-bolt mr-2 text-slate-500"></i> Acesso imediato
-                                        </div>
-                                        <div class="text-sm text-slate-600">
-                                            Após a confirmação, seu acesso aparece na sua conta.
-                                        </div>
-                                    </div>
-                                    <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                        <div class="text-sm font-black text-slate-900 mb-1">
-                                            <i class="fas fa-users mr-2 text-slate-500"></i> Comunidade UNN
-                                        </div>
-                                        <div class="text-sm text-slate-600">
-                                            Conteúdos publicados por mentores, instrutores e membros.
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -454,39 +388,96 @@
             </div>
         </div>
 
-        {{-- Categorias populares --}}
-        <section class="mt-10">
-            <div class="flex items-end justify-between gap-4 mb-4">
-                <div>
-                    <h2 class="text-2xl sm:text-3xl font-black text-slate-900">
-                        <i class="fas fa-layer-group mr-2 text-slate-400"></i> Categorias populares
-                    </h2>
-                    <p class="text-slate-600 mb-0">Explore por tipo e encontre o que você precisa.</p>
-                </div>
-                <a href="{{ route('courses.index') }}" class="text-sm font-black text-blue-700 hover:text-blue-800">Explorar tudo</a>
-            </div>
+        {{-- Top categorias (estilo loja) --}}
+        <section id="marketplace-categories" class="relative mt-6 md:-mt-10 z-10">
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-7">
+                <div class="grid lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-3">
+                        <div class="text-sm font-black text-slate-500 uppercase tracking-wide">Top categorias</div>
+                        <div class="mt-2 text-2xl font-black text-slate-900">Encontre o que você precisa</div>
+                        <p class="mt-2 text-sm text-slate-600 mb-0">Navegue por cursos, mentorias e eventos da comunidade.</p>
+                        <div class="mt-4">
+                            <a href="#marketplace-courses" class="inline-flex items-center gap-2 text-sm font-black text-blue-700 hover:text-blue-800">
+                                Ver produtos <i class="fas fa-chevron-right text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
 
-            <div class="grid sm:grid-cols-3 gap-4">
-                @foreach($storeCategories as $cat)
-                    <a href="{{ $cat['href'] }}"
-                        class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition p-5 flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-sm"
-                            style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3));">
-                            <i class="{{ $cat['icon'] }} text-lg"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="font-black text-slate-900 leading-tight">
-                                {{ $cat['label'] }}
+                    <div class="lg:col-span-9">
+                        <div class="relative" data-hscroll data-scroll-amount="420">
+                            <button type="button" data-hscroll-left
+                                class="hidden md:inline-flex absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full bg-white border border-slate-200 text-slate-700 shadow hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                                aria-label="Voltar categorias">
+                                <i class="fas fa-chevron-left text-sm"></i>
+                            </button>
+
+                            <div class="mp-hscroll flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 px-1" data-hscroll-container>
+                                @foreach($storeCategories as $cat)
+                                    <a href="{{ $cat['href'] }}"
+                                        class="snap-start shrink-0 w-72 sm:w-80 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:shadow-sm transition p-4 flex items-center gap-4">
+                                        <div class="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-blue-700 flex items-center justify-center">
+                                            <i class="{{ $cat['icon'] }} text-lg"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="font-black text-slate-900 leading-tight truncate">{{ $cat['label'] }}</div>
+                                            <div class="text-sm text-slate-500">{{ $cat['count'] }} item(ns)</div>
+                                        </div>
+                                        <div class="ml-auto text-slate-300">
+                                            <i class="fas fa-arrow-right"></i>
+                                        </div>
+                                    </a>
+                                @endforeach
                             </div>
-                            <div class="text-sm text-slate-500">
-                                {{ $cat['count'] }} item(ns)
-                            </div>
+
+                            <button type="button" data-hscroll-right
+                                class="hidden md:inline-flex absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full bg-white border border-slate-200 text-slate-700 shadow hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                                aria-label="Avançar categorias">
+                                <i class="fas fa-chevron-right text-sm"></i>
+                            </button>
                         </div>
-                        <div class="ml-auto text-slate-300 group-hover:text-slate-400 transition">
-                            <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {{-- Vantagens --}}
+        <section class="mt-6">
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200 text-blue-700 flex items-center justify-center">
+                            <i class="fas fa-shield-alt"></i>
                         </div>
-                    </a>
-                @endforeach
+                        <div class="font-black text-slate-900">Compra segura</div>
+                    </div>
+                    <div class="mt-3 text-sm text-slate-600">
+                        Pagamento integrado para você comprar sem sair do site.
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200 text-blue-700 flex items-center justify-center">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="font-black text-slate-900">Acesso imediato</div>
+                    </div>
+                    <div class="mt-3 text-sm text-slate-600">
+                        Após a confirmação, seu acesso aparece na sua conta.
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200 text-blue-700 flex items-center justify-center">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="font-black text-slate-900">Comunidade UNN</div>
+                    </div>
+                    <div class="mt-3 text-sm text-slate-600">
+                        Conteúdos publicados por mentores, instrutores e membros.
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -557,9 +548,16 @@
                     </div>
                 </div>
 
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    @foreach($flashDeals->take(8) as $deal)
-                        <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden" data-product-card>
+                <div class="relative" data-hscroll data-scroll-amount="420">
+                    <button type="button" data-hscroll-left
+                        class="hidden md:inline-flex absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full bg-white border border-slate-200 text-slate-700 shadow hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Voltar promoções">
+                        <i class="fas fa-chevron-left text-sm"></i>
+                    </button>
+
+                    <div class="mp-hscroll flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 px-1" data-hscroll-container>
+                        @foreach($flashDeals->take(8) as $deal)
+                            <div class="snap-start shrink-0 w-72 sm:w-80 group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden" data-product-card>
                             <a href="{{ $deal['url'] }}" class="block">
                                 <div class="aspect-[16/9] bg-slate-100 relative">
                                     @if(($deal['image_url'] ?? '') !== '')
@@ -601,8 +599,15 @@
                                     <span data-flash-countdown>00:00:00</span>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <button type="button" data-hscroll-right
+                        class="hidden md:inline-flex absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full bg-white border border-slate-200 text-slate-700 shadow hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Avançar promoções">
+                        <i class="fas fa-chevron-right text-sm"></i>
+                    </button>
                 </div>
             </section>
         @endif
@@ -1297,6 +1302,46 @@
                 });
             }
 
+            function initHorizontalScrollers() {
+                const wrappers = Array.from(document.querySelectorAll('[data-hscroll]'));
+                if (!wrappers.length) return;
+
+                wrappers.forEach((wrapper) => {
+                    const container = wrapper.querySelector('[data-hscroll-container]');
+                    if (!container) return;
+
+                    const leftBtn = wrapper.querySelector('[data-hscroll-left]');
+                    const rightBtn = wrapper.querySelector('[data-hscroll-right]');
+                    const scrollAmount = Math.max(120, parseInt(wrapper.dataset.scrollAmount || '360', 10) || 360);
+
+                    function update() {
+                        const maxScrollLeft = Math.max(0, container.scrollWidth - container.clientWidth);
+                        if (leftBtn) leftBtn.disabled = container.scrollLeft <= 0;
+                        if (rightBtn) rightBtn.disabled = container.scrollLeft >= (maxScrollLeft - 1);
+                    }
+
+                    if (leftBtn) {
+                        leftBtn.addEventListener('click', () => {
+                            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                        });
+                    }
+
+                    if (rightBtn) {
+                        rightBtn.addEventListener('click', () => {
+                            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                        });
+                    }
+
+                    let raf = null;
+                    container.addEventListener('scroll', () => {
+                        if (raf) cancelAnimationFrame(raf);
+                        raf = requestAnimationFrame(update);
+                    });
+                    window.addEventListener('resize', update);
+                    update();
+                });
+            }
+
             function initFlashSales() {
                 const badges = Array.from(document.querySelectorAll('[data-flash-sale]'));
                 if (!badges.length) return;
@@ -1502,12 +1547,14 @@
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', function () {
                     initMarketplaceHero();
+                    initHorizontalScrollers();
                     initMarketplaceExitOffer();
                     initFlashSales();
                     initMarketplaceEventsPopup();
                 });
             } else {
                 initMarketplaceHero();
+                initHorizontalScrollers();
                 initMarketplaceExitOffer();
                 initFlashSales();
                 initMarketplaceEventsPopup();
