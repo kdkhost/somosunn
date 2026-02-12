@@ -226,7 +226,7 @@ class SettingController extends Controller
             ],
             'ads' => ['ads_enabled', 'ads_inter_feed_enabled'],
             'gateway' => ['gateway_transparent_checkout', 'gateway_pass_tax_to_client'],
-            'marketplace' => ['marketplace_hero_enabled', 'marketplace_hero_autoplay', 'marketplace_exit_enabled'],
+            'marketplace' => ['marketplace_hero_enabled', 'marketplace_hero_autoplay', 'marketplace_exit_enabled', 'marketplace_events_popup_enabled'],
             'social' => [
                 'social_login_enabled',
                 'social_google_enabled',
@@ -269,6 +269,28 @@ class SettingController extends Controller
                 $val = (int) $raw;
                 $val = max(0, min(120, $val));
                 $data['marketplace_exit_delay_seconds'] = (string) $val;
+            }
+        }
+
+        if (array_key_exists('marketplace_events_popup_interval_seconds', $data)) {
+            $raw = trim((string) $data['marketplace_events_popup_interval_seconds']);
+            if ($raw === '') {
+                $data['marketplace_events_popup_interval_seconds'] = '';
+            } else {
+                $val = (int) $raw;
+                $val = max(20, min(300, $val));
+                $data['marketplace_events_popup_interval_seconds'] = (string) $val;
+            }
+        }
+
+        if (array_key_exists('marketplace_events_popup_max_per_session', $data)) {
+            $raw = trim((string) $data['marketplace_events_popup_max_per_session']);
+            if ($raw === '') {
+                $data['marketplace_events_popup_max_per_session'] = '';
+            } else {
+                $val = (int) $raw;
+                $val = max(0, min(10, $val));
+                $data['marketplace_events_popup_max_per_session'] = (string) $val;
             }
         }
 

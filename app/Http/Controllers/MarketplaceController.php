@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Event;
 use App\Models\Mentorship;
 use App\Models\Order;
+use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -49,7 +50,8 @@ class MarketplaceController extends Controller
         $eventsQuery = Event::query()
             ->with('user')
             ->where('published', true)
-            ->orderByDesc('start_at');
+            ->where('start_at', '>=', now())
+            ->orderBy('start_at', 'asc');
 
         if ($q !== '') {
             $eventsQuery->where(function ($query) use ($q) {
@@ -61,6 +63,13 @@ class MarketplaceController extends Controller
 
         $events = $eventsQuery
             ->limit(12)
+            ->get();
+
+        $testimonials = Testimonial::query()
+            ->where('status', 'approved')
+            ->orderByDesc('is_featured')
+            ->orderByDesc('created_at')
+            ->limit(8)
             ->get();
 
         $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
@@ -83,6 +92,7 @@ class MarketplaceController extends Controller
             'courses',
             'mentorships',
             'events',
+            'testimonials',
             'paymentsConfigured',
             'canSellByUserId',
         ));

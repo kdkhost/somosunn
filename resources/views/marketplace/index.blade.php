@@ -7,10 +7,12 @@
     $courses = $courses ?? collect();
     $mentorships = $mentorships ?? collect();
     $events = $events ?? collect();
+    $testimonials = $testimonials ?? collect();
     $paymentsConfigured = (bool) ($paymentsConfigured ?? false);
     $canSellByUserId = $canSellByUserId ?? [];
 
     $user = auth()->user();
+    $isAdmin = $user ? $user->isAdmin() : false;
     $canSell = $user ? $user->canSellOnMarketplace() : false;
     $canBuy = true;
 
@@ -65,6 +67,27 @@
         ['label' => 'Eventos', 'icon' => 'fas fa-calendar-alt', 'href' => '#marketplace-events'],
     ];
 
+    $storeCategories = [
+        [
+            'label' => 'Cursos',
+            'icon' => 'fas fa-book-open',
+            'href' => '#marketplace-courses',
+            'count' => (int) $courses->count(),
+        ],
+        [
+            'label' => 'Mentorias',
+            'icon' => 'fas fa-user-tie',
+            'href' => '#marketplace-mentorships',
+            'count' => (int) $mentorships->count(),
+        ],
+        [
+            'label' => 'Eventos',
+            'icon' => 'fas fa-calendar-alt',
+            'href' => '#marketplace-events',
+            'count' => (int) $events->count(),
+        ],
+    ];
+
     // Marketplace: Hero (banner rotativo)
     $marketplaceHeroEnabled = (string) \App\Models\Setting::get('marketplace_hero_enabled', '1') === '1';
     $marketplaceHeroAutoplay = (string) \App\Models\Setting::get('marketplace_hero_autoplay', '1') === '1';
@@ -111,6 +134,16 @@
     $marketplaceExitButtonText = trim((string) (\App\Models\Setting::get('marketplace_exit_button_text') ?: 'Ver ofertas'));
     $marketplaceExitButtonUrl = $resolveLinkUrl(\App\Models\Setting::get('marketplace_exit_button_url') ?: '/marketplace');
     $marketplaceExitImage = $resolveAssetUrl(\App\Models\Setting::get('marketplace_exit_banner_image'));
+
+    // Marketplace: Pop-up de eventos (para visitantes e compradores)
+    $marketplaceEventsPopupEnabled = (string) \App\Models\Setting::get('marketplace_events_popup_enabled', '1') === '1';
+    $marketplaceEventsPopupIntervalSecondsRaw = trim((string) (\App\Models\Setting::get('marketplace_events_popup_interval_seconds') ?: '60'));
+    $marketplaceEventsPopupIntervalSeconds = (int) ($marketplaceEventsPopupIntervalSecondsRaw !== '' ? $marketplaceEventsPopupIntervalSecondsRaw : 60);
+    $marketplaceEventsPopupIntervalSeconds = max(20, min(300, $marketplaceEventsPopupIntervalSeconds));
+    $marketplaceEventsPopupIntervalMs = $marketplaceEventsPopupIntervalSeconds * 1000;
+    $marketplaceEventsPopupMaxRaw = trim((string) (\App\Models\Setting::get('marketplace_events_popup_max_per_session') ?: '3'));
+    $marketplaceEventsPopupMaxPerSession = (int) ($marketplaceEventsPopupMaxRaw !== '' ? $marketplaceEventsPopupMaxRaw : 3);
+    $marketplaceEventsPopupMaxPerSession = max(0, min(10, $marketplaceEventsPopupMaxPerSession));
 @endphp
 
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-24 pb-16 px-4 md:px-12 lg:px-24">
@@ -175,18 +208,23 @@
             @if(!$paymentsConfigured)
                 <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
                     <div class="font-black">
-                        <i class="fas fa-exclamation-triangle mr-2"></i> Pagamento indisponível
+                        <i class="fas fa-exclamation-triangle mr-2"></i> Compras pagas indisponíveis no momento
                     </div>
                     <div class="text-sm text-amber-800">
-                        O MercadoPago ainda não foi configurado na plataforma. Compras pagas ficam indisponíveis até a configuração do gateway.
+                        Pix e cartão estão temporariamente indisponíveis. Itens gratuitos continuam liberados.
                     </div>
+
+                    @if($isAdmin)
+                        <div class="mt-2 text-xs text-amber-800">
+                            Dica (admin): verifique as configurações em <span class="font-bold">Configurações &gt; Pagamentos</span>.
+                        </div>
+                    @endif
                 </div>
             @endif
         </div>
 
-        <div class="mt-6 grid lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-8">
-                <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="mt-6">
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
                     @if($marketplaceHeroEnabled)
                         <div class="relative" data-marketplace-hero data-animation="{{ $marketplaceHeroAnimation }}"
                             data-autoplay="{{ $marketplaceHeroAutoplay ? 1 : 0 }}" data-interval="{{ $marketplaceHeroIntervalMs }}">
@@ -328,26 +366,26 @@
                             <div class="mt-7 grid sm:grid-cols-3 gap-3">
                                 <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                                     <div class="text-sm font-black text-slate-900 mb-1">
-                                        <i class="fas fa-shield-alt mr-2 text-slate-500"></i> Pagamento multi-tenant
+                                        <i class="fas fa-shield-alt mr-2 text-slate-500"></i> Compra segura
                                     </div>
                                     <div class="text-sm text-slate-600">
-                                        Gateway único na plataforma, com registro de vendedor e tipo de venda.
+                                        Pagamento integrado para você comprar sem sair do site.
                                     </div>
                                 </div>
                                 <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                                     <div class="text-sm font-black text-slate-900 mb-1">
-                                        <i class="fas fa-download mr-2 text-slate-500"></i> Conteúdo digital
+                                        <i class="fas fa-bolt mr-2 text-slate-500"></i> Acesso imediato
                                     </div>
                                     <div class="text-sm text-slate-600">
-                                        Venda focada em produtos e experiências digitais dentro da UNN.
+                                        Após a confirmação, seu acesso aparece na sua conta.
                                     </div>
                                 </div>
                                 <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                                     <div class="text-sm font-black text-slate-900 mb-1">
-                                        <i class="fas fa-user-check mr-2 text-slate-500"></i> Permissão de venda
+                                        <i class="fas fa-users mr-2 text-slate-500"></i> Comunidade UNN
                                     </div>
                                     <div class="text-sm text-slate-600">
-                                        Apenas membros com permissão de instrutor/mentor/palestrante podem vender.
+                                        Conteúdos publicados por mentores, instrutores e membros.
                                     </div>
                                 </div>
                             </div>
@@ -366,7 +404,7 @@
                                     Sua loja digital dentro da UNN
                                 </h1>
                                 <p class="mt-3 text-slate-600 text-base sm:text-lg max-w-2xl">
-                                    Cursos, mentorias e eventos publicados por membros habilitados. O gateway é multi-tenant e cada venda identifica vendedor e tipo.
+                                    Cursos, mentorias e eventos da comunidade para você comprar e acessar em um só lugar.
                                 </p>
 
                                 <div class="mt-6 flex flex-col sm:flex-row gap-3">
@@ -387,83 +425,187 @@
                                 <div class="mt-7 grid sm:grid-cols-3 gap-3">
                                     <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                                         <div class="text-sm font-black text-slate-900 mb-1">
-                                            <i class="fas fa-shield-alt mr-2 text-slate-500"></i> Pagamento multi-tenant
+                                            <i class="fas fa-shield-alt mr-2 text-slate-500"></i> Compra segura
                                         </div>
                                         <div class="text-sm text-slate-600">
-                                            Gateway único na plataforma, com registro de vendedor e tipo de venda.
+                                            Pagamento integrado para você comprar sem sair do site.
                                         </div>
                                     </div>
                                     <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                                         <div class="text-sm font-black text-slate-900 mb-1">
-                                            <i class="fas fa-download mr-2 text-slate-500"></i> Conteúdo digital
+                                            <i class="fas fa-bolt mr-2 text-slate-500"></i> Acesso imediato
                                         </div>
                                         <div class="text-sm text-slate-600">
-                                            Venda focada em produtos e experiências digitais dentro da UNN.
+                                            Após a confirmação, seu acesso aparece na sua conta.
                                         </div>
                                     </div>
                                     <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                                         <div class="text-sm font-black text-slate-900 mb-1">
-                                            <i class="fas fa-user-check mr-2 text-slate-500"></i> Permissão de venda
+                                            <i class="fas fa-users mr-2 text-slate-500"></i> Comunidade UNN
                                         </div>
                                         <div class="text-sm text-slate-600">
-                                            Apenas membros com permissão de instrutor/mentor/palestrante podem vender.
+                                            Conteúdos publicados por mentores, instrutores e membros.
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     @endif
-                </div>
-            </div>
-
-            <div class="lg:col-span-4 space-y-4">
-                <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
-                    <div class="text-sm font-black text-slate-900">
-                        <i class="fas fa-info-circle mr-2 text-slate-400"></i> Como funciona
-                    </div>
-                    <ul class="mt-3 space-y-2 text-sm text-slate-600">
-                        <li class="flex gap-2">
-                            <i class="fas fa-check text-slate-400 mt-0.5"></i>
-                            <span>Explore cursos, mentorias e eventos publicados.</span>
-                        </li>
-                        <li class="flex gap-2">
-                            <i class="fas fa-check text-slate-400 mt-0.5"></i>
-                            <span>Compras pagas exigem gateway configurado na plataforma.</span>
-                        </li>
-                        <li class="flex gap-2">
-                            <i class="fas fa-check text-slate-400 mt-0.5"></i>
-                            <span>Cada pedido registra vendedor e tipo de venda.</span>
-                        </li>
-                    </ul>
-                </div>
-
-                @if($canSell)
-                    <div class="rounded-3xl border border-blue-200 bg-blue-50 p-6">
-                        <div class="text-sm font-black text-blue-900">Quer vender no marketplace?</div>
-                        <div class="text-sm text-blue-800 mt-1">
-                            Acesse o painel para acompanhar vendas e gerenciar seu marketplace.
-                        </div>
-                        <div class="mt-4 flex flex-col sm:flex-row gap-2">
-                            <a href="{{ route('panel.marketplace.index') }}"
-                                class="btn-primary text-white px-5 py-3 rounded-2xl font-black inline-flex items-center justify-center gap-2 shadow-md">
-                                <i class="fas fa-store"></i> Abrir painel
-                            </a>
-                            <a href="{{ route('panel.marketplace.payments') }}"
-                                class="px-5 py-3 rounded-2xl font-black border border-blue-200 bg-white text-blue-800 hover:bg-blue-100 transition inline-flex items-center justify-center gap-2">
-                                <i class="fas fa-credit-card"></i> Ver pagamentos
-                            </a>
-                        </div>
-                    </div>
-                @else
-                    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
-                        <div class="text-sm font-black text-slate-900">Venda no marketplace</div>
-                        <div class="text-sm text-slate-600 mt-1">
-                            Para vender, seu usuário precisa estar habilitado como vendedor (instrutor/mentor/palestrante) no plano ou liberado individualmente.
-                        </div>
-                    </div>
-                @endif
             </div>
         </div>
+
+        {{-- Categorias populares --}}
+        <section class="mt-10">
+            <div class="flex items-end justify-between gap-4 mb-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-slate-900">
+                        <i class="fas fa-layer-group mr-2 text-slate-400"></i> Categorias populares
+                    </h2>
+                    <p class="text-slate-600 mb-0">Explore por tipo e encontre o que você precisa.</p>
+                </div>
+                <a href="{{ route('courses.index') }}" class="text-sm font-black text-blue-700 hover:text-blue-800">Explorar tudo</a>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-4">
+                @foreach($storeCategories as $cat)
+                    <a href="{{ $cat['href'] }}"
+                        class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition p-5 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-sm"
+                            style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3));">
+                            <i class="{{ $cat['icon'] }} text-lg"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="font-black text-slate-900 leading-tight">
+                                {{ $cat['label'] }}
+                            </div>
+                            <div class="text-sm text-slate-500">
+                                {{ $cat['count'] }} item(ns)
+                            </div>
+                        </div>
+                        <div class="ml-auto text-slate-300 group-hover:text-slate-400 transition">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </section>
+
+        {{-- Promoções relâmpago --}}
+        @php
+            $flashDeals = collect();
+
+            foreach ($courses as $c) {
+                if (!method_exists($c, 'isFlashSaleActive') || !$c->isFlashSaleActive() || !$c->flash_sale_ends_at) {
+                    continue;
+                }
+                $flashDeals->push([
+                    'type' => 'CURSO',
+                    'icon' => 'fas fa-book-open',
+                    'title' => (string) $c->title,
+                    'url' => route('courses.show', $c->slug ?: $c->id),
+                    'image_url' => $resolveAssetUrl($c->thumbnail ?? ''),
+                    'original' => (float) ($c->price ?? 0),
+                    'sale' => (float) ($c->effective_price ?? 0),
+                    'ends_at_ms' => (int) $c->flash_sale_ends_at->timestamp * 1000,
+                ]);
+            }
+
+            foreach ($mentorships as $m) {
+                if (!method_exists($m, 'isFlashSaleActive') || !$m->isFlashSaleActive() || !$m->flash_sale_ends_at) {
+                    continue;
+                }
+                $flashDeals->push([
+                    'type' => 'MENTORIA',
+                    'icon' => 'fas fa-user-tie',
+                    'title' => (string) $m->title,
+                    'url' => route('mentorships.show', $m),
+                    'image_url' => $resolveAssetUrl($m->image ?? ''),
+                    'original' => (float) ($m->price ?? 0),
+                    'sale' => (float) ($m->effective_price ?? 0),
+                    'ends_at_ms' => (int) $m->flash_sale_ends_at->timestamp * 1000,
+                ]);
+            }
+
+            foreach ($events as $e) {
+                if (!method_exists($e, 'isFlashSaleActive') || !$e->isFlashSaleActive() || !$e->flash_sale_ends_at) {
+                    continue;
+                }
+                $regular = (float) ($e->current_price ?? $e->price ?? 0);
+                $flashDeals->push([
+                    'type' => 'EVENTO',
+                    'icon' => 'fas fa-calendar-alt',
+                    'title' => (string) $e->title,
+                    'url' => route('events.show', $e),
+                    'image_url' => $resolveAssetUrl($e->image ?? ''),
+                    'original' => $regular,
+                    'sale' => (float) ($e->effective_price ?? $regular),
+                    'ends_at_ms' => (int) $e->flash_sale_ends_at->timestamp * 1000,
+                ]);
+            }
+
+            $flashDeals = $flashDeals->sortBy('ends_at_ms')->values();
+        @endphp
+
+        @if($flashDeals->count() > 0)
+            <section id="marketplace-flash-deals" class="mt-10">
+                <div class="flex items-end justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900">
+                            <i class="fas fa-bolt mr-2 text-slate-400"></i> Promoções relâmpago
+                        </h2>
+                        <p class="text-slate-600 mb-0">Descontos por tempo limitado.</p>
+                    </div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    @foreach($flashDeals->take(8) as $deal)
+                        <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden" data-product-card>
+                            <a href="{{ $deal['url'] }}" class="block">
+                                <div class="aspect-[16/9] bg-slate-100 relative">
+                                    @if(($deal['image_url'] ?? '') !== '')
+                                        <img src="{{ $deal['image_url'] }}" alt="{{ $deal['title'] }}" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-slate-300">
+                                            <i class="fas fa-image text-4xl"></i>
+                                        </div>
+                                    @endif
+
+                                    <div class="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black text-white shadow"
+                                        style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3));">
+                                        {{ $deal['type'] }}
+                                    </div>
+                                </div>
+                            </a>
+
+                            <div class="p-4">
+                                <div class="font-black text-slate-900 leading-snug line-clamp-2">
+                                    {{ $deal['title'] }}
+                                </div>
+
+                                <div class="mt-2 flex items-center justify-between gap-2">
+                                    <div class="text-lg font-black text-slate-900" data-price-current>
+                                        {{ $deal['sale'] > 0 ? 'R$ ' . number_format($deal['sale'], 2, ',', '.') : 'Gratuito' }}
+                                    </div>
+                                    @if(($deal['original'] ?? 0) > ($deal['sale'] ?? 0))
+                                        <div class="text-sm font-bold text-slate-400 line-through" data-price-original>
+                                            R$ {{ number_format((float) $deal['original'], 2, ',', '.') }}
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="mt-3 inline-flex items-center gap-2 rounded-full bg-slate-900 text-white px-3 py-1 text-xs font-black"
+                                    data-flash-sale data-ends-at-ms="{{ (int) ($deal['ends_at_ms'] ?? 0) }}"
+                                    data-original="{{ (float) ($deal['original'] ?? 0) }}"
+                                    data-sale="{{ (float) ($deal['sale'] ?? 0) }}">
+                                    <i class="{{ $deal['icon'] }}"></i>
+                                    <span data-flash-countdown>00:00:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        @endif
 
         {{-- Cursos --}}
         <section id="marketplace-courses" class="mt-10">
@@ -845,6 +987,67 @@
                 @endforelse
             </div>
         </section>
+
+        {{-- Depoimentos (compradores) --}}
+        @if($testimonials->count() > 0)
+            <section id="marketplace-testimonials" class="mt-12">
+                <div class="flex items-end justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900">
+                            <i class="fas fa-comment-dots mr-2 text-slate-400"></i> Depoimentos
+                        </h2>
+                        <p class="text-slate-600 mb-0">Quem já comprou recomenda.</p>
+                    </div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($testimonials->take(6) as $t)
+                        @php
+                            $rating = (int) ($t->rating ?? 0);
+                            $rating = max(0, min(5, $rating));
+                            $createdAt = $t->created_at ? (is_string($t->created_at) ? \Carbon\Carbon::parse($t->created_at) : $t->created_at)->format('d/m/Y') : null;
+                            $featured = (bool) ($t->is_featured ?? false);
+                        @endphp
+
+                        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0">
+                                    <div class="font-black text-slate-900 truncate">
+                                        {{ $t->author_name ?: 'Cliente' }}
+                                    </div>
+                                    @if(!empty($t->author_title))
+                                        <div class="text-sm text-slate-500 truncate">{{ $t->author_title }}</div>
+                                    @endif
+                                </div>
+
+                                <div class="shrink-0 flex items-center gap-1 text-amber-400" aria-label="Avaliação">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="{{ $i <= $rating ? 'fas' : 'far' }} fa-star text-sm"></i>
+                                    @endfor
+                                </div>
+                            </div>
+
+                            @if($featured)
+                                <div class="mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black text-white shadow"
+                                    style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3));">
+                                    DESTAQUE
+                                </div>
+                            @endif
+
+                            <div class="mt-3 text-sm text-slate-700 leading-relaxed">
+                                {{ $t->content }}
+                            </div>
+
+                            @if($createdAt)
+                                <div class="mt-4 text-xs text-slate-400">
+                                    {{ $createdAt }}
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        @endif
     </div>
 </div>
 
@@ -912,9 +1115,33 @@
     </div>
 @endif
 
+@php
+    $eventsPopupItems = $events
+        ->take(10)
+        ->map(function ($event) use ($resolveAssetUrl) {
+            $date = $event->start_at
+                ? (is_string($event->start_at) ? \Carbon\Carbon::parse($event->start_at) : $event->start_at)->format('d/m/Y')
+                : null;
+
+            return [
+                'id' => (int) $event->id,
+                'title' => (string) $event->title,
+                'date' => $date,
+                'url' => route('events.show', $event),
+                'image_url' => $resolveAssetUrl($event->image ?? ''),
+            ];
+        })
+        ->values();
+@endphp
+
 @push('scripts')
     <script>
         (function () {
+            const mpEventsPopupEnabled = @json((bool) $marketplaceEventsPopupEnabled);
+            const mpEventsPopupIntervalMs = @json((int) $marketplaceEventsPopupIntervalMs);
+            const mpEventsPopupMaxPerSession = @json((int) $marketplaceEventsPopupMaxPerSession);
+            const mpUpcomingEvents = @json($eventsPopupItems);
+
             function initMarketplaceHero() {
                 const hero = document.querySelector('[data-marketplace-hero]');
                 if (!hero) return;
@@ -1143,16 +1370,147 @@
                 timer = setInterval(tick, 1000);
             }
 
+            function initMarketplaceEventsPopup() {
+                if (!mpEventsPopupEnabled) return;
+                if (!mpEventsPopupMaxPerSession) return;
+                if (!Array.isArray(mpUpcomingEvents) || mpUpcomingEvents.length === 0) return;
+                if (!window.Swal || typeof window.Swal.fire !== 'function') return;
+
+                const sessionKey = 'unn_marketplace_events_popup_v1';
+
+                function escapeHtml(value) {
+                    return String(value || '').replace(/[&<>"']/g, (char) => {
+                        switch (char) {
+                            case '&':
+                                return '&amp;';
+                            case '<':
+                                return '&lt;';
+                            case '>':
+                                return '&gt;';
+                            case '"':
+                                return '&quot;';
+                            case "'":
+                                return '&#039;';
+                            default:
+                                return char;
+                        }
+                    });
+                }
+
+                function loadState() {
+                    try {
+                        const raw = sessionStorage.getItem(sessionKey);
+                        if (!raw) return { shownIds: [], shownCount: 0 };
+                        const parsed = JSON.parse(raw);
+                        return {
+                            shownIds: Array.isArray(parsed.shownIds) ? parsed.shownIds : [],
+                            shownCount: parseInt(parsed.shownCount || 0, 10) || 0,
+                        };
+                    } catch (e) {
+                        return { shownIds: [], shownCount: 0 };
+                    }
+                }
+
+                function saveState(state) {
+                    try {
+                        sessionStorage.setItem(sessionKey, JSON.stringify(state));
+                    } catch (e) {
+                        // ignore
+                    }
+                }
+
+                const toast = window.Swal.mixin({
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Ver',
+                    showCloseButton: true,
+                    timer: 12000,
+                    timerProgressBar: true,
+                    didOpen: (el) => {
+                        el.addEventListener('mouseenter', window.Swal.stopTimer);
+                        el.addEventListener('mouseleave', window.Swal.resumeTimer);
+                    },
+                });
+
+                let state = loadState();
+                let shownIds = new Set((state.shownIds || []).map((id) => parseInt(id, 10) || 0).filter(Boolean));
+                let shownCount = parseInt(state.shownCount || 0, 10) || 0;
+                let timer = null;
+
+                function pickEvent() {
+                    const available = mpUpcomingEvents.filter((ev) => ev && ev.id && !shownIds.has(ev.id));
+                    if (available.length === 0) return null;
+                    return available[Math.floor(Math.random() * available.length)];
+                }
+
+                function showPopup() {
+                    if (document.hidden) return;
+                    if (typeof window.Swal.isVisible === 'function' && window.Swal.isVisible()) return;
+                    if (shownCount >= mpEventsPopupMaxPerSession) {
+                        if (timer) clearInterval(timer);
+                        timer = null;
+                        return;
+                    }
+
+                    const ev = pickEvent();
+                    if (!ev) {
+                        if (timer) clearInterval(timer);
+                        timer = null;
+                        return;
+                    }
+
+                    const title = escapeHtml(ev.title || 'Novo evento');
+                    const date = escapeHtml(ev.date || '');
+                    const image = String(ev.image_url || '').trim();
+
+                    shownIds.add(ev.id);
+                    shownCount += 1;
+
+                    state = { shownIds: Array.from(shownIds), shownCount };
+                    saveState(state);
+
+                    const html = `
+                        <div class="flex gap-3 items-center">
+                            ${image ? `<img src="${escapeHtml(image)}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:12px;border:1px solid rgba(148,163,184,.35)" />` : ''}
+                            <div style="min-width:0">
+                                <div style="font-weight:900;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">${title}</div>
+                                ${date ? `<div style="margin-top:2px;font-size:12px;opacity:.85">Data: ${date}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+
+                    toast.fire({
+                        icon: 'info',
+                        title: 'Novo evento na comunidade',
+                        html,
+                    }).then((result) => {
+                        if (result.isConfirmed && ev.url) {
+                            window.location.href = ev.url;
+                        }
+                    });
+                }
+
+                setTimeout(() => {
+                    showPopup();
+                    if (mpEventsPopupIntervalMs > 0) {
+                        timer = setInterval(showPopup, mpEventsPopupIntervalMs);
+                    }
+                }, 12000);
+            }
+
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', function () {
                     initMarketplaceHero();
                     initMarketplaceExitOffer();
                     initFlashSales();
+                    initMarketplaceEventsPopup();
                 });
             } else {
                 initMarketplaceHero();
                 initMarketplaceExitOffer();
                 initFlashSales();
+                initMarketplaceEventsPopup();
             }
         })();
     </script>
