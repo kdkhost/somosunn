@@ -24,10 +24,10 @@
             background: #fff;
             margin-bottom: 15px;
             border-radius: 10px;
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            column-gap: 12px;
             align-items: center;
-            justify-content: space-between;
-            gap: 0;
             transition: all 0.3s ease;
             position: relative;
             z-index: 2;
@@ -66,7 +66,6 @@
         }
 
         .lesson-item .d-flex:first-child {
-            flex: 1;
             min-width: 0;
             /* Allow title to truncate if needed */
         }
@@ -76,7 +75,7 @@
             align-items: center;
             gap: 8px;
             flex-shrink: 0;
-            margin-left: auto !important;
+            margin-left: 0 !important;
             justify-content: flex-end;
             flex-wrap: nowrap;
             white-space: nowrap;
@@ -85,6 +84,8 @@
 
         .lesson-item .lesson-actions form {
             margin: 0;
+            display: inline-block !important;
+            position: static !important;
         }
 
         .lesson-item .lesson-actions .btn {
@@ -94,6 +95,7 @@
             width: 38px;
             height: 34px;
             padding: 0 !important;
+            position: relative !important;
         }
 
         .lesson-item .fa-grip-vertical {
