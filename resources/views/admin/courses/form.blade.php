@@ -446,13 +446,13 @@
                                                             // Redireciona para a edição do curso já salvo
                                                             window.location.href = `/admin/courses/${data.id}/edit?openLesson=1`;
                                                         } else {
-                                                            alert('Erro ao salvar curso. Tente novamente.');
-                                                            btnNovaAula.disabled = false;
-                                                            btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
-                                                        }
-                                                    })
+                                                        Swal.fire({ icon: 'error', title: 'Erro', text: 'Erro ao salvar curso. Tente novamente.' });
+                                                        btnNovaAula.disabled = false;
+                                                        btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
+                                                    }
+                                                })
                                                     .catch(() => {
-                                                        alert('Erro ao salvar curso. Tente novamente.');
+                                                        Swal.fire({ icon: 'error', title: 'Erro', text: 'Erro ao salvar curso. Tente novamente.' });
                                                         btnNovaAula.disabled = false;
                                                         btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
                                                     });

@@ -1642,8 +1642,10 @@
         const showUploadLimitAlert = (message) => {
             if (typeof Swal !== 'undefined') {
                 Swal.fire('Atenção', message, 'warning');
+            } else if (typeof toastr !== 'undefined') {
+                toastr.warning(message);
             } else {
-                alert(message);
+                console.warn(message);
             }
         };
 

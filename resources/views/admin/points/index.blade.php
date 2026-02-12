@@ -141,11 +141,10 @@
                                                 class="btn btn-sm btn-outline-secondary" title="Editar">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form action="{{ route('admin.points-rules.destroy', $r) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover"
-                                                    onclick="return confirm('Remover esta regra de pontuação?')">
+                                            <form action="{{ route('admin.points-rules.destroy', $r) }}" method="POST" class="d-inline js-confirm-delete" data-confirm="Remover esta regra de pontuação?">
+                                                 @csrf
+                                                 @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
@@ -223,11 +222,10 @@
                                             class="btn btn-sm btn-outline-secondary">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('admin.points-rules.destroy', $r) }}" method="POST" class="d-inline">
+                                        <form action="{{ route('admin.points-rules.destroy', $r) }}" method="POST" class="d-inline js-confirm-delete" data-confirm="Remover esta regra?">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Remover esta regra?')">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -255,3 +253,35 @@
         </div>
     @endif
 @endsection
+
+@push('scripts')
+    <script>
+        $(function () {
+            $(document)
+                .off('submit.pointsDelete', 'form.js-confirm-delete')
+                .on('submit.pointsDelete', 'form.js-confirm-delete', function (e) {
+                    e.preventDefault();
+                    const form = this;
+                    const message = (form.getAttribute('data-confirm') || 'Confirma a remoção?').toString();
+
+                    if (typeof Swal === 'undefined') {
+                        form.submit();
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: 'Confirmar remoção',
+                        text: message,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Remover',
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#d33'
+                    }).then((result) => {
+                        if (!result.isConfirmed) return;
+                        form.submit();
+                    });
+                });
+        });
+    </script>
+@endpush

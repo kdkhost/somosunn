@@ -253,13 +253,14 @@
                                     class="w-full bg-gray-200 text-gray-700 py-4 rounded-2xl font-bold text-lg hover:bg-gray-300 transition flex items-center justify-center gap-2">
                                     <i class="fas fa-calendar-check"></i> Ver próximos eventos
                                 </a>
-                            @elseif($isDemo)
+                             @elseif($isDemo)
                                 <button
-                                    class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg opacity-75 cursor-not-allowed flex items-center justify-center gap-2"
-                                    onclick="alert('Este é um evento de demonstração. Configure eventos reais no painel administrativo.');">
-                                    <i class="fas fa-ticket-alt"></i>
-                                    {{ $event->current_price > 0 ? 'Comprar Ingresso' : 'Garantir Minha Vaga' }}
-                                </button>
+                                    type="button"
+                                    data-demo="1"
+                                    class="js-demo-event-alert w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg opacity-75 cursor-not-allowed flex items-center justify-center gap-2">
+                                     <i class="fas fa-ticket-alt"></i>
+                                     {{ $event->current_price > 0 ? 'Comprar Ingresso' : 'Garantir Minha Vaga' }}
+                                 </button>
                             @elseif($event->capacity && $remainingSeats === 0)
                                 <button class="w-full bg-gray-200 text-gray-700 py-4 rounded-2xl font-bold text-lg cursor-not-allowed flex items-center justify-center gap-2" disabled>
                                     <i class="fas fa-ban"></i> Esgotado
@@ -380,3 +381,27 @@
     </section>
 </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.js-demo-event-alert');
+            if (!btn) return;
+
+            e.preventDefault();
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Evento de demonstração',
+                    text: 'Este é um evento de demonstração. Configure eventos reais no painel administrativo.',
+                    icon: 'info'
+                });
+                return;
+            }
+
+            if (typeof toastr !== 'undefined') {
+                toastr.info('Este é um evento de demonstração. Configure eventos reais no painel administrativo.');
+            }
+        });
+    </script>
+@endpush

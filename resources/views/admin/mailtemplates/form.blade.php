@@ -124,12 +124,57 @@ $(function(){
         const v = $(this).data('var');
         $('#bodyEditor').summernote('pasteHTML', v);
     });
-    $('#btnSendTest').on('click', function(){
-        const url = $(this).data('url');
-        const email = prompt('Enviar prévia para qual e-mail?');
-        if(!email) return;
-        $.post(url, {_token:'{{ csrf_token() }}', email: email}, function(){ toastr.success('Prévia enviada'); });
-    });
+    $(document)
+        .off('click.mailtpl', '#btnSendTest')
+        .on('click.mailtpl', '#btnSendTest', function () {
+            const url = $(this).data('url');
+            if (!url) return;
+
+            const fallbackEmail = @json(optional(auth()->user())->email);
+            const lastEmail = localStorage.getItem('mailtpl_test_email');
+            const defaultEmail = (lastEmail || fallbackEmail || '').toString();
+
+            Swal.fire({
+                title: 'Enviar teste',
+                text: 'Enviar prévia para qual e-mail?',
+                input: 'email',
+                inputLabel: 'E-mail',
+                inputPlaceholder: 'email@dominio.com',
+                inputValue: defaultEmail,
+                showCancelButton: true,
+                confirmButtonText: 'Enviar',
+                cancelButtonText: 'Cancelar',
+                showLoaderOnConfirm: true,
+                allowOutsideClick: () => !Swal.isLoading(),
+                preConfirm: (value) => {
+                    const email = (value || '').toString().trim();
+                    const isValid = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
+                    if (!isValid) {
+                        Swal.showValidationMessage('Informe um e-mail válido.');
+                        return false;
+                    }
+
+                    return $.post(url, { _token: '{{ csrf_token() }}', email })
+                        .then(
+                            (data) => {
+                                localStorage.setItem('mailtpl_test_email', email);
+                                return data;
+                            },
+                            (xhr) => {
+                                let msg = 'Não foi possível enviar o e-mail de teste.';
+                                if (xhr && xhr.responseJSON) {
+                                    msg = xhr.responseJSON.message || xhr.responseJSON.error || msg;
+                                }
+                                Swal.showValidationMessage(msg);
+                            }
+                        );
+                }
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+                const message = result.value && result.value.message ? result.value.message : 'Prévia enviada com sucesso.';
+                Swal.fire({ title: 'Sucesso', text: message, icon: 'success' });
+            });
+        });
 
     // auto slug (somente quando não existe)
     @if(!$template->id)

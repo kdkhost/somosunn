@@ -17,7 +17,14 @@
 
     document.getElementById('btnUpload').addEventListener('click', async function(){
         var f = document.getElementById('fileInput').files[0];
-        if(!f) return alert('Escolha um arquivo');
+        if(!f) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({ icon: 'warning', title: 'Escolha um arquivo', text: 'Selecione um arquivo para enviar.' });
+            } else if (typeof toastr !== 'undefined') {
+                toastr.warning('Selecione um arquivo para enviar.');
+            }
+            return;
+        }
 
         var chunkSize = 5 * 1024 * 1024; // 5MB
         var total = Math.ceil(f.size / chunkSize);
