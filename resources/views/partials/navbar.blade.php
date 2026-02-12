@@ -130,12 +130,10 @@
                                      Meu perfil
                                  </a>
 
-                                @if(Auth::user()->canAccessFeature('marketplace.buy'))
-                                    <a href="{{ route('marketplace.index') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                        <i class="fas fa-store w-5 opacity-70"></i>
-                                        Marketplace
-                                    </a>
-                                @endif
+                                 <a href="{{ route('marketplace.index') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                     <i class="fas fa-store w-5 opacity-70"></i>
+                                     Marketplace
+                                 </a>
 
                                  @if(Auth::user()->canSellOnMarketplace())
                                      <a href="{{ route('panel.marketplace.payments') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
