@@ -135,11 +135,9 @@ Route::post('/contato', [ContactController::class, 'send'])->middleware('throttl
 // Members
 Route::get('/membros', [\App\Http\Controllers\MemberController::class, 'index'])->name('membros');
 
-// Events (granular)
-Route::middleware(['check.feature:events_access'])->group(function () {
-    Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
-    Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
-});
+// Eventos (público: vitrine/SEO; compra/reserva controla acesso por pedido/inscrição)
+Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
+Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
 Route::middleware(['auth', 'check.feature:events_create'])->group(function () {
     Route::get('/eventos/create', [\App\Http\Controllers\EventController::class, 'create'])->name('events.create');
     Route::post('/eventos', [\App\Http\Controllers\EventController::class, 'store'])->name('events.store');
@@ -151,18 +149,13 @@ Route::middleware(['auth', 'check.feature:events_edit'])->group(function () {
 Route::middleware(['auth', 'check.feature:events_delete'])->group(function () {
     Route::delete('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'destroy'])->name('events.destroy');
 });
-Route::middleware(['auth', 'check.feature:events_reserve'])->group(function () {
-    Route::get('/eventos/{event}/checkout', [\App\Http\Controllers\EventReservationController::class, 'checkout'])->name('events.checkout');
-    Route::post('/eventos/{event}/reservar', [\App\Http\Controllers\EventReservationController::class, 'reserve'])->name('events.reserve');
-});
+Route::get('/eventos/{event}/checkout', [\App\Http\Controllers\EventReservationController::class, 'checkout'])->name('events.checkout');
+Route::post('/eventos/{event}/reservar', [\App\Http\Controllers\EventReservationController::class, 'reserve'])->name('events.reserve');
 Route::get('/eventos/pagamento/sucesso/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentSuccess'])
-    ->middleware(['auth', 'check.feature:events_access'])
     ->name('events.payment.success');
 Route::get('/eventos/pagamento/pendente/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentPending'])
-    ->middleware(['auth', 'check.feature:events_access'])
     ->name('events.payment.pending');
 Route::get('/eventos/pagamento/falha/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentFailure'])
-    ->middleware(['auth', 'check.feature:events_access'])
     ->name('events.payment.failure');
 
 // PWA static files to avoid 404 in production
@@ -230,11 +223,9 @@ Route::get('/offline', fn() => view('offline'))->name('offline');
 
 
 
-// Public & Creator Course Routes (granular)
-Route::middleware(['check.feature:courses_access'])->group(function () {
-    Route::get('courses', [\App\Http\Controllers\CourseController::class, 'index'])->name('courses.index');
-    Route::get('courses/{course}', [\App\Http\Controllers\CourseController::class, 'show'])->name('courses.show');
-});
+// Cursos (público: vitrine/SEO; acesso às aulas continua restrito por permissões/compra)
+Route::get('courses', [\App\Http\Controllers\CourseController::class, 'index'])->name('courses.index');
+Route::get('courses/{course}', [\App\Http\Controllers\CourseController::class, 'show'])->name('courses.show');
 Route::middleware(['auth', 'check.feature:courses_create'])->group(function () {
     Route::get('courses/create', [\App\Http\Controllers\CourseController::class, 'create'])->name('courses.create');
     Route::post('courses', [\App\Http\Controllers\CourseController::class, 'store'])->name('courses.store');
@@ -248,11 +239,9 @@ Route::middleware(['auth', 'check.feature:courses_delete'])->group(function () {
     Route::post('courses/{course}/complete', [\App\Http\Controllers\CourseController::class, 'complete'])->name('courses.complete');
 });
 
-// Feature: Mentorships (granular)
-Route::middleware(['check.feature:mentorships_access'])->group(function () {
-    Route::get('mentorships', [\App\Http\Controllers\MentorshipController::class, 'index'])->name('mentorships.index');
-    Route::get('mentorships/{mentorship}', [\App\Http\Controllers\MentorshipController::class, 'show'])->name('mentorships.show');
-});
+// Mentorias (público: vitrine/SEO; contratação/agenda continua restrita)
+Route::get('mentorships', [\App\Http\Controllers\MentorshipController::class, 'index'])->name('mentorships.index');
+Route::get('mentorships/{mentorship}', [\App\Http\Controllers\MentorshipController::class, 'show'])->name('mentorships.show');
 Route::middleware(['auth', 'check.feature:mentorships_create'])->group(function () {
     Route::get('mentorships/create', [\App\Http\Controllers\MentorshipController::class, 'create'])->name('mentorships.create');
     Route::post('mentorships', [\App\Http\Controllers\MentorshipController::class, 'store'])->name('mentorships.store');
