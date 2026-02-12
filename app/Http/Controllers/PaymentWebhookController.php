@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendMarketplaceOrderPaidEmailsJob;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Event;
@@ -80,6 +81,10 @@ class PaymentWebhookController extends Controller
             $this->activatePlanForOrder($order);
             $this->fulfillDigitalItemsForOrder($order);
             app(InvoiceService::class)->issueAndQueueForOrder($order);
+
+            if (!$wasPaid || !data_get($order->metadata, 'emails.marketplace_paid_sent_at')) {
+                SendMarketplaceOrderPaidEmailsJob::dispatch((int) $order->id);
+            }
         } catch (\Throwable $e) {
             Log::error('MP Webhook Error: ' . $e->getMessage(), ['seller_id' => $seller_id]);
         }
@@ -103,6 +108,8 @@ class PaymentWebhookController extends Controller
             return response('OK', 200);
         }
 
+        $wasPaid = (string) $order->status === 'paid';
+
         foreach ($charges as $charge) {
             if (($charge['status'] ?? '') !== 'PAID') {
                 continue;
@@ -122,6 +129,10 @@ class PaymentWebhookController extends Controller
             $this->activatePlanForOrder($order);
             $this->fulfillDigitalItemsForOrder($order);
             app(InvoiceService::class)->issueAndQueueForOrder($order);
+
+            if (!$wasPaid || !data_get($order->metadata, 'emails.marketplace_paid_sent_at')) {
+                SendMarketplaceOrderPaidEmailsJob::dispatch((int) $order->id);
+            }
             break;
         }
 

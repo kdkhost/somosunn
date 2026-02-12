@@ -209,6 +209,72 @@
             overflow: hidden;
         }
 
+        /* Upload widget (drag & drop) */
+        .upload-box {
+            border: 2px dashed rgba(0, 0, 0, .22);
+            padding: 18px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+            background: #ffffff;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .upload-box .upload-preview {
+            width: 100%;
+        }
+
+        .upload-box:hover,
+        .upload-box:focus {
+            border-color: #007bff;
+            background: #f8f9fa;
+            outline: none;
+        }
+
+        .upload-box.dragover {
+            border-color: #007bff;
+            background: rgba(0, 123, 255, .06);
+            box-shadow: inset 0 0 0 2px rgba(0, 123, 255, .08);
+        }
+
+        .upload-icon {
+            font-size: 28px;
+            color: rgba(0, 0, 0, .45);
+            margin-bottom: 8px;
+        }
+
+        .upload-meta {
+            font-size: 0.9rem;
+        }
+
+        .upload-preview video,
+        .upload-preview audio {
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .border-dashed {
+            border-style: dashed !important;
+        }
+
+        .dark-mode .upload-box {
+            background: rgba(255, 255, 255, .02);
+            border-color: rgba(255, 255, 255, .22);
+        }
+
+        .dark-mode .upload-box:hover,
+        .dark-mode .upload-box:focus {
+            background: rgba(255, 255, 255, .04);
+            border-color: rgba(0, 123, 255, .85);
+        }
+
         .card .nav-tabs {
             margin-bottom: .5rem;
         }
@@ -693,10 +759,52 @@
                     const existingUrl = box.data('existing-url');
                     const removeInputSelector = box.data('remove-input');
                     const accept = (input.attr('accept') || 'image/*').replace(/\./g, '');
+                    const acceptLower = String(input.attr('accept') || '').toLowerCase();
                     const sizeMb = (maxSize / 1024 / 1024).toFixed(2) + ' MB';
 
                     if (help.length) {
                         help.text('Aceita: ' + accept + ' • Até ' + sizeMb + (crop ? ' • Possível recorte' : ''));
+                    }
+
+                    function kindFromAccept() {
+                        if (acceptLower.includes('video/')) return 'video';
+                        if (acceptLower.includes('audio/')) return 'audio';
+                        if (acceptLower.includes('image/')) return 'image';
+                        if (acceptLower.trim() === '') return 'image';
+                        return 'file';
+                    }
+
+                    const defaultKind = kindFromAccept();
+
+                    function kindFromUrl(url) {
+                        const clean = String(url || '').split('?')[0].split('#')[0].toLowerCase();
+                        if (/\.(png|jpe?g|gif|webp|svg)$/.test(clean)) return 'image';
+                        if (/\.(mp4|webm|ogg|mov|m4v)$/.test(clean)) return 'video';
+                        if (/\.(mp3|wav|ogg|m4a|aac|flac)$/.test(clean)) return 'audio';
+                        return defaultKind;
+                    }
+
+                    function previewHtml(kind, url, label) {
+                        const safeLabel = String(label || 'arquivo');
+
+                        if (kind === 'video') {
+                            return '<video src="' + url + '" controls style="width:100%; max-height: 240px; border-radius: 10px;"></video>' +
+                                '<div class="text-muted small mt-2">' + safeLabel + '</div>';
+                        }
+
+                        if (kind === 'audio') {
+                            return '<audio src="' + url + '" controls style="width:100%;"></audio>' +
+                                '<div class="text-muted small mt-2">' + safeLabel + '</div>';
+                        }
+
+                        if (kind === 'file') {
+                            return '<i class="upload-icon fas fa-file-alt"></i>' +
+                                '<div class="text-muted small">Arquivo selecionado</div>' +
+                                '<div class="font-weight-bold small mt-1" style="word-break: break-word;">' + safeLabel + '</div>' +
+                                (url ? '<div class="mt-2"><a href="' + url + '" target="_blank" rel="noopener" class="btn btn-xs btn-outline-primary">Abrir</a></div>' : '');
+                        }
+
+                        return '<img src="' + url + '" alt="preview" class="img-fluid">';
                     }
 
                     function renderEmpty() {
@@ -706,7 +814,8 @@
                     }
 
                     function renderExisting(url) {
-                        preview.html('<img src="' + url + '" alt="imagem" class="img-fluid">');
+                        const kind = kindFromUrl(url);
+                        preview.html(previewHtml(kind, url, 'Arquivo atual'));
                         meta.text('Arquivo atual');
                         removeBtn.removeClass('d-none');
                     }
@@ -718,7 +827,9 @@
 
                     function setPreview(blobOrFile, name, url) {
                         const sizeMB = (blobOrFile.size / 1024 / 1024).toFixed(2);
-                        preview.html('<img src="' + url + '" alt="preview" class="img-fluid">');
+                        const type = String(blobOrFile.type || '').toLowerCase();
+                        const kind = type.startsWith('image/') ? 'image' : (type.startsWith('video/') ? 'video' : (type.startsWith('audio/') ? 'audio' : defaultKind));
+                        preview.html(previewHtml(kind, url, name || 'arquivo'));
                         meta.text((name || 'arquivo') + ' • ' + sizeMB + ' MB • ' + (blobOrFile.type || ''));
                         removeBtn.removeClass('d-none');
                     }

@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use App\Models\Course;
+use App\Models\Event;
+use App\Models\Mentorship;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -64,6 +66,34 @@ class CheckFeature
                 return method_exists($user, 'hasCourseAccess') ? (bool) $user->hasCourseAccess($courseId) : false;
             }
 
+            if ($feature === 'mentorships_access') {
+                $mentorshipParam = $request->route('mentorship');
+                if ($mentorshipParam === null) {
+                    return false;
+                }
+
+                $mentorshipId = $this->resolveMentorshipId($mentorshipParam);
+                if (!$mentorshipId) {
+                    return false;
+                }
+
+                return method_exists($user, 'hasMentorshipAccess') ? (bool) $user->hasMentorshipAccess($mentorshipId) : false;
+            }
+
+            if ($feature === 'events_access') {
+                $eventParam = $request->route('event');
+                if ($eventParam === null) {
+                    return false;
+                }
+
+                $eventId = $this->resolveEventId($eventParam);
+                if (!$eventId) {
+                    return false;
+                }
+
+                return method_exists($user, 'hasEventAccess') ? (bool) $user->hasEventAccess($eventId) : false;
+            }
+
             return false;
         } catch (\Throwable $e) {
             return false;
@@ -92,5 +122,43 @@ class CheckFeature
 
         $courseId = Course::query()->where('slug', $courseParam)->value('id');
         return $courseId ? (int) $courseId : null;
+    }
+
+    private function resolveMentorshipId($mentorshipParam): ?int
+    {
+        if ($mentorshipParam instanceof Mentorship) {
+            return (int) $mentorshipParam->id;
+        }
+
+        $mentorshipParam = trim((string) $mentorshipParam);
+
+        if ($mentorshipParam === '') {
+            return null;
+        }
+
+        if (ctype_digit($mentorshipParam)) {
+            return (int) $mentorshipParam;
+        }
+
+        return null;
+    }
+
+    private function resolveEventId($eventParam): ?int
+    {
+        if ($eventParam instanceof Event) {
+            return (int) $eventParam->id;
+        }
+
+        $eventParam = trim((string) $eventParam);
+
+        if ($eventParam === '') {
+            return null;
+        }
+
+        if (ctype_digit($eventParam)) {
+            return (int) $eventParam;
+        }
+
+        return null;
     }
 }

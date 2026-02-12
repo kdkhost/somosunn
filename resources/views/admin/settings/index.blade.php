@@ -52,29 +52,6 @@
             display: inline-block;
             cursor: pointer;
         }
-
-        .upload-box {
-            border: 2px dashed #ccc;
-            padding: 20px;
-            text-align: center;
-            border-radius: 5px;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.3s;
-        }
-
-        .upload-box:hover {
-            border-color: #007bff;
-            background: #f8f9fa;
-        }
-
-        .upload-preview img {
-            max-width: 100%;
-            max-height: 150px;
-            margin-top: 10px;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
     </style>
 @endpush
 
@@ -130,50 +107,6 @@
             // Initialize InputMask
             $('.mask-phone').inputmask('(99) 99999-9999');
             $('.mask-cep').inputmask('99999-999');
-
-            // Upload Box Logic
-            $('.upload-btn').click(function () {
-                $(this).closest('.upload-box').find('input[type=file]').click();
-            });
-
-            $('.upload-box input[type=file]').change(function () {
-                var file = this.files[0];
-                var box = $(this).closest('.upload-box');
-                var preview = box.find('.upload-preview');
-                var removeBtn = box.find('.upload-remove');
-                var removeInput = box.data('remove-input');
-
-                if (file) {
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        preview.html('<img src="' + e.target.result + '">');
-                        removeBtn.removeClass('d-none');
-                        if (removeInput) $(removeInput).val('0');
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            $('.upload-remove').click(function () {
-                var box = $(this).closest('.upload-box');
-                var input = box.find('input[type=file]');
-                var preview = box.find('.upload-preview');
-                var removeInput = box.data('remove-input');
-
-                input.val('');
-                preview.html('');
-                $(this).addClass('d-none');
-                if (removeInput) $(removeInput).val('1');
-            });
-
-            // Initialize existing images
-            $('.upload-box').each(function () {
-                var url = $(this).data('existing-url');
-                if (url) {
-                    $(this).find('.upload-preview').html('<img src="' + url + '">');
-                    $(this).find('.upload-remove').removeClass('d-none');
-                }
-            });
         });
     </script>
 @endpush
