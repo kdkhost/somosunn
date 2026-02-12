@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\Order;
 use App\Models\CouponRedemption;
+use App\Models\Plan;
 use App\Models\User;
 use App\Services\CouponService;
 use App\Support\MarketplaceFee;
@@ -114,6 +115,19 @@ class EventReservationController extends Controller
                 'phone' => $request->string('phone')->toString(),
                 'level' => 'Iniciante',
             ]);
+
+            // Vincula pacote inicial (cliente) para liberar o Painel do Membro imediatamente
+            try {
+                $defaultPlan = Plan::query()->where('slug', 'cliente')->first()
+                    ?? Plan::query()->orderBy('price')->orderBy('id')->first();
+                if ($defaultPlan) {
+                    $user->plan_id = (int) $defaultPlan->id;
+                    $user->plan_expires_at = null;
+                    $user->save();
+                }
+            } catch (\Throwable $e) {
+                // ignore (fallback: usuário escolhe plano no /premium)
+            }
 
             Auth::login($user);
         }

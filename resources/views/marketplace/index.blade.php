@@ -12,7 +12,7 @@
 
     $user = auth()->user();
     $canSell = $user ? $user->canSellOnMarketplace() : false;
-    $canBuy = $user ? $user->canAccessFeature('marketplace.buy') : false;
+    $canBuy = $user ? $user->canAccessFeature('marketplace.buy') : true;
 
     $q = trim((string) request()->query('q', ''));
 

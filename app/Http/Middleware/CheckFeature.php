@@ -24,7 +24,7 @@ class CheckFeature
         $user = $request->user();
 
         if (!$user) {
-            return redirect()->route('login');
+            return redirect()->guest(route('login'));
         }
 
         // Impersonação (admin/superadmin): liberar acesso total durante suporte/diagnóstico

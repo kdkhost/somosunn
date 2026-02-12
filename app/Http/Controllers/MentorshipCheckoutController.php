@@ -19,7 +19,7 @@ class MentorshipCheckoutController extends Controller
     public function show(Mentorship $mentorship)
     {
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Faça login para finalizar a compra da mentoria.');
+            return redirect()->guest(route('login'))->with('error', 'Faça login para finalizar a compra da mentoria.');
         }
 
         $seller = $mentorship->mentor ?: User::find($mentorship->mentor_id);
@@ -45,7 +45,7 @@ class MentorshipCheckoutController extends Controller
     public function process(Request $request, Mentorship $mentorship, MercadoPagoService $mpService, CouponService $couponService)
     {
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Faça login para finalizar a compra da mentoria.');
+            return redirect()->guest(route('login'))->with('error', 'Faça login para finalizar a compra da mentoria.');
         }
 
         $seller = $mentorship->mentor ?: User::find($mentorship->mentor_id);

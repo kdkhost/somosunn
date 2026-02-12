@@ -410,10 +410,8 @@ Route::post('/webhook/mercadopago/{seller_id}', [\App\Http\Controllers\PaymentWe
 // Short links (SEO/OG para compartilhamento)
 Route::get('/p/{code}', [\App\Http\Controllers\ShareController::class, 'product'])->name('share.product');
 
-// Marketplace (Feature: marketplace.buy / marketplace.sales)
-Route::middleware(['check.feature:marketplace.buy'])->group(function () {
-    Route::get('/marketplace', [\App\Http\Controllers\MarketplaceController::class, 'index'])->name('marketplace.index');
-});
+// Marketplace (público)
+Route::get('/marketplace', [\App\Http\Controllers\MarketplaceController::class, 'index'])->name('marketplace.index');
 
 // Marketplace (legado: vendas) - vendedores agora tratam tudo via painel admin
 Route::middleware(['auth'])->group(function () {

@@ -19,7 +19,7 @@ class CheckoutController extends Controller
     public function show(Course $course)
     {
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Faça login para finalizar a compra do curso.');
+            return redirect()->guest(route('login'))->with('error', 'Faça login para finalizar a compra do curso.');
         }
 
         $seller = $course->creator ?: User::find($course->user_id);
@@ -45,7 +45,7 @@ class CheckoutController extends Controller
     public function process(Request $request, Course $course, MercadoPagoService $mpService, CouponService $couponService)
     {
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Faça login para finalizar a compra do curso.');
+            return redirect()->guest(route('login'))->with('error', 'Faça login para finalizar a compra do curso.');
         }
 
         $seller = $course->creator ?: User::find($course->user_id);
