@@ -76,7 +76,7 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
                 'name' => (string) ($order->seller->name ?? 'Vendedor'),
                 'email' => (string) ($order->seller->email ?? ''),
             ];
-            $sellerData['links']['seller_panel_url'] = route('admin.marketplace.sales');
+            $sellerData['links']['seller_panel_url'] = route('panel.marketplace.sales');
 
             $this->sendTemplateIfExists('marketplace_order_paid_seller', (string) $order->seller->email, $sellerData, $layout);
         }

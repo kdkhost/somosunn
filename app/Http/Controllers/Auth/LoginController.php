@@ -34,7 +34,12 @@ class LoginController extends Controller
                 \Log::warning('Falha ao pontuar login diário: ' . $e->getMessage());
             }
 
-            return redirect()->intended(route('admin.dashboard'));
+            $user = Auth::user();
+            $defaultRoute = ($user && method_exists($user, 'isAdmin') && $user->isAdmin())
+                ? route('admin.dashboard')
+                : route('panel.dashboard');
+
+            return redirect()->intended($defaultRoute);
         }
         return back()->withErrors(['email' => 'Credenciais inválidas']);
     }

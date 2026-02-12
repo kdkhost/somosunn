@@ -309,7 +309,7 @@ class CourseController extends Controller
         $totalLessons = $lessons->count();
 
         if ($totalLessons === 0) {
-            return redirect()->route('admin.dashboard')
+            return redirect()->route('panel.dashboard')
                 ->with('error', 'Este curso não possui aulas para concluir.');
         }
 
@@ -385,7 +385,7 @@ class CourseController extends Controller
         );
 
         // Redirect to Student Dashboard (Meus Cursos)
-        return redirect()->route('admin.dashboard')
+        return redirect()->route('panel.dashboard')
             ->with('success', 'Parabéns! Curso concluído com sucesso. Seu certificado já está disponível (se aplicável).');
     }
 }

@@ -105,9 +105,9 @@
                             @endif
                             <div class="plan-header">
                                 <div class="font-weight-bold">{{ $plan->name }}</div>
-                                @if(auth()->check() && auth()->user()->can('settings.view'))
-                                    <span class="badge plan-badge badge-light">{{ $plan->is_active ? 'Ativo' : 'Inativo' }}</span>
-                                @endif
+                                <span class="badge plan-badge js-plan-status {{ $plan->is_active ? 'badge-success' : 'badge-secondary' }}">
+                                    {{ $plan->is_active ? 'Ativo' : 'Oculto' }}
+                                </span>
                             </div>
                             <div class="plan-cover d-flex align-items-center justify-content-center text-muted small"
                                 style="position:relative;">
@@ -134,6 +134,13 @@
                                 @endif
                             </div>
                             <div class="plan-footer">
+                                <button type="button"
+                                    class="btn btn-sm {{ $plan->is_active ? 'btn-outline-warning' : 'btn-outline-success' }} js-toggle-plan-active"
+                                    data-url="{{ route('admin.plans.toggle-active', $plan) }}"
+                                    data-active="{{ $plan->is_active ? 1 : 0 }}">
+                                    <i class="fas {{ $plan->is_active ? 'fa-eye-slash' : 'fa-eye' }} mr-1"></i>
+                                    {{ $plan->is_active ? 'Ocultar' : 'Ativar' }}
+                                </button>
                                 <a href="{{ route('admin.plans.edit', $plan) }}" class="btn btn-sm btn-secondary">Editar</a>
                                 <form action="{{ route('admin.plans.destroy', $plan) }}" method="POST" class="d-inline mb-0">
                                     @csrf @method('DELETE')
@@ -151,3 +158,69 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(function () {
+            $(document)
+                .off('click.plansActive', '.js-toggle-plan-active')
+                .on('click.plansActive', '.js-toggle-plan-active', function (e) {
+                    e.preventDefault();
+
+                    const $btn = $(this);
+                    const url = $btn.data('url');
+                    const isActive = String($btn.data('active')) === '1';
+                    const action = isActive ? 'ocultar' : 'ativar';
+
+                    Swal.fire({
+                        title: isActive ? 'Ocultar plano?' : 'Ativar plano?',
+                        text: isActive
+                            ? 'Este plano ficará oculto no site para novos usuários.'
+                            : 'Este plano voltará a ser exibido no site.',
+                        icon: isActive ? 'warning' : 'question',
+                        showCancelButton: true,
+                        confirmButtonText: isActive ? 'Ocultar' : 'Ativar',
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonColor: isActive ? '#d97706' : '#16a34a'
+                    }).then((result) => {
+                        if (!result.isConfirmed) return;
+
+                        $btn.prop('disabled', true);
+
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            dataType: 'json',
+                            data: { _token: '{{ csrf_token() }}' }
+                        }).done(function (resp) {
+                            const newActive = !!(resp && resp.is_active);
+                            const $card = $btn.closest('.plan-card');
+                            const $badge = $card.find('.js-plan-status');
+
+                            $btn.data('active', newActive ? 1 : 0);
+
+                            if (newActive) {
+                                $badge.removeClass('badge-secondary').addClass('badge-success').text('Ativo');
+                                $btn.removeClass('btn-outline-success').addClass('btn-outline-warning');
+                                $btn.html('<i class="fas fa-eye-slash mr-1"></i> Ocultar');
+                            } else {
+                                $badge.removeClass('badge-success').addClass('badge-secondary').text('Oculto');
+                                $btn.removeClass('btn-outline-warning').addClass('btn-outline-success');
+                                $btn.html('<i class="fas fa-eye mr-1"></i> Ativar');
+                            }
+
+                            toastr.success((resp && resp.message) ? resp.message : ('Plano ' + action + 'ado com sucesso.'));
+                        }).fail(function (xhr) {
+                            let msg = 'Não foi possível atualizar o plano.';
+                            if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                                msg = xhr.responseJSON.message;
+                            }
+                            toastr.error(msg);
+                        }).always(function () {
+                            $btn.prop('disabled', false);
+                        });
+                    });
+                });
+        });
+    </script>
+@endpush

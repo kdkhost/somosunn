@@ -14,7 +14,11 @@ class EnsureUserIsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check() || !auth()->user()->isAdmin()) {
-            return redirect()->route('admin.dashboard')->with('error', 'Acesso não autorizado.'); // Ou 403
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Acesso não autorizado.'], 403);
+            }
+
+            return redirect()->route('panel.dashboard')->with('warning', 'Você não tem acesso ao painel administrativo. Acesse seu Painel do Membro.');
         }
 
         return $next($request);

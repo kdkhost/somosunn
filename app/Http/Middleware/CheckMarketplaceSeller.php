@@ -26,7 +26,7 @@ class CheckMarketplaceSeller
             }
 
             return redirect()
-                ->route('admin.dashboard')
+                ->route('panel.dashboard')
                 ->with('error', 'Você não possui permissão para acessar o painel do Marketplace.');
         }
 

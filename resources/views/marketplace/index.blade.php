@@ -147,11 +147,11 @@
 
                 <div class="flex items-center gap-2">
                     @if($canSell)
-                        <a href="{{ route('admin.marketplace.index') }}"
+                        <a href="{{ route('panel.marketplace.index') }}"
                             class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-700 hover:bg-slate-50 transition">
                             <i class="fas fa-chart-line text-slate-400"></i> Painel
                         </a>
-                        <a href="{{ route('admin.marketplace.sales') }}"
+                        <a href="{{ route('panel.marketplace.sales') }}"
                             class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-700 hover:bg-slate-50 transition">
                             <i class="fas fa-receipt text-slate-400"></i> Vendas
                         </a>
@@ -444,11 +444,11 @@
                             Acesse o painel para acompanhar vendas e gerenciar seu marketplace.
                         </div>
                         <div class="mt-4 flex flex-col sm:flex-row gap-2">
-                            <a href="{{ route('admin.marketplace.index') }}"
+                            <a href="{{ route('panel.marketplace.index') }}"
                                 class="btn-primary text-white px-5 py-3 rounded-2xl font-black inline-flex items-center justify-center gap-2 shadow-md">
                                 <i class="fas fa-store"></i> Abrir painel
                             </a>
-                            <a href="{{ route('admin.marketplace.payments') }}"
+                            <a href="{{ route('panel.marketplace.payments') }}"
                                 class="px-5 py-3 rounded-2xl font-black border border-blue-200 bg-white text-blue-800 hover:bg-blue-100 transition inline-flex items-center justify-center gap-2">
                                 <i class="fas fa-credit-card"></i> Ver pagamentos
                             </a>

@@ -271,4 +271,32 @@ class PlanController extends Controller
 
         return $slug;
     }
+
+    public function toggleActive(Request $request, Plan $plan)
+    {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Acesso não autorizado.'], 403);
+            }
+
+            return redirect()->route('panel.dashboard')->with('error', 'Acesso não autorizado.');
+        }
+
+        $plan->is_active = !$plan->is_active;
+        $plan->save();
+
+        $message = $plan->is_active
+            ? 'Plano ativado e exibido no site.'
+            : 'Plano desativado e ocultado do site.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'is_active' => (bool) $plan->is_active,
+                'message' => $message,
+            ]);
+        }
+
+        return back()->with('success', $message);
+    }
 }

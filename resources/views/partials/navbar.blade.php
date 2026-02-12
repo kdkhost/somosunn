@@ -115,15 +115,20 @@
 
                         <div class="absolute right-0 top-full pt-3 hidden group-hover:block z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                             <div class="rounded-2xl bg-white shadow-2xl border border-slate-100 min-w-[240px] py-3 overflow-hidden">
-                                <div class="px-5 py-2 border-b border-slate-50 mb-2">
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Membro UNN</p>
-                                    <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
-                                </div>
+                                 <div class="px-5 py-2 border-b border-slate-50 mb-2">
+                                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Membro UNN</p>
+                                     <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
+                                 </div>
 
-                                <a href="{{ route('admin.membro.perfil') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                    <i class="fas fa-user-circle w-5 opacity-70"></i>
-                                    Meu perfil
-                                </a>
+                                 <a href="{{ route('panel.dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                     <i class="fas fa-th-large w-5 opacity-70"></i>
+                                     Painel
+                                 </a>
+
+                                 <a href="{{ route('panel.profile.edit') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                     <i class="fas fa-user-circle w-5 opacity-70"></i>
+                                     Meu perfil
+                                 </a>
 
                                 @if(Auth::user()->canAccessFeature('marketplace.buy'))
                                     <a href="{{ route('marketplace.index') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
@@ -132,26 +137,26 @@
                                     </a>
                                 @endif
 
-                                @if(Auth::user()->canSellOnMarketplace())
-                                    <a href="{{ route('admin.marketplace.payments') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                        <i class="fas fa-credit-card w-5 opacity-70"></i>
-                                        Configurar pagamentos
-                                    </a>
-                                @endif
+                                 @if(Auth::user()->canSellOnMarketplace())
+                                     <a href="{{ route('panel.marketplace.payments') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                         <i class="fas fa-credit-card w-5 opacity-70"></i>
+                                         Configurar pagamentos
+                                     </a>
+                                 @endif
 
-                                @if(Auth::user()->canSellOnMarketplace())
-                                    <a href="{{ route('admin.marketplace.sales') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                        <i class="fas fa-receipt w-5 opacity-70"></i>
-                                        Minhas vendas
-                                    </a>
-                                @endif
+                                 @if(Auth::user()->canSellOnMarketplace())
+                                     <a href="{{ route('panel.marketplace.sales') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                         <i class="fas fa-receipt w-5 opacity-70"></i>
+                                         Minhas vendas
+                                     </a>
+                                 @endif
 
-                                @if(Auth::user()->canAccessFeature('admin_panel'))
-                                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                        <i class="fas fa-th-large w-5 opacity-70"></i>
-                                        Painel Administrativo
-                                    </a>
-                                @endif
+                                 @if(Auth::user()->isAdmin())
+                                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                         <i class="fas fa-th-large w-5 opacity-70"></i>
+                                         Painel Administrativo
+                                     </a>
+                                 @endif
 
                                 <div class="mt-2 pt-2 border-t border-slate-50">
                                     <form action="{{ route('logout') }}" method="POST">
@@ -225,7 +230,7 @@
                     <p class="font-bold text-gray-800">{{ Auth::user()->name }}</p>
                 </div>
                 
-                <a href="{{ route('social.profile', Auth::id()) }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                <a href="{{ route('panel.profile.edit') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                     <i class="fas fa-user-circle w-5 opacity-70"></i> Meu perfil
                 </a>
 
@@ -236,18 +241,18 @@
                 @endif
 
                 @if(Auth::user()->canSellOnMarketplace())
-                    <a href="{{ route('admin.marketplace.payments') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <a href="{{ route('panel.marketplace.payments') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                         <i class="fas fa-credit-card w-5 opacity-70"></i> Configurar pagamentos
                     </a>
                 @endif
 
                 @if(Auth::user()->canSellOnMarketplace())
-                    <a href="{{ route('admin.marketplace.sales') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <a href="{{ route('panel.marketplace.sales') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                         <i class="fas fa-receipt w-5 opacity-70"></i> Minhas vendas
                     </a>
                 @endif
                 
-                @if(Auth::user()->canAccessFeature('admin_panel'))
+                @if(Auth::user()->isAdmin())
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                         <i class="fas fa-th-large w-5 opacity-70"></i> Painel Administrativo
                     </a>

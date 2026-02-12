@@ -359,13 +359,29 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
     });
 });
 
+// Painel do Membro (novo - layout do front-end)
+Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->group(function () {
+    Route::get('/', [\App\Http\Controllers\Panel\DashboardController::class, 'index'])->name('dashboard');
+
+    // Perfil (completo) - permitido mesmo sem plano ativo (whitelist no middleware)
+    Route::get('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'update'])->name('profile.update');
+
+    // Marketplace (Painel do vendedor)
+    Route::prefix('marketplace')->name('marketplace.')->middleware('check.marketplace.seller')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Panel\MarketplaceController::class, 'index'])->name('index');
+        Route::get('/pagamentos', [\App\Http\Controllers\Panel\MarketplaceController::class, 'payments'])->name('payments');
+        Route::get('/vendas', [\App\Http\Controllers\Panel\MarketplaceController::class, 'sales'])->name('sales');
+    });
+});
+
 // Payments (legacy) - redireciona para o painel do marketplace (admin)
 Route::middleware(['auth'])->group(function () {
     Route::get('/settings/payment', function () {
-        return redirect()->route('admin.marketplace.payments');
+        return redirect()->route('panel.marketplace.payments');
     })->name('settings.payment');
     Route::post('/settings/payment', function () {
-        return redirect()->route('admin.marketplace.payments');
+        return redirect()->route('panel.marketplace.payments');
     })->name('settings.payment.update');
 });
 
@@ -391,12 +407,12 @@ Route::middleware(['check.feature:marketplace.buy'])->group(function () {
 // Marketplace (legado: vendas) - vendedores agora tratam tudo via painel admin
 Route::middleware(['auth'])->group(function () {
     Route::get('/marketplace/vendas', function () {
-        return redirect()->route('admin.marketplace.sales');
+        return redirect()->route('panel.marketplace.sales');
     })->name('marketplace.sales');
 });
 
 // Admin routes (granular)
-Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class, 'check.plan'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class, \App\Http\Middleware\EnsureUserIsAdmin::class, 'check.plan'])->group(function () {
     // Rotas de Membro (Comum a todos no painel)
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/portal', [\App\Http\Controllers\Admin\MemberController::class, 'portal'])->name('portal.index');
@@ -418,8 +434,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
 
-    // Marketplace (Painel do vendedor)
-    Route::prefix('marketplace')->name('marketplace.')->middleware('check.marketplace.seller')->group(function () {
+    // Marketplace (Admin - visão interna)
+    Route::prefix('marketplace')->name('marketplace.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\MarketplaceController::class, 'index'])->name('index');
         Route::get('/pagamentos', [\App\Http\Controllers\Admin\MarketplaceController::class, 'payments'])->name('payments');
         Route::get('/vendas', [\App\Http\Controllers\Admin\MarketplaceController::class, 'sales'])->name('sales');
@@ -482,6 +498,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             ->middleware('check.feature:permissions_access')->names('permissions');
 
         // Plans CRUD
+        Route::post('plans/{plan}/toggle-active', [\App\Http\Controllers\Admin\PlanController::class, 'toggleActive'])
+            ->middleware('check.feature:plans_access')->name('plans.toggle-active');
         Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)
             ->middleware('check.feature:plans_access')->names('plans');
 
