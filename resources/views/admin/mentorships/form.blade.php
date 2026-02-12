@@ -89,6 +89,33 @@
                             </div>
                         </div>
 
+                        <div class="card bg-light border-0 mb-4">
+                            <div class="card-body">
+                                <h6 class="text-muted mb-3"><i class="fas fa-bolt mr-2"></i> Promoção relâmpago</h6>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="flash_sale_price">Preço promocional (R$)</label>
+                                        <input id="flash_sale_price" name="flash_sale_price" type="number" step="0.01" min="0"
+                                            class="form-control @error('flash_sale_price') is-invalid @enderror"
+                                            value="{{ old('flash_sale_price', $mentorship->flash_sale_price) }}">
+                                        @error('flash_sale_price')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="flash_sale_ends_at">Termina em</label>
+                                        <input id="flash_sale_ends_at" name="flash_sale_ends_at" type="datetime-local"
+                                            class="form-control @error('flash_sale_ends_at') is-invalid @enderror"
+                                            value="{{ old('flash_sale_ends_at', $mentorship->flash_sale_ends_at ? $mentorship->flash_sale_ends_at->format('Y-m-d\\TH:i') : '') }}">
+                                        @error('flash_sale_ends_at')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <small class="text-muted d-block">Quando expirar, o preço volta automaticamente ao valor normal.</small>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label for="description">Descricao</label>
                             <textarea id="description" name="description" rows="5"

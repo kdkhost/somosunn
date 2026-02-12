@@ -26,8 +26,22 @@
                     </p>
 
                     <div class="border-t border-gray-100 mt-6 pt-6">
+                        @php
+                            $regularTotal = (float) ($course->price ?? 0);
+                            $effectiveTotal = (float) ($course->effective_price ?? $regularTotal);
+                            $flashActive = method_exists($course, 'isFlashSaleActive') ? (bool) $course->isFlashSaleActive() : false;
+                        @endphp
                         <p class="text-sm text-gray-500">Total</p>
-                        <p class="text-3xl font-black text-gray-900">R$ {{ number_format($course->price, 2, ',', '.') }}</p>
+                        <div class="flex items-end gap-3">
+                            <p class="text-3xl font-black text-gray-900">
+                                {{ $effectiveTotal > 0 ? 'R$ ' . number_format($effectiveTotal, 2, ',', '.') : 'Gratuito' }}
+                            </p>
+                            @if($flashActive && $regularTotal > 0 && $effectiveTotal < $regularTotal)
+                                <p class="text-sm text-gray-400 line-through mb-1">
+                                    {{ 'R$ ' . number_format($regularTotal, 2, ',', '.') }}
+                                </p>
+                            @endif
+                        </div>
                         <p class="text-xs text-gray-500 mt-2">Pagamento via MercadoPago.</p>
                     </div>
                 </div>

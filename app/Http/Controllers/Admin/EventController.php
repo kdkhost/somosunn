@@ -112,7 +112,7 @@ class EventController extends Controller
     {
         $this->ensurePermission('events.create');
 
-        foreach (['price', 'batch_1_price', 'batch_2_price', 'batch_3_price'] as $field) {
+        foreach (['price', 'flash_sale_price', 'batch_1_price', 'batch_2_price', 'batch_3_price'] as $field) {
             if (!$request->has($field)) {
                 continue;
             }
@@ -121,7 +121,7 @@ class EventController extends Controller
         }
 
         // Sanitize dates (remove T)
-        foreach (['start_at', 'end_at', 'batch_1_deadline', 'batch_2_deadline', 'batch_3_deadline'] as $dateField) {
+        foreach (['start_at', 'end_at', 'flash_sale_ends_at', 'batch_1_deadline', 'batch_2_deadline', 'batch_3_deadline'] as $dateField) {
             if ($request->has($dateField) && $request->$dateField) {
                 $request->merge([$dateField => str_replace('T', ' ', $request->$dateField)]);
             }
@@ -140,6 +140,8 @@ class EventController extends Controller
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'price' => 'nullable|numeric|min:0',
+            'flash_sale_price' => 'nullable|numeric|min:0',
+            'flash_sale_ends_at' => 'nullable|date',
             'capacity' => 'nullable|integer|min:0',
             'published' => 'nullable|boolean',
             'all_day' => 'nullable|boolean',
@@ -218,7 +220,7 @@ class EventController extends Controller
         $this->ensurePermission('events.edit');
         $this->ensureCanManage($event);
 
-        foreach (['price', 'batch_1_price', 'batch_2_price', 'batch_3_price'] as $field) {
+        foreach (['price', 'flash_sale_price', 'batch_1_price', 'batch_2_price', 'batch_3_price'] as $field) {
             if (!$request->has($field)) {
                 continue;
             }
@@ -227,7 +229,7 @@ class EventController extends Controller
         }
 
         // Sanitize dates (remove T from datetime-local)
-        foreach (['start_at', 'end_at', 'batch_1_deadline', 'batch_2_deadline', 'batch_3_deadline'] as $dateField) {
+        foreach (['start_at', 'end_at', 'flash_sale_ends_at', 'batch_1_deadline', 'batch_2_deadline', 'batch_3_deadline'] as $dateField) {
             if ($request->has($dateField) && $request->$dateField) {
                 $request->merge([$dateField => str_replace('T', ' ', $request->$dateField)]);
             }
@@ -246,6 +248,8 @@ class EventController extends Controller
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'price' => 'nullable|numeric|min:0',
+            'flash_sale_price' => 'nullable|numeric|min:0',
+            'flash_sale_ends_at' => 'nullable|date',
             'capacity' => 'nullable|integer|min:0',
             'published' => 'nullable|boolean',
             'all_day' => 'nullable|boolean',

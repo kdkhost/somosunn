@@ -31,6 +31,17 @@
                         <div class="form-group mb-2"><label>Preço</label><input name="price" class="form-control mask-money"
                                 value="{{ old('price', $event->price) }}"></div>
                         <div class="form-group mb-2">
+                            <label>Promoção relâmpago (preço)</label>
+                            <input name="flash_sale_price" class="form-control mask-money"
+                                value="{{ old('flash_sale_price', $event->flash_sale_price) }}" placeholder="0,00">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label>Promoção relâmpago (termina em)</label>
+                            <input name="flash_sale_ends_at" type="datetime-local" class="form-control"
+                                value="{{ old('flash_sale_ends_at', $event->flash_sale_ends_at ? $event->flash_sale_ends_at->format('Y-m-d\\TH:i') : '') }}">
+                            <small class="text-muted d-block mt-1">Quando expirar, o valor volta ao normal automaticamente.</small>
+                        </div>
+                        <div class="form-group mb-2">
                             <label>Imagem do evento</label>
                             <input type="hidden" name="remove_image" value="0">
                             <div class="upload-box" data-max-size="5242880"

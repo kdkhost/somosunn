@@ -62,15 +62,37 @@
 
 @extends('admin.layouts.app')
 
-@section('page_title', 'Cursos Disponíveis')
+@section('page_title', 'Meus Cursos')
 
 @section('content')
+    @php
+        $resolveImageUrl = function (?string $path): ?string {
+            $path = trim((string) $path);
+            if ($path === '') {
+                return null;
+            }
+
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                return $path;
+            }
+
+            if (str_starts_with($path, 'storage/')) {
+                return asset($path);
+            }
+
+            if (str_starts_with($path, 'uploads/')) {
+                return asset($path);
+            }
+
+            return asset(ltrim($path, '/'));
+        };
+    @endphp
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Cursos Disponiveis</h3>
+            <h3 class="card-title">Meus Cursos</h3>
         </div>
         <div class="card-body">
-            <p class="text-muted">Explore nossa biblioteca de cursos e leve sua carreira para o proximo nivel.</p>
+            <p class="text-muted mb-4">Aqui ficam todos os cursos que você comprou na plataforma. Cada usuário vê apenas as próprias compras.</p>
 
             <form method="GET" class="mb-3">
                 <div class="input-group">
@@ -84,10 +106,15 @@
 
             <div class="row">
                 @forelse($items as $item)
+                    @php
+                        $showParam = $item->slug ?: $item->id;
+                        $thumbUrl = $resolveImageUrl($item->thumbnail ?? null);
+                        $author = $item->author_name ?: (optional($item->creator)->name ?? 'Instrutor UNN');
+                    @endphp
                     <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card h-100">
-                            @if($item->thumbnail)
-                                <img src="{{ asset($item->thumbnail) }}" class="card-img-top" alt="{{ $item->title }}"
+                            @if($thumbUrl)
+                                <img src="{{ $thumbUrl }}" class="card-img-top" alt="{{ $item->title }}"
                                     style="height: 200px; object-fit: cover;">
                             @else
                                 <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
@@ -96,10 +123,10 @@
                             @endif
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="badge badge-success">
-                                        R$ {{ number_format((float) $item->price, 2, ',', '.') }}
+                                    <span class="badge badge-primary">
+                                        <i class="fas fa-check-circle mr-1"></i> Acesso liberado
                                     </span>
-                                    <span class="text-xs text-muted text-uppercase">{{ $item->author_name ?: 'Instrutor UNN' }}</span>
+                                    <span class="text-xs text-muted text-uppercase">{{ $author }}</span>
                                 </div>
 
                                 <h3 class="h6 font-weight-bold mb-2 text-dark">{{ $item->title }}</h3>
@@ -113,14 +140,14 @@
                                 </div>
                             </div>
                             <div class="card-footer bg-white">
-                                <a href="{{ route('courses.show', $item->id) }}" class="btn btn-primary btn-block">
-                                    <i class="fas fa-play-circle mr-1"></i> Comecar Agora
+                                <a href="{{ route('courses.show', $showParam) }}" class="btn btn-primary btn-block">
+                                    <i class="fas fa-play-circle mr-1"></i> Acessar curso
                                 </a>
                             </div>
                         </div>
                     </div>
                 @empty
-                    <div class="col-12 text-center py-4 text-muted">Nenhum curso encontrado.</div>
+                    <div class="col-12 text-center py-4 text-muted">Você ainda não comprou nenhum curso.</div>
                 @endforelse
             </div>
 

@@ -22,6 +22,8 @@ class Event extends Model
         'latitude',
         'longitude',
         'price',
+        'flash_sale_price',
+        'flash_sale_ends_at',
         'capacity',
         'published',
         'color',
@@ -47,7 +49,10 @@ class Event extends Model
         'all_day' => 'boolean',
         'published' => 'boolean',
         'is_certificate_enabled' => 'boolean',
-        'certificate_settings' => 'array'
+        'certificate_settings' => 'array',
+        'price' => 'decimal:2',
+        'flash_sale_price' => 'decimal:2',
+        'flash_sale_ends_at' => 'datetime',
     ];
 
     protected $appends = ['start', 'end'];
@@ -85,6 +90,31 @@ class Event extends Model
 
         // Fallback to legacy price or 0
         return $this->price ?? 0;
+    }
+
+    public function isFlashSaleActive(): bool
+    {
+        $price = $this->flash_sale_price;
+        $endsAt = $this->flash_sale_ends_at;
+
+        if ($price === null || $endsAt === null) {
+            return false;
+        }
+
+        try {
+            return (float) $price >= 0 && $endsAt->isFuture();
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    public function getEffectivePriceAttribute(): float
+    {
+        if ($this->isFlashSaleActive()) {
+            return (float) $this->flash_sale_price;
+        }
+
+        return (float) ($this->current_price ?? 0);
     }
 
     public function getCurrentBatchLabelAttribute()

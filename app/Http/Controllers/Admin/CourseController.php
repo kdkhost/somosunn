@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Enrollment;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Course;
@@ -11,14 +13,40 @@ class CourseController extends Controller
 {
     public function available(Request $request)
     {
-        $q = $request->input('q');
-        $query = Course::query()->where('status', 'published');
+        $q = trim((string) $request->input('q', ''));
+        $userId = (int) Auth::id();
 
-        if ($q) {
-            $query->where('title', 'like', "%{$q}%");
+        $enrolledCourseIds = Enrollment::query()
+            ->where('user_id', $userId)
+            ->where('enrollable_type', Course::class)
+            ->pluck('enrollable_id');
+
+        $paidCourseIds = OrderItem::query()
+            ->where('item_type', 'course')
+            ->whereHas('order', function ($query) use ($userId) {
+                $query->where('user_id', $userId)->where('status', 'paid');
+            })
+            ->pluck('item_id');
+
+        $courseIds = $enrolledCourseIds->merge($paidCourseIds)->unique()->values();
+
+        $query = Course::query()->with('creator');
+
+        if ($courseIds->isEmpty()) {
+            $query->whereRaw('1=0');
+        } else {
+            $query->whereIn('id', $courseIds);
         }
 
-        $items = $query->latest()->paginate(12);
+        if ($q !== '') {
+            $query->where(function ($sub) use ($q) {
+                $sub->where('title', 'like', '%' . $q . '%')
+                    ->orWhere('short_description', 'like', '%' . $q . '%')
+                    ->orWhere('full_description', 'like', '%' . $q . '%');
+            });
+        }
+
+        $items = $query->orderByDesc('id')->paginate(12)->withQueryString();
         return view('admin.courses.available', compact('items', 'q'));
     }
 
@@ -57,11 +85,26 @@ class CourseController extends Controller
             $request->merge(['price' => $price]);
         }
 
+        if ($request->has('flash_sale_price')) {
+            $price = $request->input('flash_sale_price');
+            $price = str_replace(['R$', ' ', '.'], '', (string) $price);
+            $price = str_replace(',', '.', $price);
+            $request->merge(['flash_sale_price' => $price]);
+        }
+
+        if ($request->has('flash_sale_ends_at') && $request->input('flash_sale_ends_at')) {
+            $request->merge([
+                'flash_sale_ends_at' => str_replace('T', ' ', (string) $request->input('flash_sale_ends_at')),
+            ]);
+        }
+
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'short_description' => 'nullable|string|max:500',
             'full_description' => 'nullable|string',
             'price' => 'nullable|numeric',
+            'flash_sale_price' => 'nullable|numeric|min:0',
+            'flash_sale_ends_at' => 'nullable|date',
             'author_name' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published,archived,paused',
             'thumbnail' => 'nullable|image|max:10240', // 10MB Max
@@ -128,11 +171,26 @@ class CourseController extends Controller
             $request->merge(['price' => $price]);
         }
 
+        if ($request->has('flash_sale_price')) {
+            $price = $request->input('flash_sale_price');
+            $price = str_replace(['R$', ' ', '.'], '', (string) $price);
+            $price = str_replace(',', '.', $price);
+            $request->merge(['flash_sale_price' => $price]);
+        }
+
+        if ($request->has('flash_sale_ends_at') && $request->input('flash_sale_ends_at')) {
+            $request->merge([
+                'flash_sale_ends_at' => str_replace('T', ' ', (string) $request->input('flash_sale_ends_at')),
+            ]);
+        }
+
         $data = $request->validate([
             'title' => 'sometimes|required|string|max:255',
             'short_description' => 'nullable|string|max:500',
             'full_description' => 'nullable|string',
             'price' => 'nullable|numeric',
+            'flash_sale_price' => 'nullable|numeric|min:0',
+            'flash_sale_ends_at' => 'nullable|date',
             'author_name' => 'nullable|string|max:255',
             'status' => 'sometimes|required|in:draft,published,archived,paused',
             'thumbnail' => 'nullable|image|max:10240', // 10MB Max

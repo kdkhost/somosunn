@@ -67,6 +67,12 @@ class MentorshipController extends Controller
     {
         $this->ensurePermission('mentorships.create');
 
+        if ($request->has('flash_sale_ends_at') && $request->input('flash_sale_ends_at')) {
+            $request->merge([
+                'flash_sale_ends_at' => str_replace('T', ' ', (string) $request->input('flash_sale_ends_at')),
+            ]);
+        }
+
         $data = $this->validatedData($request, true);
         $data['mentor_id'] = $this->resolveMentorId($request, $data['mentor_id'] ?? null);
         $data['schedule'] = $this->parseSchedule($request->input('schedule_json'));
@@ -128,6 +134,12 @@ class MentorshipController extends Controller
     {
         $this->ensurePermission('mentorships.edit');
         $this->ensureOwnership($mentorship);
+
+        if ($request->has('flash_sale_ends_at') && $request->input('flash_sale_ends_at')) {
+            $request->merge([
+                'flash_sale_ends_at' => str_replace('T', ' ', (string) $request->input('flash_sale_ends_at')),
+            ]);
+        }
 
         $data = $this->validatedData($request);
         $data['mentor_id'] = $this->resolveMentorId($request, $data['mentor_id'] ?? null);
@@ -201,6 +213,8 @@ class MentorshipController extends Controller
             'title' => 'required|string|max:255',
             'mentor_id' => 'nullable|exists:users,id',
             'price' => 'nullable|numeric|min:0',
+            'flash_sale_price' => 'nullable|numeric|min:0',
+            'flash_sale_ends_at' => 'nullable|date',
             'slots' => 'nullable|integer|min:1|max:100000',
             'description' => 'nullable|string|max:20000',
             'image' => ($isCreate ? 'required' : 'nullable') . '|image|max:5120',

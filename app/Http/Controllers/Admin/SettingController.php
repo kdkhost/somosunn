@@ -76,6 +76,16 @@ class SettingController extends Controller
             'site_bg_image',
             'remove_site_bg_image',
             'smtp_test_email', // Não salvar e-mail de teste
+            // Marketplace hero/exit (arquivos tratados separadamente)
+            'marketplace_hero_slide_1_image',
+            'marketplace_hero_slide_2_image',
+            'marketplace_hero_slide_3_image',
+            'marketplace_exit_banner_image',
+            // Marketplace remove flags (tratados separadamente)
+            'remove_marketplace_hero_slide_1_image',
+            'remove_marketplace_hero_slide_2_image',
+            'remove_marketplace_hero_slide_3_image',
+            'remove_marketplace_exit_banner_image',
         ]);
 
         if ($request->hasFile('seo_og_image') && $this->imageIsSmallerThan($request->file('seo_og_image'), 1200, 630)) {
@@ -104,6 +114,9 @@ class SettingController extends Controller
             'uploads/imagens/geral',
             'uploads/imagens/watermark',
             'uploads/imagens/seo',
+            'uploads/imagens/marketplace',
+            'uploads/imagens/marketplace/hero',
+            'uploads/imagens/marketplace/exit',
         ];
         foreach ($dirs as $dir) {
             $this->ensurePublicDir($dir);
@@ -125,6 +138,10 @@ class SettingController extends Controller
             'site_bg_image',
             'seo_og_image',
             'seo_twitter_image',
+            'marketplace_hero_slide_1_image',
+            'marketplace_hero_slide_2_image',
+            'marketplace_hero_slide_3_image',
+            'marketplace_exit_banner_image',
         ];
         foreach ($removals as $key) {
             if ($request->boolean('remove_' . $key)) {
@@ -177,6 +194,18 @@ class SettingController extends Controller
         if ($request->hasFile('seo_twitter_image')) {
             $this->replaceFile('seo_twitter_image', $this->storePublic($request->file('seo_twitter_image'), 'uploads/imagens/seo'));
         }
+        if ($request->hasFile('marketplace_hero_slide_1_image')) {
+            $this->replaceFile('marketplace_hero_slide_1_image', $this->storePublic($request->file('marketplace_hero_slide_1_image'), 'uploads/imagens/marketplace/hero'));
+        }
+        if ($request->hasFile('marketplace_hero_slide_2_image')) {
+            $this->replaceFile('marketplace_hero_slide_2_image', $this->storePublic($request->file('marketplace_hero_slide_2_image'), 'uploads/imagens/marketplace/hero'));
+        }
+        if ($request->hasFile('marketplace_hero_slide_3_image')) {
+            $this->replaceFile('marketplace_hero_slide_3_image', $this->storePublic($request->file('marketplace_hero_slide_3_image'), 'uploads/imagens/marketplace/hero'));
+        }
+        if ($request->hasFile('marketplace_exit_banner_image')) {
+            $this->replaceFile('marketplace_exit_banner_image', $this->storePublic($request->file('marketplace_exit_banner_image'), 'uploads/imagens/marketplace/exit'));
+        }
 
         // Mapeamento de booleanos por grupo para garantir que desativar (unchecked) funcione
         $groupBools = [
@@ -197,6 +226,7 @@ class SettingController extends Controller
             ],
             'ads' => ['ads_enabled', 'ads_inter_feed_enabled'],
             'gateway' => ['gateway_transparent_checkout', 'gateway_pass_tax_to_client'],
+            'marketplace' => ['marketplace_hero_enabled', 'marketplace_hero_autoplay', 'marketplace_exit_enabled'],
             'social' => [
                 'social_login_enabled',
                 'social_google_enabled',
@@ -214,6 +244,33 @@ class SettingController extends Controller
         }
 
         $data['video_plyr_options_json'] = $plyrOptionsJson;
+
+        if (array_key_exists('marketplace_hero_animation', $data)) {
+            $val = trim((string) $data['marketplace_hero_animation']);
+            $data['marketplace_hero_animation'] = in_array($val, ['slide', 'fade'], true) ? $val : 'slide';
+        }
+
+        if (array_key_exists('marketplace_hero_interval_seconds', $data)) {
+            $raw = trim((string) $data['marketplace_hero_interval_seconds']);
+            if ($raw === '') {
+                $data['marketplace_hero_interval_seconds'] = '';
+            } else {
+                $val = (int) $raw;
+                $val = max(2, min(20, $val));
+                $data['marketplace_hero_interval_seconds'] = (string) $val;
+            }
+        }
+
+        if (array_key_exists('marketplace_exit_delay_seconds', $data)) {
+            $raw = trim((string) $data['marketplace_exit_delay_seconds']);
+            if ($raw === '') {
+                $data['marketplace_exit_delay_seconds'] = '';
+            } else {
+                $val = (int) $raw;
+                $val = max(0, min(120, $val));
+                $data['marketplace_exit_delay_seconds'] = (string) $val;
+            }
+        }
 
         foreach ([
             'video_plyr_seek_time' => ['min' => 0, 'max' => 120],
@@ -414,6 +471,10 @@ class SettingController extends Controller
             'site_bg_image' => ['uploads/imagens/frontend', 'uploads/imagens'],
             'seo_og_image' => ['uploads/imagens/seo', 'uploads/imagens'],
             'seo_twitter_image' => ['uploads/imagens/seo', 'uploads/imagens'],
+            'marketplace_hero_slide_1_image' => ['uploads/imagens/marketplace/hero', 'uploads/imagens/marketplace', 'uploads/imagens/frontend', 'uploads/imagens'],
+            'marketplace_hero_slide_2_image' => ['uploads/imagens/marketplace/hero', 'uploads/imagens/marketplace', 'uploads/imagens/frontend', 'uploads/imagens'],
+            'marketplace_hero_slide_3_image' => ['uploads/imagens/marketplace/hero', 'uploads/imagens/marketplace', 'uploads/imagens/frontend', 'uploads/imagens'],
+            'marketplace_exit_banner_image' => ['uploads/imagens/marketplace/exit', 'uploads/imagens/marketplace', 'uploads/imagens/frontend', 'uploads/imagens'],
         ];
 
         foreach ($keyDirs as $key => $searchDirs) {

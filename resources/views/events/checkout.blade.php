@@ -5,7 +5,10 @@
 @section('content')
 @php
     $isDemo = ($event->is_demo ?? false) === true;
-    $isPaid = (float) $event->current_price > 0;
+    $regularUnitPrice = (float) ($event->current_price ?? 0);
+    $effectiveUnitPrice = (float) ($event->effective_price ?? $regularUnitPrice);
+    $flashActive = method_exists($event, 'isFlashSaleActive') ? (bool) $event->isFlashSaleActive() : false;
+    $isPaid = $effectiveUnitPrice > 0;
     $remaining = $event->remaining_seats;
     $alreadyConfirmed = $registration && in_array($registration->status, \App\Models\EventRegistration::COUNTED_STATUSES, true);
 @endphp
@@ -47,7 +50,21 @@
                                 {{ $event->current_batch_label }}
                             </span>
                             <p class="text-sm text-gray-500">Valor por pessoa</p>
-                            <p class="text-3xl font-black text-gray-900">R$ {{ number_format($event->current_price, 2, ',', '.') }}</p>
+                            <div class="flex items-end gap-3">
+                                <p class="text-3xl font-black text-gray-900">
+                                    {{ 'R$ ' . number_format($effectiveUnitPrice, 2, ',', '.') }}
+                                </p>
+                                @if($flashActive && $regularUnitPrice > 0 && $effectiveUnitPrice < $regularUnitPrice)
+                                    <p class="text-sm text-gray-400 line-through mb-1">
+                                        {{ 'R$ ' . number_format($regularUnitPrice, 2, ',', '.') }}
+                                    </p>
+                                @endif
+                            </div>
+                            @if($flashActive && $event->flash_sale_ends_at)
+                                <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-rose-50 border border-rose-200 px-3 py-1 text-xs font-black text-rose-800">
+                                    <i class="fas fa-bolt"></i> Promoção relâmpago ativa
+                                </div>
+                            @endif
                         @else
                             <p class="text-sm text-gray-500">Entrada</p>
                             <p class="text-3xl font-black text-green-600">Gratuita</p>

@@ -86,6 +86,32 @@ class User extends Authenticatable
             || $this->canAccessFeature('mentorships.create');
     }
 
+    public function hasPurchasedCourses(): bool
+    {
+        try {
+            if ($this->isAdmin()) {
+                return true;
+            }
+
+            $hasEnrollment = $this->enrollments()
+                ->where('enrollable_type', \App\Models\Course::class)
+                ->exists();
+
+            if ($hasEnrollment) {
+                return true;
+            }
+
+            return $this->orders()
+                ->where('status', 'paid')
+                ->whereHas('items', function ($query) {
+                    $query->where('item_type', 'course');
+                })
+                ->exists();
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
     protected $fillable = [
         'name',
         'email',

@@ -673,20 +673,85 @@
                             el: info.draggedEl
                         };
 
-                        // Pre-populate form safely
-                        $('#eventForm')[0].reset();
-                        $('#title').val(info.event.title);
-                        if (info.event.backgroundColor) {
-                            $('#color').val(info.event.backgroundColor);
-                        }
-
-                        openModal(info.event);
+                        // Cria evento rápido automaticamente (sem modal)
+                        quickCreateFromExternalDrop(info);
                     }
                 });
                 calendar.render();
 
                 // Recent events list
                 loadRecentEvents();
+
+                function quickCreateFromExternalDrop(info) {
+                    if (!canCreateEvents) {
+                        info.event.remove();
+                        return;
+                    }
+
+                    var start = info.event && info.event.start ? new Date(info.event.start) : null;
+                    if (!start) {
+                        info.event.remove();
+                        return;
+                    }
+
+                    var end = info.event && info.event.end ? new Date(info.event.end) : null;
+                    if (!end) {
+                        var minutes = info.event.allDay ? (24 * 60) : 60;
+                        end = new Date(start.getTime() + minutes * 60000);
+                    }
+
+                    var formData = new FormData();
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('title', info.event.title || 'Evento');
+                    formData.append('start_at', formatDate(start));
+                    formData.append('end_at', formatDate(end));
+                    formData.append('all_day', info.event.allDay ? '1' : '0');
+                    formData.append('color', info.event.backgroundColor || selectedQuickColor);
+                    formData.append('published', '1');
+
+                    $.ajax({
+                        url: '{{ route("admin.events.store") }}',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            toastr.success((response && response.message) ? response.message : 'Evento criado com sucesso.');
+                            tempExternalSaved = true;
+
+                            if (pendingExternalDrop && pendingExternalDrop.remove && pendingExternalDrop.el) {
+                                $(pendingExternalDrop.el).remove();
+                            }
+                            pendingExternalDrop = null;
+
+                            if (tempExternalEvent) {
+                                tempExternalEvent.remove();
+                            }
+                            tempExternalEvent = null;
+
+                            calendar.refetchEvents();
+                            loadRecentEvents();
+                        },
+                        error: function (xhr) {
+                            var errorMsg = 'Erro ao criar evento rápido';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                var keys = Object.keys(xhr.responseJSON.errors);
+                                if (keys.length > 0) errorMsg = xhr.responseJSON.errors[keys[0]][0];
+                            }
+                            toastr.error(errorMsg);
+
+                            if (tempExternalEvent) {
+                                tempExternalEvent.remove();
+                            }
+                            tempExternalEvent = null;
+                            tempExternalSaved = false;
+                            pendingExternalDrop = null;
+                        }
+                    });
+                }
 
                     // Modal Handling
                     function openModal(event) {

@@ -15,6 +15,8 @@ class Mentorship extends Model
         'description',
         'image',
         'price',
+        'flash_sale_price',
+        'flash_sale_ends_at',
         'slots',
         'schedule',
         'type',
@@ -39,7 +41,35 @@ class Mentorship extends Model
         'schedule' => 'array',
         'is_certificate_enabled' => 'boolean',
         'certificate_settings' => 'array',
+        'price' => 'decimal:2',
+        'flash_sale_price' => 'decimal:2',
+        'flash_sale_ends_at' => 'datetime',
     ];
+
+    public function isFlashSaleActive(): bool
+    {
+        $price = $this->flash_sale_price;
+        $endsAt = $this->flash_sale_ends_at;
+
+        if ($price === null || $endsAt === null) {
+            return false;
+        }
+
+        try {
+            return (float) $price >= 0 && $endsAt->isFuture();
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    public function getEffectivePriceAttribute(): float
+    {
+        if ($this->isFlashSaleActive()) {
+            return (float) $this->flash_sale_price;
+        }
+
+        return (float) ($this->price ?? 0);
+    }
 
     public function mentor()
     {

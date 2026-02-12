@@ -27,7 +27,7 @@ class EventReservationController extends Controller
             return redirect()->route('events.show', $event)->with('error', 'Este evento já encerrou.');
         }
 
-        $isPaid = (float) $event->current_price > 0;
+        $isPaid = (float) $event->effective_price > 0;
         if ($isPaid) {
             $seller = $event->user ?: User::find($event->user_id);
             if ($seller && !$seller->canSellOnMarketplace()) {
@@ -76,7 +76,7 @@ class EventReservationController extends Controller
             'coupon_code' => 'nullable|string|max:40',
         ]);
 
-        $isPaid = (float) $event->current_price > 0;
+        $isPaid = (float) $event->effective_price > 0;
         $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
         $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
         $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
@@ -124,12 +124,13 @@ class EventReservationController extends Controller
 
         $registration = null;
         $order = null;
-        $currentPrice = (float) $event->current_price;
+        $regularUnitPrice = (float) $event->current_price;
+        $currentPrice = (float) $event->effective_price;
         $couponCode = $isPaid ? $couponService->normalizeCode($request->input('coupon_code')) : '';
         $sellerId = $seller ? (int) $seller->id : (int) ($event->user_id ?? 0);
 
         try {
-            DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $currentPrice, $couponCode, $couponService, &$registration, &$order) {
+            DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $regularUnitPrice, $currentPrice, $couponCode, $couponService, &$registration, &$order) {
             $registration = EventRegistration::where('event_id', $event->id)
                 ->where('user_id', $user->id)
                 ->lockForUpdate()
@@ -211,6 +212,7 @@ class EventReservationController extends Controller
                         'sale_type' => 'event',
                         'public_token' => Str::random(40),
                         'original_total_amount' => $originalTotal,
+                        'regular_total_amount' => round($regularUnitPrice * $quantity, 2),
                         'platform_fee_percent' => $platformFeePercent,
                     ],
                 ]);
@@ -227,6 +229,7 @@ class EventReservationController extends Controller
                         'context' => 'event',
                         'sale_type' => 'event',
                         'original_total_amount' => $originalTotal,
+                        'regular_total_amount' => round($regularUnitPrice * $quantity, 2),
                         'platform_fee_percent' => $platformFeePercent,
                     ]),
                 ]);
@@ -240,6 +243,9 @@ class EventReservationController extends Controller
                 'event_end_at' => optional($event->end_at)->toIso8601String(),
                 'batch_label' => $event->current_batch_label,
                 'original_unit_price' => $currentPrice,
+                'regular_unit_price' => $regularUnitPrice,
+                'flash_sale_price' => $event->flash_sale_price !== null ? (float) $event->flash_sale_price : null,
+                'flash_sale_ends_at' => $event->flash_sale_ends_at ? $event->flash_sale_ends_at->toIso8601String() : null,
                 'discount_amount' => $discountAmount,
             ];
 

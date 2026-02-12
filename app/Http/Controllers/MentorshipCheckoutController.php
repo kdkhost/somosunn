@@ -74,7 +74,9 @@ class MentorshipCheckoutController extends Controller
 
         try {
             DB::transaction(function () use ($mentorship, $couponCode, $couponService, &$order) {
-                $originalTotal = round((float) $mentorship->price, 2);
+                $regularUnitPrice = round((float) ($mentorship->price ?? 0), 2);
+                $effectiveUnitPrice = round((float) ($mentorship->effective_price ?? $regularUnitPrice), 2);
+                $originalTotal = $effectiveUnitPrice;
 
                 $discountAmount = 0.0;
                 $coupon = null;
@@ -110,6 +112,7 @@ class MentorshipCheckoutController extends Controller
                         'sale_type' => 'mentorship',
                         'public_token' => Str::random(40),
                         'original_total_amount' => $originalTotal,
+                        'regular_total_amount' => $regularUnitPrice,
                         'platform_fee_percent' => $platformFeePercent,
                     ],
                 ]);
@@ -121,7 +124,10 @@ class MentorshipCheckoutController extends Controller
                     'price' => $finalTotal,
                     'quantity' => 1,
                     'data' => [
-                        'original_unit_price' => (float) $mentorship->price,
+                        'original_unit_price' => $effectiveUnitPrice,
+                        'regular_unit_price' => $regularUnitPrice,
+                        'flash_sale_price' => $mentorship->flash_sale_price !== null ? (float) $mentorship->flash_sale_price : null,
+                        'flash_sale_ends_at' => $mentorship->flash_sale_ends_at ? $mentorship->flash_sale_ends_at->toIso8601String() : null,
                         'discount_amount' => $discountAmount,
                     ],
                 ]);

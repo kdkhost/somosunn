@@ -256,6 +256,36 @@
                                                     </div>
                                                 </div>
 
+                                                <div class="card border-0 shadow-sm mb-3">
+                                                    <div class="card-body p-3">
+                                                        <h6 class="text-muted mb-3">
+                                                            <i class="fas fa-bolt mr-2"></i> Promoção relâmpago
+                                                        </h6>
+
+                                                        <div class="form-group mb-2">
+                                                            <label class="small text-muted">Preço promocional (R$)</label>
+                                                            <div class="input-group">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">R$</span>
+                                                                </div>
+                                                                <input name="flash_sale_price" class="form-control mask-money"
+                                                                    value="{{ old('flash_sale_price', $course->flash_sale_price) }}"
+                                                                    placeholder="0,00">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group mb-0">
+                                                            <label class="small text-muted">Termina em</label>
+                                                            <input type="datetime-local" name="flash_sale_ends_at"
+                                                                class="form-control"
+                                                                value="{{ old('flash_sale_ends_at', $course->flash_sale_ends_at ? $course->flash_sale_ends_at->format('Y-m-d\\TH:i') : '') }}">
+                                                            <small class="text-muted d-block mt-1">
+                                                                Quando expirar, o preço volta ao valor normal automaticamente.
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                                 <div class="form-group mb-3">
                                                     <label>Autor / Instrutor</label>
                                                     <input name="author_name" class="form-control"

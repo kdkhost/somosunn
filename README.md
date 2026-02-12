@@ -24,6 +24,12 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 
 ## Instalação e Deploy
 
+## UTF-8 sem BOM (OBRIGATÓRIO)
+
+- Este projeto usa **UTF-8 sem BOM** em TODOS os arquivos de texto (PHP, Blade, JS, CSS, JSON, MD, etc.).
+- Nunca salve arquivos como **UTF-8 com BOM** (bytes `EF BB BF` no início do arquivo), pois causa erros de acentuação/pontuação.
+- Antes de commitar, rode: `php tools/check-no-bom.php`.
+
 ### Requisitos
 - PHP 8.1+
 - MySQL 5.7+ / Mariadb

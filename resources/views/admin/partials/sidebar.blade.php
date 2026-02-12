@@ -130,7 +130,7 @@
                 {{-- Menu para Membros (Removido: Portal e Comunidade) --}}
 
                 {{-- Itens disponíveis para todos (Membros e Admins) --}}
-                @if(auth()->user()->canAccessFeature('courses'))
+                @if(auth()->user()->canAccessFeature('courses') || auth()->user()->hasPurchasedCourses())
                     <li class="nav-item has-treeview {{ $open('admin.courses.*') }}">
                         <a href="#" class="nav-link {{ $is('admin.courses.*') }}">
                             <i class="nav-icon fas fa-graduation-cap"></i>

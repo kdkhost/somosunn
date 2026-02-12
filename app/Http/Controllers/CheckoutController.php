@@ -74,7 +74,9 @@ class CheckoutController extends Controller
 
         try {
             DB::transaction(function () use ($course, $couponCode, $couponService, &$order) {
-                $originalTotal = round((float) $course->price, 2);
+                $regularUnitPrice = round((float) ($course->price ?? 0), 2);
+                $effectiveUnitPrice = round((float) ($course->effective_price ?? $regularUnitPrice), 2);
+                $originalTotal = $effectiveUnitPrice;
 
                 $discountAmount = 0.0;
                 $coupon = null;
@@ -110,6 +112,7 @@ class CheckoutController extends Controller
                         'sale_type' => 'course',
                         'public_token' => Str::random(40),
                         'original_total_amount' => $originalTotal,
+                        'regular_total_amount' => $regularUnitPrice,
                         'platform_fee_percent' => $platformFeePercent,
                     ],
                 ]);
@@ -121,7 +124,10 @@ class CheckoutController extends Controller
                     'price' => $finalTotal,
                     'quantity' => 1,
                     'data' => [
-                        'original_unit_price' => (float) $course->price,
+                        'original_unit_price' => $effectiveUnitPrice,
+                        'regular_unit_price' => $regularUnitPrice,
+                        'flash_sale_price' => $course->flash_sale_price !== null ? (float) $course->flash_sale_price : null,
+                        'flash_sale_ends_at' => $course->flash_sale_ends_at ? $course->flash_sale_ends_at->toIso8601String() : null,
                         'discount_amount' => $discountAmount,
                     ],
                 ]);

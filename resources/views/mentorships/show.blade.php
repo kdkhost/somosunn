@@ -54,7 +54,9 @@
 @section('content')
     @php
         $mentorName = optional($mentorship->mentor)->name ?? 'Mentor UNN';
-        $price = (float) ($mentorship->price ?? 0);
+        $regularPrice = (float) ($mentorship->price ?? 0);
+        $price = (float) ($mentorship->effective_price ?? $regularPrice);
+        $flashActive = method_exists($mentorship, 'isFlashSaleActive') ? (bool) $mentorship->isFlashSaleActive() : false;
         $slots = $mentorship->slots;
         $slotsLabel = is_null($slots) ? 'A confirmar' : (string) $slots;
         $description = trim((string) ($mentorship->description ?? ''));
@@ -177,9 +179,22 @@
                             </span>
                         </div>
 
-                        <p class="mt-3 text-4xl font-black text-slate-900">
-                            {{ $price > 0 ? 'R$ ' . number_format($price, 2, ',', '.') : 'Gratuito' }}
-                        </p>
+                        <div class="mt-3 flex items-end gap-3">
+                            <p class="text-4xl font-black text-slate-900">
+                                {{ $price > 0 ? 'R$ ' . number_format($price, 2, ',', '.') : 'Gratuito' }}
+                            </p>
+                            @if($flashActive && $regularPrice > 0 && $price < $regularPrice)
+                                <p class="text-sm text-slate-400 line-through mb-1">
+                                    {{ 'R$ ' . number_format($regularPrice, 2, ',', '.') }}
+                                </p>
+                            @endif
+                        </div>
+
+                        @if($flashActive && $mentorship->flash_sale_ends_at)
+                            <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-rose-50 border border-rose-200 px-3 py-1 text-xs font-black text-rose-800">
+                                <i class="fas fa-bolt"></i> Promoção relâmpago ativa
+                            </div>
+                        @endif
 
                         <div class="mt-8 space-y-4">
                             <div class="flex items-start gap-4">

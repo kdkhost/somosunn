@@ -70,6 +70,8 @@ class Course extends Model
         'title',
         'slug',
         'price',
+        'flash_sale_price',
+        'flash_sale_ends_at',
         'duration',
         'is_certificate_enabled',
         'thumbnail',
@@ -93,11 +95,38 @@ class Course extends Model
         'is_featured' => 'boolean',
         'certificate_settings' => 'array',
         'price' => 'decimal:2',
+        'flash_sale_price' => 'decimal:2',
+        'flash_sale_ends_at' => 'datetime',
         'video_block_download' => 'boolean',
         'video_floating_enabled' => 'boolean',
         'video_floating_width' => 'integer',
         'video_floating_height' => 'integer',
     ];
+
+    public function isFlashSaleActive(): bool
+    {
+        $price = $this->flash_sale_price;
+        $endsAt = $this->flash_sale_ends_at;
+
+        if ($price === null || $endsAt === null) {
+            return false;
+        }
+
+        try {
+            return (float) $price >= 0 && $endsAt->isFuture();
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    public function getEffectivePriceAttribute(): float
+    {
+        if ($this->isFlashSaleActive()) {
+            return (float) $this->flash_sale_price;
+        }
+
+        return (float) ($this->price ?? 0);
+    }
 
     /**
      * Calculate total course hours from lesson durations.

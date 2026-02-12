@@ -401,7 +401,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/portal', [\App\Http\Controllers\Admin\MemberController::class, 'portal'])->name('portal.index');
     Route::get('/comunidade', [\App\Http\Controllers\Admin\MemberController::class, 'socialFeed'])->middleware('check.feature:community_access')->name('social.feed.internal');
-    Route::get('/courses/available', [\App\Http\Controllers\Admin\CourseController::class, 'available'])->middleware('check.feature:courses_access')->name('courses.available');
+    Route::get('/courses/available', [\App\Http\Controllers\Admin\CourseController::class, 'available'])->name('courses.available');
     Route::get('/mentorships/available', [\App\Http\Controllers\Admin\MentorshipController::class, 'available'])->middleware('check.feature:mentorships_access')->name('mentorships.available');
 
     // Chat interno (mantém layout do painel)

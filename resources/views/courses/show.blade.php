@@ -88,7 +88,21 @@
                                 @endif
                             </div>
                         @else
-                            <div class="text-3xl font-bold text-gray-900 mb-4">{{ $course->price > 0 ? 'R$ ' . number_format($course->price, 2, ',', '.') : 'Gratuito' }}</div>
+                            @php
+                                $regularPrice = (float) ($course->price ?? 0);
+                                $effectivePrice = (float) ($course->effective_price ?? $regularPrice);
+                                $flashActive = method_exists($course, 'isFlashSaleActive') ? (bool) $course->isFlashSaleActive() : false;
+                            @endphp
+                            <div class="flex items-end gap-3 mb-4">
+                                <div class="text-3xl font-bold text-gray-900">
+                                    {{ $effectivePrice > 0 ? 'R$ ' . number_format($effectivePrice, 2, ',', '.') : 'Gratuito' }}
+                                </div>
+                                @if($flashActive && $regularPrice > 0 && $effectivePrice < $regularPrice)
+                                    <div class="text-sm text-gray-400 line-through mb-1">
+                                        {{ 'R$ ' . number_format($regularPrice, 2, ',', '.') }}
+                                    </div>
+                                @endif
+                            </div>
                             @if($isPaused)
                                 <button type="button" disabled class="block w-full py-3 bg-gray-200 text-gray-500 font-bold rounded-lg transition mb-3 cursor-not-allowed">
                                     Vendas pausadas

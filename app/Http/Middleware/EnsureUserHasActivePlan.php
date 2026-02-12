@@ -37,6 +37,7 @@ class EnsureUserHasActivePlan
             'premium',
             'admin.profile.edit',
             'admin.profile.update',
+            'admin.courses.available',
             'checkout.show',
             'checkout.process',
             'checkout.success',
