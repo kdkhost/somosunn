@@ -26,8 +26,8 @@
             border-radius: 10px;
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            gap: 15px;
+            justify-content: space-between;
+            gap: 0;
             transition: all 0.3s ease;
             position: relative;
             z-index: 2;
@@ -76,7 +76,11 @@
             align-items: center;
             gap: 8px;
             flex-shrink: 0;
-            margin-left: auto;
+            margin-left: auto !important;
+            justify-content: flex-end;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+            min-width: 92px;
         }
 
         .lesson-item .lesson-actions form {
@@ -84,12 +88,12 @@
         }
 
         .lesson-item .lesson-actions .btn {
-            display: inline-flex;
+            display: inline-flex !important;
             align-items: center;
             justify-content: center;
             width: 38px;
             height: 34px;
-            padding: 0;
+            padding: 0 !important;
         }
 
         .lesson-item .fa-grip-vertical {
