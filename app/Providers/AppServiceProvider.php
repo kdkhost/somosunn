@@ -26,10 +26,10 @@ class AppServiceProvider extends ServiceProvider
 
         // CMS helper: @site('home.hero_title', 'fallback') / @siteRaw('home.hero_html')
         Blade::directive('site', function ($expression) {
-            return "<?php echo e((string) \\\\App\\\\Models\\\\SiteContent::resolve({$expression})); ?>";
+            return '<?php echo e((string) \\App\\Models\\SiteContent::resolve(' . $expression . ')); ?>';
         });
         Blade::directive('siteRaw', function ($expression) {
-            return "<?php echo (string) \\\\App\\\\Models\\\\SiteContent::resolve({$expression}); ?>";
+            return '<?php echo (string) \\App\\Models\\SiteContent::resolve(' . $expression . '); ?>';
         });
 
         \App\Models\User::observe(\App\Observers\UserObserver::class);
