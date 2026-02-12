@@ -252,6 +252,18 @@ class AppServiceProvider extends ServiceProvider
             // Carregar configurações de Pagamento (MercadoPago / PagSeguro)
             try {
                 $paymentSettings = DB::table('settings')->whereIn('key', [
+                    // Chaves usadas no painel (admin/settings/gateway)
+                    'mercadopago_env',
+                    'mercadopago_prod_access_token',
+                    'mercadopago_prod_public_key',
+                    'mercadopago_sandbox_access_token',
+                    'mercadopago_sandbox_public_key',
+                    'pagseguro_env',
+                    'pagseguro_prod_token',
+                    'pagseguro_sandbox_token',
+                    'pagseguro_email',
+
+                    // Chaves legadas/alternativas
                     'gateway_mercadopago_sandbox',
                     'gateway_mercadopago_access_token_prod',
                     'gateway_mercadopago_public_key_prod',
@@ -265,13 +277,20 @@ class AppServiceProvider extends ServiceProvider
                 ])->pluck('value', 'key')->toArray();
 
                 // MercadoPago
+                $mpEnv = trim((string) ($paymentSettings['mercadopago_env'] ?? ''));
                 $mpSandbox = (bool) ($paymentSettings['gateway_mercadopago_sandbox'] ?? 0);
-                $mpAccessToken = $mpSandbox
-                    ? ($paymentSettings['gateway_mercadopago_access_token_sandbox'] ?? '')
-                    : ($paymentSettings['gateway_mercadopago_access_token_prod'] ?? '');
-                $mpPublicKey = $mpSandbox
-                    ? ($paymentSettings['gateway_mercadopago_public_key_sandbox'] ?? '')
-                    : ($paymentSettings['gateway_mercadopago_public_key_prod'] ?? '');
+                if ($mpEnv !== '') {
+                    $mpSandbox = $mpEnv === 'sandbox';
+                }
+
+                $mpAccessTokenSandbox = trim((string) (($paymentSettings['gateway_mercadopago_access_token_sandbox'] ?? '') ?: ($paymentSettings['mercadopago_sandbox_access_token'] ?? '')));
+                $mpPublicKeySandbox = trim((string) (($paymentSettings['gateway_mercadopago_public_key_sandbox'] ?? '') ?: ($paymentSettings['mercadopago_sandbox_public_key'] ?? '')));
+
+                $mpAccessTokenProd = trim((string) (($paymentSettings['gateway_mercadopago_access_token_prod'] ?? '') ?: ($paymentSettings['mercadopago_prod_access_token'] ?? '')));
+                $mpPublicKeyProd = trim((string) (($paymentSettings['gateway_mercadopago_public_key_prod'] ?? '') ?: ($paymentSettings['mercadopago_prod_public_key'] ?? '')));
+
+                $mpAccessToken = $mpSandbox ? $mpAccessTokenSandbox : $mpAccessTokenProd;
+                $mpPublicKey = $mpSandbox ? $mpPublicKeySandbox : $mpPublicKeyProd;
 
                 if ($mpAccessToken) {
                     config(['payments.mercadopago.access_token' => $mpAccessToken]);
@@ -280,11 +299,17 @@ class AppServiceProvider extends ServiceProvider
                 }
 
                 // PagSeguro
+                $psEnv = trim((string) ($paymentSettings['pagseguro_env'] ?? ''));
                 $psSandbox = (bool) ($paymentSettings['gateway_pagseguro_sandbox'] ?? 0);
-                $psToken = $psSandbox
-                    ? ($paymentSettings['gateway_pagseguro_token_sandbox'] ?? '')
-                    : ($paymentSettings['gateway_pagseguro_token_prod'] ?? '');
-                $psEmail = $paymentSettings['gateway_pagseguro_email'] ?? '';
+                if ($psEnv !== '') {
+                    $psSandbox = $psEnv === 'sandbox';
+                }
+
+                $psTokenSandbox = trim((string) (($paymentSettings['gateway_pagseguro_token_sandbox'] ?? '') ?: ($paymentSettings['pagseguro_sandbox_token'] ?? '')));
+                $psTokenProd = trim((string) (($paymentSettings['gateway_pagseguro_token_prod'] ?? '') ?: ($paymentSettings['pagseguro_prod_token'] ?? '')));
+                $psToken = $psSandbox ? $psTokenSandbox : $psTokenProd;
+
+                $psEmail = trim((string) (($paymentSettings['gateway_pagseguro_email'] ?? '') ?: ($paymentSettings['pagseguro_email'] ?? '')));
 
                 if ($psToken && $psEmail) {
                     config(['payments.pagseguro.email' => $psEmail]);
