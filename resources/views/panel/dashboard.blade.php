@@ -6,6 +6,10 @@
     @php
         $plan = $plan ?? null;
         $stats = $stats ?? [];
+        $isImpersonatingAdmin = session()->has('impersonator_id') && session()->get('impersonator_is_admin');
+        $canAccessCommunity = auth()->user()->canAccessFeature('community') || $isImpersonatingAdmin;
+        $canAccessCourses = auth()->user()->canAccessFeature('courses_access') || (method_exists(auth()->user(), 'hasPurchasedCourses') && auth()->user()->hasPurchasedCourses()) || $isImpersonatingAdmin;
+        $canSellOnMarketplace = auth()->user()->canSellOnMarketplace() || $isImpersonatingAdmin;
         $coursesCount = (int) ($stats['courses_count'] ?? 0);
         $ordersPaidCount = (int) ($stats['orders_paid_count'] ?? 0);
         $ordersPaidTotal = (float) ($stats['orders_paid_total'] ?? 0);
@@ -46,7 +50,11 @@
                 </div>
             </div>
             <div class="mt-4 text-sm text-slate-600">
-                Acesse seus cursos em <a class="text-[#1F5EDB] font-bold hover:underline" href="{{ route('courses.index') }}">Cursos</a>.
+                @if($canAccessCourses)
+                    Acesse seus cursos em <a class="text-[#1F5EDB] font-bold hover:underline" href="{{ route('courses.index') }}">Cursos</a>.
+                @else
+                    Libere o acesso aos cursos fazendo um upgrade de plano.
+                @endif
             </div>
         </div>
 
@@ -76,10 +84,17 @@
                 </div>
             </div>
             <div class="mt-4">
-                <a href="{{ route('social.feed') }}"
-                    class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-800 transition">
-                    <i class="fas fa-arrow-right mr-2"></i> Ir para o feed
-                </a>
+                @if($canAccessCommunity)
+                    <a href="{{ route('social.feed') }}"
+                        class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-800 transition">
+                        <i class="fas fa-arrow-right mr-2"></i> Ir para o feed
+                    </a>
+                @else
+                    <a href="{{ route('premium') }}"
+                        class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                        <i class="fas fa-crown mr-2"></i> Fazer upgrade
+                    </a>
+                @endif
             </div>
         </div>
 
@@ -96,7 +111,7 @@
             <div class="mt-4 text-sm text-slate-600">
                 Líquido: <span class="font-extrabold text-slate-900">R$ {{ number_format($sellerNetTotal, 2, ',', '.') }}</span>
             </div>
-            @if(auth()->user()->canSellOnMarketplace())
+            @if($canSellOnMarketplace)
                 <div class="mt-3">
                     <a href="{{ route('panel.marketplace.sales') }}"
                         class="inline-flex items-center text-sm font-bold text-[#1F5EDB] hover:underline">
@@ -111,4 +126,3 @@
         </div>
     </div>
 @endsection
-

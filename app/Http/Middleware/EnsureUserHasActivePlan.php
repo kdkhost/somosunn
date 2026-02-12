@@ -29,6 +29,11 @@ class EnsureUserHasActivePlan
             return $next($request);
         }
 
+        // 2.5. Impersonação (admin/superadmin): não bloquear por plano
+        if (session()->has('impersonator_id') && session()->get('impersonator_is_admin')) {
+            return $next($request);
+        }
+
         // 3. Whitelist Routes
         $whitelist = [
             'login',

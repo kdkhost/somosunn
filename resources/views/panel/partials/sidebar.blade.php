@@ -1,6 +1,7 @@
 @php
     $user = auth()->user();
     $plan = $user ? $user->activePlan() : null;
+    $isImpersonatingAdmin = session()->has('impersonator_id') && session()->get('impersonator_is_admin');
 
     $navItemClass = function (bool $active = false) {
         $base = 'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition';
@@ -40,24 +41,28 @@
             Portal
         </a>
 
-        <a href="{{ route('social.feed') }}" class="{{ $navItemClass(false) }}">
-            <i class="fas fa-users w-5 opacity-80"></i>
-            Comunidade
-        </a>
+        @if($user->canAccessFeature('community') || $isImpersonatingAdmin)
+            <a href="{{ route('social.feed') }}" class="{{ $navItemClass(false) }}">
+                <i class="fas fa-users w-5 opacity-80"></i>
+                Comunidade
+            </a>
+        @endif
 
-        <a href="{{ route('chat.index') }}" class="{{ $navItemClass(false) }}">
-            <i class="fas fa-comments w-5 opacity-80"></i>
-            Chat
-        </a>
+        @if($user->canAccessFeature('chat') || $isImpersonatingAdmin)
+            <a href="{{ route('chat.index') }}" class="{{ $navItemClass(false) }}">
+                <i class="fas fa-comments w-5 opacity-80"></i>
+                Chat
+            </a>
+        @endif
 
-        @if($user->canAccessFeature('marketplace.buy'))
+        @if($user->canAccessFeature('marketplace.buy') || $isImpersonatingAdmin)
             <a href="{{ route('marketplace.index') }}" class="{{ $navItemClass(false) }}">
                 <i class="fas fa-store w-5 opacity-80"></i>
                 Marketplace
             </a>
         @endif
 
-        @if(method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace())
+        @if((method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace()) || $isImpersonatingAdmin)
             <div class="pt-4 mt-4 border-t border-slate-100">
                 <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                     Marketplace (Vendas)
@@ -88,4 +93,3 @@
         @endif
     </div>
 </div>
-

@@ -411,6 +411,11 @@ Route::middleware(['auth'])->group(function () {
     })->name('marketplace.sales');
 });
 
+// Impersonate Stop (sempre acessível quando estiver impersonando)
+Route::get('/admin/stop-impersonating', [\App\Http\Controllers\Admin\ImpersonateController::class, 'stop'])
+    ->middleware(['auth'])
+    ->name('admin.impersonate.stop');
+
 // Admin routes (granular)
 Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class, \App\Http\Middleware\EnsureUserIsAdmin::class, 'check.plan'])->group(function () {
     // Rotas de Membro (Comum a todos no painel)
@@ -477,9 +482,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::post('/reviews/{review}/approve', [\App\Http\Controllers\Admin\ItemReviewController::class, 'approve'])->middleware('check.feature:reviews_approve')->name('reviews.approve');
     Route::post('/reviews/{review}/reject', [\App\Http\Controllers\Admin\ItemReviewController::class, 'reject'])->middleware('check.feature:reviews_reject')->name('reviews.reject');
     Route::delete('/reviews/{review}', [\App\Http\Controllers\Admin\ItemReviewController::class, 'destroy'])->middleware('check.feature:reviews_delete')->name('reviews.destroy');
-
-    // Impersonate Stop (disponível se estiver impersonando, sessão controla)
-    Route::get('/stop-impersonating', [\App\Http\Controllers\Admin\ImpersonateController::class, 'stop'])->name('impersonate.stop');
 
     // Rotas Restritas (Apenas Admin/Superadmin)
     Route::middleware([\App\Http\Middleware\EnsureUserIsAdmin::class])->group(function () {

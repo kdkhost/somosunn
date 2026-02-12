@@ -119,7 +119,10 @@ trait HasFeatureAccess
         // 1. Check manual assignment (plan_id on users table)
         if ($this->plan_id) {
             if (!$this->plan_expires_at || $this->plan_expires_at->isFuture()) {
-                return $this->plan;
+                $plan = $this->plan;
+                if ($plan) {
+                    return $plan;
+                }
             }
         }
 

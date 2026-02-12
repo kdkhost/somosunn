@@ -35,20 +35,23 @@ class ImpersonateController extends Controller
 
         // Guarda o ID original na sessão
         session()->put('impersonator_id', $currentUser->id);
+        session()->put('impersonator_is_admin', true);
+        session()->put('impersonator_name', (string) ($currentUser->name ?? ''));
 
         // Loga como o novo usuário
         Auth::login($userToImpersonate);
 
-        return redirect()->route('admin.dashboard')->with('success', "Você está acessando como {$userToImpersonate->name}");
+        return redirect()->route('panel.dashboard')->with('success', "Você está acessando como {$userToImpersonate->name}");
     }
 
     public function stop()
     {
         if (!session()->has('impersonator_id')) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('panel.dashboard');
         }
 
         $originalId = session()->pull('impersonator_id');
+        session()->forget(['impersonator_is_admin', 'impersonator_name']);
         $originalUser = User::find($originalId);
 
         if ($originalUser) {

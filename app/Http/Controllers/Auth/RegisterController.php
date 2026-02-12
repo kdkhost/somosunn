@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +33,18 @@ class RegisterController extends Controller
             'address' => $data['address'] ?? null,
         ]);
 
+        // Vincula pacote inicial (cliente) para liberar o Painel do Membro imediatamente
+        try {
+            $defaultPlan = Plan::query()->where('slug', 'cliente')->first() ?? Plan::query()->orderBy('price')->orderBy('id')->first();
+            if ($defaultPlan) {
+                $user->plan_id = (int) $defaultPlan->id;
+                $user->plan_expires_at = null;
+                $user->save();
+            }
+        } catch (\Throwable $e) {
+            // ignore (fallback: usuário escolhe plano no /premium)
+        }
+
         // Award signup points (if rules exist)
         try {
             $ps = new \App\Services\PointsService();
@@ -41,7 +54,7 @@ class RegisterController extends Controller
         }
 
         Auth::login($user);
-        return redirect()->route('premium')
-            ->with('success', 'Seja bem-vindo à SOMOS UNN! Escolha um plano para começar sua jornada.');
+        return redirect()->route('panel.dashboard')
+            ->with('success', 'Seja bem-vindo à SOMOS UNN! Você já pode acessar seu painel. Se quiser, faça um upgrade de plano para liberar mais recursos.');
     }
 }

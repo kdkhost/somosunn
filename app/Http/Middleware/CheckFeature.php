@@ -27,6 +27,11 @@ class CheckFeature
             return redirect()->route('login');
         }
 
+        // Impersonação (admin/superadmin): liberar acesso total durante suporte/diagnóstico
+        if (session()->has('impersonator_id') && session()->get('impersonator_is_admin')) {
+            return $next($request);
+        }
+
         if (!$user->canAccessFeature($feature) && !$this->hasEntitlementOverride($request, $user, (string) $feature)) {
             // Se for AJAX, retorna JSON
             if ($request->expectsJson()) {
@@ -55,7 +60,7 @@ class CheckFeature
 
                 // /courses (index) não tem {course}; libera somente se já comprou/enrolou em algum curso.
                 if ($courseParam === null) {
-                    return false;
+                    return method_exists($user, 'hasPurchasedCourses') ? (bool) $user->hasPurchasedCourses() : false;
                 }
 
                 $courseId = $this->resolveCourseId($courseParam);
