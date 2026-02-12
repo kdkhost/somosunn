@@ -24,7 +24,16 @@
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
             return $path;
         }
-        return asset(ltrim($path, '/'));
+
+        $path = ltrim($path, '/');
+
+        // Pastas públicas
+        if (str_starts_with($path, 'uploads/') || str_starts_with($path, 'img/') || str_starts_with($path, 'storage/')) {
+            return asset($path);
+        }
+
+        // Arquivos salvos no disk "public" (storage/app/public -> /storage)
+        return asset('storage/' . $path);
     };
 
     $resolveLinkUrl = function (?string $url): string {
@@ -478,7 +487,7 @@
                         $flashActive = method_exists($course, 'isFlashSaleActive') ? (bool) $course->isFlashSaleActive() : false;
                         $flashEndsAtMs = ($flashActive && $course->flash_sale_ends_at) ? ((int) $course->flash_sale_ends_at->timestamp * 1000) : 0;
                         $thumb = trim((string) ($course->thumbnail ?? ''));
-                        $thumbUrl = $thumb !== '' ? asset(ltrim($thumb, '/')) : '';
+                        $thumbUrl = $resolveAssetUrl($thumb);
                         $hasAccess = $user && ($course instanceof \App\Models\Course) ? $user->hasCourseAccess($course) : false;
                         $buyEnabled = $canBuy && $paymentsConfigured && $price > 0 && $sellerCanSell($sellerId);
                         $sellerName = optional($course->creator)->name ?? 'Criador';
@@ -611,7 +620,7 @@
                         $mentorName = optional($mentorship->mentor)->name ?? 'Mentor';
                         $desc = \Illuminate\Support\Str::limit(strip_tags((string) ($mentorship->description ?? '')), 90);
                         $image = trim((string) ($mentorship->image ?? ''));
-                        $imageUrl = $image !== '' ? asset(ltrim($image, '/')) : '';
+                        $imageUrl = $resolveAssetUrl($image);
                         $shareCode = \App\Support\ShortLink::encodeProduct('mentorship', (int) $mentorship->id);
                         $shareUrl = $shareCode ? route('share.product', ['code' => $shareCode]) : '';
                     @endphp
@@ -738,7 +747,7 @@
                         $flashEndsAtMs = ($flashActive && $event->flash_sale_ends_at) ? ((int) $event->flash_sale_ends_at->timestamp * 1000) : 0;
                         $dateLabel = $event->start_at ? (is_string($event->start_at) ? \Carbon\Carbon::parse($event->start_at) : $event->start_at)->format('d/m/Y') : null;
                         $image = trim((string) ($event->image ?? ''));
-                        $imageUrl = $image !== '' ? asset(ltrim($image, '/')) : '';
+                        $imageUrl = $resolveAssetUrl($image);
                         $buyEnabled = $price <= 0 ? true : ($canBuy && $paymentsConfigured && $sellerCanSell($sellerId));
                         $sellerName = optional($event->user)->name ?? 'Organizador';
                         $shareCode = \App\Support\ShortLink::encodeProduct('event', (int) $event->id);

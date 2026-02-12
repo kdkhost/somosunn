@@ -76,20 +76,12 @@ class CourseController extends Controller
     {
         $this->ensurePermission('courses.create');
 
-        if ($request->has('price')) {
-            $price = $request->price;
-            // Remove R$, whitespace, and dots (thousand separators)
-            $price = str_replace(['R$', ' ', '.'], '', $price);
-            // Replace comma with dot
-            $price = str_replace(',', '.', $price);
-            $request->merge(['price' => $price]);
-        }
+        foreach (['price', 'flash_sale_price'] as $field) {
+            if (!$request->has($field)) {
+                continue;
+            }
 
-        if ($request->has('flash_sale_price')) {
-            $price = $request->input('flash_sale_price');
-            $price = str_replace(['R$', ' ', '.'], '', (string) $price);
-            $price = str_replace(',', '.', $price);
-            $request->merge(['flash_sale_price' => $price]);
+            $request->merge([$field => $this->normalizeMoneyInput($request->input($field))]);
         }
 
         if ($request->has('flash_sale_ends_at') && $request->input('flash_sale_ends_at')) {
@@ -164,18 +156,12 @@ class CourseController extends Controller
         $this->ensurePermission('courses.edit');
         $this->ensureCanManage($course);
 
-        if ($request->has('price')) {
-            $price = $request->price;
-            $price = str_replace(['R$', ' ', '.'], '', $price);
-            $price = str_replace(',', '.', $price);
-            $request->merge(['price' => $price]);
-        }
+        foreach (['price', 'flash_sale_price'] as $field) {
+            if (!$request->has($field)) {
+                continue;
+            }
 
-        if ($request->has('flash_sale_price')) {
-            $price = $request->input('flash_sale_price');
-            $price = str_replace(['R$', ' ', '.'], '', (string) $price);
-            $price = str_replace(',', '.', $price);
-            $request->merge(['flash_sale_price' => $price]);
+            $request->merge([$field => $this->normalizeMoneyInput($request->input($field))]);
         }
 
         if ($request->has('flash_sale_ends_at') && $request->input('flash_sale_ends_at')) {
@@ -298,6 +284,39 @@ class CourseController extends Controller
         if (!$user || (!$user->isAdmin() && !$user->hasPermission($permission))) {
             abort(403, 'Você não tem permissão para realizar esta ação.');
         }
+    }
+
+    protected function normalizeMoneyInput($value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        $value = str_replace(['R$', ' ', "\u{00A0}"], '', $value);
+        if ($value === '') {
+            return null;
+        }
+
+        if (str_contains($value, ',')) {
+            // Brazilian format: 1.234,56 -> 1234.56
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        } elseif (substr_count($value, '.') > 1) {
+            // 1.234.567 -> 1234567
+            $value = str_replace('.', '', $value);
+        }
+
+        $value = trim($value);
+        if ($value === '' || $value === '-') {
+            return null;
+        }
+
+        return $value;
     }
 
     /**

@@ -26,7 +26,8 @@
             border-radius: 10px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
+            gap: 15px;
             transition: all 0.3s ease;
             position: relative;
             z-index: 2;
@@ -72,7 +73,7 @@
 
         .lesson-item .d-flex:last-child {
             flex-shrink: 0;
-            margin-left: 15px;
+            margin-left: auto;
         }
 
         .lesson-item .fa-grip-vertical {
@@ -405,59 +406,60 @@
                         <!-- TAB 2: AULAS -->
                         @if($course->exists)
                             <div class="tab-pane fade" id="lessons" role="tabpanel" aria-labelledby="lessons-tab">
-                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="d-flex align-items-center mb-4">
                                     <h4 class="mb-0 text-dark">Grade Curricular</h4>
-                                    <button class="btn btn-success shadow-sm" id="btnNovaAula" type="button">
+                                    <button class="btn btn-success shadow-sm ml-auto" id="btnNovaAula" type="button">
                                         <i class="fas fa-plus mr-1"></i> Nova Aula
                                     </button>
-                                    @push('scripts')
-                                        <script>
-                                            document.addEventListener('DOMContentLoaded', function () {
-                                                const btnNovaAula = document.getElementById('btnNovaAula');
-                                                if (!btnNovaAula) return;
-                                                btnNovaAula.addEventListener('click', function (e) {
-                                                    e.preventDefault();
-                                                    // Se já existe course_id, apenas abre o modal normalmente
-                                                    const courseId = {{ $course->exists ? $course->id : 'null' }};
-                                                    if (courseId) {
-                                                        if (typeof openLessonModal === 'function') openLessonModal();
-                                                        return;
-                                                    }
-                                                    // Auto-save do formulário de curso via AJAX
-                                                    const form = btnNovaAula.closest('form');
-                                                    if (!form) return;
-                                                    const formData = new FormData(form);
-                                                    formData.append('status', 'draft');
-                                                    btnNovaAula.disabled = true;
-                                                    btnNovaAula.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Salvando...';
-                                                    fetch(form.action, {
-                                                        method: 'POST',
-                                                        headers: {
-                                                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-                                                        },
-                                                        body: formData
-                                                    })
-                                                        .then(response => response.json())
-                                                        .then(data => {
-                                                            if (data && data.id) {
-                                                                // Redireciona para a edição do curso já salvo
-                                                                window.location.href = `/admin/courses/${data.id}/edit?openLesson=1`;
-                                                            } else {
-                                                                alert('Erro ao salvar curso. Tente novamente.');
-                                                                btnNovaAula.disabled = false;
-                                                                btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
-                                                            }
-                                                        })
-                                                        .catch(() => {
+                                </div>
+
+                                @push('scripts')
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            const btnNovaAula = document.getElementById('btnNovaAula');
+                                            if (!btnNovaAula) return;
+                                            btnNovaAula.addEventListener('click', function (e) {
+                                                e.preventDefault();
+                                                // Se já existe course_id, apenas abre o modal normalmente
+                                                const courseId = {{ $course->exists ? $course->id : 'null' }};
+                                                if (courseId) {
+                                                    if (typeof openLessonModal === 'function') openLessonModal();
+                                                    return;
+                                                }
+                                                // Auto-save do formulário de curso via AJAX
+                                                const form = btnNovaAula.closest('form');
+                                                if (!form) return;
+                                                const formData = new FormData(form);
+                                                formData.append('status', 'draft');
+                                                btnNovaAula.disabled = true;
+                                                btnNovaAula.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Salvando...';
+                                                fetch(form.action, {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                                    },
+                                                    body: formData
+                                                })
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        if (data && data.id) {
+                                                            // Redireciona para a edição do curso já salvo
+                                                            window.location.href = `/admin/courses/${data.id}/edit?openLesson=1`;
+                                                        } else {
                                                             alert('Erro ao salvar curso. Tente novamente.');
                                                             btnNovaAula.disabled = false;
                                                             btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
-                                                        });
-                                                });
+                                                        }
+                                                    })
+                                                    .catch(() => {
+                                                        alert('Erro ao salvar curso. Tente novamente.');
+                                                        btnNovaAula.disabled = false;
+                                                        btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
+                                                    });
                                             });
-                                        </script>
-                                    @endpush
-                                </div>
+                                        });
+                                    </script>
+                                @endpush
 
                                 <div id="lessons-list">
                                     @forelse($course->lessons as $lesson)
