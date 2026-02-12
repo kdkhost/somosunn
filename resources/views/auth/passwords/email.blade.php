@@ -6,7 +6,7 @@
 <div class="min-h-screen flex items-center justify-center bg-slate-50 py-16 px-6">
     <div class="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 !px-0">
         
-        <x-auth-visual title="Recuperar acesso" :show-social="true">
+        <x-auth-visual title="Recuperar acesso" :show-social="true" context="password_email">
             Esqueceu sua senha? Não se preocupe, informe seu e-mail e nós te ajudamos a recuperar.
         </x-auth-visual>
 
@@ -15,6 +15,8 @@
                 <h3 class="text-3xl font-bold text-slate-900 mb-2">Esqueceu a senha?</h3>
                 <p class="text-slate-500">Informe o e-mail cadastrado e enviaremos um link.</p>
             </div>
+
+            <x-social-auth-buttons class="mb-6" />
             
             @if ($errors->any())
                 <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">

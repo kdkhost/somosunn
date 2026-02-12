@@ -6,13 +6,15 @@
 <div class="min-h-screen flex items-center justify-center bg-slate-50 py-16 px-6">
     <div class="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 !px-0">
         
-        <x-auth-visual title="Nova senha" :show-social="true">
+        <x-auth-visual title="Nova senha" :show-social="true" context="password_reset">
             Defina uma senha forte e segura para proteger sua conta e seus dados.
         </x-auth-visual>
 
         <div class="p-10 flex flex-col justify-center">
             <h3 class="text-3xl font-bold mb-8 text-slate-900">Redefinir Senha</h3>
-            
+
+            <x-social-auth-buttons class="mb-6" />
+             
             @if ($errors->any())
                 <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
                     @foreach ($errors->all() as $error)

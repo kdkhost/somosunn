@@ -9,13 +9,16 @@
     <div class="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 !px-0">
             <!-- Coluna visual -->
-            <x-auth-visual title="Bem-vindo de volta!" :show-social="true">
+            <x-auth-visual title="Bem-vindo de volta!" :show-social="true" context="login">
                 Acesse seu painel, cursos, palestras e mentorias com as suas credenciais ou login social.
             </x-auth-visual>
 
             <!-- Coluna formulário -->
             <div class="p-10">
                 <h3 class="text-3xl font-bold mb-8">Entrar na sua conta</h3>
+
+                <x-social-auth-buttons class="mb-8" />
+
                 <form method="POST" action="{{ route('login') }}" id="loginForm" class="space-y-5">
                     @csrf
                     <div>

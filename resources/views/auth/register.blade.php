@@ -8,11 +8,14 @@
 @endphp
 <div class="min-h-screen flex items-center justify-center bg-slate-50 py-16 px-6">
     <div class="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 !px-0">
-        <x-auth-visual title="Crie sua conta" :show-social="true">
+        <x-auth-visual title="Crie sua conta" :show-social="true" context="register">
             Faça parte da comunidade e tenha acesso às mentorias e eventos exclusivos.
         </x-auth-visual>
         <div class="p-10">
             <h3 class="text-3xl font-bold mb-8">Criar conta</h3>
+
+            <x-social-auth-buttons class="mb-8" />
+
             <form method="POST" action="{{ route('register') }}" class="space-y-5">
                 @csrf
                 <div>

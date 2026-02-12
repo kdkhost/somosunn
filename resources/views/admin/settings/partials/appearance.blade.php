@@ -157,6 +157,59 @@
 
     <hr class="my-4">
 
+    <h5 class="text-primary mb-3"><i class="fas fa-magic mr-2"></i> Autenticação (Animações)</h5>
+    <div class="alert alert-light border mb-4">
+        <i class="fas fa-info-circle mr-2"></i> A animação do banner aparece apenas em telas de notebook/desktop
+        (coluna visual do formulário).
+    </div>
+
+    <div class="form-group mb-4">
+        <div class="custom-control custom-switch custom-switch-lg">
+            <input type="hidden" name="auth_visual_animation_enabled" value="0">
+            <input type="checkbox" class="custom-control-input" id="auth_visual_animation_enabled"
+                name="auth_visual_animation_enabled" value="1" {{ ($settings['auth_visual_animation_enabled'] ?? 1) ? 'checked' : '' }}>
+            <label class="custom-control-label font-weight-bold" for="auth_visual_animation_enabled">Ativar animação do banner de autenticação</label>
+        </div>
+        <small class="text-muted">Quando desativado, a coluna visual fica estática (sem partículas/animações).</small>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 form-group">
+            <div class="custom-control custom-switch">
+                <input type="hidden" name="auth_visual_animation_login" value="0">
+                <input type="checkbox" class="custom-control-input" id="auth_visual_animation_login"
+                    name="auth_visual_animation_login" value="1" {{ ($settings['auth_visual_animation_login'] ?? 1) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="auth_visual_animation_login">Login</label>
+            </div>
+        </div>
+        <div class="col-md-3 form-group">
+            <div class="custom-control custom-switch">
+                <input type="hidden" name="auth_visual_animation_register" value="0">
+                <input type="checkbox" class="custom-control-input" id="auth_visual_animation_register"
+                    name="auth_visual_animation_register" value="1" {{ ($settings['auth_visual_animation_register'] ?? 1) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="auth_visual_animation_register">Cadastro</label>
+            </div>
+        </div>
+        <div class="col-md-3 form-group">
+            <div class="custom-control custom-switch">
+                <input type="hidden" name="auth_visual_animation_password_email" value="0">
+                <input type="checkbox" class="custom-control-input" id="auth_visual_animation_password_email"
+                    name="auth_visual_animation_password_email" value="1" {{ ($settings['auth_visual_animation_password_email'] ?? 1) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="auth_visual_animation_password_email">Recuperar senha</label>
+            </div>
+        </div>
+        <div class="col-md-3 form-group">
+            <div class="custom-control custom-switch">
+                <input type="hidden" name="auth_visual_animation_password_reset" value="0">
+                <input type="checkbox" class="custom-control-input" id="auth_visual_animation_password_reset"
+                    name="auth_visual_animation_password_reset" value="1" {{ ($settings['auth_visual_animation_password_reset'] ?? 1) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="auth_visual_animation_password_reset">Resetar senha</label>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
     <h5 class="text-primary mb-3"><i class="fas fa-spinner mr-2"></i> Preloader</h5>
     <div class="form-group">
         <div class="custom-control custom-switch custom-switch-lg">
