@@ -24,7 +24,7 @@
                 ['label' => 'Feed Social', 'href' => route('social.feed'), 'setting_key' => 'feature_social'],
                 ['label' => 'Cursos', 'href' => route('courses.index'), 'setting_key' => 'feature_courses'],
                 ['label' => 'Eventos', 'href' => route('events.index'), 'setting_key' => 'feature_events'],
-                ['label' => 'Marketplace', 'href' => route('marketplace.index'), 'requires_auth' => true],
+                ['label' => 'Marketplace', 'href' => route('marketplace.index')],
                 ['label' => 'Membros', 'href' => route('membros')],
             ],
         ],
@@ -238,11 +238,9 @@
                     <i class="fas fa-user-circle w-5 opacity-70"></i> Meu perfil
                 </a>
 
-                @if(Auth::user()->canAccessFeature('marketplace.buy'))
-                    <a href="{{ route('marketplace.index') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
-                        <i class="fas fa-store w-5 opacity-70"></i> Marketplace
-                    </a>
-                @endif
+                <a href="{{ route('marketplace.index') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <i class="fas fa-store w-5 opacity-70"></i> Marketplace
+                </a>
 
                 @if(Auth::user()->canSellOnMarketplace())
                     <a href="{{ route('panel.marketplace.payments') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
