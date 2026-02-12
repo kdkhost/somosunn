@@ -13,6 +13,18 @@
         }
         $siteTheme = $settings['site_theme'] ?? 'light';
 
+        $isSuperAdmin = false;
+        try {
+            if (auth()->check()) {
+                $u = auth()->user();
+                $role = (string) ($u->role ?? '');
+                $level = (string) ($u->level ?? '');
+                $isSuperAdmin = ($role === 'superadmin') || in_array($level, ['superadmin', 'sucesso'], true);
+            }
+        } catch (\Throwable $e) {
+            $isSuperAdmin = false;
+        }
+
         $resolvePublicAsset = function (?string $value) {
             if (!$value) {
                 return null;
@@ -76,6 +88,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    @if(!$isSuperAdmin)
+        <script>
+            window.tailwind = window.tailwind || {};
+            window.tailwind.config = { corePlugins: { preflight: false } };
+        </script>
+        <script src="https://cdn.tailwindcss.com"></script>
+    @endif
     <style>
         /* Layout helpers only — do not override AdminLTE colors here */
         :root {
@@ -283,7 +302,7 @@
 </head>
 
 <body
-    class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}">
+    class="{{ $isSuperAdmin ? 'hold-transition sidebar-mini layout-fixed layout-navbar-fixed' : 'bg-slate-50 min-h-screen' }} {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}">
     {{-- Badge de Impersonation - Flutuante discreto --}}
     @if(session()->has('impersonator_id'))
         <div id="impersonation-badge"
@@ -298,44 +317,86 @@
             </button>
         </div>
     @endif
-    <div class="wrapper">
-        @if($preloaderEnabled && (!auth()->check() || !auth()->user()->isAdmin()))
-            <div class="preloader flex-column justify-content-center align-items-center">
-                <img class="animation__shake" src="{{ $preloaderImage }}" alt="UNN" height="80" width="80">
+
+    @if($isSuperAdmin)
+        <div class="wrapper">
+            @if($preloaderEnabled && (!auth()->check() || !auth()->user()->isAdmin()))
+                <div class="preloader flex-column justify-content-center align-items-center">
+                    <img class="animation__shake" src="{{ $preloaderImage }}" alt="UNN" height="80" width="80">
+                </div>
+            @endif
+
+            @include('admin.partials.navbar')
+            @include('admin.partials.sidebar')
+
+            <div class="content-wrapper">
+                @if(View::hasSection('page_title') || View::hasSection('breadcrumb'))
+                    <div class="content-header">
+                        <div class="container-fluid">
+                            <div class="d-flex justify-content-between align-items-center py-2">
+                                <h1 class="m-0 h4">@yield('page_title')</h1>
+                                <ol class="breadcrumb mb-0">
+                                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" data-pjax>Home</a></li>
+                                    @hasSection('breadcrumb_items')
+                                        @yield('breadcrumb_items')
+                                    @else
+                                        <li class="breadcrumb-item active">@yield('page_title')</li>
+                                    @endif
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+                <section class="content">
+                    <div class="container-fluid pb-4" id="pjax-container">
+                        @yield('content')
+                    </div>
+                </section>
             </div>
-        @endif
 
-        @include('admin.partials.navbar')
-        @include('admin.partials.sidebar')
+            @include('admin.partials.control-sidebar')
+            @include('admin.partials.footer')
+        </div>
+    @else
+        @include('partials.header')
 
-        <div class="content-wrapper">
-            @if(View::hasSection('page_title') || View::hasSection('breadcrumb'))
-                <div class="content-header">
-                    <div class="container-fluid">
-                        <div class="d-flex justify-content-between align-items-center py-2">
-                            <h1 class="m-0 h4">@yield('page_title')</h1>
-                            <ol class="breadcrumb mb-0">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" data-pjax>Home</a></li>
-                                @hasSection('breadcrumb_items')
-                                    @yield('breadcrumb_items')
-                                @else
-                                    <li class="breadcrumb-item active">@yield('page_title')</li>
-                                @endif
-                            </ol>
+        <main class="pt-20 lg:pt-24 min-h-[calc(100vh-80px)]">
+            <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8">
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <aside class="w-full lg:w-80">
+                        @include('panel.partials.sidebar')
+                    </aside>
+
+                    <div class="flex-1">
+                        @if(View::hasSection('page_title'))
+                            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6">
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900">@yield('page_title')</h1>
+                                        @hasSection('breadcrumb')
+                                            <ol class="breadcrumb mb-0 mt-2 text-sm">
+                                                @yield('breadcrumb')
+                                            </ol>
+                                        @endif
+                                    </div>
+                                    <a href="{{ route('panel.dashboard') }}"
+                                        class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                                        <i class="fas fa-arrow-left mr-2"></i> Voltar ao painel
+                                    </a>
+                                </div>
+                            </div>
+                        @endif
+
+                        <div id="pjax-container">
+                            @yield('content')
                         </div>
                     </div>
                 </div>
-            @endif
-            <section class="content">
-                <div class="container-fluid pb-4" id="pjax-container">
-                    @yield('content')
-                </div>
-            </section>
-        </div>
+            </div>
+        </main>
 
-        @include('admin.partials.control-sidebar')
-        @include('admin.partials.footer')
-    </div>
+        @includeWhen(true, 'partials.footer')
+    @endif
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>

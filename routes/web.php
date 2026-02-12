@@ -363,6 +363,17 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
 Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->group(function () {
     Route::get('/', [\App\Http\Controllers\Panel\DashboardController::class, 'index'])->name('dashboard');
 
+    // Atalho para abrir o antigo painel (AdminLTE) dentro do novo layout (exceto superadmin)
+    Route::get('/admin', function (\Illuminate\Http\Request $request) {
+        $to = trim((string) $request->query('to', ''));
+        if ($to !== '') {
+            $to = ltrim($to, '/');
+            return redirect('/admin/' . $to);
+        }
+
+        return redirect()->route('admin.dashboard');
+    })->name('admin');
+
     // Perfil (completo) - permitido mesmo sem plano ativo (whitelist no middleware)
     Route::get('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'update'])->name('profile.update');

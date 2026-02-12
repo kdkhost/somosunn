@@ -152,11 +152,11 @@
                                  @endif
 
                                  @if(Auth::user()->isAdmin())
-                                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                     <a href="{{ route('panel.admin') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
                                          <i class="fas fa-th-large w-5 opacity-70"></i>
                                          Painel Administrativo
                                      </a>
-                                     <a href="{{ route('admin.settings', ['group' => 'general']) }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                     <a href="{{ route('panel.admin', ['to' => 'settings/general']) }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
                                          <i class="fas fa-cogs w-5 opacity-70"></i>
                                          Configurações
                                      </a>
@@ -257,10 +257,10 @@
                 @endif
                 
                 @if(Auth::user()->isAdmin())
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <a href="{{ route('panel.admin') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                         <i class="fas fa-th-large w-5 opacity-70"></i> Painel Administrativo
                     </a>
-                    <a href="{{ route('admin.settings', ['group' => 'general']) }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <a href="{{ route('panel.admin', ['to' => 'settings/general']) }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                         <i class="fas fa-cogs w-5 opacity-70"></i> Configurações
                     </a>
                 @endif

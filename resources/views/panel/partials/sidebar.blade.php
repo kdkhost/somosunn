@@ -89,23 +89,23 @@
                     Administração
                 </div>
 
-                <a href="{{ route('admin.dashboard') }}" class="{{ $navItemClass(false) }}">
+                <a href="{{ route('panel.admin') }}" class="{{ $navItemClass(false) }}">
                     <i class="fas fa-shield-alt w-5 opacity-80"></i>
                     Painel administrativo
                 </a>
-                <a href="{{ route('admin.settings', ['group' => 'general']) }}" class="{{ $navItemClass(false) }}">
+                <a href="{{ route('panel.admin', ['to' => 'settings/general']) }}" class="{{ $navItemClass(false) }}">
                     <i class="fas fa-cogs w-5 opacity-80"></i>
                     Configurações gerais
                 </a>
-                <a href="{{ route('admin.settings', ['group' => 'gateway']) }}" class="{{ $navItemClass(false) }}">
+                <a href="{{ route('panel.admin', ['to' => 'settings/gateway']) }}" class="{{ $navItemClass(false) }}">
                     <i class="fas fa-credit-card w-5 opacity-80"></i>
                     Gateway / Pagamentos
                 </a>
-                <a href="{{ route('admin.settings', ['group' => 'smtp']) }}" class="{{ $navItemClass(false) }}">
+                <a href="{{ route('panel.admin', ['to' => 'settings/smtp']) }}" class="{{ $navItemClass(false) }}">
                     <i class="fas fa-envelope w-5 opacity-80"></i>
                     SMTP
                 </a>
-                <a href="{{ route('admin.mailtemplates.index') }}" class="{{ $navItemClass(false) }}">
+                <a href="{{ route('panel.admin', ['to' => 'mailtemplates']) }}" class="{{ $navItemClass(false) }}">
                     <i class="fas fa-at w-5 opacity-80"></i>
                     Templates de e-mail
                 </a>
