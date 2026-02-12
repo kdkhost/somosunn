@@ -352,11 +352,23 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
 Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->group(function () {
     Route::get('/', [\App\Http\Controllers\Panel\DashboardController::class, 'index'])->name('dashboard');
 
-    // Atalho para abrir o antigo painel (AdminLTE) dentro do novo layout (exceto superadmin)
+    // Atalho para abrir o painel administrativo (AdminLTE) com fallback seguro durante impersonação
     Route::get('/admin', function (\Illuminate\Http\Request $request) {
         $to = trim((string) $request->query('to', ''));
+        $to = $to !== '' ? ltrim($to, '/') : '';
+
+        // Se estiver impersonando como membro, primeiro volta para a conta original.
+        if (session()->has('impersonator_id') && session()->get('impersonator_is_admin')) {
+            return redirect()->route('admin.impersonate.stop', $to !== '' ? ['to' => $to] : []);
+        }
+
+        $user = auth()->user();
+        if (!$user || !$user->isAdmin()) {
+            return redirect()->route('panel.dashboard')
+                ->with('warning', 'Você não tem acesso ao painel administrativo.');
+        }
+
         if ($to !== '') {
-            $to = ltrim($to, '/');
             return redirect('/admin/' . $to);
         }
 

@@ -88,7 +88,8 @@ class SocialAuthController extends Controller
 
         Auth::login($user, true);
 
-        $defaultRedirect = $user->isAdmin() ? route('admin.dashboard') : route('panel.dashboard');
+        $isSuperadmin = (($user->role ?? '') === 'superadmin' || ($user->level ?? '') === 'superadmin');
+        $defaultRedirect = $isSuperadmin ? route('admin.dashboard') : route('panel.dashboard');
         return redirect()->intended($defaultRedirect);
     }
 

@@ -35,9 +35,8 @@ class LoginController extends Controller
             }
 
             $user = Auth::user();
-            $defaultRoute = ($user && method_exists($user, 'isAdmin') && $user->isAdmin())
-                ? route('admin.dashboard')
-                : route('panel.dashboard');
+            $isSuperadmin = $user && (($user->role ?? '') === 'superadmin' || ($user->level ?? '') === 'superadmin');
+            $defaultRoute = $isSuperadmin ? route('admin.dashboard') : route('panel.dashboard');
 
             return redirect()->intended($defaultRoute);
         }

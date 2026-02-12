@@ -4,12 +4,23 @@
 
 @section('panel_content')
     @php
+        $user = auth()->user();
         $plan = $plan ?? null;
         $stats = $stats ?? [];
+
         $isImpersonatingAdmin = session()->has('impersonator_id') && session()->get('impersonator_is_admin');
-        $canAccessCommunity = auth()->user()->canAccessFeature('community') || $isImpersonatingAdmin;
-        $canAccessCourses = auth()->user()->canAccessFeature('courses_access') || (method_exists(auth()->user(), 'hasPurchasedCourses') && auth()->user()->hasPurchasedCourses()) || $isImpersonatingAdmin;
-        $canSellOnMarketplace = auth()->user()->canSellOnMarketplace() || $isImpersonatingAdmin;
+        $isAdminUser = $user && method_exists($user, 'isAdmin') && $user->isAdmin();
+        $isSuperadminUser = $user && (($user->role ?? '') === 'superadmin' || ($user->level ?? '') === 'superadmin');
+        $roleLabel = $isSuperadminUser ? 'Super Admin' : ($isAdminUser ? 'Administrador' : null);
+
+        $canAccessCommunity = ($user && $user->canAccessFeature('community')) || $isImpersonatingAdmin;
+        $canAccessCourses = ($user && $user->canAccessFeature('courses_access'))
+            || ($user && method_exists($user, 'hasPurchasedCourses') && $user->hasPurchasedCourses())
+            || $isImpersonatingAdmin;
+        $canSellOnMarketplace = ($user && method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace()) || $isImpersonatingAdmin;
+
+        $profileComplete = $user && method_exists($user, 'isProfileComplete') ? (bool) $user->isProfileComplete() : true;
+
         $coursesCount = (int) ($stats['courses_count'] ?? 0);
         $ordersPaidCount = (int) ($stats['orders_paid_count'] ?? 0);
         $ordersPaidTotal = (float) ($stats['orders_paid_total'] ?? 0);
@@ -19,10 +30,21 @@
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900">Olá, {{ auth()->user()->name }}!</h1>
+            <div class="min-w-0">
+                <div class="flex items-center gap-3 flex-wrap">
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 truncate">Olá, {{ $user?->name }}!</h1>
+                    @if($roleLabel)
+                        <span class="inline-flex items-center rounded-full bg-slate-900/5 px-3 py-1 text-xs font-extrabold text-slate-700">
+                            <i class="fas fa-shield-alt mr-2 opacity-70"></i> {{ $roleLabel }}
+                        </span>
+                    @endif
+                </div>
                 <p class="text-slate-600 mt-1">
-                    {{ $plan?->name ? 'Plano ativo: ' . $plan->name : 'Você ainda não possui um plano ativo.' }}
+                    @if($roleLabel)
+                        Acesso administrativo liberado neste painel.
+                    @else
+                        {{ $plan?->name ? 'Plano ativo: ' . $plan->name : 'Você ainda não possui um plano ativo.' }}
+                    @endif
                 </p>
             </div>
             <div class="flex flex-wrap gap-3">
@@ -37,6 +59,21 @@
             </div>
         </div>
     </div>
+
+    @if(!$profileComplete && !$roleLabel)
+        <div class="mt-6 bg-amber-50 border border-amber-100 rounded-3xl p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+                <div class="font-extrabold text-amber-900">Complete seu perfil</div>
+                <div class="text-sm text-amber-800 mt-1">
+                    Preencha seus dados para melhorar sua experiência e liberar recursos do seu plano.
+                </div>
+            </div>
+            <a href="{{ route('panel.profile.edit') }}"
+                class="inline-flex items-center justify-center rounded-full bg-amber-600 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-amber-700 transition">
+                <i class="fas fa-pen mr-2"></i> Atualizar agora
+            </a>
+        </div>
+    @endif
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6">
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
@@ -124,5 +161,38 @@
                 </div>
             @endif
         </div>
+
+        @if($roleLabel)
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 md:col-span-2 xl:col-span-4">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <div class="text-sm font-bold text-slate-500">Administração</div>
+                        <div class="text-xl font-extrabold text-slate-900 mt-1">Atalhos rápidos</div>
+                        <div class="text-sm text-slate-600 mt-1">
+                            Acesse configurações e módulos administrativos sem perder o padrão do novo painel.
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="{{ route('panel.admin') }}"
+                            class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-slate-800 transition">
+                            <i class="fas fa-th-large mr-2"></i> Painel Admin
+                        </a>
+                        <a href="{{ route('panel.admin', ['to' => 'settings/general']) }}"
+                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                            <i class="fas fa-cogs mr-2"></i> Configurações
+                        </a>
+                        <a href="{{ route('panel.admin', ['to' => 'settings/gateway']) }}"
+                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                            <i class="fas fa-credit-card mr-2"></i> Gateway
+                        </a>
+                        <a href="{{ route('panel.admin', ['to' => 'mailtemplates']) }}"
+                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                            <i class="fas fa-at mr-2"></i> E-mails
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection
+

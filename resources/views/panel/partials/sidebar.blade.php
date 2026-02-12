@@ -3,6 +3,10 @@
     $plan = $user ? $user->activePlan() : null;
     $isImpersonatingAdmin = session()->has('impersonator_id') && session()->get('impersonator_is_admin');
 
+    $isAdminUser = $user && method_exists($user, 'isAdmin') && $user->isAdmin();
+    $isSuperadminUser = $user && (($user->role ?? '') === 'superadmin' || ($user->level ?? '') === 'superadmin');
+    $roleLabel = $isSuperadminUser ? 'Super Admin' : ($isAdminUser ? 'Administrador' : null);
+
     $navItemClass = function (bool $active = false) {
         $base = 'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition';
         return $active
@@ -20,7 +24,11 @@
         <div class="min-w-0">
             <div class="font-bold text-slate-900 truncate">{{ $user->name }}</div>
             <div class="text-xs text-slate-500 truncate">
-                {{ $plan?->name ? $plan->name : 'Sem plano ativo' }}
+                @if($roleLabel)
+                    {{ $roleLabel }}
+                @else
+                    {{ $plan?->name ? $plan->name : 'Sem plano ativo' }}
+                @endif
             </div>
         </div>
     </div>
@@ -113,3 +121,4 @@
         @endif
     </div>
 </div>
+
