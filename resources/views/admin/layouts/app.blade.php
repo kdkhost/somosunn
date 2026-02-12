@@ -451,6 +451,7 @@
             });
             $(document).on('pjax:end', function () {
                 $('.summernote').summernote({ height: 180 });
+                $('.summernote-lg').summernote({ height: 420 });
                 initUploadWidgets();
                 initMasks();
                 initColorPickers();
@@ -458,6 +459,7 @@
                 initCouponFormEnhancements();
             });
             $('.summernote').summernote({ height: 180 });
+            $('.summernote-lg').summernote({ height: 420 });
             initUploadWidgets();
             initMasks();
             initColorPickers();

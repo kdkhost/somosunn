@@ -9,7 +9,17 @@ use Illuminate\Support\Facades\Storage;
 
 class CMSController extends Controller
 {
-    private const ALLOWED_SLUGS = ['home', 'about', 'footer'];
+    private const ALLOWED_SLUGS = [
+        'home',
+        'about',
+        'footer',
+        'institucional_sobre',
+        'institucional_manifesto',
+        'institucional_quem_somos',
+        'institucional_como_funciona',
+        'institucional_valores',
+        'institucional_contato',
+    ];
 
     public function index(Request $request, ?string $slug = null)
     {
@@ -64,7 +74,7 @@ class CMSController extends Controller
                 continue;
             }
 
-            SiteContent::putValue($slug, $field, (string) ($validated[$field] ?? ''), 'text');
+            SiteContent::putValue($slug, $field, (string) ($validated[$field] ?? ''), $type);
         }
 
         return redirect()
@@ -80,6 +90,15 @@ class CMSController extends Controller
     private function fieldsFor(string $slug): array
     {
         return match ($slug) {
+            'institucional_sobre',
+            'institucional_manifesto',
+            'institucional_quem_somos',
+            'institucional_como_funciona',
+            'institucional_valores',
+            'institucional_contato' => [
+                'title' => 'text',
+                'body' => 'html',
+            ],
             'about' => [
                 'manifesto' => 'text',
                 'vision' => 'text',

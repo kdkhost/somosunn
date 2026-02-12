@@ -10,18 +10,42 @@
 
             <div class="card">
                 <div class="card-header">
-                    <ul class="nav nav-pills">
+                    <ul class="nav nav-pills flex-wrap">
                         <li class="nav-item">
                             <a href="{{ route('admin.cms.index', ['slug' => 'home']) }}"
                                 class="nav-link {{ $slug === 'home' ? 'active' : '' }}">Home</a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.cms.index', ['slug' => 'about']) }}"
-                                class="nav-link {{ $slug === 'about' ? 'active' : '' }}">Sobre</a>
+                                class="nav-link {{ $slug === 'about' ? 'active' : '' }}">Sobre (Seções)</a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.cms.index', ['slug' => 'footer']) }}"
                                 class="nav-link {{ $slug === 'footer' ? 'active' : '' }}">Rodape</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.index', ['slug' => 'institucional_sobre']) }}"
+                                class="nav-link {{ $slug === 'institucional_sobre' ? 'active' : '' }}">Inst. Sobre</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.index', ['slug' => 'institucional_manifesto']) }}"
+                                class="nav-link {{ $slug === 'institucional_manifesto' ? 'active' : '' }}">Inst. Manifesto</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.index', ['slug' => 'institucional_quem_somos']) }}"
+                                class="nav-link {{ $slug === 'institucional_quem_somos' ? 'active' : '' }}">Inst. Quem Somos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.index', ['slug' => 'institucional_como_funciona']) }}"
+                                class="nav-link {{ $slug === 'institucional_como_funciona' ? 'active' : '' }}">Inst. Como Funciona</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.index', ['slug' => 'institucional_valores']) }}"
+                                class="nav-link {{ $slug === 'institucional_valores' ? 'active' : '' }}">Inst. Valores</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.index', ['slug' => 'institucional_contato']) }}"
+                                class="nav-link {{ $slug === 'institucional_contato' ? 'active' : '' }}">Inst. Contato</a>
                         </li>
                     </ul>
                 </div>
@@ -29,7 +53,33 @@
                     enctype="multipart/form-data">
                     @csrf
                     <div class="card-body">
-                        @if($slug === 'home')
+                        @php($isInstitutional = str_starts_with($slug, 'institucional_'))
+                        @if($isInstitutional)
+                            <div class="form-group">
+                                <label>Título (SEO / Aba do Navegador)</label>
+                                <input type="text" name="title" class="form-control"
+                                    value="{{ old('title', $contents['title'] ?? '') }}">
+                            </div>
+
+                            @if($slug === 'institucional_contato')
+                                <div class="alert alert-info">
+                                    <strong>Placeholders do Contato:</strong>
+                                    <div class="mt-2">
+                                        <code>[[CONTACT_ALERTS]]</code> (mensagens de sucesso/erro),
+                                        <code>[[CONTACT_INFO]]</code> (informações/links),
+                                        <code>[[CONTACT_FORM]]</code> (formulário),
+                                        <code>[[CONTACT_MAP_EMBED_URL]]</code> (URL do mapa no <code>src</code>),
+                                        <code>[[FAQ_SECTION]]</code> (FAQ).
+                                    </div>
+                                </div>
+                            @endif
+
+                            <div class="form-group mb-0">
+                                <label>Corpo (HTML)</label>
+                                <textarea name="body" rows="22" style="min-height: 520px;"
+                                    class="form-control text-monospace">{{ old('body', $contents['body'] ?? '') }}</textarea>
+                            </div>
+                        @elseif($slug === 'home')
                             <div class="form-group">
                                 <label>Titulo do Hero</label>
                                 <input type="text" name="hero_title" class="form-control"

@@ -53,6 +53,13 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 
 ## 📅 Histórico de Atualizações
 
+### 12/02/2026 — CMS do Institucional (páginas editáveis)
+- **Conteúdo 100% pelo Painel:**
+  - Páginas institucionais agora carregam **título** e **corpo (HTML)** do banco (`site_contents`), editáveis em **Conteúdo do Site**.
+  - Conteúdo atual das páginas foi semeado automaticamente no banco, respeitando edições já feitas pelo admin.
+- **Contato sem quebrar funcionalidades:**
+  - O corpo do Contato suporta placeholders (`[[CONTACT_*]]`) para manter formulário, mapa e FAQ funcionando mesmo com HTML editável.
+
 ### 07/02/2026 — Webhooks, Logs e Refatoração
 - **Configurações Refatoradas:**
   - Divisão da página gigante de configurações em abas modulares (Geral, PWA, SMTP, Gateway, etc.).
