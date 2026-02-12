@@ -85,9 +85,29 @@
 
         @if($user->isAdmin())
             <div class="pt-4 mt-4 border-t border-slate-100">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                    Administração
+                </div>
+
                 <a href="{{ route('admin.dashboard') }}" class="{{ $navItemClass(false) }}">
                     <i class="fas fa-shield-alt w-5 opacity-80"></i>
                     Painel administrativo
+                </a>
+                <a href="{{ route('admin.settings', ['group' => 'general']) }}" class="{{ $navItemClass(false) }}">
+                    <i class="fas fa-cogs w-5 opacity-80"></i>
+                    Configurações gerais
+                </a>
+                <a href="{{ route('admin.settings', ['group' => 'gateway']) }}" class="{{ $navItemClass(false) }}">
+                    <i class="fas fa-credit-card w-5 opacity-80"></i>
+                    Gateway / Pagamentos
+                </a>
+                <a href="{{ route('admin.settings', ['group' => 'smtp']) }}" class="{{ $navItemClass(false) }}">
+                    <i class="fas fa-envelope w-5 opacity-80"></i>
+                    SMTP
+                </a>
+                <a href="{{ route('admin.mailtemplates.index') }}" class="{{ $navItemClass(false) }}">
+                    <i class="fas fa-at w-5 opacity-80"></i>
+                    Templates de e-mail
                 </a>
             </div>
         @endif

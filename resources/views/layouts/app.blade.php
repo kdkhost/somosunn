@@ -750,11 +750,19 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Input masks
-            var imasks = document.querySelectorAll('input[data-mask]');
-            imasks.forEach(function (el) {
-                var m = el.getAttribute('data-mask');
-                Inputmask(m).mask(el);
-            });
+            try {
+                if (typeof Inputmask === 'function') {
+                    var imasks = document.querySelectorAll('input[data-mask]');
+                    imasks.forEach(function (el) {
+                        var m = el.getAttribute('data-mask');
+                        if (m) {
+                            Inputmask(m).mask(el);
+                        }
+                    });
+                }
+            } catch (e) {
+                // Se algum CDN estiver bloqueado, não quebra o restante do site
+            }
 
             // CEP auto-complete on any input with id=cep
             var cep = document.getElementById('cep');
@@ -791,35 +799,65 @@
                 });
             }
 
-            // Mobile menu toggle
-            var mobileToggle = document.getElementById('mobile-menu-toggle');
-            var mobileMenu = document.getElementById('mobile-menu');
-            var mobilePanel = document.getElementById('mobile-menu-panel');
-            var mobileOverlay = document.getElementById('mobile-menu-overlay');
-            var mobileClose = document.getElementById('mobile-menu-close');
-            if (mobileToggle && mobileMenu && mobilePanel && mobileOverlay && mobileClose) {
+            // Mobile menu toggle (sidebar do front-end)
+            var initMobileMenu = function () {
+                var mobileToggle = document.getElementById('mobile-menu-toggle');
+                var mobileMenu = document.getElementById('mobile-menu');
+                var mobilePanel = document.getElementById('mobile-menu-panel');
+                var mobileOverlay = document.getElementById('mobile-menu-overlay');
+                var mobileClose = document.getElementById('mobile-menu-close');
+
+                if (!mobileToggle || !mobileMenu || !mobilePanel || !mobileOverlay || !mobileClose) {
+                    return;
+                }
+
+                if (mobileToggle.dataset.mobileMenuBound === '1') {
+                    return;
+                }
+                mobileToggle.dataset.mobileMenuBound = '1';
+
                 var openMenu = function () {
                     mobileMenu.classList.remove('hidden');
                     mobileMenu.setAttribute('aria-hidden', 'false');
+
                     mobileOverlay.classList.remove('pointer-events-none');
-                    setTimeout(function () {
-                        mobileOverlay.classList.add('opacity-100');
-                        mobilePanel.classList.remove('-translate-x-full');
-                    }, 20);
+                    mobileOverlay.classList.remove('opacity-0');
+                    mobileOverlay.classList.add('opacity-100');
+
+                    mobilePanel.classList.remove('-translate-x-full');
                 };
+
                 var closeMenu = function () {
+                    mobileOverlay.classList.add('opacity-0');
                     mobileOverlay.classList.remove('opacity-100');
                     mobilePanel.classList.add('-translate-x-full');
                     mobileOverlay.classList.add('pointer-events-none');
                     setTimeout(function () {
                         mobileMenu.classList.add('hidden');
                         mobileMenu.setAttribute('aria-hidden', 'true');
-                    }, 400);
+                    }, 320);
                 };
-                mobileToggle.addEventListener('click', openMenu);
-                mobileClose.addEventListener('click', closeMenu);
+
+                mobileToggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    openMenu();
+                });
+
+                mobileClose.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    closeMenu();
+                });
+
                 mobileOverlay.addEventListener('click', closeMenu);
-            }
+
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
+                        closeMenu();
+                    }
+                });
+            };
+
+            initMobileMenu();
 
             document.querySelectorAll('button[title], a[title]').forEach(function (el) {
                 var tooltipText = el.getAttribute('title');
