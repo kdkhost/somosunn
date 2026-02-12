@@ -71,9 +71,25 @@
             /* Allow title to truncate if needed */
         }
 
-        .lesson-item .d-flex:last-child {
+        .lesson-item .lesson-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             flex-shrink: 0;
             margin-left: auto;
+        }
+
+        .lesson-item .lesson-actions form {
+            margin: 0;
+        }
+
+        .lesson-item .lesson-actions .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 34px;
+            padding: 0;
         }
 
         .lesson-item .fa-grip-vertical {
@@ -480,11 +496,11 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="d-flex align-items-center flex-nowrap">
-                                                <button type="button" class="btn btn-sm btn-outline-primary btn-edit-lesson mr-1"
+                                            <div class="lesson-actions">
+                                                <button type="button" class="btn btn-sm btn-outline-primary btn-edit-lesson"
                                                     data-id="{{ $lesson->id }}" title="Editar"><i class="fas fa-edit"></i></button>
                                                 <form action="{{ route('courses.lessons.destroy', [$course, $lesson]) }}"
-                                                    method="POST" class="d-inline ajax-delete ml-1">
+                                                    method="POST" class="ajax-delete d-inline-block">
                                                     @csrf @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir"><i
                                                             class="fas fa-trash"></i></button>
