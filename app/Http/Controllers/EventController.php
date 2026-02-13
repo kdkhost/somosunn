@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use Illuminate\Http\Request;
+use App\Models\EventMaterial;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
@@ -69,6 +71,56 @@ class EventController extends Controller
             abort(404);
         }
 
-        return view('events.show', compact('event'));
+        $event->load(['materials' => function ($query) {
+            $query->latest('id');
+        }]);
+
+        $canDownloadMaterials = Auth::check() && Auth::user()->hasEventAccess($event);
+
+        return view('events.show', compact('event', 'canDownloadMaterials'));
+    }
+
+    public function downloadMaterial(Event $event, EventMaterial $material)
+    {
+        if ((int) $material->event_id !== (int) $event->id) {
+            abort(404);
+        }
+
+        if (!Auth::check() || !Auth::user()->hasEventAccess($event)) {
+            abort(403, 'Voce nao tem permissao para baixar este material.');
+        }
+
+        if (!Storage::disk('public')->exists($material->file_path)) {
+            abort(404);
+        }
+
+        $downloadName = trim((string) $material->file_name) !== ''
+            ? $material->file_name
+            : basename((string) $material->file_path);
+
+        $headers = [
+            'Content-Type' => 'application/octet-stream',
+            'X-Content-Type-Options' => 'nosniff',
+        ];
+
+        $publicDisk = Storage::disk('public');
+        if (method_exists($publicDisk, 'path')) {
+            $absolutePath = $publicDisk->path($material->file_path);
+            if (is_file($absolutePath)) {
+                return response()->download($absolutePath, $downloadName, $headers);
+            }
+        }
+
+        $stream = $publicDisk->readStream($material->file_path);
+        if ($stream === false) {
+            abort(404);
+        }
+
+        return response()->streamDownload(function () use ($stream) {
+            fpassthru($stream);
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+        }, $downloadName, $headers);
     }
 }
