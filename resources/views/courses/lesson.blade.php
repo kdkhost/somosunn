@@ -192,13 +192,31 @@
                             </h4>
                             <div class="grid gap-3">
                                 @foreach($lesson->attachments as $attachment)
+                                    @php
+                                        $attachmentExtension = strtolower((string) ($attachment->file_type ?: pathinfo((string) $attachment->file_name, PATHINFO_EXTENSION)));
+                                        $attachmentIconMap = [
+                                            'pdf' => 'fa-file-pdf text-red-600',
+                                            'doc' => 'fa-file-word text-blue-600',
+                                            'docx' => 'fa-file-word text-blue-600',
+                                            'xls' => 'fa-file-excel text-emerald-600',
+                                            'xlsx' => 'fa-file-excel text-emerald-600',
+                                            'csv' => 'fa-file-csv text-emerald-600',
+                                            'ppt' => 'fa-file-powerpoint text-amber-600',
+                                            'pptx' => 'fa-file-powerpoint text-amber-600',
+                                            'zip' => 'fa-file-archive text-slate-600',
+                                            'rar' => 'fa-file-archive text-slate-600',
+                                            'txt' => 'fa-file-alt text-slate-600',
+                                        ];
+                                        $attachmentIcon = $attachmentIconMap[$attachmentExtension] ?? 'fa-file-alt text-blue-600';
+                                        $attachmentBadge = $attachmentExtension !== '' ? '.' . strtoupper($attachmentExtension) : '.FILE';
+                                    @endphp
                                     <a href="{{ route('courses.lessons.attachments.download', [$course->id, $lesson->id, $attachment->id]) }}"
                                         download="{{ $attachment->file_name }}"
                                         class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition group">
                                         <div class="flex items-center overflow-hidden">
                                             <div
-                                                class="bg-blue-100 text-blue-600 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 mr-3">
-                                                <i class="fas fa-file-alt"></i>
+                                                class="bg-blue-100 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 mr-3">
+                                                <i class="fas {{ $attachmentIcon }}"></i>
                                             </div>
                                             <div class="truncate">
                                                 <p
@@ -206,7 +224,7 @@
                                                     {{ $attachment->file_name }}
                                                 </p>
                                                 <p class="text-xs text-gray-500">
-                                                    {{ round($attachment->file_size / 1024 / 1024, 2) }} MB
+                                                    {{ round($attachment->file_size / 1024 / 1024, 2) }} MB • {{ $attachmentBadge }}
                                                 </p>
                                             </div>
                                         </div>
