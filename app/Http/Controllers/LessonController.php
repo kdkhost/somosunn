@@ -156,15 +156,23 @@ class LessonController extends Controller
 
         $request->validate([
             'file' => 'required|file|max:' . $docMaxKb . $allowedDocRule,
+            'name' => 'nullable|string|max:255',
         ]);
 
         $file = $request->file('file');
+        $extension = strtolower((string) $file->getClientOriginalExtension());
+        if (!empty($allowedDocExt) && !in_array($extension, $allowedDocExt, true)) {
+            return response()->json(['error' => 'Formato de arquivo nao permitido para materiais.'], 422);
+        }
+
         $path = $file->store('course-materials', 'public');
+        $customName = trim((string) $request->input('name', ''));
+        $finalName = $customName !== '' ? $customName : $file->getClientOriginalName();
 
         $attachment = $lesson->attachments()->create([
             'file_path' => $path,
-            'file_name' => $request->input('name', $file->getClientOriginalName()),
-            'file_type' => $file->getClientOriginalExtension(),
+            'file_name' => $finalName,
+            'file_type' => $extension,
             'file_size' => $file->getSize(),
         ]);
 
