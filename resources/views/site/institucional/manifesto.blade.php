@@ -42,13 +42,22 @@
             return is_array($val) ? $val : $fallback;
         };
 
+        $normalizeHref = function (?string $value, string $fallback) {
+            $value = trim((string) $value);
+            if ($value === '') return $fallback;
+            if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, '/')) {
+                return $value;
+            }
+            return '/' . ltrim($value, '/');
+        };
+
         $heroTitle = \App\Models\SiteContent::getValue($cmsSlug, 'hero_title', 'Nosso');
         $heroHighlight = \App\Models\SiteContent::getValue($cmsSlug, 'hero_title_highlight', 'Manifesto');
         $heroSubtitle = \App\Models\SiteContent::getValue($cmsSlug, 'hero_subtitle', 'O que acreditamos e por que existimos.');
 
         $manifestoQuote = \App\Models\SiteContent::getValue($cmsSlug, 'manifesto_quote', '"Acreditamos que ninguém cresce sozinho."');
         $manifestoBody = \App\Models\SiteContent::getValue($cmsSlug, 'manifesto_body');
-        $manifestoBodyFallback = '<h2>Sobre Colaboração</h2><p>Em um mundo que celebra o individualismo, nós escolhemos o caminho da colaboração. Sabemos que os maiores negócios nascem de parcerias sólidas, construídas sobre confiança e propósito compartilhado.</p><h2>Sobre Abundância</h2><p>Rejeitamos a mentalidade de escassez. Há espaço para todos crescerem. Quando um membro prospera, a comunidade inteira se fortalece. O sucesso do outro não é ameaça — é inspiração.</p><h2>Sobre Autenticidade</h2><p>Valorizamos pessoas reais, com histórias reais. Aqui não há espaço para máscaras. As conexões mais poderosas nascem quando nos mostramos autênticos.</p><h2>Sobre Impacto</h2><p>Não buscamos apenas lucro. Acreditamos que empreendedores têm o poder de transformar a sociedade. Cada negócio bem-sucedido gera empregos, melhora vidas e inspira outros a seguirem o mesmo caminho.</p><h2>Nossa Promessa</h2><p>Prometemos criar o ambiente ideal para que você encontre as pessoas certas, no momento certo. Prometemos facilitar conexões genuínas que geram valor real.</p>';
+        $manifestoBodyFallback = '<h2>Sobre Colaboração</h2><p>Em um mundo que celebra o individualismo, nós escolhemos o caminho da colaboração. Sabemos que os maiores negócios nascem de parcerias sólidas, construídas sobre confiança e propósito compartilhado.</p><h2>Sobre Abundância</h2><p>Rejeitamos a mentalidade de escassez. Há espaço para todos crescerem. Quando um membro prospera, a comunidade inteira se fortalece. O sucesso do outro não é ameaça — é inspiração.</p><h2>Sobre Autenticidade</h2><p>Valorizamos pessoas reais, com histórias reais. Aqui não há espaço para máscaras ou personagens. As conexões mais poderosas nascem quando nos mostramos vulneráveis e autênticos.</p><h2>Sobre Impacto</h2><p>Não buscamos apenas lucro. Acreditamos que empreendedores têm o poder de transformar a sociedade. Cada negócio bem-sucedido gera empregos, melhora vidas e inspira outros a seguirem o mesmo caminho.</p><h2>Nossa Promessa</h2><p>Prometemos criar o ambiente ideal para que você encontre as pessoas certas, no momento certo. Prometemos ser facilitadores de conexões genuínas que geram valor real. Prometemos nunca perder a essência do que nos fez começar: a crença inabalável no poder das pessoas.</p>';
 
         $highlightQuote = \App\Models\SiteContent::getValue($cmsSlug, 'highlight_quote', '"Sozinhos vamos mais rápido. Juntos vamos mais longe."');
         $highlightAuthor = \App\Models\SiteContent::getValue($cmsSlug, 'highlight_author', '— Filosofia UNN');
@@ -62,10 +71,13 @@
         ];
         $pillarsItems = $decodeJson(\App\Models\SiteContent::getValue($cmsSlug, 'pillars_items'), $pillarsFallback);
 
-        $ctaTitle = \App\Models\SiteContent::getValue($cmsSlug, 'cta_title', 'Compartilha desses valores?');
-        $ctaSubtitle = \App\Models\SiteContent::getValue($cmsSlug, 'cta_subtitle', 'Você está no lugar certo. Faça parte da nossa comunidade.');
-        $ctaButtonText = \App\Models\SiteContent::getValue($cmsSlug, 'cta_button_text', 'Fazer parte');
-        $ctaButtonUrl = \App\Models\SiteContent::getValue($cmsSlug, 'cta_button_url', route('register'));
+        $pillarsButtonText = \App\Models\SiteContent::getValue($cmsSlug, 'pillars_button_text', 'Conhecer nossos valores');
+        $pillarsButtonUrl = $normalizeHref(\App\Models\SiteContent::getValue($cmsSlug, 'pillars_button_url'), route('valores'));
+
+        $ctaTitle = \App\Models\SiteContent::getValue($cmsSlug, 'cta_title', 'Se identificou com nossa visão?');
+        $ctaSubtitle = \App\Models\SiteContent::getValue($cmsSlug, 'cta_subtitle', 'Faça parte de uma comunidade que pensa como você.');
+        $ctaButtonText = \App\Models\SiteContent::getValue($cmsSlug, 'cta_button_text', 'Quero fazer parte');
+        $ctaButtonUrl = $normalizeHref(\App\Models\SiteContent::getValue($cmsSlug, 'cta_button_url'), route('register'));
     @endphp
 
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
@@ -118,6 +130,13 @@
                         </div>
                     @endforeach
                 </div>
+
+                @if(trim((string) $pillarsButtonText) !== '' && trim((string) $pillarsButtonUrl) !== '')
+                    <a href="{{ $pillarsButtonUrl }}"
+                        class="btn-primary text-white px-8 py-3 rounded-full font-semibold inline-flex items-center gap-2 mt-8">
+                        {{ $pillarsButtonText }} <i class="fas fa-arrow-right"></i>
+                    </a>
+                @endif
             </div>
         </section>
 
@@ -130,7 +149,7 @@
                 <a href="{{ $ctaButtonUrl }}"
                     class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition"
                     style="color: var(--unn-azul-1)">
-                    <i class="fas fa-handshake"></i>
+                    <i class="fas fa-rocket"></i>
                     {{ $ctaButtonText }}
                 </a>
             </div>

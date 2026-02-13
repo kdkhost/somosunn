@@ -260,6 +260,8 @@ class CMSController extends Controller
                                     'title' => ['label' => 'Título', 'type' => 'text'],
                                 ],
                             ],
+                            'pillars_button_text' => ['label' => 'Botão (texto)', 'type' => 'text', 'help' => 'Deixe vazio para ocultar o botão.'],
+                            'pillars_button_url' => ['label' => 'Botão (link)', 'type' => 'text', 'help' => 'Deixe vazio para ocultar o botão.'],
                         ],
                     ],
                     'cta' => [

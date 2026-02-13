@@ -133,6 +133,13 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Front-end consumindo do CMS:**
   - Páginas institucionais passaram a renderizar a partir desses campos, com fallback padrão quando não preenchido.
 
+### 13/02/2026 — Institucional 2.1 (prefill + Manifesto completo)
+- **Prefill automático dos campos estruturados (sem sobrescrever edições):**
+  - Nova migration semeia os novos campos do CMS com o conteúdo padrão das páginas institucionais (Hero, listas, textos e CTAs).
+- **Manifesto restaurado ao conteúdo original (mantendo o estilo atual):**
+  - Botão dos pilares ("Conhecer nossos valores") agora é configurável no painel e volta a aparecer por padrão.
+  - CTA do Manifesto volta ao texto original ("Se identificou com nossa visão?" / "Quero fazer parte").
+
 
 ---
 © 2026 UNN Networking. Todos os direitos reservados.
