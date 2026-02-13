@@ -29,7 +29,7 @@
     @endphp
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6" id="painel-dashboard">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between flex-wrap w-full">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 flex-wrap">
             <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap min-w-0">
                     <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 truncate">Olá, {{ $user?->name }}!</h1>
@@ -47,18 +47,18 @@
                     @endif
                 </p>
             </div>
-            <div class="flex flex-col gap-2 w-full mt-4 md:mt-0">
+            <div class="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 w-full sm:w-auto mt-4 md:mt-0">
                 <a href="{{ route('panel.profile.edit') }}"
-                    class="inline-flex items-center justify-center rounded-full bg-[#1F5EDB] px-4 py-2 text-xs sm:text-sm font-bold text-white hover:brightness-110 transition w-full">
+                    class="inline-flex items-center justify-center rounded-full bg-[#1F5EDB] px-5 py-2.5 text-sm font-bold text-white hover:brightness-110 transition">
                     <i class="fas fa-user-edit mr-2"></i> Editar perfil
                 </a>
                 <a href="{{ route('premium') }}"
-                    class="inline-flex items-center justify-center rounded-full border border-[#1F5EDB] px-4 py-2 text-xs sm:text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition w-full">
+                    class="inline-flex items-center justify-center rounded-full border border-[#1F5EDB] px-5 py-2.5 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
                     <i class="fas fa-crown mr-2"></i> Ver planos
                 </a>
                 @if(!$isSuperadminUser)
                     <a href="{{ route('panel.admin') }}"
-                        class="inline-flex items-center justify-center rounded-full border border-slate-300 px-4 py-2 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-100 transition w-full">
+                        class="inline-flex items-center justify-center rounded-full border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
                         <i class="fas fa-layer-group mr-2"></i> Painel completo
                     </a>
                 @endif
@@ -81,12 +81,12 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 mt-6">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-3 sm:p-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6">
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-xs sm:text-sm font-bold text-slate-500">Meus cursos</div>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $coursesCount }}</div>
+                    <div class="text-sm font-bold text-slate-500">Meus cursos</div>
+                    <div class="text-3xl font-extrabold text-slate-900 mt-1">{{ $coursesCount }}</div>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-[#1F5EDB]/10 flex items-center justify-center text-[#1F5EDB]">
                     <i class="fas fa-graduation-cap text-xl"></i>
@@ -101,11 +101,11 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-3 sm:p-5">
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-xs sm:text-sm font-bold text-slate-500">Compras pagas</div>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $ordersPaidCount }}</div>
+                    <div class="text-sm font-bold text-slate-500">Compras pagas</div>
+                    <div class="text-3xl font-extrabold text-slate-900 mt-1">{{ $ordersPaidCount }}</div>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
                     <i class="fas fa-check-circle text-xl"></i>
@@ -116,11 +116,11 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-3 sm:p-5">
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-xs sm:text-sm font-bold text-slate-500">Comunidade</div>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">UNN</div>
+                    <div class="text-sm font-bold text-slate-500">Comunidade</div>
+                    <div class="text-3xl font-extrabold text-slate-900 mt-1">UNN</div>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-slate-900/5 flex items-center justify-center text-slate-700">
                     <i class="fas fa-users text-xl"></i>
@@ -141,11 +141,11 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-3 sm:p-5">
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-xs sm:text-sm font-bold text-slate-500">Minhas vendas</div>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $sellerPaidCount }}</div>
+                    <div class="text-sm font-bold text-slate-500">Minhas vendas</div>
+                    <div class="text-3xl font-extrabold text-slate-900 mt-1">{{ $sellerPaidCount }}</div>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600">
                     <i class="fas fa-receipt text-xl"></i>
@@ -169,30 +169,30 @@
         </div>
 
         @if($roleLabel)
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-3 sm:p-5 md:col-span-2 xl:col-span-4">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 md:col-span-2 xl:col-span-4">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <div class="text-xs sm:text-sm font-bold text-slate-500">Administração</div>
-                        <div class="text-lg sm:text-xl font-extrabold text-slate-900 mt-1">Atalhos rápidos</div>
-                        <div class="text-xs sm:text-sm text-slate-600 mt-1">
+                        <div class="text-sm font-bold text-slate-500">Administração</div>
+                        <div class="text-xl font-extrabold text-slate-900 mt-1">Atalhos rápidos</div>
+                        <div class="text-sm text-slate-600 mt-1">
                             Acesse configurações e módulos administrativos sem perder o padrão do novo painel.
                         </div>
                     </div>
-                    <div class="flex flex-col gap-3 w-full sm:flex-row sm:flex-wrap">
+                    <div class="flex flex-wrap gap-3">
                         <a href="{{ route('panel.admin') }}"
-                            class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-slate-800 transition w-full sm:w-auto">
+                            class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-slate-800 transition">
                             <i class="fas fa-th-large mr-2"></i> Painel Admin
                         </a>
                         <a href="{{ route('panel.admin', ['to' => 'settings/general']) }}"
-                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition w-full sm:w-auto">
+                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
                             <i class="fas fa-cogs mr-2"></i> Configurações
                         </a>
                         <a href="{{ route('panel.admin', ['to' => 'settings/gateway']) }}"
-                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition w-full sm:w-auto">
+                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
                             <i class="fas fa-credit-card mr-2"></i> Gateway
                         </a>
                         <a href="{{ route('panel.admin', ['to' => 'mailtemplates']) }}"
-                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition w-full sm:w-auto">
+                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
                             <i class="fas fa-at mr-2"></i> E-mails
                         </a>
                     </div>
