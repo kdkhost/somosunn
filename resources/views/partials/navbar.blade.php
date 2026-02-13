@@ -87,7 +87,8 @@
             </div>
 
             <!-- Mobile Toggle -->
-            <button id="mobile-menu-toggle" class="lg:hidden inline-flex items-center justify-center rounded-full border-0 sm:border sm:border-[#1F5EDB] px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
+            <button id="mobile-menu-toggle" type="button" aria-controls="mobile-menu" aria-expanded="false"
+                class="lg:hidden inline-flex items-center justify-center rounded-full border-0 sm:border sm:border-[#1F5EDB] px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
                 <span class="sr-only">Abrir menu</span>
                 <i class="fas fa-bars text-lg"></i>
             </button>
@@ -184,7 +185,7 @@
     </div>
 </nav>
 
-<div id="mobile-menu" class="fixed inset-0 z-40 hidden" aria-hidden="true">
+<div id="mobile-menu" class="fixed inset-0 hidden" aria-hidden="true" style="z-index:1200;">
     <div id="mobile-menu-overlay" class="absolute inset-0 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
     <div id="mobile-menu-panel" class="relative z-10 w-4/5 max-w-sm h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out overflow-y-auto">
         <div class="flex items-center justify-between border-b border-slate-100 px-6 py-5">
@@ -193,7 +194,7 @@
                     <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain" onerror="this.style.display='none';">
                 </div>
             </div>
-            <button id="mobile-menu-close" class="text-gray-500 hover:text-gray-900 text-3xl leading-none">&times;</button>
+            <button id="mobile-menu-close" type="button" class="text-gray-500 hover:text-gray-900 text-3xl leading-none">&times;</button>
         </div>
         <nav class="px-6 py-4 flex flex-col gap-1 text-gray-700">
             @foreach($menuItems as $item)
@@ -277,3 +278,94 @@
         </div>
     </div>
 </div>
+
+@once
+    @push('scripts')
+        <script>
+            (function () {
+                const bindMobileMenu = function () {
+                    const mobileToggle = document.getElementById('mobile-menu-toggle');
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    const mobilePanel = document.getElementById('mobile-menu-panel');
+                    const mobileOverlay = document.getElementById('mobile-menu-overlay');
+                    const mobileClose = document.getElementById('mobile-menu-close');
+                    const body = document.body;
+
+                    if (!mobileToggle || !mobileMenu || !mobilePanel || !mobileOverlay || !mobileClose) {
+                        return;
+                    }
+
+                    if (mobileMenu.dataset.bound === '1' || mobileToggle.dataset.mobileMenuBound === '1') {
+                        return;
+                    }
+                    mobileMenu.dataset.bound = '1';
+                    mobileToggle.dataset.mobileMenuBound = '1';
+
+                    const openMenu = function () {
+                        mobileMenu.classList.remove('hidden');
+                        mobileMenu.setAttribute('aria-hidden', 'false');
+                        mobileToggle.setAttribute('aria-expanded', 'true');
+                        body.classList.add('overflow-hidden');
+
+                        mobileOverlay.classList.remove('pointer-events-none');
+                        mobileOverlay.classList.remove('opacity-0');
+                        mobileOverlay.classList.add('opacity-100');
+                        mobilePanel.classList.remove('-translate-x-full');
+                    };
+
+                    const closeMenu = function () {
+                        mobileToggle.setAttribute('aria-expanded', 'false');
+                        mobileOverlay.classList.add('opacity-0');
+                        mobileOverlay.classList.remove('opacity-100');
+                        mobilePanel.classList.add('-translate-x-full');
+                        mobileOverlay.classList.add('pointer-events-none');
+
+                        setTimeout(function () {
+                            mobileMenu.classList.add('hidden');
+                            mobileMenu.setAttribute('aria-hidden', 'true');
+                            body.classList.remove('overflow-hidden');
+                        }, 320);
+                    };
+
+                    mobileToggle.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        openMenu();
+                    });
+
+                    mobileClose.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        closeMenu();
+                    });
+
+                    mobileOverlay.addEventListener('click', closeMenu);
+
+                    mobilePanel.querySelectorAll('a[href]').forEach(function (link) {
+                        link.addEventListener('click', function () {
+                            closeMenu();
+                        });
+                    });
+
+                    document.addEventListener('keydown', function (event) {
+                        if (event.key === 'Escape' && mobileMenu.getAttribute('aria-hidden') === 'false') {
+                            closeMenu();
+                        }
+                    });
+
+                    window.addEventListener('resize', function () {
+                        if (window.innerWidth >= 1024 && mobileMenu.getAttribute('aria-hidden') === 'false') {
+                            closeMenu();
+                        }
+                    });
+                };
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', bindMobileMenu);
+                } else {
+                    bindMobileMenu();
+                }
+
+                document.addEventListener('pjax:end', bindMobileMenu);
+            })();
+        </script>
+    @endpush
+@endonce
