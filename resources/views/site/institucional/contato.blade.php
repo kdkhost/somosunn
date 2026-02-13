@@ -1,6 +1,26 @@
 @extends('layouts.app')
 
 @php
+    $cmsSlug = 'institucional_contato';
+
+    $metaImagePath = (string) \App\Models\SiteContent::getValue($cmsSlug, 'meta_image', '');
+    $metaImageUrl = '';
+    if (trim($metaImagePath) !== '') {
+        $metaImageUrl = (str_starts_with($metaImagePath, 'http://') || str_starts_with($metaImagePath, 'https://'))
+            ? $metaImagePath
+            : asset('storage/' . ltrim($metaImagePath, '/'));
+    }
+
+    $twitterImagePath = (string) \App\Models\SiteContent::getValue($cmsSlug, 'twitter_image', '');
+    $twitterImageUrl = '';
+    if (trim($twitterImagePath) !== '') {
+        $twitterImageUrl = (str_starts_with($twitterImagePath, 'http://') || str_starts_with($twitterImagePath, 'https://'))
+            ? $twitterImagePath
+            : asset('storage/' . ltrim($twitterImagePath, '/'));
+    } elseif ($metaImageUrl !== '') {
+        $twitterImageUrl = $metaImageUrl;
+    }
+
     $companyName = \App\Models\Setting::get('company_name') ?: 'UNN';
     $companyEmail = \App\Models\Setting::get('company_email') ?: 'contato@somosunn.com.br';
     $companyPhone = \App\Models\Setting::get('company_phone') ?: '(11) 99999-9999';
@@ -68,13 +88,22 @@
     $recaptchaSiteKey = (string) (\App\Models\Setting::get('recaptcha_v3_site_key') ?: config('services.recaptcha.site_key', ''));
 @endphp
 
-@section('title', \App\Models\SiteContent::getValue('institucional_contato', 'title', 'Contato - UNN'))
+@section('title', \App\Models\SiteContent::getValue($cmsSlug, 'title', 'Contato - UNN'))
+@section('meta_title', \App\Models\SiteContent::getValue($cmsSlug, 'meta_title', ''))
+@section('meta_description', \App\Models\SiteContent::getValue($cmsSlug, 'meta_description', ''))
+@section('meta_keywords', \App\Models\SiteContent::getValue($cmsSlug, 'meta_keywords', ''))
+@section('meta_robots', \App\Models\SiteContent::getValue($cmsSlug, 'meta_robots', ''))
+@section('canonical', \App\Models\SiteContent::getValue($cmsSlug, 'canonical', ''))
+@section('og_type', \App\Models\SiteContent::getValue($cmsSlug, 'og_type', ''))
+@section('twitter_card', \App\Models\SiteContent::getValue($cmsSlug, 'twitter_card', ''))
+@section('meta_image', $metaImageUrl)
+@section('twitter_image', $twitterImageUrl)
 
 @section('content')
 @php
     $fallbackBody = view('site.institucional._fallback.contato')->render();
 
-    $html = app(\App\Services\Site\SitePageContentService::class)->render('institucional_contato', 'body', $fallbackBody, [
+    $html = app(\App\Services\Site\SitePageContentService::class)->render($cmsSlug, 'body', $fallbackBody, [
         'CONTACT_ALERTS' => view('site.institucional.partials.contact-alerts')->render(),
         'CONTACT_INFO' => view('site.institucional.partials.contact-info', [
             'companyEmail' => $companyEmail,
@@ -173,4 +202,3 @@
     </script>
 @endif
 @endpush
-

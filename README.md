@@ -53,6 +53,13 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 
 ## 📅 Histórico de Atualizações
 
+### 13/02/2026 — CMS Institucional (editor, SEO e menu)
+- **Painel CMS mais organizado:**
+  - Menu **Conteúdo do Site** virou submenu no sidebar com todas as páginas (evita abas estourando).
+  - Editor institucional com **Summernote** e upload de imagens/GIFs direto no corpo.
+- **SEO por página (personalizável):**
+  - Campos para `meta_title`, `meta_description`, `meta_keywords`, `canonical`, `robots`, `og_type`, `twitter_card`, `meta_image` e `twitter_image`.
+
 ### 12/02/2026 — CMS do Institucional (páginas editáveis)
 - **Conteúdo 100% pelo Painel:**
   - Páginas institucionais agora carregam **título** e **corpo (HTML)** do banco (`site_contents`), editáveis em **Conteúdo do Site**.

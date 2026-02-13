@@ -449,17 +449,94 @@
 
                 $a.attr('data-pjax', 'true');
             });
+
+            function initSummernotes() {
+                $('.summernote, .summernote-lg').each(function () {
+                    const $el = $(this);
+                    const defaultHeight = $el.hasClass('summernote-lg') ? 520 : 180;
+                    const heightRaw = $el.data('height');
+                    const height = parseInt((heightRaw || defaultHeight).toString(), 10) || defaultHeight;
+
+                    const toolbarMode = ($el.data('toolbar') || '').toString();
+                    const uploadUrl = ($el.data('uploadUrl') || '').toString();
+                    const cmsSlug = ($el.data('cmsSlug') || '').toString();
+
+                    const options = { height: height };
+
+                    if (toolbarMode === 'full') {
+                        options.toolbar = [
+                            ['style', ['style']],
+                            ['font', ['bold', 'italic', 'underline', 'clear']],
+                            ['fontname', ['fontname']],
+                            ['fontsize', ['fontsize']],
+                            ['color', ['color']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['table', ['table']],
+                            ['insert', ['link', 'picture', 'video', 'hr']],
+                            ['view', ['fullscreen', 'codeview', 'help']]
+                        ];
+                    }
+
+                    if (uploadUrl !== '') {
+                        options.callbacks = options.callbacks || {};
+                        options.callbacks.onImageUpload = function (files) {
+                            const $editor = $(this);
+                            if (!files || !files.length) return;
+
+                            Array.from(files).forEach(function (file) {
+                                const formData = new FormData();
+                                formData.append('file', file);
+                                formData.append('_token', '{{ csrf_token() }}');
+                                if (cmsSlug) {
+                                    formData.append('slug', cmsSlug);
+                                }
+
+                                $.ajax({
+                                    url: uploadUrl,
+                                    method: 'POST',
+                                    data: formData,
+                                    processData: false,
+                                    contentType: false,
+                                    success: function (resp) {
+                                        const url = resp && resp.url ? resp.url : '';
+                                        if (!url) {
+                                            toastr.error('Falha ao enviar imagem.');
+                                            return;
+                                        }
+                                        $editor.summernote('insertImage', url);
+                                    },
+                                    error: function () {
+                                        toastr.error('Falha ao enviar imagem.');
+                                    }
+                                });
+                            });
+                        };
+                    }
+
+                    $el.summernote(options);
+                });
+            }
+
+            $(document).on('click', '.js-cms-insert-placeholder', function () {
+                const token = ($(this).data('token') || '').toString();
+                const target = ($(this).data('target') || '#cmsBody').toString();
+                if (!token) return;
+
+                try {
+                    $(target).summernote('pasteHTML', token);
+                } catch (e) {
+                    toastr.error('Não foi possível inserir o placeholder no editor.');
+                }
+            });
             $(document).on('pjax:end', function () {
-                $('.summernote').summernote({ height: 180 });
-                $('.summernote-lg').summernote({ height: 420 });
+                initSummernotes();
                 initUploadWidgets();
                 initMasks();
                 initColorPickers();
                 initDateTimePickers();
                 initCouponFormEnhancements();
             });
-            $('.summernote').summernote({ height: 180 });
-            $('.summernote-lg').summernote({ height: 420 });
+            initSummernotes();
             initUploadWidgets();
             initMasks();
             initColorPickers();

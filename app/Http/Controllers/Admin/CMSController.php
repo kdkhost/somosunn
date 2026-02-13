@@ -82,6 +82,22 @@ class CMSController extends Controller
             ->with('success', 'Conteudo salvo com sucesso.');
     }
 
+    public function uploadMedia(Request $request)
+    {
+        $request->validate([
+            'slug' => ['nullable', 'string', 'max:120'],
+            'file' => ['required', 'file', 'max:8192', 'mimes:jpg,jpeg,png,webp,gif,svg'],
+        ]);
+
+        $slug = $this->normalizeSlug((string) $request->input('slug', 'home'));
+        $path = $request->file('file')->store('site-content/cms/' . $slug, 'public');
+
+        return response()->json([
+            'url' => asset('storage/' . ltrim($path, '/')),
+            'path' => $path,
+        ]);
+    }
+
     private function normalizeSlug(string $slug): string
     {
         return in_array($slug, self::ALLOWED_SLUGS, true) ? $slug : 'home';
@@ -97,6 +113,15 @@ class CMSController extends Controller
             'institucional_valores',
             'institucional_contato' => [
                 'title' => 'text',
+                'meta_title' => 'text',
+                'meta_description' => 'text',
+                'meta_keywords' => 'text',
+                'canonical' => 'text',
+                'meta_robots' => 'text',
+                'og_type' => 'text',
+                'twitter_card' => 'text',
+                'meta_image' => 'image',
+                'twitter_image' => 'image',
                 'body' => 'html',
             ],
             'about' => [

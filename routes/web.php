@@ -506,6 +506,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         // CMS (Conteúdo do Site)
         Route::get('/cms/{slug?}', [\App\Http\Controllers\Admin\CMSController::class, 'index'])->name('cms.index');
         Route::post('/cms/{slug}', [\App\Http\Controllers\Admin\CMSController::class, 'update'])->name('cms.update');
+        Route::post('/cms/media/upload', [\App\Http\Controllers\Admin\CMSController::class, 'uploadMedia'])->name('cms.upload');
 
         // Usuários
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('users');

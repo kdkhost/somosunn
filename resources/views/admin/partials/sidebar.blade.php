@@ -1,6 +1,10 @@
 @php
     $is = fn($patterns) => request()->routeIs($patterns) ? 'active' : '';
     $open = fn($patterns) => request()->routeIs($patterns) ? 'menu-open' : '';
+    $cmsSlug = (string) (request()->route('slug') ?? request()->query('slug') ?? 'home');
+    if (trim($cmsSlug) === '') {
+        $cmsSlug = 'home';
+    }
 @endphp
 @php
     $brandLogo = asset('img/logo.svg'); // Default fallback
@@ -293,12 +297,77 @@
                                     <p>E-mails</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.cms.index', ['slug' => 'home']) }}"
-                                    class="nav-link {{ $is('admin.cms.*') }}">
+                            <li class="nav-item has-treeview {{ $open('admin.cms.*') }}">
+                                <a href="#" class="nav-link {{ $is('admin.cms.*') }}">
                                     <i class="fas fa-globe nav-icon"></i>
-                                    <p>Conteúdo do Site</p>
+                                    <p>Conteúdo do Site<i class="right fas fa-angle-left"></i></p>
                                 </a>
+                                <ul class="nav nav-treeview pl-4">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index', ['slug' => 'home']) }}"
+                                            class="nav-link {{ request()->routeIs('admin.cms.*') && $cmsSlug === 'home' ? 'active' : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Home</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index', ['slug' => 'about']) }}"
+                                            class="nav-link {{ request()->routeIs('admin.cms.*') && $cmsSlug === 'about' ? 'active' : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Sobre (Seções)</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index', ['slug' => 'footer']) }}"
+                                            class="nav-link {{ request()->routeIs('admin.cms.*') && $cmsSlug === 'footer' ? 'active' : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Rodapé</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index', ['slug' => 'institucional_sobre']) }}"
+                                            class="nav-link {{ request()->routeIs('admin.cms.*') && $cmsSlug === 'institucional_sobre' ? 'active' : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Institucional: Sobre</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index', ['slug' => 'institucional_manifesto']) }}"
+                                            class="nav-link {{ request()->routeIs('admin.cms.*') && $cmsSlug === 'institucional_manifesto' ? 'active' : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Institucional: Manifesto</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index', ['slug' => 'institucional_quem_somos']) }}"
+                                            class="nav-link {{ request()->routeIs('admin.cms.*') && $cmsSlug === 'institucional_quem_somos' ? 'active' : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Institucional: Quem Somos</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index', ['slug' => 'institucional_como_funciona']) }}"
+                                            class="nav-link {{ request()->routeIs('admin.cms.*') && $cmsSlug === 'institucional_como_funciona' ? 'active' : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Institucional: Como Funciona</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index', ['slug' => 'institucional_valores']) }}"
+                                            class="nav-link {{ request()->routeIs('admin.cms.*') && $cmsSlug === 'institucional_valores' ? 'active' : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Institucional: Valores</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index', ['slug' => 'institucional_contato']) }}"
+                                            class="nav-link {{ request()->routeIs('admin.cms.*') && $cmsSlug === 'institucional_contato' ? 'active' : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Institucional: Contato</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                             {{-- Certificates moved to shared section below --}}
                             <li class="nav-item">
