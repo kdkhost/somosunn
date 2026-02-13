@@ -833,10 +833,13 @@
 
 
                 var openMenu = function () {
+                    // Primeiro, mostra o menu e overlay
                     mobileMenu.classList.remove('hidden');
                     mobileMenu.setAttribute('aria-hidden', 'false');
+                    mobilePanel.classList.remove('translate-x-0');
+                    mobilePanel.classList.add('-translate-x-full');
 
-                    // Forçar reflow para garantir transição
+                    // Força reflow para garantir transição
                     void mobilePanel.offsetWidth;
                     void mobileOverlay.offsetWidth;
 
@@ -844,13 +847,11 @@
                     mobileOverlay.classList.remove('opacity-0');
                     mobileOverlay.classList.add('opacity-100');
 
-                    // Inicia com translate-x-full, depois remove para animar
-                    mobilePanel.classList.remove('translate-x-0');
-                    mobilePanel.classList.add('-translate-x-full');
+                    // Delay maior para browsers lentos (especialmente Firefox)
                     setTimeout(function () {
                         mobilePanel.classList.remove('-translate-x-full');
                         mobilePanel.classList.add('translate-x-0');
-                    }, 10); // delay mínimo para garantir animação
+                    }, 50);
                 };
 
                 var closeMenu = function () {
