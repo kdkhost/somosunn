@@ -1,0 +1,9 @@
+<IfModule mod_mime.c>
+    AddType application/javascript .js
+    AddType text/css .css
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Cache-Control "max-age=604800, public"
+</IfModule>
