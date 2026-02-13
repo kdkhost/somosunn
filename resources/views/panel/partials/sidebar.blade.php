@@ -84,6 +84,10 @@
                     <i class="fas fa-credit-card w-5 opacity-80"></i>
                     Pagamentos
                 </a>
+                <a href="{{ route('panel.marketplace.gateway') }}" class="{{ $navItemClass(request()->routeIs('panel.marketplace.gateway')) }}">
+                    <i class="fas fa-cog w-5 opacity-80"></i>
+                    Minhas Configurações de Pagamento
+                </a>
                 <a href="{{ route('panel.marketplace.sales') }}" class="{{ $navItemClass(request()->routeIs('panel.marketplace.sales')) }}">
                     <i class="fas fa-receipt w-5 opacity-80"></i>
                     Minhas vendas
@@ -91,16 +95,17 @@
             </div>
         @endif
 
-        @if($user->isAdmin())
+        @if(!$isSuperadminUser)
             <div class="pt-4 mt-4 border-t border-slate-100">
                 <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                    Administração
+                    Workspace
                 </div>
 
                 <a href="{{ route('panel.admin') }}" class="{{ $navItemClass(false) }}">
                     <i class="fas fa-shield-alt w-5 opacity-80"></i>
-                    Painel administrativo
+                    Painel completo
                 </a>
+                @if($user->isAdmin())
                 <a href="{{ route('panel.admin', ['to' => 'settings/general']) }}" class="{{ $navItemClass(false) }}">
                     <i class="fas fa-cogs w-5 opacity-80"></i>
                     Configurações gerais
@@ -117,8 +122,8 @@
                     <i class="fas fa-at w-5 opacity-80"></i>
                     Templates de e-mail
                 </a>
+                @endif
             </div>
         @endif
     </div>
 </div>
-
