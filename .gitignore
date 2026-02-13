@@ -16,3 +16,4 @@
 /public/css/*.map
 npm-debug.log
 composer.lock
+/storage/logs/*.log
