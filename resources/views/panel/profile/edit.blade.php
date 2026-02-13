@@ -81,12 +81,28 @@
                     <div class="flex flex-wrap gap-2 mt-2">
                         @foreach($opcoesInteresses as $opcao)
                             <label class="inline-flex items-center px-3 py-2 bg-slate-100 rounded-xl cursor-pointer text-sm font-medium transition hover:bg-blue-100">
-                                <input type="checkbox" name="interests[]" value="{{ $opcao }}" class="form-checkbox accent-blue-600 mr-2" {{ $interessesSelecionados->contains($opcao) ? 'checked' : '' }}>
+                                <input type="checkbox" name="interests[]" value="{{ $opcao }}" class="form-checkbox accent-blue-600 mr-2 interesse-checkbox" data-interesse="{{ $opcao }}" {{ $interessesSelecionados->contains($opcao) ? 'checked' : '' }}>
                                 {{ $opcao }}
                             </label>
                         @endforeach
+                        <input type="text" name="interest_other" id="interest-other-input" placeholder="Descreva seu outro interesse" class="mt-2 w-full rounded-2xl border border-blue-200 px-4 py-3 text-sm bg-white hidden" value="{{ old('interest_other', $user->interest_other ?? '') }}">
                     </div>
                     <small class="text-xs text-slate-500 block mt-1">Selecione uma ou mais áreas. Você pode marcar quantas quiser.</small>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            function toggleOtherField() {
+                                const outro = document.querySelector('input.interesse-checkbox[data-interesse="Outro"]');
+                                const input = document.getElementById('interest-other-input');
+                                if (outro && input) {
+                                    input.classList.toggle('hidden', !outro.checked);
+                                }
+                            }
+                            document.querySelectorAll('input.interesse-checkbox').forEach(cb => {
+                                cb.addEventListener('change', toggleOtherField);
+                            });
+                            toggleOtherField();
+                        });
+                    </script>
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold text-slate-700">Bio</label>

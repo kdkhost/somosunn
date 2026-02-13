@@ -123,6 +123,7 @@ class User extends Authenticatable
         'company',
         'segment',
         'interests',
+        'interest_other',
         'photo',
         'cover_photo',
         'role',

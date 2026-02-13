@@ -87,6 +87,11 @@ class ProfileController extends Controller
         if (isset($data['interests']) && is_array($data['interests'])) {
             $data['interests'] = array_values(array_filter($data['interests']));
         }
+        // Salvar interesse personalizado se "Outro" estiver marcado
+        $data['interest_other'] = null;
+        if (isset($data['interests']) && in_array('Outro', $data['interests'])) {
+            $data['interest_other'] = trim($request->input('interest_other'));
+        }
 
         // Upload avatar
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
