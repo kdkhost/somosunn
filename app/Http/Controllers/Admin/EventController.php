@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\EventMaterial;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -345,6 +346,106 @@ class EventController extends Controller
         return response()->json(['status' => 'success', 'message' => 'Evento removido']);
     }
 
+    public function uploadMaterial(Request $request, Event $event)
+    {
+        $this->ensurePermission('events.edit');
+        $this->ensureCanManage($event);
+
+        set_time_limit(0);
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 0);
+
+        $policy = $this->resolveMaterialUploadPolicy();
+        $maxValidationKb = max(1, max($policy['document_max_mb'], $policy['video_max_mb'])) * 1024;
+        $mimesRule = !empty($policy['allowed_extensions'])
+            ? ('|mimes:' . implode(',', $policy['allowed_extensions']))
+            : '';
+
+        $request->validate([
+            'file' => 'required|file|max:' . $maxValidationKb . $mimesRule,
+            'name' => 'nullable|string|max:255',
+        ]);
+
+        $file = $request->file('file');
+        $extension = strtolower((string) $file->getClientOriginalExtension());
+
+        if (!empty($policy['allowed_extensions']) && !in_array($extension, $policy['allowed_extensions'], true)) {
+            return response()->json([
+                'error' => 'Formato de arquivo nao permitido pela politica ativa.',
+            ], 422);
+        }
+
+        $isVideo = in_array($extension, $policy['video_extensions'], true);
+        $maxAllowedBytes = max(1, $isVideo ? $policy['video_max_mb'] : $policy['document_max_mb']) * 1024 * 1024;
+
+        if ((int) $file->getSize() > $maxAllowedBytes) {
+            return response()->json([
+                'error' => 'Arquivo excede o limite de tamanho permitido.',
+            ], 422);
+        }
+
+        $path = $file->store('event-materials', 'public');
+        $customName = trim((string) $request->input('name', ''));
+        $finalName = $customName !== '' ? $customName : $file->getClientOriginalName();
+
+        $material = $event->materials()->create([
+            'file_path' => $path,
+            'file_name' => $finalName,
+            'file_type' => $extension,
+            'file_size' => $file->getSize(),
+            'created_by' => Auth::id(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'material' => $material,
+            'download_url' => route('events.materials.download', [$event, $material]),
+        ]);
+    }
+
+    public function renameMaterial(Request $request, Event $event, EventMaterial $material)
+    {
+        $this->ensurePermission('events.edit');
+        $this->ensureCanManage($event);
+
+        if ((int) $material->event_id !== (int) $event->id) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $material->update([
+            'file_name' => trim((string) $validated['name']),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'material' => $material->fresh(),
+        ]);
+    }
+
+    public function deleteMaterial(Event $event, EventMaterial $material)
+    {
+        $this->ensurePermission('events.edit');
+        $this->ensureCanManage($event);
+
+        if ((int) $material->event_id !== (int) $event->id) {
+            abort(404);
+        }
+
+        if (Storage::disk('public')->exists($material->file_path)) {
+            Storage::disk('public')->delete($material->file_path);
+        }
+
+        $material->delete();
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+
     public function updateCalendarSettings(Request $request)
     {
         $payload = $request->validate([
@@ -529,6 +630,54 @@ class EventController extends Controller
         }
 
         return $value;
+    }
+
+    protected function resolveMaterialUploadPolicy(): array
+    {
+        $defaultDoc = implode(',', (array) config('uploads.allowed_document_formats', []));
+        $defaultVideo = implode(',', (array) config('uploads.allowed_video_formats', []));
+
+        $docExtensions = $this->parseExtensions((string) Setting::get('allowed_document_formats', $defaultDoc));
+        if (empty($docExtensions)) {
+            $docExtensions = $this->parseExtensions($defaultDoc);
+        }
+
+        $videoExtensions = $this->parseExtensions((string) Setting::get('allowed_video_formats', $defaultVideo));
+        if (empty($videoExtensions)) {
+            $videoExtensions = $this->parseExtensions($defaultVideo);
+        }
+
+        $allExtensions = array_values(array_unique(array_merge($docExtensions, $videoExtensions)));
+
+        $documentMaxMb = (int) Setting::get('document_max_mb', (int) config('uploads.document_max_mb', 50));
+        $videoMaxMb = (int) Setting::get('video_max_mb', (int) config('uploads.video_max_mb', 1024));
+
+        return [
+            'document_extensions' => $docExtensions,
+            'video_extensions' => $videoExtensions,
+            'allowed_extensions' => $allExtensions,
+            'document_max_mb' => max(1, $documentMaxMb),
+            'video_max_mb' => max(1, $videoMaxMb),
+        ];
+    }
+
+    protected function parseExtensions(?string $raw): array
+    {
+        $parts = preg_split('/[,\s]+/', strtolower((string) $raw)) ?: [];
+        $extensions = [];
+
+        foreach ($parts as $part) {
+            $ext = trim((string) $part);
+            $ext = ltrim($ext, '.');
+
+            if ($ext === '' || !preg_match('/^[a-z0-9]+$/', $ext)) {
+                continue;
+            }
+
+            $extensions[] = $ext;
+        }
+
+        return array_values(array_unique($extensions));
     }
 
     protected function deleteEventImageIfExists(Event $event): void
