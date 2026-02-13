@@ -185,9 +185,9 @@
     </div>
 </nav>
 
-<div id="mobile-menu" class="fixed inset-0 hidden" aria-hidden="true" style="z-index:1200;">
-    <div id="mobile-menu-overlay" class="absolute inset-0 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
-    <div id="mobile-menu-panel" class="relative z-10 w-4/5 max-w-sm h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out overflow-y-auto">
+<div id="mobile-menu" class="fixed inset-0 hidden" aria-hidden="true" style="z-index:2000;">
+    <div id="mobile-menu-overlay" class="absolute inset-0 bg-black/60 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    <div id="mobile-menu-panel" class="relative z-20 w-4/5 max-w-xs h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out overflow-y-auto">
         <div class="flex items-center justify-between border-b border-slate-100 px-6 py-5">
             <div class="flex items-center gap-3">
                 <div class="inline-flex h-12 w-auto items-center justify-center overflow-hidden">

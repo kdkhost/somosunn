@@ -81,12 +81,12 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6">
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5 mt-4 sm:mt-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-2 sm:p-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-sm font-bold text-slate-500">Meus cursos</div>
-                    <div class="text-3xl font-extrabold text-slate-900 mt-1">{{ $coursesCount }}</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-500">Meus cursos</div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $coursesCount }}</div>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-[#1F5EDB]/10 flex items-center justify-center text-[#1F5EDB]">
                     <i class="fas fa-graduation-cap text-xl"></i>
@@ -101,11 +101,11 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-2 sm:p-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-sm font-bold text-slate-500">Compras pagas</div>
-                    <div class="text-3xl font-extrabold text-slate-900 mt-1">{{ $ordersPaidCount }}</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-500">Compras pagas</div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $ordersPaidCount }}</div>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
                     <i class="fas fa-check-circle text-xl"></i>
@@ -116,11 +116,11 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-2 sm:p-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-sm font-bold text-slate-500">Comunidade</div>
-                    <div class="text-3xl font-extrabold text-slate-900 mt-1">UNN</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-500">Comunidade</div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">UNN</div>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-slate-900/5 flex items-center justify-center text-slate-700">
                     <i class="fas fa-users text-xl"></i>
@@ -141,11 +141,11 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-2 sm:p-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-sm font-bold text-slate-500">Minhas vendas</div>
-                    <div class="text-3xl font-extrabold text-slate-900 mt-1">{{ $sellerPaidCount }}</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-500">Minhas vendas</div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $sellerPaidCount }}</div>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600">
                     <i class="fas fa-receipt text-xl"></i>
@@ -169,12 +169,12 @@
         </div>
 
         @if($roleLabel)
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 md:col-span-2 xl:col-span-4">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-2 sm:p-5 md:col-span-2 xl:col-span-4">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <div class="text-sm font-bold text-slate-500">Administração</div>
-                        <div class="text-xl font-extrabold text-slate-900 mt-1">Atalhos rápidos</div>
-                        <div class="text-sm text-slate-600 mt-1">
+                        <div class="text-xs sm:text-sm font-bold text-slate-500">Administração</div>
+                        <div class="text-lg sm:text-xl font-extrabold text-slate-900 mt-1">Atalhos rápidos</div>
+                        <div class="text-xs sm:text-sm text-slate-600 mt-1">
                             Acesse configurações e módulos administrativos sem perder o padrão do novo painel.
                         </div>
                     </div>

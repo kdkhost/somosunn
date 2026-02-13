@@ -1,8 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+
     <div class="bg-slate-50 min-h-screen pt-20 pb-8">
-        <div class="max-w-7xl mx-auto px-2 sm:px-4 md:px-8 lg:px-16">
+        <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 lg:px-16">
             <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
                 <aside class="w-full lg:w-80 mb-4 lg:mb-0">
                     @include('panel.partials.sidebar')
