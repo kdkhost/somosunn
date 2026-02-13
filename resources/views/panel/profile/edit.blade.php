@@ -37,12 +37,14 @@
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Telefone</label>
-                    <input name="phone" value="{{ old('phone', $user->phone) }}"
+                    <input id="profile_phone" name="phone" value="{{ old('phone', $user->phone) }}"
+                        data-mask-phone maxlength="16" inputmode="tel" autocomplete="tel"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Documento</label>
-                    <input name="doc" value="{{ old('doc', $user->doc) }}"
+                    <input id="profile_doc" name="doc" value="{{ old('doc', $user->doc) }}"
+                        data-mask-cpf-cnpj maxlength="18" inputmode="numeric" autocomplete="off"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
@@ -131,37 +133,39 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-5">
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">CEP</label>
-                    <input name="cep" value="{{ old('cep', $user->cep) }}"
+                    <input id="profile_cep" name="cep" value="{{ old('cep', $user->cep) }}"
+                        data-mask-cep maxlength="9" inputmode="numeric" autocomplete="postal-code"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                    <p id="profile_cep_feedback" class="mt-2 text-xs text-slate-500"></p>
                 </div>
                 <div class="md:col-span-3">
                     <label class="text-sm font-bold text-slate-700">Rua/Avenida</label>
-                    <input name="street" value="{{ old('street', $user->street) }}"
+                    <input id="profile_street" name="street" value="{{ old('street', $user->street) }}"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">Número</label>
-                    <input name="number" value="{{ old('number', $user->number) }}"
+                    <input id="profile_number" name="number" value="{{ old('number', $user->number) }}"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-3">
                     <label class="text-sm font-bold text-slate-700">Complemento</label>
-                    <input name="complement" value="{{ old('complement', $user->complement) }}"
+                    <input id="profile_complement" name="complement" value="{{ old('complement', $user->complement) }}"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold text-slate-700">Bairro</label>
-                    <input name="neighborhood" value="{{ old('neighborhood', $user->neighborhood) }}"
+                    <input id="profile_neighborhood" name="neighborhood" value="{{ old('neighborhood', $user->neighborhood) }}"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">Cidade</label>
-                    <input name="city" value="{{ old('city', $user->city) }}"
+                    <input id="profile_city" name="city" value="{{ old('city', $user->city) }}"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">UF</label>
-                    <input name="state" value="{{ old('state', $user->state) }}" maxlength="2"
+                    <input id="profile_state" name="state" value="{{ old('state', $user->state) }}" maxlength="2" autocomplete="address-level1"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm uppercase">
                 </div>
             </div>
@@ -240,3 +244,110 @@
     </form>
 @endsection
 
+@push('scripts')
+    <script>
+        (function () {
+            function applyProfileMasks() {
+                if (typeof Inputmask !== 'function') {
+                    return;
+                }
+
+                var cepInput = document.getElementById('profile_cep');
+                var phoneInput = document.getElementById('profile_phone');
+                var docInput = document.getElementById('profile_doc');
+
+                if (cepInput) {
+                    Inputmask('99999-999').mask(cepInput);
+                }
+                if (phoneInput) {
+                    Inputmask({ mask: ['(99) 9999-9999', '(99) 99999-9999'], keepStatic: true }).mask(phoneInput);
+                }
+                if (docInput) {
+                    Inputmask({ mask: ['999.999.999-99', '99.999.999/9999-99'], keepStatic: true }).mask(docInput);
+                }
+            }
+
+            function initViaCepAutofill() {
+                var cepInput = document.getElementById('profile_cep');
+                if (!cepInput) {
+                    return;
+                }
+
+                var feedback = document.getElementById('profile_cep_feedback');
+                var streetInput = document.getElementById('profile_street');
+                var neighborhoodInput = document.getElementById('profile_neighborhood');
+                var cityInput = document.getElementById('profile_city');
+                var stateInput = document.getElementById('profile_state');
+                var lastCep = '';
+
+                function setFeedback(message, isError) {
+                    if (!feedback) {
+                        return;
+                    }
+
+                    feedback.textContent = message || '';
+                    feedback.classList.toggle('text-red-600', !!isError);
+                    feedback.classList.toggle('text-slate-500', !isError);
+                }
+
+                function fetchCep() {
+                    var digits = (cepInput.value || '').replace(/\D/g, '');
+                    if (digits.length !== 8 || digits === lastCep) {
+                        return;
+                    }
+
+                    lastCep = digits;
+                    setFeedback('Buscando endereco...', false);
+
+                    fetch('https://viacep.com.br/ws/' + digits + '/json/')
+                        .then(function (response) {
+                            return response.json();
+                        })
+                        .then(function (data) {
+                            if (!data || data.erro) {
+                                setFeedback('CEP nao encontrado. Complete o endereco manualmente.', true);
+                                return;
+                            }
+
+                            if (streetInput && !streetInput.value) {
+                                streetInput.value = data.logradouro || '';
+                            }
+                            if (neighborhoodInput && !neighborhoodInput.value) {
+                                neighborhoodInput.value = data.bairro || '';
+                            }
+                            if (cityInput && !cityInput.value) {
+                                cityInput.value = data.localidade || '';
+                            }
+                            if (stateInput && !stateInput.value) {
+                                stateInput.value = (data.uf || '').toUpperCase();
+                            }
+
+                            setFeedback('Endereco preenchido automaticamente.', false);
+                        })
+                        .catch(function () {
+                            setFeedback('Nao foi possivel consultar o CEP agora. Complete manualmente.', true);
+                        });
+                }
+
+                cepInput.addEventListener('blur', fetchCep);
+                cepInput.addEventListener('input', function () {
+                    if ((cepInput.value || '').replace(/\D/g, '').length < 8) {
+                        lastCep = '';
+                        setFeedback('', false);
+                    }
+                });
+            }
+
+            function initProfileEnhancements() {
+                applyProfileMasks();
+                initViaCepAutofill();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initProfileEnhancements);
+            } else {
+                initProfileEnhancements();
+            }
+        })();
+    </script>
+@endpush
