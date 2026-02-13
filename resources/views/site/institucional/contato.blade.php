@@ -100,31 +100,80 @@
 @section('twitter_image', $twitterImageUrl)
 
 @section('content')
-@php
-    $fallbackBody = view('site.institucional._fallback.contato')->render();
+    @php
+        $heroTitle = \App\Models\SiteContent::getValue($cmsSlug, 'hero_title', 'Fale');
+        $heroHighlight = \App\Models\SiteContent::getValue($cmsSlug, 'hero_title_highlight', 'Conosco');
+        $heroSubtitle = \App\Models\SiteContent::getValue($cmsSlug, 'hero_subtitle', 'Estamos aqui para ajudar. Entre em contato por qualquer um dos canais abaixo.');
 
-    $html = app(\App\Services\Site\SitePageContentService::class)->render($cmsSlug, 'body', $fallbackBody, [
-        'CONTACT_ALERTS' => view('site.institucional.partials.contact-alerts')->render(),
-        'CONTACT_INFO' => view('site.institucional.partials.contact-info', [
-            'companyEmail' => $companyEmail,
-            'companyPhone' => $companyPhone,
-            'companyZip' => $companyZip,
-            'companyAddress' => $companyAddress,
-            'companyNumber' => $companyNumber,
-            'companyComplement' => $companyComplement,
-            'companyDistrict' => $companyDistrict,
-            'companyCity' => $companyCity,
-            'companyState' => $companyState,
-            'socialLinks' => $socialLinks,
-        ])->render(),
-        'CONTACT_FORM' => view('site.institucional.partials.contact-form')->render(),
-        'CONTACT_MAP_EMBED_URL' => e($mapEmbedUrl),
-        'FAQ_SECTION' => view('components.faq-section', ['context' => 'contact'])->render(),
-    ]);
-@endphp
+        $mapTitle = \App\Models\SiteContent::getValue($cmsSlug, 'map_title', 'Nossa Localização');
+        $mapEmbedUrlOverride = (string) \App\Models\SiteContent::getValue($cmsSlug, 'map_embed_url', '');
+        $mapEmbedUrlOverride = trim($mapEmbedUrlOverride);
+        if ($mapEmbedUrlOverride !== '' && preg_match('/^\\s*javascript\\s*:/i', $mapEmbedUrlOverride)) {
+            $mapEmbedUrlOverride = '';
+        }
 
-{!! $html !!}
+        $finalMapEmbedUrl = $mapEmbedUrlOverride !== '' ? $mapEmbedUrlOverride : $mapEmbedUrl;
+    @endphp
+
+    <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+        <!-- Hero Section -->
+        <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
+            <div class="max-w-7xl mx-auto text-center">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient unn-title-max">
+                    {{ $heroTitle }} <span class="text-gradient">{{ $heroHighlight }}</span>
+                </h1>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    {{ $heroSubtitle }}
+                </p>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="py-12 md:py-16 px-4 md:px-12 lg:px-24">
+            <div class="max-w-7xl mx-auto">
+                @include('site.institucional.partials.contact-alerts')
+
+                <div class="grid lg:grid-cols-2 gap-8 md:gap-12">
+                    @include('site.institucional.partials.contact-info', [
+                        'companyEmail' => $companyEmail,
+                        'companyPhone' => $companyPhone,
+                        'companyZip' => $companyZip,
+                        'companyAddress' => $companyAddress,
+                        'companyNumber' => $companyNumber,
+                        'companyComplement' => $companyComplement,
+                        'companyDistrict' => $companyDistrict,
+                        'companyCity' => $companyCity,
+                        'companyState' => $companyState,
+                        'socialLinks' => $socialLinks,
+                    ])
+
+                    @include('site.institucional.partials.contact-form')
+                </div>
+            </div>
+        </section>
+
+        <!-- Map Section -->
+        <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">{{ $mapTitle }}</h2>
+                <div class="rounded-3xl overflow-hidden shadow-2xl h-[400px]">
+                    <iframe
+                        src="{{ $finalMapEmbedUrl }}"
+                        class="w-full h-full border-0"
+                        loading="lazy"
+                        title="{{ $mapTitle }}"
+                    ></iframe>
+                </div>
+            </div>
+        </section>
+
+        <x-faq-section context="contact" />
+    </div>
 @endsection
+
+@push('styles')
+    @include('site.institucional.partials.common-styles')
+@endpush
 
 @push('scripts')
 <script>

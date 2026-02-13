@@ -53,25 +53,6 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 
 ## 📅 Histórico de Atualizações
 
-### 13/02/2026 — Auth (logo maior e login social consistente)
-- **Formulários (Login/Registro/Reset):**
-  - Logo do painel visual aumentada para melhor destaque da marca.
-  - Botões/ícones de login social agora apontam para o mesmo fluxo de autenticação (sem abrir tela com JSON).
-
-### 13/02/2026 — CMS Institucional (editor, SEO e menu)
-- **Painel CMS mais organizado:**
-  - Menu **Conteúdo do Site** virou submenu no sidebar com todas as páginas (evita abas estourando).
-  - Editor institucional com **Summernote** e upload de imagens/GIFs direto no corpo.
-- **SEO por página (personalizável):**
-  - Campos para `meta_title`, `meta_description`, `meta_keywords`, `canonical`, `robots`, `og_type`, `twitter_card`, `meta_image` e `twitter_image`.
-
-### 12/02/2026 — CMS do Institucional (páginas editáveis)
-- **Conteúdo 100% pelo Painel:**
-  - Páginas institucionais agora carregam **título** e **corpo (HTML)** do banco (`site_contents`), editáveis em **Conteúdo do Site**.
-  - Conteúdo atual das páginas foi semeado automaticamente no banco, respeitando edições já feitas pelo admin.
-- **Contato sem quebrar funcionalidades:**
-  - O corpo do Contato suporta placeholders (`[[CONTACT_*]]`) para manter formulário, mapa e FAQ funcionando mesmo com HTML editável.
-
 ### 07/02/2026 — Webhooks, Logs e Refatoração
 - **Configurações Refatoradas:**
   - Divisão da página gigante de configurações em abas modulares (Geral, PWA, SMTP, Gateway, etc.).
@@ -123,6 +104,34 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Enrollment Polimórfico:**
   - Correção no registro de conclusão usando `enrollable_id` e `enrollable_type`.
   - Atualização de status para "completed" ao finalizar curso.
+
+### 12/02/2026 — CMS do Institucional (páginas editáveis)
+- **Conteúdo 100% pelo Painel:**
+  - Páginas institucionais agora carregam **título** e **corpo (HTML)** do banco (`site_contents`), editáveis em **Conteúdo do Site**.
+  - Conteúdo atual das páginas foi semeado automaticamente no banco, respeitando edições já feitas pelo admin.
+- **Contato sem quebrar funcionalidades:**
+  - O corpo do Contato suporta placeholders (`[[CONTACT_*]]`) para manter formulário, mapa e FAQ funcionando mesmo com HTML editável.
+
+### 13/02/2026 — Auth (logo maior e login social consistente)
+- **Formulários (Login/Registro/Reset):**
+  - Logo do painel visual aumentada para melhor destaque da marca.
+  - Botões/ícones de login social agora apontam para o mesmo fluxo de autenticação (sem abrir tela com JSON).
+
+### 13/02/2026 — CMS Institucional (editor, SEO e menu)
+- **Painel CMS mais organizado:**
+  - Menu **Conteúdo do Site** virou submenu no sidebar com todas as páginas (evita abas estourando).
+  - Editor institucional com **Summernote** e upload de imagens/GIFs direto no corpo.
+- **SEO por página (personalizável):**
+  - Campos para `meta_title`, `meta_description`, `meta_keywords`, `canonical`, `robots`, `og_type`, `twitter_card`, `meta_image` e `twitter_image`.
+
+### 13/02/2026 — Institucional 2.0 (editor por seções)
+- **Menu no sidebar (sem ficar dentro de Administração):**
+  - Novo menu **SITE > Institucional** com todas as páginas institucionais (e Home/Rodapé) organizadas no sidebar.
+- **Editor estruturado (sem colar HTML/CSS/JS):**
+  - Cada página agora é editada por **abas de seções** (Hero, listas/cards, textos ricos por seção, CTA e SEO).
+  - Repetidores para listas (ex.: números, cards, passos e planos) com adicionar/remover itens.
+- **Front-end consumindo do CMS:**
+  - Páginas institucionais passaram a renderizar a partir desses campos, com fallback padrão quando não preenchido.
 
 
 ---
