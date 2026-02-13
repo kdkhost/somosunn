@@ -831,6 +831,7 @@
                 mobileToggle.dataset.mobileMenuBound = '1';
 
 
+
                 var openMenu = function () {
                     mobileMenu.classList.remove('hidden');
                     mobileMenu.setAttribute('aria-hidden', 'false');
@@ -843,8 +844,13 @@
                     mobileOverlay.classList.remove('opacity-0');
                     mobileOverlay.classList.add('opacity-100');
 
-                    mobilePanel.classList.remove('-translate-x-full');
-                    mobilePanel.classList.add('translate-x-0');
+                    // Inicia com translate-x-full, depois remove para animar
+                    mobilePanel.classList.remove('translate-x-0');
+                    mobilePanel.classList.add('-translate-x-full');
+                    setTimeout(function () {
+                        mobilePanel.classList.remove('-translate-x-full');
+                        mobilePanel.classList.add('translate-x-0');
+                    }, 10); // delay mínimo para garantir animação
                 };
 
                 var closeMenu = function () {
