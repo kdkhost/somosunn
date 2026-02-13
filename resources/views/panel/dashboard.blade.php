@@ -29,9 +29,9 @@
     @endphp
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6" id="painel-dashboard">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 flex-wrap">
             <div class="min-w-0">
-                <div class="flex items-center gap-3 flex-wrap">
+                <div class="flex items-center gap-2 flex-wrap min-w-0">
                     <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 truncate">Olá, {{ $user?->name }}!</h1>
                     @if($roleLabel)
                         <span class="inline-flex items-center rounded-full bg-slate-900/5 px-3 py-1 text-xs font-extrabold text-slate-700">
@@ -47,7 +47,7 @@
                     @endif
                 </p>
             </div>
-            <div class="flex flex-wrap gap-3">
+            <div class="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 w-full sm:w-auto mt-4 md:mt-0">
                 <a href="{{ route('panel.profile.edit') }}"
                     class="inline-flex items-center justify-center rounded-full bg-[#1F5EDB] px-5 py-2.5 text-sm font-bold text-white hover:brightness-110 transition">
                     <i class="fas fa-user-edit mr-2"></i> Editar perfil

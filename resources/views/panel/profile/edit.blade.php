@@ -4,13 +4,13 @@
 
 @section('panel_content')
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 flex-wrap">
             <div>
                 <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900">Meu perfil</h1>
                 <p class="text-slate-600 mt-1">Mantenha seus dados atualizados para melhor experiência na plataforma.</p>
             </div>
             <a href="{{ route('panel.dashboard') }}"
-                class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition w-full sm:w-auto mt-3 md:mt-0">
                 <i class="fas fa-arrow-left mr-2"></i> Voltar
             </a>
         </div>
