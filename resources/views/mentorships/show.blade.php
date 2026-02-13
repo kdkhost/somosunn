@@ -243,6 +243,74 @@
                     </aside>
                 </div>
 
+                @if($mentorship->materials->count() > 0)
+                    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 md:p-10 mt-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                            <div>
+                                <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Materiais da mentoria</h2>
+                                <p class="text-sm text-slate-500">Arquivos de apoio com identificacao por extensao.</p>
+                            </div>
+                            <span
+                                class="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-700 px-4 py-2 text-xs font-black uppercase tracking-wider">
+                                {{ $mentorship->materials->count() }} {{ $mentorship->materials->count() === 1 ? 'arquivo' : 'arquivos' }}
+                            </span>
+                        </div>
+
+                        @if($canDownloadMaterials)
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                @foreach($mentorship->materials as $material)
+                                    @php
+                                        $materialExtension = strtolower((string) ($material->file_type ?: pathinfo((string) $material->file_name, PATHINFO_EXTENSION)));
+                                        $materialIconMap = [
+                                            'pdf' => 'fa-file-pdf text-red-600',
+                                            'doc' => 'fa-file-word text-blue-600',
+                                            'docx' => 'fa-file-word text-blue-600',
+                                            'xls' => 'fa-file-excel text-green-600',
+                                            'xlsx' => 'fa-file-excel text-green-600',
+                                            'csv' => 'fa-file-csv text-green-600',
+                                            'ppt' => 'fa-file-powerpoint text-orange-600',
+                                            'pptx' => 'fa-file-powerpoint text-orange-600',
+                                            'zip' => 'fa-file-archive text-slate-500',
+                                            'rar' => 'fa-file-archive text-slate-500',
+                                            'mp4' => 'fa-file-video text-cyan-600',
+                                            'webm' => 'fa-file-video text-cyan-600',
+                                            'mkv' => 'fa-file-video text-cyan-600',
+                                            'mov' => 'fa-file-video text-cyan-600',
+                                            'jpg' => 'fa-file-image text-indigo-600',
+                                            'jpeg' => 'fa-file-image text-indigo-600',
+                                            'png' => 'fa-file-image text-indigo-600',
+                                            'webp' => 'fa-file-image text-indigo-600',
+                                        ];
+                                        $materialIcon = $materialIconMap[$materialExtension] ?? 'fa-file-alt text-blue-600';
+                                        $materialBadge = $materialExtension !== '' ? '.' . strtoupper($materialExtension) : '.FILE';
+                                        $materialSize = $material->file_size ? number_format(((int) $material->file_size) / 1024 / 1024, 2, ',', '.') . ' MB' : '--';
+                                    @endphp
+                                    <a href="{{ route('mentorships.materials.download', [$mentorship, $material]) }}"
+                                        class="group rounded-2xl border border-slate-200 bg-slate-50/60 p-4 hover:border-slate-300 hover:bg-slate-50 transition"
+                                        target="_blank" rel="noopener">
+                                        <div class="flex items-start gap-3">
+                                            <div
+                                                class="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0">
+                                                <i class="fas {{ $materialIcon }}"></i>
+                                            </div>
+                                            <div class="min-w-0">
+                                                <p class="font-semibold text-slate-900 truncate">{{ $material->file_name }}</p>
+                                                <p class="text-xs text-slate-500 mt-1">{{ $materialSize }} &bull; {{ $materialBadge }}</p>
+                                                <p class="text-xs text-blue-700 font-semibold mt-2 group-hover:underline">Baixar material</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <div
+                                class="rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center text-slate-500">
+                                Faca login com acesso ativo a esta mentoria para baixar os materiais.
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
                 <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 md:p-10 mt-6">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                         <div>
