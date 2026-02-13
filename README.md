@@ -22,32 +22,39 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 - **Relatórios:** Dashboards financeiros, de vendas e de engajamento.
 - **Configurações:** Controle total da plataforma via painel (cores, imagens, textos, integrações).
 
-## Instalação e Deploy
+## Novidades — Fevereiro/2026
 
-## UTF-8 sem BOM (OBRIGATÓRIO)
+### Novo Painel Unificado e Modernização
+- Todas as funcionalidades migradas para o novo painel (AdminLTE + Tailwind), sem dependência do sistema antigo para membros e instrutores.
+- Menu mobile 100% acessível, com navegação fluida, foco, aria-labels e fechamento automático.
+- Sidebar do painel com acesso rápido a configurações de pagamento, vendas e painel completo.
 
-- Este projeto usa **UTF-8 sem BOM** em TODOS os arquivos de texto (PHP, Blade, JS, CSS, JSON, MD, etc.).
-- Nunca salve arquivos como **UTF-8 com BOM** (bytes `EF BB BF` no início do arquivo), pois causa erros de acentuação/pontuação.
-- Antes de commitar, rode: `php tools/check-no-bom.php`.
+### Materiais de Apoio em Eventos e Mentorias
+- Upload de materiais (documentos, vídeos, imagens) via drag-and-drop para eventos e mentorias (admin e instrutor).
+- Ícones automáticos por tipo de arquivo, exibição de extensão e tamanho.
+- Ações rápidas: renomear, excluir e download seguro dos materiais.
+- Visual moderno e responsivo para participantes e instrutores.
 
-### Requisitos
-- PHP 8.1+
-- MySQL 5.7+ / Mariadb
-- Composer 2+
+### Configuração de Gateway de Pagamento (Instrutor)
+- Novo painel "Minhas Configurações de Pagamento" para cadastro de credenciais MercadoPago e PagSeguro.
+- Teste de conexão integrado e ativação/desativação de gateways.
+- Split de pagamento automático: comissão da plataforma é descontada e repassada ao instrutor.
+- Manual detalhado em `resources/docs/manual-instrutor-gateway.md`.
 
-### Instruções Rápidas (cPanel/Compartilhado)
-1. Configure o banco de dados e o arquivo `.env`.
-2. Execute as migrações: `php artisan migrate --seed`.
-3. Configure o cron job para rodar `php artisan schedule:run` a cada minuto.
-4. Para filas, use `QUEUE_CONNECTION=database` e configure o worker.
+### Perfil do Usuário Modernizado
+- Máscaras automáticas para CPF/CNPJ, telefone e CEP.
+- Preenchimento automático de endereço via consulta ao CEP (viacep.com.br).
+- Validações aprimoradas e feedback visual.
 
-### Webhooks de Pagamento
-Configure as URLs no seu gateway (MercadoPago/PagSeguro):
-- `YOUR_DOMAIN/api/v1/webhooks/mercadopago`
-- `YOUR_DOMAIN/api/v1/webhooks/pagseguro`
+### Novos Models e Migrations
+- `Commission`: registro detalhado de comissões de vendas.
+- `EventMaterial` e `MentorshipMaterial`: upload e gerenciamento de arquivos de apoio.
+- Novas migrations para tabelas de materiais e comissões.
+- Configuração dinâmica de comissão do marketplace (`marketplace_platform_fee_percent`).
 
-### SMTP e Emails
-Configure as credenciais no painel admin em **Configurações > SMTP**. Use a ferramenta de "Teste de Envio" para validar.
+### Documentação e Manuais
+- Manual do fluxo completo do instrutor: `resources/docs/manual-fluxo-completo.md`.
+- Manual de configuração de gateway: `resources/docs/manual-instrutor-gateway.md`.
 
 ---
 
