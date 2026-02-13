@@ -73,18 +73,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Admin - UNN')</title>
     <link rel="icon" href="{{ $faviconUrl }}" type="image/svg+xml">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" onerror="this.onerror=null;this.href='/vendor/fontawesome-free/css/all.min.css';">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars/css/OverlayScrollbars.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jqvmap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-colorpicker@3.4.0/dist/css/bootstrap-colorpicker.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="/vendor/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="/vendor/overlayscrollbars/css/OverlayScrollbars.min.css">
+    <link rel="stylesheet" href="/vendor/jqvmap/css/jqvmap.min.css">
+    <link rel="stylesheet" href="/vendor/adminlte-copia/css/adminlte.min.css">
+    <link rel="stylesheet" href="/vendor/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+    <link rel="stylesheet" href="/vendor/cropperjs/css/cropper.min.css">
+    <link rel="stylesheet" href="/vendor/summernote/css/summernote-bs4.min.css">
+    <link rel="stylesheet" href="/vendor/toastr/css/toastr.min.css">
+    <link rel="stylesheet" href="/vendor/sweetalert2/css/sweetalert2.min.css">
+    <link rel="stylesheet" href="/vendor/flatpickr/css/flatpickr.min.css">
+    <link rel="stylesheet" href="/vendor/adminlte-copia/css/adminlte.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -398,25 +397,24 @@
         @includeWhen(true, 'partials.footer')
     @endif
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="/vendor/jquery/jquery.min.js"></script>
     <script>if(typeof jQuery==='undefined'){document.write('<script src="/vendor/jquery/jquery.min.js"><\/script>');}</script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/jquery.inputmask.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars/js/jquery.overlayScrollbars.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-knob-chif@1.2.13/dist/jquery.knob.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jquery.vmap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/maps/jquery.vmap.world.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap-colorpicker@3.4.0/dist/js/bootstrap-colorpicker.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/inputmask/js/jquery.inputmask.min.js"></script>
+    <script src="/vendor/overlayscrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <script src="/vendor/adminlte-copia/js/adminlte.min.js"></script>
+    <script src="/vendor/chart.js/js/chart.min.js"></script>
+    <script src="/vendor/jquery-knob-chif/js/jquery.knob.min.js"></script>
+    <script src="/vendor/jqvmap/js/jquery.vmap.min.js"></script>
+    <script src="/vendor/jqvmap/js/maps/jquery.vmap.world.js"></script>
+    <script src="/vendor/cropperjs/js/cropper.min.js"></script>
+    <script src="/vendor/summernote/js/summernote-bs4.min.js"></script>
+    <script src="/vendor/pjax/js/jquery.pjax.min.js"></script>
+    <script src="/vendor/toastr/js/toastr.min.js"></script>
+    <script src="/vendor/sweetalert2/js/sweetalert2.all.min.js"></script>
+    <script src="/vendor/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+    <script src="/vendor/flatpickr/js/flatpickr.min.js"></script>
+    <script src="/vendor/flatpickr/js/l10n/pt.js"></script>
     @include('admin.partials.notifications')
     @include('admin.partials.chat-widget')
     @stack('scripts')
