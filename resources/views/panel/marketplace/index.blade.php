@@ -14,12 +14,12 @@
     @endphp
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4 flex-wrap">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 flex-wrap">
             <div>
-                <h1 class="text-xl md:text-3xl font-extrabold text-slate-900">Marketplace (Vendas)</h1>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900">Marketplace (Vendas)</h1>
                 <p class="text-slate-600 mt-1">Acompanhe suas vendas e a comissão da plataforma.</p>
             </div>
-            <div class="flex flex-col sm:flex-row flex-wrap gap-1 sm:gap-3 w-full sm:w-auto mt-3 md:mt-0">
+            <div class="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 w-full sm:w-auto mt-4 md:mt-0">
                 <a href="{{ route('panel.marketplace.payments') }}"
                     class="inline-flex items-center justify-center rounded-full border border-[#1F5EDB] px-5 py-2.5 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
                     <i class="fas fa-credit-card mr-2"></i> Pagamentos
@@ -32,18 +32,18 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5 mt-4 sm:mt-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 mt-6">
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
-            <div class="text-xs sm:text-sm font-bold text-slate-500">Vendas pagas</div>
-            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $paidCount }}</div>
+            <div class="text-sm font-bold text-slate-500">Vendas pagas</div>
+            <div class="text-3xl font-extrabold text-slate-900 mt-1">{{ $paidCount }}</div>
         </div>
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
-            <div class="text-xs sm:text-sm font-bold text-slate-500">Pendentes</div>
-            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $pendingCount }}</div>
+            <div class="text-sm font-bold text-slate-500">Pendentes</div>
+            <div class="text-3xl font-extrabold text-slate-900 mt-1">{{ $pendingCount }}</div>
         </div>
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
-            <div class="text-xs sm:text-sm font-bold text-slate-500">Total líquido</div>
-            <div class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1">R$ {{ number_format($netTotal, 2, ',', '.') }}</div>
+            <div class="text-sm font-bold text-slate-500">Total líquido</div>
+            <div class="text-2xl font-extrabold text-slate-900 mt-1">R$ {{ number_format($netTotal, 2, ',', '.') }}</div>
             <div class="text-xs text-slate-500 mt-2">
                 Bruto: R$ {{ number_format($paidTotal, 2, ',', '.') }} • Comissão: R$ {{ number_format($platformFeeTotal, 2, ',', '.') }}
             </div>
