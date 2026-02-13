@@ -6,5 +6,5 @@ return [
     'video_max_mb' => env('VIDEO_MAX_MB', 1024),
     'document_max_mb' => env('DOCUMENT_MAX_MB', 50),
     'allowed_video_formats' => array_values(array_filter(array_map('trim', explode(',', strtolower(env('ALLOWED_VIDEO_FORMATS', 'mp4,webm,mkv')))))),
-    'allowed_document_formats' => array_values(array_filter(array_map('trim', explode(',', strtolower(env('ALLOWED_DOCUMENT_FORMATS', 'pdf,docx,pptx')))))),
+    'allowed_document_formats' => array_values(array_filter(array_map('trim', explode(',', strtolower(env('ALLOWED_DOCUMENT_FORMATS', 'pdf,doc,docx,ppt,pptx,csv,txt,rtf,odt,ods,odp,xls,xlsx,zip,rar')))))),
 ];
