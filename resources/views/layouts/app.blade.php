@@ -926,7 +926,7 @@
             window.UNN = window.UNN || {};
             window.UNN.videoPlayer = {!! $videoPlayerConfigJson !!};
         </script>
-        <script src="{{ asset('vendor/plyr/plyr.polyfilled.js') }}"></script>
+        <script src="/vendor/plyr/plyr.polyfilled.js"></script>
         <script>
             (function () {
                 const config = (window.UNN && window.UNN.videoPlayer) ? window.UNN.videoPlayer : null;
