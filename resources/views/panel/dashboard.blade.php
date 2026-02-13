@@ -29,7 +29,7 @@
     @endphp
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6" id="painel-dashboard">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 flex-wrap">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between flex-wrap w-full">
             <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap min-w-0">
                     <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 truncate">Olá, {{ $user?->name }}!</h1>
@@ -49,16 +49,16 @@
             </div>
             <div class="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 w-full sm:w-auto mt-4 md:mt-0">
                 <a href="{{ route('panel.profile.edit') }}"
-                    class="inline-flex items-center justify-center rounded-full bg-[#1F5EDB] px-5 py-2.5 text-sm font-bold text-white hover:brightness-110 transition">
+                    class="inline-flex items-center justify-center rounded-full bg-[#1F5EDB] px-5 py-2.5 text-sm font-bold text-white hover:brightness-110 transition w-full sm:w-auto">
                     <i class="fas fa-user-edit mr-2"></i> Editar perfil
                 </a>
                 <a href="{{ route('premium') }}"
-                    class="inline-flex items-center justify-center rounded-full border border-[#1F5EDB] px-5 py-2.5 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
+                    class="inline-flex items-center justify-center rounded-full border border-[#1F5EDB] px-5 py-2.5 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition w-full sm:w-auto">
                     <i class="fas fa-crown mr-2"></i> Ver planos
                 </a>
                 @if(!$isSuperadminUser)
                     <a href="{{ route('panel.admin') }}"
-                        class="inline-flex items-center justify-center rounded-full border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                        class="inline-flex items-center justify-center rounded-full border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition w-full sm:w-auto">
                         <i class="fas fa-layer-group mr-2"></i> Painel completo
                     </a>
                 @endif
@@ -178,21 +178,21 @@
                             Acesse configurações e módulos administrativos sem perder o padrão do novo painel.
                         </div>
                     </div>
-                    <div class="flex flex-wrap gap-3">
+                    <div class="flex flex-col gap-3 w-full sm:flex-row sm:flex-wrap">
                         <a href="{{ route('panel.admin') }}"
-                            class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-slate-800 transition">
+                            class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-slate-800 transition w-full sm:w-auto">
                             <i class="fas fa-th-large mr-2"></i> Painel Admin
                         </a>
                         <a href="{{ route('panel.admin', ['to' => 'settings/general']) }}"
-                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition w-full sm:w-auto">
                             <i class="fas fa-cogs mr-2"></i> Configurações
                         </a>
                         <a href="{{ route('panel.admin', ['to' => 'settings/gateway']) }}"
-                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition w-full sm:w-auto">
                             <i class="fas fa-credit-card mr-2"></i> Gateway
                         </a>
                         <a href="{{ route('panel.admin', ['to' => 'mailtemplates']) }}"
-                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                            class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition w-full sm:w-auto">
                             <i class="fas fa-at mr-2"></i> E-mails
                         </a>
                     </div>

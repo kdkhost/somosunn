@@ -830,26 +830,33 @@
                 }
                 mobileToggle.dataset.mobileMenuBound = '1';
 
+
                 var openMenu = function () {
                     mobileMenu.classList.remove('hidden');
                     mobileMenu.setAttribute('aria-hidden', 'false');
+
+                    // Forçar reflow para garantir transição
+                    void mobilePanel.offsetWidth;
+                    void mobileOverlay.offsetWidth;
 
                     mobileOverlay.classList.remove('pointer-events-none');
                     mobileOverlay.classList.remove('opacity-0');
                     mobileOverlay.classList.add('opacity-100');
 
                     mobilePanel.classList.remove('-translate-x-full');
+                    mobilePanel.classList.add('translate-x-0');
                 };
 
                 var closeMenu = function () {
                     mobileOverlay.classList.add('opacity-0');
                     mobileOverlay.classList.remove('opacity-100');
+                    mobilePanel.classList.remove('translate-x-0');
                     mobilePanel.classList.add('-translate-x-full');
-                    mobileOverlay.classList.add('pointer-events-none');
                     setTimeout(function () {
                         mobileMenu.classList.add('hidden');
                         mobileMenu.setAttribute('aria-hidden', 'true');
-                    }, 320);
+                        mobileOverlay.classList.add('pointer-events-none');
+                    }, 350);
                 };
 
                 mobileToggle.addEventListener('click', function (e) {
