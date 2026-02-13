@@ -6,6 +6,23 @@
     <li class="breadcrumb-item active">{{ $course->exists ? 'Editar' : 'Novo' }}</li>
 @endsection
 
+@php
+    $allowedDocExtensions = [];
+    foreach ((array) config('uploads.allowed_document_formats', []) as $ext) {
+        $ext = strtolower(trim((string) $ext));
+        if ($ext !== '' && preg_match('/^[a-z0-9]+$/', $ext)) {
+            $allowedDocExtensions[] = $ext;
+        }
+    }
+    $allowedDocExtensions = array_values(array_unique($allowedDocExtensions));
+    $dropzoneAcceptedList = [];
+    foreach ($allowedDocExtensions as $ext) {
+        $dropzoneAcceptedList[] = '.' . $ext;
+    }
+    $dropzoneAcceptedFiles = implode(',', $dropzoneAcceptedList);
+    $dropzoneMaxFilesizeMb = (int) config('uploads.document_max_mb', 50);
+@endphp
+
 @push('styles')
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
     <style>
@@ -1178,22 +1195,75 @@
             });
         }
 
+        const allowedDocumentExtensions = @json($allowedDocExtensions);
+        const dropzoneAcceptedFiles = @json($dropzoneAcceptedFiles);
+        const dropzoneMaxFilesize = {{ $dropzoneMaxFilesizeMb }};
+        const allowedExtensionsLabel = allowedDocumentExtensions.length
+            ? ('.' + allowedDocumentExtensions.join(', .'))
+            : 'formatos definidos pela politica ativa';
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function detectAttachmentExtension(attachment) {
+            const explicitType = String(attachment.file_type || '').toLowerCase().trim();
+            if (explicitType !== '') {
+                return explicitType;
+            }
+
+            const fileName = String(attachment.file_name || '').toLowerCase();
+            const parts = fileName.split('.');
+            return parts.length > 1 ? parts.pop() : '';
+        }
+
+        function getAttachmentIconClass(extension) {
+            const ext = String(extension || '').toLowerCase();
+            const iconMap = {
+                pdf: 'fa-file-pdf text-danger',
+                doc: 'fa-file-word text-primary',
+                docx: 'fa-file-word text-primary',
+                xls: 'fa-file-excel text-success',
+                xlsx: 'fa-file-excel text-success',
+                csv: 'fa-file-csv text-success',
+                ppt: 'fa-file-powerpoint text-warning',
+                pptx: 'fa-file-powerpoint text-warning',
+                zip: 'fa-file-archive text-secondary',
+                rar: 'fa-file-archive text-secondary',
+                txt: 'fa-file-alt text-muted'
+            };
+
+            return iconMap[ext] || 'fa-file-alt text-muted';
+        }
+
         function renderAttachments(attachments, lessonId) {
             const list = $('#attachmentList');
             list.empty();
             attachments.forEach(att => {
                 const size = (att.file_size / 1024 / 1024).toFixed(2) + ' MB';
+                const extension = detectAttachmentExtension(att);
+                const iconClass = getAttachmentIconClass(extension);
+                const extensionBadge = extension ? '.' + extension.toUpperCase() : '.FILE';
+                const safeName = escapeHtml(att.file_name || 'arquivo');
+                const escapedNameForJs = String(att.file_name || '')
+                    .replace(/\\/g, '\\\\')
+                    .replace(/'/g, '\\\'');
                 const item = `
                                                                                                         <li class="attachment-item" id="att-${att.id}">
                                                                                                             <div class="d-flex align-items-center">
-                                                                                                                <i class="fas fa-file attachment-icon"></i>
+                                                                                                                <i class="fas ${iconClass} attachment-icon"></i>
                                                                                                                 <div>
-                                                                                                                    <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
-                                                                                                                    <small class="text-muted">${size}</small>
+                                                                                                                    <div class="font-weight-bold" id="att-name-${att.id}">${safeName}</div>
+                                                                                                                    <small class="text-muted">${size} &bull; ${extensionBadge}</small>
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                             <div>
-                                                                                                                <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
+                                                                                                                <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${escapedNameForJs}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
                                                                                                                 <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
                                                                                                             </div>
                                                                                                         </li>
@@ -1247,13 +1317,13 @@
                 myDropzone = new Dropzone("#filesDropzone", {
                     url: "/dummy", // Set dynamically
                     headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                    maxFilesize: 500, // 500 MB
+                    maxFilesize: dropzoneMaxFilesize,
                     timeout: 0, // No timeout
-                    acceptedFiles: null,
+                    acceptedFiles: dropzoneAcceptedFiles || null,
                     autoProcessQueue: false, // Wait for name
                     addRemoveLinks: true,
                     dictRemoveFile: "Cancelar",
-                    dictDefaultMessage: "Arraste arquivos aqui ou clique para enviar",
+                    dictDefaultMessage: "Arraste arquivos aqui ou clique para enviar (" + allowedExtensionsLabel + ")",
                     dictFallbackMessage: "Seu navegador não suporta upload arrastar e soltar.",
                     dictFileTooBig: "Arquivo muito grande (@{{filesize}}MiB). Máximo: @{{maxFilesize}}MiB.",
                     dictInvalidFileType: "Você não pode enviar arquivos deste tipo.",
