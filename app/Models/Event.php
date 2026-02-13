@@ -176,4 +176,9 @@ class Event extends Model
     {
         return $this->hasMany(Certificate::class);
     }
+
+    public function materials()
+    {
+        return $this->hasMany(EventMaterial::class)->latest('id');
+    }
 }
