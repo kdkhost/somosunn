@@ -25,5 +25,5 @@ document.addEventListener('DOMContentLoaded', function () {
         ]
     });
     // Descomente para iniciar automaticamente
-    // tour.start();
+    tour.start();
 });
