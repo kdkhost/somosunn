@@ -7,6 +7,32 @@
     if (!empty($mentorship->schedule) && is_array($mentorship->schedule)) {
         $schedulePretty = json_encode($mentorship->schedule, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
+
+    $allowedDocumentRaw = trim((string) (\App\Models\Setting::get('allowed_document_formats', '')));
+    if ($allowedDocumentRaw === '') {
+        $allowedDocumentRaw = implode(',', (array) config('uploads.allowed_document_formats', []));
+    }
+
+    $allowedVideoRaw = trim((string) (\App\Models\Setting::get('allowed_video_formats', '')));
+    if ($allowedVideoRaw === '') {
+        $allowedVideoRaw = implode(',', (array) config('uploads.allowed_video_formats', []));
+    }
+
+    $allowedMaterialExtensions = [];
+    $allowedMaterialRawList = preg_split('/[,\s]+/', strtolower($allowedDocumentRaw . ',' . $allowedVideoRaw)) ?: [];
+    foreach ($allowedMaterialRawList as $ext) {
+        $ext = strtolower(trim((string) $ext));
+        if ($ext !== '' && preg_match('/^[a-z0-9]+$/', $ext)) {
+            $allowedMaterialExtensions[] = $ext;
+        }
+    }
+    $allowedMaterialExtensions = array_values(array_unique($allowedMaterialExtensions));
+    $materialDropzoneAcceptedFiles = implode(',', array_map(fn($ext) => '.' . $ext, $allowedMaterialExtensions));
+    $materialDropzoneMaxFilesizeMb = max(1,
+        (int) (\App\Models\Setting::get('document_max_mb', (int) config('uploads.document_max_mb', 50))),
+        (int) (\App\Models\Setting::get('video_max_mb', (int) config('uploads.video_max_mb', 1024)))
+    );
+    $mentorshipMaterials = $mentorship->exists ? $mentorship->materials()->latest('id')->get() : collect();
 @endphp
 
 @section('content')
@@ -221,6 +247,95 @@
                             </button>
                         </div>
                     </form>
+
+                    @if($mentorship->exists)
+                        <div class="card border-0 shadow-sm mt-4">
+                            <div class="card-header bg-white border-bottom-0">
+                                <h6 class="mb-1 font-weight-bold">
+                                    <i class="fas fa-folder-open text-primary mr-1"></i> Materiais da mentoria
+                                </h6>
+                                <small class="text-muted">
+                                    Arraste e solte arquivos ou clique para selecionar. Tipos permitidos:
+                                    {{ $allowedMaterialExtensions ? '.' . implode(', .', $allowedMaterialExtensions) : 'conforme politica ativa' }}.
+                                </small>
+                            </div>
+                            <div class="card-body">
+                                <form action="{{ route('admin.mentorships.materials.upload', $mentorship) }}" method="POST"
+                                    class="dropzone" id="mentorshipMaterialsDropzone">
+                                    @csrf
+                                </form>
+                                <ul class="attachment-list mt-3" id="mentorshipMaterialsList">
+                                    @forelse($mentorshipMaterials as $material)
+                                        @php
+                                            $materialExtension = strtolower((string) ($material->file_type ?: pathinfo((string) $material->file_name, PATHINFO_EXTENSION)));
+                                            $materialIconMap = [
+                                                'pdf' => 'fa-file-pdf text-danger',
+                                                'doc' => 'fa-file-word text-primary',
+                                                'docx' => 'fa-file-word text-primary',
+                                                'xls' => 'fa-file-excel text-success',
+                                                'xlsx' => 'fa-file-excel text-success',
+                                                'csv' => 'fa-file-csv text-success',
+                                                'ppt' => 'fa-file-powerpoint text-warning',
+                                                'pptx' => 'fa-file-powerpoint text-warning',
+                                                'zip' => 'fa-file-archive text-secondary',
+                                                'rar' => 'fa-file-archive text-secondary',
+                                                'mp4' => 'fa-file-video text-info',
+                                                'webm' => 'fa-file-video text-info',
+                                                'mkv' => 'fa-file-video text-info',
+                                                'mov' => 'fa-file-video text-info',
+                                                'jpg' => 'fa-file-image text-purple',
+                                                'jpeg' => 'fa-file-image text-purple',
+                                                'png' => 'fa-file-image text-purple',
+                                                'webp' => 'fa-file-image text-purple',
+                                            ];
+                                            $materialIcon = $materialIconMap[$materialExtension] ?? 'fa-file-alt text-muted';
+                                            $materialBadge = $materialExtension !== '' ? '.' . strtoupper($materialExtension) : '.FILE';
+                                            $materialSize = $material->file_size ? number_format(((int) $material->file_size) / 1024 / 1024, 2, ',', '.') . ' MB' : '--';
+                                        @endphp
+                                        <li class="attachment-item" id="mentorship-material-{{ $material->id }}"
+                                            data-material-item="1">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas {{ $materialIcon }} attachment-icon"></i>
+                                                <div>
+                                                    <div class="font-weight-bold"
+                                                        id="mentorship-material-name-{{ $material->id }}">{{ $material->file_name }}
+                                                    </div>
+                                                    <small class="text-muted">{{ $materialSize }} &bull;
+                                                        {{ $materialBadge }}</small>
+                                                </div>
+                                            </div>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{{ route('mentorships.materials.download', [$mentorship, $material]) }}"
+                                                    class="btn btn-outline-primary" target="_blank" rel="noopener"
+                                                    title="Baixar">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-outline-secondary js-rename-mentorship-material"
+                                                    data-id="{{ $material->id }}"
+                                                    data-name="{{ $material->file_name }}"
+                                                    title="Renomear">
+                                                    <i class="fas fa-pen"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger js-delete-mentorship-material"
+                                                    data-id="{{ $material->id }}"
+                                                    title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </li>
+                                    @empty
+                                        <li class="attachment-item text-muted justify-content-center" id="mentorship-material-empty">
+                                            Nenhum material enviado ainda.
+                                        </li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                        </div>
+                    @else
+                        <div class="alert alert-info mt-4 mb-0">
+                            Salve a mentoria para habilitar o envio de materiais com arrasta e solta.
+                        </div>
+                    @endif
                 </div>
 
                 <!-- TAB CERTIFICADO -->
@@ -542,7 +657,38 @@
 @endsection
 
 @push('styles')
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
     <style>
+        .dropzone {
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            background: #f8f9fa;
+            min-height: 150px;
+            padding: 24px;
+        }
+
+        .attachment-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border: 1px solid #ececec;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: #fff;
+        }
+
+        .attachment-icon {
+            font-size: 1.3rem;
+            margin-right: 10px;
+        }
+
         .cert-element {
             padding: 4px;
             border-radius: 4px;
@@ -560,6 +706,329 @@
         }
     </style>
 @endpush
+
+@if($mentorship->exists)
+    @push('scripts')
+        <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+        <script>
+            (function () {
+            const dropzoneElement = document.getElementById('mentorshipMaterialsDropzone');
+            const listElement = document.getElementById('mentorshipMaterialsList');
+
+            if (!dropzoneElement || !listElement || typeof Dropzone === 'undefined') {
+                return;
+            }
+
+            Dropzone.autoDiscover = false;
+
+            const csrfToken = '{{ csrf_token() }}';
+            const uploadUrl = @json(route('admin.mentorships.materials.upload', $mentorship));
+            const renameUrlTemplate = @json(route('admin.mentorships.materials.rename', [$mentorship->id, '__MATERIAL_ID__']));
+            const deleteUrlTemplate = @json(route('admin.mentorships.materials.destroy', [$mentorship->id, '__MATERIAL_ID__']));
+            const downloadUrlTemplate = @json(route('mentorships.materials.download', [$mentorship->id, '__MATERIAL_ID__']));
+            const acceptedFiles = @json($materialDropzoneAcceptedFiles);
+            const maxFilesize = {{ $materialDropzoneMaxFilesizeMb }};
+            const allowedExtensions = @json($allowedMaterialExtensions);
+            const allowedExtensionsLabel = allowedExtensions.length
+                ? ('.' + allowedExtensions.join(', .'))
+                : 'formatos definidos pela politica ativa';
+
+            function resolveUrl(template, materialId) {
+                return String(template).replace('__MATERIAL_ID__', String(materialId));
+            }
+
+            function escapeHtml(value) {
+                return String(value ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            function detectExtension(material) {
+                const explicitType = String(material.file_type || '').toLowerCase().trim();
+                if (explicitType !== '') {
+                    return explicitType;
+                }
+
+                const fileName = String(material.file_name || '').toLowerCase();
+                const parts = fileName.split('.');
+                return parts.length > 1 ? parts.pop() : '';
+            }
+
+            function iconClass(extension) {
+                const ext = String(extension || '').toLowerCase();
+                const map = {
+                    pdf: 'fa-file-pdf text-danger',
+                    doc: 'fa-file-word text-primary',
+                    docx: 'fa-file-word text-primary',
+                    xls: 'fa-file-excel text-success',
+                    xlsx: 'fa-file-excel text-success',
+                    csv: 'fa-file-csv text-success',
+                    ppt: 'fa-file-powerpoint text-warning',
+                    pptx: 'fa-file-powerpoint text-warning',
+                    zip: 'fa-file-archive text-secondary',
+                    rar: 'fa-file-archive text-secondary',
+                    txt: 'fa-file-alt text-muted',
+                    mp4: 'fa-file-video text-info',
+                    webm: 'fa-file-video text-info',
+                    mkv: 'fa-file-video text-info',
+                    mov: 'fa-file-video text-info',
+                    jpg: 'fa-file-image text-info',
+                    jpeg: 'fa-file-image text-info',
+                    png: 'fa-file-image text-info',
+                    webp: 'fa-file-image text-info',
+                    gif: 'fa-file-image text-info'
+                };
+
+                return map[ext] || 'fa-file-alt text-muted';
+            }
+
+            function formatSize(bytes) {
+                const size = Number(bytes || 0);
+                if (!Number.isFinite(size) || size <= 0) {
+                    return '--';
+                }
+
+                return ((size / 1024 / 1024).toFixed(2)).replace('.', ',') + ' MB';
+            }
+
+            function materialItemCount() {
+                return listElement.querySelectorAll('li[data-material-item="1"]').length;
+            }
+
+            function updateEmptyState() {
+                const emptyItem = document.getElementById('mentorship-material-empty');
+
+                if (materialItemCount() > 0) {
+                    if (emptyItem) {
+                        emptyItem.remove();
+                    }
+                    return;
+                }
+
+                if (!emptyItem) {
+                    const placeholder = document.createElement('li');
+                    placeholder.className = 'attachment-item text-muted justify-content-center';
+                    placeholder.id = 'mentorship-material-empty';
+                    placeholder.textContent = 'Nenhum material enviado ainda.';
+                    listElement.appendChild(placeholder);
+                }
+            }
+
+            function buildMaterialItem(material, downloadUrl) {
+                const extension = detectExtension(material);
+                const extensionBadge = extension ? '.' + extension.toUpperCase() : '.FILE';
+                const safeName = escapeHtml(material.file_name || 'arquivo');
+                const icon = iconClass(extension);
+                const sizeLabel = formatSize(material.file_size);
+                const finalDownloadUrl = downloadUrl || resolveUrl(downloadUrlTemplate, material.id);
+
+                return `
+                    <li class="attachment-item" id="mentorship-material-${material.id}" data-material-item="1">
+                        <div class="d-flex align-items-center">
+                            <i class="fas ${icon} attachment-icon"></i>
+                            <div>
+                                <div class="font-weight-bold" id="mentorship-material-name-${material.id}">${safeName}</div>
+                                <small class="text-muted">${sizeLabel} &bull; ${extensionBadge}</small>
+                            </div>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <a href="${finalDownloadUrl}" class="btn btn-outline-primary" target="_blank" rel="noopener" title="Baixar">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            <button type="button" class="btn btn-outline-secondary js-rename-mentorship-material" data-id="${material.id}" data-name="${safeName}" title="Renomear">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger js-delete-mentorship-material" data-id="${material.id}" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                `;
+            }
+
+            function showErrorMessage(message) {
+                if (typeof message === 'string' && message.trim() !== '') {
+                    return message;
+                }
+
+                if (message && typeof message === 'object') {
+                    if (typeof message.error === 'string' && message.error.trim() !== '') {
+                        return message.error;
+                    }
+                    if (typeof message.message === 'string' && message.message.trim() !== '') {
+                        return message.message;
+                    }
+                }
+
+                return 'Nao foi possivel concluir o envio do arquivo.';
+            }
+
+            listElement.addEventListener('click', function (event) {
+                const renameButton = event.target.closest('.js-rename-mentorship-material');
+                if (renameButton) {
+                    const materialId = renameButton.getAttribute('data-id');
+                    const currentName = renameButton.getAttribute('data-name') || '';
+
+                    Swal.fire({
+                        title: 'Renomear material',
+                        input: 'text',
+                        inputValue: currentName,
+                        showCancelButton: true,
+                        confirmButtonText: 'Salvar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+                        const nextName = String(result.value || '').trim();
+                        if (nextName === '') {
+                            toastr.error('Informe um nome valido.');
+                            return;
+                        }
+
+                        $.ajax({
+                            url: resolveUrl(renameUrlTemplate, materialId),
+                            type: 'PUT',
+                            data: {
+                                _token: csrfToken,
+                                name: nextName
+                            },
+                            success: function () {
+                                const title = document.getElementById('mentorship-material-name-' + materialId);
+                                if (title) {
+                                    title.textContent = nextName;
+                                }
+                                renameButton.setAttribute('data-name', nextName);
+                                toastr.success('Material renomeado com sucesso.');
+                            },
+                            error: function (xhr) {
+                                const message = xhr?.responseJSON?.message || xhr?.responseJSON?.error || 'Nao foi possivel renomear o material.';
+                                toastr.error(message);
+                            }
+                        });
+                    });
+                    return;
+                }
+
+                const deleteButton = event.target.closest('.js-delete-mentorship-material');
+                if (!deleteButton) {
+                    return;
+                }
+
+                const materialId = deleteButton.getAttribute('data-id');
+                Swal.fire({
+                    title: 'Excluir material?',
+                    text: 'Essa acao nao pode ser desfeita.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, excluir',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+
+                    $.ajax({
+                        url: resolveUrl(deleteUrlTemplate, materialId),
+                        type: 'DELETE',
+                        data: { _token: csrfToken },
+                        success: function () {
+                            const item = document.getElementById('mentorship-material-' + materialId);
+                            if (item) {
+                                item.remove();
+                            }
+                            updateEmptyState();
+                            toastr.success('Material removido com sucesso.');
+                        },
+                        error: function (xhr) {
+                            const message = xhr?.responseJSON?.message || xhr?.responseJSON?.error || 'Nao foi possivel remover o material.';
+                            toastr.error(message);
+                        }
+                    });
+                });
+            });
+
+            const dz = new Dropzone('#mentorshipMaterialsDropzone', {
+                url: uploadUrl,
+                paramName: 'file',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                maxFilesize: maxFilesize,
+                timeout: 0,
+                acceptedFiles: acceptedFiles || null,
+                autoProcessQueue: false,
+                addRemoveLinks: true,
+                dictRemoveFile: 'Cancelar',
+                dictDefaultMessage: 'Arraste arquivos aqui ou clique para enviar (' + allowedExtensionsLabel + ')',
+                dictFallbackMessage: 'Seu navegador nao suporta envio por arrastar e soltar.',
+                dictFileTooBig: 'Arquivo muito grande (@{{filesize}} MiB). Maximo: @{{maxFilesize}} MiB.',
+                dictInvalidFileType: 'Esse tipo de arquivo nao e permitido.',
+                dictResponseError: 'Falha no servidor (@{{statusCode}}).',
+                dictCancelUpload: 'Cancelar upload',
+                dictUploadCanceled: 'Upload cancelado.',
+                init: function () {
+                    this.on('addedfile', function (file) {
+                        Swal.fire({
+                            title: 'Nome do material',
+                            input: 'text',
+                            inputValue: file.name,
+                            showCancelButton: true,
+                            confirmButtonText: 'Enviar',
+                            cancelButtonText: 'Cancelar',
+                            allowOutsideClick: false,
+                            returnFocus: false
+                        }).then((result) => {
+                            if (!result.isConfirmed) {
+                                this.removeFile(file);
+                                return;
+                            }
+
+                            const customName = String(result.value || '').trim();
+                            file.customName = customName !== '' ? customName : file.name;
+                            this.processFile(file);
+                        });
+                    });
+
+                    this.on('sending', function (file, xhr, formData) {
+                        formData.append('name', file.customName || file.name);
+                    });
+
+                    this.on('success', function (file, response) {
+                        if (!response || !response.success || !response.material) {
+                            toastr.error('Resposta inesperada do servidor no upload.');
+                            this.removeFile(file);
+                            return;
+                        }
+
+                        const html = buildMaterialItem(response.material, response.download_url);
+                        listElement.insertAdjacentHTML('afterbegin', html);
+                        updateEmptyState();
+                        toastr.success('Material enviado com sucesso.');
+                        this.removeFile(file);
+                    });
+
+                    this.on('error', function (file, message) {
+                        if (file && file.status === 'canceled') {
+                            return;
+                        }
+
+                        const parsed = showErrorMessage(message?.error || message);
+                        toastr.error(parsed);
+                        this.removeFile(file);
+                    });
+                }
+            });
+
+                updateEmptyState();
+            })();
+        </script>
+    @endpush
+@endif
 
 @push('scripts')
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
