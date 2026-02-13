@@ -15,7 +15,7 @@
     };
 @endphp
 
-<div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 sticky top-24">
+<div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 sticky top-24" id="sidebar-menu">
     <div class="flex items-center gap-3">
         <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
             <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="w-full h-full object-cover" onerror="this.style.display='none';">
@@ -39,7 +39,7 @@
             Visão geral
         </a>
 
-        <a href="{{ route('panel.profile.edit') }}" class="{{ $navItemClass(request()->routeIs('panel.profile.*')) }}">
+        <a href="{{ route('panel.profile.edit') }}" class="{{ $navItemClass(request()->routeIs('panel.profile.*')) }}" id="menu-perfil">
             <i class="fas fa-user-circle w-5 opacity-80"></i>
             Meu perfil
         </a>
@@ -64,7 +64,12 @@
         @endif
 
         @if($user->canAccessFeature('marketplace.buy') || $isImpersonatingAdmin)
-            <a href="{{ route('marketplace.index') }}" class="{{ $navItemClass(false) }}">
+            <a href="{{ route('marketplace.index') }}" class="{{ $navItemClass(false) }}" id="menu-marketplace">
+                    <div class="mt-6 text-center">
+                        <button class="btn btn-outline-info btn-sm" onclick="window.MemberTour.reset()">
+                            <i class="fas fa-question-circle"></i> Recomeçar Tour
+                        </button>
+                    </div>
                 <i class="fas fa-store w-5 opacity-80"></i>
                 Marketplace
             </a>

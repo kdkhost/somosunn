@@ -31,6 +31,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700">E-mail</label>
                     <input name="email" type="email" required class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:border-purple-500 focus:ring-2 focus:ring-purple-300 transition-all" />
+                                    <input name="email" type="email" required placeholder="seu@email.com" class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:border-purple-500 focus:ring-2 focus:ring-purple-300 transition-all" />
                 </div>
                 <button type="submit" class="w-full btn-primary text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">Enviar link de recuperação</button>
             </form>

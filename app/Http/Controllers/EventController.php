@@ -24,7 +24,8 @@ class EventController extends Controller
         $now = now();
 
         // Public listing: upcoming events and events that haven't ended yet (ongoing).
-        $events = Event::where('published', true)
+        $events = Event::with('user')
+            ->where('published', true)
             ->whereNotNull('start_at')
             ->where(function ($query) use ($now) {
                 $query->where('start_at', '>=', $now)
@@ -40,7 +41,8 @@ class EventController extends Controller
         $featuredEvent = $events->first();
         $otherEvents = $featuredEvent ? $events->slice(1)->values() : collect();
 
-        $pastEvents = Event::where('published', true)
+        $pastEvents = Event::with('user')
+            ->where('published', true)
             ->whereNotNull('start_at')
             ->where(function ($query) use ($now) {
                 $query->where('end_at', '<', $now)

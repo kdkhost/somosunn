@@ -21,18 +21,22 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Nome completo</label>
                     <input name="name" type="text" required class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
+                                    <input name="name" type="text" required placeholder="Digite seu nome completo" class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">E-mail</label>
                     <input name="email" type="email" required autocomplete="email" class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
+                                    <input name="email" type="email" required autocomplete="email" placeholder="seu@email.com" class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Senha</label>
                     <input name="password" type="password" required autocomplete="new-password" class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
+                                    <input name="password" type="password" required autocomplete="new-password" placeholder="Crie uma senha" class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Confirmar senha</label>
                     <input name="password_confirmation" type="password" required autocomplete="new-password" class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
+                                    <input name="password_confirmation" type="password" required autocomplete="new-password" placeholder="Confirme a senha" class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
                 </div>
                 <button type="submit" class="w-full btn-primary text-white py-3 rounded-xl font-semibold shadow-lg">Criar conta</button>
             </form>

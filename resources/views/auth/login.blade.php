@@ -24,12 +24,12 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700">E-mail</label>
                         <input name="email" type="email" required autocomplete="email"
-                            class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
+                            placeholder="seu@email.com" class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Senha</label>
                         <input name="password" type="password" required autocomplete="current-password"
-                            class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
+                            placeholder="Sua senha" class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
                     </div>
                     <div class="flex items-center justify-between text-sm text-gray-500">
                         <label class="inline-flex items-center gap-2"><input type="checkbox" name="remember"

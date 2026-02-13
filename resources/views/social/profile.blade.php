@@ -81,7 +81,7 @@
             <!-- Capa -->
             <div class="h-64 sm:h-80 w-full bg-gray-200 overflow-hidden relative group">
                 @if(isset($user->cover_photo) && $user->cover_photo)
-                    <img src="{{ asset($user->cover_photo) }}" alt="Capa" class="w-full h-full object-cover">
+                    <img src="{{ asset($user->cover_photo) }}" alt="Capa" class="w-full h-full object-cover" loading="lazy">
                 @else
                     <div class="w-full h-full bg-gradient-to-r from-[#1F5EDB] to-[#0d3b96]"></div>
                 @endif
@@ -94,7 +94,7 @@
                     <!-- Avatar -->
                     <div class="flex-shrink-0 relative">
                         <div class="w-40 h-40 sm:w-48 sm:h-48 bg-white rounded-full p-1.5 shadow-xl">
-                            <img src="{{ $user->profile_photo_url }}"
+                            <img src="{{ $user->profile_photo_url }}" loading="lazy"
                                 class="w-full h-full rounded-full object-cover border-4 border-white" alt="Avatar"
                                 onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                         </div>
@@ -348,7 +348,7 @@
                                     <div class="flex items-center justify-between gap-3">
                                         <div class="flex items-center gap-3">
                                             <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
-                                                <img src="{{ $requester->profile_photo_url }}" alt="Avatar"
+                                                <img src="{{ $requester->profile_photo_url }}" alt="Avatar" loading="lazy"
                                                     class="w-10 h-10 object-cover"
                                                     onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                                             </div>

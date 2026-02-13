@@ -20,7 +20,14 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="theme-color" content="#1F5EDB">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="format-detection" content="telephone=no">
     <title>@yield('title', \App\Models\Setting::get('seo_meta_title') ?: config('app.name', 'UNN'))</title>
     @php
         $logoFront = \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
@@ -312,6 +319,13 @@
             background: linear-gradient(135deg, var(--unn-azul-1) 0%, var(--unn-azul-2) 50%, var(--unn-azul-3) 100%);
             color: #fff;
             border: none;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s, filter 0.2s;
+        }
+
+        /* Transições globais para botões, menus e elementos interativos */
+        button, .btn, .btn-primary, .btn-secondary, .btn-danger, .btn-success, .btn-warning, .btn-info,
+        a[class*="btn-"], a.btn, .sidebar, .menu, .dropdown, .rounded-xl, .rounded-full {
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s, filter 0.2s, border-color 0.2s, transform 0.2s;
         }
 
         /* Garantir que botões e links não quebrem texto */

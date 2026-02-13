@@ -51,28 +51,72 @@
                 <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
                     <h2 class="text-2xl font-black text-gray-900 mb-6">Finalizar compra</h2>
 
-                    <form action="{{ route('checkout.process', $course) }}" method="POST" class="space-y-6">
+                    <form id="checkout-coupon-form" action="{{ route('checkout.process', $course) }}" method="POST" class="space-y-6">
                         @csrf
-
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Cupom de desconto (opcional)</label>
                             <input type="text" name="coupon_code" value="{{ old('coupon_code') }}" placeholder="Ex: BLACKFRIDAY26"
                                 class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                            <p class="text-xs text-gray-500 mt-2">Se tiver um cupom, aplique antes de continuar.</p>
+                            <p class="text-xs text-gray-500 mt-2">Se tiver um cupom, aplique antes de pagar.</p>
                         </div>
-
-                        <button type="submit"
-                            class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
-                            <i class="fas fa-lock"></i> Continuar para pagamento
-                        </button>
-
                         <p class="text-xs text-gray-500 text-center">
-                            Ao continuar, você concorda com os termos de compra e políticas do curso.
+                            Ao pagar, você concorda com os termos de compra e políticas do curso.
                         </p>
                     </form>
+                    <div class="mt-8">
+                        <div id="cardPaymentBrick_container"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script>
+    // Chave pública MercadoPago vinda do backend (ajuste conforme necessário)
+    const mp = new MercadoPago('{{ config('payments.mercadopago.public_key') }}', {
+        locale: 'pt-BR'
+    });
+    const bricksBuilder = mp.bricks();
+    const renderPaymentBrick = async (bricksBuilder) => {
+        const settings = {
+            initialization: {
+                amount: {{ (float) ($course->effective_price ?? $course->price ?? 0) }},
+                // preferenceId pode ser usado se já existir lógica para gerar preference no backend
+            },
+            customization: {
+                paymentMethods: {
+                    ticket: "all",
+                    bankTransfer: "all", // PIX
+                    creditCard: "all",
+                    debitCard: "all",
+                    mercadoPago: "all",
+                },
+                visual: {
+                    style: {
+                        theme: 'bootstrap',
+                    }
+                }
+            },
+            callbacks: {
+                onReady: () => {
+                   // loaded
+                },
+                onSubmit: ({ selectedPaymentMethod, formData }) => {
+                    // Aqui pode ser implementada lógica para processar o pagamento, exibir loading, etc.
+                },
+                onError: (error) => {
+                    console.error(error);
+                },
+            },
+        };
+        window.paymentBrickController = await bricksBuilder.create(
+            'payment',
+            'cardPaymentBrick_container',
+            settings
+        );
+    };
+    renderPaymentBrick(bricksBuilder);
+</script>
 @endsection

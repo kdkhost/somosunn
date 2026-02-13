@@ -28,16 +28,34 @@ class ProfileController extends Controller
             'state' => $this->normalizeState($request->input('state')),
         ]);
 
+        $docType = $request->input('doc_type', 'cpf');
+
         $data = $request->validate([
             'name' => 'required|string|max:120',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6|confirmed',
             'phone' => ['nullable', 'string', 'max:16', 'regex:/^\(\d{2}\)\s\d{4,5}-\d{4}$/'],
-            'doc' => ['nullable', 'string', 'max:18', 'regex:/^(\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})$/'],
+            'doc_type' => 'required|in:cpf,cnpj',
+            'doc' => [
+                'nullable',
+                'string',
+                'max:18',
+                function ($attribute, $value, $fail) use ($docType) {
+                    if ($value) {
+                        if ($docType === 'cpf' && !preg_match('/^\d{3}\.\d{3}\.\d{3}-\d{2}$/', $value)) {
+                            return $fail('O CPF informado não é válido.');
+                        }
+                        if ($docType === 'cnpj' && !preg_match('/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/', $value)) {
+                            return $fail('O CNPJ informado não é válido.');
+                        }
+                    }
+                },
+            ],
             'occupation' => 'nullable|string|max:100',
             'company' => 'nullable|string|max:100',
             'segment' => 'nullable|string|max:120',
-            'interests' => 'nullable|string|max:500',
+            'interests' => 'nullable|array',
+            'interests.*' => 'string|max:100',
             'bio' => 'nullable|string|max:500',
             'photo' => 'nullable|image|max:2048',
             'cover_photo' => 'nullable|image|max:4096',
@@ -64,6 +82,11 @@ class ProfileController extends Controller
         $data['show_phone_public'] = $request->has('show_phone_public');
         $data['show_address_public'] = $request->has('show_address_public');
         $data['hide_profile'] = $request->has('hide_profile');
+
+        // Salvar interesses como string separada por vírgula para compatibilidade, ou como array/json se o model permitir
+        if (isset($data['interests']) && is_array($data['interests'])) {
+            $data['interests'] = implode(',', array_filter($data['interests']));
+        }
 
         // Upload avatar
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {

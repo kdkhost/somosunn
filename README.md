@@ -1,3 +1,40 @@
+# Tour guiado para membros (2026)
+
+## Novidade: Tour interativo no painel do membro
+- Implementado tour guiado e explicativo para novos usuários/membros usando Shepherd.js.
+- O tour ensina o uso do painel, menu lateral, perfil e marketplace.
+- O status de conclusão do tour é salvo por usuário (localStorage).
+- O membro pode reiniciar o tour a qualquer momento pelo botão “Recomeçar Tour” no menu lateral.
+
+### Como funciona
+- O tour inicia automaticamente para quem nunca concluiu.
+- Para reiniciar, clique no botão de ajuda no menu lateral.
+- Passos e destaques podem ser expandidos facilmente.
+
+---
+# Otimizações de Queries e Próximos Passos (2026)
+
+## O que foi feito
+- Todas as listagens principais revisadas para evitar N+1 queries (uso de with/withCount nos controllers).
+- Documentação das dependências, fallback de CDN e meta tags de performance/PWA já incluídas.
+
+## Recomendações futuras
+- Sempre usar eager loading (`with()`) ao exibir relações em listagens.
+- Monitorar queries com debugbar ou logs em produção.
+- Revisar periodicamente controllers e APIs para novas relações.
+- Consultar IMPLEMENTATION_SUMMARY_QUERIES.md para histórico das otimizações.
+
+---
+## Dependências Frontend e Fallback de CDN
+
+O painel administrativo utiliza bibliotecas JS/CSS via CDN (ex: jQuery, FontAwesome, Bootstrap, AdminLTE, Tailwind). Para garantir robustez:
+
+- Os principais assets possuem fallback automático para arquivos locais em `public/vendor` caso o CDN falhe.
+- Mantenha os arquivos locais atualizados. Recomenda-se rodar `npm install` ou baixar as versões correspondentes e copiar para `public/vendor`.
+- Exemplo: se o CDN do jQuery estiver indisponível, será carregado `/vendor/jquery/jquery.min.js` automaticamente.
+- O mesmo vale para FontAwesome (`/vendor/fontawesome-free/css/all.min.css`).
+
+> **Dica:** Para ambientes offline ou restritos, garanta que todos os arquivos necessários estejam presentes em `public/vendor`.
 # UNN — Plataforma de Networking
 
 # Visão Geral do Sistema

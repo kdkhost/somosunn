@@ -28,49 +28,72 @@
                 <div>
                     <label class="text-sm font-bold text-slate-700">Nome completo *</label>
                     <input name="name" value="{{ old('name', $user->name) }}" required
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="Digite seu nome completo" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">E-mail *</label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}" required
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="seu@email.com" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Telefone</label>
                     <input id="profile_phone" name="phone" value="{{ old('phone', $user->phone) }}"
                         data-mask-phone maxlength="16" inputmode="tel" autocomplete="tel"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="(99) 99999-9999" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Documento</label>
-                    <input id="profile_doc" name="doc" value="{{ old('doc', $user->doc) }}"
-                        data-mask-cpf-cnpj maxlength="18" inputmode="numeric" autocomplete="off"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                    <div class="flex gap-2">
+                        <select id="doc_type" name="doc_type" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm" style="min-width:110px">
+                            <option value="cpf" {{ (old('doc_type', (strlen(preg_replace('/\D/', '', $user->doc ?? '')) <= 11 ? 'cpf' : 'cnpj')) == 'cpf') ? 'selected' : '' }}>CPF</option>
+                            <option value="cnpj" {{ (old('doc_type', (strlen(preg_replace('/\D/', '', $user->doc ?? '')) > 11 ? 'cnpj' : 'cpf')) == 'cnpj') ? 'selected' : '' }}>CNPJ</option>
+                        </select>
+                        <input id="profile_doc" name="doc" value="{{ old('doc', $user->doc) }}"
+                            maxlength="18" inputmode="numeric" autocomplete="off"
+                            placeholder="Digite o número" title="Digite apenas números. Aceita {{ old('doc_type', (strlen(preg_replace('/\D/', '', $user->doc ?? '')) <= 11 ? 'CPF' : 'CNPJ')) }} válido."
+                            class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                    </div>
+                    <small class="text-xs text-slate-500">Selecione o tipo e digite o número do documento.</small>
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Ocupação</label>
                     <input name="occupation" value="{{ old('occupation', $user->occupation) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="Sua ocupação" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Empresa</label>
                     <input name="company" value="{{ old('company', $user->company) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="Empresa onde trabalha" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Segmento</label>
                     <input name="segment" value="{{ old('segment', $user->segment) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="Segmento de atuação" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Interesses</label>
-                    <input name="interests" value="{{ old('interests', $user->interests) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                    @php
+                        $opcoesInteresses = [
+                            'Marketing', 'Tecnologia', 'Saúde', 'Educação', 'Finanças', 'Gestão', 'Design', 'Engenharia', 'Direito', 'Psicologia', 'RH', 'Vendas', 'Comunicação', 'Outro'
+                        ];
+                        $interessesSelecionados = collect(old('interests', $user->interests))->filter()->map(function($i) {
+                            return trim($i);
+                        });
+                        if (is_string($interessesSelecionados)) {
+                            $interessesSelecionados = collect(explode(',', $interessesSelecionados))->map(function($i) { return trim($i); });
+                        }
+                    @endphp
+                    <select name="interests[]" multiple size="5" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" title="Selecione um ou mais interesses. Use Ctrl ou Cmd para múltiplos.">
+                        @foreach($opcoesInteresses as $opcao)
+                            <option value="{{ $opcao }}" {{ $interessesSelecionados->contains($opcao) ? 'selected' : '' }}>{{ $opcao }}</option>
+                        @endforeach
+                    </select>
+                    <small class="text-xs text-slate-500">Segure Ctrl (Windows) ou Cmd (Mac) para selecionar múltiplos.</small>
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold text-slate-700">Bio</label>
                     <textarea name="bio" rows="4"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">{{ old('bio', $user->bio) }}</textarea>
+                        placeholder="Conte um pouco sobre você" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">{{ old('bio', $user->bio) }}</textarea>
                 </div>
             </div>
 
@@ -78,13 +101,13 @@
                 <div>
                     <label class="text-sm font-bold text-slate-700">Nova senha</label>
                     <input type="password" name="password" minlength="6"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="Nova senha" title="Mínimo 6 caracteres. Use letras e números para maior segurança." class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                     <p class="text-xs text-slate-500 mt-2">Deixe em branco para manter a senha atual.</p>
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Confirmar senha</label>
                     <input type="password" name="password_confirmation" minlength="6"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="Confirme a nova senha" title="Repita a senha para confirmação." class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
             </div>
         </div>
@@ -99,14 +122,11 @@
                     <div class="text-sm font-bold text-slate-700">Foto de perfil</div>
                     <div class="mt-3 flex items-center gap-4">
                         <div class="w-16 h-16 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center">
-                            @if($user->photo)
-                                <img src="{{ asset($user->photo) }}" alt="Avatar" class="w-full h-full object-cover">
-                            @else
-                                <span class="text-slate-500 font-bold">{{ mb_substr((string) $user->name, 0, 1) }}</span>
-                            @endif
+                            <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="w-full h-full object-cover" loading="lazy" onerror="this.src='{{ asset('img/default-user.svg') }}'">
                         </div>
-                        <input type="file" name="photo" accept="image/*"
+                        <input type="file" name="photo" accept="image/*" id="profile_photo_input"
                             class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-[#1F5EDB] file:px-5 file:py-2 file:text-sm file:font-bold file:text-white hover:file:brightness-110">
+                        <small class="text-xs text-slate-500">Máx. 2MB. Imagens grandes serão rejeitadas.</small>
                     </div>
                 </div>
 
@@ -115,11 +135,37 @@
                     <div class="mt-3">
                         @if($user->cover_photo)
                             <div class="w-full h-28 rounded-2xl overflow-hidden bg-slate-100">
-                                <img src="{{ asset($user->cover_photo) }}" alt="Capa" class="w-full h-full object-cover">
+                                <img src="{{ asset($user->cover_photo) }}" alt="Capa" class="w-full h-full object-cover" loading="lazy">
                             </div>
                         @endif
-                        <input type="file" name="cover_photo" accept="image/*"
+                        <input type="file" name="cover_photo" accept="image/*" id="cover_photo_input"
                             class="mt-3 block w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-slate-900 file:px-5 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-slate-800">
+                        <small class="text-xs text-slate-500">Máx. 4MB. Imagens grandes serão rejeitadas.</small>
+                    @push('scripts')
+                    <script>
+                    // Validação de tamanho de upload de imagem (frontend)
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var photoInput = document.getElementById('profile_photo_input');
+                        var coverInput = document.getElementById('cover_photo_input');
+                        if (photoInput) {
+                            photoInput.addEventListener('change', function(e) {
+                                if (e.target.files[0] && e.target.files[0].size > 2 * 1024 * 1024) {
+                                    alert('A foto de perfil deve ter no máximo 2MB.');
+                                    e.target.value = '';
+                                }
+                            });
+                        }
+                        if (coverInput) {
+                            coverInput.addEventListener('change', function(e) {
+                                if (e.target.files[0] && e.target.files[0].size > 4 * 1024 * 1024) {
+                                    alert('A imagem de capa deve ter no máximo 4MB.');
+                                    e.target.value = '';
+                                }
+                            });
+                        }
+                    });
+                    </script>
+                    @endpush
                     </div>
                 </div>
             </div>
@@ -135,38 +181,38 @@
                     <label class="text-sm font-bold text-slate-700">CEP</label>
                     <input id="profile_cep" name="cep" value="{{ old('cep', $user->cep) }}"
                         data-mask-cep maxlength="9" inputmode="numeric" autocomplete="postal-code"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="00000-000" title="Digite o CEP para preencher endereço automaticamente." class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                     <p id="profile_cep_feedback" class="mt-2 text-xs text-slate-500"></p>
                 </div>
                 <div class="md:col-span-3">
                     <label class="text-sm font-bold text-slate-700">Rua/Avenida</label>
                     <input id="profile_street" name="street" value="{{ old('street', $user->street) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="Rua/Avenida" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">Número</label>
                     <input id="profile_number" name="number" value="{{ old('number', $user->number) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="Número" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-3">
                     <label class="text-sm font-bold text-slate-700">Complemento</label>
                     <input id="profile_complement" name="complement" value="{{ old('complement', $user->complement) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="Complemento" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold text-slate-700">Bairro</label>
                     <input id="profile_neighborhood" name="neighborhood" value="{{ old('neighborhood', $user->neighborhood) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="Bairro" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">Cidade</label>
                     <input id="profile_city" name="city" value="{{ old('city', $user->city) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="Cidade" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">UF</label>
                     <input id="profile_state" name="state" value="{{ old('state', $user->state) }}" maxlength="2" autocomplete="address-level1"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm uppercase">
+                        placeholder="UF" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm uppercase">
                 </div>
             </div>
         </div>
@@ -180,32 +226,32 @@
                 <div>
                     <label class="text-sm font-bold text-slate-700">Website</label>
                     <input name="website" value="{{ old('website', $user->website) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="Seu site ou portfólio" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Instagram</label>
                     <input name="instagram" value="{{ old('instagram', $user->instagram) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="@seuusuario" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Facebook</label>
                     <input name="facebook" value="{{ old('facebook', $user->facebook) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="facebook.com/seuusuario" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Twitter</label>
                     <input name="twitter" value="{{ old('twitter', $user->twitter) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="@seuusuario" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">LinkedIn</label>
                     <input name="linkedin" value="{{ old('linkedin', $user->linkedin) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="linkedin.com/in/seuusuario" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">YouTube</label>
                     <input name="youtube" value="{{ old('youtube', $user->youtube) }}"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                        placeholder="youtube.com/seucanal" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
             </div>
         </div>
@@ -255,6 +301,7 @@
                 var cepInput = document.getElementById('profile_cep');
                 var phoneInput = document.getElementById('profile_phone');
                 var docInput = document.getElementById('profile_doc');
+                var docType = document.getElementById('doc_type');
 
                 if (cepInput) {
                     Inputmask('99999-999').mask(cepInput);
@@ -262,8 +309,20 @@
                 if (phoneInput) {
                     Inputmask({ mask: ['(99) 9999-9999', '(99) 99999-9999'], keepStatic: true }).mask(phoneInput);
                 }
-                if (docInput) {
-                    Inputmask({ mask: ['999.999.999-99', '99.999.999/9999-99'], keepStatic: true }).mask(docInput);
+                if (docInput && docType) {
+                    var mask = docType.value === 'cpf' ? '999.999.999-99' : '99.999.999/9999-99';
+                    Inputmask(mask).mask(docInput);
+                }
+
+                if (docType && docInput) {
+                    docType.addEventListener('change', function() {
+                        docInput.value = '';
+                        var mask = docType.value === 'cpf' ? '999.999.999-99' : '99.999.999/9999-99';
+                        Inputmask.remove(docInput);
+                        Inputmask(mask).mask(docInput);
+                        docInput.placeholder = docType.value === 'cpf' ? 'Digite o CPF' : 'Digite o CNPJ';
+                        docInput.title = 'Digite apenas números. Aceita ' + (docType.value === 'cpf' ? 'CPF' : 'CNPJ') + ' válido.';
+                    });
                 }
             }
 
@@ -323,6 +382,12 @@
                             }
 
                             setFeedback('Endereco preenchido automaticamente.', false);
+
+                            // Foco automático no campo número
+                            var numberInput = document.getElementById('profile_number');
+                            if (numberInput) {
+                                setTimeout(function() { numberInput.focus(); }, 100);
+                            }
                         })
                         .catch(function () {
                             setFeedback('Nao foi possivel consultar o CEP agora. Complete manualmente.', true);

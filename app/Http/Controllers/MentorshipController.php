@@ -16,7 +16,7 @@ class MentorshipController extends Controller
     public function index()
     {
         // Pega mentorias disponíveis
-        $mentorships = Mentorship::latest()->paginate(12);
+        $mentorships = Mentorship::with('mentor')->latest()->paginate(12);
         return view('mentorships.index', compact('mentorships'));
     }
 

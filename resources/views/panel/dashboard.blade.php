@@ -28,7 +28,7 @@
         $sellerNetTotal = (float) ($stats['seller_net_total'] ?? 0);
     @endphp
 
-    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6" id="painel-dashboard">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div class="min-w-0">
                 <div class="flex items-center gap-3 flex-wrap">

@@ -21,12 +21,14 @@ class HomeController extends Controller
 
         if (view()->shared('unnDbAvailable')) {
             try {
-                $freeEvents = Event::where('published', true)
+                $freeEvents = Event::with('user')
+                    ->where('published', true)
                     ->orderBy('start_at')
                     ->limit(6)
                     ->get();
 
-                $paidMentorings = Mentorship::where('slots', '>', 0)
+                $paidMentorings = Mentorship::with('mentor')
+                    ->where('slots', '>', 0)
                     ->orderByDesc('price')
                     ->limit(3)
                     ->get();
@@ -73,13 +75,15 @@ class HomeController extends Controller
         $featuredCourses = collect();
         if (view()->shared('unnDbAvailable')) {
             try {
-                $mentorings = Mentorship::where('slots', '>', 0)
+                $mentorings = Mentorship::with('mentor')
+                    ->where('slots', '>', 0)
                     ->orderBy('schedule')
                     ->limit(6)
                     ->get();
 
                 // Cursos em destaque: status published OU paused, is_featured = true
-                $featuredCourses = \App\Models\Course::where('is_featured', true)
+                $featuredCourses = \App\Models\Course::with('creator')
+                    ->where('is_featured', true)
                     ->whereIn('status', ['published', 'paused'])
                     ->inRandomOrder()
                     ->limit(6)

@@ -30,16 +30,19 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700">E-mail</label>
                     <input name="email" type="email" value="{{ $email ?? old('email') }}" required class="mt-1 w-full rounded-xl border border-gray-200 p-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#7a5af8] transition-all" />
+                                    <input name="email" type="email" value="{{ $email ?? old('email') }}" required placeholder="seu@email.com" class="mt-1 w-full rounded-xl border border-gray-200 p-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#7a5af8] transition-all" />
                 </div>
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Nova senha</label>
                     <input name="password" type="password" required class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" placeholder="Mínimo 8 caracteres" />
+                                    <input name="password" type="password" required placeholder="Nova senha" class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
                 </div>
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Confirmar senha</label>
                     <input name="password_confirmation" type="password" required class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
+                                    <input name="password_confirmation" type="password" required placeholder="Confirme a nova senha" class="mt-1 w-full rounded-xl border border-gray-200 p-3 focus:ring-2 focus:ring-[#7a5af8]" />
                 </div>
                 
                 <button type="submit" class="w-full btn-primary text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">Alterar senha</button>
