@@ -90,4 +90,9 @@ class Mentorship extends Model
     {
         return $this->hasMany(Certificate::class);
     }
+
+    public function materials()
+    {
+        return $this->hasMany(MentorshipMaterial::class)->latest('id');
+    }
 }
