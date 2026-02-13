@@ -131,6 +131,22 @@ class CheckoutController extends Controller
                         'discount_amount' => $discountAmount,
                     ],
                 ]);
+                // Log de comissão
+                \App\Models\Commission::create([
+                    'order_id' => $order->id,
+                    'seller_id' => $course->user_id,
+                    'total_amount' => $finalTotal,
+                    'platform_fee_amount' => $platformFeeAmount,
+                    'seller_amount' => max(0, $finalTotal - $platformFeeAmount),
+                    'currency' => 'BRL',
+                    'gateway' => 'mercadopago',
+                    'metadata' => [
+                        'course_id' => $course->id,
+                        'platform_fee_percent' => $platformFeePercent,
+                        'buyer_id' => Auth::id(),
+                        'coupon_id' => $coupon->id ?? null,
+                    ],
+                ]);
 
                 if ($coupon && $discountAmount > 0) {
                     $order->update([
