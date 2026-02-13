@@ -175,7 +175,7 @@ class MercadoPagoService
             $statementDescriptor = 'UNN PLATAFORMA';
         }
 
-        $payload = [
+        return [
             'items' => $items,
             'payer' => [
                 'name' => $order->user->name,
@@ -187,14 +187,6 @@ class MercadoPagoService
             'statement_descriptor' => $statementDescriptor,
             'notification_url' => $this->notificationUrl(),
         ];
-
-        // Split de pagamento (repasse de comissão)
-        $platformFee = (float) ($order->platform_fee_amount ?? 0);
-        if ($platformFee > 0) {
-            $payload['marketplace_fee'] = $platformFee;
-        }
-
-        return $payload;
     }
 
     public function refundPayment(Order $order): array

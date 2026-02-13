@@ -1,4 +1,6 @@
-# UNN — Plataforma de Networking# Visão Geral do Sistema
+# UNN — Plataforma de Networking
+
+# Visão Geral do Sistema
 
 O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida em Laravel 10.
 
@@ -20,39 +22,32 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 - **Relatórios:** Dashboards financeiros, de vendas e de engajamento.
 - **Configurações:** Controle total da plataforma via painel (cores, imagens, textos, integrações).
 
-## Novidades — Fevereiro/2026
+## Instalação e Deploy
 
-### Novo Painel Unificado e Modernização
-- Todas as funcionalidades migradas para o novo painel (AdminLTE + Tailwind), sem dependência do sistema antigo para membros e instrutores.
-- Menu mobile 100% acessível, com navegação fluida, foco, aria-labels e fechamento automático.
-- Sidebar do painel com acesso rápido a configurações de pagamento, vendas e painel completo.
+## UTF-8 sem BOM (OBRIGATÓRIO)
 
-### Materiais de Apoio em Eventos e Mentorias
-- Upload de materiais (documentos, vídeos, imagens) via drag-and-drop para eventos e mentorias (admin e instrutor).
-- Ícones automáticos por tipo de arquivo, exibição de extensão e tamanho.
-- Ações rápidas: renomear, excluir e download seguro dos materiais.
-- Visual moderno e responsivo para participantes e instrutores.
+- Este projeto usa **UTF-8 sem BOM** em TODOS os arquivos de texto (PHP, Blade, JS, CSS, JSON, MD, etc.).
+- Nunca salve arquivos como **UTF-8 com BOM** (bytes `EF BB BF` no início do arquivo), pois causa erros de acentuação/pontuação.
+- Antes de commitar, rode: `php tools/check-no-bom.php`.
 
-### Configuração de Gateway de Pagamento (Instrutor)
-- Novo painel "Minhas Configurações de Pagamento" para cadastro de credenciais MercadoPago e PagSeguro.
-- Teste de conexão integrado e ativação/desativação de gateways.
-- Split de pagamento automático: comissão da plataforma é descontada e repassada ao instrutor.
-- Manual detalhado em `resources/docs/manual-instrutor-gateway.md`.
+### Requisitos
+- PHP 8.1+
+- MySQL 5.7+ / Mariadb
+- Composer 2+
 
-### Perfil do Usuário Modernizado
-- Máscaras automáticas para CPF/CNPJ, telefone e CEP.
-- Preenchimento automático de endereço via consulta ao CEP (viacep.com.br).
-- Validações aprimoradas e feedback visual.
+### Instruções Rápidas (cPanel/Compartilhado)
+1. Configure o banco de dados e o arquivo `.env`.
+2. Execute as migrações: `php artisan migrate --seed`.
+3. Configure o cron job para rodar `php artisan schedule:run` a cada minuto.
+4. Para filas, use `QUEUE_CONNECTION=database` e configure o worker.
 
-### Novos Models e Migrations
-- `Commission`: registro detalhado de comissões de vendas.
-- `EventMaterial` e `MentorshipMaterial`: upload e gerenciamento de arquivos de apoio.
-- Novas migrations para tabelas de materiais e comissões.
-- Configuração dinâmica de comissão do marketplace (`marketplace_platform_fee_percent`).
+### Webhooks de Pagamento
+Configure as URLs no seu gateway (MercadoPago/PagSeguro):
+- `YOUR_DOMAIN/api/v1/webhooks/mercadopago`
+- `YOUR_DOMAIN/api/v1/webhooks/pagseguro`
 
-### Documentação e Manuais
-- Manual do fluxo completo do instrutor: `resources/docs/manual-fluxo-completo.md`.
-- Manual de configuração de gateway: `resources/docs/manual-instrutor-gateway.md`.
+### SMTP e Emails
+Configure as credenciais no painel admin em **Configurações > SMTP**. Use a ferramenta de "Teste de Envio" para validar.
 
 ---
 
@@ -110,79 +105,6 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
   - Correção no registro de conclusão usando `enrollable_id` e `enrollable_type`.
   - Atualização de status para "completed" ao finalizar curso.
 
-### 12/02/2026 — CMS do Institucional (páginas editáveis)
-- **Conteúdo 100% pelo Painel:**
-  - Páginas institucionais agora carregam **título** e **corpo (HTML)** do banco (`site_contents`), editáveis em **Conteúdo do Site**.
-  - Conteúdo atual das páginas foi semeado automaticamente no banco, respeitando edições já feitas pelo admin.
-- **Contato sem quebrar funcionalidades:**
-  - O corpo do Contato suporta placeholders (`[[CONTACT_*]]`) para manter formulário, mapa e FAQ funcionando mesmo com HTML editável.
-
-### 13/02/2026 — Auth (logo maior e login social consistente)
-- **Formulários (Login/Registro/Reset):**
-  - Logo do painel visual aumentada para melhor destaque da marca.
-  - Botões/ícones de login social agora apontam para o mesmo fluxo de autenticação (sem abrir tela com JSON).
-
-### 13/02/2026 — CMS Institucional (editor, SEO e menu)
-- **Painel CMS mais organizado:**
-  - Menu **Conteúdo do Site** virou submenu no sidebar com todas as páginas (evita abas estourando).
-  - Editor institucional com **Summernote** e upload de imagens/GIFs direto no corpo.
-- **SEO por página (personalizável):**
-  - Campos para `meta_title`, `meta_description`, `meta_keywords`, `canonical`, `robots`, `og_type`, `twitter_card`, `meta_image` e `twitter_image`.
-
-### 13/02/2026 — Institucional 2.0 (editor por seções)
-- **Menu no sidebar (sem ficar dentro de Administração):**
-  - Novo menu **SITE > Institucional** com todas as páginas institucionais (e Home/Rodapé) organizadas no sidebar.
-- **Editor estruturado (sem colar HTML/CSS/JS):**
-  - Cada página agora é editada por **abas de seções** (Hero, listas/cards, textos ricos por seção, CTA e SEO).
-  - Repetidores para listas (ex.: números, cards, passos e planos) com adicionar/remover itens.
-- **Front-end consumindo do CMS:**
-  - Páginas institucionais passaram a renderizar a partir desses campos, com fallback padrão quando não preenchido.
-
-### 13/02/2026 — Institucional 2.1 (prefill + Manifesto completo)
-- **Prefill automático dos campos estruturados (sem sobrescrever edições):**
-  - Nova migration semeia os novos campos do CMS com o conteúdo padrão das páginas institucionais (Hero, listas, textos e CTAs).
-- **Manifesto restaurado ao conteúdo original (mantendo o estilo atual):**
-  - Botão dos pilares ("Conhecer nossos valores") agora é configurável no painel e volta a aparecer por padrão.
-  - CTA do Manifesto volta ao texto original ("Se identificou com nossa visão?" / "Quero fazer parte").
-
-# Tour guiado dinâmico para membros (2026)
-
-## Novidade: Tour interativo e automático no painel do membro
-- O tour agora navega automaticamente entre todas as páginas do painel administrativo do membro.
-- Cada etapa destaca o menu/função, explica o que é, para que serve e como usar.
-- Sinais visuais, overlay e persistência de etapa: o usuário pode sair e voltar, continuará do ponto correto.
-- Nunca leva para o frontend público.
-- O membro pode reiniciar o tour a qualquer momento pelo botão “Recomeçar Tour” no menu lateral.
-
-### Como funciona
-- O tour inicia automaticamente para quem nunca concluiu.
-- Para reiniciar, clique no botão de ajuda no menu lateral.
-- O tour avança sozinho entre menus e páginas do painel, guiando o usuário passo a passo.
-
----
-# Otimizações de Queries e Próximos Passos (2026)
-
-## O que foi feito
-- Todas as listagens principais revisadas para evitar N+1 queries (uso de with/withCount nos controllers).
-- Documentação das dependências, fallback de CDN e meta tags de performance/PWA já incluídas.
-
-## Recomendações futuras
-- Sempre usar eager loading (`with()`) ao exibir relações em listagens.
-- Monitorar queries com debugbar ou logs em produção.
-- Revisar periodicamente controllers e APIs para novas relações.
-- Consultar IMPLEMENTATION_SUMMARY_QUERIES.md para histórico das otimizações.
-
----
-## Dependências Frontend e Fallback de CDN
-
-O painel administrativo utiliza bibliotecas JS/CSS via CDN (ex: jQuery, FontAwesome, Bootstrap, AdminLTE, Tailwind). Para garantir robustez:
-
-- Os principais assets possuem fallback automático para arquivos locais em `public/vendor` caso o CDN falhe.
-- Mantenha os arquivos locais atualizados. Recomenda-se rodar `npm install` ou baixar as versões correspondentes e copiar para `public/vendor`.
-- Exemplo: se o CDN do jQuery estiver indisponível, será carregado `/vendor/jquery/jquery.min.js` automaticamente.
-- O mesmo vale para FontAwesome (`/vendor/fontawesome-free/css/all.min.css`).
-
-> **Dica:** Para ambientes offline ou restritos, garanta que todos os arquivos necessários estejam presentes em `public/vendor`.
 
 ---
 © 2026 UNN Networking. Todos os direitos reservados.

@@ -20,16 +20,12 @@ class SiteContent extends Model
 
     public static function getValue(string $slug, string $key, ?string $default = null): ?string
     {
-        try {
-            $value = static::query()
-                ->where('slug', $slug)
-                ->where('key', $key)
-                ->value('value');
+        $value = static::query()
+            ->where('slug', $slug)
+            ->where('key', $key)
+            ->value('value');
 
-            return $value !== null ? (string) $value : $default;
-        } catch (\Throwable $e) {
-            return $default;
-        }
+        return $value !== null ? (string) $value : $default;
     }
 
     public static function putValue(string $slug, string $key, ?string $value, string $type = 'text'): self

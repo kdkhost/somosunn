@@ -1,7 +1,4 @@
 // Floating Chat Box Functions
-// Restaurar estado do chat ao carregar a página
-document.addEventListener('DOMContentLoaded', function() {
-    const chatBox = document.getElementById('chatBox');
 function openChatBox(userId, userName, userPhoto) {
     const chatBox = document.getElementById('chatBox');
     const chatUserName = document.getElementById('chatUserName');
@@ -30,15 +27,12 @@ function openChatBox(userId, userName, userPhoto) {
     loadMessages(userId);
 }
 
-    localStorage.setItem('chatBoxOpen', '1');
-    localStorage.setItem('chatBoxMinimized', '0');
 function closeChatBox() {
     const chatBox = document.getElementById('chatBox');
     chatBox.style.transform = 'translateY(100%)';
     setTimeout(() => {
         chatBox.style.display = 'none';
     }, 300);
-    localStorage.setItem('chatBoxOpen', '0');
 }
 
 function toggleMinimizeChat() {
@@ -50,12 +44,10 @@ function toggleMinimizeChat() {
         chatBody.style.display = 'block';
         chatFooter.style.display = 'block';
         minimizeIcon.className = 'fas fa-minus text-sm';
-        localStorage.setItem('chatBoxMinimized', '0');
     } else {
         chatBody.style.display = 'none';
         chatFooter.style.display = 'none';
         minimizeIcon.className = 'fas fa-window-maximize text-sm';
-        localStorage.setItem('chatBoxMinimized', '1');
     }
 }
 
@@ -154,21 +146,4 @@ function appendMessage(content, isMine, shouldScroll = true) {
 function scrollChatToBottom() {
     const chatBody = document.getElementById('chatBody');
     chatBody.scrollTop = chatBody.scrollHeight;
-    const chatBody = document.getElementById('chatBody');
-    const chatFooter = document.getElementById('chatFooter');
-    const minimizeIcon = document.getElementById('chatMinimizeIcon');
-    if (localStorage.getItem('chatBoxOpen') === '1') {
-        chatBox.style.display = 'block';
-        setTimeout(() => {
-            chatBox.style.transform = 'translateY(0)';
-        }, 10);
-    }
-    if (localStorage.getItem('chatBoxMinimized') === '1') {
-        if (chatBody && chatFooter && minimizeIcon) {
-            chatBody.style.display = 'none';
-            chatFooter.style.display = 'none';
-            minimizeIcon.className = 'fas fa-window-maximize text-sm';
-        }
-    }
-});
 }

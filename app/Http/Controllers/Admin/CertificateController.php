@@ -289,7 +289,7 @@ class CertificateController extends Controller
         }
 
         try {
-            Mail::to($certificate->user->email)->queue(new CertificateIssued($certificate));
+            Mail::to($certificate->user->email)->send(new CertificateIssued($certificate));
             return redirect()->back()->with('success', 'Certificado enviado por e-mail para ' . $certificate->user->email);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Erro ao enviar e-mail: ' . $e->getMessage());

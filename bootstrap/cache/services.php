@@ -25,11 +25,12 @@
     21 => 'Illuminate\\View\\ViewServiceProvider',
     22 => 'Illuminate\\Routing\\RoutingServiceProvider',
     23 => 'Laravel\\Sanctum\\SanctumServiceProvider',
-    24 => 'Carbon\\Laravel\\ServiceProvider',
-    25 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    26 => 'App\\Providers\\RouteServiceProvider',
-    27 => 'App\\Providers\\AppServiceProvider',
-    28 => 'Laravel\\Socialite\\SocialiteServiceProvider',
+    24 => 'Laravel\\Socialite\\SocialiteServiceProvider',
+    25 => 'Carbon\\Laravel\\ServiceProvider',
+    26 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    27 => 'App\\Providers\\RouteServiceProvider',
+    28 => 'App\\Providers\\AppServiceProvider',
+    29 => 'Laravel\\Socialite\\SocialiteServiceProvider',
   ),
   'eager' => 
   array (

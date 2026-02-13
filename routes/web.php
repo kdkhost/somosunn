@@ -138,9 +138,6 @@ Route::get('/membros', [\App\Http\Controllers\MemberController::class, 'index'])
 // Eventos (público: vitrine/SEO; compra/reserva controla acesso por pedido/inscrição)
 Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
 Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
-Route::get('/eventos/{event}/materiais/{material}/download', [\App\Http\Controllers\EventController::class, 'downloadMaterial'])
-    ->middleware('auth')
-    ->name('events.materials.download');
 Route::middleware(['auth', 'check.feature:events_create'])->group(function () {
     Route::get('/eventos/create', [\App\Http\Controllers\EventController::class, 'create'])->name('events.create');
     Route::post('/eventos', [\App\Http\Controllers\EventController::class, 'store'])->name('events.store');
@@ -245,9 +242,6 @@ Route::middleware(['auth', 'check.feature:courses_delete'])->group(function () {
 // Mentorias (público: vitrine/SEO; contratação/agenda continua restrita)
 Route::get('mentorships', [\App\Http\Controllers\MentorshipController::class, 'index'])->name('mentorships.index');
 Route::get('mentorships/{mentorship}', [\App\Http\Controllers\MentorshipController::class, 'show'])->name('mentorships.show');
-Route::get('mentorships/{mentorship}/materials/{material}/download', [\App\Http\Controllers\MentorshipController::class, 'downloadMaterial'])
-    ->middleware('auth')
-    ->name('mentorships.materials.download');
 Route::middleware(['auth', 'check.feature:mentorships_create'])->group(function () {
     Route::get('mentorships/create', [\App\Http\Controllers\MentorshipController::class, 'create'])->name('mentorships.create');
     Route::post('mentorships', [\App\Http\Controllers\MentorshipController::class, 'store'])->name('mentorships.store');
@@ -358,22 +352,11 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
 Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->group(function () {
     Route::get('/', [\App\Http\Controllers\Panel\DashboardController::class, 'index'])->name('dashboard');
 
-    // Atalho para abrir o painel administrativo (AdminLTE) com fallback seguro durante impersonação
+    // Atalho para abrir o antigo painel (AdminLTE) dentro do novo layout (exceto superadmin)
     Route::get('/admin', function (\Illuminate\Http\Request $request) {
         $to = trim((string) $request->query('to', ''));
-        $to = $to !== '' ? ltrim($to, '/') : '';
-
-        // Se estiver impersonando como membro, primeiro volta para a conta original.
-        if (session()->has('impersonator_id') && session()->get('impersonator_is_admin')) {
-            return redirect()->route('admin.impersonate.stop', $to !== '' ? ['to' => $to] : []);
-        }
-
-        $user = auth()->user();
-        if (!$user) {
-            return redirect()->route('login');
-        }
-
         if ($to !== '') {
+            $to = ltrim($to, '/');
             return redirect('/admin/' . $to);
         }
 
@@ -389,10 +372,6 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::get('/', [\App\Http\Controllers\Panel\MarketplaceController::class, 'index'])->name('index');
         Route::get('/pagamentos', [\App\Http\Controllers\Panel\MarketplaceController::class, 'payments'])->name('payments');
         Route::get('/vendas', [\App\Http\Controllers\Panel\MarketplaceController::class, 'sales'])->name('sales');
-        // Configuração de gateway do membro
-        Route::get('/gateway', [\App\Http\Controllers\Panel\MarketplaceController::class, 'gateway'])->name('gateway');
-        Route::post('/gateway', [\App\Http\Controllers\Panel\MarketplaceController::class, 'updatePayments'])->name('gateway.update');
-        Route::post('/gateway/test', [\App\Http\Controllers\Panel\MarketplaceController::class, 'testPaymentsConnection'])->name('gateway.test');
     });
 });
 
@@ -436,7 +415,7 @@ Route::get('/admin/stop-impersonating', [\App\Http\Controllers\Admin\Impersonate
     ->name('admin.impersonate.stop');
 
 // Admin routes (granular)
-Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class, 'check.plan'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class, \App\Http\Middleware\EnsureUserIsAdmin::class, 'check.plan'])->group(function () {
     // Rotas de Membro (Comum a todos no painel)
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/portal', [\App\Http\Controllers\Admin\MemberController::class, 'portal'])->name('portal.index');
@@ -512,11 +491,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
         Route::post('/settings/test-smtp', [\App\Http\Controllers\Admin\SettingController::class, 'testSmtp'])->name('settings.test-smtp');
 
-        // CMS (Conteúdo do Site)
-        Route::get('/cms/{slug?}', [\App\Http\Controllers\Admin\CMSController::class, 'index'])->name('cms.index');
-        Route::post('/cms/{slug}', [\App\Http\Controllers\Admin\CMSController::class, 'update'])->name('cms.update');
-        Route::post('/cms/media/upload', [\App\Http\Controllers\Admin\CMSController::class, 'uploadMedia'])->name('cms.upload');
-
         // Usuários
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('users');
         // Permissões / Papéis
@@ -562,15 +536,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             ->middleware('check.feature:events_edit')->name('events.calendar.settings');
         Route::resource('events', \App\Http\Controllers\Admin\EventController::class)
             ->middleware('check.feature:events_access')->names('events');
-        Route::post('events/{event}/materials', [\App\Http\Controllers\Admin\EventController::class, 'uploadMaterial'])
-            ->middleware('check.feature:events_edit')
-            ->name('events.materials.upload');
-        Route::put('events/{event}/materials/{material}', [\App\Http\Controllers\Admin\EventController::class, 'renameMaterial'])
-            ->middleware('check.feature:events_edit')
-            ->name('events.materials.rename');
-        Route::delete('events/{event}/materials/{material}', [\App\Http\Controllers\Admin\EventController::class, 'deleteMaterial'])
-            ->middleware('check.feature:events_edit')
-            ->name('events.materials.destroy');
 
         // Points Rules
         Route::resource('points-rules', \App\Http\Controllers\Admin\PointsRuleController::class)
@@ -579,15 +544,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         // Mentorships CRUD
         Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class)
             ->middleware('check.feature:mentorships_access')->names('mentorships');
-        Route::post('mentorships/{mentorship}/materials', [\App\Http\Controllers\Admin\MentorshipController::class, 'uploadMaterial'])
-            ->middleware('check.feature:mentorships_edit')
-            ->name('mentorships.materials.upload');
-        Route::put('mentorships/{mentorship}/materials/{material}', [\App\Http\Controllers\Admin\MentorshipController::class, 'renameMaterial'])
-            ->middleware('check.feature:mentorships_edit')
-            ->name('mentorships.materials.rename');
-        Route::delete('mentorships/{mentorship}/materials/{material}', [\App\Http\Controllers\Admin\MentorshipController::class, 'deleteMaterial'])
-            ->middleware('check.feature:mentorships_edit')
-            ->name('mentorships.materials.destroy');
 
         // Ranking
         Route::get('/ranking', [\App\Http\Controllers\Admin\RankingController::class, 'index'])

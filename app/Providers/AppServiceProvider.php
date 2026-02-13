@@ -5,7 +5,6 @@ namespace App\Providers;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\RateLimiter;
@@ -22,14 +21,6 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('invoices_email', function ($job) {
             return Limit::perHour(100);
-        });
-
-        // CMS helper: @site('home.hero_title', 'fallback') / @siteRaw('home.hero_html')
-        Blade::directive('site', function ($expression) {
-            return '<?php echo e((string) \\App\\Models\\SiteContent::resolve(' . $expression . ')); ?>';
-        });
-        Blade::directive('siteRaw', function ($expression) {
-            return '<?php echo (string) \\App\\Models\\SiteContent::resolve(' . $expression . '); ?>';
         });
 
         \App\Models\User::observe(\App\Observers\UserObserver::class);

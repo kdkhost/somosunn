@@ -20,12 +20,7 @@ class SocialAuthController extends Controller
         if (!in_array($provider, $this->providers, true)) {
             abort(404);
         }
-        try {
-            return Socialite::driver($provider)->stateless()->redirect();
-        } catch (\Throwable $e) {
-            Log::warning('Social login redirect failed: ' . $e->getMessage());
-            return redirect()->route('login')->with('error', 'Não foi possível iniciar o login social. Verifique as configurações do provedor e tente novamente.');
-        }
+        return Socialite::driver($provider)->redirect();
     }
 
     public function callback(Request $request, $provider)
@@ -93,8 +88,7 @@ class SocialAuthController extends Controller
 
         Auth::login($user, true);
 
-        $isSuperadmin = (($user->role ?? '') === 'superadmin' || ($user->level ?? '') === 'superadmin');
-        $defaultRedirect = $isSuperadmin ? route('admin.dashboard') : route('panel.dashboard');
+        $defaultRedirect = $user->isAdmin() ? route('admin.dashboard') : route('panel.dashboard');
         return redirect()->intended($defaultRedirect);
     }
 

@@ -123,7 +123,6 @@ class User extends Authenticatable
         'company',
         'segment',
         'interests',
-        'interest_other',
         'photo',
         'cover_photo',
         'role',
@@ -163,8 +162,7 @@ class User extends Authenticatable
         'plan_expires_at' => 'datetime',
         'extra_features' => 'array',
         'social_links' => 'array',
-        'hide_profile' => 'boolean',
-        'interests' => 'array',
+        'hide_profile' => 'boolean'
     ];
 
     public function plan()

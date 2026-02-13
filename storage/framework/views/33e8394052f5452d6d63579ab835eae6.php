@@ -1,0 +1,560 @@
+<?php
+    $is = fn($patterns) => request()->routeIs($patterns) ? 'active' : '';
+    $open = fn($patterns) => request()->routeIs($patterns) ? 'menu-open' : '';
+    $cmsSlug = (string) (request()->route('slug') ?? request()->query('slug') ?? 'home');
+    if (trim($cmsSlug) === '') {
+        $cmsSlug = 'home';
+    }
+?>
+<?php
+    $brandLogo = asset('img/logo.svg'); // Default fallback
+    $brandFavicon = asset('img/logo.svg'); // Default fallback
+
+    try {
+        $logoAdmin = \App\Models\Setting::get('logo_admin');
+        $logoMain = \App\Models\Setting::get('logo_image');
+        $logoFavicon = \App\Models\Setting::get('favicon_image');
+
+        // Tenta usar logo_admin primeiro, depois logo_image
+        if ($logoAdmin && file_exists(public_path($logoAdmin))) {
+            $brandLogo = asset($logoAdmin);
+        } elseif ($logoMain && file_exists(public_path($logoMain))) {
+            $brandLogo = asset($logoMain);
+        }
+
+        // Tenta usar favicon personalizado
+        if ($logoFavicon && file_exists(public_path($logoFavicon))) {
+            $brandFavicon = asset($logoFavicon);
+        } elseif (file_exists(public_path('favicon.ico'))) {
+            $brandFavicon = asset('favicon.ico');
+        }
+    } catch (\Throwable $e) {
+        // Usa fallback padrão em caso de erro
+        \Log::error('Erro ao carregar logo da sidebar: ' . $e->getMessage());
+    }
+?>
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="<?php echo e(route('admin.dashboard')); ?>" class="brand-link d-flex align-items-center justify-content-center p-0"
+        style="height:60px; overflow:hidden;">
+        <img src="<?php echo e($brandLogo); ?>" alt="UNN" class="brand-logo-img"
+            style="max-height: 44px; width: auto; max-width: 80%; object-fit: contain;">
+        <img src="<?php echo e($brandFavicon); ?>" alt="UNN" class="brand-favicon-img"
+            style="max-height: 44px; width: auto; max-width: 80%; object-fit: contain;">
+    </a>
+    <style>
+        /* Estado Padrão (Aberto): Logo Visível, Favicon Oculto */
+        .brand-link .brand-logo-img {
+            display: block;
+        }
+
+        .brand-link .brand-favicon-img {
+            display: none;
+        }
+
+        /* Estado Fechado (.sidebar-collapse no body): Logo Oculto, Favicon Visível */
+        body.sidebar-collapse .brand-link .brand-logo-img {
+            display: none !important;
+        }
+
+        body.sidebar-collapse .brand-link .brand-favicon-img {
+            display: block !important;
+        }
+
+        /* Estado Hover no Mini (Passar mouse quando fechado): Logo Volta, Favicon Some */
+        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link .brand-logo-img {
+            display: block !important;
+        }
+
+        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link .brand-favicon-img {
+            display: none !important;
+        }
+    </style>
+    <div class="sidebar" style="padding-bottom: 1.5rem;">
+        
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
+            <div class="image mr-2">
+                <img src="<?php echo e(auth()->user()->photo ? asset(auth()->user()->photo) : asset('img/user.png')); ?>"
+                    class="img-circle elevation-2 border border-blue-200" alt="User Image"
+                    style="width: 38px; height: 38px; object-fit: cover;">
+            </div>
+            <div class="info">
+                <a href="<?php echo e(route('admin.profile.edit')); ?>" class="d-block text-wrap"
+                    style="max-width: 160px;"><?php echo e(auth()->user()->name); ?></a>
+                <span class="text-muted small"><i
+                        class="fas fa-crown text-warning mr-1"></i><?php echo e(auth()->user()->activePlan() ? auth()->user()->activePlan()->name : 'Acesso Limitado'); ?></span>
+            </div>
+        </div>
+
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" data-accordion="true"
+                id="sidebar-tree" role="menu" style="gap: 2px;">
+                <li class="nav-item">
+                    <a href="<?php echo e(route('admin.dashboard')); ?>"
+                        class="nav-link <?php echo e($is('admin.dashboard')); ?> rounded-lg font-semibold">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+
+                <?php
+                    $canMarketplaceSeller = auth()->user()->canSellOnMarketplace();
+                ?>
+
+                <?php if($canMarketplaceSeller): ?>
+                    <li class="nav-header">MARKETPLACE</li>
+                    <li class="nav-item has-treeview <?php echo e($open('admin.marketplace.*')); ?>">
+                        <a href="#" class="nav-link <?php echo e($is('admin.marketplace.*')); ?>">
+                            <i class="nav-icon fas fa-store"></i>
+                            <p>Marketplace<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.marketplace.index')); ?>" class="nav-link <?php echo e($is('admin.marketplace.index')); ?>">
+                                    <i class="fas fa-chart-line nav-icon"></i>
+                                    <p>Painel</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.marketplace.payments')); ?>" class="nav-link <?php echo e($is('admin.marketplace.payments')); ?>">
+                                    <i class="fas fa-credit-card nav-icon"></i>
+                                    <p>Pagamentos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.marketplace.sales')); ?>" class="nav-link <?php echo e($is('admin.marketplace.sales')); ?>">
+                                    <i class="fas fa-receipt nav-icon"></i>
+                                    <p>Minhas vendas</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+                
+                
+
+                
+                <?php if(auth()->user()->canAccessFeature('courses') || auth()->user()->hasPurchasedCourses()): ?>
+                    <li class="nav-item has-treeview <?php echo e($open('admin.courses.*')); ?>">
+                        <a href="#" class="nav-link <?php echo e($is('admin.courses.*')); ?>">
+                            <i class="nav-icon fas fa-graduation-cap"></i>
+                            <p>Cursos<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item"><a href="<?php echo e(route('admin.courses.available')); ?>" class="nav-link"><i
+                                        class="fas fa-list nav-icon"></i>
+                                    <p>Meus Cursos</p>
+                                </a></li>
+                            <?php if(auth()->user()->isAdmin()): ?>
+                                <li class="nav-item"><a href="<?php echo e(route('admin.courses.index')); ?>"
+                                        class="nav-link <?php echo e($is('admin.courses.index')); ?>"><i class="fas fa-cog nav-icon"></i>
+                                        <p>Gerenciar</p>
+                                    </a></li>
+                                <li class="nav-item"><a href="<?php echo e(route('admin.courses.create')); ?>"
+                                        class="nav-link <?php echo e($is('admin.courses.create')); ?>"><i class="fas fa-plus nav-icon"></i>
+                                        <p>Novo</p>
+                                    </a></li>
+                            <?php endif; ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+                <?php if(auth()->user()->canAccessFeature('events')): ?>
+                    <li class="nav-item has-treeview <?php echo e($open('admin.events.*')); ?>">
+                        <a href="#" class="nav-link <?php echo e($is('admin.events.*')); ?>">
+                            <i class="nav-icon fas fa-calendar"></i>
+                            <p>Eventos<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item"><a href="<?php echo e(route('admin.events.index')); ?>" data-pjax="false"
+                                    class="nav-link <?php echo e($is('admin.events.index')); ?>"><i
+                                        class="fas fa-calendar-alt nav-icon"></i>
+                                    <p>Calendário</p>
+                                </a></li>
+                            <li class="nav-item"><a href="<?php echo e(route('admin.events.create')); ?>"
+                                    class="nav-link <?php echo e($is('admin.events.create')); ?>"><i class="fas fa-plus nav-icon"></i>
+                                    <p>Novo</p>
+                                </a></li>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+                <?php if(auth()->user()->isAdmin() || auth()->user()->canAccessFeature('courses')): ?>
+                    <li class="nav-item">
+                        <a href="<?php echo e(route('admin.certificates.index')); ?>"
+                            class="nav-link <?php echo e($is('admin.certificates.*')); ?>">
+                            <i class="nav-icon fas fa-certificate"></i>
+                            <p>Certificados</p>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <?php if(auth()->user()->canAccessFeature('mentorships')): ?>
+                    <li class="nav-item has-treeview <?php echo e($open('admin.mentorships.*')); ?>">
+                        <a href="#" class="nav-link <?php echo e($is('admin.mentorships.*')); ?>">
+                            <i class="nav-icon fas fa-chalkboard-teacher"></i>
+                            <p>Mentorias<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item"><a href="<?php echo e(route('admin.mentorships.available')); ?>"
+                                    class="nav-link <?php echo e($is('admin.mentorships.available')); ?>"><i
+                                        class="fas fa-list nav-icon"></i>
+                                    <p>Disponíveis</p>
+                                </a></li>
+                            <?php if(auth()->user()->isAdmin()): ?>
+                                <li class="nav-item"><a href="<?php echo e(route('admin.mentorships.index')); ?>"
+                                        class="nav-link <?php echo e($is('admin.mentorships.index')); ?>"><i
+                                            class="fas fa-cog nav-icon"></i>
+                                        <p>Gerenciar</p>
+                                    </a></li>
+                                <li class="nav-item"><a href="<?php echo e(route('admin.mentorships.create')); ?>"
+                                        class="nav-link <?php echo e($is('admin.mentorships.create')); ?>"><i
+                                            class="fas fa-plus nav-icon"></i>
+                                        <p>Novo</p>
+                                    </a></li>
+                            <?php endif; ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+                
+                <?php if(auth()->user()->isAdmin()): ?>
+                    <li class="nav-header">SITE</li>
+
+                    <li class="nav-item has-treeview <?php echo e($open('admin.cms.*')); ?>">
+                        <a href="#" class="nav-link <?php echo e($is('admin.cms.*')); ?>">
+                            <i class="fas fa-globe nav-icon"></i>
+                            <p>Institucional<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.cms.index', ['slug' => 'home'])); ?>"
+                                    class="nav-link <?php echo e(request()->routeIs('admin.cms.*') && $cmsSlug === 'home' ? 'active' : ''); ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Home</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.cms.index', ['slug' => 'about'])); ?>"
+                                    class="nav-link <?php echo e(request()->routeIs('admin.cms.*') && $cmsSlug === 'about' ? 'active' : ''); ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Sobre (Seções)</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.cms.index', ['slug' => 'footer'])); ?>"
+                                    class="nav-link <?php echo e(request()->routeIs('admin.cms.*') && $cmsSlug === 'footer' ? 'active' : ''); ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Rodapé</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.cms.index', ['slug' => 'institucional_sobre'])); ?>"
+                                    class="nav-link <?php echo e(request()->routeIs('admin.cms.*') && $cmsSlug === 'institucional_sobre' ? 'active' : ''); ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Sobre</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.cms.index', ['slug' => 'institucional_manifesto'])); ?>"
+                                    class="nav-link <?php echo e(request()->routeIs('admin.cms.*') && $cmsSlug === 'institucional_manifesto' ? 'active' : ''); ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Manifesto</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.cms.index', ['slug' => 'institucional_quem_somos'])); ?>"
+                                    class="nav-link <?php echo e(request()->routeIs('admin.cms.*') && $cmsSlug === 'institucional_quem_somos' ? 'active' : ''); ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Quem Somos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.cms.index', ['slug' => 'institucional_como_funciona'])); ?>"
+                                    class="nav-link <?php echo e(request()->routeIs('admin.cms.*') && $cmsSlug === 'institucional_como_funciona' ? 'active' : ''); ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Como Funciona</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.cms.index', ['slug' => 'institucional_valores'])); ?>"
+                                    class="nav-link <?php echo e(request()->routeIs('admin.cms.*') && $cmsSlug === 'institucional_valores' ? 'active' : ''); ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Valores</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.cms.index', ['slug' => 'institucional_contato'])); ?>"
+                                    class="nav-link <?php echo e(request()->routeIs('admin.cms.*') && $cmsSlug === 'institucional_contato' ? 'active' : ''); ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Contato</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <?php
+                        $adminMenuPatterns = [
+                            'admin.users.*',
+                            'admin.plans.*',
+                            'admin.orders.*',
+                            'admin.invoices.*',
+                            'admin.coupons.*',
+                            'admin.permissions.*',
+                            'admin.points-rules.*',
+                            'admin.ranking',
+                            'admin.mailtemplates.*',
+                            'admin.certificates.*',
+                            'admin.fonts.*',
+                            'admin.faqs.*',
+                            'admin.settings*',
+                        ];
+                    ?>
+
+                    <li class="nav-header">ADMINISTRAÇÃO</li>
+
+                    <li class="nav-item has-treeview <?php echo e($open($adminMenuPatterns)); ?>">
+                        <a href="#" class="nav-link <?php echo e($is($adminMenuPatterns)); ?>">
+                            <i class="nav-icon fas fa-tools"></i>
+                            <p>Administração<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.users.index')); ?>" class="nav-link <?php echo e($is('admin.users.*')); ?>">
+                                    <i class="fas fa-users-cog nav-icon"></i>
+                                    <p>Usuários</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.plans.index')); ?>" class="nav-link <?php echo e($is('admin.plans.*')); ?>">
+                                    <i class="fas fa-tags nav-icon"></i>
+                                    <p>Planos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.orders.index')); ?>" class="nav-link <?php echo e($is('admin.orders.*')); ?>">
+                                    <i class="fas fa-shopping-cart nav-icon"></i>
+                                    <p>Vendas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.invoices.index')); ?>"
+                                    class="nav-link <?php echo e($is('admin.invoices.*')); ?>">
+                                    <i class="fas fa-file-invoice nav-icon"></i>
+                                    <p>Faturas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.coupons.index')); ?>" class="nav-link <?php echo e($is('admin.coupons.*')); ?>">
+                                    <i class="fas fa-ticket-alt nav-icon"></i>
+                                    <p>Cupons</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.permissions.index')); ?>"
+                                    class="nav-link <?php echo e($is('admin.permissions.*')); ?>">
+                                    <i class="fas fa-user-shield nav-icon"></i>
+                                    <p>Permissões</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.points-rules.index')); ?>"
+                                    class="nav-link <?php echo e($is('admin.points-rules.*')); ?>">
+                                    <i class="fas fa-star nav-icon"></i>
+                                    <p>Pontuação</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.mailtemplates.index')); ?>"
+                                    class="nav-link <?php echo e($is('admin.mailtemplates.*')); ?>">
+                                    <i class="fas fa-envelope nav-icon"></i>
+                                    <p>E-mails</p>
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.fonts.index')); ?>" class="nav-link <?php echo e($is('admin.fonts.*')); ?>">
+                                    <i class="fas fa-font nav-icon"></i>
+                                    <p>Fontes</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.faqs.index')); ?>" class="nav-link <?php echo e($is('admin.faqs.*')); ?>">
+                                    <i class="fas fa-question-circle nav-icon"></i>
+                                    <p>FAQ</p>
+                                </a>
+                            </li>
+                            <li class="nav-item has-treeview <?php echo e($open('admin.settings*')); ?>">
+                                <a href="#" class="nav-link <?php echo e($is('admin.settings*')); ?>">
+                                    <i class="nav-icon fas fa-cogs"></i>
+                                    <p>Configurações<i class="right fas fa-angle-left"></i></p>
+                                </a>
+                                <ul class="nav nav-treeview pl-4">
+                                    <li class="nav-item">
+                                        <a href="<?php echo e(route('admin.settings', ['group' => 'general'])); ?>"
+                                            class="nav-link <?php echo e(request()->route('group') == 'general' || !request()->route('group') && request()->routeIs('admin.settings') ? 'active' : ''); ?>">
+                                            <i class="fas fa-info-circle nav-icon"></i>
+                                            <p>Geral</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?php echo e(route('admin.settings', ['group' => 'appearance'])); ?>"
+                                            class="nav-link <?php echo e(request()->route('group') == 'appearance' ? 'active' : ''); ?>">
+                                            <i class="fas fa-paint-brush nav-icon"></i>
+                                            <p>Aparência</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?php echo e(route('admin.settings', ['group' => 'images'])); ?>"
+                                            class="nav-link <?php echo e(request()->route('group') == 'images' ? 'active' : ''); ?>">
+                                            <i class="fas fa-images nav-icon"></i>
+                                            <p>Imagens</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?php echo e(route('admin.settings', ['group' => 'player'])); ?>"
+                                            class="nav-link <?php echo e(request()->route('group') == 'player' ? 'active' : ''); ?>">
+                                            <i class="fas fa-play-circle nav-icon"></i>
+                                            <p>Player</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?php echo e(route('admin.settings', ['group' => 'ads'])); ?>"
+                                            class="nav-link <?php echo e(request()->route('group') == 'ads' ? 'active' : ''); ?>">
+                                            <i class="fas fa-ad nav-icon"></i>
+                                            <p>Anúncios</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?php echo e(route('admin.settings', ['group' => 'pwa'])); ?>"
+                                            class="nav-link <?php echo e(request()->route('group') == 'pwa' ? 'active' : ''); ?>">
+                                            <i class="fas fa-mobile-alt nav-icon"></i>
+                                            <p>PWA</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?php echo e(route('admin.settings', ['group' => 'marketplace'])); ?>"
+                                            class="nav-link <?php echo e(request()->route('group') == 'marketplace' ? 'active' : ''); ?>">
+                                            <i class="fas fa-store nav-icon"></i>
+                                            <p>Marketplace</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?php echo e(route('admin.settings', ['group' => 'gateway'])); ?>"
+                                            class="nav-link <?php echo e(request()->route('group') == 'gateway' ? 'active' : ''); ?>">
+                                            <i class="fas fa-credit-card nav-icon"></i>
+                                            <p>Pagamentos</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?php echo e(route('admin.settings', ['group' => 'smtp'])); ?>"
+                                            class="nav-link <?php echo e(request()->route('group') == 'smtp' ? 'active' : ''); ?>">
+                                            <i class="fas fa-envelope nav-icon"></i>
+                                            <p>SMTP</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?php echo e(route('admin.settings', ['group' => 'social'])); ?>"
+                                            class="nav-link <?php echo e(request()->route('group') == 'social' ? 'active' : ''); ?>">
+                                            <i class="fas fa-users nav-icon"></i>
+                                            <p>Social</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?php echo e(route('admin.settings', ['group' => 'seo'])); ?>"
+                                            class="nav-link <?php echo e(request()->route('group') == 'seo' ? 'active' : ''); ?>">
+                                            <i class="fas fa-search nav-icon"></i>
+                                            <p>SEO</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?php echo e(route('admin.settings', ['group' => 'system'])); ?>"
+                                            class="nav-link <?php echo e(request()->route('group') == 'system' ? 'active' : ''); ?>">
+                                            <i class="fas fa-server nav-icon"></i>
+                                            <p>Sistema</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.activity_logs.index')); ?>"
+                                    class="nav-link <?php echo e($is('admin.activity_logs.index')); ?>">
+                                    <i class="fas fa-history nav-icon"></i>
+                                    <p>Logs de Atividade</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+                <li class="nav-header">PERSONALIZAÇÃO</li>
+
+                <li class="nav-item">
+                    <a href="<?php echo e(route('admin.profile.edit')); ?>" class="nav-link <?php echo e($is('admin.profile.*')); ?>">
+                        <i class="nav-icon fas fa-id-card"></i>
+                        <p>Meu Perfil</p>
+                    </a>
+                </li>
+
+                <?php if(auth()->user()->hasPermission('testimonials.view') || auth()->user()->hasPermission('testimonials.moderate') || auth()->user()->hasPermission('testimonials.delete')): ?>
+                    <li class="nav-item">
+                        <a href="<?php echo e(route('admin.testimonials.index')); ?>"
+                            class="nav-link <?php echo e($is('admin.testimonials.*')); ?>">
+                            <i class="nav-icon fas fa-quote-left"></i>
+                            <p>Depoimentos
+                                <?php if(isset($pendingTestimonialsCount) && $pendingTestimonialsCount > 0): ?>
+                                    <span class="badge badge-success right"><?php echo e($pendingTestimonialsCount); ?></span>
+                                <?php endif; ?>
+                            </p>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <?php if(auth()->user()->isAdmin() || auth()->user()->canAccessFeature('courses') || auth()->user()->canAccessFeature('mentorships')): ?>
+                    <li class="nav-item">
+                        <a href="<?php echo e(route('admin.reviews.index')); ?>" class="nav-link <?php echo e($is('admin.reviews.*')); ?>">
+                            <i class="nav-icon fas fa-star-half-alt"></i>
+                            <p>Avaliações
+                                <?php if(isset($pendingReviewsCount) && $pendingReviewsCount > 0): ?>
+                                    <span class="badge badge-info right"><?php echo e($pendingReviewsCount); ?></span>
+                                <?php endif; ?>
+                            </p>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <!-- Comunidade -->
+                <?php if(auth()->user()->canAccessFeature('community')): ?>
+                    <li class="nav-item">
+                        
+                        <a href="<?php echo e(route('admin.social.feed.internal')); ?>" class="nav-link <?php echo e($is('admin.social.*')); ?>">
+                            <i class="nav-icon fas fa-comments"></i>
+                            <p>Comunidade
+                                <?php if(isset($pendingConnectionsCount) && $pendingConnectionsCount > 0): ?>
+                                    <span class="badge badge-warning right"><?php echo e($pendingConnectionsCount); ?></span>
+                                <?php endif; ?>
+                            </p>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <?php if(auth()->user()->canAccessFeature('chat')): ?>
+                    <li class="nav-item">
+                        <a href="<?php echo e(route('admin.chat.index')); ?>" class="nav-link <?php echo e($is('admin.chat.*')); ?>">
+                            <i class="nav-icon fas fa-comment-dots"></i>
+                            <p>Chat
+                                <?php if(isset($unreadMessagesCount) && $unreadMessagesCount > 0): ?>
+                                    <span class="badge badge-danger right"><?php echo e($unreadMessagesCount); ?></span>
+                                <?php endif; ?>
+                            </p>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+
+        </nav>
+        
+    </div>
+</aside>
+<?php /**PATH G:\Tudo\MEU-SISTEMA\SOMOS_UNN\resources\views\admin\partials\sidebar.blade.php ENDPATH**/ ?>

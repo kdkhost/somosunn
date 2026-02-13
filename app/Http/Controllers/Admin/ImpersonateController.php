@@ -44,14 +44,11 @@ class ImpersonateController extends Controller
         return redirect()->route('panel.dashboard')->with('success', "Você está acessando como {$userToImpersonate->name}");
     }
 
-    public function stop(Request $request)
+    public function stop()
     {
         if (!session()->has('impersonator_id')) {
             return redirect()->route('panel.dashboard');
         }
-
-        $to = trim((string) $request->query('to', ''));
-        $to = $to !== '' ? ltrim($to, '/') : '';
 
         $originalId = session()->pull('impersonator_id');
         session()->forget(['impersonator_is_admin', 'impersonator_name']);
@@ -59,11 +56,6 @@ class ImpersonateController extends Controller
 
         if ($originalUser) {
             Auth::login($originalUser);
-
-            if ($to !== '') {
-                return redirect('/admin/' . $to)->with('success', 'Voltou para sua conta original.');
-            }
-
             return redirect()->route('admin.users.index')->with('success', 'Voltou para sua conta original.');
         }
 

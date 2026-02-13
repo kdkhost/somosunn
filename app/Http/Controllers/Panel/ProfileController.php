@@ -21,53 +21,28 @@ class ProfileController extends Controller
         $user = auth()->user();
         $wasProfileComplete = method_exists($user, 'isProfileComplete') ? $user->isProfileComplete() : false;
 
-        $request->merge([
-            'phone' => $this->normalizePhone($request->input('phone')),
-            'doc' => $this->normalizeDocument($request->input('doc')),
-            'cep' => $this->normalizeCep($request->input('cep')),
-            'state' => $this->normalizeState($request->input('state')),
-        ]);
-
-        $docType = $request->input('doc_type', 'cpf');
-
         $data = $request->validate([
             'name' => 'required|string|max:120',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6|confirmed',
-            'phone' => ['nullable', 'string', 'max:16', 'regex:/^\(\d{2}\)\s\d{4,5}-\d{4}$/'],
-            'doc_type' => 'required|in:cpf,cnpj',
-            'doc' => [
-                'nullable',
-                'string',
-                'max:18',
-                function ($attribute, $value, $fail) use ($docType) {
-                    if ($value) {
-                        if ($docType === 'cpf' && !preg_match('/^\d{3}\.\d{3}\.\d{3}-\d{2}$/', $value)) {
-                            return $fail('O CPF informado não é válido.');
-                        }
-                        if ($docType === 'cnpj' && !preg_match('/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/', $value)) {
-                            return $fail('O CNPJ informado não é válido.');
-                        }
-                    }
-                },
-            ],
+            'phone' => 'nullable|string|max:20',
+            'doc' => 'nullable|string|max:20',
             'occupation' => 'nullable|string|max:100',
             'company' => 'nullable|string|max:100',
             'segment' => 'nullable|string|max:120',
-            'interests' => 'nullable|array',
-            'interests.*' => 'string|max:100',
+            'interests' => 'nullable|string|max:500',
             'bio' => 'nullable|string|max:500',
             'photo' => 'nullable|image|max:2048',
             'cover_photo' => 'nullable|image|max:4096',
 
             // Endereço
-            'cep' => ['nullable', 'string', 'size:9', 'regex:/^\d{5}-\d{3}$/'],
+            'cep' => 'nullable|string|max:9',
             'street' => 'nullable|string|max:255',
             'number' => 'nullable|string|max:10',
             'complement' => 'nullable|string|max:100',
             'neighborhood' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
-            'state' => ['nullable', 'string', 'size:2', 'regex:/^[A-Z]{2}$/'],
+            'state' => 'nullable|string|max:2',
 
             // Redes Sociais
             'website' => 'nullable|url|max:255',
@@ -82,16 +57,6 @@ class ProfileController extends Controller
         $data['show_phone_public'] = $request->has('show_phone_public');
         $data['show_address_public'] = $request->has('show_address_public');
         $data['hide_profile'] = $request->has('hide_profile');
-
-        // Salvar interesses como array (JSON) se o model permitir
-        if (isset($data['interests']) && is_array($data['interests'])) {
-            $data['interests'] = array_values(array_filter($data['interests']));
-        }
-        // Salvar interesse personalizado se "Outro" estiver marcado
-        $data['interest_other'] = null;
-        if (isset($data['interests']) && in_array('Outro', $data['interests'])) {
-            $data['interest_other'] = trim($request->input('interest_other'));
-        }
 
         // Upload avatar
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
@@ -180,88 +145,5 @@ class ProfileController extends Controller
 
         return redirect()->route('panel.profile.edit')->with('success', 'Perfil atualizado com sucesso!');
     }
-
-    private function normalizeDigits(?string $value): string
-    {
-        return preg_replace('/\D+/', '', (string) $value) ?: '';
-    }
-
-    private function normalizeCep(?string $value): ?string
-    {
-        $raw = trim((string) $value);
-        if ($raw === '') {
-            return null;
-        }
-
-        $digits = $this->normalizeDigits($raw);
-        if (strlen($digits) !== 8) {
-            return $raw;
-        }
-
-        return substr($digits, 0, 5) . '-' . substr($digits, 5, 3);
-    }
-
-    private function normalizePhone(?string $value): ?string
-    {
-        $raw = trim((string) $value);
-        if ($raw === '') {
-            return null;
-        }
-
-        $digits = $this->normalizeDigits($raw);
-        if (strlen($digits) === 10) {
-            return sprintf('(%s) %s-%s', substr($digits, 0, 2), substr($digits, 2, 4), substr($digits, 6, 4));
-        }
-        if (strlen($digits) === 11) {
-            return sprintf('(%s) %s-%s', substr($digits, 0, 2), substr($digits, 2, 5), substr($digits, 7, 4));
-        }
-
-        return $raw;
-    }
-
-    private function normalizeDocument(?string $value): ?string
-    {
-        $raw = trim((string) $value);
-        if ($raw === '') {
-            return null;
-        }
-
-        $digits = $this->normalizeDigits($raw);
-        if (strlen($digits) === 11) {
-            return sprintf(
-                '%s.%s.%s-%s',
-                substr($digits, 0, 3),
-                substr($digits, 3, 3),
-                substr($digits, 6, 3),
-                substr($digits, 9, 2)
-            );
-        }
-        if (strlen($digits) === 14) {
-            return sprintf(
-                '%s.%s.%s/%s-%s',
-                substr($digits, 0, 2),
-                substr($digits, 2, 3),
-                substr($digits, 5, 3),
-                substr($digits, 8, 4),
-                substr($digits, 12, 2)
-            );
-        }
-
-        return $raw;
-    }
-
-    private function normalizeState(?string $value): ?string
-    {
-        $raw = strtoupper(trim((string) $value));
-        if ($raw === '') {
-            return null;
-        }
-
-        $lettersOnly = preg_replace('/[^A-Z]/', '', $raw) ?: '';
-        if (strlen($lettersOnly) !== 2) {
-            return $raw;
-        }
-
-        return $lettersOnly;
-    }
 }
+
