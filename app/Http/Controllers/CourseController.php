@@ -103,6 +103,9 @@ class CourseController extends Controller
      */
     public function create()
     {
+        if (!Auth::user() || !Auth::user()->canAccessFeature('vendor')) {
+            abort(403, 'Você não possui permissão para criar cursos.');
+        }
         return view('courses.create');
     }
 
@@ -111,6 +114,9 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
+        if (!Auth::user() || !Auth::user()->canAccessFeature('vendor')) {
+            abort(403, 'Você não possui permissão para criar cursos.');
+        }
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
@@ -237,6 +243,9 @@ class CourseController extends Controller
      */
     public function edit(Course $course)
     {
+        if (!Auth::user() || !Auth::user()->canAccessFeature('vendor')) {
+            abort(403, 'Você não possui permissão para editar cursos.');
+        }
         $this->authorize('update', $course);
         return view('courses.edit', compact('course'));
     }
@@ -246,6 +255,9 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $course)
     {
+        if (!Auth::user() || !Auth::user()->canAccessFeature('vendor')) {
+            abort(403, 'Você não possui permissão para editar cursos.');
+        }
         $this->authorize('update', $course);
 
         $validated = $request->validate([
@@ -285,6 +297,9 @@ class CourseController extends Controller
      */
     public function destroy(Course $course)
     {
+        if (!Auth::user() || !Auth::user()->canAccessFeature('vendor')) {
+            abort(403, 'Você não possui permissão para remover cursos.');
+        }
         $this->authorize('delete', $course);
         $course->delete();
         return redirect()->route('courses.index')->with('success', 'Curso removido.');
