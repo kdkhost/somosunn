@@ -56,6 +56,12 @@
                     class="inline-flex items-center justify-center rounded-full border border-[#1F5EDB] px-5 py-2.5 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
                     <i class="fas fa-crown mr-2"></i> Ver planos
                 </a>
+                @if(!$isSuperadminUser)
+                    <a href="{{ route('panel.admin') }}"
+                        class="inline-flex items-center justify-center rounded-full border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                        <i class="fas fa-layer-group mr-2"></i> Painel completo
+                    </a>
+                @endif
             </div>
         </div>
     </div>
@@ -195,4 +201,3 @@
         @endif
     </div>
 @endsection
-
