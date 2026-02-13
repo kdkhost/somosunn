@@ -20,7 +20,12 @@ class SocialAuthController extends Controller
         if (!in_array($provider, $this->providers, true)) {
             abort(404);
         }
-        return Socialite::driver($provider)->redirect();
+        try {
+            return Socialite::driver($provider)->stateless()->redirect();
+        } catch (\Throwable $e) {
+            Log::warning('Social login redirect failed: ' . $e->getMessage());
+            return redirect()->route('login')->with('error', 'Não foi possível iniciar o login social. Verifique as configurações do provedor e tente novamente.');
+        }
     }
 
     public function callback(Request $request, $provider)

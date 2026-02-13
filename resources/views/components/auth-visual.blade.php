@@ -34,7 +34,7 @@
     @endphp
     
     <div class="relative z-10 flex flex-col items-center w-full">
-        <img src="{{ $logoAuthSrc }}" class="h-16 mb-6 drop-shadow-lg {{ $animClass }}" alt="Logo"
+        <img src="{{ $logoAuthSrc }}" class="h-24 lg:h-28 w-auto max-w-[260px] mb-6 drop-shadow-lg {{ $animClass }}" alt="Logo"
             onerror="this.style.display='none';">
         
         <h2 class="text-3xl font-bold mb-3 text-center drop-shadow-md {{ $animClass }}"
@@ -50,17 +50,17 @@
         @if(isset($showSocial) && $showSocial)
         <div class="flex gap-3 mt-8 {{ $animClass }}" @if($shouldAnimate) style="animation-delay: 300ms" @endif>
             @if($googleEnabled)
-            <a href="{{ route('social.redirect','google') }}" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110" title="Google">
+            <a href="{{ route('social.redirect', ['provider' => 'google']) }}" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110" title="Google">
                 <i class="fab fa-google"></i>
             </a>
             @endif
             @if($facebookEnabled)
-            <a href="{{ route('social.redirect','facebook') }}" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110" title="Facebook">
+            <a href="{{ route('social.redirect', ['provider' => 'facebook']) }}" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110" title="Facebook">
                 <i class="fab fa-facebook-f"></i>
             </a>
             @endif
             @if($linkedinEnabled)
-            <a href="{{ route('social.redirect','linkedin') }}" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110" title="LinkedIn">
+            <a href="{{ route('social.redirect', ['provider' => 'linkedin']) }}" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110" title="LinkedIn">
                 <i class="fab fa-linkedin-in"></i>
             </a>
             @endif

@@ -53,6 +53,11 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 
 ## 📅 Histórico de Atualizações
 
+### 13/02/2026 — Auth (logo maior e login social consistente)
+- **Formulários (Login/Registro/Reset):**
+  - Logo do painel visual aumentada para melhor destaque da marca.
+  - Botões/ícones de login social agora apontam para o mesmo fluxo de autenticação (sem abrir tela com JSON).
+
 ### 13/02/2026 — CMS Institucional (editor, SEO e menu)
 - **Painel CMS mais organizado:**
   - Menu **Conteúdo do Site** virou submenu no sidebar com todas as páginas (evita abas estourando).
