@@ -1,15 +1,16 @@
-# Tour guiado para membros (2026)
+# Tour guiado dinâmico para membros (2026)
 
-## Novidade: Tour interativo no painel do membro
-- Implementado tour guiado e explicativo para novos usuários/membros usando Shepherd.js.
-- O tour ensina o uso do painel, menu lateral, perfil e marketplace.
-- O status de conclusão do tour é salvo por usuário (localStorage).
+## Novidade: Tour interativo e automático no painel do membro
+- O tour agora navega automaticamente entre todas as páginas do painel administrativo do membro.
+- Cada etapa destaca o menu/função, explica o que é, para que serve e como usar.
+- Sinais visuais, overlay e persistência de etapa: o usuário pode sair e voltar, continuará do ponto correto.
+- Nunca leva para o frontend público.
 - O membro pode reiniciar o tour a qualquer momento pelo botão “Recomeçar Tour” no menu lateral.
 
 ### Como funciona
 - O tour inicia automaticamente para quem nunca concluiu.
 - Para reiniciar, clique no botão de ajuda no menu lateral.
-- Passos e destaques podem ser expandidos facilmente.
+- O tour avança sozinho entre menus e páginas do painel, guiando o usuário passo a passo.
 
 ---
 # Otimizações de Queries e Próximos Passos (2026)
