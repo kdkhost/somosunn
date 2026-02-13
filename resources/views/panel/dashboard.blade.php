@@ -81,8 +81,8 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6">
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-8">
+        <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-6 flex flex-col justify-between min-h-[170px]">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-xs sm:text-sm font-bold text-slate-500">Meus cursos</div>
@@ -101,7 +101,7 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
+        <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-6 flex flex-col justify-between min-h-[170px]">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-xs sm:text-sm font-bold text-slate-500">Compras pagas</div>
@@ -116,7 +116,7 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
+        <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-6 flex flex-col justify-between min-h-[170px]">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-xs sm:text-sm font-bold text-slate-500">Comunidade</div>
@@ -141,7 +141,7 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
+        <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-6 flex flex-col justify-between min-h-[170px]">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-xs sm:text-sm font-bold text-slate-500">Minhas vendas</div>
@@ -169,7 +169,7 @@
         </div>
 
         @if($roleLabel)
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 md:col-span-2 xl:col-span-4">
+            <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-6 md:col-span-2 xl:col-span-4">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <div class="text-xs sm:text-sm font-bold text-slate-500">Administração</div>
