@@ -363,7 +363,7 @@
                     feedback.classList.toggle('text-slate-500', !isError);
                 }
 
-                function fetchCep() {
+                function fetchCep(auto = false) {
                     var digits = (cepInput.value || '').replace(/\D/g, '');
                     if (digits.length !== 8 || digits === lastCep) {
                         return;
@@ -382,18 +382,10 @@
                                 return;
                             }
 
-                            if (streetInput && !streetInput.value) {
-                                streetInput.value = data.logradouro || '';
-                            }
-                            if (neighborhoodInput && !neighborhoodInput.value) {
-                                neighborhoodInput.value = data.bairro || '';
-                            }
-                            if (cityInput && !cityInput.value) {
-                                cityInput.value = data.localidade || '';
-                            }
-                            if (stateInput && !stateInput.value) {
-                                stateInput.value = (data.uf || '').toUpperCase();
-                            }
+                            if (streetInput) streetInput.value = data.logradouro || '';
+                            if (neighborhoodInput) neighborhoodInput.value = data.bairro || '';
+                            if (cityInput) cityInput.value = data.localidade || '';
+                            if (stateInput) stateInput.value = (data.uf || '').toUpperCase();
 
                             setFeedback('Endereco preenchido automaticamente.', false);
 
@@ -408,12 +400,20 @@
                         });
                 }
 
-                cepInput.addEventListener('blur', fetchCep);
+                // Ao digitar o CEP completo, busca automaticamente
                 cepInput.addEventListener('input', function () {
-                    if ((cepInput.value || '').replace(/\D/g, '').length < 8) {
+                    var digits = (cepInput.value || '').replace(/\D/g, '');
+                    if (digits.length === 8) {
+                        fetchCep(true);
+                    } else {
                         lastCep = '';
                         setFeedback('', false);
                     }
+                });
+                // Mantém suporte ao blur
+                cepInput.addEventListener('blur', function () {
+                    var digits = (cepInput.value || '').replace(/\D/g, '');
+                    if (digits.length === 8) fetchCep();
                 });
             }
 
