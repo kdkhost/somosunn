@@ -71,24 +71,22 @@
                         placeholder="Segmento de atuação" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
-                    <label class="text-sm font-bold text-slate-700">Interesses</label>
+                    <label class="text-sm font-bold text-slate-700 mb-1 block">Áreas de Interesse</label>
                     @php
                         $opcoesInteresses = [
                             'Marketing', 'Tecnologia', 'Saúde', 'Educação', 'Finanças', 'Gestão', 'Design', 'Engenharia', 'Direito', 'Psicologia', 'RH', 'Vendas', 'Comunicação', 'Outro'
                         ];
-                        $interessesSelecionados = collect(old('interests', $user->interests))->filter()->map(function($i) {
-                            return trim($i);
-                        });
-                        if (is_string($interessesSelecionados)) {
-                            $interessesSelecionados = collect(explode(',', $interessesSelecionados))->map(function($i) { return trim($i); });
-                        }
+                        $interessesSelecionados = collect(old('interests', $user->interests ?? []))->filter()->map(fn($i) => trim($i));
                     @endphp
-                    <select name="interests[]" multiple size="5" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" title="Selecione um ou mais interesses. Use Ctrl ou Cmd para múltiplos.">
+                    <div class="flex flex-wrap gap-2 mt-2">
                         @foreach($opcoesInteresses as $opcao)
-                            <option value="{{ $opcao }}" {{ $interessesSelecionados->contains($opcao) ? 'selected' : '' }}>{{ $opcao }}</option>
+                            <label class="inline-flex items-center px-3 py-2 bg-slate-100 rounded-xl cursor-pointer text-sm font-medium transition hover:bg-blue-100">
+                                <input type="checkbox" name="interests[]" value="{{ $opcao }}" class="form-checkbox accent-blue-600 mr-2" {{ $interessesSelecionados->contains($opcao) ? 'checked' : '' }}>
+                                {{ $opcao }}
+                            </label>
                         @endforeach
-                    </select>
-                    <small class="text-xs text-slate-500">Segure Ctrl (Windows) ou Cmd (Mac) para selecionar múltiplos.</small>
+                    </div>
+                    <small class="text-xs text-slate-500 block mt-1">Selecione uma ou mais áreas. Você pode marcar quantas quiser.</small>
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold text-slate-700">Bio</label>

@@ -83,9 +83,9 @@ class ProfileController extends Controller
         $data['show_address_public'] = $request->has('show_address_public');
         $data['hide_profile'] = $request->has('hide_profile');
 
-        // Salvar interesses como string separada por vírgula para compatibilidade, ou como array/json se o model permitir
+        // Salvar interesses como array (JSON) se o model permitir
         if (isset($data['interests']) && is_array($data['interests'])) {
-            $data['interests'] = implode(',', array_filter($data['interests']));
+            $data['interests'] = array_values(array_filter($data['interests']));
         }
 
         // Upload avatar
