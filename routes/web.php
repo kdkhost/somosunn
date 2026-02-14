@@ -348,32 +348,23 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
     });
 });
 
-// Painel do Membro (novo - layout do front-end)
-Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->group(function () {
-    Route::get('/', [\App\Http\Controllers\Panel\DashboardController::class, 'index'])->name('dashboard');
-
-    // Atalho para abrir o antigo painel (AdminLTE) dentro do novo layout (exceto superadmin)
-    Route::get('/admin', function (\Illuminate\Http\Request $request) {
-        $to = trim((string) $request->query('to', ''));
-        if ($to !== '') {
-            $to = ltrim($to, '/');
-            return redirect('/admin/' . $to);
-        }
-
-        return redirect()->route('admin.dashboard');
-    })->name('admin');
-
-    // Perfil (completo) - permitido mesmo sem plano ativo (whitelist no middleware)
-    Route::get('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'edit'])->name('profile.edit');
-    Route::post('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'update'])->name('profile.update');
-
-    // Marketplace (Painel do vendedor)
-    Route::prefix('marketplace')->name('marketplace.')->middleware('check.marketplace.seller')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Panel\MarketplaceController::class, 'index'])->name('index');
-        Route::get('/pagamentos', [\App\Http\Controllers\Panel\MarketplaceController::class, 'payments'])->name('payments');
-        Route::get('/vendas', [\App\Http\Controllers\Panel\MarketplaceController::class, 'sales'])->name('sales');
+// Painel do Membro (NUNCA carrega AdminLTE, só Tailwind/Blade)
+Route::prefix('painel')
+    ->name('panel.')
+    ->middleware(['auth', 'check.plan', 'check.role:member,admin']) // ajuste os roles conforme necessário
+    ->group(function () {
+        Route::get('/', [\App\Http\Controllers\Panel\DashboardController::class, 'index'])->name('dashboard');
+        // Outras rotas do painel de membros...
     });
-});
+
+// Painel Admin (SOMENTE superadmin, AdminLTE)
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class, \App\Http\Middleware\EnsureUserIsAdmin::class, 'check.plan'])
+    ->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+        // Outras rotas do painel admin...
+    });
 
 // Payments (legacy) - redireciona para o painel do marketplace (admin)
 Route::middleware(['auth'])->group(function () {
