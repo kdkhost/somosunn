@@ -13,21 +13,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin/cron')->name('admin.cron.')-
 // Rota para checkout de assinatura (compatível com premium.blade.php) — sempre no início para garantir visibilidade
 Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('subscription.checkout');
 Route::get('/assinatura/sucesso/{order}', [\App\Http\Controllers\SubscriptionController::class, 'success'])->name('subscription.success');
- * layout, funcionalidades, lógica de programação e documentação associada,
- * é protegido pelas leis brasileiras de direitos autorais (Lei nº 9.610/98)
- * e demais legislações internacionais aplicáveis.
- *
- * -----------------------------------------------------------------------------
- * PROPRIEDADE INTELECTUAL:
- * Todo o conteúdo deste sistema é de propriedade exclusiva do autor,
- * sendo proibida a reprodução total ou parcial, modificação,
- * engenharia reversa, redistribuição, sublicenciamento,
- * comercialização ou qualquer forma de exploração sem autorização
- * expressa e formal do titular dos direitos.
- *
- * -----------------------------------------------------------------------------
- * LICENÇA DE USO:
- * Este sistema é licenciado, não vendido.
  * O uso é restrito ao cliente contratante conforme contrato firmado.
  * É vedado o compartilhamento, revenda ou distribuição a terceiros
  * sem autorização prévia e documentada.
