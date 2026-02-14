@@ -13,21 +13,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin/cron')->name('admin.cron.')-
 // Rota para checkout de assinatura (compatível com premium.blade.php) — sempre no início para garantir visibilidade
 Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('subscription.checkout');
 Route::get('/assinatura/sucesso/{order}', [\App\Http\Controllers\SubscriptionController::class, 'success'])->name('subscription.success');
- * © 2026 Marcelo Brad - Todos os direitos reservados.
- *
- * AUTOR:
- * marcelo-brad rj
- *
- * CONTATO:
- * Tel: +55 21 98132-5441
- * Email: contato@kdkhost.com.br
- * Telegram: @MARCELO_BRAD
- * Instagram: @marcelobradrj
- * WhatsApp: +55 21 98132-5441
- *
- * -----------------------------------------------------------------------------
- * DIREITOS AUTORAIS:
- * Este software, incluindo seu código-fonte, estrutura, banco de dados,
  * layout, funcionalidades, lógica de programação e documentação associada,
  * é protegido pelas leis brasileiras de direitos autorais (Lei nº 9.610/98)
  * e demais legislações internacionais aplicáveis.
