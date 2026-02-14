@@ -51,32 +51,7 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 
 ---
 
-
 ## 📅 Histórico de Atualizações
-
-### 14/02/2026 — Novo Painel de Membros, Mobile e UX
-- **Novo Painel Moderno:**
-  - Todos os módulos administrativos migrados para painel unificado e responsivo (cursos, eventos, certificados, cupons, marketplace).
-  - Visual moderno com Tailwind, navegação simplificada e experiência consistente para todos (exceto superadmin).
-- **Menu Mobile:**
-  - Correção completa do menu mobile, com navegação fluida e acessível em todos os dispositivos.
-- **Perfil do Membro:**
-  - Novo formulário de perfil com auto-preenchimento de endereço via ViaCEP.
-  - Máscaras e limites para telefone e CPF/CNPJ.
-  - Validação inline e feedback visual amigável.
-- **Certificados e Cupons:**
-  - Listagem, download e visualização de certificados no painel.
-  - CRUD completo de cupons com validação e feedback.
-- **Cursos e Eventos:**
-  - CRUD completo, upload de imagens, status e descrições.
-- **Marketplace:**
-  - Resumo financeiro, vendas, pagamentos e taxas em cards visuais.
-- **Padronização:**
-  - Todas as views migradas para Blade moderno, seguindo layout único.
-  - Controllers e rotas padronizados, seguindo PSR-12 e boas práticas Laravel.
-- **Próximos passos:**
-  - Drag-and-drop para uploads, controle de tipos de arquivos, ícones de extensão de material.
-
 
 ### 07/02/2026 — Webhooks, Logs e Refatoração
 - **Configurações Refatoradas:**

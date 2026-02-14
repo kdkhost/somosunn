@@ -1,0 +1,4 @@
+git pull
+php artisan migrate
+php artisan view:clear
+php artisan optimize:clear
