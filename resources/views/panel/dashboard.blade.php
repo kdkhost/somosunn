@@ -40,29 +40,25 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6" id="dashboard-widgets">
         @component('components.panel-widget', [
             'title' => 'Meus cursos',
-            'value' => '<span id="counter-curso">' . $coursesCount . '</span>',
+            'value' => '<span id="counter-curso" class="animate-pulse">...</span>',
             'icon' => 'fas fa-graduation-cap',
             'iconBg' => 'bg-[#1F5EDB]/10',
             'iconColor' => 'text-[#1F5EDB]'
         ])
-            @if($canAccessCourses)
-                Acesse seus cursos em <a class="text-[#1F5EDB] font-bold hover:underline" href="{{ route('courses.index') }}">Cursos</a>.
-            @else
-                Libere o acesso aos cursos fazendo um upgrade de plano.
-            @endif
+            <span id="widget-cursos-msg">Carregando...</span>
         @endcomponent
 
         @component('components.panel-widget', [
             'title' => 'Compras pagas',
-            'value' => $ordersPaidCount,
+            'value' => '<span id="counter-orders" class="animate-pulse">...</span>',
             'icon' => 'fas fa-check-circle',
             'iconBg' => 'bg-emerald-500/10',
             'iconColor' => 'text-emerald-600'
         ])
-            Total: <span class="font-extrabold text-slate-900">R$ {{ number_format($ordersPaidTotal, 2, ',', '.') }}</span>
+            Total: <span id="counter-orders-total" class="font-extrabold text-slate-900 animate-pulse">...</span>
         @endcomponent
 
         @component('components.panel-widget', [
@@ -87,51 +83,91 @@
 
         @component('components.panel-widget', [
             'title' => 'Minhas vendas',
-            'value' => $sellerPaidCount,
+            'value' => '<span id="counter-seller" class="animate-pulse">...</span>',
             'icon' => 'fas fa-receipt',
             'iconBg' => 'bg-amber-500/10',
             'iconColor' => 'text-amber-600'
         ])
-            Líquido: <span class="font-extrabold text-slate-900">R$ {{ number_format($sellerNetTotal, 2, ',', '.') }}</span>
-            @if($canSellOnMarketplace)
-                <div class="mt-3">
-                    <a href="{{ route('panel.marketplace.sales') }}"
-                        class="inline-flex items-center text-sm font-bold text-[#1F5EDB] hover:underline">
-                        Ver detalhes <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                    </a>
-                </div>
-            @else
-                <div class="mt-3 text-xs text-slate-500">
-                    Ative um plano com permissão de vendas para liberar.
-                </div>
-            @endif
+            Líquido: <span id="counter-seller-total" class="font-extrabold text-slate-900 animate-pulse">...</span>
+            <div class="mt-3">
+                <a href="{{ route('panel.marketplace.sales') }}"
+                    class="inline-flex items-center text-sm font-bold text-[#1F5EDB] hover:underline">
+                    Ver detalhes <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                </a>
+            </div>
         @endcomponent
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mt-8">
+        <div class="flex items-center justify-between mb-4">
+            <div class="text-lg font-bold text-slate-900">Vendas nos últimos 6 meses</div>
+        </div>
+        <canvas id="salesChart" height="80"></canvas>
     </div>
 @endsection
 
 @push('scripts')
-<!-- Laravel Echo + Pusher CDN -->
-<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.0/dist/echo.iife.js"></script>
 <script>
-    // Configurar Pusher/Echo
-    window.Pusher = Pusher;
-    window.Echo = new Echo({
-        broadcaster: 'pusher',
-        key: '{{ env('PUSHER_APP_KEY') }}',
-        cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
-        forceTLS: true
-    });
-    // IDs dos elementos dos contadores
-    const counters = {
-        'curso': document.getElementById('counter-curso'),
-        // Adicione outros tipos conforme necessário
-    };
-    window.Echo.channel('service-visits')
-        .listen('ServiceVisitRegistered', (e) => {
-            if (e.serviceType && counters[e.serviceType] && (!e.serviceId || counters[e.serviceType].dataset?.id == e.serviceId)) {
-                counters[e.serviceType].textContent = e.count;
+function updateDashboardWidgets() {
+    fetch('{{ route('panel.dashboard.stats') }}')
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && data.stats) {
+                document.getElementById('counter-curso').textContent = data.stats.courses_count;
+                document.getElementById('counter-orders').textContent = data.stats.orders_paid_count;
+                document.getElementById('counter-orders-total').textContent = 'R$ ' + (data.stats.orders_paid_total).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                document.getElementById('counter-seller').textContent = data.stats.seller_paid_count;
+                document.getElementById('counter-seller-total').textContent = 'R$ ' + (data.stats.seller_net_total).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                document.getElementById('widget-cursos-msg').textContent = '';
+                // Remove animação de loading
+                document.querySelectorAll('.animate-pulse').forEach(e => e.classList.remove('animate-pulse'));
             }
         });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    updateDashboardWidgets();
+    setInterval(updateDashboardWidgets, 10000); // Atualiza a cada 10s
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function updateSalesChart(chart) {
+    fetch('{{ route('panel.dashboard.stats') }}?chart=1')
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && data.sales_chart) {
+                chart.data.labels = data.sales_chart.labels;
+                chart.data.datasets[0].data = data.sales_chart.data;
+                chart.update();
+            }
+        });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var ctx = document.getElementById('salesChart').getContext('2d');
+    var salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+            datasets: [{
+                label: 'Vendas pagas',
+                data: [0,0,0,0,0,0],
+                backgroundColor: '#1F5EDB',
+                borderRadius: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+    updateSalesChart(salesChart);
+    setInterval(function() { updateSalesChart(salesChart); }, 10000);
+});
 </script>
 @endpush

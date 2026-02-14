@@ -327,6 +327,7 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
 // Painel do Membro (novo - layout do front-end)
 Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->group(function () {
     Route::get('/', [\App\Http\Controllers\Panel\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/stats', [\App\Http\Controllers\Panel\DashboardController::class, 'stats'])->name('dashboard.stats');
 
     // Atalho para abrir o antigo painel (AdminLTE) dentro do novo layout (exceto superadmin)
     Route::get('/admin', function (\Illuminate\Http\Request $request) {
