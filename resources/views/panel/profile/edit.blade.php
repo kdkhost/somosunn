@@ -27,47 +27,49 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
                 <div>
                     <label class="text-sm font-bold text-slate-700">Nome completo *</label>
-                    <input name="name" value="{{ old('name', $user->name) }}" required
+                    <input name="name" value="{{ old('name', $user->name) }}" required maxlength="80"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">E-mail *</label>
-                    <input type="email" name="email" value="{{ old('email', $user->email) }}" required
+                    <input type="email" name="email" value="{{ old('email', $user->email) }}" required maxlength="120"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Telefone</label>
                     <input name="phone" value="{{ old('phone', $user->phone) }}"
+                        maxlength="20" inputmode="tel" autocomplete="tel" data-mask-phone
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Documento</label>
                     <input name="doc" value="{{ old('doc', $user->doc) }}"
+                        maxlength="18" inputmode="numeric" autocomplete="off" data-mask-doc
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Ocupação</label>
-                    <input name="occupation" value="{{ old('occupation', $user->occupation) }}"
+                    <input name="occupation" value="{{ old('occupation', $user->occupation) }}" maxlength="60"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Empresa</label>
-                    <input name="company" value="{{ old('company', $user->company) }}"
+                    <input name="company" value="{{ old('company', $user->company) }}" maxlength="60"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Segmento</label>
-                    <input name="segment" value="{{ old('segment', $user->segment) }}"
+                    <input name="segment" value="{{ old('segment', $user->segment) }}" maxlength="60"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Interesses</label>
-                    <input name="interests" value="{{ old('interests', $user->interests) }}"
+                    <input name="interests" value="{{ old('interests', $user->interests) }}" maxlength="120"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold text-slate-700">Bio</label>
-                    <textarea name="bio" rows="4"
+                    <textarea name="bio" rows="4" maxlength="500"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">{{ old('bio', $user->bio) }}</textarea>
                 </div>
             </div>
@@ -98,14 +100,57 @@
                     <div class="mt-3 flex items-center gap-4">
                         <div class="w-16 h-16 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center">
                             @if($user->photo)
-                                <img src="{{ asset($user->photo) }}" alt="Avatar" class="w-full h-full object-cover">
+                                <img id="profile-photo-preview" src="{{ asset($user->photo) }}" alt="Avatar" class="w-full h-full object-cover">
                             @else
                                 <span class="text-slate-500 font-bold">{{ mb_substr((string) $user->name, 0, 1) }}</span>
                             @endif
                         </div>
-                        <input type="file" name="photo" accept="image/*"
-                            class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-[#1F5EDB] file:px-5 file:py-2 file:text-sm file:font-bold file:text-white hover:file:brightness-110">
+                        <div id="profile-photo-drop" class="relative w-full">
+                            <input type="file" name="photo" id="profile-photo-input" accept="image/*"
+                                class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-[#1F5EDB] file:px-5 file:py-2 file:text-sm file:font-bold file:text-white hover:file:brightness-110">
+                            <div id="profile-photo-dropzone" class="mt-2 flex items-center justify-center border-2 border-dashed border-slate-300 rounded-xl py-4 text-slate-400 cursor-pointer transition hover:border-blue-400">
+                                <span class="text-sm">Arraste e solte uma imagem aqui ou clique para selecionar</span>
+                            </div>
+                        </div>
                     </div>
+                @push('scripts')
+                <script>
+                // Drag & drop foto de perfil
+                function initProfilePhotoDrop() {
+                    var dropzone = document.getElementById('profile-photo-dropzone');
+                    var input = document.getElementById('profile-photo-input');
+                    var preview = document.getElementById('profile-photo-preview');
+                    if (!dropzone || !input) return;
+                    dropzone.addEventListener('click', function() { input.click(); });
+                    dropzone.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        dropzone.classList.add('border-blue-400', 'bg-blue-50');
+                    });
+                    dropzone.addEventListener('dragleave', function(e) {
+                        e.preventDefault();
+                        dropzone.classList.remove('border-blue-400', 'bg-blue-50');
+                    });
+                    dropzone.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        dropzone.classList.remove('border-blue-400', 'bg-blue-50');
+                        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                            input.files = e.dataTransfer.files;
+                            // Preview instantâneo
+                            if (preview) {
+                                var reader = new FileReader();
+                                reader.onload = function(ev) {
+                                    preview.src = ev.target.result;
+                                };
+                                reader.readAsDataURL(e.dataTransfer.files[0]);
+                            }
+                        }
+                    });
+                }
+                document.addEventListener('DOMContentLoaded', function () {
+                    initProfilePhotoDrop();
+                });
+                </script>
+                @endpush
                 </div>
 
                 <div>
@@ -131,7 +176,8 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-5">
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">CEP</label>
-                    <input name="cep" value="{{ old('cep', $user->cep) }}"
+                    <input name="cep" id="profile_cep" value="{{ old('cep', $user->cep) }}"
+                        maxlength="9" inputmode="numeric" autocomplete="postal-code" data-mask-cep
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-3">
@@ -141,22 +187,61 @@
                 </div>
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">Número</label>
-                    <input name="number" value="{{ old('number', $user->number) }}"
+                    <input name="number" id="profile_number" value="{{ old('number', $user->number) }}"
+                        maxlength="10" inputmode="numeric"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
+                @push('scripts')
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.8/inputmask.min.js"></script>
+                <script>
+                // Máscaras
+                function initMasks() {
+                    if (window.Inputmask) {
+                        var phone = document.querySelector('[data-mask-phone]');
+                        if (phone) {
+                            Inputmask({ mask: ['(99) 9999-9999', '(99) 99999-9999'], keepStatic: true }).mask(phone);
+                        }
+                        var doc = document.querySelector('[data-mask-doc]');
+                        if (doc) {
+                            Inputmask({ mask: ['999.999.999-99', '99.999.999/9999-99'], keepStatic: true }).mask(doc);
+                        }
+                        var cep = document.querySelector('[data-mask-cep]');
+                        if (cep) {
+                            Inputmask('99999-999').mask(cep);
+                        }
+                    }
+                }
+                // Auto-avançar do CEP para número
+                function initCepAutoAdvance() {
+                    var cepInput = document.getElementById('profile_cep');
+                    var numberInput = document.getElementById('profile_number');
+                    if (!cepInput || !numberInput) return;
+                    cepInput.addEventListener('input', function () {
+                        var digits = (cepInput.value || '').replace(/\D/g, '');
+                        if (digits.length === 8) {
+                            setTimeout(function() { numberInput.focus(); }, 100);
+                        }
+                    });
+                }
+                document.addEventListener('DOMContentLoaded', function () {
+                    initMasks();
+                    initCepAutoAdvance();
+                });
+                </script>
+                @endpush
                 </div>
                 <div class="md:col-span-3">
                     <label class="text-sm font-bold text-slate-700">Complemento</label>
-                    <input name="complement" value="{{ old('complement', $user->complement) }}"
+                    <input name="complement" value="{{ old('complement', $user->complement) }}" maxlength="40"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold text-slate-700">Bairro</label>
-                    <input name="neighborhood" value="{{ old('neighborhood', $user->neighborhood) }}"
+                    <input name="neighborhood" value="{{ old('neighborhood', $user->neighborhood) }}" maxlength="60"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">Cidade</label>
-                    <input name="city" value="{{ old('city', $user->city) }}"
+                    <input name="city" value="{{ old('city', $user->city) }}" maxlength="60"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-1">
@@ -175,32 +260,32 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
                 <div>
                     <label class="text-sm font-bold text-slate-700">Website</label>
-                    <input name="website" value="{{ old('website', $user->website) }}"
+                    <input name="website" value="{{ old('website', $user->website) }}" maxlength="120"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Instagram</label>
-                    <input name="instagram" value="{{ old('instagram', $user->instagram) }}"
+                    <input name="instagram" value="{{ old('instagram', $user->instagram) }}" maxlength="80"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Facebook</label>
-                    <input name="facebook" value="{{ old('facebook', $user->facebook) }}"
+                    <input name="facebook" value="{{ old('facebook', $user->facebook) }}" maxlength="80"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Twitter</label>
-                    <input name="twitter" value="{{ old('twitter', $user->twitter) }}"
+                    <input name="twitter" value="{{ old('twitter', $user->twitter) }}" maxlength="80"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">LinkedIn</label>
-                    <input name="linkedin" value="{{ old('linkedin', $user->linkedin) }}"
+                    <input name="linkedin" value="{{ old('linkedin', $user->linkedin) }}" maxlength="80"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">YouTube</label>
-                    <input name="youtube" value="{{ old('youtube', $user->youtube) }}"
+                    <input name="youtube" value="{{ old('youtube', $user->youtube) }}" maxlength="80"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
             </div>
