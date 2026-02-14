@@ -5,10 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class ScheduledTask extends Model
-    public function logs()
-    {
-        return $this->hasMany(ScheduledTaskLog::class);
-    }
 {
     protected $table = 'scheduled_tasks';
     protected $fillable = [
@@ -21,4 +17,9 @@ class ScheduledTask extends Model
         'active' => 'boolean',
         'last_run_at' => 'datetime',
     ];
+
+    public function logs()
+    {
+        return $this->hasMany(ScheduledTaskLog::class);
+    }
 }
