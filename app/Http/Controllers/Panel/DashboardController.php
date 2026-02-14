@@ -25,38 +25,22 @@ class DashboardController extends Controller
 
         try {
             if ($user) {
-                $stats['courses_count'] = (int) Enrollment::query()
-                    ->where('user_id', $user->id)
-                    ->where('enrollable_type', Course::class)
-                    ->count();
-
-                $stats['orders_paid_count'] = (int) Order::query()
-                    ->where('user_id', $user->id)
-                    ->where('status', 'paid')
-                    ->count();
-
-                $stats['orders_paid_total'] = (float) Order::query()
-                    ->where('user_id', $user->id)
-                    ->where('status', 'paid')
-                    ->sum('total_amount');
-
-                if (method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace()) {
-                    $sellerPaidTotal = (float) Order::query()
-                        ->where('seller_id', $user->id)
-                        ->where('status', 'paid')
-                        ->sum('total_amount');
-
-                    $sellerFeeTotal = (float) Order::query()
-                        ->where('seller_id', $user->id)
-                        ->where('status', 'paid')
-                        ->sum('platform_fee_amount');
-
-                    $stats['seller_paid_count'] = (int) Order::query()
-                        ->where('seller_id', $user->id)
-                        ->where('status', 'paid')
-                        ->count();
-
-                    $stats['seller_net_total'] = (float) max(0, $sellerPaidTotal - $sellerFeeTotal);
+                $isAdmin = method_exists($user, 'isAdmin') && $user->isAdmin();
+                $isSuperadmin = method_exists($user, 'isSuperadmin') && $user->isSuperadmin();
+                // Admin/superadmin: visão global
+                if ($isAdmin || $isSuperadmin) {
+                    $stats['courses_count'] = (int) \App\Models\Course::count();
+                    $stats['orders_paid_count'] = (int) \App\Models\Order::where('status', 'paid')->count();
+                    $stats['orders_paid_total'] = (float) \App\Models\Order::where('status', 'paid')->sum('total_amount');
+                    $stats['seller_paid_count'] = (int) \App\Models\Order::where('status', 'paid')->count();
+                    $stats['seller_net_total'] = (float) \App\Models\Order::where('status', 'paid')->sum('total_amount') - (float) \App\Models\Order::where('status', 'paid')->sum('platform_fee_amount');
+                } else {
+                    // Responsável: só vê seus produtos
+                    $stats['courses_count'] = (int) \App\Models\Course::where('user_id', $user->id)->count();
+                    $stats['orders_paid_count'] = (int) \App\Models\Order::where('user_id', $user->id)->where('status', 'paid')->count();
+                    $stats['orders_paid_total'] = (float) \App\Models\Order::where('user_id', $user->id)->where('status', 'paid')->sum('total_amount');
+                    $stats['seller_paid_count'] = (int) \App\Models\Order::where('seller_id', $user->id)->where('status', 'paid')->count();
+                    $stats['seller_net_total'] = (float) max(0, (float) \App\Models\Order::where('seller_id', $user->id)->where('status', 'paid')->sum('total_amount') - (float) \App\Models\Order::where('seller_id', $user->id)->where('status', 'paid')->sum('platform_fee_amount'));
                 }
             }
         } catch (\Throwable $e) {

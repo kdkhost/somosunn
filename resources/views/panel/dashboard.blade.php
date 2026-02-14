@@ -39,78 +39,58 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6">
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-sm font-bold text-slate-500">Meus cursos</div>
-                    <div class="text-3xl font-extrabold text-slate-900 mt-1">{{ $coursesCount }}</div>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-[#1F5EDB]/10 flex items-center justify-center text-[#1F5EDB]">
-                    <i class="fas fa-graduation-cap text-xl"></i>
-                </div>
-            </div>
-            <div class="mt-4 text-sm text-slate-600">
-                @if($canAccessCourses)
-                    Acesse seus cursos em <a class="text-[#1F5EDB] font-bold hover:underline" href="{{ route('courses.index') }}">Cursos</a>.
-                @else
-                    Libere o acesso aos cursos fazendo um upgrade de plano.
-                @endif
-            </div>
-        </div>
+        @component('components.panel-widget', [
+            'title' => 'Meus cursos',
+            'value' => '<span id="counter-curso">' . $coursesCount . '</span>',
+            'icon' => 'fas fa-graduation-cap',
+            'iconBg' => 'bg-[#1F5EDB]/10',
+            'iconColor' => 'text-[#1F5EDB]'
+        ])
+            @if($canAccessCourses)
+                Acesse seus cursos em <a class="text-[#1F5EDB] font-bold hover:underline" href="{{ route('courses.index') }}">Cursos</a>.
+            @else
+                Libere o acesso aos cursos fazendo um upgrade de plano.
+            @endif
+        @endcomponent
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-sm font-bold text-slate-500">Compras pagas</div>
-                    <div class="text-3xl font-extrabold text-slate-900 mt-1">{{ $ordersPaidCount }}</div>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
-                    <i class="fas fa-check-circle text-xl"></i>
-                </div>
-            </div>
-            <div class="mt-4 text-sm text-slate-600">
-                Total: <span class="font-extrabold text-slate-900">R$ {{ number_format($ordersPaidTotal, 2, ',', '.') }}</span>
-            </div>
-        </div>
+        @component('components.panel-widget', [
+            'title' => 'Compras pagas',
+            'value' => $ordersPaidCount,
+            'icon' => 'fas fa-check-circle',
+            'iconBg' => 'bg-emerald-500/10',
+            'iconColor' => 'text-emerald-600'
+        ])
+            Total: <span class="font-extrabold text-slate-900">R$ {{ number_format($ordersPaidTotal, 2, ',', '.') }}</span>
+        @endcomponent
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-sm font-bold text-slate-500">Comunidade</div>
-                    <div class="text-3xl font-extrabold text-slate-900 mt-1">UNN</div>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-slate-900/5 flex items-center justify-center text-slate-700">
-                    <i class="fas fa-users text-xl"></i>
-                </div>
-            </div>
-            <div class="mt-4">
-                @if($canAccessCommunity)
-                    <a href="{{ route('social.feed') }}"
-                        class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-800 transition">
-                        <i class="fas fa-arrow-right mr-2"></i> Ir para o feed
-                    </a>
-                @else
-                    <a href="{{ route('premium') }}"
-                        class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
-                        <i class="fas fa-crown mr-2"></i> Fazer upgrade
-                    </a>
-                @endif
-            </div>
-        </div>
+        @component('components.panel-widget', [
+            'title' => 'Comunidade',
+            'value' => 'UNN',
+            'icon' => 'fas fa-users',
+            'iconBg' => 'bg-slate-900/5',
+            'iconColor' => 'text-slate-700'
+        ])
+            @if($canAccessCommunity)
+                <a href="{{ route('social.feed') }}"
+                    class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-800 transition">
+                    <i class="fas fa-arrow-right mr-2"></i> Ir para o feed
+                </a>
+            @else
+                <a href="{{ route('premium') }}"
+                    class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                    <i class="fas fa-crown mr-2"></i> Fazer upgrade
+                </a>
+            @endif
+        @endcomponent
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-sm font-bold text-slate-500">Minhas vendas</div>
-                    <div class="text-3xl font-extrabold text-slate-900 mt-1">{{ $sellerPaidCount }}</div>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600">
-                    <i class="fas fa-receipt text-xl"></i>
-                </div>
-            </div>
-            <div class="mt-4 text-sm text-slate-600">
-                Líquido: <span class="font-extrabold text-slate-900">R$ {{ number_format($sellerNetTotal, 2, ',', '.') }}</span>
-            </div>
+        @component('components.panel-widget', [
+            'title' => 'Minhas vendas',
+            'value' => $sellerPaidCount,
+            'icon' => 'fas fa-receipt',
+            'iconBg' => 'bg-amber-500/10',
+            'iconColor' => 'text-amber-600'
+        ])
+            Líquido: <span class="font-extrabold text-slate-900">R$ {{ number_format($sellerNetTotal, 2, ',', '.') }}</span>
             @if($canSellOnMarketplace)
                 <div class="mt-3">
                     <a href="{{ route('panel.marketplace.sales') }}"
@@ -123,6 +103,33 @@
                     Ative um plano com permissão de vendas para liberar.
                 </div>
             @endif
-        </div>
+        @endcomponent
     </div>
 @endsection
+
+@push('scripts')
+<!-- Laravel Echo + Pusher CDN -->
+<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.0/dist/echo.iife.js"></script>
+<script>
+    // Configurar Pusher/Echo
+    window.Pusher = Pusher;
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: '{{ env('PUSHER_APP_KEY') }}',
+        cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
+        forceTLS: true
+    });
+    // IDs dos elementos dos contadores
+    const counters = {
+        'curso': document.getElementById('counter-curso'),
+        // Adicione outros tipos conforme necessário
+    };
+    window.Echo.channel('service-visits')
+        .listen('ServiceVisitRegistered', (e) => {
+            if (e.serviceType && counters[e.serviceType] && (!e.serviceId || counters[e.serviceType].dataset?.id == e.serviceId)) {
+                counters[e.serviceType].textContent = e.count;
+            }
+        });
+</script>
+@endpush

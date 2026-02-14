@@ -1,5 +1,15 @@
 # UNN — Plataforma de Networking
 
+## Novidades Recentes (fev/2026)
+
+- **Menu mobile 100% responsivo:** Navegação aprimorada em smartphones, com abertura/fechamento suave e acessibilidade total.
+- **Dashboard com métricas em tempo real:** Contadores de visitas e vendas atualizados automaticamente via websockets (Laravel Echo + Pusher).
+- **Widgets customizados por perfil:** Cada membro vê métricas e atalhos conforme seu plano; admin/superadmin têm visão global consolidada.
+- **Gerenciamento de tarefas agendadas (cron) pelo painel:** Superadmin pode criar, ativar/desativar, rodar e monitorar tarefas agendadas sem depender do cron da hospedagem.
+- **Logs detalhados de execuções:** Histórico de execuções e falhas disponível para cada tarefa agendada.
+
+Veja instruções detalhadas abaixo para uso dessas funcionalidades.
+
 # Visão Geral do Sistema
 
 O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida em Laravel 10.
@@ -22,6 +32,13 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 - **Relatórios:** Dashboards financeiros, de vendas e de engajamento.
 - **Configurações:** Controle total da plataforma via painel (cores, imagens, textos, integrações).
 
+### 4. Novidades 2026
+- **Menu Mobile Responsivo:** Menu principal funcional em todas as telas e dispositivos.
+- **Dashboard Dinâmica:** Widgets e métricas em tempo real, segmentados por perfil.
+- **Cron Interno:** Gerencie tarefas agendadas direto pelo painel admin (menu "Cron").
+- **Logs de Execução:** Visualize histórico de execuções e falhas de cada tarefa agendada.
+
+
 ## Instalação e Deploy
 
 ## UTF-8 sem BOM (OBRIGATÓRIO)
@@ -40,6 +57,19 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 2. Execute as migrações: `php artisan migrate --seed`.
 3. Configure o cron job para rodar `php artisan schedule:run` a cada minuto.
 4. Para filas, use `QUEUE_CONNECTION=database` e configure o worker.
+
+#### Para usar o cron interno (painel):
+- Acesse o menu **Admin > Cron**
+- Cadastre comandos Artisan (ex: `schedule:run`, `queue:work`, etc.) e defina a frequência (cron/preset)
+- Ative/desative tarefas conforme necessário
+- Execute manualmente e visualize logs de cada execução
+
+#### Para dashboards em tempo real:
+- Certifique-se de que as variáveis PUSHER estão configuradas no `.env`
+- O painel usará websockets para atualizar contadores automaticamente
+
+#### Menu mobile:
+- O menu principal está 100% funcional em smartphones e tablets, com navegação fluida e acessível
 
 ### Webhooks de Pagamento
 Configure as URLs no seu gateway (MercadoPago/PagSeguro):

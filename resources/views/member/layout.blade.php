@@ -33,14 +33,14 @@
         </div>
     </header>
     <!-- Menu Mobile -->
-    <div id="mobile-menu" class="fixed inset-0 z-50 bg-black bg-opacity-40 hidden">
-        <div class="absolute top-0 right-0 w-3/4 max-w-xs h-full bg-white shadow-lg flex flex-col p-6 animate-slide-in">
+    <div id="mobile-menu" class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden transition-opacity duration-300">
+        <div class="absolute top-0 right-0 w-3/4 max-w-xs h-full bg-white shadow-lg flex flex-col p-6 transform translate-x-full transition-transform duration-300" id="mobile-menu-panel" tabindex="-1" aria-modal="true" role="dialog">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-2">
                     <img src="{{ asset('img/logo-unn.png') }}" alt="Logo UNN" class="h-8">
                     <span class="font-bold text-lg text-blue-900">SOMOS UNN</span>
                 </div>
-                <button id="mobile-menu-close" class="text-gray-700 text-2xl" aria-label="Fechar menu">&times;</button>
+                <button id="mobile-menu-close" class="text-gray-700 text-2xl focus:outline-none" aria-label="Fechar menu">&times;</button>
             </div>
             <nav class="flex flex-col gap-4 mb-8">
                 <a href="/painel" class="text-blue-700 hover:underline">Início</a>
@@ -62,26 +62,45 @@
     </footer>
     @stack('scripts')
     <script>
-        // Menu mobile responsivo
+        // Menu mobile responsivo aprimorado
         document.addEventListener('DOMContentLoaded', function () {
             const toggle = document.getElementById('mobile-menu-toggle');
             const menu = document.getElementById('mobile-menu');
+            const panel = document.getElementById('mobile-menu-panel');
             const close = document.getElementById('mobile-menu-close');
-            if (toggle && menu && close) {
-                toggle.addEventListener('click', function () {
-                    menu.classList.remove('hidden');
-                });
-                close.addEventListener('click', function () {
+            let lastFocused = null;
+            function openMenu() {
+                menu.classList.remove('hidden');
+                setTimeout(() => {
+                    menu.classList.add('opacity-100');
+                    panel.classList.remove('translate-x-full');
+                    panel.focus();
+                }, 10);
+                document.body.style.overflow = 'hidden';
+                lastFocused = document.activeElement;
+            }
+            function closeMenu() {
+                menu.classList.remove('opacity-100');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => {
                     menu.classList.add('hidden');
-                });
+                    if (lastFocused) lastFocused.focus();
+                }, 300);
+                document.body.style.overflow = '';
+            }
+            if (toggle && menu && close && panel) {
+                toggle.addEventListener('click', openMenu);
+                close.addEventListener('click', closeMenu);
                 menu.addEventListener('click', function (e) {
-                    if (e.target === menu) menu.classList.add('hidden');
+                    if (e.target === menu) closeMenu();
                 });
                 // Fecha ao navegar
                 menu.querySelectorAll('a').forEach(function (link) {
-                    link.addEventListener('click', function () {
-                        menu.classList.add('hidden');
-                    });
+                    link.addEventListener('click', closeMenu);
+                });
+                // Acessibilidade: ESC fecha menu
+                document.addEventListener('keydown', function (e) {
+                    if (!menu.classList.contains('hidden') && e.key === 'Escape') closeMenu();
                 });
             }
         });
