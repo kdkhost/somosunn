@@ -20,6 +20,10 @@
                                     @yield('panel_breadcrumb')
                                 </li>
                             @endif
+                            <li class="flex items-center">
+                                <span class="mx-2">/</span>
+                                <span class="font-bold text-slate-700">@yield('title', ucfirst(Str::after(Route::currentRouteName(), 'panel.')))</span>
+                            </li>
                         </ol>
                     </nav>
                     @yield('panel_content')

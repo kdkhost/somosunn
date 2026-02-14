@@ -39,27 +39,27 @@
             Meu perfil
         </a>
 
-        <a href="{{ route('portal') }}" class="{{ $navItemClass(false) }}">
+        <a href="{{ route('portal') }}" class="{{ $navItemClass(request()->is('portal')) }}">
             <i class="fas fa-home w-5 opacity-80"></i>
             Portal
         </a>
 
         @if($user->canAccessFeature('community') || $isImpersonatingAdmin)
-            <a href="{{ route('social.feed') }}" class="{{ $navItemClass(false) }}">
+            <a href="{{ route('social.feed') }}" class="{{ $navItemClass(request()->routeIs('social.feed')) }}">
                 <i class="fas fa-users w-5 opacity-80"></i>
                 Comunidade
             </a>
         @endif
 
         @if($user->canAccessFeature('chat') || $isImpersonatingAdmin)
-            <a href="{{ route('chat.index') }}" class="{{ $navItemClass(false) }}">
+            <a href="{{ route('chat.index') }}" class="{{ $navItemClass(request()->routeIs('chat.*')) }}">
                 <i class="fas fa-comments w-5 opacity-80"></i>
                 Chat
             </a>
         @endif
 
         @if($user->canAccessFeature('marketplace.buy') || $isImpersonatingAdmin)
-            <a href="{{ route('marketplace.index') }}" class="{{ $navItemClass(false) }}">
+            <a href="{{ route('marketplace.index') }}" class="{{ $navItemClass(request()->routeIs('marketplace.*')) }}">
                 <i class="fas fa-store w-5 opacity-80"></i>
                 Marketplace
             </a>
@@ -70,7 +70,6 @@
                 <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                     Marketplace (Vendas)
                 </div>
-
                 <a href="{{ route('panel.marketplace.index') }}" class="{{ $navItemClass(request()->routeIs('panel.marketplace.index')) }}">
                     <i class="fas fa-chart-line w-5 opacity-80"></i>
                     Painel de vendas
