@@ -14,8 +14,11 @@
 <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 sticky top-24">
     <div class="flex items-center gap-3">
         <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
-            <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="w-full h-full object-cover" onerror="this.style.display='none';">
-            <span class="text-slate-500 font-bold" aria-hidden="true">{{ mb_substr((string) ($user->name ?? ''), 0, 1) }}</span>
+            @if($user->profile_photo_url && !str_contains($user->profile_photo_url, 'default-user.svg'))
+                <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="w-full h-full object-cover">
+            @else
+                <span class="text-slate-500 font-bold text-xl" aria-hidden="true">{{ mb_substr((string) ($user->name ?? ''), 0, 1) }}</span>
+            @endif
         </div>
         <div class="min-w-0">
             <div class="font-bold text-slate-900 truncate">{{ $user->name }}</div>

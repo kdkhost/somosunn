@@ -2,6 +2,17 @@
 
 @section('title', 'Painel do Membro - UNN')
 
+@section('panel_breadcrumb')
+    <nav class="text-sm text-slate-500" aria-label="breadcrumb">
+        <ol class="list-none p-0 inline-flex gap-1">
+            <li class="flex items-center">
+                <i class="fas fa-home mr-1"></i>
+                <a href="{{ route('panel.dashboard') }}" class="hover:underline">Painel</a>
+            </li>
+        </ol>
+    </nav>
+@endsection
+
 @section('panel_content')
     @php
         $plan = $plan ?? null;

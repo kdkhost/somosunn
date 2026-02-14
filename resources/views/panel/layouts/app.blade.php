@@ -8,6 +8,9 @@
                     @include('panel.partials.sidebar')
                 </aside>
                 <main class="flex-1">
+                    @hasSection('panel_breadcrumb')
+                        <div class="mb-4">@yield('panel_breadcrumb')</div>
+                    @endif
                     @yield('panel_content')
                 </main>
             </div>

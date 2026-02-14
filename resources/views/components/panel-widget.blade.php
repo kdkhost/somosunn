@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between">
         <div>
             <div class="text-sm font-bold text-slate-500">{{ $title }}</div>
-            <div class="text-3xl font-extrabold text-slate-900 mt-1">{{ $value }}</div>
+            <div class="text-3xl font-extrabold text-slate-900 mt-1">{!! $value !!}</div>
         </div>
         <div class="w-12 h-12 rounded-2xl flex items-center justify-center {{ $iconBg }}">
             <i class="{{ $icon }} text-xl {{ $iconColor }}"></i>
