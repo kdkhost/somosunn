@@ -8,9 +8,20 @@
                     @include('panel.partials.sidebar')
                 </aside>
                 <main class="flex-1">
-                    @hasSection('panel_breadcrumb')
-                        <div class="mb-4">@yield('panel_breadcrumb')</div>
-                    @endif
+                    <nav class="text-sm text-slate-500 mb-4" aria-label="breadcrumb">
+                        <ol class="list-none p-0 inline-flex gap-1">
+                            <li class="flex items-center">
+                                <i class="fas fa-home mr-1"></i>
+                                <a href="{{ route('panel.dashboard') }}" class="hover:underline">Painel</a>
+                            </li>
+                            @hasSection('panel_breadcrumb')
+                                <li class="flex items-center">
+                                    <span class="mx-2">/</span>
+                                    @yield('panel_breadcrumb')
+                                </li>
+                            @endif
+                        </ol>
+                    </nav>
                     @yield('panel_content')
                 </main>
             </div>
