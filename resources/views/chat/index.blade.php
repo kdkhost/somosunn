@@ -1,18 +1,15 @@
-@extends($extends ?? 'layouts.app')
+@extends('panel.layouts.app')
 
 @section('title', 'Mensagens - UNN')
 
-@if(($extends ?? 'layouts.app') === 'admin.layouts.app')
-    @section('page_title', 'Mensagens')
-    @section('breadcrumb_items')
-        <li class="breadcrumb-item active">Chat</li>
-    @endsection
-@endif
 
-@section('content')
+{{-- Remove breadcrumbs/admin context para painel --}}
+
+@section('panel_content')
     @php
         $routeNamePrefix = $routeNamePrefix ?? 'chat';
-        $isAdminContext = ($extends ?? 'layouts.app') === 'admin.layouts.app';
+        // $isAdminContext = ($extends ?? 'layouts.app') === 'admin.layouts.app';
+        $isAdminContext = false;
     @endphp
 
     <div class="{{ $isAdminContext ? 'px-0 py-2' : 'max-w-6xl mx-auto px-0 sm:px-4 py-2 sm:py-6' }} h-[calc(100vh-120px)] sm:h-[calc(100vh-160px)] md:h-[calc(100vh-180px)] min-h-[400px]">
