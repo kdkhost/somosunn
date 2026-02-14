@@ -8,7 +8,9 @@ use App\Models\Enrollment;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 
+
 class DashboardController extends Controller
+{
 
     /**
      * Endpoint AJAX para estatísticas dinâmicas da dashboard
