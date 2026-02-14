@@ -10,7 +10,8 @@
                 <p class="text-slate-600 mt-1">Mantenha seus dados atualizados para melhor experiência na plataforma.</p>
             </div>
             <a href="{{ route('panel.dashboard') }}"
-                class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition">
+                class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-100 transition"
+                data-tooltip="Voltar para o painel principal" style="position:relative;">
                 <i class="fas fa-arrow-left mr-2"></i> Voltar
             </a>
         </div>
@@ -28,48 +29,57 @@
                 <div>
                     <label class="text-sm font-bold text-slate-700">Nome completo *</label>
                     <input name="name" value="{{ old('name', $user->name) }}" required maxlength="80"
+                        placeholder="Digite seu nome completo"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">E-mail *</label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}" required maxlength="120"
+                        placeholder="exemplo@email.com"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Telefone</label>
                     <input name="phone" value="{{ old('phone', $user->phone) }}"
                         maxlength="20" inputmode="tel" autocomplete="tel" data-mask-phone
+                        placeholder="(99) 99999-9999"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Documento</label>
                     <input name="doc" value="{{ old('doc', $user->doc) }}"
                         maxlength="18" inputmode="numeric" autocomplete="off" data-mask-doc
+                        placeholder="CPF ou CNPJ"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Ocupação</label>
                     <input name="occupation" value="{{ old('occupation', $user->occupation) }}" maxlength="60"
+                        placeholder="Sua profissão"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Empresa</label>
                     <input name="company" value="{{ old('company', $user->company) }}" maxlength="60"
+                        placeholder="Nome da empresa"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Segmento</label>
                     <input name="segment" value="{{ old('segment', $user->segment) }}" maxlength="60"
+                        placeholder="Área de atuação"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Interesses</label>
                     <input name="interests" value="{{ old('interests', $user->interests) }}" maxlength="120"
+                        placeholder="Ex: tecnologia, marketing, saúde..."
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold text-slate-700">Bio</label>
                     <textarea name="bio" rows="4" maxlength="500"
+                        placeholder="Conte um pouco sobre você"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">{{ old('bio', $user->bio) }}</textarea>
                 </div>
             </div>
@@ -178,17 +188,20 @@
                     <label class="text-sm font-bold text-slate-700">CEP</label>
                     <input name="cep" id="profile_cep" value="{{ old('cep', $user->cep) }}"
                         maxlength="9" inputmode="numeric" autocomplete="postal-code" data-mask-cep
+                        placeholder="00000-000"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-3">
                     <label class="text-sm font-bold text-slate-700">Rua/Avenida</label>
                     <input name="street" value="{{ old('street', $user->street) }}"
+                        placeholder="Nome da rua ou avenida"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">Número</label>
                     <input name="number" id="profile_number" value="{{ old('number', $user->number) }}"
                         maxlength="10" inputmode="numeric"
+                        placeholder="Nº"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 @push('scripts')
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.8/inputmask.min.js"></script>
@@ -232,21 +245,25 @@
                 <div class="md:col-span-3">
                     <label class="text-sm font-bold text-slate-700">Complemento</label>
                     <input name="complement" value="{{ old('complement', $user->complement) }}" maxlength="40"
+                        placeholder="Apto, bloco, sala..."
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold text-slate-700">Bairro</label>
                     <input name="neighborhood" value="{{ old('neighborhood', $user->neighborhood) }}" maxlength="60"
+                        placeholder="Bairro"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">Cidade</label>
                     <input name="city" value="{{ old('city', $user->city) }}" maxlength="60"
+                        placeholder="Cidade"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div class="md:col-span-1">
                     <label class="text-sm font-bold text-slate-700">UF</label>
                     <input name="state" value="{{ old('state', $user->state) }}" maxlength="2"
+                        placeholder="UF"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm uppercase">
                 </div>
             </div>
@@ -261,31 +278,37 @@
                 <div>
                     <label class="text-sm font-bold text-slate-700">Website</label>
                     <input name="website" value="{{ old('website', $user->website) }}" maxlength="120"
+                        placeholder="https://seusite.com.br"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Instagram</label>
                     <input name="instagram" value="{{ old('instagram', $user->instagram) }}" maxlength="80"
+                        placeholder="@seuusuario"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Facebook</label>
                     <input name="facebook" value="{{ old('facebook', $user->facebook) }}" maxlength="80"
+                        placeholder="/seuusuario"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Twitter</label>
                     <input name="twitter" value="{{ old('twitter', $user->twitter) }}" maxlength="80"
+                        placeholder="@seuusuario"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">LinkedIn</label>
                     <input name="linkedin" value="{{ old('linkedin', $user->linkedin) }}" maxlength="80"
+                        placeholder="/in/seuusuario"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">YouTube</label>
                     <input name="youtube" value="{{ old('youtube', $user->youtube) }}" maxlength="80"
+                        placeholder="/c/seucanal"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">
                 </div>
             </div>
@@ -318,9 +341,53 @@
 
         <div class="flex flex-col sm:flex-row gap-3 justify-end">
             <button type="submit"
-                class="inline-flex items-center justify-center rounded-full bg-[#1F5EDB] px-8 py-3 text-sm font-extrabold text-white hover:brightness-110 transition">
+                class="inline-flex items-center justify-center rounded-full bg-[#1F5EDB] px-8 py-3 text-sm font-extrabold text-white hover:brightness-110 transition"
+                data-tooltip="Salvar todas as alterações do perfil" style="position:relative;">
                 <i class="fas fa-save mr-2"></i> Salvar alterações
             </button>
+        @push('scripts')
+        <script>
+        // Tooltips simples (usando a cor do tema)
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('[data-tooltip]').forEach(function(el) {
+                el.addEventListener('mouseenter', function() {
+                    let tip = document.createElement('div');
+                    tip.className = 'custom-tooltip';
+                    tip.innerText = el.getAttribute('data-tooltip');
+                    tip.style.position = 'absolute';
+                    tip.style.background = '#1F5EDB';
+                    tip.style.color = '#fff';
+                    tip.style.padding = '6px 12px';
+                    tip.style.borderRadius = '8px';
+                    tip.style.fontSize = '13px';
+                    tip.style.zIndex = 1000;
+                    tip.style.top = (el.offsetTop - 38) + 'px';
+                    tip.style.left = (el.offsetLeft + el.offsetWidth/2 - 60) + 'px';
+                    tip.style.boxShadow = '0 2px 8px 0 rgba(31,94,219,0.15)';
+                    tip.classList.add('fade-in');
+                    el.parentNode.appendChild(tip);
+                    el._tip = tip;
+                });
+                el.addEventListener('mouseleave', function() {
+                    if (el._tip) {
+                        el._tip.remove();
+                        el._tip = null;
+                    }
+                });
+            });
+        });
+        </script>
+        <style>
+        .custom-tooltip {
+            pointer-events: none;
+            transition: opacity 0.15s;
+            opacity: 0.98;
+        }
+        .custom-tooltip.fade-in {
+            opacity: 1;
+        }
+        </style>
+        @endpush
         </div>
     </form>
 @endsection
