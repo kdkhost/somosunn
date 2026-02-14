@@ -1,3 +1,4 @@
+<?php
 // Rotas de gerenciamento de cron (admin/superadmin)
 Route::middleware(['auth', 'admin'])->prefix('admin/cron')->name('admin.cron.')->group(function () {
     Route::get('/', [\App\Http\Controllers\Admin\CronController::class, 'index'])->name('index');
@@ -9,7 +10,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin/cron')->name('admin.cron.')-
     Route::get('/{task}/logs', [\App\Http\Controllers\Admin\CronController::class, 'logs'])->name('logs');
     Route::post('/{task}/run', [\App\Http\Controllers\Admin\CronController::class, 'run'])->name('run');
 });
-<?php
 // Rota para checkout de assinatura (compatível com premium.blade.php) — sempre no início para garantir visibilidade
 Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('subscription.checkout');
 Route::get('/assinatura/sucesso/{order}', [\App\Http\Controllers\SubscriptionController::class, 'success'])->name('subscription.success');
