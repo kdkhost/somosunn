@@ -90,7 +90,6 @@ class DashboardController extends Controller
             'sales_chart' => $salesChart,
         ]);
     }
-{
     public function index()
     {
         $user = Auth::user();
