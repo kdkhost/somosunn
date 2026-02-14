@@ -1,9 +1,13 @@
+
+# Laravel padrão
 /vendor/
-.env
 /node_modules/
+/.env
 /public/storage/
+/storage/
 /storage/*.key
 /storage/app/public/
+/storage/logs/
 .idea/
 *.log
 .DS_Store
@@ -16,4 +20,3 @@
 /public/css/*.map
 npm-debug.log
 composer.lock
-/storage/logs/*.log
