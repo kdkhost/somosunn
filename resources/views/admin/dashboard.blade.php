@@ -54,105 +54,88 @@
         </select>
         <button type="button" class="btn btn-sm btn-outline-primary ml-2" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
     </form>
-    <div class="row mb-3">
-        <div class="col-lg-3 col-md-6 col-12 mb-3">
-            <div class="small-box bg-gradient-success shadow-lg position-relative">
-                <div class="inner">
-                    <h3 class="display-4 mb-1">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</h3>
-                    <p class="font-weight-bold">Saldo Total <span class="badge badge-light ml-1" title="Vendas confirmadas"><i class="fas fa-check-circle text-success"></i></span></p>
+    <!-- KPIs principais -->
+    <div class="row mb-4">
+        <div class="col-6 col-md-3 mb-3">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body py-3">
+                    <div class="mb-1"><i class="fas fa-wallet fa-2x text-success"></i></div>
+                    <div class="h4 mb-0">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</div>
+                    <small class="text-muted">Saldo Total</small>
                 </div>
-                <div class="icon" style="top:10px;right:10px;"><i class="fas fa-wallet fa-3x"></i></div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-12 mb-3">
-            <div class="small-box bg-gradient-danger shadow-lg position-relative">
-                <div class="inner">
-                    <h3 class="display-4 mb-1">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</h3>
-                    <p class="font-weight-bold">Reembolsados <span class="badge badge-light ml-1" title="Pedidos reembolsados"><i class="fas fa-undo"></i></span></p>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body py-3">
+                    <div class="mb-1"><i class="fas fa-undo fa-2x text-danger"></i></div>
+                    <div class="h4 mb-0">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</div>
+                    <small class="text-muted">Reembolsados</small>
                 </div>
-                <div class="icon" style="top:10px;right:10px;"><i class="fas fa-undo fa-3x"></i></div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-12 mb-3">
-            <div class="small-box bg-gradient-warning shadow-lg position-relative">
-                <div class="inner">
-                    <h3 class="display-4 mb-1">{{ $totalUsers ?? 0 }}</h3>
-                    <p class="font-weight-bold">Usuários Registrados <span class="badge badge-light ml-1" title="Contas ativas"><i class="fas fa-users"></i></span></p>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body py-3">
+                    <div class="mb-1"><i class="fas fa-users fa-2x text-warning"></i></div>
+                    <div class="h4 mb-0">{{ $totalUsers ?? 0 }}</div>
+                    <small class="text-muted">Usuários</small>
                 </div>
-                <div class="icon" style="top:10px;right:10px;"><i class="fas fa-users fa-3x"></i></div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-12 mb-3">
-            <div class="small-box bg-gradient-info shadow-lg position-relative">
-                <div class="inner">
-                    <h3 class="display-4 mb-1">{{ $totalOrders ?? 0 }}</h3>
-                    <p class="font-weight-bold">Total de Pedidos <span class="badge badge-light ml-1" title="Pedidos realizados"><i class="fas fa-shopping-bag"></i></span></p>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body py-3">
+                    <div class="mb-1"><i class="fas fa-shopping-bag fa-2x text-info"></i></div>
+                    <div class="h4 mb-0">{{ $totalOrders ?? 0 }}</div>
+                    <small class="text-muted">Pedidos</small>
                 </div>
-                <div class="icon" style="top:10px;right:10px;"><i class="fas fa-shopping-bag fa-3x"></i></div>
             </div>
         </div>
     </div>
 
     <div class="row mb-4">
         <div class="col-12">
-            <h5 class="mb-2 font-weight-bold text-secondary"><i class="fas fa-chart-bar mr-1"></i>Monitoramento Geral</h5>
-            <hr class="mt-0 mb-3">
-        </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
-            <div class="info-box bg-primary shadow-sm h-100">
-                <span class="info-box-icon"><i class="fas fa-graduation-cap fa-2x"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Cursos</span>
-                    <span class="info-box-number">{{ $coursesCount ?? 0 }}</span>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pb-2">
+                    <h5 class="mb-0 font-weight-bold text-secondary"><i class="fas fa-chart-bar mr-1"></i>Visão Geral</h5>
+                </div>
+                <div class="card-body pt-0">
+                    <ul class="nav nav-tabs mb-3" id="dashboardTab" role="tablist">
+                        <li class="nav-item"><a class="nav-link active" id="tab-vendas" data-toggle="tab" href="#vendas" role="tab">Vendas</a></li>
+                        <li class="nav-item"><a class="nav-link" id="tab-pedidos" data-toggle="tab" href="#pedidos" role="tab">Pedidos</a></li>
+                        <li class="nav-item"><a class="nav-link" id="tab-usuarios" data-toggle="tab" href="#usuarios" role="tab">Usuários</a></li>
+                        <li class="nav-item"><a class="nav-link" id="tab-conteudo" data-toggle="tab" href="#conteudo" role="tab">Conteúdo</a></li>
+                        <li class="nav-item"><a class="nav-link" id="tab-certificados" data-toggle="tab" href="#certificados" role="tab">Certificados</a></li>
+                        <li class="nav-item"><a class="nav-link" id="tab-jobs" data-toggle="tab" href="#jobs" role="tab">Jobs</a></li>
+                        <li class="nav-item"><a class="nav-link" id="tab-logs" data-toggle="tab" href="#logs" role="tab">Logs</a></li>
+                    </ul>
+                    <div class="tab-content" id="dashboardTabContent">
+                        <div class="tab-pane fade show active" id="vendas" role="tabpanel">
+                            <div style="height:320px"><canvas id="salesChart" style="height:100% !important;"></canvas></div>
+                        </div>
+                        <div class="tab-pane fade" id="pedidos" role="tabpanel">
+                            <div style="height:320px"><canvas id="ordersStatusChart" style="height:100% !important;"></canvas></div>
+                        </div>
+                        <div class="tab-pane fade" id="usuarios" role="tabpanel">
+                            <div style="height:320px"><canvas id="usersByMonthChart" style="height:100% !important;"></canvas></div>
+                        </div>
+                        <div class="tab-pane fade" id="conteudo" role="tabpanel">
+                            <div style="height:320px"><canvas id="contentDistributionChart" style="height:100% !important;"></canvas></div>
+                        </div>
+                        <div class="tab-pane fade" id="certificados" role="tabpanel">
+                            <div style="height:320px"><canvas id="certificatesByMonthChart" style="height:100% !important;"></canvas></div>
+                        </div>
+                        <div class="tab-pane fade" id="jobs" role="tabpanel">
+                            <div style="height:320px"><canvas id="jobsStatusChart" style="height:100% !important;"></canvas></div>
+                        </div>
+                        <div class="tab-pane fade" id="logs" role="tabpanel">
+                            <div style="height:320px"><canvas id="logsByTypeChart" style="height:100% !important;"></canvas></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
-            <div class="info-box bg-success shadow-sm h-100">
-                <span class="info-box-icon"><i class="fas fa-chalkboard-teacher fa-2x"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Mentorias</span>
-                    <span class="info-box-number">{{ $mentorshipsCount ?? 0 }}</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
-            <div class="info-box bg-warning shadow-sm h-100">
-                <span class="info-box-icon"><i class="fas fa-calendar-alt fa-2x"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Eventos</span>
-                    <span class="info-box-number">{{ $eventsCount ?? 0 }}</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
-            <div class="info-box bg-secondary shadow-sm h-100">
-                <span class="info-box-icon"><i class="fas fa-certificate fa-2x"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Certificados</span>
-                    <span class="info-box-number">{{ $certificatesCount ?? 0 }}</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
-            <div class="info-box bg-dark shadow-sm h-100">
-                <span class="info-box-icon"><i class="fas fa-tasks fa-2x"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Jobs Pendentes</span>
-                    <span class="info-box-number">{{ $pendingJobsCount ?? 0 }}</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
-            <div class="info-box bg-light shadow-sm h-100">
-                <span class="info-box-icon text-primary"><i class="fas fa-history fa-2x"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Logs</span>
-                    <span class="info-box-number">{{ $logsCount ?? 0 }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div class="row mb-4">
         <div class="col-lg-6 col-12 mb-3">
