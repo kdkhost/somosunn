@@ -17,7 +17,8 @@
             @if($user->profile_photo_url && !str_contains($user->profile_photo_url, 'default-user.svg'))
                 <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="w-full h-full object-cover">
             @else
-                <span class="text-slate-500 font-bold text-xl" aria-hidden="true">{{ mb_substr((string) ($user->name ?? ''), 0, 1) }}</span>
+                <span class="text-slate-500 font-bold text-xl"
+                    aria-hidden="true">{{ mb_substr((string) ($user->name ?? ''), 0, 1) }}</span>
             @endif
         </div>
         <div class="min-w-0">
@@ -70,15 +71,18 @@
                 <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                     Marketplace (Vendas)
                 </div>
-                <a href="{{ route('panel.marketplace.index') }}" class="{{ $navItemClass(request()->routeIs('panel.marketplace.index')) }}">
+                <a href="{{ route('panel.marketplace.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.marketplace.index')) }}">
                     <i class="fas fa-chart-line w-5 opacity-80"></i>
                     Painel de vendas
                 </a>
-                <a href="{{ route('panel.marketplace.payments') }}" class="{{ $navItemClass(request()->routeIs('panel.marketplace.payments')) }}">
+                <a href="{{ route('panel.marketplace.payments') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.marketplace.payments')) }}">
                     <i class="fas fa-credit-card w-5 opacity-80"></i>
                     Pagamentos
                 </a>
-                <a href="{{ route('panel.marketplace.sales') }}" class="{{ $navItemClass(request()->routeIs('panel.marketplace.sales')) }}">
+                <a href="{{ route('panel.marketplace.sales') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.marketplace.sales')) }}">
                     <i class="fas fa-receipt w-5 opacity-80"></i>
                     Minhas vendas
                 </a>
@@ -91,23 +95,28 @@
                     Administração
                 </div>
 
-                <a href="{{ route('panel.admin') }}" class="{{ $navItemClass(false) }}">
+                <a href="{{ route('panel.admin.dashboard') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.dashboard')) }}">
                     <i class="fas fa-shield-alt w-5 opacity-80"></i>
                     Painel administrativo
                 </a>
-                <a href="{{ route('panel.admin', ['to' => 'settings/general']) }}" class="{{ $navItemClass(false) }}">
+                <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'general') }}">
                     <i class="fas fa-cogs w-5 opacity-80"></i>
                     Configurações gerais
                 </a>
-                <a href="{{ route('panel.admin', ['to' => 'settings/gateway']) }}" class="{{ $navItemClass(false) }}">
+                <a href="{{ route('panel.admin.settings', ['group' => 'gateway']) }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'gateway') }}">
                     <i class="fas fa-credit-card w-5 opacity-80"></i>
                     Gateway / Pagamentos
                 </a>
-                <a href="{{ route('panel.admin', ['to' => 'settings/smtp']) }}" class="{{ $navItemClass(false) }}">
+                <a href="{{ route('panel.admin.settings', ['group' => 'smtp']) }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'smtp') }}">
                     <i class="fas fa-envelope w-5 opacity-80"></i>
                     SMTP
                 </a>
-                <a href="{{ route('panel.admin', ['to' => 'mailtemplates']) }}" class="{{ $navItemClass(false) }}">
+                <a href="{{ route('panel.admin.mailtemplates.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.mailtemplates.*')) }}">
                     <i class="fas fa-at w-5 opacity-80"></i>
                     Templates de e-mail
                 </a>

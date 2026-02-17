@@ -156,6 +156,29 @@ class DashboardController extends Controller
             $calendarEvents = [];
         }
 
+        if (request()->routeIs('panel.*')) {
+            return view('panel.admin.dashboard', compact(
+                'totalRevenue',
+                'refundedAmount',
+                'totalOrders',
+                'totalUsers',
+                'salesChartData',
+                'months',
+                'calendarEvents',
+                'coursesCount',
+                'mentorshipsCount',
+                'eventsCount',
+                'certificatesCount',
+                'pendingJobsCount',
+                'logsCount',
+                'ordersByStatus',
+                'usersByMonth',
+                'certificatesByMonth',
+                'contentDistribution',
+                'jobsStatus'
+            ));
+        }
+
         return view('admin.dashboard', compact(
             'totalRevenue',
             'refundedAmount',
@@ -175,7 +198,6 @@ class DashboardController extends Controller
             'certificatesByMonth',
             'contentDistribution',
             'jobsStatus',
-
         ));
     }
 }

@@ -35,6 +35,10 @@ class SettingController extends Controller
         $settings = Setting::all()->pluck('value', 'key')->toArray();
         $settings = $this->normalizeFileSettings($settings);
 
+        if (request()->routeIs('panel.*')) {
+            return view('panel.admin.settings.index', compact('settings', 'group'));
+        }
+
         return view('admin.settings.index', compact('settings', 'group'));
     }
 

@@ -388,7 +388,7 @@
                                         // Foca no número
                                         setTimeout(() => {
                                             const numInput = document.getElementById('profile_number');
-                                            if(numInput) numInput.focus();
+                                            if (numInput) numInput.focus();
                                         }, 100);
                                     }
                                 })
@@ -404,7 +404,7 @@
                 const segmentSelect = document.getElementById('segment_select');
                 const segmentCustom = document.getElementById('segment_custom');
                 if (segmentSelect && segmentCustom) {
-                    segmentSelect.addEventListener('change', function() {
+                    segmentSelect.addEventListener('change', function () {
                         if (this.value === 'Outros') {
                             segmentCustom.classList.remove('hidden');
                             segmentCustom.focus();
@@ -417,12 +417,13 @@
                 const interestsCb = document.getElementById('interests_other_cb');
                 const interestsCustom = document.getElementById('interests_custom');
                 if (interestsCb && interestsCustom) {
-                    interestsCb.addEventListener('change', function() {
+                    interestsCb.addEventListener('change', function () {
                         if (this.checked) {
                             interestsCustom.classList.remove('hidden');
                             interestsCustom.focus();
                         } else {
                             interestsCustom.classList.add('hidden');
+                            interestsCustom.value = ''; // Clear value if unchecked
                         }
                     });
                 }

@@ -305,16 +305,26 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::get('/', [\App\Http\Controllers\Panel\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/stats', [\App\Http\Controllers\Panel\DashboardController::class, 'stats'])->name('dashboard.stats');
 
-    // Atalho para abrir o antigo painel (AdminLTE) dentro do novo layout (exceto superadmin)
-    Route::get('/admin', function (\Illuminate\Http\Request $request) {
-        $to = trim((string) $request->query('to', ''));
-        if ($to !== '') {
-            $to = ltrim($to, '/');
-            return redirect('/admin/' . $to);
-        }
+    // Admin Routes within Panel (Tailwind)
+    // PROTECTED: Only Admins can access these routes
+    Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\EnsureUserIsAdmin::class])->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
-        return redirect()->route('admin.dashboard');
-    })->name('admin');
+        // Settings
+        Route::get('/settings/{group?}', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
+        Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+        Route::post('/settings/test-smtp', [\App\Http\Controllers\Admin\SettingController::class, 'testSmtp'])->name('settings.test-smtp');
+
+        // Mail Templates
+        Route::get('/mailtemplates', [\App\Http\Controllers\Admin\MailTemplateController::class, 'index'])->name('mailtemplates.index');
+        Route::get('/mailtemplates/create', [\App\Http\Controllers\Admin\MailTemplateController::class, 'create'])->name('mailtemplates.create');
+        Route::post('/mailtemplates', [\App\Http\Controllers\Admin\MailTemplateController::class, 'store'])->name('mailtemplates.store');
+        Route::get('/mailtemplates/{mailtemplate}/edit', [\App\Http\Controllers\Admin\MailTemplateController::class, 'edit'])->name('mailtemplates.edit');
+        Route::put('/mailtemplates/{mailtemplate}', [\App\Http\Controllers\Admin\MailTemplateController::class, 'update'])->name('mailtemplates.update');
+        Route::delete('/mailtemplates/{mailtemplate}', [\App\Http\Controllers\Admin\MailTemplateController::class, 'destroy'])->name('mailtemplates.destroy');
+        Route::get('/mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('mailtemplates.preview');
+        Route::post('/mailtemplates/{mailtemplate}/send-preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
+    });
 
     // Perfil (completo) - permitido mesmo sem plano ativo (whitelist no middleware)
     Route::get('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'edit'])->name('profile.edit');
