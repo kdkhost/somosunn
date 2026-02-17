@@ -74,7 +74,7 @@
                     <input name="interests" id="interests-input" value="{{ old('interests', $user->interests) }}"
                         placeholder="Ex: tecnologia, marketing, saúde"
                         class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
-                    <p class="text-xs text-slate-400 mt-1">Digite e pressione Enter para adicionar tags.</p>
+                    <p class="text-xs text-slate-400 mt-1">Separe cada interesse por vírgula.</p>
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold text-slate-700">Bio</label>
@@ -299,24 +299,10 @@
                     });
                 });
 
-                // --- 2. Tagify (Interesses) ---
-                var inputInterests = document.querySelector('input[name=interests]');
-                if (inputInterests) {
-                    new Tagify(inputInterests, {
-                        maxTags: 10,
-                        dropdown: {
-                            maxItems: 20,           // <- mixumum allowed rendered suggestions
-                            classname: "tags-look", // <- custom classname for this dropdown, so it could be targeted
-                            enabled: 0,             // <- show suggestions on focus
-                            closeOnSelect: false    // <- do not hide the suggestions dropdown once an item has been selected
-                        },
-                        whitelist: ["Tecnologia", "Marketing", "Vendas", "Saúde", "Educação", "Finanças", "Design", "Direito", "Engenharia", "Gestão"]
-                    });
-                }
-
-                // --- 3. Máscaras Inputmask ---
+                // --- 2. Máscaras Inputmask ---
+                // Verifica se Inputmask carregou
                 if (typeof Inputmask !== 'undefined') {
-                    // Telefone (8 ou 9 dígitos)
+                    // Telefone
                     Inputmask({ mask: ['(99) 9999-9999', '(99) 99999-9999'], keepStatic: true }).mask(document.querySelectorAll('[data-mask-phone]'));
 
                     // CPF/CNPJ
@@ -324,16 +310,18 @@
 
                     // CEP
                     Inputmask('99999-999').mask(document.querySelectorAll('[data-mask-cep]'));
+                } else {
+                    console.error('Inputmask não foi carregado corretamente.');
                 }
 
-                // --- 4. Auto-Preenchimento de CEP ---
+                // --- 3. Auto-Preenchimento de CEP ---
                 const cepInput = document.getElementById('profile_cep');
                 if (cepInput) {
                     cepInput.addEventListener('input', function (e) {
                         let cep = e.target.value.replace(/\D/g, '');
                         if (cep.length === 8) {
                             // Feedback visual (loading)
-                            cepInput.parentNode.classList.add('opacity-50');
+                            cepInput.parentElement.classList.add('opacity-50');
 
                             fetch(`https://viacep.com.br/ws/${cep}/json/`)
                                 .then(response => response.json())
@@ -346,14 +334,14 @@
 
                                         // Foca no número
                                         setTimeout(() => {
-                                            document.getElementById('profile_number').focus();
+                                            const numInput = document.getElementById('profile_number');
+                                            if (numInput) numInput.focus();
                                         }, 100);
-                                    } else {
-                                        // erro silencioso ou toast
                                     }
                                 })
+                                .catch(err => console.error('Erro ViaCEP:', err))
                                 .finally(() => {
-                                    cepInput.parentNode.classList.remove('opacity-50');
+                                    cepInput.parentElement.classList.remove('opacity-50');
                                 });
                         }
                     });
