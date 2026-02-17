@@ -231,7 +231,7 @@
                     <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-calendar-alt mr-1"></i>Calendário</h6>
                 </div>
                 <div class="card-body pt-0">
-                    <div id="calendar" style="width: 100%"></div>
+                    <div id="calendar" style="width:100%; min-height: 350px; max-height: 400px; overflow-y: auto;"></div>
                 </div>
             </div>
         </div>
@@ -539,7 +539,8 @@
                         center: 'title',
                         right: 'dayGridMonth'
                     },
-                    height: 350,
+                    contentHeight: 350,
+                    height: null,
                     events: {!! json_encode($calendarEvents ?? []) !!},
                     editable: false
                 });
