@@ -1,3 +1,40 @@
+                @push('scripts')
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    // Exemplo: notificação de sucesso
+                    function showSuccess(msg) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso',
+                            text: msg,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                    // Exemplo: notificação de erro
+                    function showError(msg) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: msg,
+                            timer: 3000,
+                            showConfirmButton: true
+                        });
+                    }
+                    // Exemplo: confirmação
+                    function showConfirm(msg, callback) {
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Confirmação',
+                            text: msg,
+                            showCancelButton: true,
+                            confirmButtonText: 'Sim',
+                            cancelButtonText: 'Não'
+                        }).then((result) => {
+                            if (result.isConfirmed && typeof callback === 'function') callback();
+                        });
+                    }
+                    // Exemplo de uso automático (remova se não quiser)
+                    // showSuccess('Dashboard carregada com sucesso!');
                 <!-- Gráficos principais -->
                 <div class="row">
                     <div class="col-lg-8 col-12">
