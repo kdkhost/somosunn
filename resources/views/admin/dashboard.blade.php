@@ -43,23 +43,106 @@
         </div>
     @endif
 
+    @if($isAdmin)
     <div class="row">
-        @if($isAdmin)
-            <div class="col-lg-3 col-sm-6 col-12">
-                <x-widgets.metric title="Saldo Total (Vendas)" icon="fas fa-wallet" :value="$totalRevenue ?? 0" color="green" />
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</h3>
+                    <p>Saldo Total (Vendas)</p>
+                </div>
+                <div class="icon"><i class="fas fa-wallet"></i></div>
             </div>
-            <div class="col-lg-3 col-sm-6 col-12">
-                <x-widgets.metric title="Reembolsados" icon="fas fa-undo" :value="$refundedAmount ?? 0" color="red" />
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</h3>
+                    <p>Reembolsados</p>
+                </div>
+                <div class="icon"><i class="fas fa-undo"></i></div>
             </div>
-            <div class="col-lg-3 col-sm-6 col-12">
-                <x-widgets.metric title="Usuários Registrados" icon="fas fa-users" :value="$totalUsers ?? 0" color="yellow" />
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>{{ $totalUsers ?? 0 }}</h3>
+                    <p>Usuários Registrados</p>
+                </div>
+                <div class="icon"><i class="fas fa-users"></i></div>
             </div>
-            <div class="col-lg-3 col-sm-6 col-12">
-                <x-widgets.metric title="Total de Pedidos" icon="fas fa-shopping-bag" :value="$totalOrders ?? 0" color="blue" />
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>{{ $totalOrders ?? 0 }}</h3>
+                    <p>Total de Pedidos</p>
+                </div>
+                <div class="icon"><i class="fas fa-shopping-bag"></i></div>
             </div>
-        @endif
+        </div>
+    </div>
+    <!-- Novos info-boxes de monitoramento -->
+    <div class="row">
+        <div class="col-md-2 col-sm-4 col-6">
+            <div class="info-box bg-primary">
+                <span class="info-box-icon"><i class="fas fa-graduation-cap"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Cursos</span>
+                    <span class="info-box-number">{{ $coursesCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+            <div class="info-box bg-success">
+                <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Mentorias</span>
+                    <span class="info-box-number">{{ $mentorshipsCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+            <div class="info-box bg-warning">
+                <span class="info-box-icon"><i class="fas fa-calendar-alt"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Eventos</span>
+                    <span class="info-box-number">{{ $eventsCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+            <div class="info-box bg-secondary">
+                <span class="info-box-icon"><i class="fas fa-certificate"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Certificados</span>
+                    <span class="info-box-number">{{ $certificatesCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+            <div class="info-box bg-dark">
+                <span class="info-box-icon"><i class="fas fa-tasks"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Jobs Pendentes</span>
+                    <span class="info-box-number">{{ $pendingJobsCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+            <div class="info-box bg-light">
+                <span class="info-box-icon text-primary"><i class="fas fa-history"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Logs</span>
+                    <span class="info-box-number">{{ $logsCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
-        {{-- Widgets Comuns (Membros + Admin) --}}
+    @if(!$isAdmin)
+    <div class="row">
         <div class="col-md-4">
             <x-widgets.metric title="Meus Cursos" icon="fas fa-graduation-cap" :value="$coursesCount ?? 0" color="blue" />
         </div>
@@ -69,6 +152,8 @@
         <div class="col-md-4">
             <x-widgets.metric title="Eventos" icon="fas fa-calendar-alt" :value="$eventsCount ?? 0" color="yellow" />
         </div>
+    </div>
+    @endif
     </div>
 
     @if($isAdmin)

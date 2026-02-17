@@ -20,12 +20,28 @@ class DashboardController extends Controller
         $salesChartData = [];
         $months = [];
 
+
+        // Novas métricas globais
+        $coursesCount = 0;
+        $mentorshipsCount = 0;
+        $eventsCount = 0;
+        $certificatesCount = 0;
+        $pendingJobsCount = 0;
+        $logsCount = 0;
+
         try {
             if ($isAdmin) {
                 $totalRevenue = \App\Models\Order::where('status', 'paid')->sum('total_amount');
                 $refundedAmount = \App\Models\Order::where('status', 'refunded')->sum('total_amount');
                 $totalOrders = \App\Models\Order::count();
                 $totalUsers = \App\Models\User::count();
+
+                $coursesCount = \App\Models\Course::count();
+                $mentorshipsCount = \App\Models\Mentorship::count();
+                $eventsCount = \App\Models\Event::count();
+                $certificatesCount = \App\Models\Certificate::count();
+                $pendingJobsCount = \DB::table('jobs')->count();
+                $logsCount = \App\Models\ActivityLog::count();
 
                 for ($i = 5; $i >= 0; $i--) {
                     $date = now()->subMonths($i);
@@ -39,6 +55,12 @@ class DashboardController extends Controller
                 // If not admin, we skip sales stats
                 $salesChartData = array_fill(0, 6, 0);
                 $months = collect(range(0, 5))->map(fn($i) => now()->subMonths($i)->format('M/Y'))->reverse()->values()->toArray();
+
+                // Métricas pessoais (membro)
+                $user = auth()->user();
+                $coursesCount = $user->courses()->count();
+                $mentorshipsCount = $user->mentorships()->count() ?? 0;
+                $eventsCount = $user->eventRegistrations()->count();
             }
 
             // Calendar Events (Unified for all)
@@ -74,6 +96,20 @@ class DashboardController extends Controller
             $calendarEvents = [];
         }
 
-        return view('admin.dashboard', compact('totalRevenue', 'refundedAmount', 'totalOrders', 'totalUsers', 'salesChartData', 'months', 'calendarEvents'));
+        return view('admin.dashboard', compact(
+            'totalRevenue',
+            'refundedAmount',
+            'totalOrders',
+            'totalUsers',
+            'salesChartData',
+            'months',
+            'calendarEvents',
+            'coursesCount',
+            'mentorshipsCount',
+            'eventsCount',
+            'certificatesCount',
+            'pendingJobsCount',
+            'logsCount',
+        ));
     }
 }

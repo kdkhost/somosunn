@@ -10,6 +10,16 @@
 
 Veja instruções detalhadas abaixo para uso dessas funcionalidades.
 
+## Melhorias de Dashboard (fev/2026)
+
+- Dashboards de membro e admin totalmente refatoradas com widgets dinâmicos Blade.
+- Exibição de métricas, vendas, comunidade, ranking, etc. conforme permissões e plano do usuário.
+- Estrutura pronta para integração com dados em tempo real (websockets/Redis) e cache otimizado.
+- Novos componentes Blade em `resources/views/components/widgets/` para fácil expansão e manutenção.
+- Código preparado para uso de Redis (requer extensão fileinfo habilitada no PHP para produção).
+
+> **Atenção:** Para usar cache Redis, habilite a extensão `fileinfo` no PHP e instale o Predis (`composer require predis/predis`).
+
 # Visão Geral do Sistema
 
 O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida em Laravel 10.
