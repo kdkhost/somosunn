@@ -1,3 +1,26 @@
+                <!-- Gráficos principais -->
+                <div class="row">
+                    <div class="col-lg-8 col-12">
+                        <div class="card card-primary card-outline">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-chart-line mr-2"></i>Histórico de Vendas</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="salesChart" style="height:220px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-12">
+                        <div class="card card-info card-outline">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-chart-pie mr-2"></i>Pedidos por Status</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="ordersStatusChart" style="height:220px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
         <!-- KPIs principais -->
         <div class="row mb-3">
             <div class="col-6 col-md-3 mb-3">
@@ -358,6 +381,75 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
         </div>
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/core/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/daygrid/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/timegrid/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/list/main.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/core/main.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/daygrid/main.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/timegrid/main.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/list/main.min.css">
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gráfico de vendas (exemplo)
+        var salesCtx = document.getElementById('salesChart');
+        if (salesCtx) {
+            new Chart(salesCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: 'Vendas',
+                        data: [120, 150, 180, 90, 200, 170, 220],
+                        borderColor: '#007bff',
+                        backgroundColor: '#007bff22',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { plugins: { legend: { display: false } }, scales: { x: {}, y: {} } }
+            });
+        }
+        // Gráfico de pedidos por status (exemplo)
+        var ordersCtx = document.getElementById('ordersStatusChart');
+        if (ordersCtx) {
+            new Chart(ordersCtx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sucesso', 'Pendente', 'Falha'],
+                    datasets: [{
+                        data: [60, 25, 15],
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                    }]
+                },
+                options: { plugins: { legend: { display: true } } }
+            });
+        }
+        // FullCalendar
+        var calendarEl = document.getElementById('calendar');
+        if (calendarEl) {
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                plugins: ['dayGrid', 'timeGrid', 'list'],
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                },
+                locale: 'pt-br',
+                height: 350,
+                events: [
+                    { title: 'Evento 1', start: new Date(), color: '#007bff' },
+                    { title: 'Mentoria', start: new Date(new Date().setDate(new Date().getDate()+2)), color: '#28a745' },
+                    { title: 'Curso', start: new Date(new Date().setDate(new Date().getDate()+5)), color: '#ffc107' }
+                ]
+            });
+            calendar.render();
+        }
+    });
+    </script>
+    @endpush
     </div>
 </section>
 @endsection
