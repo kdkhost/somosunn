@@ -34,29 +34,29 @@
 
         {{-- Tabs Navigation --}}
         <div
-            class="bg-slate-100 dark:bg-slate-800/50 p-1 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1 transition-colors duration-300">
+            class="bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1.5 transition-all duration-300">
             <button type="button" @click="tab = 'general'"
-                :class="tab === 'general' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
-                class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
+                :class="tab === 'general' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
                 <i class="fas fa-info-circle"></i>
                 <span>Geral</span>
             </button>
             <button type="button" @click="tab = 'pricing'"
-                :class="tab === 'pricing' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
-                class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
+                :class="tab === 'pricing' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
                 <i class="fas fa-tag"></i>
                 <span>Preço</span>
             </button>
             @if($course->exists)
                 <button type="button" @click="tab = 'lessons'"
-                    :class="tab === 'lessons' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
-                    class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
+                    :class="tab === 'lessons' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
+                    class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
                     <i class="fas fa-layer-group"></i>
                     <span>Conteúdo ({{ $course->lessons_count ?? $course->lessons()->count() }})</span>
                 </button>
                 <button type="button" @click="tab = 'certificate'"
-                    :class="tab === 'certificate' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
-                    class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
+                    :class="tab === 'certificate' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
+                    class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
                     <i class="fas fa-certificate"></i>
                     <span>Certificado</span>
                 </button>
@@ -256,11 +256,11 @@
                                 </div>
                                 <input type="file" name="thumbnail" x-ref="thumbnail" class="hidden" accept="image/*"
                                     @change="
-                                        photoName = $event.target.files[0].name;
-                                        const reader = new FileReader();
-                                        reader.onload = (e) => { photoPreview = e.target.result; };
-                                        reader.readAsDataURL($event.target.files[0]);
-                                       ">
+                                            photoName = $event.target.files[0].name;
+                                            const reader = new FileReader();
+                                            reader.onload = (e) => { photoPreview = e.target.result; };
+                                            reader.readAsDataURL($event.target.files[0]);
+                                           ">
                             </div>
                         </div>
                     </div>
@@ -370,7 +370,8 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <h4 class="font-bold text-slate-900 dark:text-white truncate transition-colors">
-                                        {{ $lesson->title }}</h4>
+                                        {{ $lesson->title }}
+                                    </h4>
                                     <div class="flex items-center gap-3 mt-0.5">
                                         <span
                                             class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1 transition-colors">
@@ -574,13 +575,13 @@
                     if (lesson.attachments && lesson.attachments.length) {
                         lesson.attachments.forEach(att => {
                             $list.append(`
-                                <li class="flex items-center justify-between p-2 bg-slate-50 rounded-lg border border-slate-200">
-                                    <span class="text-xs font-medium text-slate-700">${att.file_name}</span>
-                                    <button type="button" onclick="deleteAttachment(${id}, ${att.id})" class="text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </li>
-                            `);
+                                        <li class="flex items-center justify-between p-2 bg-slate-50 rounded-lg border border-slate-200">
+                                            <span class="text-xs font-medium text-slate-700">${att.file_name}</span>
+                                            <button type="button" onclick="deleteAttachment(${id}, ${att.id})" class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </li>
+                                    `);
                         });
                     }
 
