@@ -164,8 +164,15 @@
                     <label
                         class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Token
                         (Produção)</label>
-                    <input type="text" name="pagseguro_prod_token" value="{{ $settings['pagseguro_prod_token'] ?? '' }}"
-                        class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                    <div class="flex gap-2">
+                        <input type="text" name="pagseguro_prod_token"
+                            value="{{ $settings['pagseguro_prod_token'] ?? '' }}"
+                            class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                        <button type="button" onclick="testGatewayConnection('pagseguro')"
+                            class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl font-bold hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors whitespace-nowrap">
+                            <i class="fas fa-plug mr-2"></i> Testar
+                        </button>
+                    </div>
                 </div>
             </div>
 
