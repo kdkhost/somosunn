@@ -121,7 +121,7 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-right">
-                                    <div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                    <div class="flex items-center justify-end gap-2 transition-opacity">
                                         @if(auth()->user()->role === 'superadmin' && $u->id !== auth()->id())
                                             <a href="{{ route('admin.users.impersonate', $u) }}" 
                                                class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition" 
