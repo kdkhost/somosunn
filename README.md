@@ -170,5 +170,13 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Visualização Completa:** Sistema de pré-visualização que ajusta a altura dinamicamente para exibir o modelo de e-mail por completo, sem cortes.
 - **Teste Rápido:** Atalho para envio de e-mail de teste diretamente do modal de edição.
 
+### 17/02/2026 (Noite) — Correção de Bloqueio de Cliques Mobile
+- **Auditoria Completa:** Identificação e correção de todos os overlays que bloqueavam cliques no mobile.
+- **Navbar Mobile:** Removido `pointer-events-none` do container principal do menu mobile.
+- **Member Layout:** Adicionado JavaScript completo de toggle para `pointer-events` no menu mobile de membros.
+- **Cache-Busting v=3:** Atualização de versão do FilePond para forçar reload de assets.
+- **Rota de Assinatura:** Adicionada rota POST `subscription.process` faltante.
+- **Commits:** `1e1526e`, `765f11a`, `e9ad637`
+
 ---
 © 2026 UNN Networking. Todos os direitos reservados.
