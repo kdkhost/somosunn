@@ -23,6 +23,22 @@ AddDefaultCharset UTF-8
 </IfModule>
 
 <IfModule mod_headers.c>
+    # CORS headers for external resources (prevent CORB blocking)
+    <FilesMatch "\.(css|js|woff|woff2|ttf|eot|svg)$">
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Methods "GET, OPTIONS"
+        Header set Access-Control-Allow-Headers "Content-Type"
+    </FilesMatch>
+    
+    # Ensure correct Content-Type for CSS and JS
+    <FilesMatch "\.css$">
+        Header set Content-Type "text/css; charset=utf-8"
+    </FilesMatch>
+    
+    <FilesMatch "\.js$">
+        Header set Content-Type "application/javascript; charset=utf-8"
+    </FilesMatch>
+    
     # Allow caching for vendor assets (CSS, JS, fonts, images)
     <FilesMatch "\.(css|js|woff|woff2|ttf|eot|svg|jpg|jpeg|png|gif|ico)$">
         Header set Cache-Control "max-age=604800, public"
