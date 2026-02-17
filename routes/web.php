@@ -390,7 +390,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     });
 
     // Preferência de Tema
-    Route::post('/theme/toggle', [\App\Http\Controllers\Panel\ThemeController::class, 'update'])->name('panel.theme.toggle');
+    Route::post('/theme/toggle', [\App\Http\Controllers\Panel\ThemeController::class, 'update'])->name('theme.toggle');
 
     // Perfil (completo) - permitido mesmo sem plano ativo (whitelist no middleware)
     Route::get('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'edit'])->name('profile.edit');
