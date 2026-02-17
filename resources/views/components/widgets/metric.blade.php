@@ -1,4 +1,4 @@
-@props(['title', 'icon', 'value', 'color' => 'blue', 'realtime' => false, 'href' => null])
+@props(['title', 'icon', 'value', 'color' => 'blue', 'realtime' => false, 'href' => null, 'id' => null])
 <div
     class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-5 flex items-center gap-4 border-l-4 border-{{$color}}-500 dark:border-{{$color}}-400 transition-all duration-300 relative group {{ $href ? 'hover:shadow-md hover:-translate-y-0.5' : '' }}">
     <div
@@ -9,15 +9,18 @@
         <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 truncate">
             {{ $title }}
         </div>
-        <div class="text-2xl font-black text-slate-900 dark:text-white" @if($realtime) x-data="{ value: {{ $value }} }"
-        x-text="value" @endif>
+        <div class="text-2xl font-black text-slate-900 dark:text-white" @if($id) id="{{ $id }}" @endif @if($realtime)
+        x-data="{ value: {{ $value }} }" x-text="value" @endif>
             {{ $value }}
         </div>
     </div>
     @if($href)
-        <a href="{{ $href }}" class="absolute top-4 right-4 text-slate-300 hover:text-{{$color}}-500 transition-colors"
-            title="Acessar">
-            <i class="fas fa-arrow-up-right-from-square text-xs"></i>
+        <a href="{{ $href }}" class="absolute inset-0 z-10" title="Acessar {{ $title }}">
+            <span class="sr-only">Acessar {{ $title }}</span>
         </a>
+        <div
+            class="absolute top-4 right-4 text-slate-400 dark:text-slate-600 group-hover:text-{{$color}}-500 transition-colors">
+            <i class="fas fa-arrow-up-right-from-square text-xs"></i>
+        </div>
     @endif
 </div>

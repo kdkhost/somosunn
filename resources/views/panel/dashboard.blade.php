@@ -44,17 +44,17 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6" id="dashboard-widgets">
         @if($canAccessCourses)
-            <x-widgets.metric title="Meus Cursos" icon="fas fa-graduation-cap" :value="$coursesCount ?? 0" color="blue" :href="route('courses.index')" />
+            <x-widgets.metric title="Meus Cursos" icon="fas fa-graduation-cap" :value="$coursesCount ?? 0" color="blue" :href="route('courses.index')" id="counter-curso" />
         @endif
-        <x-widgets.metric title="Compras pagas" icon="fas fa-check-circle" :value="$ordersPaidCount ?? 0" color="emerald" :href="route('marketplace.index')" />
-        <x-widgets.metric title="Total em compras" icon="fas fa-wallet" :value="number_format($ordersPaidTotal ?? 0, 2, ',', '.')" color="green" :href="route('marketplace.index')" />
+        <x-widgets.metric title="Compras pagas" icon="fas fa-check-circle" :value="$ordersPaidCount ?? 0" color="emerald" :href="route('marketplace.index')" id="counter-orders" />
+        <x-widgets.metric title="Total em compras" icon="fas fa-wallet" :value="number_format($ordersPaidTotal ?? 0, 2, ',', '.')" color="green" :href="route('marketplace.index')" id="counter-orders-total" />
         @if($canSellOnMarketplace)
             <x-widgets.metric title="Vendas realizadas" icon="fas fa-shopping-cart" :value="$sellerPaidCount ?? 0"
-                color="purple" :href="route('panel.marketplace.sales')" />
-            <x-widgets.metric title="Receita líquida" icon="fas fa-coins" :value="number_format($sellerNetTotal ?? 0, 2, ',', '.')" color="yellow" :href="route('panel.marketplace.payments')" />
+                color="purple" :href="route('panel.marketplace.sales')" id="counter-seller" />
+            <x-widgets.metric title="Receita líquida" icon="fas fa-coins" :value="number_format($sellerNetTotal ?? 0, 2, ',', '.')" color="yellow" :href="route('panel.marketplace.payments')" id="counter-seller-total" />
         @endif
         @if($canAccessCommunity)
-            <x-widgets.metric title="Comunidade" icon="fas fa-users" :value="$communityCount ?? 0" color="cyan" :href="route('social.feed')" />
+            <x-widgets.metric title="Comunidade" icon="fas fa-users" :value="$communityCount ?? 0" color="cyan" :href="route('social.feed')" id="counter-community" />
         @endif
     </div>
 
@@ -132,16 +132,31 @@
                 .then(r => r.json())
                 .then(data => {
                     if (data.success && data.stats) {
-                        document.getElementById('counter-curso').textContent = data.stats.courses_count;
-                        document.getElementById('counter-orders').textContent = data.stats.orders_paid_count;
-                        document.getElementById('counter-orders-total').textContent = 'R$ ' + (data.stats.orders_paid_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                        document.getElementById('counter-seller').textContent = data.stats.seller_paid_count;
-                        document.getElementById('counter-seller-total').textContent = 'R$ ' + (data.stats.seller_net_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                        document.getElementById('widget-cursos-msg').textContent = '';
+                        const elCurso = document.getElementById('counter-curso');
+                        if (elCurso) elCurso.textContent = data.stats.courses_count;
+
+                        const elOrders = document.getElementById('counter-orders');
+                        if (elOrders) elOrders.textContent = data.stats.orders_paid_count;
+
+                        const elOrdersTotal = document.getElementById('counter-orders-total');
+                        if (elOrdersTotal) elOrdersTotal.textContent = 'R$ ' + (data.stats.orders_paid_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+                        const elSeller = document.getElementById('counter-seller');
+                        if (elSeller) elSeller.textContent = data.stats.seller_paid_count;
+
+                        const elSellerTotal = document.getElementById('counter-seller-total');
+                        if (elSellerTotal) elSellerTotal.textContent = 'R$ ' + (data.stats.seller_net_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+                        const elCommunity = document.getElementById('counter-community');
+                        if (elCommunity) elCommunity.textContent = data.stats.community_count;
+
+                        const elCursoMsg = document.getElementById('widget-cursos-msg');
+                        if (elCursoMsg) elCursoMsg.textContent = '';
+                        
                         // Remove animação de loading
                         document.querySelectorAll('.animate-pulse').forEach(e => e.classList.remove('animate-pulse'));
                     }
-                });
+                }).catch(e => console.error('Dashboard stats update failed:', e));
         }
         document.addEventListener('DOMContentLoaded', function () {
             updateDashboardWidgets();

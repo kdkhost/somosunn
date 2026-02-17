@@ -167,7 +167,9 @@ class DashboardController extends Controller
             // Falha silenciosa no networking
         }
 
-        return view('panel.dashboard', compact('user', 'plan', 'stats', 'suggestedUsers'));
+        $communityCount = (int) \App\Models\User::count();
+
+        return view('panel.dashboard', compact('user', 'plan', 'stats', 'suggestedUsers', 'communityCount'));
     }
 }
 
