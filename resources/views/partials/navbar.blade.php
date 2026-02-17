@@ -168,9 +168,9 @@
 
                 <!-- Mobile Toggle -->
                 <button id="mobile-menu-toggle" type="button"
-                    class="lg:hidden inline-flex items-center justify-center rounded-full border-0 px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 relative z-[60] active:scale-95 transition-transform">
+                    class="lg:hidden inline-flex items-center justify-center rounded-full border-0 p-2 min-w-[44px] min-h-[44px] text-[#1F5EDB] hover:bg-[#1F5EDB]/10 relative z-[60] active:scale-95 transition-transform touch-manipulation">
                     <span class="sr-only">Abrir menu</span>
-                    <i class="fas fa-bars text-lg"></i>
+                    <i class="fas fa-bars text-xl"></i>
                 </button>
             </div>
 
