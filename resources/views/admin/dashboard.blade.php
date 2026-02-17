@@ -105,10 +105,13 @@
     <!-- Gráficos premium -->
     <div class="row mb-4">
         <div class="col-lg-8 col-12 mb-3">
-            <div class="card shadow-lg border-0 h-100 chart-hover" title="Evolução das vendas mês a mês.">
-                <div class="card-header bg-gradient-primary text-white border-0 pb-2 d-flex align-items-center justify-content-between">
+            <div class="card card-primary card-outline card-outline-tabs h-100">
+                <div class="card-header p-2 d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-line mr-2"></i>Histórico de Vendas</h5>
-                    <span class="badge badge-light text-primary">R$</span>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                        <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
+                    </div>
                 </div>
                 <div class="card-body pt-2" style="height:340px; min-height:340px; max-height:340px;">
                     <canvas id="salesChart" style="height:100% !important; max-height:100% !important;"></canvas>
@@ -116,9 +119,13 @@
             </div>
         </div>
         <div class="col-lg-4 col-12 mb-3">
-            <div class="card shadow-lg border-0 h-100 chart-hover" title="Distribuição dos pedidos por status.">
-                <div class="card-header bg-gradient-info text-white border-0 pb-2 d-flex align-items-center justify-content-between">
+            <div class="card card-info card-outline card-outline-tabs h-100">
+                <div class="card-header p-2 d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-pie mr-2"></i>Pedidos por Status</h5>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                        <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
+                    </div>
                 </div>
                 <div class="card-body pt-2" style="height:340px; min-height:340px; max-height:340px;">
                     <canvas id="ordersStatusChart" style="height:100% !important; max-height:100% !important;"></canvas>
@@ -128,9 +135,13 @@
     </div>
     <div class="row mb-4">
         <div class="col-lg-4 col-12 mb-3">
-            <div class="card shadow-lg border-0 h-100 chart-hover" title="Novos usuários cadastrados mês a mês.">
-                <div class="card-header bg-gradient-warning text-white border-0 pb-2 d-flex align-items-center justify-content-between">
+            <div class="card card-warning card-outline card-outline-tabs h-100">
+                <div class="card-header p-2 d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-user-plus mr-2"></i>Novos Usuários por Mês</h5>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                        <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
+                    </div>
                 </div>
                 <div class="card-body pt-2" style="height:340px; min-height:340px; max-height:340px;">
                     <canvas id="usersByMonthChart" style="height:100% !important; max-height:100% !important;"></canvas>
@@ -140,47 +151,47 @@
         <div class="col-lg-8 col-12 mb-3">
             <div class="row h-100">
                 <div class="col-md-4 col-6 mb-3">
-                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center info-hover" title="Total de cursos cadastrados.">
-                        <span class="info-box-icon text-primary mb-2"><i class="fas fa-graduation-cap fa-2x"></i></span>
-                        <div class="info-box-content text-center">
-                            <span class="info-box-text font-weight-bold">Cursos</span>
-                            <span class="info-box-number display-4">{{ $coursesCount ?? 0 }}</span>
+                    <div class="info-box bg-gradient-primary shadow-sm">
+                        <span class="info-box-icon"><i class="fas fa-graduation-cap"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Cursos</span>
+                            <span class="info-box-number">{{ $coursesCount ?? 0 }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4 col-6 mb-3">
-                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center info-hover" title="Total de mentorias ativas.">
-                        <span class="info-box-icon text-success mb-2"><i class="fas fa-chalkboard-teacher fa-2x"></i></span>
-                        <div class="info-box-content text-center">
-                            <span class="info-box-text font-weight-bold">Mentorias</span>
-                            <span class="info-box-number display-4">{{ $mentorshipsCount ?? 0 }}</span>
+                    <div class="info-box bg-gradient-success shadow-sm">
+                        <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Mentorias</span>
+                            <span class="info-box-number">{{ $mentorshipsCount ?? 0 }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4 col-12 mb-3">
-                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center info-hover" title="Total de eventos cadastrados.">
-                        <span class="info-box-icon text-warning mb-2"><i class="fas fa-calendar-alt fa-2x"></i></span>
-                        <div class="info-box-content text-center">
-                            <span class="info-box-text font-weight-bold">Eventos</span>
-                            <span class="info-box-number display-4">{{ $eventsCount ?? 0 }}</span>
+                    <div class="info-box bg-gradient-warning shadow-sm">
+                        <span class="info-box-icon"><i class="fas fa-calendar-alt"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Eventos</span>
+                            <span class="info-box-number">{{ $eventsCount ?? 0 }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6 col-6 mb-3">
-                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center info-hover" title="Total de certificados emitidos.">
-                        <span class="info-box-icon text-secondary mb-2"><i class="fas fa-certificate fa-2x"></i></span>
-                        <div class="info-box-content text-center">
-                            <span class="info-box-text font-weight-bold">Certificados</span>
-                            <span class="info-box-number display-4">{{ $certificatesCount ?? 0 }}</span>
+                    <div class="info-box bg-gradient-secondary shadow-sm">
+                        <span class="info-box-icon"><i class="fas fa-certificate"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Certificados</span>
+                            <span class="info-box-number">{{ $certificatesCount ?? 0 }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6 col-6 mb-3">
-                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center info-hover" title="Total de jobs pendentes.">
-                        <span class="info-box-icon text-dark mb-2"><i class="fas fa-tasks fa-2x"></i></span>
-                        <div class="info-box-content text-center">
-                            <span class="info-box-text font-weight-bold">Jobs Pendentes</span>
-                            <span class="info-box-number display-4">{{ $pendingJobsCount ?? 0 }}</span>
+                    <div class="info-box bg-gradient-dark shadow-sm">
+                        <span class="info-box-icon"><i class="fas fa-tasks"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Jobs Pendentes</span>
+                            <span class="info-box-number">{{ $pendingJobsCount ?? 0 }}</span>
                         </div>
                     </div>
                 </div>
@@ -190,9 +201,13 @@
     <!-- Calendário premium -->
     <div class="row mb-4">
         <div class="col-lg-5 col-12 mb-3">
-            <div class="card shadow-lg border-0 h-100" title="Calendário de eventos e atividades.">
-                <div class="card-header bg-gradient-secondary text-white border-0 pb-2 d-flex align-items-center justify-content-between">
+            <div class="card card-secondary card-outline card-outline-tabs h-100" title="Calendário de eventos e atividades.">
+                <div class="card-header p-2 d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-calendar-alt mr-2"></i>Calendário</h5>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                        <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
+                    </div>
                 </div>
                 <div class="card-body pt-2" style="height:340px; min-height:340px; max-height:340px;">
                     <div id="calendar" style="width:100%; min-height: 320px; max-height: 320px; overflow-y: auto;"></div>
