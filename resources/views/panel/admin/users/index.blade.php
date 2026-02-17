@@ -36,7 +36,7 @@
         <!-- Filters -->
         <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
             <a href="{{ route('panel.admin.users.index') }}" 
-               class="px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition {{ !request('role') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700' }}">
+               class="px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition {{ !request('role') ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200 dark:border-slate-700' }}">
                Todos
             </a>
             @php
@@ -48,7 +48,7 @@
             @endphp
             @foreach($roles as $key => $label)
                 <a href="{{ route('panel.admin.users.index', array_merge(request()->all(), ['role' => $key])) }}" 
-                   class="px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request('role') == $key ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700' }}">
+                   class="px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition {{ request('role') == $key ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200 dark:border-slate-700' }}">
                    {{ $label }}
                 </a>
             @endforeach
