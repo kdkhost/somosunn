@@ -44,49 +44,62 @@
     @endif
 
     @if($isAdmin)
-    <form id="dashboardFilterForm" class="mb-4 d-flex flex-wrap align-items-center gap-2 bg-white rounded shadow-sm p-3">
-        <label class="mr-2 font-weight-bold">Período:</label>
-        <select name="period" id="dashboardPeriod" class="form-control form-control-lg w-auto">
-            <option value="30">Últimos 30 dias</option>
-            <option value="7">Últimos 7 dias</option>
-            <option value="90">Últimos 90 dias</option>
-            <option value="365">Ano atual</option>
-        </select>
-        <button type="button" class="btn btn-lg btn-gradient-primary ml-2" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
+    <form id="dashboardFilterForm" class="mb-4 row align-items-center">
+        <div class="col-auto pr-0"><label class="col-form-label font-weight-bold">Período:</label></div>
+        <div class="col-auto">
+            <select name="period" id="dashboardPeriod" class="form-control form-control-sm">
+                <option value="30">Últimos 30 dias</option>
+                <option value="7">Últimos 7 dias</option>
+                <option value="90">Últimos 90 dias</option>
+                <option value="365">Ano atual</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-sm btn-primary" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
+        </div>
     </form>
-    <!-- KPIs premium -->
+    <!-- KPIs harmonizados AdminLTE -->
     <div class="row mb-4">
-        <div class="col-12 d-flex flex-wrap justify-content-between align-items-stretch gap-3">
-            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0 kpi-hover" style="min-width:220px;" title="Total de vendas confirmadas no período selecionado.">
-                <div class="card-body py-4">
-                    <div class="mb-2"><i class="fas fa-wallet fa-3x text-gradient-success"></i></div>
-                    <div class="display-4 font-weight-bold mb-1">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</div>
-                    <div class="text-muted font-weight-bold">Saldo Total</div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-md-3 mb-3">
+                    <div class="info-box bg-gradient-success shadow-sm">
+                        <span class="info-box-icon"><i class="fas fa-wallet"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Saldo Total</span>
+                            <span class="info-box-number">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0 kpi-hover" style="min-width:220px;" title="Valor total reembolsado no período.">
-                <div class="card-body py-4">
-                    <div class="mb-2"><i class="fas fa-undo fa-3x text-gradient-danger"></i></div>
-                    <div class="display-4 font-weight-bold mb-1">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</div>
-                    <div class="text-muted font-weight-bold">Reembolsados</div>
+                <div class="col-12 col-sm-6 col-md-3 mb-3">
+                    <div class="info-box bg-gradient-danger shadow-sm">
+                        <span class="info-box-icon"><i class="fas fa-undo"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Reembolsados</span>
+                            <span class="info-box-number">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0 kpi-hover" style="min-width:220px;" title="Total de usuários cadastrados.">
-                <div class="card-body py-4">
-                    <div class="mb-2"><i class="fas fa-users fa-3x text-gradient-warning"></i></div>
-                    <div class="display-4 font-weight-bold mb-1">{{ $totalUsers ?? 0 }}</div>
-                    <div class="text-muted font-weight-bold">Usuários</div>
+                <div class="col-12 col-sm-6 col-md-3 mb-3">
+                    <div class="info-box bg-gradient-warning shadow-sm">
+                        <span class="info-box-icon"><i class="fas fa-users"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Usuários</span>
+                            <span class="info-box-number">{{ $totalUsers ?? 0 }}</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0 kpi-hover" style="min-width:220px;" title="Total de pedidos realizados.">
-                <div class="card-body py-4">
-                    <div class="mb-2"><i class="fas fa-shopping-bag fa-3x text-gradient-info"></i></div>
-                    <div class="display-4 font-weight-bold mb-1">{{ $totalOrders ?? 0 }}</div>
-                    <div class="text-muted font-weight-bold">Pedidos</div>
+                <div class="col-12 col-sm-6 col-md-3 mb-3">
+                    <div class="info-box bg-gradient-info shadow-sm">
+                        <span class="info-box-icon"><i class="fas fa-shopping-bag"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Pedidos</span>
+                            <span class="info-box-number">{{ $totalOrders ?? 0 }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="w-100 my-3"><hr class="border-light"></div>
     </div>
 
     <!-- Gráficos premium -->
