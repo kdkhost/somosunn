@@ -21,31 +21,31 @@
                         <span>Status: {{ request('status') ? ucfirst(request('status')) : 'Todos' }}</span>
                         <i class="fas fa-chevron-down text-xs text-slate-400 dark:text-slate-500"></i>
                     </button>
-                    <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                    <div x-show="open" x-transition:enter="transition ease-out duration-200"
                         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100"
-                        x-transition:leave-end="opacity-0 scale-95"
-                        class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-100 dark:border-slate-800 py-1 z-50 origin-top-right focus:outline-none"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 py-2 z-50 origin-top-right focus:outline-none"
                         style="display: none;">
                         <a href="{{ route('panel.admin.orders.index', array_merge(request()->except('status'), ['status' => null])) }}"
-                            class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                            Todos
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <span class="w-2 h-2 rounded-full bg-slate-400"></span> Todos
                         </a>
                         <a href="{{ route('panel.admin.orders.index', array_merge(request()->except('status'), ['status' => 'paid'])) }}"
-                            class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                            Pago
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Pago
                         </a>
                         <a href="{{ route('panel.admin.orders.index', array_merge(request()->except('status'), ['status' => 'pending'])) }}"
-                            class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                            Pendente
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span> Pendente
                         </a>
                         <a href="{{ route('panel.admin.orders.index', array_merge(request()->except('status'), ['status' => 'failed'])) }}"
-                            class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                            Falha
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <span class="w-2 h-2 rounded-full bg-rose-500"></span> Falha
                         </a>
                         <a href="{{ route('panel.admin.orders.index', array_merge(request()->except('status'), ['status' => 'refunded'])) }}"
-                            class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                            Reembolsado
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <span class="w-2 h-2 rounded-full bg-slate-600"></span> Reembolsado
                         </a>
                     </div>
                 </div>

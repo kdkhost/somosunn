@@ -9,23 +9,6 @@
         .note-modal-backdrop {
             z-index: 40 !important;
         }
-
-        .note-editor.note-frame {
-            border-radius: 0.75rem;
-            border-color: #e2e8f0;
-        }
-
-        .note-toolbar {
-            border-top-left-radius: 0.75rem;
-            border-top-right-radius: 0.75rem;
-            background-color: #f8fafc !important;
-            border-bottom-color: #e2e8f0;
-        }
-
-        .note-statusbar {
-            border-bottom-left-radius: 0.75rem;
-            border-bottom-right-radius: 0.75rem;
-        }
     </style>
 @endpush
 

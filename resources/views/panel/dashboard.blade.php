@@ -31,11 +31,11 @@
             </div>
             <div class="flex flex-wrap gap-3">
                 <a href="{{ route('panel.profile.edit') }}"
-                    class="inline-flex items-center justify-center rounded-full bg-[#1F5EDB] px-5 py-2.5 text-sm font-bold text-white hover:brightness-110 transition shadow-lg shadow-blue-500/20">
+                    class="inline-flex items-center justify-center rounded-full bg-blue-600 text-white px-5 py-2.5 text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-blue-500/20">
                     <i class="fas fa-user-edit mr-2"></i> Editar perfil
                 </a>
                 <a href="{{ route('premium') }}"
-                    class="inline-flex items-center justify-center rounded-full border border-blue-200 dark:border-blue-800 px-5 py-2.5 text-sm font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition">
+                    class="inline-flex items-center justify-center rounded-full border border-blue-200 dark:border-blue-800 px-5 py-2.5 text-sm font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all">
                     <i class="fas fa-crown mr-2"></i> Ver planos
                 </a>
             </div>
@@ -67,7 +67,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 @foreach($suggestedUsers as $sUser)
                     <div
-                        class="bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-2xl p-4 flex flex-col items-center text-center hover:shadow-md transition duration-300">
+                        class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 flex flex-col items-center text-center hover:shadow-md transition duration-300">
                         <div
                             class="w-16 h-16 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 mb-3 border border-white dark:border-slate-700 shadow-sm">
                             @if($sUser->photo)
@@ -170,7 +170,7 @@
                     datasets: [{
                         label: 'Vendas pagas',
                         data: [0, 0, 0, 0, 0, 0],
-                        backgroundColor: '#1F5EDB',
+                        backgroundColor: '#2563eb',
                         borderRadius: 8,
                     }]
                 },
