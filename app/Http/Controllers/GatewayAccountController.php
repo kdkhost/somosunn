@@ -19,21 +19,40 @@ class GatewayAccountController extends Controller
 
     public function update(Request $request)
     {
-        $validated = $request->validate([
-            'public_key' => 'required|string',
-            'access_token' => 'required|string',
-        ]);
+        $provider = $request->input('provider', 'mercadopago');
 
-        $gateway = GatewayAccount::updateOrCreate(
-            ['user_id' => Auth::id(), 'provider' => 'mercadopago'],
-            [
+        if ($provider === 'pagseguro') {
+            $validated = $request->validate([
+                'email' => 'required|email',
+                'token' => 'required|string',
+            ]);
+
+            $data = [
+                'client_id' => $validated['email'], // Using client_id to store email for consistency or extra field
+                'access_token' => $validated['token'],
+                'enabled' => true,
+            ];
+            // Or prioritize extra fields if preferred, but usually access_token is fine for token
+        } else {
+            // Mercado Pago Default
+            $validated = $request->validate([
+                'public_key' => 'required|string',
+                'access_token' => 'required|string',
+            ]);
+
+            $data = [
                 'public_key' => $validated['public_key'],
                 'access_token' => $validated['access_token'],
                 'enabled' => true,
-            ]
+            ];
+        }
+
+        GatewayAccount::updateOrCreate(
+            ['user_id' => Auth::id(), 'provider' => $provider],
+            $data
         );
 
-        return back()->with('success', 'Configurações de pagamento salvas.');
+        return back()->with('success', 'Configurações de ' . ucfirst($provider) . ' salvas com sucesso.');
     }
 
     public function connect()
