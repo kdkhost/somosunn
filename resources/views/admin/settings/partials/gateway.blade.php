@@ -6,8 +6,30 @@
 
     {{-- MERCADO PAGO --}}
     <div class="card card-outline card-success collapsed-card mb-3">
-        <div class="card-header">
+        <div class="card-header d-flex align-items-center">
             <h3 class="card-title font-weight-bold text-success"><i class="fas fa-handshake mr-2"></i> MercadoPago</h3>
+
+            <div class="ml-auto mr-3">
+                @php
+                    $mpEnv = $settings['mercadopago_env'] ?? 'sandbox';
+                    $hasMP = $mpEnv == 'sandbox'
+                        ? !empty($settings['mercadopago_sandbox_access_token'])
+                        : !empty($settings['mercadopago_prod_access_token']);
+                @endphp
+
+                @if($mpEnv == 'sandbox')
+                    <span class="badge badge-warning"><i class="fas fa-flask mr-1"></i> Sandbox</span>
+                @else
+                    <span class="badge badge-success"><i class="fas fa-rocket mr-1"></i> Produção</span>
+                @endif
+
+                @if($hasMP)
+                    <span class="badge badge-primary"><i class="fas fa-check mr-1"></i> Configurado</span>
+                @else
+                    <span class="badge badge-secondary"><i class="fas fa-clock mr-1"></i> Pendente</span>
+                @endif
+            </div>
+
             <div class="card-tools">
                 <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
                         class="fas fa-plus"></i></button>
@@ -115,9 +137,30 @@
 
 {{-- PAGSEGURO --}}
 <div class="card card-outline card-warning collapsed-card mb-4">
-    <div class="card-header">
-        <h3 class="card-title font-weight-bold text-warning"><i class="fas fa-money-bill-wave mr-2"></i> PagSeguro
-        </h3>
+    <div class="card-header d-flex align-items-center">
+        <h3 class="card-title font-weight-bold text-warning"><i class="fas fa-money-bill-wave mr-2"></i> PagSeguro</h3>
+
+        <div class="ml-auto mr-3">
+            @php
+                $psEnv = $settings['pagseguro_env'] ?? 'sandbox';
+                $hasPS = $psEnv == 'sandbox'
+                    ? !empty($settings['pagseguro_sandbox_token'])
+                    : !empty($settings['pagseguro_prod_token']);
+            @endphp
+
+            @if($psEnv == 'sandbox')
+                <span class="badge badge-warning"><i class="fas fa-flask mr-1"></i> Sandbox</span>
+            @else
+                <span class="badge badge-success"><i class="fas fa-rocket mr-1"></i> Produção</span>
+            @endif
+
+            @if($hasPS)
+                <span class="badge badge-primary"><i class="fas fa-check mr-1"></i> Configurado</span>
+            @else
+                <span class="badge badge-secondary"><i class="fas fa-clock mr-1"></i> Pendente</span>
+            @endif
+        </div>
+
         <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
         </div>
