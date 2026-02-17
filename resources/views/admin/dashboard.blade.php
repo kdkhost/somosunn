@@ -58,35 +58,41 @@
             <button type="button" class="btn btn-sm btn-primary rounded-pill px-4" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
         </div>
     </form>
-    <!-- KPIs premium, grandes e destacados -->
-    <div class="row mb-4">
-        <div class="col-12 d-flex flex-wrap justify-content-between align-items-stretch gap-3">
-            <div class="info-box bg-white border shadow-sm flex-fill text-center kpi-gourmet mb-3">
-                <span class="info-box-icon bg-gradient-success elevation-1"><i class="fas fa-wallet"></i></span>
+    <!-- KPIs clean, alinhados -->
+    <div class="row mb-3">
+        <div class="col-6 col-md-3 mb-3">
+            <div class="info-box bg-gradient-success shadow-sm">
+                <span class="info-box-icon"><i class="fas fa-wallet"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold text-secondary">Saldo Total</span>
-                    <span class="info-box-number display-4 text-dark">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</span>
+                    <span class="info-box-text">Saldo Total</span>
+                    <span class="info-box-number">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</span>
                 </div>
             </div>
-            <div class="info-box bg-white border shadow-sm flex-fill text-center kpi-gourmet mb-3">
-                <span class="info-box-icon bg-gradient-danger elevation-1"><i class="fas fa-undo"></i></span>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="info-box bg-gradient-danger shadow-sm">
+                <span class="info-box-icon"><i class="fas fa-undo"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold text-secondary">Reembolsados</span>
-                    <span class="info-box-number display-4 text-dark">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</span>
+                    <span class="info-box-text">Reembolsados</span>
+                    <span class="info-box-number">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</span>
                 </div>
             </div>
-            <div class="info-box bg-white border shadow-sm flex-fill text-center kpi-gourmet mb-3">
-                <span class="info-box-icon bg-gradient-warning elevation-1"><i class="fas fa-users"></i></span>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="info-box bg-gradient-warning shadow-sm">
+                <span class="info-box-icon"><i class="fas fa-users"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold text-secondary">Usuários</span>
-                    <span class="info-box-number display-4 text-dark">{{ $totalUsers ?? 0 }}</span>
+                    <span class="info-box-text">Usuários</span>
+                    <span class="info-box-number">{{ $totalUsers ?? 0 }}</span>
                 </div>
             </div>
-            <div class="info-box bg-white border shadow-sm flex-fill text-center kpi-gourmet mb-3">
-                <span class="info-box-icon bg-gradient-info elevation-1"><i class="fas fa-shopping-bag"></i></span>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="info-box bg-gradient-info shadow-sm">
+                <span class="info-box-icon"><i class="fas fa-shopping-bag"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold text-secondary">Pedidos</span>
-                    <span class="info-box-number display-4 text-dark">{{ $totalOrders ?? 0 }}</span>
+                    <span class="info-box-text">Pedidos</span>
+                    <span class="info-box-number">{{ $totalOrders ?? 0 }}</span>
                 </div>
             </div>
         </div>
@@ -120,47 +126,35 @@
 @endpush
 
     <!-- Gráficos premium -->
-    <div class="row mb-4">
+    <div class="row mb-3">
         <div class="col-lg-8 col-12 mb-3">
-            <div class="card card-primary card-outline card-outline-tabs h-100">
-                <div class="card-header p-2 d-flex align-items-center justify-content-between">
+            <div class="card card-primary card-outline h-100">
+                <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-line mr-2"></i>Histórico de Vendas</h5>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                        <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
-                    </div>
                 </div>
-                <div class="card-body pt-2" style="height:340px; min-height:340px; max-height:340px;">
+                <div class="card-body pt-2" style="height:320px; min-height:320px; max-height:320px;">
                     <canvas id="salesChart" style="height:100% !important; max-height:100% !important;"></canvas>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-12 mb-3">
-            <div class="card card-info card-outline card-outline-tabs h-100">
-                <div class="card-header p-2 d-flex align-items-center justify-content-between">
+            <div class="card card-info card-outline h-100">
+                <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-pie mr-2"></i>Pedidos por Status</h5>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                        <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
-                    </div>
                 </div>
-                <div class="card-body pt-2" style="height:340px; min-height:340px; max-height:340px;">
+                <div class="card-body pt-2" style="height:320px; min-height:320px; max-height:320px;">
                     <canvas id="ordersStatusChart" style="height:100% !important; max-height:100% !important;"></canvas>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row mb-4">
+    <div class="row mb-3">
         <div class="col-lg-4 col-12 mb-3">
-            <div class="card card-warning card-outline card-outline-tabs h-100">
-                <div class="card-header p-2 d-flex align-items-center justify-content-between">
+            <div class="card card-warning card-outline h-100">
+                <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-user-plus mr-2"></i>Novos Usuários por Mês</h5>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                        <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
-                    </div>
                 </div>
-                <div class="card-body pt-2" style="height:340px; min-height:340px; max-height:340px;">
+                <div class="card-body pt-2" style="height:320px; min-height:320px; max-height:320px;">
                     <canvas id="usersByMonthChart" style="height:100% !important; max-height:100% !important;"></canvas>
                 </div>
             </div>
@@ -216,18 +210,14 @@
         </div>
     </div>
     <!-- Calendário premium -->
-    <div class="row mb-4">
+    <div class="row mb-3">
         <div class="col-lg-5 col-12 mb-3">
-            <div class="card card-secondary card-outline card-outline-tabs h-100" title="Calendário de eventos e atividades.">
-                <div class="card-header p-2 d-flex align-items-center justify-content-between">
+            <div class="card card-secondary card-outline h-100" title="Calendário de eventos e atividades.">
+                <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-calendar-alt mr-2"></i>Calendário</h5>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                        <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
-                    </div>
                 </div>
-                <div class="card-body pt-2" style="height:340px; min-height:340px; max-height:340px;">
-                    <div id="calendar" style="width:100%; min-height: 320px; max-height: 320px; overflow-y: auto;"></div>
+                <div class="card-body pt-2" style="height:320px; min-height:320px; max-height:320px;">
+                    <div id="calendar" style="width:100%; min-height: 300px; max-height: 320px; overflow-y: auto;"></div>
                 </div>
             </div>
         </div>
