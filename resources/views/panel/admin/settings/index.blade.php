@@ -32,10 +32,10 @@
 
                 @foreach($tabs as $key => $tab)
                         <a href="{{ route('panel.admin.settings', ['group' => $key]) }}"
-                            class="flex items-center gap-2 px-6 py-4 text-sm font-medium transition whitespace-nowrap border-b-2
-                                                      {{ $group === $key
-                    ? 'border-blue-600 text-blue-600 bg-blue-50/50 dark:bg-blue-900/20'
-                    : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800' }}">
+                            class="flex items-center gap-2 px-6 py-4 text-sm transition whitespace-nowrap border-b-2
+                                                                  {{ $group === $key
+                    ? 'border-blue-600 text-blue-600 font-bold bg-blue-50/50 dark:bg-blue-900/20'
+                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium hover:bg-slate-50 dark:hover:bg-slate-800' }}">
                             <i class="fas {{ $tab['icon'] }}"></i>
                             {{ $tab['label'] }}
                         </a>
