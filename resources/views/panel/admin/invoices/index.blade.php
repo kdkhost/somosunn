@@ -64,6 +64,13 @@
                             {{-- Cliente --}}
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
+                                        @if($inv->user && $inv->user->profile_photo_url && !str_contains($inv->user->profile_photo_url, 'default-user.svg'))
+                                            <img src="{{ $inv->user->profile_photo_url }}" alt="" class="w-full h-full object-cover">
+                                        @else
+                                            <i class="fas fa-user text-slate-400 dark:text-slate-500 text-[10px]"></i>
+                                        @endif
+                                    </div>
                                     <div class="min-w-0">
                                         <div class="font-medium text-slate-900 dark:text-white text-sm transition-colors">
                                             {{ $inv->user->name ?? '—' }}

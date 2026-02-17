@@ -102,13 +102,12 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700">
-                                            @if($order->user && $order->user->profile_photo_url)
-                                                <img src="{{ $order->user->profile_photo_url }}" alt="{{ $order->user->name }}"
+                                            class="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
+                                            @if($order->user && $order->user->profile_photo_url && !str_contains($order->user->profile_photo_url, 'default-user.svg'))
+                                                <img src="{{ $order->user->profile_photo_url }}" alt=""
                                                     class="w-full h-full object-cover">
                                             @else
-                                                <span
-                                                    class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ mb_substr($order->user->name ?? '?', 0, 1) }}</span>
+                                                <i class="fas fa-user text-slate-400 dark:text-slate-500 text-[10px]"></i>
                                             @endif
                                         </div>
                                         <div class="min-w-0">

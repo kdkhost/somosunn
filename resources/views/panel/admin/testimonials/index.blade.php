@@ -131,11 +131,12 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold overflow-hidden">
-                                            @if($test->user && $test->user->profile_photo_url)
-                                                <img src="{{ $test->user->profile_photo_url }}" class="w-full h-full object-cover">
+                                            class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
+                                            @if($test->user && $test->user->profile_photo_url && !str_contains($test->user->profile_photo_url, 'default-user.svg'))
+                                                <img src="{{ $test->user->profile_photo_url }}" alt=""
+                                                    class="w-full h-full object-cover">
                                             @else
-                                                {{ substr($test->author_name ?: '?', 0, 1) }}
+                                                <i class="fas fa-user text-slate-400 dark:text-slate-500"></i>
                                             @endif
                                         </div>
                                         <div>

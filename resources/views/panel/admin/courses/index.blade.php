@@ -71,9 +71,12 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center gap-3">
                                         @php $creatorName = $course->author_name ?: ($course->creator->name ?? 'N/A'); @endphp
-                                        <div
-                                            class="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700 transition-colors">
-                                            {{ mb_substr($creatorName, 0, 1) }}
+                                        <div class="w-7 h-7 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
+                                            @if($course->creator && $course->creator->profile_photo_url && !str_contains($course->creator->profile_photo_url, 'default-user.svg'))
+                                                <img src="{{ $course->creator->profile_photo_url }}" alt="" class="w-full h-full object-cover">
+                                            @else
+                                                <i class="fas fa-user text-slate-400 dark:text-slate-500 text-[10px]"></i>
+                                            @endif
                                         </div>
                                         <span class="text-sm text-slate-600 dark:text-slate-400 font-medium transition-colors">{{ $creatorName }}</span>
                                     </div>

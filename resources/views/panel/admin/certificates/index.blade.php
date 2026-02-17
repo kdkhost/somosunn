@@ -71,8 +71,12 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold transition-colors">
-                                            {{ substr($cert->user->name, 0, 1) }}
+                                            class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
+                                            @if($cert->user->profile_photo_url && !str_contains($cert->user->profile_photo_url, 'default-user.svg'))
+                                                <img src="{{ $cert->user->profile_photo_url }}" alt="" class="w-full h-full object-cover">
+                                            @else
+                                                <i class="fas fa-user text-slate-400 dark:text-slate-500"></i>
+                                            @endif
                                         </div>
                                         <div>
                                             <p class="text-sm font-bold text-slate-900 dark:text-white transition-colors">
@@ -167,8 +171,12 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 font-bold transition-colors">
-                                            {{ substr($enrollment->user->name, 0, 1) }}
+                                            class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
+                                            @if($enrollment->user->profile_photo_url && !str_contains($enrollment->user->profile_photo_url, 'default-user.svg'))
+                                                <img src="{{ $enrollment->user->profile_photo_url }}" alt="" class="w-full h-full object-cover">
+                                            @else
+                                                <i class="fas fa-user text-slate-400 dark:text-slate-500"></i>
+                                            @endif
                                         </div>
                                         <div>
                                             <p class="text-sm font-bold text-slate-900 dark:text-white transition-colors">

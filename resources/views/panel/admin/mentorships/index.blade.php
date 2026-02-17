@@ -120,8 +120,13 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
                                         <div
-                                            class="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center text-[10px] font-bold transition-colors">
-                                            {{ strtoupper(substr($mentorship->mentor->name ?? 'M', 0, 1)) }}
+                                            class="w-7 h-7 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
+                                            @if($mentorship->mentor && $mentorship->mentor->profile_photo_url && !str_contains($mentorship->mentor->profile_photo_url, 'default-user.svg'))
+                                                <img src="{{ $mentorship->mentor->profile_photo_url }}" alt=""
+                                                    class="w-full h-full object-cover">
+                                            @else
+                                                <i class="fas fa-user text-slate-400 dark:text-slate-500 text-[10px]"></i>
+                                            @endif
                                         </div>
                                         <span
                                             class="text-sm font-medium text-slate-600 dark:text-slate-400 transition-colors">{{ $mentorship->mentor->name ?? 'N/A' }}</span>

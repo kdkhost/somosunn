@@ -72,7 +72,7 @@
         <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16">
 
             {{-- Breadcrumb (Top Navigation) --}}
-            <nav class="mb-6 flex flex-wrap items-center justify-between gap-4" aria-label="breadcrumb">
+            <nav class="h-24 flex items-center justify-between gap-4" aria-label="breadcrumb">
                 <ol
                     class="list-none p-0 inline-flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-slate-400 font-medium">
                     <li class="flex items-center">

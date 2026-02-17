@@ -20,7 +20,7 @@
             @if($user->profile_photo_url && !str_contains($user->profile_photo_url, 'default-user.svg'))
                 <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="w-full h-full object-cover">
             @else
-                <i class="fas fa-user text-slate-400 dark:text-slate-500 text-xl"></i>
+                <i class="fas fa-user text-slate-400 dark:text-slate-500 text-lg"></i>
             @endif
         </div>
         <div class="min-w-0">

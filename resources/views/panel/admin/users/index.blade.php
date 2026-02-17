@@ -72,11 +72,11 @@
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 font-bold text-lg overflow-hidden shrink-0 border border-slate-100 dark:border-slate-700">
-                                            @if($u->photo)
-                                                <img src="{{ asset($u->photo) }}" alt="" class="w-full h-full object-cover">
+                                        <div class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
+                                            @if($u->profile_photo_url && !str_contains($u->profile_photo_url, 'default-user.svg'))
+                                                <img src="{{ $u->profile_photo_url }}" alt="" class="w-full h-full object-cover">
                                             @else
-                                                {{ substr($u->name, 0, 1) }}
+                                                <i class="fas fa-user text-slate-400 dark:text-slate-500"></i>
                                             @endif
                                         </div>
                                         <div>
