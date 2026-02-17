@@ -297,6 +297,9 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
         // Floating Chat Routes
         Route::get('/chat/with/{user}', [\App\Http\Controllers\ChatController::class, 'withUser'])->name('chat.with.user');
         Route::post('/chat/with/{user}/message', [\App\Http\Controllers\ChatController::class, 'storeMessageWithUser'])->name('chat.with.user.message');
+
+        // Notification Hub
+        Route::get('/api/notifications/hub', [\App\Http\Controllers\NotificationHubController::class, 'index'])->name('notifications.hub');
     });
 });
 

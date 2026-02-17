@@ -90,14 +90,89 @@
                 @endforeach
             </div>
 
-            <!-- Mobile Toggle -->
-            <button id="mobile-menu-toggle"
-                class="lg:hidden inline-flex items-center justify-center rounded-full border-0 sm:border sm:border-[#1F5EDB] px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
-                <span class="sr-only">Abrir menu</span>
-                <i class="fas fa-bars text-lg"></i>
-            </button>
+            <!-- Notification Hub & Mobile Toggle Combined -->
+            <div class="flex items-center gap-2 sm:gap-4">
+                @auth
+                    <!-- Notification Hub (Bell) -->
+                    <div class="relative" x-data="{
+                                open: false,
+                                total: 0,
+                                items: [],
+                                loading: true,
+                                async fetchNotifications() {
+                                    try {
+                                        const r = await fetch('{{ route('notifications.hub') }}');
+                                        const data = await r.json();
+                                        this.total = data.total;
+                                        this.items = data.items.filter(i => i.count > 0);
+                                    } catch(e) { console.error(e) } finally { this.loading = false }
+                                }
+                             }" x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 30000)">
 
-            <!-- Action Buttons -->
+                        <button @click="open = !open; fetchNotifications()"
+                            class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition relative p-2 focus:outline-none">
+                            <i class="fas fa-bell text-xl"></i>
+                            <template x-if="total > 0">
+                                <span x-text="total"
+                                    class="absolute top-1 right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white dark:ring-slate-900 shadow-sm animate-pulse"></span>
+                            </template>
+                        </button>
+
+                        <!-- Notification Dropdown -->
+                        <div x-show="open" @click.away="open = false"
+                            class="absolute right-0 mt-3 w-72 sm:w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
+                            style="display: none;">
+
+                            <div
+                                class="p-4 border-b border-slate-50 dark:border-slate-800 flex justify-between items-center">
+                                <h3 class="font-bold text-gray-800 dark:text-white">Notificações</h3>
+                                <span x-text="total + ' Alerta(s)'"
+                                    class="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full uppercase tracking-wider"></span>
+                            </div>
+
+                            <div class="max-h-[350px] overflow-y-auto no-scrollbar">
+                                <template x-if="total == 0">
+                                    <div class="p-8 text-center text-gray-400 dark:text-slate-500">
+                                        <i class="fas fa-check-circle text-3xl opacity-20 mb-3 block"></i>
+                                        <p class="text-sm">Tudo em dia por aqui!</p>
+                                    </div>
+                                </template>
+
+                                <template x-for="item in items" :key="item.type">
+                                    <a :href="item.route"
+                                        class="flex items-center gap-4 px-4 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border-b border-slate-50 dark:border-slate-800 last:border-0">
+                                        <div :class="item.bg + ' ' + item.color"
+                                            class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
+                                            <i :class="item.icon"></i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-bold text-gray-800 dark:text-white truncate"
+                                                x-text="item.count + ' ' + item.label"></p>
+                                            <p class="text-[11px] text-gray-500 dark:text-slate-400">Clique para visualizar
+                                            </p>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-[10px] text-gray-300"></i>
+                                    </a>
+                                </template>
+                            </div>
+
+                            <div class="p-3 bg-gray-50 dark:bg-slate-950/50 text-center">
+                                <a href="{{ route('panel.dashboard') }}"
+                                    class="text-[11px] font-bold text-blue-600 hover:underline">Ver painel geral</a>
+                            </div>
+                        </div>
+                    </div>
+                @endauth
+
+                <!-- Mobile Toggle -->
+                <button id="mobile-menu-toggle"
+                    class="lg:hidden inline-flex items-center justify-center rounded-full border-0 sm:border sm:border-[#1F5EDB] px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
+                    <span class="sr-only">Abrir menu</span>
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Desktop Action Buttons -->
             <div class="hidden lg:flex items-center gap-3">
                 @guest
                     <a href="{{ route('login') }}"
@@ -105,14 +180,6 @@
                         Entrar
                     </a>
                 @else
-                    <div class="relative group mr-2" id="connection-notifications-bubble">
-                        <a href="{{ route('social.feed') }}" class="text-gray-500 hover:text-blue-600 transition relative">
-                            <i class="fas fa-bell text-xl"></i>
-                            <span id="connection-notification-count"
-                                class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1 rounded-full hidden">0</span>
-                        </a>
-                    </div>
-
                     <!-- Dropdown Minha Conta -->
                     <div class="relative group">
                         <button
