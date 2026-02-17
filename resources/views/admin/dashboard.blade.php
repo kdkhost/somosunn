@@ -44,97 +44,288 @@
     @endif
 
     @if($isAdmin)
-    <div class="row">
-        <div class="col-md-3 col-sm-6 col-12">
-            <div class="small-box bg-success">
+    <form id="dashboardFilterForm" class="mb-3 d-flex flex-wrap align-items-center gap-2">
+        <label class="mr-2 font-weight-bold">Período:</label>
+        <select name="period" id="dashboardPeriod" class="form-control form-control-sm w-auto">
+            <option value="30">Últimos 30 dias</option>
+            <option value="7">Últimos 7 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="365">Ano atual</option>
+        </select>
+        <button type="button" class="btn btn-sm btn-outline-primary ml-2" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
+    </form>
+    <div class="row mb-3">
+        <div class="col-lg-3 col-md-6 col-12 mb-3">
+            <div class="small-box bg-gradient-success shadow-lg position-relative">
                 <div class="inner">
-                    <h3>R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</h3>
-                    <p>Saldo Total (Vendas)</p>
+                    <h3 class="display-4 mb-1">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</h3>
+                    <p class="font-weight-bold">Saldo Total <span class="badge badge-light ml-1" title="Vendas confirmadas"><i class="fas fa-check-circle text-success"></i></span></p>
                 </div>
-                <div class="icon"><i class="fas fa-wallet"></i></div>
+                <div class="icon" style="top:10px;right:10px;"><i class="fas fa-wallet fa-3x"></i></div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 col-12">
-            <div class="small-box bg-danger">
+        <div class="col-lg-3 col-md-6 col-12 mb-3">
+            <div class="small-box bg-gradient-danger shadow-lg position-relative">
                 <div class="inner">
-                    <h3>R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</h3>
-                    <p>Reembolsados</p>
+                    <h3 class="display-4 mb-1">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</h3>
+                    <p class="font-weight-bold">Reembolsados <span class="badge badge-light ml-1" title="Pedidos reembolsados"><i class="fas fa-undo"></i></span></p>
                 </div>
-                <div class="icon"><i class="fas fa-undo"></i></div>
+                <div class="icon" style="top:10px;right:10px;"><i class="fas fa-undo fa-3x"></i></div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 col-12">
-            <div class="small-box bg-warning">
+        <div class="col-lg-3 col-md-6 col-12 mb-3">
+            <div class="small-box bg-gradient-warning shadow-lg position-relative">
                 <div class="inner">
-                    <h3>{{ $totalUsers ?? 0 }}</h3>
-                    <p>Usuários Registrados</p>
+                    <h3 class="display-4 mb-1">{{ $totalUsers ?? 0 }}</h3>
+                    <p class="font-weight-bold">Usuários Registrados <span class="badge badge-light ml-1" title="Contas ativas"><i class="fas fa-users"></i></span></p>
                 </div>
-                <div class="icon"><i class="fas fa-users"></i></div>
+                <div class="icon" style="top:10px;right:10px;"><i class="fas fa-users fa-3x"></i></div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 col-12">
-            <div class="small-box bg-info">
+        <div class="col-lg-3 col-md-6 col-12 mb-3">
+            <div class="small-box bg-gradient-info shadow-lg position-relative">
                 <div class="inner">
-                    <h3>{{ $totalOrders ?? 0 }}</h3>
-                    <p>Total de Pedidos</p>
+                    <h3 class="display-4 mb-1">{{ $totalOrders ?? 0 }}</h3>
+                    <p class="font-weight-bold">Total de Pedidos <span class="badge badge-light ml-1" title="Pedidos realizados"><i class="fas fa-shopping-bag"></i></span></p>
                 </div>
-                <div class="icon"><i class="fas fa-shopping-bag"></i></div>
+                <div class="icon" style="top:10px;right:10px;"><i class="fas fa-shopping-bag fa-3x"></i></div>
             </div>
         </div>
     </div>
-    <!-- Novos info-boxes de monitoramento -->
-    <div class="row">
-        <div class="col-md-2 col-sm-4 col-6">
-            <div class="info-box bg-primary">
-                <span class="info-box-icon"><i class="fas fa-graduation-cap"></i></span>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="mb-2 font-weight-bold text-secondary"><i class="fas fa-chart-bar mr-1"></i>Monitoramento Geral</h5>
+            <hr class="mt-0 mb-3">
+        </div>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
+            <div class="info-box bg-primary shadow-sm h-100">
+                <span class="info-box-icon"><i class="fas fa-graduation-cap fa-2x"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Cursos</span>
                     <span class="info-box-number">{{ $coursesCount ?? 0 }}</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-2 col-sm-4 col-6">
-            <div class="info-box bg-success">
-                <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
+            <div class="info-box bg-success shadow-sm h-100">
+                <span class="info-box-icon"><i class="fas fa-chalkboard-teacher fa-2x"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Mentorias</span>
                     <span class="info-box-number">{{ $mentorshipsCount ?? 0 }}</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-2 col-sm-4 col-6">
-            <div class="info-box bg-warning">
-                <span class="info-box-icon"><i class="fas fa-calendar-alt"></i></span>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
+            <div class="info-box bg-warning shadow-sm h-100">
+                <span class="info-box-icon"><i class="fas fa-calendar-alt fa-2x"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Eventos</span>
                     <span class="info-box-number">{{ $eventsCount ?? 0 }}</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-2 col-sm-4 col-6">
-            <div class="info-box bg-secondary">
-                <span class="info-box-icon"><i class="fas fa-certificate"></i></span>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
+            <div class="info-box bg-secondary shadow-sm h-100">
+                <span class="info-box-icon"><i class="fas fa-certificate fa-2x"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Certificados</span>
                     <span class="info-box-number">{{ $certificatesCount ?? 0 }}</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-2 col-sm-4 col-6">
-            <div class="info-box bg-dark">
-                <span class="info-box-icon"><i class="fas fa-tasks"></i></span>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
+            <div class="info-box bg-dark shadow-sm h-100">
+                <span class="info-box-icon"><i class="fas fa-tasks fa-2x"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Jobs Pendentes</span>
                     <span class="info-box-number">{{ $pendingJobsCount ?? 0 }}</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-2 col-sm-4 col-6">
-            <div class="info-box bg-light">
-                <span class="info-box-icon text-primary"><i class="fas fa-history"></i></span>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
+            <div class="info-box bg-light shadow-sm h-100">
+                <span class="info-box-icon text-primary"><i class="fas fa-history fa-2x"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Logs</span>
                     <span class="info-box-number">{{ $logsCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-6 col-12 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-2">
+                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-line mr-1"></i>Histórico de Vendas</h6>
+                </div>
+                <div class="card-body pt-0">
+                    <canvas id="salesChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-12 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-2">
+                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-pie mr-1"></i>Pedidos por Status</h6>
+                </div>
+                <div class="card-body pt-0">
+                    <canvas id="ordersStatusChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-12 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-2">
+                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-user-plus mr-1"></i>Novos Usuários por Mês</h6>
+                </div>
+                <div class="card-body pt-0">
+                    <canvas id="usersByMonthChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-12 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-2">
+                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-layer-group mr-1"></i>Distribuição de Conteúdo</h6>
+                </div>
+                <div class="card-body pt-0">
+                    <canvas id="contentDistributionChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-12 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-2">
+                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-certificate mr-1"></i>Certificados Emitidos por Mês</h6>
+                </div>
+                <div class="card-body pt-0">
+                    <canvas id="certificatesByMonthChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-12 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-2">
+                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-tasks mr-1"></i>Jobs Pendentes x Concluídos</h6>
+                </div>
+                <div class="card-body pt-0">
+                    <canvas id="jobsStatusChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-12 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-2">
+                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-history mr-1"></i>Logs por Tipo</h6>
+                </div>
+                <div class="card-body pt-0">
+                    <canvas id="logsByTypeChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-12 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-2">
+                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-calendar-alt mr-1"></i>Calendário</h6>
+                </div>
+                <div class="card-body pt-0">
+                    <div id="calendar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Novos info-boxes de monitoramento -->
+    <div class="row flex-wrap" style="gap: 0.5rem;">
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-2">
+            <div class="info-box bg-primary" style="min-height: 90px;">
+                <span class="info-box-icon" style="min-width:56px;"><i class="fas fa-graduation-cap"></i></span>
+                <div class="info-box-content" style="white-space:normal;">
+                    <span class="info-box-text" style="font-size:1.05rem;">Cursos</span>
+                    <span class="info-box-number" style="font-size:1.3rem;">{{ $coursesCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-2">
+            <div class="info-box bg-success" style="min-height: 90px;">
+                <span class="info-box-icon" style="min-width:56px;"><i class="fas fa-chalkboard-teacher"></i></span>
+                <div class="info-box-content" style="white-space:normal;">
+                    <span class="info-box-text" style="font-size:1.05rem;">Mentorias</span>
+                    <span class="info-box-number" style="font-size:1.3rem;">{{ $mentorshipsCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-2">
+            <div class="info-box bg-warning" style="min-height: 90px;">
+                <span class="info-box-icon" style="min-width:56px;"><i class="fas fa-calendar-alt"></i></span>
+                <div class="info-box-content" style="white-space:normal;">
+                    <span class="info-box-text" style="font-size:1.05rem;">Eventos</span>
+                    <span class="info-box-number" style="font-size:1.3rem;">{{ $eventsCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-2">
+            <div class="info-box bg-secondary" style="min-height: 90px;">
+                <span class="info-box-icon" style="min-width:56px;"><i class="fas fa-certificate"></i></span>
+                <div class="info-box-content" style="white-space:normal;">
+                    <span class="info-box-text" style="font-size:1.05rem;">Certificados</span>
+                    <span class="info-box-number" style="font-size:1.3rem;">{{ $certificatesCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-2">
+            <div class="info-box bg-dark" style="min-height: 90px;">
+                <span class="info-box-icon" style="min-width:56px;"><i class="fas fa-tasks"></i></span>
+                <div class="info-box-content" style="white-space:normal;">
+                    <span class="info-box-text" style="font-size:1.05rem;">Jobs Pendentes</span>
+                    <span class="info-box-number" style="font-size:1.3rem;">{{ $pendingJobsCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-2">
+            <div class="info-box bg-light" style="min-height: 90px;">
+                <span class="info-box-icon text-primary" style="min-width:56px;"><i class="fas fa-history"></i></span>
+                <div class="info-box-content" style="white-space:normal;">
+                    <span class="info-box-text" style="font-size:1.05rem;">Logs</span>
+                    <span class="info-box-number" style="font-size:1.3rem;">{{ $logsCount ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    @if($isAdmin)
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-0 pb-2 d-flex justify-content-between align-items-center">
+                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-history mr-1"></i>Últimas Atividades do Sistema</h6>
+                    <a href="{{ route('admin.logs.index') }}" class="btn btn-xs btn-outline-secondary">Ver todos</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Ação</th>
+                                    <th>Usuário</th>
+                                    <th>Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(\App\Models\ActivityLog::with('user')->latest()->limit(10)->get() as $log)
+                                    <tr>
+                                        <td>{{ $log->created_at->format('d/m/Y H:i') }}</td>
+                                        <td><span class="badge badge-info">{{ $log->action }}</span></td>
+                                        <td>{{ $log->user ? $log->user->name : '-' }}</td>
+                                        <td>{{ Str::limit($log->description, 60) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -226,9 +417,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/locales/pt-br.js"></script>
     <script>
         $(function () {
-            // Sales Chart
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            new Chart(ctx, {
+            // Filtro de período (apenas visual, precisa integração backend para filtrar de verdade)
+            $('#refreshDashboardBtn').on('click', function(e) {
+                e.preventDefault();
+                alert('Filtro de período ainda não implementado no backend. (Exemplo visual)');
+            });
+            // Gráfico de vendas (linha)
+            new Chart(document.getElementById('salesChart').getContext('2d'), {
                 type: 'line',
                 data: {
                     labels: {!! json_encode($months) !!},
@@ -244,52 +439,112 @@
                         pointHoverRadius: 6
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: true, position: 'top' },
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) { label += ': '; }
-                                    if (context.parsed.y !== null) {
-                                        label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function (value) { return 'R$ ' + value; }
-                            }
-                        }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Gráfico de pizza: Pedidos por status
+            new Chart(document.getElementById('ordersStatusChart').getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: {!! json_encode(array_keys($ordersByStatus)) !!},
+                    datasets: [{
+                        data: {!! json_encode(array_values($ordersByStatus)) !!},
+                        backgroundColor: ['#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6c757d', '#007bff']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Gráfico de barras: Novos usuários por mês
+            new Chart(document.getElementById('usersByMonthChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode(array_keys($usersByMonth)) !!},
+                    datasets: [{
+                        label: 'Novos Usuários',
+                        data: {!! json_encode(array_values($usersByMonth)) !!},
+                        backgroundColor: '#007bff'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Gráfico de barras horizontais: Distribuição de conteúdo
+            new Chart(document.getElementById('contentDistributionChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode(array_keys($contentDistribution)) !!},
+                    datasets: [{
+                        label: 'Quantidade',
+                        data: {!! json_encode(array_values($contentDistribution)) !!},
+                        backgroundColor: ['#007bff', '#28a745', '#ffc107']
+                    }]
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+            });
+
+            // Gráfico de linha: Certificados emitidos por mês
+            new Chart(document.getElementById('certificatesByMonthChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: {!! json_encode(array_keys($certificatesByMonth)) !!},
+                    datasets: [{
+                        label: 'Certificados',
+                        data: {!! json_encode(array_values($certificatesByMonth)) !!},
+                        backgroundColor: 'rgba(108,117,125,0.2)',
+                        borderColor: '#6c757d',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Gráfico doughnut: Jobs pendentes x concluídos
+            new Chart(document.getElementById('jobsStatusChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: {!! json_encode(array_keys($jobsStatus)) !!},
+                    datasets: [{
+                        data: {!! json_encode(array_values($jobsStatus)) !!},
+                        backgroundColor: ['#343a40', '#28a745']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Gráfico de pizza: Logs por tipo
+            new Chart(document.getElementById('logsByTypeChart').getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: {!! json_encode(array_keys($logsByType)) !!},
+                    datasets: [{
+                        data: {!! json_encode(array_values($logsByType)) !!},
+                        backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d', '#17a2b8']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
             });
 
             // Calendar Widget
             var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                plugins: ['dayGrid', 'interaction', 'bootstrap'],
-                themeSystem: 'bootstrap',
-                locale: 'pt-br',
-                header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth'
-                },
-                height: 350, // Widget Height
-                height: 350, // Widget Height
-                events: {!! json_encode($calendarEvents ?? []) !!},
-                editable: false // Read-only dashboard widget
-            });
-            calendar.render();
+            if (calendarEl) {
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    plugins: ['dayGrid', 'interaction', 'bootstrap'],
+                    themeSystem: 'bootstrap',
+                    locale: 'pt-br',
+                    header: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth'
+                    },
+                    height: 350,
+                    events: {!! json_encode($calendarEvents ?? []) !!},
+                    editable: false
+                });
+                calendar.render();
+            }
         });
     </script>
 @endpush

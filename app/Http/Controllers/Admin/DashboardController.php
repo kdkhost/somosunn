@@ -29,6 +29,14 @@ class DashboardController extends Controller
         $pendingJobsCount = 0;
         $logsCount = 0;
 
+        // Dados para gráficos adicionais
+        $ordersByStatus = [];
+        $usersByMonth = [];
+        $certificatesByMonth = [];
+        $contentDistribution = [];
+        $jobsStatus = [];
+        $logsByType = [];
+
         try {
             if ($isAdmin) {
                 $totalRevenue = \App\Models\Order::where('status', 'paid')->sum('total_amount');
@@ -43,14 +51,52 @@ class DashboardController extends Controller
                 $pendingJobsCount = \DB::table('jobs')->count();
                 $logsCount = \App\Models\ActivityLog::count();
 
+                // Gráfico: Pedidos por status
+                $ordersByStatus = \App\Models\Order::selectRaw('status, COUNT(*) as total')
+                    ->groupBy('status')->pluck('total', 'status')->toArray();
+
+                // Gráfico: Novos usuários por mês (últimos 6 meses)
+                $usersByMonth = [];
                 for ($i = 5; $i >= 0; $i--) {
                     $date = now()->subMonths($i);
-                    $months[] = $date->format('M/Y');
+                    $label = $date->format('M/Y');
+                    $months[] = $label;
                     $salesChartData[] = \App\Models\Order::where('status', 'paid')
                         ->whereMonth('created_at', $date->month)
                         ->whereYear('created_at', $date->year)
                         ->sum('total_amount');
+                    $usersByMonth[$label] = \App\Models\User::whereMonth('created_at', $date->month)
+                        ->whereYear('created_at', $date->year)
+                        ->count();
                 }
+
+                // Gráfico: Certificados emitidos por mês (últimos 6 meses)
+                $certificatesByMonth = [];
+                for ($i = 5; $i >= 0; $i--) {
+                    $date = now()->subMonths($i);
+                    $label = $date->format('M/Y');
+                    $certificatesByMonth[$label] = \App\Models\Certificate::whereMonth('issued_at', $date->month)
+                        ->whereYear('issued_at', $date->year)
+                        ->count();
+                }
+
+                // Gráfico: Distribuição de conteúdo
+                $contentDistribution = [
+                    'Cursos' => $coursesCount,
+                    'Mentorias' => $mentorshipsCount,
+                    'Eventos' => $eventsCount,
+                ];
+
+                // Gráfico: Jobs pendentes x concluídos (simples)
+                $jobsStatus = [
+                    'Pendentes' => \DB::table('jobs')->count(),
+                    'Concluídos' => \DB::table('job_batches')->where('finished_at', '!=', null)->count(),
+                ];
+
+                // Gráfico: Logs por tipo (action)
+                $logsByType = \App\Models\ActivityLog::selectRaw('action, COUNT(*) as total')
+                    ->groupBy('action')->pluck('total', 'action')->toArray();
+
             } else {
                 // If not admin, we skip sales stats
                 $salesChartData = array_fill(0, 6, 0);
@@ -110,6 +156,12 @@ class DashboardController extends Controller
             'certificatesCount',
             'pendingJobsCount',
             'logsCount',
+            'ordersByStatus',
+            'usersByMonth',
+            'certificatesByMonth',
+            'contentDistribution',
+            'jobsStatus',
+            'logsByType',
         ));
     }
 }
