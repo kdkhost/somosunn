@@ -1,8 +1,8 @@
 <div class="space-y-6">
     <div
-        class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-2xl p-4 flex items-start gap-3">
-        <i class="fas fa-envelope text-blue-500 mt-1"></i>
-        <div class="text-sm text-blue-800 dark:text-blue-300">
+        class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700/50 rounded-2xl p-4 flex items-start gap-3 shadow-sm transition-all">
+        <i class="fas fa-envelope text-blue-500 dark:text-blue-400 mt-1"></i>
+        <div class="text-sm text-blue-800 dark:text-blue-100">
             Configure o servidor de e-mail (SMTP) para envio de notificações, recuperação de senha e boas-vindas.
         </div>
     </div>
