@@ -477,7 +477,7 @@
                     contentType: false,
                     success: function (resp) {
                         const msg = (resp && resp.message) ? resp.message : 'Salvo com sucesso';
-                        toastr.success(msg);
+                        showSuccess(msg);
                         if (resp && resp.redirect) { $.pjax({ url: resp.redirect, container: container }); }
                     },
                     error: function (xhr) {
@@ -493,7 +493,7 @@
                                 if (Array.isArray(firstVal) && firstVal[0]) { msg = firstVal[0]; }
                             }
                         }
-                        toastr.error(msg);
+                        showError(msg);
                     }
                 });
             });
@@ -506,17 +506,8 @@
                 const redirect = $btn.data('redirect') || null;
                 const $form = $btn.closest('form');
 
-                Swal.fire({
-                    title: 'Confirmar ação',
-                    text: 'Confirme para continuar.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Confirmar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (!result.isConfirmed) return;
-
-                    // Prefer form submission when explicitly requested (ex.: reembolso)
+                showConfirm('Confirme para continuar.', function() {
+                    // Prefer form submission quando explicitamente solicitado
                     if ($btn.is('[data-confirm-delete]') || (!url && $form.length)) {
                         if ($form.length) {
                             if ($form.hasClass('ajax-form')) {
@@ -529,13 +520,13 @@
                     }
 
                     if (!url) {
-                        toastr.error('Ação inválida: URL não encontrada.');
+                        showError('Ação inválida: URL não encontrada.');
                         return;
                     }
 
                     $.post(url, { _method: 'DELETE', _token: '{{ csrf_token() }}' })
                         .done(function (resp) {
-                            toastr.success('Excluído');
+                            showSuccess('Excluído');
 
                             if (redirect) {
                                 window.location.href = redirect;
@@ -553,7 +544,7 @@
                             let msg = 'Erro ao excluir';
                             if (xhr && xhr.status === 419) { msg = 'Sessão expirada. Recarregue a página e tente novamente.'; }
                             else if (xhr && xhr.responseJSON && xhr.responseJSON.message) { msg = xhr.responseJSON.message; }
-                            toastr.error(msg);
+                            showError(msg);
                         });
                 });
             });
