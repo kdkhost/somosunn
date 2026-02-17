@@ -95,20 +95,20 @@
                 @auth
                     <!-- Notification Hub (Bell) -->
                     <div class="relative" x-data="{
-                                                    open: false,
-                                                    total: 0,
-                                                    items: [],
-                                                    loading: true,
-                                                     async fetchNotifications() {
-                                                         try {
-                                                             const r = await fetch('{{ route('notifications.hub') }}');
-                                                             if (!r.ok) return;
-                                                             const data = await r.json();
-                                                             this.total = data.total || 0;
-                                                             this.items = (data.items || []).filter(i => i.count > 0);
-                                                         } catch(e) { console.error('Notification hub failed:', e) } finally { this.loading = false }
-                                                     }
-                                                  }"
+                                                        open: false,
+                                                        total: 0,
+                                                        items: [],
+                                                        loading: true,
+                                                         async fetchNotifications() {
+                                                             try {
+                                                                 const r = await fetch('{{ route('notifications.hub') }}');
+                                                                 if (!r.ok) return;
+                                                                 const data = await r.json();
+                                                                 this.total = data.total || 0;
+                                                                 this.items = (data.items || []).filter(i => i.count > 0);
+                                                             } catch(e) { console.error('Notification hub failed:', e) } finally { this.loading = false }
+                                                         }
+                                                      }"
                         x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
 
                         <button @click="open = !open; fetchNotifications()"
@@ -277,116 +277,78 @@
         class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 pointer-events-none"></div>
     <div id="mobile-menu-panel"
         class="relative z-10 w-4/5 max-w-sm h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out overflow-y-auto pointer-events-auto">
-        <div class="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+        <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
             <div class="flex items-center gap-3">
-                <div class="inline-flex h-12 w-auto items-center justify-center overflow-hidden">
+                <div class="inline-flex h-10 w-auto items-center justify-center overflow-hidden">
                     <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain"
                         onerror="this.style.display='none';">
                 </div>
             </div>
             <button id="mobile-menu-close"
-                class="text-gray-500 hover:text-gray-900 text-3xl leading-none px-4">&times;</button>
+                class="text-gray-500 hover:text-gray-900 text-2xl leading-none px-3">&times;</button>
         </div>
 
-        @if(request()->routeIs('panel.*') || request()->is('painel*') || request()->is('admin*'))
-            <div class="px-6 py-4">
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Navegação do Painel</div>
-                @include('panel.partials.sidebar', ['mobile' => true])
+        @auth
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Membro UNN</p>
+                <p class="font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
             </div>
-            <div class="border-t border-slate-100 my-2"></div>
-        @endif
+        @endauth
 
-        <nav class="px-6 py-4 flex flex-col gap-1 text-gray-700">
+        <nav class="px-4 py-4 flex flex-col gap-1 text-gray-700">
             @foreach($menuItems as $item)
-                <div>
-                    <a href="{{ $item['href'] }}"
-                        class="block rounded-2xl px-4 py-2 font-semibold hover:bg-slate-100 transition-colors">
-                        {{ $item['label'] }}
-                    </a>
-                    @if(isset($item['children']))
-                        <div class="pl-4 space-y-1">
-                            @foreach($item['children'] as $child)
-                                @php
-                                    $childRequiresAuth = (bool) ($child['requires_auth'] ?? false);
-                                @endphp
-                                @if(!$childRequiresAuth || Auth::check())
-                                    <a href="{{ $child['href'] }}"
-                                        class="block rounded-xl px-3 py-1.5 text-sm text-gray-600 hover:bg-slate-100 transition-colors">
-                                        {{ $child['label'] }}
-                                    </a>
-                                @endif
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
+                <a href="{{ $item['href'] }}"
+                    class="block rounded-xl px-4 py-2.5 font-semibold hover:bg-slate-100 transition-colors">
+                    {{ $item['label'] }}
+                </a>
             @endforeach
-        </nav>
-        <div class="px-6 mt-2 mb-6 space-y-3">
-            @guest
-                <a href="{{ route('login') }}"
-                    class="inline-flex w-full items-center justify-center rounded-full border border-[#1F5EDB] px-6 py-3 text-sm font-semibold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
-                    Entrar
+
+            @auth
+                <div class="border-t border-slate-100 my-2"></div>
+
+                <a href="{{ route('panel.dashboard') }}"
+                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <i class="fas fa-th-large w-4 opacity-70"></i> Painel
                 </a>
-                <a href="{{ route('register') }}"
-                    class="inline-flex w-full items-center justify-center rounded-full {{ $cta['class'] }} px-6 py-3 text-sm font-bold text-white transition">
-                    Fazer parte
-                </a>
-            @else
-                <div class="p-4 bg-slate-50 rounded-2xl mb-4">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Membro UNN</p>
-                    <p class="font-bold text-gray-800">{{ Auth::user()->name }}</p>
-                </div>
 
                 <a href="{{ route('panel.profile.edit') }}"
-                    class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
-                    <i class="fas fa-user-circle w-5 opacity-70"></i> Meu perfil
+                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <i class="fas fa-user-circle w-4 opacity-70"></i> Meu perfil
                 </a>
 
                 <a href="{{ route('marketplace.index') }}"
-                    class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
-                    <i class="fas fa-store w-5 opacity-70"></i> Marketplace
+                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <i class="fas fa-store w-4 opacity-70"></i> Marketplace
                 </a>
-
-                @if(Auth::user()->canSellOnMarketplace())
-                    <a href="{{ route('panel.marketplace.payments') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
-                        <i class="fas fa-credit-card w-5 opacity-70"></i> Configurar pagamentos
-                    </a>
-                @endif
-
-                @if(Auth::user()->canSellOnMarketplace())
-                    <a href="{{ route('panel.marketplace.sales') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
-                        <i class="fas fa-receipt w-5 opacity-70"></i> Minhas vendas
-                    </a>
-                @endif
 
                 @if(Auth::user()->isAdmin())
                     <a href="{{ route('panel.admin.dashboard') }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
-                        <i class="fas fa-th-large w-5 opacity-70"></i> Painel Administrativo
-                    </a>
-                    <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
-                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
-                        <i class="fas fa-cogs w-5 opacity-70"></i> Configurações
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                        <i class="fas fa-cog w-4 opacity-70"></i> Administração
                     </a>
                 @endif
+            @endauth
+        </nav>
 
-                <form action="{{ route('logout') }}" method="POST" class="mt-4">
+        <div class="px-4 pb-6 space-y-2">
+            @guest
+                <a href="{{ route('login') }}"
+                    class="inline-flex w-full items-center justify-center rounded-full border border-[#1F5EDB] px-6 py-2.5 text-sm font-semibold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
+                    Entrar
+                </a>
+                <a href="{{ route('register') }}"
+                    class="inline-flex w-full items-center justify-center rounded-full {{ $cta['class'] }} px-6 py-2.5 text-sm font-bold text-white transition">
+                    Fazer parte
+                </a>
+            @else
+                <form action="{{ route('logout') }}" method="POST" class="mt-2">
                     @csrf
                     <button type="submit"
-                        class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 transition">
-                        <i class="fas fa-sign-out-alt w-5 opacity-70"></i> Sair da conta
+                        class="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 transition">
+                        <i class="fas fa-sign-out-alt w-4 opacity-70"></i> Sair
                     </button>
                 </form>
             @endguest
-
-            @if(!empty($pwaEnabled))
-                <button onclick="showInstallModal()"
-                    class="w-full mt-3 inline-flex items-center justify-center rounded-full bg-slate-100 px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">
-                    <i class="fas fa-download mr-2"></i> Instalar App
-                </button>
-            @endif
         </div>
     </div>
 </div>
