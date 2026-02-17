@@ -18,7 +18,7 @@
 
             <div class="flex items-center gap-3">
                 <a href="{{ route('panel.admin.points-rules.index') }}"
-                    class="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-sm font-semibold rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all flex items-center gap-2">
+                    class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg shadow-blue-500/20">
                     <i class="fas fa-cog"></i>
                     <span>Configurar Regras</span>
                 </a>
