@@ -86,9 +86,10 @@
     </div>
     <div class="row mb-2">
         <div class="col-md-3 col-12 mb-2">
-            <div class="card card-outline card-primary h-100" data-toggle="tooltip" title="Informações do sistema e ambiente.">
-                <div class="card-header py-2 px-3">
+            <div class="card card-outline card-primary h-100" data-toggle="tooltip" title="Informações do sistema e ambiente." aria-label="Detalhes do Sistema">
+                <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
                     <h3 class="card-title text-sm">Detalhes do Sistema <i class="fas fa-info-circle text-muted ml-1"></i></h3>
+                    <span class="badge badge-success" aria-label="Status do sistema">Online</span>
                 </div>
                 <div class="card-body p-2">
                     <ul class="list-unstyled mb-0">
@@ -102,19 +103,23 @@
             </div>
         </div>
         <div class="col-md-3 col-12 mb-2">
-            <div class="card card-outline card-success h-100" data-toggle="tooltip" title="Percentual de disponibilidade do sistema.">
-                <div class="card-header py-2 px-3">
+            <div class="card card-outline card-success h-100" data-toggle="tooltip" title="Percentual de disponibilidade do sistema." aria-label="Disponibilidade">
+                <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
                     <h3 class="card-title text-sm">Disponibilidade <i class="fas fa-question-circle text-muted ml-1"></i></h3>
+                    <span class="badge badge-success" aria-label="Disponibilidade">99%</span>
                 </div>
                 <div class="card-body p-2 d-flex align-items-center justify-content-center">
-                    <canvas id="availabilityChart" width="80" height="80"></canvas>
+                    <canvas id="availabilityChart" width="80" height="80" aria-label="Gráfico de disponibilidade"></canvas>
                 </div>
             </div>
         </div>
         <div class="col-md-6 col-12 mb-2">
             <div class="row h-100">
                 <div class="col-12 col-sm-4 mb-2">
-                    <div class="card bg-success text-white h-100" data-toggle="tooltip" title="Receita total acumulada.">
+                    <div class="card bg-success text-white h-100" data-toggle="tooltip" title="Receita total acumulada." aria-label="Saldo Total">
+                        <div class="card-header py-1 px-2 d-flex justify-content-between align-items-center bg-transparent border-0">
+                            <span class="badge badge-success" aria-label="Status financeiro">OK</span>
+                        </div>
                         <div class="card-body p-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -123,12 +128,15 @@
                                 </div>
                                 <i class="fas fa-wallet fa-2x"></i>
                             </div>
-                            <canvas id="saldoChart" height="30"></canvas>
+                            <canvas id="saldoChart" height="30" aria-label="Gráfico de saldo"></canvas>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-sm-4 mb-2">
-                    <div class="card bg-danger text-white h-100" data-toggle="tooltip" title="Total reembolsado no período.">
+                    <div class="card bg-danger text-white h-100" data-toggle="tooltip" title="Total reembolsado no período." aria-label="Reembolsados">
+                        <div class="card-header py-1 px-2 d-flex justify-content-between align-items-center bg-transparent border-0">
+                            <span class="badge badge-warning" aria-label="Status de reembolso">Alerta</span>
+                        </div>
                         <div class="card-body p-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -137,12 +145,15 @@
                                 </div>
                                 <i class="fas fa-undo fa-2x"></i>
                             </div>
-                            <canvas id="reembolsoChart" height="30"></canvas>
+                            <canvas id="reembolsoChart" height="30" aria-label="Gráfico de reembolso"></canvas>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-sm-4 mb-2">
-                    <div class="card bg-warning text-dark h-100" data-toggle="tooltip" title="Total de usuários cadastrados.">
+                    <div class="card bg-warning text-dark h-100" data-toggle="tooltip" title="Total de usuários cadastrados." aria-label="Usuários">
+                        <div class="card-header py-1 px-2 d-flex justify-content-between align-items-center bg-transparent border-0">
+                            <span class="badge badge-info" aria-label="Status de usuários">Estável</span>
+                        </div>
                         <div class="card-body p-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -151,7 +162,7 @@
                                 </div>
                                 <i class="fas fa-users fa-2x"></i>
                             </div>
-                            <canvas id="usuariosChart" height="30"></canvas>
+                            <canvas id="usuariosChart" height="30" aria-label="Gráfico de usuários"></canvas>
                         </div>
                     </div>
                 </div>
