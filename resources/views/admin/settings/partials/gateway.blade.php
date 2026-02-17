@@ -214,7 +214,7 @@
             msg.textContent = '';
             msg.className = 'ml-2 text-sm font-weight-bold';
 
-            fetch('{{ route("admin.settings.test_gateway") }}', {
+            fetch('{{ route("settings.test_gateway") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
