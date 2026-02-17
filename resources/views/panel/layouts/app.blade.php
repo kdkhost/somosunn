@@ -51,16 +51,15 @@
                 </ol>
             </nav>
 
-            <div class="flex flex-col lg:flex-row gap-8">
-                <aside class="hidden lg:block w-full lg:w-72 shrink-0">
+            <div class="flex flex-col md:flex-row gap-8">
+                <aside class="w-full md:w-72 shrink-0 h-auto md:h-full">
                     @include('panel.partials.sidebar')
                 </aside>
-                <main class="flex-1 min-w-0">
+                <div class="flex-1 min-w-0">
                     @yield('panel_content')
-                </main>
+                </div>
             </div>
         </div>
-    </div>
     </div>
 
     @push('scripts')

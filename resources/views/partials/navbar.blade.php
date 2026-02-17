@@ -312,39 +312,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const toggle = document.getElementById('mobile-menu-toggle');
-        const close = document.getElementById('mobile-menu-close');
-        const menu = document.getElementById('mobile-menu');
-        const panel = document.getElementById('mobile-menu-panel');
-        const overlay = document.getElementById('mobile-menu-overlay');
-
-        const openMenu = () => {
-            menu.classList.remove('hidden');
-            // Force reflow
-            menu.offsetHeight;
-            overlay.classList.remove('opacity-0', 'pointer-events-none');
-            overlay.classList.add('opacity-100', 'pointer-events-auto');
-            panel.classList.remove('-translate-x-full');
-            panel.classList.add('translate-x-0');
-            document.body.style.overflow = 'hidden';
-        };
-
-        const closeMenu = () => {
-            overlay.classList.remove('opacity-100', 'pointer-events-auto');
-            overlay.classList.add('opacity-0', 'pointer-events-none');
-            panel.classList.remove('translate-x-0');
-            panel.classList.add('-translate-x-full');
-            document.body.style.overflow = '';
-            setTimeout(() => {
-                menu.classList.add('hidden');
-            }, 300);
-        };
-
-        toggle?.addEventListener('click', openMenu);
-        close?.addEventListener('click', closeMenu);
-        overlay?.addEventListener('click', closeMenu);
-    });
-</script>
