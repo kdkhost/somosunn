@@ -1,4 +1,255 @@
-@extends('admin.layouts.app')
+@extends('admin.layout')
+
+@section('content')
+<div class="container-fluid">
+    <!-- Card de informações do sistema -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card card-outline card-primary h-100" data-toggle="tooltip" title="Informações do sistema e ambiente." aria-label="Detalhes do Sistema">
+                <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
+                    <h3 class="card-title text-sm">Detalhes do Sistema <i class="fas fa-info-circle text-muted ml-1"></i></h3>
+                    <span class="badge badge-success" aria-label="Status do sistema">Online</span>
+                </div>
+                <div class="card-body p-2">
+                    <ul class="list-unstyled mb-0">
+                        <li><b>Monitor:</b> {{ request()->getHost() }}</li>
+                        <li><b>Tipo:</b> Laravel</li>
+                        <li><b>Versão:</b> {{ app()->version() }}</li>
+                        <li><b>PHP:</b> {{ phpversion() }}</li>
+                        <li><b>Uptime:</b> <span id="uptime">--</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPIs e métricas principais -->
+    <div class="row mb-3">
+        <div class="col-6 col-md-3 mb-3">
+            <div class="card bg-success text-white h-100" data-toggle="tooltip" title="Receita total acumulada." aria-label="Saldo Total">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Saldo Total</div>
+                            <div class="h4 mb-0">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</div>
+                        </div>
+                        <i class="fas fa-wallet fa-2x"></i>
+                    </div>
+                    <canvas id="saldoChart" height="30" aria-label="Gráfico de saldo"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="card bg-danger text-white h-100" data-toggle="tooltip" title="Total reembolsado no período." aria-label="Reembolsados">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Reembolsados</div>
+                            <div class="h4 mb-0">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</div>
+                        </div>
+                        <i class="fas fa-undo fa-2x"></i>
+                    </div>
+                    <canvas id="reembolsoChart" height="30" aria-label="Gráfico de reembolso"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="card bg-warning text-dark h-100" data-toggle="tooltip" title="Total de usuários cadastrados." aria-label="Usuários">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Usuários</div>
+                            <div class="h4 mb-0">{{ $totalUsers ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                    <canvas id="usuariosChart" height="30" aria-label="Gráfico de usuários"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="card bg-info text-white h-100" data-toggle="tooltip" title="Total de pedidos realizados." aria-label="Pedidos">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Pedidos</div>
+                            <div class="h4 mb-0">{{ $totalOrders ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-shopping-bag fa-2x"></i>
+                    </div>
+                    <canvas id="pedidosChart" height="30" aria-label="Gráfico de pedidos"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid de métricas secundárias -->
+    <div class="row mb-3">
+        <div class="col-6 col-md-2 mb-3">
+            <div class="card bg-primary text-white h-100" data-toggle="tooltip" title="Total de cursos cadastrados." aria-label="Cursos">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Cursos</div>
+                            <div class="h5 mb-0">{{ $coursesCount ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-graduation-cap fa-lg"></i>
+                    </div>
+                    <canvas id="cursosChart" height="20" aria-label="Gráfico de cursos"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-2 mb-3">
+            <div class="card bg-success text-white h-100" data-toggle="tooltip" title="Total de mentorias ativas." aria-label="Mentorias">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Mentorias</div>
+                            <div class="h5 mb-0">{{ $mentorshipsCount ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-chalkboard-teacher fa-lg"></i>
+                    </div>
+                    <canvas id="mentoriasChart" height="20" aria-label="Gráfico de mentorias"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-2 mb-3">
+            <div class="card bg-warning text-dark h-100" data-toggle="tooltip" title="Total de eventos realizados." aria-label="Eventos">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Eventos</div>
+                            <div class="h5 mb-0">{{ $eventsCount ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-calendar-alt fa-lg"></i>
+                    </div>
+                    <canvas id="eventosChart" height="20" aria-label="Gráfico de eventos"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-2 mb-3">
+            <div class="card bg-secondary text-white h-100" data-toggle="tooltip" title="Total de certificados emitidos." aria-label="Certificados">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Certificados</div>
+                            <div class="h5 mb-0">{{ $certificatesCount ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-certificate fa-lg"></i>
+                    </div>
+                    <canvas id="certificadosChart" height="20" aria-label="Gráfico de certificados"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-2 mb-3">
+            <div class="card bg-dark text-white h-100" data-toggle="tooltip" title="Jobs pendentes de execução." aria-label="Jobs Pendentes">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Jobs Pendentes</div>
+                            <div class="h5 mb-0">{{ $pendingJobsCount ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-tasks fa-lg"></i>
+                    </div>
+                    <canvas id="jobsChart" height="20" aria-label="Gráfico de jobs"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FullCalendar 4 -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card card-outline card-secondary h-100" title="Calendário de eventos e atividades.">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-calendar-alt mr-2"></i>Calendário</h3>
+                </div>
+                <div class="card-body">
+                    <div id="calendar" style="width:100%; min-height: 300px; max-height: 400px; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/core/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/daygrid/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/timegrid/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/list/main.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/core/main.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/daygrid/main.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/timegrid/main.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@4.4.2/list/main.min.css">
+<script>
+function formatUptime(seconds) {
+    const d = Math.floor(seconds / 86400);
+    const h = Math.floor((seconds % 86400) / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    return `${d}d ${h}h ${m}min`;
+}
+document.addEventListener('DOMContentLoaded', function() {
+    // Uptime fake (substitua por valor real se disponível)
+    const uptimeSeconds = 86400 * 12 + 3600 * 6 + 60 * 23; // 12 dias, 6h, 23min
+    document.getElementById('uptime').innerText = formatUptime(uptimeSeconds);
+
+    // Ativa tooltips Bootstrap/AdminLTE
+    if (window.$ && $.fn.tooltip) {
+        $('[data-toggle="tooltip"]').tooltip();
+    } else {
+        document.querySelectorAll('[data-toggle="tooltip"]').forEach(function(el) {
+            el.setAttribute('title', el.getAttribute('title'));
+        });
+    }
+
+    // Mini-gráficos Chart.js
+    const miniData = (max) => Array.from({length: 10}, () => Math.floor(Math.random() * max));
+    const miniConfig = (color) => ({
+        type: 'line',
+        data: { labels: Array(10).fill(''), datasets: [{ data: miniData(100), borderColor: color, backgroundColor: color+'22', fill: true, tension: 0.4, pointRadius: 0 }] },
+        options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } }, elements: { line: { borderWidth: 2 } }, responsive: false, maintainAspectRatio: false }
+    });
+    const charts = [
+        ['saldoChart', '#28a745'],
+        ['reembolsoChart', '#dc3545'],
+        ['usuariosChart', '#ffc107'],
+        ['pedidosChart', '#17a2b8'],
+        ['cursosChart', '#007bff'],
+        ['mentoriasChart', '#28a745'],
+        ['eventosChart', '#ffc107'],
+        ['certificadosChart', '#6c757d'],
+        ['jobsChart', '#343a40']
+    ];
+    charts.forEach(([id, color]) => {
+        const el = document.getElementById(id);
+        if (el) new Chart(el.getContext('2d'), miniConfig(color));
+    });
+
+    // FullCalendar 4
+    var calendarEl = document.getElementById('calendar');
+    if (calendarEl) {
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            plugins: ['dayGrid', 'timeGrid', 'list'],
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            },
+            locale: 'pt-br',
+            height: 350,
+            events: [
+                { title: 'Evento 1', start: new Date(), color: '#007bff' },
+                { title: 'Mentoria', start: new Date(new Date().setDate(new Date().getDate()+2)), color: '#28a745' },
+                { title: 'Curso', start: new Date(new Date().setDate(new Date().getDate()+5)), color: '#ffc107' }
+            ]
+        });
+        calendar.render();
+    }
+});
+</script>
+@endpush
+@endsection
 
 @section('page_title', 'Dashboard')
 @section('breadcrumb')
