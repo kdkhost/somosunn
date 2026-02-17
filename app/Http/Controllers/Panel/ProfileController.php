@@ -57,6 +57,8 @@ class ProfileController extends Controller
             'twitter' => 'nullable|string|max:255',
             'linkedin' => 'nullable|url|max:255',
             'youtube' => 'nullable|url|max:255',
+
+            'theme_pref' => 'nullable|string|in:light,dark',
         ]);
 
         $data['show_email_public'] = $request->has('show_email_public');

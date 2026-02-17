@@ -2,34 +2,37 @@
     $user = auth()->user();
     $plan = $user ? $user->activePlan() : null;
     $isImpersonatingAdmin = session()->has('impersonator_id') && session()->get('impersonator_is_admin');
+    $currentTheme = $user->theme_pref ?? 'light';
 
     $navItemClass = function (bool $active = false) {
-        $base = 'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition';
+        $base = 'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200';
         return $active
-            ? $base . ' bg-[#1F5EDB]/10 text-[#1F5EDB]'
-            : $base . ' text-slate-700 hover:bg-slate-100';
+            ? $base . ' bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 shadow-sm border border-blue-600/5 dark:border-blue-500/10'
+            : $base . ' text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200';
     };
 @endphp
 
-<div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 sticky top-24">
-    <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
+<div
+    class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 p-6 sticky top-24 transition-colors duration-300">
+    <div class="flex items-center gap-4 mb-8">
+        <div
+            class="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
             @if($user->profile_photo_url && !str_contains($user->profile_photo_url, 'default-user.svg'))
                 <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="w-full h-full object-cover">
             @else
-                <span class="text-slate-500 font-bold text-xl"
-                    aria-hidden="true">{{ mb_substr((string) ($user->name ?? ''), 0, 1) }}</span>
+                <i class="fas fa-user text-slate-400 dark:text-slate-500 text-xl"></i>
             @endif
         </div>
         <div class="min-w-0">
-            <div class="font-bold text-slate-900 truncate">{{ $user->name }}</div>
-            <div class="text-xs text-slate-500 truncate">
-                {{ $plan?->name ? $plan->name : 'Sem plano ativo' }}
+            <div class="font-bold text-slate-900 dark:text-white truncate text-lg">{{ $user->name }}</div>
+            <div
+                class="inline-flex items-center px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-tight">
+                {{ $plan?->name ? $plan->name : 'Sem plano' }}
             </div>
         </div>
     </div>
 
-    <div class="mt-5 space-y-1">
+    <div class="space-y-1">
         <a href="{{ route('panel.dashboard') }}" class="{{ $navItemClass(request()->routeIs('panel.dashboard')) }}">
             <i class="fas fa-th-large w-5 opacity-80"></i>
             Visão geral
@@ -67,9 +70,9 @@
         @endif
 
         @if((method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace()) || $isImpersonatingAdmin)
-            <div class="pt-4 mt-4 border-t border-slate-100">
-                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                    Marketplace (Vendas)
+            <div class="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
+                <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 px-4">
+                    Vendedor
                 </div>
                 <a href="{{ route('panel.marketplace.index') }}"
                     class="{{ $navItemClass(request()->routeIs('panel.marketplace.index')) }}">
@@ -90,8 +93,8 @@
         @endif
 
         @if($user->isAdmin())
-            <div class="pt-4 mt-4 border-t border-slate-100">
-                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-4">
+            <div class="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
+                <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 px-4">
                     Administração
                 </div>
 
@@ -102,7 +105,7 @@
                 </a>
 
                 {{-- Gestão --}}
-                <div class="mt-4 mb-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gestão</div>
+                <div class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Gestão</div>
                 <a href="{{ route('panel.admin.users.index') }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.users.*')) }}">
                     <i class="fas fa-users-cog w-5 opacity-80"></i>
@@ -130,7 +133,7 @@
                 </a>
 
                 {{-- Conteúdo --}}
-                <div class="mt-4 mb-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Conteúdo</div>
+                <div class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Conteúdo</div>
                 <a href="{{ route('panel.admin.courses.index') }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.courses.*')) }}">
                     <i class="fas fa-graduation-cap w-5 opacity-80"></i>
@@ -153,7 +156,7 @@
                 </a>
 
                 {{-- Configurações --}}
-                <div class="mt-4 mb-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ajustes</div>
+                <div class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Ajustes</div>
                 <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'general') }}">
                     <i class="fas fa-cogs w-5 opacity-80"></i>
@@ -176,5 +179,46 @@
                 </a>
             </div>
         @endif
+
+        {{-- Theme Toggle --}}
+        <div class="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
+            <button onclick="toggleTheme()" 
+                class="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 group">
+                <div class="flex items-center gap-3">
+                    <i class="fas {{ $currentTheme === 'dark' ? 'fa-sun' : 'fa-moon' }} w-5 opacity-80 group-hover:rotate-12 transition-transform"></i>
+                    <span>Modo {{ $currentTheme === 'dark' ? 'Claro' : 'Escuro' }}</span>
+                </div>
+                <div class="w-10 h-5 bg-slate-200 dark:bg-slate-700 rounded-full relative transition-colors">
+                    <div class="absolute top-1 {{ $currentTheme === 'dark' ? 'right-1' : 'left-1' }} w-3 h-3 bg-white dark:bg-blue-400 rounded-full shadow-sm transition-all"></div>
+                </div>
+            </button>
+        </div>
     </div>
+</div>
+
+<script>
+function toggleTheme() {
+    const theme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+    
+    // UI Update
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+
+    // Save Preference
+    fetch('{{ route("panel.theme.toggle") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ theme: theme })
+    }).then(r => r.json()).then(data => {
+        // Optional: reload to apply all server-side classes correctly if needed
+        window.location.reload();
+    });
+}
+</script>
 </div>

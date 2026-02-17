@@ -14,35 +14,37 @@
 @endpush
 
 @section('content')
-    <div class="bg-slate-50 min-h-screen pb-10">
+    <div class="bg-slate-50 dark:bg-slate-950 min-h-screen pb-10 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16">
 
             {{-- Breadcrumb (Top Navigation) --}}
             <nav class="mb-6 flex flex-wrap items-center justify-between gap-4" aria-label="breadcrumb">
-                <ol class="list-none p-0 inline-flex flex-wrap items-center gap-2 text-sm text-slate-500 font-medium">
+                <ol
+                    class="list-none p-0 inline-flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-slate-400 font-medium">
                     <li class="flex items-center">
                         <a href="{{ route('panel.dashboard') }}"
-                            class="hover:text-blue-600 transition-colors flex items-center gap-2">
+                            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
                             <div
-                                class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 shadow-sm">
+                                class="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 shadow-sm">
                                 <i class="fas fa-home text-xs"></i>
                             </div>
                             <span>Painel</span>
                         </a>
                     </li>
                     @hasSection('panel_breadcrumb')
-                        <li class="flex items-center text-slate-300">
+                        <li class="flex items-center text-slate-300 dark:text-slate-700">
                             <i class="fas fa-chevron-right text-[10px] mx-1"></i>
                         </li>
                         <li class="flex items-center">
                             @yield('panel_breadcrumb')
                         </li>
                     @endif
-                    <li class="flex items-center text-slate-300">
+                    <li class="flex items-center text-slate-300 dark:text-slate-700">
                         <i class="fas fa-chevron-right text-[10px] mx-1"></i>
                     </li>
-                    <li class="flex items-center text-blue-600">
-                        <span class="font-bold bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs">
+                    <li class="flex items-center text-blue-600 dark:text-blue-400">
+                        <span
+                            class="font-bold bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full text-xs">
                             @yield('title', ucfirst(Str::after(Route::currentRouteName(), 'panel.')))
                         </span>
                     </li>
@@ -50,7 +52,7 @@
             </nav>
 
             <div class="flex flex-col lg:flex-row gap-8">
-                <aside class="w-full lg:w-72 shrink-0">
+                <aside class="hidden lg:block w-full lg:w-72 shrink-0">
                     @include('panel.partials.sidebar')
                 </aside>
                 <main class="flex-1 min-w-0">

@@ -43,13 +43,13 @@
 
                 @foreach($gestao as $item)
                     <a href="{{ route($item['route']) }}"
-                        class="group bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-{{ $item['color'] }}-500/5 hover:-translate-y-1 transition-all duration-300">
+                        class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-{{ $item['color'] }}-500/5 hover:-translate-y-1 transition-all duration-300">
                         <div
-                            class="w-14 h-14 rounded-2xl bg-{{ $item['color'] }}-50 text-{{ $item['color'] }}-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
+                            class="w-14 h-14 rounded-2xl bg-{{ $item['color'] }}-50 dark:bg-{{ $item['color'] }}-900/20 text-{{ $item['color'] }}-600 dark:text-{{ $item['color'] }}-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
                             <i class="fas {{ $item['icon'] }} text-xl"></i>
                         </div>
-                        <h4 class="font-bold text-slate-900 text-lg mb-1">{{ $item['title'] }}</h4>
-                        <p class="text-sm text-slate-500 font-medium leading-relaxed">{{ $item['desc'] }}</p>
+                        <h4 class="font-bold text-slate-900 dark:text-white text-lg mb-1">{{ $item['title'] }}</h4>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">{{ $item['desc'] }}</p>
                     </a>
                 @endforeach
             </div>
@@ -58,10 +58,10 @@
         {{-- Section: Conteúdo --}}
         <div>
             <div class="flex items-center gap-3 mb-6 px-2">
-                <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center">
                     <i class="fas fa-layer-group text-sm"></i>
                 </div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Educação & Conteúdo</h3>
+                <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Educação & Conteúdo</h3>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @php
@@ -75,13 +75,13 @@
 
                 @foreach($conteudo as $item)
                     <a href="{{ route($item['route']) }}"
-                        class="group bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-{{ $item['color'] }}-500/5 hover:-translate-y-1 transition-all duration-300">
+                        class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-{{ $item['color'] }}-500/5 hover:-translate-y-1 transition-all duration-300">
                         <div
-                            class="w-14 h-14 rounded-2xl bg-{{ $item['color'] }}-50 text-{{ $item['color'] }}-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
+                            class="w-14 h-14 rounded-2xl bg-{{ $item['color'] }}-50 dark:bg-{{ $item['color'] }}-900/20 text-{{ $item['color'] }}-600 dark:text-{{ $item['color'] }}-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
                             <i class="fas {{ $item['icon'] }} text-xl"></i>
                         </div>
-                        <h4 class="font-bold text-slate-900 text-lg mb-1">{{ $item['title'] }}</h4>
-                        <p class="text-sm text-slate-500 font-medium leading-relaxed">{{ $item['desc'] }}</p>
+                        <h4 class="font-bold text-slate-900 dark:text-white text-lg mb-1">{{ $item['title'] }}</h4>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">{{ $item['desc'] }}</p>
                     </a>
                 @endforeach
             </div>
@@ -90,10 +90,10 @@
         {{-- Section: Ajustes Técnicos --}}
         <div>
             <div class="flex items-center gap-3 mb-6 px-2">
-                <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center">
                     <i class="fas fa-sliders-h text-sm"></i>
                 </div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Ajustes & Configurações</h3>
+                <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Ajustes & Configurações</h3>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @php
@@ -107,25 +107,25 @@
 
                 @foreach($ajustes as $item)
                     <a href="{{ route($item['route'], $item['param'] ?? []) }}"
-                        class="group bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-{{ $item['color'] }}-500/5 hover:-translate-y-1 transition-all duration-300">
+                        class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-{{ $item['color'] }}-500/5 hover:-translate-y-1 transition-all duration-300">
                         <div
-                            class="w-13 h-13 rounded-2xl bg-{{ $item['color'] }}-50 text-{{ $item['color'] }}-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
+                            class="w-13 h-13 rounded-2xl bg-{{ $item['color'] }}-50 dark:bg-{{ $item['color'] }}-900/20 text-{{ $item['color'] }}-600 dark:text-{{ $item['color'] }}-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
                             <i class="fas {{ $item['icon'] }} text-xl"></i>
                         </div>
-                        <h4 class="font-bold text-slate-900 text-lg mb-1">{{ $item['title'] }}</h4>
-                        <p class="text-sm text-slate-500 font-medium leading-relaxed">{{ $item['desc'] }}</p>
+                        <h4 class="font-bold text-slate-900 dark:text-white text-lg mb-1">{{ $item['title'] }}</h4>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">{{ $item['desc'] }}</p>
                     </a>
                 @endforeach
 
                 @if(auth()->user()->isSuperAdmin())
                     <a href="{{ route('admin.dashboard') }}" target="_blank"
-                        class="group bg-slate-50 p-6 rounded-3xl border border-slate-200 border-dashed hover:border-blue-300 hover:bg-blue-50/30 transition-all duration-300">
+                        class="group bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 border-dashed hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-all duration-300">
                         <div
-                            class="w-13 h-13 rounded-2xl bg-white text-slate-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
+                            class="w-13 h-13 rounded-2xl bg-white dark:bg-slate-900 text-slate-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
                             <i class="fas fa-external-link-alt text-lg"></i>
                         </div>
-                        <h4 class="font-bold text-slate-500 text-lg mb-1">Painel Legacy</h4>
-                        <p class="text-xs text-slate-400 font-medium italic">Acesso fallback ao AdminLTE</p>
+                        <h4 class="font-bold text-slate-500 dark:text-slate-400 text-lg mb-1">Painel Legacy</h4>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 font-medium italic">Acesso fallback ao AdminLTE</p>
                     </a>
                 @endif
             </div>

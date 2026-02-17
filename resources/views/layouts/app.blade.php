@@ -272,6 +272,35 @@
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        unn: {
+                            azul: {
+                                1: '#1F5EDB',
+                                2: '#177FD6',
+                                3: '#1D3FC4',
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script>
+        // Set theme immediately to avoid flash
+        (function() {
+            const theme = @json(auth()->user()?->theme_pref ?? 'light');
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @if($videoPlayerEnabled)
         <link rel="stylesheet" href="{{ asset('vendor/plyr/plyr.css') }}">

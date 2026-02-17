@@ -39,17 +39,17 @@
         <!-- Header & Toolbar -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <h2 class="text-2xl font-bold text-slate-800">Modelos de E-mail</h2>
-                <p class="text-slate-500 text-sm">Gerencie os templates de notificação do sistema.</p>
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Modelos de E-mail</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-sm">Gerencie os templates de notificação do sistema.</p>
             </div>
             <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <form action="{{ route('panel.admin.mailtemplates.index') }}" method="GET"
                     class="relative group w-full sm:w-64">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-search text-slate-400 group-focus-within:text-blue-500 transition"></i>
+                        <i class="fas fa-search text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition"></i>
                     </div>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar templates..."
-                        class="pl-10 w-full rounded-xl border-slate-300 bg-white focus:border-blue-500 focus:ring-blue-500 transition shadow-sm">
+                        class="pl-10 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500 transition shadow-sm">
                 </form>
                 <button onclick="openEditor()"
                     class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-xl shadow-lg shadow-blue-500/30 transition transform hover:scale-[1.02] flex items-center justify-center gap-2 whitespace-nowrap">
@@ -61,22 +61,22 @@
         <!-- Filters (Optional - Categories) -->
         <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
             <a href="{{ route('panel.admin.mailtemplates.index') }}"
-                class="px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition {{ !request('category') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200' }}">
+                class="px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition {{ !request('category') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800' }}">
                 Todos
             </a>
             @foreach(['sistema', 'conta', 'financeiro', 'marketing'] as $cat)
                 <a href="{{ route('panel.admin.mailtemplates.index', ['category' => $cat]) }}"
-                    class="px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request('category') == $cat ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200' }}">
+                    class="px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request('category') == $cat ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800' }}">
                     {{ ucfirst($cat) }}
                 </a>
             @endforeach
         </div>
 
         <!-- Table -->
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors duration-300">
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-500 tracking-wider">
+                <table class="w-full text-left text-sm text-slate-600 dark:text-slate-400">
+                    <thead class="bg-slate-50 dark:bg-slate-800/50 text-xs uppercase font-bold text-slate-500 dark:text-slate-500 tracking-wider">
                         <tr>
                             <th class="px-6 py-4">Nome / Slug</th>
                             <th class="px-6 py-4">Categoria</th>
@@ -85,30 +85,30 @@
                             <th class="px-6 py-4 text-right">Ações</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @forelse($templates as $t)
-                                        <tr class="hover:bg-slate-50 transition group">
+                                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition group">
                                             <td class="px-6 py-4">
-                                                <div class="font-bold text-slate-800">{{ $t->name }}</div>
-                                                <div class="text-xs font-mono text-slate-400 mt-0.5">{{ $t->slug }}</div>
+                                                <div class="font-bold text-slate-800 dark:text-white">{{ $t->name }}</div>
+                                                <div class="text-xs font-mono text-slate-400 dark:text-slate-500 mt-0.5">{{ $t->slug }}</div>
                                             </td>
                                             <td class="px-6 py-4">
                                                 <span
                                                     class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold 
-                                                                                                                        {{ $t->category == 'financeiro' ? 'bg-green-100 text-green-700' :
-                            ($t->category == 'conta' ? 'bg-purple-100 text-purple-700' :
-                                ($t->category == 'sistema' ? 'bg-slate-100 text-slate-700' : 'bg-blue-100 text-blue-700')) }}">
+                                                                                                                        {{ $t->category == 'financeiro' ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' :
+                            ($t->category == 'conta' ? 'bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400' :
+                                ($t->category == 'sistema' ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-400' : 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400')) }}">
                                                     {{ ucfirst($t->category) }}
                                                 </span>
                                             </td>
-                                            <td class="px-6 py-4 max-w-xs truncate" title="{{ $t->subject }}">
+                                            <td class="px-6 py-4 max-w-xs truncate dark:text-slate-300" title="{{ $t->subject }}">
                                                 {{ $t->subject }}
                                             </td>
                                             <td class="px-6 py-4 text-center">
                                                 @if($t->is_active)
-                                                    <div class="w-2 h-2 rounded-full bg-green-500 mx-auto" title="Ativo"></div>
+                                                    <div class="w-2 h-2 rounded-full bg-green-500 mx-auto shadow-sm shadow-green-500/50" title="Ativo"></div>
                                                 @else
-                                                    <div class="w-2 h-2 rounded-full bg-red-400 mx-auto" title="Inativo"></div>
+                                                    <div class="w-2 h-2 rounded-full bg-red-400 mx-auto shadow-sm shadow-red-400/50" title="Inativo"></div>
                                                 @endif
                                             </td>
                                             <td class="px-6 py-4 text-right">
@@ -116,23 +116,23 @@
                                                     class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                                     <button
                                                         onclick="openEditor('{{ route('panel.admin.mailtemplates.edit', $t) }}', '{{ route('panel.admin.mailtemplates.update', $t) }}')"
-                                                        class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition"
+                                                        class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition"
                                                         title="Editar">
-                                                        <i class="fas fa-pen"></i>
+                                                        <i class="fas fa-pen text-xs"></i>
                                                     </button>
                                                     <button onclick="preview({{ $t->id }})"
-                                                        class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition"
+                                                        class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition"
                                                         title="Pré-visualizar">
-                                                        <i class="fas fa-eye"></i>
+                                                        <i class="fas fa-eye text-xs"></i>
                                                     </button>
                                                     <form action="{{ route('panel.admin.mailtemplates.destroy', $t) }}" method="POST"
                                                         onsubmit="return confirm('Tem certeza que deseja remover este modelo?');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit"
-                                                            class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition"
+                                                            class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition"
                                                             title="Remover">
-                                                            <i class="fas fa-trash-alt"></i>
+                                                            <i class="fas fa-trash-alt text-xs"></i>
                                                         </button>
                                                     </form>
                                                 </div>
@@ -152,7 +152,7 @@
                 </table>
             </div>
             @if($templates->hasPages())
-                <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+                <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
                     {{ $templates->links() }}
                 </div>
             @endif
@@ -161,38 +161,38 @@
 
     <!-- Editor Modal -->
     <div id="editorModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
         <div
-            class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] flex flex-col transform scale-95 transition-transform duration-300">
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] flex flex-col transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-800">
             <!-- Modal Header -->
-            <div class="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+            <div class="flex justify-between items-center px-6 py-4 border-b border-slate-100 dark:border-slate-800">
                 <div>
-                    <h3 id="modalTitle" class="text-lg font-bold text-slate-800">Novo Modelo</h3>
-                    <p class="text-xs text-slate-500">Preencha as informações abaixo.</p>
+                    <h3 id="modalTitle" class="text-lg font-bold text-slate-800 dark:text-white">Novo Modelo</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Preencha as informações abaixo.</p>
                 </div>
                 <button onclick="closeEditor()"
-                    class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+                    class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
 
             <!-- Modal Body (Scrollable) -->
-            <div class="flex-1 overflow-y-auto p-6 bg-slate-50 custom-scrollbar relative" id="editorBody">
+            <div class="flex-1 overflow-y-auto p-6 bg-slate-50 dark:bg-slate-950 custom-scrollbar relative" id="editorBody">
                 <!-- Content injected via AJAX -->
-                <div class="flex flex-col items-center justify-center h-40 text-slate-400">
+                <div class="flex flex-col items-center justify-center h-40 text-slate-400 dark:text-slate-600">
                     <i class="fas fa-circle-notch fa-spin text-3xl mb-3 text-blue-500"></i>
                     <p>Carregando editor...</p>
                 </div>
             </div>
 
             <!-- Modal Footer -->
-            <div class="px-6 py-4 border-t border-slate-100 bg-white rounded-b-2xl flex justify-between items-center gap-4">
-                <div class="text-xs text-slate-400 hidden sm:block">
+            <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-b-2xl flex justify-between items-center gap-4">
+                <div class="text-xs text-slate-400 dark:text-slate-500 hidden sm:block">
                     <i class="fas fa-info-circle mr-1"></i> Todos os campos marcados são obrigatórios.
                 </div>
                 <div class="flex gap-3">
                     <button onclick="closeEditor()"
-                        class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition">
+                        class="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                         Cancelar
                     </button>
                     <button id="btnSaveTemplate"
@@ -206,28 +206,28 @@
 
     <!-- Preview Modal (Simplified reused) -->
     <div id="previewModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 hidden opacity-0 transition-opacity duration-300">
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
         <div
-            class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-300">
-            <div class="flex justify-between items-center p-4 border-b border-slate-100">
-                <h3 class="font-bold text-slate-800">Pré-visualização</h3>
-                <button onclick="closePreview()" class="text-slate-400 hover:text-slate-600">
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-800">
+            <div class="flex justify-between items-center p-4 border-b border-slate-100 dark:border-slate-800">
+                <h3 class="font-bold text-slate-800 dark:text-white">Pré-visualização</h3>
+                <button onclick="closePreview()" class="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div class="flex-1 overflow-y-auto bg-slate-100 p-0 relative custom-scrollbar">
-                <div id="previewLoader" class="absolute inset-0 flex items-center justify-center bg-slate-100 z-10">
+            <div class="flex-1 overflow-y-auto bg-slate-100 dark:bg-slate-950 p-0 relative custom-scrollbar">
+                <div id="previewLoader" class="absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-slate-950 z-10 transition-colors duration-300">
                     <i class="fas fa-spinner fa-spin text-3xl text-blue-500"></i>
                 </div>
                 <iframe id="previewFrame" class="w-full border-0 transition-all duration-300"
                     style="min-height: 500px;"></iframe>
             </div>
-            <div class="p-4 border-t border-slate-100 bg-white">
+            <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-b-2xl">
                 <div class="flex gap-3">
                     <input type="email" id="previewEmail" placeholder="E-mail para teste"
-                        class="flex-1 rounded-xl border-slate-200">
+                        class="flex-1 rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-blue-500">
                     <button id="sendPreviewBtn"
-                        class="bg-slate-800 text-white px-6 rounded-xl font-bold hover:bg-slate-900 transition">Enviar</button>
+                        class="bg-slate-800 dark:bg-blue-600 text-white px-6 rounded-xl font-bold hover:bg-slate-900 dark:hover:bg-blue-700 transition shadow-lg shadow-blue-500/10">Enviar</button>
                 </div>
             </div>
         </div>
