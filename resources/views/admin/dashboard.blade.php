@@ -58,49 +58,203 @@
             <button type="button" class="btn btn-sm btn-primary rounded-pill px-4" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
         </div>
     </form>
-    <!-- KPIs padrão AdminLTE 3.2 -->
+    <!-- Linha de detalhes do sistema e disponibilidade -->
+    <div class="row mb-2">
+        <div class="col-md-3 col-12">
+            <div class="card card-outline card-primary h-100">
+                <div class="card-header py-2 px-3">
+                    <h3 class="card-title text-sm">Detalhes do Sistema</h3>
+                </div>
+                <div class="card-body p-2">
+                    <ul class="list-unstyled mb-0">
+                        <li><b>Monitor:</b> {{ request()->getHost() }}</li>
+                        <li><b>Tipo:</b> Laravel</li>
+                        <li><b>Versão:</b> {{ app()->version() }}</li>
+                        <li><b>PHP:</b> {{ phpversion() }}</li>
+                        <li><b>Uptime:</b> <span id="uptime">--</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-12">
+            <div class="card card-outline card-success h-100">
+                <div class="card-header py-2 px-3">
+                    <h3 class="card-title text-sm">Disponibilidade</h3>
+                </div>
+                <div class="card-body p-2 d-flex align-items-center justify-content-center">
+                    <canvas id="availabilityChart" width="80" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-12">
+            <div class="row h-100">
+                <div class="col-4">
+                    <div class="card bg-success text-white mb-2">
+                        <div class="card-body p-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-xs">Saldo Total</div>
+                                    <div class="h4 mb-0">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</div>
+                                </div>
+                                <i class="fas fa-wallet fa-2x"></i>
+                            </div>
+                            <canvas id="saldoChart" height="30"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card bg-danger text-white mb-2">
+                        <div class="card-body p-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-xs">Reembolsados</div>
+                                    <div class="h4 mb-0">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</div>
+                                </div>
+                                <i class="fas fa-undo fa-2x"></i>
+                            </div>
+                            <canvas id="reembolsoChart" height="30"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card bg-warning text-dark mb-2">
+                        <div class="card-body p-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-xs">Usuários</div>
+                                    <div class="h4 mb-0">{{ $totalUsers ?? 0 }}</div>
+                                </div>
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                            <canvas id="usuariosChart" height="30"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid de métricas principais e secundárias -->
     <div class="row">
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-success">
-                <div class="inner">
-                    <h3>R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</h3>
-                    <p>Saldo Total</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-wallet"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-danger">
-                <div class="inner">
-                    <h3>R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</h3>
-                    <p>Reembolsados</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-undo"></i>
+        <div class="col-md-2 col-6 mb-2">
+            <div class="card bg-info text-white">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Pedidos</div>
+                            <div class="h5 mb-0">{{ $totalOrders ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-shopping-bag fa-lg"></i>
+                    </div>
+                    <canvas id="pedidosChart" height="20"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-warning">
-                <div class="inner">
-                    <h3>{{ $totalUsers ?? 0 }}</h3>
-                    <p>Usuários</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-users"></i>
+        <div class="col-md-2 col-6 mb-2">
+            <div class="card bg-primary text-white">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Cursos</div>
+                            <div class="h5 mb-0">{{ $coursesCount ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-graduation-cap fa-lg"></i>
+                    </div>
+                    <canvas id="cursosChart" height="20"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-                <div class="inner">
-                    <h3>{{ $totalOrders ?? 0 }}</h3>
-                    <p>Pedidos</p>
+        <div class="col-md-2 col-6 mb-2">
+            <div class="card bg-success text-white">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Mentorias</div>
+                            <div class="h5 mb-0">{{ $mentorshipsCount ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-chalkboard-teacher fa-lg"></i>
+                    </div>
+                    <canvas id="mentoriasChart" height="20"></canvas>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-shopping-bag"></i>
+            </div>
+        </div>
+        <div class="col-md-2 col-6 mb-2">
+            <div class="card bg-warning text-dark">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Eventos</div>
+                            <div class="h5 mb-0">{{ $eventsCount ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-calendar-alt fa-lg"></i>
+                    </div>
+                    <canvas id="eventosChart" height="20"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-6 mb-2">
+            <div class="card bg-secondary text-white">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Certificados</div>
+                            <div class="h5 mb-0">{{ $certificatesCount ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-certificate fa-lg"></i>
+                    </div>
+                    <canvas id="certificadosChart" height="20"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-6 mb-2">
+            <div class="card bg-dark text-white">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs">Jobs Pendentes</div>
+                            <div class="h5 mb-0">{{ $pendingJobsCount ?? 0 }}</div>
+                        </div>
+                        <i class="fas fa-tasks fa-lg"></i>
+                    </div>
+                    <canvas id="jobsChart" height="20"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Linha de gráficos maiores -->
+    <div class="row mt-2">
+        <div class="col-lg-8 col-12 mb-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-chart-line mr-2"></i>Histórico de Vendas</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="salesChart" style="height:220px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-12 mb-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-chart-pie mr-2"></i>Pedidos por Status</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="ordersStatusChart" style="height:220px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Linha de calendário -->
+    <div class="row mt-2">
+        <div class="col-lg-5 col-12 mb-2">
+            <div class="card" title="Calendário de eventos e atividades.">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-calendar-alt mr-2"></i>Calendário</h3>
+                </div>
+                <div class="card-body">
+                    <div id="calendar" style="width:100%; min-height: 180px; max-height: 220px; overflow-y: auto;"></div>
                 </div>
             </div>
         </div>
