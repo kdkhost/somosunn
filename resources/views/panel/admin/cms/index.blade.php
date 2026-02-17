@@ -23,21 +23,21 @@
 
         {{-- Tabs Navigation --}}
         <div
-            class="bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1.5 transition-all">
+            class="bg-slate-100/50 dark:bg-slate-800 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1.5 transition-all">
             <a href="{{ route('panel.admin.cms.index', ['slug' => 'home']) }}"
-                :class="activeTab === 'home' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
+                :class="activeTab === 'home' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : 'text-slate-500 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'"
                 class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
                 <i class="fas fa-home"></i>
                 <span>Home / Hero</span>
             </a>
             <a href="{{ route('panel.admin.cms.index', ['slug' => 'about']) }}"
-                :class="activeTab === 'about' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
+                :class="activeTab === 'about' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : 'text-slate-500 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'"
                 class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
                 <i class="fas fa-info-circle"></i>
                 <span>Sobre Nós</span>
             </a>
             <a href="{{ route('panel.admin.cms.index', ['slug' => 'footer']) }}"
-                :class="activeTab === 'footer' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
+                :class="activeTab === 'footer' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : 'text-slate-500 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'"
                 class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
                 <i class="fas fa-shoe-prints"></i>
                 <span>Rodapé / Links</span>
