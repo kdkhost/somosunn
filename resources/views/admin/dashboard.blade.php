@@ -301,7 +301,7 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-white border-0 pb-2 d-flex justify-content-between align-items-center">
                     <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-history mr-1"></i>Últimas Atividades do Sistema</h6>
-                    <a href="{{ route('admin.logs.index') }}" class="btn btn-xs btn-outline-secondary">Ver todos</a>
+                    <!-- <a href="#" class="btn btn-xs btn-outline-secondary disabled" title="Funcionalidade em breve">Ver todos</a> -->
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
