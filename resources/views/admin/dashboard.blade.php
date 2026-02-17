@@ -57,28 +57,28 @@
     <!-- KPIs premium -->
     <div class="row mb-4">
         <div class="col-12 d-flex flex-wrap justify-content-between align-items-stretch gap-3">
-            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0" style="min-width:220px;">
+            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0 kpi-hover" style="min-width:220px;" title="Total de vendas confirmadas no período selecionado.">
                 <div class="card-body py-4">
                     <div class="mb-2"><i class="fas fa-wallet fa-3x text-gradient-success"></i></div>
                     <div class="display-4 font-weight-bold mb-1">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</div>
                     <div class="text-muted font-weight-bold">Saldo Total</div>
                 </div>
             </div>
-            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0" style="min-width:220px;">
+            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0 kpi-hover" style="min-width:220px;" title="Valor total reembolsado no período.">
                 <div class="card-body py-4">
                     <div class="mb-2"><i class="fas fa-undo fa-3x text-gradient-danger"></i></div>
                     <div class="display-4 font-weight-bold mb-1">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</div>
                     <div class="text-muted font-weight-bold">Reembolsados</div>
                 </div>
             </div>
-            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0" style="min-width:220px;">
+            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0 kpi-hover" style="min-width:220px;" title="Total de usuários cadastrados.">
                 <div class="card-body py-4">
                     <div class="mb-2"><i class="fas fa-users fa-3x text-gradient-warning"></i></div>
                     <div class="display-4 font-weight-bold mb-1">{{ $totalUsers ?? 0 }}</div>
                     <div class="text-muted font-weight-bold">Usuários</div>
                 </div>
             </div>
-            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0" style="min-width:220px;">
+            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0 kpi-hover" style="min-width:220px;" title="Total de pedidos realizados.">
                 <div class="card-body py-4">
                     <div class="mb-2"><i class="fas fa-shopping-bag fa-3x text-gradient-info"></i></div>
                     <div class="display-4 font-weight-bold mb-1">{{ $totalOrders ?? 0 }}</div>
@@ -86,12 +86,13 @@
                 </div>
             </div>
         </div>
+        <div class="w-100 my-3"><hr class="border-light"></div>
     </div>
 
     <!-- Gráficos premium -->
     <div class="row mb-4">
         <div class="col-lg-8 col-12 mb-3">
-            <div class="card shadow-lg border-0 h-100">
+            <div class="card shadow-lg border-0 h-100 chart-hover" title="Evolução das vendas mês a mês.">
                 <div class="card-header bg-gradient-primary text-white border-0 pb-2 d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-line mr-2"></i>Histórico de Vendas</h5>
                     <span class="badge badge-light text-primary">R$</span>
@@ -102,7 +103,7 @@
             </div>
         </div>
         <div class="col-lg-4 col-12 mb-3">
-            <div class="card shadow-lg border-0 h-100">
+            <div class="card shadow-lg border-0 h-100 chart-hover" title="Distribuição dos pedidos por status.">
                 <div class="card-header bg-gradient-info text-white border-0 pb-2 d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-pie mr-2"></i>Pedidos por Status</h5>
                 </div>
@@ -114,7 +115,7 @@
     </div>
     <div class="row mb-4">
         <div class="col-lg-4 col-12 mb-3">
-            <div class="card shadow-lg border-0 h-100">
+            <div class="card shadow-lg border-0 h-100 chart-hover" title="Novos usuários cadastrados mês a mês.">
                 <div class="card-header bg-gradient-warning text-white border-0 pb-2 d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-user-plus mr-2"></i>Novos Usuários por Mês</h5>
                 </div>
@@ -126,7 +127,7 @@
         <div class="col-lg-8 col-12 mb-3">
             <div class="row h-100">
                 <div class="col-md-4 col-6 mb-3">
-                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center">
+                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center info-hover" title="Total de cursos cadastrados.">
                         <span class="info-box-icon text-primary mb-2"><i class="fas fa-graduation-cap fa-2x"></i></span>
                         <div class="info-box-content text-center">
                             <span class="info-box-text font-weight-bold">Cursos</span>
@@ -135,7 +136,7 @@
                     </div>
                 </div>
                 <div class="col-md-4 col-6 mb-3">
-                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center">
+                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center info-hover" title="Total de mentorias ativas.">
                         <span class="info-box-icon text-success mb-2"><i class="fas fa-chalkboard-teacher fa-2x"></i></span>
                         <div class="info-box-content text-center">
                             <span class="info-box-text font-weight-bold">Mentorias</span>
@@ -144,7 +145,7 @@
                     </div>
                 </div>
                 <div class="col-md-4 col-12 mb-3">
-                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center">
+                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center info-hover" title="Total de eventos cadastrados.">
                         <span class="info-box-icon text-warning mb-2"><i class="fas fa-calendar-alt fa-2x"></i></span>
                         <div class="info-box-content text-center">
                             <span class="info-box-text font-weight-bold">Eventos</span>
@@ -153,7 +154,7 @@
                     </div>
                 </div>
                 <div class="col-md-6 col-6 mb-3">
-                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center">
+                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center info-hover" title="Total de certificados emitidos.">
                         <span class="info-box-icon text-secondary mb-2"><i class="fas fa-certificate fa-2x"></i></span>
                         <div class="info-box-content text-center">
                             <span class="info-box-text font-weight-bold">Certificados</span>
@@ -162,7 +163,7 @@
                     </div>
                 </div>
                 <div class="col-md-6 col-6 mb-3">
-                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center">
+                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center info-hover" title="Total de jobs pendentes.">
                         <span class="info-box-icon text-dark mb-2"><i class="fas fa-tasks fa-2x"></i></span>
                         <div class="info-box-content text-center">
                             <span class="info-box-text font-weight-bold">Jobs Pendentes</span>
@@ -176,7 +177,7 @@
     <!-- Calendário premium -->
     <div class="row mb-4">
         <div class="col-lg-5 col-12 mb-3">
-            <div class="card shadow-lg border-0 h-100">
+            <div class="card shadow-lg border-0 h-100" title="Calendário de eventos e atividades.">
                 <div class="card-header bg-gradient-secondary text-white border-0 pb-2 d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-calendar-alt mr-2"></i>Calendário</h5>
                 </div>
@@ -186,6 +187,42 @@
             </div>
         </div>
     </div>
+@push('styles')
+    <style>
+        .kpi-hover:hover, .chart-hover:hover, .info-hover:hover {
+            box-shadow: 0 0 0 4px #007bff22, 0 2px 16px #0001 !important;
+            transform: translateY(-2px) scale(1.02);
+            transition: all 0.15s;
+            z-index: 2;
+        }
+        .kpi-card .display-4, .info-box-number.display-4 {
+            color: #222;
+            letter-spacing: -1px;
+        }
+        .card-title, .info-box-text {
+            letter-spacing: 0.5px;
+        }
+        .card-header {
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        .card {
+            border-radius: 0.7rem;
+        }
+        @media (max-width: 991px) {
+            .kpi-card, .chart-hover, .info-hover {
+                min-width: 160px !important;
+            }
+        }
+        @media (max-width: 767px) {
+            .kpi-card, .chart-hover, .info-hover {
+                min-width: 120px !important;
+            }
+            .display-4 {
+                font-size: 2rem !important;
+            }
+        }
+    </style>
+@endpush
 
     <!-- Cards de métricas secundárias (apenas 5) -->
     <div class="row mb-4">
