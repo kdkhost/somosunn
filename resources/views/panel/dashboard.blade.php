@@ -44,17 +44,17 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6" id="dashboard-widgets">
         @if($canAccessCourses)
-            <x-widgets.metric title="Meus Cursos" icon="fas fa-graduation-cap" :value="$coursesCount ?? 0" color="blue" />
+            <x-widgets.metric title="Meus Cursos" icon="fas fa-graduation-cap" :value="$coursesCount ?? 0" color="blue" :href="route('courses.index')" />
         @endif
-        <x-widgets.metric title="Compras pagas" icon="fas fa-check-circle" :value="$ordersPaidCount ?? 0" color="emerald" />
-        <x-widgets.metric title="Total em compras" icon="fas fa-wallet" :value="number_format($ordersPaidTotal ?? 0, 2, ',', '.')" color="green" />
+        <x-widgets.metric title="Compras pagas" icon="fas fa-check-circle" :value="$ordersPaidCount ?? 0" color="emerald" :href="route('marketplace.index')" />
+        <x-widgets.metric title="Total em compras" icon="fas fa-wallet" :value="number_format($ordersPaidTotal ?? 0, 2, ',', '.')" color="green" :href="route('marketplace.index')" />
         @if($canSellOnMarketplace)
             <x-widgets.metric title="Vendas realizadas" icon="fas fa-shopping-cart" :value="$sellerPaidCount ?? 0"
-                color="purple" />
-            <x-widgets.metric title="Receita líquida" icon="fas fa-coins" :value="number_format($sellerNetTotal ?? 0, 2, ',', '.')" color="yellow" />
+                color="purple" :href="route('panel.marketplace.sales')" />
+            <x-widgets.metric title="Receita líquida" icon="fas fa-coins" :value="number_format($sellerNetTotal ?? 0, 2, ',', '.')" color="yellow" :href="route('panel.marketplace.payments')" />
         @endif
         @if($canAccessCommunity)
-            <x-widgets.metric title="Comunidade" icon="fas fa-users" :value="$communityCount ?? 0" color="cyan" />
+            <x-widgets.metric title="Comunidade" icon="fas fa-users" :value="$communityCount ?? 0" color="cyan" :href="route('social.feed')" />
         @endif
     </div>
 
