@@ -23,9 +23,9 @@
 
         {{-- Tabs Navigation --}}
         <div
-            class="bg-white dark:bg-slate-950 p-1 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 inline-flex items-center gap-1 transition-colors">
+            class="bg-slate-100 dark:bg-slate-800/50 p-1 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1 transition-colors">
             <a href="{{ route('panel.admin.cms.index', ['slug' => 'home']) }}"
-                :class="activeTab === 'home' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
+                :class="activeTab === 'home' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
                 class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                 <i class="fas fa-home"></i>
                 <span>Home / Hero</span>
