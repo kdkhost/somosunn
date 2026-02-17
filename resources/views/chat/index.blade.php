@@ -3,7 +3,7 @@
 @section('title', 'Mensagens - UNN')
 
 @section('panel_content')
-    <div x-data="{ 
+    <div x-data='{ 
             activeConversationId: null,
             loading: false,
             conversations: [],
@@ -15,35 +15,35 @@
 
                 try {
                     const response = await fetch(`/chat/${id}`, {
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        headers: { "X-Requested-With": "XMLHttpRequest" }
                     });
                     const html = await response.text();
                     this.$refs.chatContainer.innerHTML = html;
 
                     // Executar scripts injetados
-                    const scripts = this.$refs.chatContainer.querySelectorAll('script');
+                    const scripts = this.$refs.chatContainer.querySelectorAll("script");
                     scripts.forEach(oldScript => {
-                        const newScript = document.createElement('script');
+                        const newScript = document.createElement("script");
                         Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
                         newScript.appendChild(document.createTextNode(oldScript.innerHTML));
                         oldScript.parentNode.replaceChild(newScript, oldScript);
                     });
 
                     // Atualizar histórico sem reload
-                    window.history.pushState({}, '', `/chat/${id}`);
+                    window.history.pushState({}, "", `/chat/${id}`);
                 } catch (error) {
-                    console.error('Erro ao carregar conversa:', error);
+                    console.error("Erro ao carregar conversa:", error);
                 } finally {
                     this.loading = false;
                 }
             },
 
             refreshList() {
-                fetch('{{ route('chat.list') }}')
+                fetch("{{ route("chat.list") }}")
                     .then(r => r.json())
                     .then(data => { this.conversations = data; });
             }
-        }" x-init="conversations = @json($conversations); setInterval(() => refreshList(), 5000)"
+        }' x-init='conversations = @json($conversations); setInterval(() => refreshList(), 5000)'
         class="max-w-6xl mx-auto px-0 sm:px-4 py-2 sm:py-6 h-[calc(100vh-120px)] sm:h-[calc(100vh-160px)] md:h-[calc(100vh-180px)] min-h-[400px]">
 
         <div
