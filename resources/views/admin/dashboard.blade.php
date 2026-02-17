@@ -228,14 +228,14 @@ document.addEventListener('DOMContentLoaded', function() {
 <section class="content">
     <div class="container-fluid">
         <!-- Card de informações do sistema -->
-        <div class="row mb-3">
-            <div class="col-12">
-                <div class="card card-outline card-primary h-100" data-toggle="tooltip" title="Informações do sistema e ambiente." aria-label="Detalhes do Sistema">
-                    <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
-                        <h3 class="card-title text-sm">Detalhes do Sistema <i class="fas fa-info-circle text-muted ml-1"></i></h3>
-                        <span class="badge badge-success" aria-label="Status do sistema">Online</span>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card card-primary card-outline">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title">Detalhes do Sistema <i class="fas fa-info-circle text-muted ml-1"></i></h3>
+                        <span class="badge badge-success">Online</span>
                     </div>
-                    <div class="card-body p-2">
+                    <div class="card-body">
                         <ul class="list-unstyled mb-0">
                             <li><b>Monitor:</b> {{ request()->getHost() }}</li>
                             <li><b>Tipo:</b> Laravel</li>
@@ -247,8 +247,117 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
         </div>
-        <!-- KPIs, métricas, FullCalendar, etc -->
-        {{-- Coloque aqui o restante da dashboard: KPIs, métricas, gráficos, calendário, etc --}}
+
+        <!-- KPIs padrão AdminLTE -->
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</h3>
+                        <p>Saldo Total</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</h3>
+                        <p>Reembolsados</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-undo"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>{{ $totalUsers ?? 0 }}</h3>
+                        <p>Usuários</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>{{ $totalOrders ?? 0 }}</h3>
+                        <p>Pedidos</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards métricas secundárias -->
+        <div class="row">
+            <div class="col-md-2 col-6">
+                <div class="info-box bg-primary">
+                    <span class="info-box-icon"><i class="fas fa-graduation-cap"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Cursos</span>
+                        <span class="info-box-number">{{ $coursesCount ?? 0 }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="info-box bg-success">
+                    <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Mentorias</span>
+                        <span class="info-box-number">{{ $mentorshipsCount ?? 0 }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="info-box bg-warning">
+                    <span class="info-box-icon"><i class="fas fa-calendar-alt"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Eventos</span>
+                        <span class="info-box-number">{{ $eventsCount ?? 0 }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="info-box bg-secondary">
+                    <span class="info-box-icon"><i class="fas fa-certificate"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Certificados</span>
+                        <span class="info-box-number">{{ $certificatesCount ?? 0 }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="info-box bg-dark">
+                    <span class="info-box-icon"><i class="fas fa-tasks"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Jobs Pendentes</span>
+                        <span class="info-box-number">{{ $pendingJobsCount ?? 0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FullCalendar 4 -->
+        <div class="row">
+            <div class="col-lg-6 col-12">
+                <div class="card card-outline card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-calendar-alt mr-2"></i>Calendário</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="calendar" style="width:100%; min-height: 300px; max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 @endsection
