@@ -50,7 +50,7 @@ class MarketplaceController extends Controller
     public function editPayment()
     {
         $gateway = \App\Models\GatewayAccount::firstOrNew(['user_id' => Auth::id(), 'provider' => 'mercadopago']);
-        return view('settings.payment', compact('gateway'));
+        return view('panel.marketplace.connect', compact('gateway'));
     }
 
     public function sales()
