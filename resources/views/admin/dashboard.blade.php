@@ -160,8 +160,8 @@
                 <div class="card-header bg-white border-0 pb-2">
                     <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-line mr-1"></i>Histórico de Vendas</h6>
                 </div>
-                <div class="card-body pt-0">
-                    <canvas id="salesChart" height="120"></canvas>
+                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
+                    <canvas id="salesChart" style="height:100% !important; max-height:100% !important;"></canvas>
                 </div>
             </div>
         </div>
@@ -170,8 +170,8 @@
                 <div class="card-header bg-white border-0 pb-2">
                     <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-pie mr-1"></i>Pedidos por Status</h6>
                 </div>
-                <div class="card-body pt-0">
-                    <canvas id="ordersStatusChart" height="120"></canvas>
+                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
+                    <canvas id="ordersStatusChart" style="height:100% !important; max-height:100% !important;"></canvas>
                 </div>
             </div>
         </div>
