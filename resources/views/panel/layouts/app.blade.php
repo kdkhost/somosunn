@@ -1,13 +1,11 @@
 @extends('layouts.app')
 
 @push('styles')
-    <!-- FilePond CSS -->
-    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
-    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
-    <link href="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.css"
-        rel="stylesheet">
-    <link href="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.css"
-        rel="stylesheet">
+    <!-- FilePond CSS (local) -->
+    <link href="{{ asset('vendor/filepond/filepond.css') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-image-preview.css') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-size.css') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-type.css') }}" rel="stylesheet">
 
     <!-- Tagify CSS -->
     <link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
@@ -117,11 +115,11 @@
     </div>
 
     @push('scripts')
-        <!-- FilePond JS -->
-        <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
-        <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
-        <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
-        <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+        <!-- FilePond JS (local) -->
+        <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-image-preview.js') }}"></script>
+        <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-size.js') }}"></script>
+        <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-type.js') }}"></script>
+        <script src="{{ asset('vendor/filepond/filepond.js') }}"></script>
 
         <!-- Tagify JS -->
         <script src="https://unpkg.com/@yaireo/tagify"></script>
