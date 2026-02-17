@@ -170,6 +170,8 @@ class User extends Authenticatable
         'hide_profile' => 'boolean'
     ];
 
+    protected $appends = ['profile_photo_url'];
+
     public function plan()
     {
         return $this->belongsTo(\App\Models\Plan::class);
