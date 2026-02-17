@@ -901,26 +901,7 @@
             });
         });
 
-        // Global Notifications Polling
-        @auth
-            window.refreshNotifications = function() {
-                fetch('{{ route("connection.notifications") }}')
-                    .then(r => r.json())
-                    .then(data => {
-                        const badge = document.getElementById('connection-notification-count');
-                        if (badge) {
-                            if (data.count > 0) {
-                                badge.textContent = data.count;
-                                badge.classList.remove('hidden');
-                            } else {
-                                badge.classList.add('hidden');
-                            }
-                        }
-                    });
-            };
-            setInterval(window.refreshNotifications, 15000);
-            window.refreshNotifications();
-        @endauth
+        // Global Notifications Polling moved to NotificationHub component in navbar.blade.php
     </script>
 
     @if($videoPlayerEnabled)

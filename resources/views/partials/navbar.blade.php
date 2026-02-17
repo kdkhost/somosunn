@@ -33,7 +33,7 @@
     $cta = ['label' => 'Fazer parte', 'href' => route('register'), 'class' => 'bg-gradient-to-br from-[#1F5EDB] via-[#177FD6] to-[#1D3FC4] text-white shadow-[0_15px_30px_-10px_rgba(29,63,196,0.45)]'];
 @endphp
 
-<nav class="fixed inset-x-0 top-0 z-30 bg-white shadow-xl border-b border-slate-100">
+<nav class="fixed inset-x-0 top-0 z-50 bg-white shadow-xl border-b border-slate-100">
     <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-4 flex items-center justify-between gap-4">
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0">
@@ -95,19 +95,20 @@
                 @auth
                     <!-- Notification Hub (Bell) -->
                     <div class="relative" x-data="{
-                                    open: false,
-                                    total: 0,
-                                    items: [],
-                                    loading: true,
-                                    async fetchNotifications() {
-                                        try {
-                                            const r = await fetch('{{ route('notifications.hub') }}');
-                                            const data = await r.json();
-                                            this.total = data.total;
-                                            this.items = data.items.filter(i => i.count > 0);
-                                        } catch(e) { console.error(e) } finally { this.loading = false }
-                                    }
-                                 }" x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 30000)">
+                                            open: false,
+                                            total: 0,
+                                            items: [],
+                                            loading: true,
+                                             async fetchNotifications() {
+                                                 try {
+                                                     const r = await fetch('{{ route('notifications.hub') }}');
+                                                     if (!r.ok) return;
+                                                     const data = await r.json();
+                                                     this.total = data.total || 0;
+                                                     this.items = (data.items || []).filter(i => i.count > 0);
+                                                 } catch(e) { console.error('Notification hub failed:', e) } finally { this.loading = false }
+                                             }
+                                          }" x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
 
                         <button @click="open = !open; fetchNotifications()"
                             class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition relative p-2 focus:outline-none">
@@ -172,7 +173,7 @@
                 </button>
             </div>
 
-            <!-- Desktop Action Buttons -->
+            <!-- Action Buttons -->
             <div class="hidden lg:flex items-center gap-3">
                 @guest
                     <a href="{{ route('login') }}"
@@ -180,84 +181,84 @@
                         Entrar
                     </a>
                 @else
-                    <!-- Dropdown Minha Conta -->
-                    <div class="relative group">
-                        <button
-                            class="inline-flex items-center gap-2 rounded-full {{ $cta['class'] }} px-7 py-3 text-sm font-bold text-white transition-all transform hover:scale-105 active:scale-95 whitespace-nowrap">
-                            Minha Conta
-                            <i class="fas fa-chevron-down text-xs opacity-70"></i>
-                        </button>
+                <!-- Dropdown Minha Conta -->
+                <div class="relative group">
+                    <button
+                        class="inline-flex items-center gap-2 rounded-full {{ $cta['class'] }} px-7 py-3 text-sm font-bold text-white transition-all transform hover:scale-105 active:scale-95 whitespace-nowrap">
+                        Minha Conta
+                        <i class="fas fa-chevron-down text-xs opacity-70"></i>
+                    </button>
 
+                    <div
+                        class="absolute right-0 top-full pt-3 hidden group-hover:block z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                         <div
-                            class="absolute right-0 top-full pt-3 hidden group-hover:block z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                            <div
-                                class="rounded-2xl bg-white shadow-2xl border border-slate-100 min-w-[240px] py-3 overflow-hidden">
-                                <div class="px-5 py-2 border-b border-slate-50 mb-2">
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Membro UNN</p>
-                                    <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
-                                </div>
+                            class="rounded-2xl bg-white shadow-2xl border border-slate-100 min-w-[240px] py-3 overflow-hidden">
+                            <div class="px-5 py-2 border-b border-slate-50 mb-2">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Membro UNN</p>
+                                <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
+                            </div>
 
-                                <a href="{{ route('panel.dashboard') }}"
+                            <a href="{{ route('panel.dashboard') }}"
+                                class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                <i class="fas fa-th-large w-5 opacity-70"></i>
+                                Painel
+                            </a>
+
+                            <a href="{{ route('panel.profile.edit') }}"
+                                class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                <i class="fas fa-user-circle w-5 opacity-70"></i>
+                                Meu perfil
+                            </a>
+
+                            <a href="{{ route('marketplace.index') }}"
+                                class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                <i class="fas fa-store w-5 opacity-70"></i>
+                                Marketplace
+                            </a>
+
+                            @if(Auth::user()->canSellOnMarketplace())
+                                <a href="{{ route('panel.marketplace.payments') }}"
+                                    class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                    <i class="fas fa-credit-card w-5 opacity-70"></i>
+                                    Configurar pagamentos
+                                </a>
+                            @endif
+
+                            @if(Auth::user()->canSellOnMarketplace())
+                                <a href="{{ route('panel.marketplace.sales') }}"
+                                    class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                    <i class="fas fa-receipt w-5 opacity-70"></i>
+                                    Minhas vendas
+                                </a>
+                            @endif
+
+                            @if(Auth::user()->isAdmin())
+                                <a href="{{ route('panel.admin.dashboard') }}"
                                     class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
                                     <i class="fas fa-th-large w-5 opacity-70"></i>
-                                    Painel
+                                    Painel Administrativo
                                 </a>
-
-                                <a href="{{ route('panel.profile.edit') }}"
+                                <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
                                     class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                    <i class="fas fa-user-circle w-5 opacity-70"></i>
-                                    Meu perfil
+                                    <i class="fas fa-cogs w-5 opacity-70"></i>
+                                    Configurações
                                 </a>
+                            @endif
 
-                                <a href="{{ route('marketplace.index') }}"
-                                    class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                    <i class="fas fa-store w-5 opacity-70"></i>
-                                    Marketplace
-                                </a>
-
-                                @if(Auth::user()->canSellOnMarketplace())
-                                    <a href="{{ route('panel.marketplace.payments') }}"
-                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                        <i class="fas fa-credit-card w-5 opacity-70"></i>
-                                        Configurar pagamentos
-                                    </a>
-                                @endif
-
-                                @if(Auth::user()->canSellOnMarketplace())
-                                    <a href="{{ route('panel.marketplace.sales') }}"
-                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                        <i class="fas fa-receipt w-5 opacity-70"></i>
-                                        Minhas vendas
-                                    </a>
-                                @endif
-
-                                @if(Auth::user()->isAdmin())
-                                    <a href="{{ route('panel.admin.dashboard') }}"
-                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                        <i class="fas fa-th-large w-5 opacity-70"></i>
-                                        Painel Administrativo
-                                    </a>
-                                    <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
-                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                        <i class="fas fa-cogs w-5 opacity-70"></i>
-                                        Configurações
-                                    </a>
-                                @endif
-
-                                <div class="mt-2 pt-2 border-t border-slate-50">
-                                    <form action="{{ route('logout') }}" method="POST">
-                                        @csrf
-                                        <button type="submit"
-                                            class="flex w-full items-center gap-3 px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-all font-semibold">
-                                            <i class="fas fa-sign-out-alt w-5 opacity-70"></i>
-                                            Sair da conta
-                                        </button>
-                                    </form>
-                                </div>
+                            <div class="mt-2 pt-2 border-t border-slate-50">
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit"
+                                        class="flex w-full items-center gap-3 px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-all font-semibold">
+                                        <i class="fas fa-sign-out-alt w-5 opacity-70"></i>
+                                        Sair da conta
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
-                @endguest
+                </div>
+                @endauth
 
                 @guest
                     <a href="{{ $cta['href'] }}"
