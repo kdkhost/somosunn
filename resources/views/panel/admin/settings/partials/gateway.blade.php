@@ -80,9 +80,15 @@
                             class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Access
                             Token
                             (Produção)</label>
-                        <input type="text" name="mercadopago_prod_access_token"
-                            value="{{ $settings['mercadopago_prod_access_token'] ?? '' }}"
-                            class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                        <div class="flex gap-2">
+                            <input type="text" name="mercadopago_prod_access_token"
+                                value="{{ $settings['mercadopago_prod_access_token'] ?? '' }}"
+                                class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                            <button type="button" onclick="testGatewayConnection('mercadopago')"
+                                class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl font-bold hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors whitespace-nowrap">
+                                <i class="fas fa-plug mr-2"></i> Testar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -236,6 +242,18 @@
                         (Cliente paga)</option>
                 </select>
             </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Taxa da
+                    Plataforma - Marketplace (%)</label>
+                <div class="relative">
+                    <input type="number" step="0.01" name="marketplace_fee"
+                        value="{{ $settings['marketplace_fee'] ?? '10.00' }}"
+                        class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-8">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <span class="text-slate-500 dark:text-slate-400">%</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -286,6 +304,73 @@
                 // Trigger initial state
                 select.dispatchEvent(new Event('change'));
             });
+
+            // Make testGatewayConnection global
+            window.testGatewayConnection = function (gateway) {
+                const btn = event.currentTarget;
+                const originalContent = btn.innerHTML;
+                const icon = btn.querySelector('i');
+
+                // Loading state
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Testando...';
+
+                // Get credentials based on gateway
+                let data = {
+                    gateway: gateway,
+                    _token: '{{ csrf_token() }}'
+                };
+
+                if (gateway === 'mercadopago') {
+                    data.access_token = document.querySelector('input[name="mercadopago_prod_access_token"]').value;
+                    data.env = document.querySelector('select[name="mercadopago_env"]').value;
+                    if (data.env === 'sandbox') {
+                        data.access_token = document.querySelector('input[name="mercadopago_sandbox_access_token"]').value;
+                    }
+                } else if (gateway === 'pagseguro') {
+                    data.token = document.querySelector('input[name="pagseguro_prod_token"]').value;
+                    data.email = document.querySelector('input[name="pagseguro_email"]').value;
+                    data.env = document.querySelector('select[name="pagseguro_env"]').value;
+                    if (data.env === 'sandbox') {
+                        data.token = document.querySelector('input[name="pagseguro_sandbox_token"]').value;
+                    }
+                }
+
+                // Call test route
+                fetch('{{ route("panel.admin.settings.test-gateway") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.success(data.message);
+                            } else {
+                                alert('Sucesso: ' + data.message);
+                            }
+                        } else {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(data.message);
+                            } else {
+                                alert('Erro: ' + data.message);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Erro ao testar conexão. Verifique o console.');
+                    })
+                    .finally(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = originalContent;
+                    });
+            };
         });
     </script>
 @endpush
