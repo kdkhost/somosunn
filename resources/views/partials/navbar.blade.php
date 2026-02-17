@@ -95,20 +95,20 @@
                 @auth
                     <!-- Notification Hub (Bell) -->
                     <div class="relative" x-data="{
-                                                open: false,
-                                                total: 0,
-                                                items: [],
-                                                loading: true,
-                                                 async fetchNotifications() {
-                                                     try {
-                                                         const r = await fetch('{{ route('notifications.hub') }}');
-                                                         if (!r.ok) return;
-                                                         const data = await r.json();
-                                                         this.total = data.total || 0;
-                                                         this.items = (data.items || []).filter(i => i.count > 0);
-                                                     } catch(e) { console.error('Notification hub failed:', e) } finally { this.loading = false }
-                                                 }
-                                              }"
+                                                    open: false,
+                                                    total: 0,
+                                                    items: [],
+                                                    loading: true,
+                                                     async fetchNotifications() {
+                                                         try {
+                                                             const r = await fetch('{{ route('notifications.hub') }}');
+                                                             if (!r.ok) return;
+                                                             const data = await r.json();
+                                                             this.total = data.total || 0;
+                                                             this.items = (data.items || []).filter(i => i.count > 0);
+                                                         } catch(e) { console.error('Notification hub failed:', e) } finally { this.loading = false }
+                                                     }
+                                                  }"
                         x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
 
                         <button @click="open = !open; fetchNotifications()"
@@ -167,8 +167,8 @@
                 @endauth
 
                 <!-- Mobile Toggle -->
-                <button id="mobile-menu-toggle"
-                    class="lg:hidden inline-flex items-center justify-center rounded-full border-0 px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
+                <button id="mobile-menu-toggle" type="button"
+                    class="lg:hidden inline-flex items-center justify-center rounded-full border-0 px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 relative z-[60] active:scale-95 transition-transform">
                     <span class="sr-only">Abrir menu</span>
                     <i class="fas fa-bars text-lg"></i>
                 </button>
@@ -272,11 +272,11 @@
     </div>
 </nav>
 
-<div id="mobile-menu" class="fixed inset-0 z-[100] hidden" aria-hidden="true">
+<div id="mobile-menu" class="fixed inset-0 z-[100] hidden pointer-events-none" aria-hidden="true">
     <div id="mobile-menu-overlay"
-        class="absolute inset-0 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+        class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 pointer-events-none"></div>
     <div id="mobile-menu-panel"
-        class="relative z-10 w-4/5 max-w-sm h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out overflow-y-auto">
+        class="relative z-10 w-4/5 max-w-sm h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out overflow-y-auto pointer-events-auto">
         <div class="flex items-center justify-between border-b border-slate-100 px-6 py-5">
             <div class="flex items-center gap-3">
                 <div class="inline-flex h-12 w-auto items-center justify-center overflow-hidden">

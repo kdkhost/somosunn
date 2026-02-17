@@ -851,6 +851,7 @@
                     mobileMenu.setAttribute('aria-hidden', 'false');
 
                     mobileOverlay.classList.remove('pointer-events-none');
+                    mobileOverlay.classList.add('pointer-events-auto');
                     mobileOverlay.classList.remove('opacity-0');
                     mobileOverlay.classList.add('opacity-100');
 
@@ -861,7 +862,10 @@
                     mobileOverlay.classList.add('opacity-0');
                     mobileOverlay.classList.remove('opacity-100');
                     mobilePanel.classList.add('-translate-x-full');
+                    
+                    mobileOverlay.classList.remove('pointer-events-auto');
                     mobileOverlay.classList.add('pointer-events-none');
+
                     setTimeout(function () {
                         mobileMenu.classList.add('hidden');
                         mobileMenu.setAttribute('aria-hidden', 'true');
