@@ -38,13 +38,13 @@ class DashboardController extends Controller
                     $stats['seller_paid_count'] = (int) \App\Models\Order::where('status', 'paid')->count();
                     $stats['seller_net_total'] = (float) \App\Models\Order::where('status', 'paid')->sum('total_amount') - (float) \App\Models\Order::where('status', 'paid')->sum('platform_fee_amount');
                     // Gráfico: vendas dos últimos 6 meses
-                    $months = collect(range(0, 5))->map(function($i) {
+                    $months = collect(range(0, 5))->map(function ($i) {
                         return now()->subMonths(5 - $i)->format('m/Y');
                     });
-                    $labels = $months->map(function($m) {
+                    $labels = $months->map(function ($m) {
                         return \Carbon\Carbon::createFromFormat('m/Y', $m)->translatedFormat('M/Y');
                     });
-                    $data = $months->map(function($m) {
+                    $data = $months->map(function ($m) {
                         [$month, $year] = explode('/', $m);
                         return (int) \App\Models\Order::where('status', 'paid')
                             ->whereMonth('created_at', $month)
@@ -62,13 +62,13 @@ class DashboardController extends Controller
                     $stats['seller_paid_count'] = (int) \App\Models\Order::where('seller_id', $user->id)->where('status', 'paid')->count();
                     $stats['seller_net_total'] = (float) max(0, (float) \App\Models\Order::where('seller_id', $user->id)->where('status', 'paid')->sum('total_amount') - (float) \App\Models\Order::where('seller_id', $user->id)->where('status', 'paid')->sum('platform_fee_amount'));
                     // Gráfico: vendas dos últimos 6 meses (do vendedor)
-                    $months = collect(range(0, 5))->map(function($i) {
+                    $months = collect(range(0, 5))->map(function ($i) {
                         return now()->subMonths(5 - $i)->format('m/Y');
                     });
-                    $labels = $months->map(function($m) {
+                    $labels = $months->map(function ($m) {
                         return \Carbon\Carbon::createFromFormat('m/Y', $m)->translatedFormat('M/Y');
                     });
-                    $data = $months->map(function($m) use ($user) {
+                    $data = $months->map(function ($m) use ($user) {
                         [$month, $year] = explode('/', $m);
                         return (int) \App\Models\Order::where('seller_id', $user->id)
                             ->where('status', 'paid')
@@ -82,7 +82,8 @@ class DashboardController extends Controller
                     ];
                 }
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
         return response()->json([
             'success' => true,
             'plan' => $plan?->name,
@@ -127,7 +128,46 @@ class DashboardController extends Controller
             // Dashboard não pode quebrar (fallback silencioso)
         }
 
-        return view('panel.dashboard', compact('user', 'plan', 'stats'));
+        // --- Sugestões de Networking ---
+        $suggestedUsers = collect([]);
+        try {
+            if ($user && !empty($user->interests)) {
+                $myInterests = array_map('trim', explode(',', $user->interests));
+
+                // Buscar usuários que NÃO são o atual e NÃO estão conectados
+                $query = \App\Models\User::where('id', '!=', $user->id)
+                    ->where('hide_profile', false) // Respeitar privacidade
+                    ->where(function ($q) use ($myInterests) {
+                        foreach ($myInterests as $interest) {
+                            if (!empty($interest)) {
+                                $q->orWhere('interests', 'LIKE', "%{$interest}%");
+                            }
+                        }
+                    });
+
+                // Excluir já conectados (requer lógica de conexão)
+                // Assumindo que existe método isConnectedWith ou tabela connections
+                $connectedIds = \App\Models\Connection::where(function ($q) use ($user) {
+                    $q->where('requester_id', $user->id);
+                })->orWhere(function ($q) use ($user) {
+                    $q->where('requested_id', $user->id);
+                })
+                    ->pluck('requester_id', 'requested_id')
+                    ->flatten()
+                    ->unique()
+                    ->toArray();
+
+                if (!empty($connectedIds)) {
+                    $query->whereNotIn('id', $connectedIds);
+                }
+
+                $suggestedUsers = $query->inRandomOrder()->take(4)->get();
+            }
+        } catch (\Throwable $e) {
+            // Falha silenciosa no networking
+        }
+
+        return view('panel.dashboard', compact('user', 'plan', 'stats', 'suggestedUsers'));
     }
 }
 

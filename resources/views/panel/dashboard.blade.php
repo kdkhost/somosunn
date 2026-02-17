@@ -47,13 +47,66 @@
         <x-widgets.metric title="Compras pagas" icon="fas fa-check-circle" :value="$ordersPaidCount ?? 0" color="emerald" />
         <x-widgets.metric title="Total em compras" icon="fas fa-wallet" :value="number_format($ordersPaidTotal ?? 0, 2, ',', '.')" color="green" />
         @if($canSellOnMarketplace)
-            <x-widgets.metric title="Vendas realizadas" icon="fas fa-shopping-cart" :value="$sellerPaidCount ?? 0" color="purple" />
+            <x-widgets.metric title="Vendas realizadas" icon="fas fa-shopping-cart" :value="$sellerPaidCount ?? 0"
+                color="purple" />
             <x-widgets.metric title="Receita líquida" icon="fas fa-coins" :value="number_format($sellerNetTotal ?? 0, 2, ',', '.')" color="yellow" />
         @endif
         @if($canAccessCommunity)
             <x-widgets.metric title="Comunidade" icon="fas fa-users" :value="$communityCount ?? 0" color="cyan" />
         @endif
     </div>
+
+    @if(isset($suggestedUsers) && $suggestedUsers->count() > 0)
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mt-6">
+            <h2 class="text-lg font-extrabold text-slate-900 mb-4 flex items-center gap-2">
+                <i class="fas fa-users text-blue-500"></i> Sugestões de Conexão
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                @foreach($suggestedUsers as $sUser)
+                    <div
+                        class="border border-slate-100 rounded-2xl p-4 flex flex-col items-center text-center hover:shadow-md transition">
+                        <div class="w-16 h-16 rounded-full overflow-hidden bg-slate-100 mb-3">
+                            @if($sUser->photo)
+                                <img src="{{ asset($sUser->photo) }}" alt="{{ $sUser->name }}" class="w-full h-full object-cover">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xl">
+                                    {{ mb_substr($sUser->name, 0, 1) }}
+                                </div>
+                            @endif
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-sm line-clamp-1">{{ $sUser->name }}</h3>
+                        <p class="text-xs text-slate-500 mb-3 line-clamp-1">{{ $sUser->occupation ?? 'Membro' }}</p>
+
+                        @php
+                            $commonTags = [];
+                            if ($sUser->interests && auth()->user()->interests) {
+                                $myTags = array_map('trim', explode(',', auth()->user()->interests));
+                                $userTags = array_map('trim', explode(',', $sUser->interests));
+                                $commonTags = array_intersect($myTags, $userTags);
+                            }
+                        @endphp
+
+                        @if(!empty($commonTags))
+                            <div class="flex flex-wrap gap-1 justify-center mb-3">
+                                @foreach(array_slice($commonTags, 0, 2) as $tag)
+                                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[10px] font-bold">{{ $tag }}</span>
+                                @endforeach
+                                @if(count($commonTags) > 2)
+                                    <span
+                                        class="bg-slate-50 text-slate-500 px-2 py-0.5 rounded text-[10px]">+{{ count($commonTags) - 2 }}</span>
+                                @endif
+                            </div>
+                        @endif
+
+                        <a href="#"
+                            class="mt-auto w-full inline-flex items-center justify-center rounded-xl bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-800 transition">
+                            Conectar
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mt-8">
         <div class="flex items-center justify-between mb-4">
@@ -64,67 +117,67 @@
 @endsection
 
 @push('scripts')
-<script>
-function updateDashboardWidgets() {
-    fetch('{{ route('panel.dashboard.stats') }}')
-        .then(r => r.json())
-        .then(data => {
-            if (data.success && data.stats) {
-                document.getElementById('counter-curso').textContent = data.stats.courses_count;
-                document.getElementById('counter-orders').textContent = data.stats.orders_paid_count;
-                document.getElementById('counter-orders-total').textContent = 'R$ ' + (data.stats.orders_paid_total).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                document.getElementById('counter-seller').textContent = data.stats.seller_paid_count;
-                document.getElementById('counter-seller-total').textContent = 'R$ ' + (data.stats.seller_net_total).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                document.getElementById('widget-cursos-msg').textContent = '';
-                // Remove animação de loading
-                document.querySelectorAll('.animate-pulse').forEach(e => e.classList.remove('animate-pulse'));
-            }
-        });
-}
-document.addEventListener('DOMContentLoaded', function() {
-    updateDashboardWidgets();
-    setInterval(updateDashboardWidgets, 10000); // Atualiza a cada 10s
-});
-</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-function updateSalesChart(chart) {
-    fetch('{{ route('panel.dashboard.stats') }}?chart=1')
-        .then(r => r.json())
-        .then(data => {
-            if (data.success && data.sales_chart) {
-                chart.data.labels = data.sales_chart.labels;
-                chart.data.datasets[0].data = data.sales_chart.data;
-                chart.update();
-            }
-        });
-}
-document.addEventListener('DOMContentLoaded', function() {
-    var ctx = document.getElementById('salesChart').getContext('2d');
-    var salesChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-            datasets: [{
-                label: 'Vendas pagas',
-                data: [0,0,0,0,0,0],
-                backgroundColor: '#1F5EDB',
-                borderRadius: 8,
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: true }
-            },
-            scales: {
-                y: { beginAtZero: true }
-            }
+    <script>
+        function updateDashboardWidgets() {
+            fetch('{{ route('panel.dashboard.stats') }}')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success && data.stats) {
+                        document.getElementById('counter-curso').textContent = data.stats.courses_count;
+                        document.getElementById('counter-orders').textContent = data.stats.orders_paid_count;
+                        document.getElementById('counter-orders-total').textContent = 'R$ ' + (data.stats.orders_paid_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                        document.getElementById('counter-seller').textContent = data.stats.seller_paid_count;
+                        document.getElementById('counter-seller-total').textContent = 'R$ ' + (data.stats.seller_net_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                        document.getElementById('widget-cursos-msg').textContent = '';
+                        // Remove animação de loading
+                        document.querySelectorAll('.animate-pulse').forEach(e => e.classList.remove('animate-pulse'));
+                    }
+                });
         }
-    });
-    updateSalesChart(salesChart);
-    setInterval(function() { updateSalesChart(salesChart); }, 10000);
-});
-</script>
+        document.addEventListener('DOMContentLoaded', function () {
+            updateDashboardWidgets();
+            setInterval(updateDashboardWidgets, 10000); // Atualiza a cada 10s
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function updateSalesChart(chart) {
+            fetch('{{ route('panel.dashboard.stats') }}?chart=1')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success && data.sales_chart) {
+                        chart.data.labels = data.sales_chart.labels;
+                        chart.data.datasets[0].data = data.sales_chart.data;
+                        chart.update();
+                    }
+                });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            var ctx = document.getElementById('salesChart').getContext('2d');
+            var salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                    datasets: [{
+                        label: 'Vendas pagas',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: '#1F5EDB',
+                        borderRadius: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+            updateSalesChart(salesChart);
+            setInterval(function () { updateSalesChart(salesChart); }, 10000);
+        });
+    </script>
 @endpush

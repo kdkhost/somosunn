@@ -30,7 +30,7 @@ class ProfileController extends Controller
             'occupation' => 'nullable|string|max:100',
             'company' => 'nullable|string|max:100',
             'segment' => 'nullable|string|max:120',
-            'interests' => 'nullable|string|max:500',
+            'interests' => 'nullable|string', // Aumentado para TEXT no banco
             'bio' => 'nullable|string|max:500',
             'photo' => 'nullable|image|max:2048',
             'cover_photo' => 'nullable|image|max:4096',
@@ -57,6 +57,15 @@ class ProfileController extends Controller
         $data['show_phone_public'] = $request->has('show_phone_public');
         $data['show_address_public'] = $request->has('show_address_public');
         $data['hide_profile'] = $request->has('hide_profile');
+
+        // Processar Interesses (Tagify envia JSON)
+        if (!empty($data['interests'])) {
+            $json = json_decode($data['interests'], true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($json)) {
+                $tags = array_column($json, 'value');
+                $data['interests'] = implode(', ', $tags);
+            }
+        }
 
         // Upload avatar
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {

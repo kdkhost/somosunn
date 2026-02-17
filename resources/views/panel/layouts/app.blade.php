@@ -1,5 +1,18 @@
 @extends('layouts.app')
 
+@push('styles')
+    <!-- FilePond CSS -->
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+    <link href="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.css"
+        rel="stylesheet">
+    <link href="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.css"
+        rel="stylesheet">
+
+    <!-- Tagify CSS -->
+    <link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+@endpush
+
 @section('content')
     <div class="bg-slate-50 min-h-screen pt-24 pb-10">
         <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16">
@@ -22,7 +35,8 @@
                             @endif
                             <li class="flex items-center">
                                 <span class="mx-2">/</span>
-                                <span class="font-bold text-slate-700">@yield('title', ucfirst(Str::after(Route::currentRouteName(), 'panel.')))</span>
+                                <span
+                                    class="font-bold text-slate-700">@yield('title', ucfirst(Str::after(Route::currentRouteName(), 'panel.')))</span>
                             </li>
                         </ol>
                     </nav>
@@ -32,4 +46,3 @@
         </div>
     </div>
 @endsection
-
