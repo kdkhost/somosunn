@@ -311,37 +311,37 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- KPIs principais institucional -->
         <div class="row mb-3">
             <div class="col-6 col-md-3 mb-3">
-                <div class="small-box bg-success">
+                <div class="small-box bg-success" data-toggle="tooltip" title="Receita total acumulada" aria-label="Saldo Total">
                     <div class="inner">
-                        <h3>R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</h3>
-                        <p>Saldo Total</p>
+                        <h3>R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }} <span class="badge badge-light ml-1" aria-label="Atualizado">Atual</span></h3>
+                        <p>Saldo Total <i class="fas fa-info-circle text-white-50" tabindex="0" aria-label="Receita total acumulada"></i></p>
                     </div>
                     <div class="icon"><i class="fas fa-wallet"></i></div>
                 </div>
             </div>
             <div class="col-6 col-md-3 mb-3">
-                <div class="small-box bg-danger">
+                <div class="small-box bg-danger" data-toggle="tooltip" title="Total reembolsado no período" aria-label="Reembolsados">
                     <div class="inner">
-                        <h3>R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</h3>
-                        <p>Reembolsados</p>
+                        <h3>R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }} <span class="badge badge-light ml-1" aria-label="Atualizado">Atual</span></h3>
+                        <p>Reembolsados <i class="fas fa-info-circle text-white-50" tabindex="0" aria-label="Total reembolsado"></i></p>
                     </div>
                     <div class="icon"><i class="fas fa-undo"></i></div>
                 </div>
             </div>
             <div class="col-6 col-md-3 mb-3">
-                <div class="small-box bg-warning">
+                <div class="small-box bg-warning" data-toggle="tooltip" title="Total de usuários cadastrados" aria-label="Usuários">
                     <div class="inner">
-                        <h3>{{ $totalUsers ?? 0 }}</h3>
-                        <p>Usuários</p>
+                        <h3>{{ $totalUsers ?? 0 }} <span class="badge badge-light ml-1" aria-label="Atualizado">Atual</span></h3>
+                        <p>Usuários <i class="fas fa-info-circle text-dark-50" tabindex="0" aria-label="Total de usuários"></i></p>
                     </div>
                     <div class="icon"><i class="fas fa-users"></i></div>
                 </div>
             </div>
             <div class="col-6 col-md-3 mb-3">
-                <div class="small-box bg-info">
+                <div class="small-box bg-info" data-toggle="tooltip" title="Total de pedidos realizados" aria-label="Pedidos">
                     <div class="inner">
-                        <h3>{{ $totalOrders ?? 0 }}</h3>
-                        <p>Pedidos</p>
+                        <h3>{{ $totalOrders ?? 0 }} <span class="badge badge-light ml-1" aria-label="Atualizado">Atual</span></h3>
+                        <p>Pedidos <i class="fas fa-info-circle text-white-50" tabindex="0" aria-label="Total de pedidos"></i></p>
                     </div>
                     <div class="icon"><i class="fas fa-shopping-bag"></i></div>
                 </div>
@@ -351,46 +351,46 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- Métricas secundárias institucional -->
         <div class="row mb-3">
             <div class="col-6 col-md-2 mb-3">
-                <div class="info-box bg-primary">
+                <div class="info-box bg-primary" data-toggle="tooltip" title="Total de cursos cadastrados" aria-label="Cursos">
                     <span class="info-box-icon"><i class="fas fa-graduation-cap"></i></span>
                     <div class="info-box-content">
-                        <span class="info-box-text">Cursos</span>
+                        <span class="info-box-text">Cursos <span class="badge badge-light ml-1" aria-label="Atualizado">Atual</span></span>
                         <span class="info-box-number">{{ $coursesCount ?? 0 }}</span>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-2 mb-3">
-                <div class="info-box bg-success">
+                <div class="info-box bg-success" data-toggle="tooltip" title="Total de mentorias ativas" aria-label="Mentorias">
                     <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
                     <div class="info-box-content">
-                        <span class="info-box-text">Mentorias</span>
+                        <span class="info-box-text">Mentorias <span class="badge badge-light ml-1" aria-label="Atualizado">Atual</span></span>
                         <span class="info-box-number">{{ $mentorshipsCount ?? 0 }}</span>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-2 mb-3">
-                <div class="info-box bg-warning">
+                <div class="info-box bg-warning" data-toggle="tooltip" title="Total de eventos realizados" aria-label="Eventos">
                     <span class="info-box-icon"><i class="fas fa-calendar-alt"></i></span>
                     <div class="info-box-content">
-                        <span class="info-box-text">Eventos</span>
+                        <span class="info-box-text">Eventos <span class="badge badge-light ml-1" aria-label="Atualizado">Atual</span></span>
                         <span class="info-box-number">{{ $eventsCount ?? 0 }}</span>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-2 mb-3">
-                <div class="info-box bg-secondary">
+                <div class="info-box bg-secondary" data-toggle="tooltip" title="Total de certificados emitidos" aria-label="Certificados">
                     <span class="info-box-icon"><i class="fas fa-certificate"></i></span>
                     <div class="info-box-content">
-                        <span class="info-box-text">Certificados</span>
+                        <span class="info-box-text">Certificados <span class="badge badge-light ml-1" aria-label="Atualizado">Atual</span></span>
                         <span class="info-box-number">{{ $certificatesCount ?? 0 }}</span>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-2 mb-3">
-                <div class="info-box bg-dark">
+                <div class="info-box bg-dark" data-toggle="tooltip" title="Jobs pendentes de execução" aria-label="Jobs Pendentes">
                     <span class="info-box-icon"><i class="fas fa-tasks"></i></span>
                     <div class="info-box-content">
-                        <span class="info-box-text">Jobs Pendentes</span>
+                        <span class="info-box-text">Jobs Pendentes <span class="badge badge-light ml-1" aria-label="Atualizado">Atual</span></span>
                         <span class="info-box-number">{{ $pendingJobsCount ?? 0 }}</span>
                     </div>
                 </div>
