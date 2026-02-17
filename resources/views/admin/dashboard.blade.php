@@ -93,9 +93,9 @@
         </div>
     </div>
 
-    <!-- Gráficos principais -->
+    <!-- Gráficos principais (apenas 3) -->
     <div class="row mb-4">
-        <div class="col-lg-6 col-12 mb-3">
+        <div class="col-lg-4 col-12 mb-3">
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-white border-0 pb-2">
                     <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-line mr-1"></i>Histórico de Vendas</h6>
@@ -105,7 +105,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 col-12 mb-3">
+        <div class="col-lg-4 col-12 mb-3">
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-white border-0 pb-2">
                     <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-pie mr-1"></i>Pedidos por Status</h6>
@@ -115,9 +115,19 @@
                 </div>
             </div>
         </div>
+        <div class="col-lg-4 col-12 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-2">
+                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-user-plus mr-1"></i>Novos Usuários por Mês</h6>
+                </div>
+                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
+                    <canvas id="usersByMonthChart" style="height:100% !important; max-height:100% !important;"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Cards de métricas secundárias -->
+    <!-- Cards de métricas secundárias (apenas 5) -->
     <div class="row mb-4">
         <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
             <div class="info-box bg-primary shadow-sm h-100">
@@ -164,15 +174,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
-            <div class="info-box bg-light shadow-sm h-100">
-                <span class="info-box-icon text-primary"><i class="fas fa-history fa-2x"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Logs</span>
-                    <span class="info-box-number">{{ $logsCount ?? 0 }}</span>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Calendário discreto -->
@@ -189,61 +190,6 @@
         </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-12">
-        </div>
-
-    <div class="row mb-4">
-        <div class="col-lg-6 col-12 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white border-0 pb-2">
-                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-line mr-1"></i>Histórico de Vendas</h6>
-                </div>
-                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
-                    <canvas id="salesChart" style="height:100% !important; max-height:100% !important;"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6 col-12 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white border-0 pb-2">
-                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-pie mr-1"></i>Pedidos por Status</h6>
-                </div>
-                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
-                    <canvas id="ordersStatusChart" style="height:100% !important; max-height:100% !important;"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6 col-12 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white border-0 pb-2">
-                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-user-plus mr-1"></i>Novos Usuários por Mês</h6>
-                </div>
-                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
-                    <canvas id="usersByMonthChart" style="height:100% !important; max-height:100% !important;"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6 col-12 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white border-0 pb-2">
-                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-layer-group mr-1"></i>Distribuição de Conteúdo</h6>
-                </div>
-                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
-                    <canvas id="contentDistributionChart" style="height:100% !important; max-height:100% !important;"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6 col-12 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white border-0 pb-2">
-                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-certificate mr-1"></i>Certificados Emitidos por Mês</h6>
-                </div>
-                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
-                    <canvas id="certificatesByMonthChart" style="height:100% !important; max-height:100% !important;"></canvas>
-                </div>
-            </div>
-        </div>
         <div class="col-lg-6 col-12 mb-3">
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-white border-0 pb-2">
