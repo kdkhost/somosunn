@@ -58,41 +58,49 @@
             <button type="button" class="btn btn-sm btn-primary rounded-pill px-4" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
         </div>
     </form>
-    <!-- KPIs clean, alinhados -->
-    <div class="row mb-3">
-        <div class="col-6 col-md-3 mb-3">
-            <div class="info-box bg-gradient-success shadow-sm">
-                <span class="info-box-icon"><i class="fas fa-wallet"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Saldo Total</span>
-                    <span class="info-box-number">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</span>
+    <!-- KPIs padrão AdminLTE 3.2 -->
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</h3>
+                    <p>Saldo Total</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-wallet"></i>
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-3 mb-3">
-            <div class="info-box bg-gradient-danger shadow-sm">
-                <span class="info-box-icon"><i class="fas fa-undo"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Reembolsados</span>
-                    <span class="info-box-number">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</span>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</h3>
+                    <p>Reembolsados</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-undo"></i>
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-3 mb-3">
-            <div class="info-box bg-gradient-warning shadow-sm">
-                <span class="info-box-icon"><i class="fas fa-users"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Usuários</span>
-                    <span class="info-box-number">{{ $totalUsers ?? 0 }}</span>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>{{ $totalUsers ?? 0 }}</h3>
+                    <p>Usuários</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-users"></i>
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-3 mb-3">
-            <div class="info-box bg-gradient-info shadow-sm">
-                <span class="info-box-icon"><i class="fas fa-shopping-bag"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Pedidos</span>
-                    <span class="info-box-number">{{ $totalOrders ?? 0 }}</span>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>{{ $totalOrders ?? 0 }}</h3>
+                    <p>Pedidos</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-shopping-bag"></i>
                 </div>
             </div>
         </div>
@@ -126,43 +134,43 @@
 @endpush
 
     <!-- Gráficos premium -->
-    <div class="row mb-3">
-        <div class="col-lg-8 col-12 mb-3">
-            <div class="card card-primary card-outline h-100">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-line mr-2"></i>Histórico de Vendas</h5>
+    <div class="row">
+        <div class="col-lg-8 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-chart-line mr-2"></i>Histórico de Vendas</h3>
                 </div>
-                <div class="card-body pt-2" style="height:320px; min-height:320px; max-height:320px;">
-                    <canvas id="salesChart" style="height:100% !important; max-height:100% !important;"></canvas>
+                <div class="card-body">
+                    <canvas id="salesChart" style="height:300px;"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-12 mb-3">
-            <div class="card card-info card-outline h-100">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-pie mr-2"></i>Pedidos por Status</h5>
+        <div class="col-lg-4 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-chart-pie mr-2"></i>Pedidos por Status</h3>
                 </div>
-                <div class="card-body pt-2" style="height:320px; min-height:320px; max-height:320px;">
-                    <canvas id="ordersStatusChart" style="height:100% !important; max-height:100% !important;"></canvas>
+                <div class="card-body">
+                    <canvas id="ordersStatusChart" style="height:300px;"></canvas>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row mb-3">
-        <div class="col-lg-4 col-12 mb-3">
-            <div class="card card-warning card-outline h-100">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-user-plus mr-2"></i>Novos Usuários por Mês</h5>
+    <div class="row">
+        <div class="col-lg-4 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-user-plus mr-2"></i>Novos Usuários por Mês</h3>
                 </div>
-                <div class="card-body pt-2" style="height:320px; min-height:320px; max-height:320px;">
-                    <canvas id="usersByMonthChart" style="height:100% !important; max-height:100% !important;"></canvas>
+                <div class="card-body">
+                    <canvas id="usersByMonthChart" style="height:250px;"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-lg-8 col-12 mb-3">
-            <div class="row h-100">
-                <div class="col-md-4 col-6 mb-3">
-                    <div class="info-box bg-gradient-primary shadow-sm">
+        <div class="col-lg-8 col-12">
+            <div class="row">
+                <div class="col-md-4 col-6">
+                    <div class="info-box bg-primary">
                         <span class="info-box-icon"><i class="fas fa-graduation-cap"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Cursos</span>
@@ -170,8 +178,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-6 mb-3">
-                    <div class="info-box bg-gradient-success shadow-sm">
+                <div class="col-md-4 col-6">
+                    <div class="info-box bg-success">
                         <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Mentorias</span>
@@ -179,8 +187,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-12 mb-3">
-                    <div class="info-box bg-gradient-warning shadow-sm">
+                <div class="col-md-4 col-12">
+                    <div class="info-box bg-warning">
                         <span class="info-box-icon"><i class="fas fa-calendar-alt"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Eventos</span>
@@ -188,8 +196,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-6 mb-3">
-                    <div class="info-box bg-gradient-secondary shadow-sm">
+                <div class="col-md-6 col-6">
+                    <div class="info-box bg-secondary">
                         <span class="info-box-icon"><i class="fas fa-certificate"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Certificados</span>
@@ -197,8 +205,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-6 mb-3">
-                    <div class="info-box bg-gradient-dark shadow-sm">
+                <div class="col-md-6 col-6">
+                    <div class="info-box bg-dark">
                         <span class="info-box-icon"><i class="fas fa-tasks"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Jobs Pendentes</span>
@@ -210,14 +218,14 @@
         </div>
     </div>
     <!-- Calendário premium -->
-    <div class="row mb-3">
-        <div class="col-lg-5 col-12 mb-3">
-            <div class="card card-secondary card-outline h-100" title="Calendário de eventos e atividades.">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-calendar-alt mr-2"></i>Calendário</h5>
+    <div class="row">
+        <div class="col-lg-5 col-12">
+            <div class="card" title="Calendário de eventos e atividades.">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-calendar-alt mr-2"></i>Calendário</h3>
                 </div>
-                <div class="card-body pt-2" style="height:320px; min-height:320px; max-height:320px;">
-                    <div id="calendar" style="width:100%; min-height: 300px; max-height: 320px; overflow-y: auto;"></div>
+                <div class="card-body">
+                    <div id="calendar" style="width:100%; min-height: 250px; max-height: 320px; overflow-y: auto;"></div>
                 </div>
             </div>
         </div>
