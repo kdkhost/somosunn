@@ -308,57 +308,49 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
 
-        <!-- KPIs padrão AdminLTE -->
-        <div class="row">
-            <div class="col-lg-3 col-6">
+        <!-- KPIs principais institucional -->
+        <div class="row mb-3">
+            <div class="col-6 col-md-3 mb-3">
                 <div class="small-box bg-success">
                     <div class="inner">
                         <h3>R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</h3>
                         <p>Saldo Total</p>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-wallet"></i>
-                    </div>
+                    <div class="icon"><i class="fas fa-wallet"></i></div>
                 </div>
             </div>
-            <div class="col-lg-3 col-6">
+            <div class="col-6 col-md-3 mb-3">
                 <div class="small-box bg-danger">
                     <div class="inner">
                         <h3>R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</h3>
                         <p>Reembolsados</p>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-undo"></i>
-                    </div>
+                    <div class="icon"><i class="fas fa-undo"></i></div>
                 </div>
             </div>
-            <div class="col-lg-3 col-6">
+            <div class="col-6 col-md-3 mb-3">
                 <div class="small-box bg-warning">
                     <div class="inner">
                         <h3>{{ $totalUsers ?? 0 }}</h3>
                         <p>Usuários</p>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-users"></i>
-                    </div>
+                    <div class="icon"><i class="fas fa-users"></i></div>
                 </div>
             </div>
-            <div class="col-lg-3 col-6">
+            <div class="col-6 col-md-3 mb-3">
                 <div class="small-box bg-info">
                     <div class="inner">
                         <h3>{{ $totalOrders ?? 0 }}</h3>
                         <p>Pedidos</p>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-shopping-bag"></i>
-                    </div>
+                    <div class="icon"><i class="fas fa-shopping-bag"></i></div>
                 </div>
             </div>
         </div>
 
-        <!-- Cards métricas secundárias -->
-        <div class="row">
-            <div class="col-md-2 col-6">
+        <!-- Métricas secundárias institucional -->
+        <div class="row mb-3">
+            <div class="col-6 col-md-2 mb-3">
                 <div class="info-box bg-primary">
                     <span class="info-box-icon"><i class="fas fa-graduation-cap"></i></span>
                     <div class="info-box-content">
@@ -367,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             </div>
-            <div class="col-md-2 col-6">
+            <div class="col-6 col-md-2 mb-3">
                 <div class="info-box bg-success">
                     <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
                     <div class="info-box-content">
@@ -376,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             </div>
-            <div class="col-md-2 col-6">
+            <div class="col-6 col-md-2 mb-3">
                 <div class="info-box bg-warning">
                     <span class="info-box-icon"><i class="fas fa-calendar-alt"></i></span>
                     <div class="info-box-content">
@@ -385,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             </div>
-            <div class="col-md-2 col-6">
+            <div class="col-6 col-md-2 mb-3">
                 <div class="info-box bg-secondary">
                     <span class="info-box-icon"><i class="fas fa-certificate"></i></span>
                     <div class="info-box-content">
@@ -394,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             </div>
-            <div class="col-md-2 col-6">
+            <div class="col-6 col-md-2 mb-3">
                 <div class="info-box bg-dark">
                     <span class="info-box-icon"><i class="fas fa-tasks"></i></span>
                     <div class="info-box-content">
@@ -648,19 +640,19 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
-    <!-- FullCalendar 4 -->
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="card card-outline card-secondary h-100" title="Calendário de eventos e atividades.">
-                <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-calendar-alt mr-2"></i>Calendário</h3>
-                </div>
-                <div class="card-body">
-                    <div id="calendar" style="width:100%; min-height: 300px; max-height: 400px; overflow-y: auto;"></div>
+        <!-- Calendário institucional -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card card-outline card-secondary h-100" title="Calendário de eventos e atividades.">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-calendar-alt mr-2"></i>Calendário</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="calendar" style="width:100%; min-height: 350px; max-height: 450px; overflow-y: auto;"></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 </div>
 
 @push('scripts')
