@@ -12,6 +12,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin/cron')->name('admin.cron.')-
 });
 // Rota para checkout de assinatura (compatível com premium.blade.php) — sempre no início para garantir visibilidade
 Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('subscription.checkout');
+Route::post('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'process'])->name('subscription.process');
 Route::get('/assinatura/sucesso/{order}', [\App\Http\Controllers\SubscriptionController::class, 'success'])->name('subscription.success');
 
 use Illuminate\Support\Facades\Route;
