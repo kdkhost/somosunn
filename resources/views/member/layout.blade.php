@@ -78,40 +78,97 @@
             const panel = document.getElementById('mobile-menu-panel');
             const close = document.getElementById('mobile-menu-close');
             let lastFocused = null;
-            function openMenu() {
-                menu.classList.remove('hidden');
-                setTimeout(() => {
-                    menu.classList.add('opacity-100');
-                    panel.classList.remove('translate-x-full');
-                    panel.focus();
-                }, 10);
-                document.body.style.overflow = 'hidden';
-                lastFocused = document.activeElement;
+
+            if (!toggle || !menu || !panel || !close) {
+                return;
             }
+
+            function openMenu() {
+                lastFocused = document.activeElement;
+
+                // Remove pointer-events-none e adiciona pointer-events-auto
+                menu.classList.remove('hidden', 'pointer-events-none');
+                menu.classList.add('pointer-events-auto');
+                menu.setAttribute('aria-hidden', 'false');
+
+                // Anima o painel
+                setTimeout(() => {
+                    panel.classList.remove('translate-x-full');
+                }, 10);
+
+                // Foca no painel para acessibilidade
+                panel.focus();
+
+                // Previne scroll do body
+                document.body.style.overflow = 'hidden';
+            }
+
             function closeMenu() {
-                menu.classList.remove('opacity-100');
+                // Anima o painel para fora
                 panel.classList.add('translate-x-full');
+
+                // Adiciona pointer-events-none e remove pointer-events-auto
+                menu.classList.add('pointer-events-none');
+                menu.classList.remove('pointer-events-auto');
+
+                // Aguarda animação antes de esconder
                 setTimeout(() => {
                     menu.classList.add('hidden');
-                    if (lastFocused) lastFocused.focus();
+                    menu.setAttribute('aria-hidden', 'true');
+
+                    // Restaura scroll do body
+                    document.body.style.overflow = '';
+
+                    // Retorna foco ao botão toggle
+                    if (lastFocused) {
+                        lastFocused.focus();
+                    }
                 }, 300);
-                document.body.style.overflow = '';
             }
-            if (toggle && menu && close && panel) {
-                toggle.addEventListener('click', openMenu);
-                close.addEventListener('click', closeMenu);
-                menu.addEventListener('click', function (e) {
-                    if (e.target === menu) closeMenu();
-                });
-                // Fecha ao navegar
-                menu.querySelectorAll('a').forEach(function (link) {
-                    link.addEventListener('click', closeMenu);
-                });
-                // Acessibilidade: ESC fecha menu
-                document.addEventListener('keydown', function (e) {
-                    if (!menu.classList.contains('hidden') && e.key === 'Escape') closeMenu();
-                });
-            }
+
+            // Event listeners
+            toggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                openMenu();
+            });
+
+            close.addEventListener('click', function (e) {
+                e.preventDefault();
+                closeMenu();
+            });
+
+            // Fecha ao clicar no overlay
+            menu.addEventListener('click', function (e) {
+                if (e.target === menu) {
+                    closeMenu();
+                }
+            });
+
+            // Fecha com tecla ESC
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && !menu.classList.contains('hidden')) {
+                    closeMenu();
+                }
+            });
+
+            // Trap focus dentro do menu quando aberto
+            panel.addEventListener('keydown', function (e) {
+                if (e.key === 'Tab') {
+                    const focusableElements = panel.querySelectorAll(
+                        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+                    );
+                    const firstElement = focusableElements[0];
+                    const lastElement = focusableElements[focusableElements.length - 1];
+
+                    if (e.shiftKey && document.activeElement === firstElement) {
+                        e.preventDefault();
+                        lastElement.focus();
+                    } else if (!e.shiftKey && document.activeElement === lastElement) {
+                        e.preventDefault();
+                        firstElement.focus();
+                    }
+                }
+            });
         });
     </script>
 </body>
