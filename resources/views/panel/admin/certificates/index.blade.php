@@ -20,16 +20,16 @@
 
         {{-- Tabs Navigation --}}
         <div
-            class="bg-slate-100 dark:bg-slate-800/50 p-1 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1 transition-colors">
+            class="bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1.5 transition-all">
             <button @click="tab = 'issued'"
-                :class="tab === 'issued' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
-                class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
+                :class="tab === 'issued' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
                 <i class="fas fa-certificate"></i>
                 <span>Emitidos</span>
             </button>
             <button @click="tab = 'pending'"
-                :class="tab === 'pending' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
-                class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
+                :class="tab === 'pending' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
                 <i class="fas fa-clock"></i>
                 <span>Pendentes</span>
                 @if($pendingEnrollments->count() > 0)
