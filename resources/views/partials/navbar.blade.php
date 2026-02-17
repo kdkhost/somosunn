@@ -95,20 +95,20 @@
                 @auth
                     <!-- Notification Hub (Bell) -->
                     <div class="relative" x-data="{
-                                                        open: false,
-                                                        total: 0,
-                                                        items: [],
-                                                        loading: true,
-                                                         async fetchNotifications() {
-                                                             try {
-                                                                 const r = await fetch('{{ route('notifications.hub') }}');
-                                                                 if (!r.ok) return;
-                                                                 const data = await r.json();
-                                                                 this.total = data.total || 0;
-                                                                 this.items = (data.items || []).filter(i => i.count > 0);
-                                                             } catch(e) { console.error('Notification hub failed:', e) } finally { this.loading = false }
-                                                         }
-                                                      }"
+                                                            open: false,
+                                                            total: 0,
+                                                            items: [],
+                                                            loading: true,
+                                                             async fetchNotifications() {
+                                                                 try {
+                                                                     const r = await fetch('{{ route('notifications.hub') }}');
+                                                                     if (!r.ok) return;
+                                                                     const data = await r.json();
+                                                                     this.total = data.total || 0;
+                                                                     this.items = (data.items || []).filter(i => i.count > 0);
+                                                                 } catch(e) { console.error('Notification hub failed:', e) } finally { this.loading = false }
+                                                             }
+                                                          }"
                         x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
 
                         <button @click="open = !open; fetchNotifications()"
@@ -272,7 +272,7 @@
     </div>
 </nav>
 
-<div id="mobile-menu" class="fixed inset-0 z-[100] hidden pointer-events-none" aria-hidden="true">
+<div id="mobile-menu" class="fixed inset-0 z-[100] hidden" aria-hidden="true">
     <div id="mobile-menu-overlay"
         class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 pointer-events-none"></div>
     <div id="mobile-menu-panel"
