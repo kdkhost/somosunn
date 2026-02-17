@@ -56,6 +56,24 @@
                 </div>
             </div>
 
+            <div class="env-auth p-3 bg-white rounded border border-primary mb-3">
+                <h6 class="text-primary mb-3"><i class="fas fa-key mr-1"></i> Credenciais de Aplicativo (OAuth)</h6>
+                <p class="text-sm text-muted mb-3">Necessário para permitir que vendedores conectem suas contas
+                    automaticamente.</p>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Client ID (App ID)</label>
+                        <input type="text" name="mercadopago_client_id" class="form-control"
+                            value="{{ $settings['mercadopago_client_id'] ?? '' }}">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Client Secret</label>
+                        <input type="password" name="mercadopago_client_secret" class="form-control"
+                            value="{{ $settings['mercadopago_client_secret'] ?? '' }}">
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Webhook URL (Copie e cole no painel do MercadoPago)</label>
                 <div class="input-group">

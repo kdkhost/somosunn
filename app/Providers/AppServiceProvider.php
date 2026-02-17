@@ -249,44 +249,23 @@ class AppServiceProvider extends ServiceProvider
                 // Silently fail if table doesnt exist yet
             }
 
-            // Carregar configurações de Pagamento (MercadoPago / PagSeguro)
+            // Carregar configurações de Pagamento (Mercado Pago / PagSeguro)
             try {
                 $paymentSettings = DB::table('settings')->whereIn('key', [
-                    // Chaves usadas no painel (admin/settings/gateway)
+                    // Config Env
                     'mercadopago_env',
-                    'mercadopago_prod_access_token',
-                    'mercadopago_prod_public_key',
-                    'mercadopago_sandbox_access_token',
-                    'mercadopago_sandbox_public_key',
+                    'pagseguro_env',
+                    // Mercado Pago OAuth (App Credentials)
                     'mercadopago_client_id',
                     'mercadopago_client_secret',
-                    'mercadopago_redirect_uri',
-                    'pagseguro_env',
-                    'pagseguro_prod_token',
-                    'pagseguro_sandbox_token',
+                    // Mercado Pago Prod
+                    'mercadopago_prod_public_key',
+                    'mercadopago_prod_access_token',
+                    // Mercado Pago Sandbox
+                    'mercadopago_sandbox_public_key',
+                    'mercadopago_sandbox_access_token',
+                    // PagSeguro
                     'pagseguro_email',
-
-                    // Chaves legadas/alternativas
-                    'gateway_mercadopago_sandbox',
-                    'gateway_mercadopago_access_token_prod',
-                    'gateway_mercadopago_public_key_prod',
-                    'gateway_mercadopago_access_token_sandbox',
-                    'gateway_mercadopago_public_key_sandbox',
-
-                    'gateway_pagseguro_sandbox',
-                    'gateway_pagseguro_token_prod',
-                    'gateway_pagseguro_token_sandbox',
-                    'gateway_pagseguro_email',
-                ])->pluck('value', 'key')->toArray();
-
-                // MercadoPago
-                $mpEnv = trim((string) ($paymentSettings['mercadopago_env'] ?? ''));
-                $mpSandbox = (bool) ($paymentSettings['gateway_mercadopago_sandbox'] ?? 0);
-                if ($mpEnv !== '') {
-                    $mpSandbox = $mpEnv === 'sandbox';
-                }
-
-                $mpAccessTokenSandbox = trim((string) (($paymentSettings['gateway_mercadopago_access_token_sandbox'] ?? '') ?: ($paymentSettings['mercadopago_sandbox_access_token'] ?? '')));
                 $mpPublicKeySandbox = trim((string) (($paymentSettings['gateway_mercadopago_public_key_sandbox'] ?? '') ?: ($paymentSettings['mercadopago_sandbox_public_key'] ?? '')));
 
                 $mpAccessTokenProd = trim((string) (($paymentSettings['gateway_mercadopago_access_token_prod'] ?? '') ?: ($paymentSettings['mercadopago_prod_access_token'] ?? '')));

@@ -878,4 +878,71 @@ class SettingController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
+    public function testGateway(Request $request)
+    {
+        $gateway = $request->input('gateway');
+
+        try {
+            if ($gateway === 'mercadopago') {
+                $token = $request->input('access_token');
+
+                if (empty($token)) {
+                    return response()->json(['success' => false, 'message' => 'Access Token não informado.']);
+                }
+
+                // Tenta buscar informações do usuário (endpoint leve)
+                $response = Http::withToken($token)->get('https://api.mercadopago.com/users/me');
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $userName = $data['first_name'] . ' ' . $data['last_name'];
+                    $mode = ($data['site_id'] ?? '') == 'MLB' ? 'Produção/Sandbox BR' : 'Outra Região';
+
+                    return response()->json([
+                        'success' => true,
+                        'message' => "Conexão OK! Conta: {$userName} ({$mode})"
+                    ]);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Falha na conexão: ' . ($response->json()['message'] ?? $response->status())
+                    ]);
+                }
+            }
+
+            if ($gateway === 'pagseguro') {
+                $email = $request->input('email');
+                $token = $request->input('token');
+                $env = $request->input('env', 'production');
+
+                // PagSeguro não tem um endpoint "me" simples sem criar transação, 
+                // mas podemos tentar consulta de sessão ou uma consulta inócua.
+                // Endpoint de Sessão é comum para teste.
+
+                $baseUrl = $env === 'sandbox'
+                    ? 'https://ws.sandbox.pagseguro.uol.com.br'
+                    : 'https://ws.pagseguro.uol.com.br';
+
+                $response = Http::post("{$baseUrl}/v2/sessions?email={$email}&token={$token}");
+
+                if ($response->successful() || str_contains($response->body(), '<id>')) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => "Conexão OK! Sessão iniciada com sucesso."
+                    ]);
+                } else {
+                    // Tentar capturar erro do XML se possível, ou raw body
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Falha na conexão PagSeguro. Verifique Email/Token. Code: ' . $response->status()
+                    ]);
+                }
+            }
+
+            return response()->json(['success' => false, 'message' => 'Gateway desconhecido.']);
+
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Erro interno: ' . $e->getMessage()]);
+        }
+    }
 }
