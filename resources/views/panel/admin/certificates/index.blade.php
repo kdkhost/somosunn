@@ -20,16 +20,20 @@
 
         {{-- Tabs Navigation --}}
         <div
-            class="bg-slate-100/50 dark:bg-slate-800 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1.5 transition-all">
+            class="bg-slate-100/80 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 inline-flex items-center gap-1.5 transition-all">
             <button @click="tab = 'issued'"
-                :class="tab === 'issued' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : 'text-slate-500 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                :class="tab === 'issued' 
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50' 
+                    : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-semibold bg-transparent'"
+                class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                 <i class="fas fa-certificate"></i>
                 <span>Emitidos</span>
             </button>
             <button @click="tab = 'pending'"
-                :class="tab === 'pending' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : 'text-slate-500 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                :class="tab === 'pending' 
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50' 
+                    : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-semibold bg-transparent'"
+                class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                 <i class="fas fa-clock"></i>
                 <span>Pendentes</span>
                 @if($pendingEnrollments->count() > 0)
