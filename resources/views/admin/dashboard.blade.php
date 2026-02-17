@@ -44,10 +44,10 @@
     @endif
 
     @if($isAdmin)
-    <form id="dashboardFilterForm" class="mb-4 row align-items-center">
+    <form id="dashboardFilterForm" class="mb-4 row align-items-center justify-content-end">
         <div class="col-auto pr-0"><label class="col-form-label font-weight-bold">Período:</label></div>
         <div class="col-auto">
-            <select name="period" id="dashboardPeriod" class="form-control form-control-sm">
+            <select name="period" id="dashboardPeriod" class="form-control form-control-sm rounded-pill">
                 <option value="30">Últimos 30 dias</option>
                 <option value="7">Últimos 7 dias</option>
                 <option value="90">Últimos 90 dias</option>
@@ -55,52 +55,69 @@
             </select>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-sm btn-primary" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
+            <button type="button" class="btn btn-sm btn-primary rounded-pill px-4" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
         </div>
     </form>
-    <!-- KPIs harmonizados AdminLTE -->
+    <!-- KPIs premium, grandes e destacados -->
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="row">
-                <div class="col-12 col-sm-6 col-md-3 mb-3">
-                    <div class="info-box bg-gradient-success shadow-sm">
-                        <span class="info-box-icon"><i class="fas fa-wallet"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Saldo Total</span>
-                            <span class="info-box-number">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</span>
-                        </div>
-                    </div>
+        <div class="col-12 d-flex flex-wrap justify-content-between align-items-stretch gap-3">
+            <div class="info-box bg-white border shadow-sm flex-fill text-center kpi-gourmet mb-3">
+                <span class="info-box-icon bg-gradient-success elevation-1"><i class="fas fa-wallet"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text font-weight-bold text-secondary">Saldo Total</span>
+                    <span class="info-box-number display-4 text-dark">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</span>
                 </div>
-                <div class="col-12 col-sm-6 col-md-3 mb-3">
-                    <div class="info-box bg-gradient-danger shadow-sm">
-                        <span class="info-box-icon"><i class="fas fa-undo"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Reembolsados</span>
-                            <span class="info-box-number">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</span>
-                        </div>
-                    </div>
+            </div>
+            <div class="info-box bg-white border shadow-sm flex-fill text-center kpi-gourmet mb-3">
+                <span class="info-box-icon bg-gradient-danger elevation-1"><i class="fas fa-undo"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text font-weight-bold text-secondary">Reembolsados</span>
+                    <span class="info-box-number display-4 text-dark">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</span>
                 </div>
-                <div class="col-12 col-sm-6 col-md-3 mb-3">
-                    <div class="info-box bg-gradient-warning shadow-sm">
-                        <span class="info-box-icon"><i class="fas fa-users"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Usuários</span>
-                            <span class="info-box-number">{{ $totalUsers ?? 0 }}</span>
-                        </div>
-                    </div>
+            </div>
+            <div class="info-box bg-white border shadow-sm flex-fill text-center kpi-gourmet mb-3">
+                <span class="info-box-icon bg-gradient-warning elevation-1"><i class="fas fa-users"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text font-weight-bold text-secondary">Usuários</span>
+                    <span class="info-box-number display-4 text-dark">{{ $totalUsers ?? 0 }}</span>
                 </div>
-                <div class="col-12 col-sm-6 col-md-3 mb-3">
-                    <div class="info-box bg-gradient-info shadow-sm">
-                        <span class="info-box-icon"><i class="fas fa-shopping-bag"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Pedidos</span>
-                            <span class="info-box-number">{{ $totalOrders ?? 0 }}</span>
-                        </div>
-                    </div>
+            </div>
+            <div class="info-box bg-white border shadow-sm flex-fill text-center kpi-gourmet mb-3">
+                <span class="info-box-icon bg-gradient-info elevation-1"><i class="fas fa-shopping-bag"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text font-weight-bold text-secondary">Pedidos</span>
+                    <span class="info-box-number display-4 text-dark">{{ $totalOrders ?? 0 }}</span>
                 </div>
             </div>
         </div>
     </div>
+@push('styles')
+    <style>
+        .kpi-gourmet {
+            min-width: 220px;
+            max-width: 340px;
+            border-radius: 1.2rem;
+            transition: box-shadow .15s, transform .15s;
+        }
+        .kpi-gourmet:hover {
+            box-shadow: 0 0 0 4px #007bff22, 0 2px 16px #0001 !important;
+            transform: translateY(-2px) scale(1.03);
+            z-index: 2;
+        }
+        .info-box-content .display-4 {
+            font-size: 2.2rem;
+            font-weight: bold;
+            letter-spacing: -1px;
+        }
+        @media (max-width: 991px) {
+            .kpi-gourmet { min-width: 160px !important; }
+        }
+        @media (max-width: 767px) {
+            .kpi-gourmet { min-width: 120px !important; }
+            .info-box-content .display-4 { font-size: 1.3rem !important; }
+        }
+    </style>
+@endpush
 
     <!-- Gráficos premium -->
     <div class="row mb-4">
