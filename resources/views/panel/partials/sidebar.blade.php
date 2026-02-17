@@ -105,7 +105,9 @@
                 </a>
 
                 {{-- Gestão --}}
-                <div class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Gestão</div>
+                <div
+                    class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                    Gestão</div>
                 <a href="{{ route('panel.admin.users.index') }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.users.*')) }}">
                     <i class="fas fa-users-cog w-5 opacity-80"></i>
@@ -133,7 +135,9 @@
                 </a>
 
                 {{-- Conteúdo --}}
-                <div class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Conteúdo</div>
+                <div
+                    class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                    Conteúdo</div>
                 <a href="{{ route('panel.admin.courses.index') }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.courses.*')) }}">
                     <i class="fas fa-graduation-cap w-5 opacity-80"></i>
@@ -156,7 +160,9 @@
                 </a>
 
                 {{-- Configurações --}}
-                <div class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Ajustes</div>
+                <div
+                    class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                    Ajustes</div>
                 <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'general') }}">
                     <i class="fas fa-cogs w-5 opacity-80"></i>
@@ -182,14 +188,17 @@
 
         {{-- Theme Toggle --}}
         <div class="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
-            <button onclick="toggleTheme()" 
+            <button onclick="toggleTheme()"
                 class="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 group">
                 <div class="flex items-center gap-3">
-                    <i class="fas {{ $currentTheme === 'dark' ? 'fa-sun' : 'fa-moon' }} w-5 opacity-80 group-hover:rotate-12 transition-transform"></i>
+                    <i
+                        class="fas {{ $currentTheme === 'dark' ? 'fa-sun' : 'fa-moon' }} w-5 opacity-80 group-hover:rotate-12 transition-transform"></i>
                     <span>Modo {{ $currentTheme === 'dark' ? 'Claro' : 'Escuro' }}</span>
                 </div>
                 <div class="w-10 h-5 bg-slate-200 dark:bg-slate-700 rounded-full relative transition-colors">
-                    <div class="absolute top-1 {{ $currentTheme === 'dark' ? 'right-1' : 'left-1' }} w-3 h-3 bg-white dark:bg-blue-400 rounded-full shadow-sm transition-all"></div>
+                    <div
+                        class="absolute top-1 {{ $currentTheme === 'dark' ? 'right-1' : 'left-1' }} w-3 h-3 bg-white dark:bg-blue-400 rounded-full shadow-sm transition-all">
+                    </div>
                 </div>
             </button>
         </div>
@@ -197,28 +206,27 @@
 </div>
 
 <script>
-function toggleTheme() {
-    const theme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-    
-    // UI Update
-    if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-    }
+    function toggleTheme() {
+        const theme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
 
-    // Save Preference
-    fetch('{{ route("panel.theme.toggle") }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({ theme: theme })
-    }).then(r => r.json()).then(data => {
-        // Optional: reload to apply all server-side classes correctly if needed
-        window.location.reload();
-    });
-}
+        // UI Update
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Save Preference
+        fetch('{{ route("panel.theme.toggle") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ theme: theme })
+        }).then(r => r.json()).then(data => {
+            // Optional: reload to apply all server-side classes correctly if needed
+            window.location.reload();
+        });
+    }
 </script>
-</div>
