@@ -39,7 +39,7 @@
     </header>
     <!-- Menu Mobile -->
     <div id="mobile-menu"
-        class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden transition-opacity duration-300">
+        class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden pointer-events-none transition-opacity duration-300">
         <div class="absolute top-0 right-0 w-3/4 max-w-xs h-full bg-white dark:bg-slate-900 shadow-lg flex flex-col p-6 transform translate-x-full transition-transform duration-300 border-l dark:border-slate-800"
             id="mobile-menu-panel" tabindex="-1" aria-modal="true" role="dialog">
             <div class="flex items-center justify-between mb-6">

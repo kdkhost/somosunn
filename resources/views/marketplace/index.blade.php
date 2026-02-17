@@ -1057,7 +1057,7 @@
 </div>
 
 @if($marketplaceExitEnabled)
-    <div id="mp-exit-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+    <div id="mp-exit-modal" class="fixed inset-0 z-[9999] hidden pointer-events-none items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
         data-delay-ms="{{ $marketplaceExitDelaySeconds * 1000 }}">
         <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-100 relative">
             <button type="button" data-exit-close
@@ -1258,15 +1258,15 @@
                 function open() {
                     if (isShown()) return;
                     if (Date.now() < readyAt) return;
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
+                    modal.classList.remove('hidden', 'pointer-events-none');
+                    modal.classList.add('flex', 'pointer-events-auto');
                     document.documentElement.classList.add('overflow-hidden');
                     markShown();
                 }
 
                 function close() {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
+                    modal.classList.add('hidden', 'pointer-events-none');
+                    modal.classList.remove('flex', 'pointer-events-auto');
                     document.documentElement.classList.remove('overflow-hidden');
                 }
 
