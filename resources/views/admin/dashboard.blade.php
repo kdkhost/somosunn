@@ -259,6 +259,54 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    // Função para uptime fake (exemplo, pode ser substituído por valor real via backend)
+    function formatUptime(seconds) {
+        const d = Math.floor(seconds / 86400);
+        const h = Math.floor((seconds % 86400) / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        return `${d}d ${h}h ${m}min`;
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Uptime fake (substitua por valor real se disponível)
+        const uptimeSeconds = 86400 * 12 + 3600 * 6 + 60 * 23; // 12 dias, 6h, 23min
+        document.getElementById('uptime').innerText = formatUptime(uptimeSeconds);
+
+        // Dados fake para mini-gráficos
+        const miniData = (max) => Array.from({length: 10}, () => Math.floor(Math.random() * max));
+        const miniConfig = (color) => ({
+            type: 'line',
+            data: { labels: Array(10).fill(''), datasets: [{ data: miniData(100), borderColor: color, backgroundColor: color+'22', fill: true, tension: 0.4, pointRadius: 0 }] },
+            options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } }, elements: { line: { borderWidth: 2 } }, responsive: false, maintainAspectRatio: false }
+        });
+        const charts = [
+            ['saldoChart', '#28a745'],
+            ['reembolsoChart', '#dc3545'],
+            ['usuariosChart', '#ffc107'],
+            ['pedidosChart', '#17a2b8'],
+            ['cursosChart', '#007bff'],
+            ['mentoriasChart', '#28a745'],
+            ['eventosChart', '#ffc107'],
+            ['certificadosChart', '#6c757d'],
+            ['jobsChart', '#343a40']
+        ];
+        charts.forEach(([id, color]) => {
+            const el = document.getElementById(id);
+            if (el) new Chart(el.getContext('2d'), miniConfig(color));
+        });
+        // Disponibilidade (doughnut)
+        const avail = document.getElementById('availabilityChart');
+        if (avail) new Chart(avail.getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: ['Up', 'Down'], datasets: [{ data: [99, 1], backgroundColor: ['#28a745', '#e0e0e0'], borderWidth: 0 }] },
+            options: { cutout: '70%', plugins: { legend: { display: false } } }
+        });
+    });
+    </script>
+    @endpush
 @push('styles')
     <style>
         .kpi-gourmet {
