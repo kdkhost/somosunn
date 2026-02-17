@@ -21,6 +21,8 @@
                         <option value="sandbox" {{ ($settings['mercadopago_env'] ?? 'sandbox') == 'sandbox' ? 'selected' : '' }}>Sandbox (Ambiente de Testes)</option>
                         <option value="production" {{ ($settings['mercadopago_env'] ?? 'sandbox') == 'production' ? 'selected' : '' }}>Produção (Ambiente Real)</option>
                     </select>
+                    <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle mr-1"></i> Use <b>Sandbox</b>
+                        para testar o fluxo de pagamento sem gastar dinheiro real.</small>
                 </div>
             </div>
 
@@ -31,11 +33,15 @@
                         <label>Public Key (Sandbox)</label>
                         <input type="text" name="mercadopago_sandbox_public_key" class="form-control"
                             value="{{ $settings['mercadopago_sandbox_public_key'] ?? '' }}">
+                        <small class="text-muted">Encontre em: <a
+                                href="https://www.mercadopago.com.br/developers/panel/credentials"
+                                target="_blank">Minhas Aplicações > Sua App > Credenciais de Teste</a></small>
                     </div>
                     <div class="col-md-6 form-group">
                         <label>Access Token (Sandbox)</label>
                         <input type="text" name="mercadopago_sandbox_access_token" class="form-control"
                             value="{{ $settings['mercadopago_sandbox_access_token'] ?? '' }}">
+                        <small class="text-muted">Usado para autorizar transações de teste.</small>
                     </div>
                 </div>
             </div>
@@ -47,11 +53,15 @@
                         <label>Public Key (Produção)</label>
                         <input type="text" name="mercadopago_prod_public_key" class="form-control"
                             value="{{ $settings['mercadopago_prod_public_key'] ?? '' }}">
+                        <small class="text-muted">Encontre em: <a
+                                href="https://www.mercadopago.com.br/developers/panel/credentials"
+                                target="_blank">Credenciais de Produção</a></small>
                     </div>
                     <div class="col-md-6 form-group">
                         <label>Access Token (Produção)</label>
                         <input type="text" name="mercadopago_prod_access_token" class="form-control"
                             value="{{ $settings['mercadopago_prod_access_token'] ?? '' }}">
+                        <small class="text-muted"><b>Cuidado:</b> Chave de acesso real à sua conta.</small>
                     </div>
                 </div>
             </div>
@@ -65,11 +75,15 @@
                         <label>Client ID (App ID)</label>
                         <input type="text" name="mercadopago_client_id" class="form-control"
                             value="{{ $settings['mercadopago_client_id'] ?? '' }}">
+                        <small class="text-muted">Obtenha em: <a
+                                href="https://www.mercadopago.com.br/developers/panel/applications" target="_blank">Menu
+                                Lateral > Aplicação > Detalhes</a></small>
                     </div>
                     <div class="col-md-6 form-group">
                         <label>Client Secret</label>
                         <input type="password" name="mercadopago_client_secret" class="form-control"
                             value="{{ $settings['mercadopago_client_secret'] ?? '' }}">
+                        <small class="text-muted">Configuração <b>obrigatória</b> para o Split de Pagamento.</small>
                     </div>
                 </div>
             </div>
@@ -132,6 +146,9 @@
                     <label>Token (Sandbox)</label>
                     <input type="text" name="pagseguro_sandbox_token" id="pagseguro_sandbox_token" class="form-control"
                         value="{{ $settings['pagseguro_sandbox_token'] ?? '' }}">
+                    <small class="text-muted">Encontre em: <a
+                            href="https://pagseguro.uol.com.br/preferencias/integracoes.jhtml" target="_blank">Venda
+                            Online > Integrações</a> no painel Sandbox.</small>
                 </div>
             </div>
         </div>
@@ -143,6 +160,9 @@
                     <label>Token (Produção)</label>
                     <input type="text" name="pagseguro_prod_token" id="pagseguro_prod_token" class="form-control"
                         value="{{ $settings['pagseguro_prod_token'] ?? '' }}">
+                    <small class="text-muted">Encontre em: <a
+                            href="https://pagseguro.uol.com.br/preferencias/integracoes.jhtml" target="_blank">Perfis de
+                            Integração > Token de Integração</a></small>
                 </div>
             </div>
         </div>
