@@ -135,7 +135,7 @@
 
                             {{-- Actions --}}
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex items-center justify-end gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                <div class="flex items-center justify-end gap-1 transition-opacity">
                                     <a href="{{ route('panel.admin.coupons.edit', $coupon) }}" 
                                        class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors border border-transparent" 
                                        title="Editar">

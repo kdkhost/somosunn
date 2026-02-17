@@ -128,7 +128,7 @@
 
                             {{-- Actions --}}
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex items-center justify-end gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                <div class="flex items-center justify-end gap-1 transition-opacity">
                                     <a href="{{ route('panel.admin.invoices.show', $inv) }}" 
                                        class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg transition-colors border border-transparent" 
                                        title="Ver Detalhes">
