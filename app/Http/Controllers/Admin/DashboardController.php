@@ -12,7 +12,7 @@ class DashboardController extends Controller
         // Membros e Admins acessam, mas a view filtra o conteúdo
         $isAdmin = auth()->user()->isAdmin();
 
-        // Data for charts (Last 6 months)
+        // Dados para gráficos (Últimos 6 meses)
         $totalRevenue = 0;
         $refundedAmount = 0;
         $totalOrders = 0;
@@ -35,7 +35,7 @@ class DashboardController extends Controller
         $certificatesByMonth = [];
         $contentDistribution = [];
         $jobsStatus = [];
-        $logsByType = [];
+
 
         try {
             if ($isAdmin) {
@@ -52,8 +52,26 @@ class DashboardController extends Controller
                 $logsCount = \App\Models\ActivityLog::count();
 
                 // Gráfico: Pedidos por status
-                $ordersByStatus = \App\Models\Order::selectRaw('status, COUNT(*) as total')
+                $rawOrdersByStatus = \App\Models\Order::selectRaw('status, COUNT(*) as total')
                     ->groupBy('status')->pluck('total', 'status')->toArray();
+
+                $statusMap = [
+                    'paid' => 'Pago',
+                    'pending' => 'Pendente',
+                    'refunded' => 'Reembolsado',
+                    'canceled' => 'Cancelado',
+                    'failed' => 'Falhou',
+                    'processing' => 'Processando',
+                    'completed' => 'Concluído',
+                    'active' => 'Ativo',
+                    'inactive' => 'Inativo'
+                ];
+
+                $ordersByStatus = [];
+                foreach ($rawOrdersByStatus as $status => $count) {
+                    $label = $statusMap[$status] ?? ucfirst($status);
+                    $ordersByStatus[$label] = $count;
+                }
 
                 // Gráfico: Novos usuários por mês (últimos 6 meses)
                 $usersByMonth = [];
@@ -93,12 +111,8 @@ class DashboardController extends Controller
                     'Concluídos' => \DB::table('job_batches')->where('finished_at', '!=', null)->count(),
                 ];
 
-                // Gráfico: Logs por tipo (action)
-                $logsByType = \App\Models\ActivityLog::selectRaw('action, COUNT(*) as total')
-                    ->groupBy('action')->pluck('total', 'action')->toArray();
-
             } else {
-                // If not admin, we skip sales stats
+                // Se não for admin, pulamos estatísticas de vendas
                 $salesChartData = array_fill(0, 6, 0);
                 $months = collect(range(0, 5))->map(fn($i) => now()->subMonths($i)->format('M/Y'))->reverse()->values()->toArray();
 
@@ -109,7 +123,7 @@ class DashboardController extends Controller
                 $eventsCount = $user->eventRegistrations()->count();
             }
 
-            // Calendar Events (Unified for all)
+            // Eventos do Calendário (Unificado)
             $eventsQuery = \App\Models\Event::query();
             if (!$isAdmin) {
                 $eventsQuery->where('published', true);
@@ -132,7 +146,7 @@ class DashboardController extends Controller
 
         } catch (\Throwable $e) {
             \Log::error('Erro ao carregar dashboard: ' . $e->getMessage());
-            // Fallback data
+            // Dados de fallback
             $totalRevenue = 0;
             $refundedAmount = 0;
             $totalOrders = 0;
@@ -161,7 +175,7 @@ class DashboardController extends Controller
             'certificatesByMonth',
             'contentDistribution',
             'jobsStatus',
-            'logsByType',
+
         ));
     }
 }
