@@ -95,7 +95,7 @@
                                             <td class="px-6 py-4">
                                                 <span
                                                     class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold 
-                                                                                {{ $t->category == 'financeiro' ? 'bg-green-100 text-green-700' :
+                                                                                                                        {{ $t->category == 'financeiro' ? 'bg-green-100 text-green-700' :
                             ($t->category == 'conta' ? 'bg-purple-100 text-purple-700' :
                                 ($t->category == 'sistema' ? 'bg-slate-100 text-slate-700' : 'bg-blue-100 text-blue-700')) }}">
                                                     {{ ucfirst($t->category) }}
@@ -215,11 +215,12 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div class="flex-1 overflow-hidden bg-slate-100 p-0 relative">
+            <div class="flex-1 overflow-y-auto bg-slate-100 p-0 relative custom-scrollbar">
                 <div id="previewLoader" class="absolute inset-0 flex items-center justify-center bg-slate-100 z-10">
                     <i class="fas fa-spinner fa-spin text-3xl text-blue-500"></i>
                 </div>
-                <iframe id="previewFrame" class="w-full h-full border-0"></iframe>
+                <iframe id="previewFrame" class="w-full border-0 transition-all duration-300"
+                    style="min-height: 500px;"></iframe>
             </div>
             <div class="p-4 border-t border-slate-100 bg-white">
                 <div class="flex gap-3">
@@ -259,11 +260,11 @@
 
             // Reset Content
             editorBody.innerHTML = `
-                        <div class="flex flex-col items-center justify-center h-40 text-slate-400">
-                            <i class="fas fa-circle-notch fa-spin text-3xl mb-3 text-blue-500"></i>
-                            <p>Carregando editor...</p>
-                        </div>
-                    `;
+                                <div class="flex flex-col items-center justify-center h-40 text-slate-400">
+                                    <i class="fas fa-circle-notch fa-spin text-3xl mb-3 text-blue-500"></i>
+                                    <p>Carregando editor...</p>
+                                </div>
+                            `;
 
             const url = editUrl || '{{ route("panel.admin.mailtemplates.create") }}';
             currentAction = updateUrl || '{{ route("panel.admin.mailtemplates.store") }}';
@@ -443,7 +444,14 @@
                     doc.open();
                     doc.write(data.html);
                     doc.close();
+
                     loader.style.display = 'none';
+
+                    // Adjust height after content written to show "completo"
+                    setTimeout(() => {
+                        const height = iframe.contentWindow.document.body.scrollHeight;
+                        iframe.style.height = (height + 50) + 'px';
+                    }, 200);
                 });
         }
 

@@ -163,5 +163,12 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
   - **Sidebar Reorganizada:** Categorias lógicas (**Gestão, Conteúdo, Ajustes**) para melhor fluxo de trabalho.
   - **Correção de Paginação:** Substituição de `withQueryString` legado por `appends()` para estabilidade em servidores cPanel.
 
+### 17/02/2026 (Tarde) — Refatoração de Templates de E-mail (Fase 5)
+- **Editor em Modal:** Migração da edição de templates de e-mail para um fluxo de modal moderno via AJAX.
+- **Integração Summernote:** Editor de texto rico integrado especificamente para garantir compatibilidade HTML nos e-mails.
+- **Variáveis Dinâmicas:** Nova interface para inserção de variáveis com um clique, categorizadas por ícones.
+- **Visualização Completa:** Sistema de pré-visualização que ajusta a altura dinamicamente para exibir o modelo de e-mail por completo, sem cortes.
+- **Teste Rápido:** Atalho para envio de e-mail de teste diretamente do modal de edição.
+
 ---
 © 2026 UNN Networking. Todos os direitos reservados.
