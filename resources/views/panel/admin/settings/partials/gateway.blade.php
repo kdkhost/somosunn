@@ -30,14 +30,14 @@
                 <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4"><i class="fas fa-tools mr-1"></i> Credenciais de Sandbox</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Public Key (Sandbox)</label>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Public Key (Sandbox)</label>
                         <input type="text" name="mercadopago_sandbox_public_key" value="{{ $settings['mercadopago_sandbox_public_key'] ?? '' }}" 
-                               class="w-full rounded-2xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-2xl border-slate-400 bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-800">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Access Token (Sandbox)</label>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Access Token (Sandbox)</label>
                         <input type="text" name="mercadopago_sandbox_access_token" value="{{ $settings['mercadopago_sandbox_access_token'] ?? '' }}" 
-                               class="w-full rounded-2xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-2xl border-slate-400 bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-800">
                     </div>
                 </div>
             </div>
@@ -47,25 +47,25 @@
                 <h4 class="text-xs font-bold text-green-700 uppercase tracking-wider mb-4"><i class="fas fa-check-circle mr-1"></i> Credenciais de Produção</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Public Key (Produção)</label>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Public Key (Produção)</label>
                         <input type="text" name="mercadopago_prod_public_key" value="{{ $settings['mercadopago_prod_public_key'] ?? '' }}" 
-                               class="w-full rounded-2xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-2xl border-slate-400 bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-800">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Access Token (Produção)</label>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Access Token (Produção)</label>
                         <input type="text" name="mercadopago_prod_access_token" value="{{ $settings['mercadopago_prod_access_token'] ?? '' }}" 
-                               class="w-full rounded-2xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-2xl border-slate-400 bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-800">
                     </div>
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Webhook URL</label>
+                <label class="block text-sm font-bold text-slate-700 mb-1">Webhook URL</label>
                 <div class="flex">
                     <input type="text" readonly value="{{ route('api.webhooks.mercadopago') }}" 
-                           class="w-full rounded-l-2xl border-slate-200 bg-slate-50 text-slate-500 text-sm">
+                           class="w-full rounded-l-2xl border-slate-400 bg-slate-100 text-slate-500 text-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
                     <button type="button" onclick="copyToClipboard('{{ route('api.webhooks.mercadopago') }}')" 
-                            class="bg-slate-100 hover:bg-slate-200 border border-l-0 border-slate-200 rounded-r-2xl px-4 text-slate-600 font-medium">
+                            class="bg-slate-100 hover:bg-slate-200 border border-l-0 border-slate-400 rounded-r-2xl px-4 text-slate-600 font-medium">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
@@ -84,13 +84,13 @@
         <div id="pagseguro_card" class="hidden p-6 border-t border-slate-200">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">E-mail da Conta</label>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">E-mail da Conta</label>
                     <input type="email" name="pagseguro_email" value="{{ $settings['pagseguro_email'] ?? '' }}" 
-                           class="w-full rounded-2xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                           class="w-full rounded-2xl border-slate-400 bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Ambiente de Execução</label>
-                    <select name="pagseguro_env" class="gateway-env-select w-full rounded-2xl border-slate-200 focus:border-blue-500 focus:ring-blue-500" data-gateway="pagseguro">
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Ambiente de Execução</label>
+                    <select name="pagseguro_env" class="gateway-env-select w-full rounded-2xl border-slate-400 bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-800" data-gateway="pagseguro">
                         <option value="sandbox" {{ ($settings['pagseguro_env'] ?? 'sandbox') == 'sandbox' ? 'selected' : '' }}>Sandbox (Testes)</option>
                         <option value="production" {{ ($settings['pagseguro_env'] ?? 'sandbox') == 'production' ? 'selected' : '' }}>Produção</option>
                     </select>
@@ -100,28 +100,28 @@
             <div class="env-sandbox mb-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
                 <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4"><i class="fas fa-tools mr-1"></i> Credenciais de Sandbox</h4>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Token (Sandbox)</label>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Token (Sandbox)</label>
                     <input type="text" name="pagseguro_sandbox_token" value="{{ $settings['pagseguro_sandbox_token'] ?? '' }}" 
-                           class="w-full rounded-2xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                           class="w-full rounded-2xl border-slate-400 bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-800">
                 </div>
             </div>
 
             <div class="env-production mb-4 p-4 bg-green-50 rounded-2xl border border-green-200 hidden">
                 <h4 class="text-xs font-bold text-green-700 uppercase tracking-wider mb-4"><i class="fas fa-check-circle mr-1"></i> Credenciais de Produção</h4>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Token (Produção)</label>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Token (Produção)</label>
                     <input type="text" name="pagseguro_prod_token" value="{{ $settings['pagseguro_prod_token'] ?? '' }}" 
-                           class="w-full rounded-2xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                           class="w-full rounded-2xl border-slate-400 bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-800">
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Webhook URL</label>
+                <label class="block text-sm font-bold text-slate-700 mb-1">Webhook URL</label>
                 <div class="flex">
                     <input type="text" readonly value="{{ route('api.webhooks.pagseguro') }}" 
-                           class="w-full rounded-l-2xl border-slate-200 bg-slate-50 text-slate-500 text-sm">
+                           class="w-full rounded-l-2xl border-slate-400 bg-slate-100 text-slate-500 text-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
                     <button type="button" onclick="copyToClipboard('{{ route('api.webhooks.pagseguro') }}')" 
-                            class="bg-slate-100 hover:bg-slate-200 border border-l-0 border-slate-200 rounded-r-2xl px-4 text-slate-600 font-medium">
+                            class="bg-slate-100 hover:bg-slate-200 border border-l-0 border-slate-400 rounded-r-2xl px-4 text-slate-600 font-medium">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
@@ -143,30 +143,30 @@
                        {{ ($settings['gateway_transparent_checkout'] ?? 0) ? 'checked' : '' }}>
             </div>
             <div class="text-sm">
-                <label for="gateway_transparent_checkout" class="font-medium text-slate-700">Habilitar Checkout Transparente</label>
+                <label for="gateway_transparent_checkout" class="font-bold text-slate-700">Habilitar Checkout Transparente</label>
                 <p class="text-slate-500">Se desativado, o usuário será redirecionado para a página de pagamento do gateway.</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Juros de Parcelamento (% a.m.)</label>
+                <label class="block text-sm font-bold text-slate-700 mb-1">Juros de Parcelamento (% a.m.)</label>
                 <div class="relative">
                     <input type="number" step="0.01" name="gateway_installment_tax" value="{{ $settings['gateway_installment_tax'] ?? '0.00' }}" 
-                           class="w-full rounded-2xl border-slate-200 focus:border-blue-500 focus:ring-blue-500 pr-8">
+                           class="w-full rounded-2xl border-slate-400 bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-800 pr-8">
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <span class="text-slate-500">%</span>
                     </div>
                 </div>
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Máx. Parcelas sem Juros</label>
+                <label class="block text-sm font-bold text-slate-700 mb-1">Máx. Parcelas sem Juros</label>
                 <input type="number" name="gateway_max_installments_no_interest" value="{{ $settings['gateway_max_installments_no_interest'] ?? '1' }}" 
-                       class="w-full rounded-2xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                       class="w-full rounded-2xl border-slate-400 bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-800">
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Repassar Taxas ao Cliente?</label>
-                <select name="gateway_pass_tax_to_client" class="w-full rounded-2xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                <label class="block text-sm font-bold text-slate-700 mb-1">Repassar Taxas ao Cliente?</label>
+                <select name="gateway_pass_tax_to_client" class="w-full rounded-2xl border-slate-400 bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-800">
                     <option value="0" {{ ($settings['gateway_pass_tax_to_client'] ?? 0) == 0 ? 'selected' : '' }}>Não (Empresa absorve)</option>
                     <option value="1" {{ ($settings['gateway_pass_tax_to_client'] ?? 0) == 1 ? 'selected' : '' }}>Sim (Cliente paga)</option>
                 </select>
