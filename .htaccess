@@ -17,7 +17,11 @@ AddDefaultCharset UTF-8
     RewriteEngine On
     RewriteBase /
 
-    # bloquear diretórios privados
+    # IMPORTANTE: Permitir acesso a public/vendor (assets CSS/JS)
+    # ANTES de bloquear vendor do composer
+    RewriteRule ^vendor/(.*)$ public/vendor/$1 [L,NC]
+    
+    # bloquear diretórios privados (vendor do composer na raiz, node_modules)
     RewriteRule ^(?:vendor|node_modules)/(.*)$ - [F,L,NC]
     RewriteRule ^storage/(framework|logs|app)/(.*)$ - [F,L,NC]
 
