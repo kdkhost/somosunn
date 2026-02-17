@@ -65,16 +65,51 @@
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700">Segmento</label>
-                    <input name="segment" value="{{ old('segment', $user->segment) }}" maxlength="60"
-                        placeholder="Área de atuação"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <select name="segment_select" id="segment_select"
+                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500 bg-white">
+                        <option value="">Selecione...</option>
+                        @foreach(['Tecnologia', 'Marketing', 'Vendas', 'Saúde', 'Educação', 'Direito', 'Engenharia', 'Finanças', 'Imobiliário', 'Alimentação', 'Consultoria', 'RH'] as $opt)
+                            <option value="{{ $opt }}" {{ old('segment', $user->segment) == $opt ? 'selected' : '' }}>{{ $opt }}
+                            </option>
+                        @endforeach
+                        <option value="Outros" {{ !in_array(old('segment', $user->segment), ['Tecnologia', 'Marketing', 'Vendas', 'Saúde', 'Educação', 'Direito', 'Engenharia', 'Finanças', 'Imobiliário', 'Alimentação', 'Consultoria', 'RH', '', null]) ? 'selected' : '' }}>Outros</option>
+                    </select>
+                    <input name="segment_custom" id="segment_custom"
+                        value="{{ !in_array(old('segment', $user->segment), ['Tecnologia', 'Marketing', 'Vendas', 'Saúde', 'Educação', 'Direito', 'Engenharia', 'Finanças', 'Imobiliário', 'Alimentação', 'Consultoria', 'RH', '', null]) ? old('segment', $user->segment) : '' }}"
+                        placeholder="Qual seu segmento?"
+                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500 {{ !in_array(old('segment', $user->segment), ['Tecnologia', 'Marketing', 'Vendas', 'Saúde', 'Educação', 'Direito', 'Engenharia', 'Finanças', 'Imobiliário', 'Alimentação', 'Consultoria', 'RH', '', null]) ? '' : 'hidden' }}">
                 </div>
                 <div class="md:col-span-1">
-                    <label class="text-sm font-bold text-slate-700">Interesses (Separados por vírgula)</label>
-                    <input name="interests" id="interests-input" value="{{ old('interests', $user->interests) }}"
-                        placeholder="Ex: tecnologia, marketing, saúde"
-                        class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
-                    <p class="text-xs text-slate-400 mt-1">Separe cada interesse por vírgula.</p>
+                    <label class="text-sm font-bold text-slate-700 block mb-2">Interesses</label>
+                    <div class="flex flex-col gap-2">
+                        @php
+                            $userInterests = $user->interests ? array_map('trim', explode(',', $user->interests)) : [];
+                            $definedInterests = ['Networking', 'Mentorias', 'Cursos', 'Eventos', 'Parcerias', 'Investimentos', 'Vagas', 'Notícias'];
+                            $hasCustomInterest = false;
+                            foreach ($userInterests as $ui) {
+                                if (!in_array($ui, $definedInterests) && !empty($ui))
+                                    $hasCustomInterest = true;
+                            }
+                        @endphp
+                        <div class="grid grid-cols-2 gap-2">
+                            @foreach($definedInterests as $interest)
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="interests_list[]" value="{{ $interest }}" {{ in_array($interest, $userInterests) ? 'checked' : '' }}
+                                        class="rounded text-blue-600 focus:ring-blue-500">
+                                    <span class="text-sm text-slate-600">{{ $interest }}</span>
+                                </label>
+                            @endforeach
+                            <label class="flex items-center gap-2 cursor-pointer col-span-2">
+                                <input type="checkbox" id="interests_other_cb" {{ $hasCustomInterest ? 'checked' : '' }}
+                                    class="rounded text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm text-slate-600">Outros</span>
+                            </label>
+                        </div>
+                        <input name="interests_custom" id="interests_custom"
+                            value="{{ $hasCustomInterest ? implode(', ', array_diff($userInterests, $definedInterests)) : '' }}"
+                            placeholder="Quais outros interesses? (Separe por vírgula)"
+                            class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500 {{ $hasCustomInterest ? '' : 'hidden' }}">
+                    </div>
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold text-slate-700">Bio</label>
@@ -277,6 +312,18 @@
     </form>
 
     @push('scripts')
+        <style>
+            /* Hide FilePond Credits */
+            .filepond--credits {
+                display: none !important;
+                visibility: hidden;
+                pointer-events: none;
+            }
+
+            .filepond--root {
+                margin-bottom: 0;
+            }
+        </style>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 // --- 1. FilePond Uploads ---
@@ -290,12 +337,18 @@
                 const ponds = document.querySelectorAll('input.filepond');
                 ponds.forEach(input => {
                     FilePond.create(input, {
-                        labelIdle: 'Arraste & Solte sua imagem ou <span class="filepond--label-action">Procure</span>',
-                        storeAsFile: true, // Simples submit de form
+                        labelIdle: '<span class="text-xs">Arraste ou <span class="filepond--label-action">clique</span> para alterar</span>',
+                        credits: false, // Remove "Powered by PQINA"
+                        storeAsFile: true,
                         labelFileProcessing: 'Enviando...',
                         labelFileProcessingComplete: 'Pronto',
-                        labelTapToCancel: 'clique para cancelar',
-                        labelTapToUndo: 'clique para desfazer',
+                        labelTapToCancel: 'cancelar',
+                        labelTapToUndo: 'desfazer',
+                        stylePanelLayout: 'compact',
+                        styleLoadIndicatorPosition: 'center',
+                        styleProgressIndicatorPosition: 'right bottom',
+                        styleButtonRemoveItemPosition: 'left bottom',
+                        styleButtonProcessItemPosition: 'right bottom',
                     });
                 });
 
@@ -314,7 +367,7 @@
                     console.error('Inputmask não foi carregado corretamente.');
                 }
 
-                // --- 3. Auto-Preenchimento de CEP ---
+                // --- 4. Auto-Preenchimento de CEP ---
                 const cepInput = document.getElementById('profile_cep');
                 if (cepInput) {
                     cepInput.addEventListener('input', function (e) {
@@ -335,7 +388,7 @@
                                         // Foca no número
                                         setTimeout(() => {
                                             const numInput = document.getElementById('profile_number');
-                                            if (numInput) numInput.focus();
+                                            if(numInput) numInput.focus();
                                         }, 100);
                                     }
                                 })
@@ -343,6 +396,33 @@
                                 .finally(() => {
                                     cepInput.parentElement.classList.remove('opacity-50');
                                 });
+                        }
+                    });
+                }
+
+                // --- 5. Lógica de Segmento e Interesses (Outros) ---
+                const segmentSelect = document.getElementById('segment_select');
+                const segmentCustom = document.getElementById('segment_custom');
+                if (segmentSelect && segmentCustom) {
+                    segmentSelect.addEventListener('change', function() {
+                        if (this.value === 'Outros') {
+                            segmentCustom.classList.remove('hidden');
+                            segmentCustom.focus();
+                        } else {
+                            segmentCustom.classList.add('hidden');
+                        }
+                    });
+                }
+
+                const interestsCb = document.getElementById('interests_other_cb');
+                const interestsCustom = document.getElementById('interests_custom');
+                if (interestsCb && interestsCustom) {
+                    interestsCb.addEventListener('change', function() {
+                        if (this.checked) {
+                            interestsCustom.classList.remove('hidden');
+                            interestsCustom.focus();
+                        } else {
+                            interestsCustom.classList.add('hidden');
                         }
                     });
                 }

@@ -29,8 +29,14 @@ class ProfileController extends Controller
             'doc' => 'nullable|string|max:20',
             'occupation' => 'nullable|string|max:100',
             'company' => 'nullable|string|max:100',
-            'segment' => 'nullable|string|max:120',
-            'interests' => 'nullable|string', // Aumentado para TEXT no banco
+
+            // New fields for Segment/Interests
+            'segment_select' => 'nullable|string',
+            'segment_custom' => 'nullable|string|max:120',
+            'interests_list' => 'nullable|array',
+            'interests_list.*' => 'string',
+            'interests_custom' => 'nullable|string',
+
             'bio' => 'nullable|string|max:500',
             'photo' => 'nullable|image|max:2048',
             'cover_photo' => 'nullable|image|max:4096',
@@ -58,14 +64,26 @@ class ProfileController extends Controller
         $data['show_address_public'] = $request->has('show_address_public');
         $data['hide_profile'] = $request->has('hide_profile');
 
-        // Processar Interesses (Tagify envia JSON)
-        if (!empty($data['interests'])) {
-            $json = json_decode($data['interests'], true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($json)) {
-                $tags = array_column($json, 'value');
-                $data['interests'] = implode(', ', $tags);
-            }
+        // 1. Process Segment
+        if ($request->segment_select === 'Outros') {
+            $data['segment'] = $request->segment_custom;
+        } else {
+            $data['segment'] = $request->segment_select;
         }
+
+        // 2. Process Interests
+        $interests = $request->interests_list ?? [];
+        if (!empty($request->interests_custom)) {
+            // Split custom interests by comma and merge
+            $customInterests = array_map('trim', explode(',', $request->interests_custom));
+            $interests = array_merge($interests, $customInterests);
+        }
+        // Remove duplicates and empty values
+        $interests = array_unique(array_filter($interests, function ($value) {
+            return !empty(trim($value));
+        }));
+
+        $data['interests'] = implode(', ', $interests);
 
         // Upload avatar
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
