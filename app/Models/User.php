@@ -78,6 +78,11 @@ class User extends Authenticatable
         return in_array($this->role, ['admin', 'superadmin']) || in_array($this->level, ['superadmin', 'sucesso']);
     }
 
+    public function isSuperAdmin()
+    {
+        return $this->role === 'superadmin' || $this->level === 'superadmin';
+    }
+
     public function canSellOnMarketplace(): bool
     {
         return $this->canAccessFeature('marketplace.sell')
