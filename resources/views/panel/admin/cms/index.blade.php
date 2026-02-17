@@ -31,13 +31,13 @@
                 <span>Home / Hero</span>
             </a>
             <a href="{{ route('panel.admin.cms.index', ['slug' => 'about']) }}"
-                :class="activeTab === 'about' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
+                :class="activeTab === 'about' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
                 class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                 <i class="fas fa-info-circle"></i>
                 <span>Sobre Nós</span>
             </a>
             <a href="{{ route('panel.admin.cms.index', ['slug' => 'footer']) }}"
-                :class="activeTab === 'footer' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
+                :class="activeTab === 'footer' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
                 class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                 <i class="fas fa-shoe-prints"></i>
                 <span>Rodapé / Links</span>
