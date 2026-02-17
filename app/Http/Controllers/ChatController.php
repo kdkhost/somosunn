@@ -66,6 +66,11 @@ class ChatController extends Controller
             ->update(['read_at' => now()]);
 
         $messages = $conversation->messages()->with('user')->latest()->limit(50)->get();
+
+        if (request()->ajax() || request()->expectsJson()) {
+            return view('chat.partials.conversation', compact('conversation', 'messages'))->render();
+        }
+
         $conversations = Auth::user()->conversations()
             ->with(['users'])
             ->withCount([
@@ -99,7 +104,7 @@ class ChatController extends Controller
                 }
             ])
             ->get()
-            ->map(function($conv) {
+            ->map(function ($conv) {
                 // Garante que conv é objeto, não Collection
                 return $conv;
             })

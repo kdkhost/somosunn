@@ -2,95 +2,120 @@
 
 @section('title', 'Mensagens - UNN')
 
-
-{{-- Remove breadcrumbs/admin context para painel --}}
-
 @section('panel_content')
-    @php
-        $routeNamePrefix = $routeNamePrefix ?? 'chat';
-        // $isAdminContext = ($extends ?? 'layouts.app') === 'admin.layouts.app';
-        $isAdminContext = false;
-    @endphp
+<div x-data="{ 
+        activeConversationId: null,
+        loading: false,
+        conversations: [],
+        
+        async loadConversation(id) {
+            if (this.activeConversationId === id) return;
+            this.activeConversationId = id;
+            this.loading = true;
+            
+            try {
+                const response = await fetch(`/chat/${id}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const html = await response.text();
+                this.$refs.chatContainer.innerHTML = html;
+                
+                // Executar scripts injetados
+                const scripts = this.$refs.chatContainer.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                });
+
+                // Atualizar histórico sem reload
+                window.history.pushState({}, '', `/chat/${id}`);
+            } catch (error) {
+                console.error('Erro ao carregar conversa:', error);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        refreshList() {
+            fetch('{{ route('chat.list') }}')
+                .then(r => r.json())
+                .then(data => { this.conversations = data; });
+        }
+    }" x-init="conversations = @json($conversations); setInterval(() => refreshList(), 5000)"
+    class="max-w-6xl mx-auto px-0 sm:px-4 py-2 sm:py-6 h-[calc(100vh-120px)] sm:h-[calc(100vh-160px)] md:h-[calc(100vh-180px)] min-h-[400px]">
 
     <div
-        class="{{ $isAdminContext ? 'px-0 py-2' : 'max-w-6xl mx-auto px-0 sm:px-4 py-2 sm:py-6' }} h-[calc(100vh-120px)] sm:h-[calc(100vh-160px)] md:h-[calc(100vh-180px)] min-h-[400px]">
-        <div
-            class="bg-white dark:bg-slate-900 rounded-none sm:rounded-lg shadow-xl overflow-hidden flex h-full border-0 sm:border border-gray-200 dark:border-slate-800 transition-colors duration-300">
-            <!-- Sidebar Conversations -->
-            <div class="w-full md:w-1/3 border-r border-gray-200 dark:border-slate-800 flex flex-col">
-                <div
-                    class="p-3 sm:p-4 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 transition-colors">
-                    <h2 class="font-bold text-lg sm:text-xl text-gray-800 dark:text-white">Mensagens</h2>
-                </div>
-                <div class="flex-1 overflow-y-auto" id="conversations-list">
-                    @foreach($conversations as $conv)
-                        @php
-                            $otherUser = $conv->users->where('id', '!=', Auth::id())->first() ?? $conv->users->first();
-                            $otherUserPhoto = $otherUser?->profile_photo_url ?? asset('img/default-user.svg');
-                            $otherUserName = $otherUser?->name ?? ($conv->title ?? 'Conversa');
-                        @endphp
-                        <a href="{{ route($routeNamePrefix . '.show', $conv->id) }}" data-conversation-id="{{ $conv->id }}"
-                            class="block p-3 sm:p-4 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition border-b border-gray-50 dark:border-slate-800/50">
-                            <div class="flex items-center gap-2 sm:gap-3">
-                                <img src="{{ $otherUserPhoto }}" alt="{{ $otherUserName }}"
-                                    class="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}'">
-                                <div class="flex-1 min-w-0">
-                                    <h4 class="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                                        {{ $otherUserName }}
-                                    </h4>
-                                    <p class="text-xs text-gray-500 dark:text-slate-400 truncate">Ver conversa...</p>
-                                </div>
-                                @if($conv->unread_count > 0)
-                                    <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full">
-                                        {{ $conv->unread_count }}
-                                    </span>
-                                @endif
-                            </div>
-                        </a>
-                    @endforeach
-                    @if($conversations->isEmpty())
-                        <div class="p-8 text-center text-gray-500 dark:text-gray-400">
-                            Nenhuma conversa iniciada.
-                        </div>
-                    @endif
-                </div>
+        class="bg-white dark:bg-slate-900 rounded-none sm:rounded-lg shadow-xl overflow-hidden flex h-full border-0 sm:border border-gray-200 dark:border-slate-800 transition-all duration-300">
+
+        <!-- Sidebar Conversations -->
+        <div :class="activeConversationId ? 'hidden md:flex' : 'flex'"
+            class="w-full md:w-1/3 border-r border-gray-200 dark:border-slate-800 flex-col transition-all">
+            <div
+                class="p-3 sm:p-4 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 transition-colors">
+                <h2 class="font-bold text-lg sm:text-xl text-gray-800 dark:text-white">Mensagens</h2>
             </div>
 
-            <!-- Chat Area -->
-            <div class="hidden md:flex flex-1 flex-col bg-slate-50 dark:bg-slate-950 transition-colors">
-                <div class="flex-1 flex items-center justify-center text-gray-400 dark:text-slate-600 flex-col gap-4">
-                    <i class="fas fa-comments text-6xl opacity-20"></i>
-                    <p class="font-medium">Selecione uma conversa para começar</p>
+            <div class="flex-1 overflow-y-auto no-scrollbar" id="conversations-list">
+                <template x-for="conv in conversations" :key="conv.id">
+                    <div @click="loadConversation(conv.id)"
+                        :class="activeConversationId == conv.id ? 'bg-blue-50 dark:bg-blue-900/30' : 'hover:bg-gray-50 dark:hover:bg-slate-800/50'"
+                        class="cursor-pointer block p-3 sm:p-4 transition border-b border-gray-100 dark:border-slate-800/50">
+
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <div class="relative flex-shrink-0">
+                                <img :src="conv.users.find(u => u.id != {{ Auth::id() }})?.profile_photo_url || '{{ asset('img/default-user.svg') }}'"
+                                    class="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-slate-700"
+                                    @error="$el.src='{{ asset('img/default-user.svg') }}'">
+                                <span
+                                    class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
+                            </div>
+
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-bold text-gray-900 dark:text-white truncate"
+                                    x-text="conv.users.find(u => u.id != {{ Auth::id() }})?.name || 'Conversa'"></h4>
+                                <p class="text-xs text-gray-500 dark:text-slate-400 truncate"
+                                    x-text="conv.messages[0]?.body || 'Ver conversa...'"></p>
+                            </div>
+
+                            <div class="flex flex-col items-end gap-1">
+                                <span x-show="conv.unread_count > 0" x-text="conv.unread_count"
+                                    class="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="conversations.length === 0" class="p-8 text-center text-gray-500 dark:text-slate-400">
+                    Nenhuma conversa iniciada.
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div :class="activeConversationId ? 'flex' : 'hidden md:flex'"
+            class="flex-1 flex-col bg-slate-50 dark:bg-slate-950 transition-all">
+
+            <div x-ref="chatContainer" class="flex-1 flex flex-col h-full relative">
+                <!-- Default state -->
+                <div x-show="!activeConversationId && !loading"
+                    class="flex-1 flex flex-col items-center justify-center text-gray-400 dark:text-slate-600 gap-4">
+                    <div class="w-20 h-20 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                        <i class="fas fa-comments text-3xl opacity-50"></i>
+                    </div>
+                    <p class="font-bold text-lg">Selecione uma conversa</p>
+                    <p class="text-sm opacity-70">Para começar a trocar mensagens agora mesmo</p>
+                </div>
+
+                <!-- Loading state -->
+                <div x-show="loading" class="flex-1 flex items-center justify-center">
+                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    @push('scripts')
-        <script>
-            setInterval(() => {
-                fetch('{{ route($routeNamePrefix . ".list") }}')
-                    .then(r => r.json())
-                    .then(conversations => {
-                        conversations.forEach(conv => {
-                            const link = document.querySelector(`[data-conversation-id="${conv.id}"]`);
-                            const badgeContainer = link ? link.querySelector('.flex.items-center') : null;
-                            if (badgeContainer) {
-                                let badge = badgeContainer.querySelector('span.bg-blue-600');
-                                if (conv.unread_count > 0) {
-                                    if (!badge) {
-                                        badge = document.createElement('span');
-                                        badge.className = 'bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full';
-                                        badgeContainer.appendChild(badge);
-                                    }
-                                    badge.textContent = conv.unread_count;
-                                } else if (badge) {
-                                    badge.remove();
-                                }
-                            }
-                        });
-                    });
-            }, 5000);
-        </script>
-    @endpush
+</div>
 @endsection
