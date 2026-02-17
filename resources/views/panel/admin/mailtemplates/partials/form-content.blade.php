@@ -4,28 +4,28 @@
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Nome</label>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Nome</label>
                     <input type="text" name="name" id="tpl_name" value="{{ old('name', $template->name ?? '') }}" required
-                           class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 transition-all font-medium text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600">
+                           class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 pr-4 py-2.5 px-4">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Slug (Identificador)</label>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Slug (Identificador)</label>
                     <input type="text" name="slug" id="tpl_slug" value="{{ old('slug', $template->slug ?? '') }}" required
                            {{ isset($template->id) ? 'readonly' : '' }}
-                           class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 focus:border-blue-500 focus:ring-blue-500 {{ isset($template->id) ? 'cursor-not-allowed' : '' }}">
+                           class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 outline-none transition-all font-medium pr-4 py-2.5 px-4 {{ isset($template->id) ? 'cursor-not-allowed opacity-75' : 'focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10' }}">
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Assunto do E-mail</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Assunto do E-mail</label>
                 <input type="text" name="subject" value="{{ old('subject', $template->subject ?? '') }}" required
-                       class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 transition-all font-medium text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600">
+                       class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 pr-4 py-2.5 px-4">
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Conteúdo (HTML)</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Conteúdo (HTML)</label>
                 <textarea name="body" id="bodyEditor">{{ old('body', $template->body ?? '') }}</textarea>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">A logo da plataforma será inserida automaticamente no topo do e-mail.</p>
+                <p class="text-xs text-slate-500 dark:text-slate-500 mt-2 transition-colors">A logo da plataforma será inserida automaticamente no topo do e-mail.</p>
             </div>
         </div>
 
@@ -36,8 +36,8 @@
                     <i class="fas fa-magic"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-slate-800 dark:text-white">Variáveis Dinâmicas</h3>
-                    <p class="text-xs text-slate-400 dark:text-slate-500">Clique para inserir no editor.</p>
+                    <h3 class="font-bold text-slate-800 dark:text-white transition-colors">Variáveis Dinâmicas</h3>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 transition-colors">Clique para inserir no editor.</p>
                 </div>
             </div>
             
@@ -78,8 +78,8 @@
             <h3 class="font-bold text-slate-800 dark:text-white mb-2">Configurações</h3>
             
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Categoria</label>
-                <select name="category" class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 transition-all font-medium text-slate-800 dark:text-white">
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Categoria</label>
+                <select name="category" class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-4 py-2.5 px-4">
                     @foreach(['sistema', 'conta', 'financeiro', 'marketing'] as $cat)
                         <option value="{{ $cat }}" {{ old('category', $template->category ?? '') == $cat ? 'selected' : '' }}>
                             {{ ucfirst($cat) }}
@@ -89,28 +89,28 @@
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Status</label>
-                <select name="is_active" class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 transition-all font-medium text-slate-800 dark:text-white">
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Status</label>
+                <select name="is_active" class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-4 py-2.5 px-4">
                     <option value="1" {{ old('is_active', $template->is_active ?? true) ? 'selected' : '' }}>Ativo</option>
                     <option value="0" {{ old('is_active', $template->is_active ?? true) ? '' : 'selected' }}>Inativo</option>
                 </select>
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Idioma</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Idioma</label>
                 <input type="text" name="locale" value="{{ old('locale', $template->locale ?? 'pt-BR') }}"
-                       class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 transition-all font-medium text-slate-800 dark:text-white">
+                       class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-4 py-2.5 px-4">
             </div>
         </div>
 
         <!-- Test Email -->
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 space-y-4 transition-colors duration-300">
-            <h3 class="font-bold text-slate-800 dark:text-white mb-2">Testar Template</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Salve as alterações antes de testar para visualizar o conteúdo atualizado.</p>
+            <h3 class="font-bold text-slate-800 dark:text-white mb-2 transition-colors">Testar Template</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-500 transition-colors">Salve as alterações antes de testar para visualizar o conteúdo atualizado.</p>
             
             <div class="flex gap-2">
                  <input type="email" id="test_email_input" placeholder="seu@email.com" 
-                        class="flex-1 rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 text-sm dark:text-white placeholder-slate-400 dark:placeholder-slate-600">
+                        class="flex-1 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none text-sm dark:text-white placeholder-slate-400 dark:placeholder-slate-600 pr-4 py-2.5 px-4 outline-none transition-all">
                  <button type="button" id="btnSendTest" 
                          data-url="{{ isset($template->id) ? route('panel.admin.mailtemplates.sendpreview', $template) : '' }}"
                          class="bg-slate-800 dark:bg-blue-600 text-white rounded-xl px-4 hover:bg-slate-900 dark:hover:bg-blue-700 transition shadow-md">

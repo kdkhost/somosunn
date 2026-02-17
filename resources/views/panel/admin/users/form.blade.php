@@ -3,9 +3,9 @@
 @section('title', ($user->id ? 'Editar' : 'Novo') . ' Usuário')
 
 @section('panel_breadcrumb')
-    <a href="{{ route('panel.admin.users.index') }}" class="hover:underline">Usuários</a>
-    <span class="mx-2">/</span>
-    <span class="text-slate-500">{{ $user->id ? 'Editar' : 'Novo' }}</span>
+    <a href="{{ route('panel.admin.users.index') }}" class="hover:underline transition-all">Usuários</a>
+    <span class="mx-2 text-slate-300 dark:text-slate-700 transition-colors">/</span>
+    <span class="text-slate-500 dark:text-slate-400 transition-colors">{{ $user->id ? 'Editar' : 'Novo' }}</span>
 @endsection
 
 @section('panel_content')
@@ -53,49 +53,49 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Main Info -->
                 <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-6 transition-colors duration-300">
-                        <h3 class="font-bold text-lg text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2 mb-4">Dados Pessoais</h3>
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 space-y-6 transition-colors duration-300">
+                        <h3 class="font-bold text-lg text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2 mb-4 transition-colors">Dados Pessoais</h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
-                                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Nome Completo</label>
+                                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Nome Completo</label>
                                 <input type="text" name="name" value="{{ old('name', $user->name) }}" required
-                                       class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                                       class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-4 py-2.5 px-4">
                             </div>
                             <div>
-                                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">E-mail</label>
+                                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">E-mail</label>
                                 <input type="email" name="email" value="{{ old('email', $user->email) }}" required
-                                       class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                                       class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-4 py-2.5 px-4">
                             </div>
                             <div>
-                                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">
                                     Senha 
-                                    @if($user->id) <span class="font-normal text-slate-400 dark:text-slate-500 text-xs ml-1">(deixe em branco para manter)</span> @endif
+                                    @if($user->id) <span class="font-normal text-slate-400 dark:text-slate-500 text-xs ml-1 transition-colors">(deixe em branco para manter)</span> @endif
                                 </label>
                                 <input type="password" name="password" {{ !$user->id ? 'required' : '' }}
-                                       class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                                       class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-4 py-2.5 px-4">
                             </div>
                         </div>
                     </div>
 
                     <!-- Permissions / Features -->
-                    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 transition-colors duration-300">
-                        <h3 class="font-bold text-lg text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2 mb-4">
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 transition-colors duration-300">
+                        <h3 class="font-bold text-lg text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2 mb-4 transition-colors">
                             Permissões e Recursos
-                            <span class="text-xs font-normal text-slate-400 dark:text-slate-500 ml-2">Liberar acesso individual a funcionalidades</span>
+                            <span class="text-xs font-normal text-slate-400 dark:text-slate-500 ml-2 transition-colors">Liberar acesso individual a funcionalidades</span>
                         </h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             @foreach($userFeatures as $key => $label)
-                                <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer group">
+                                <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-950 transition cursor-pointer group">
                                     <div class="flex items-center h-5">
                                         <input type="checkbox" name="extra_features[]" value="{{ $key }}"
                                             {{ in_array($key, old('extra_features', $user->extra_features ?? [])) ? 'checked' : '' }}
-                                            class="w-4 h-4 text-blue-600 border-gray-300 dark:border-slate-600 rounded focus:ring-blue-500 dark:bg-slate-900 dark:checked:bg-blue-600">
+                                            class="w-4 h-4 text-blue-600 border-gray-300 dark:border-slate-700 rounded focus:ring-blue-500 dark:bg-slate-950 dark:checked:bg-blue-600 transition-colors">
                                     </div>
                                     <div class="flex flex-col">
                                         <span class="text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition">{{ $label }}</span>
-                                        <span class="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{{ $key }}</span>
+                                        <span class="text-[10px] text-slate-400 dark:text-slate-500 font-mono transition-colors">{{ $key }}</span>
                                     </div>
                                 </label>
                             @endforeach
@@ -107,11 +107,11 @@
                 <div class="space-y-6">
                     <!-- Access Control -->
                     <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 space-y-4 transition-colors duration-300">
-                        <h3 class="font-bold text-slate-800 dark:text-white mb-2">Controle de Acesso</h3>
+                        <h3 class="font-bold text-slate-800 dark:text-white mb-2 transition-colors">Controle de Acesso</h3>
                         
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Função (Role)</label>
-                            <select name="role" class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Função (Role)</label>
+                            <select name="role" class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white outline-none">
                                 <option value="membro" {{ old('role', $user->role) == 'membro' ? 'selected' : '' }}>Membro</option>
                                 <option value="instrutor" {{ old('role', $user->role) == 'instrutor' ? 'selected' : '' }}>Instrutor</option>
                                 <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Administrador</option>
@@ -119,12 +119,12 @@
                                     <option value="superadmin" {{ old('role', $user->role) == 'superadmin' ? 'selected' : '' }}>Super Admin</option>
                                 @endif
                             </select>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Define o nível hierárquico no sistema.</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-500 mt-1 transition-colors">Define o nível hierárquico no sistema.</p>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Nível (Gamification)</label>
-                            <select name="level" class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Nível (Gamification)</label>
+                            <select name="level" class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white outline-none">
                                 <option value="iniciante" {{ old('level', $user->level) == 'iniciante' ? 'selected' : '' }}>Iniciante</option>
                                 <option value="bronze" {{ old('level', $user->level) == 'bronze' ? 'selected' : '' }}>Bronze</option>
                                 <option value="prata" {{ old('level', $user->level) == 'prata' ? 'selected' : '' }}>Prata</option>
@@ -137,11 +137,11 @@
 
                     <!-- Plan Control -->
                     <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 space-y-4 transition-colors duration-300">
-                        <h3 class="font-bold text-slate-800 dark:text-white mb-2">Plano e Assinatura</h3>
+                        <h3 class="font-bold text-slate-800 dark:text-white mb-2 transition-colors">Plano e Assinatura</h3>
                         
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Plano Ativo</label>
-                            <select name="plan_id" class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Plano Ativo</label>
+                            <select name="plan_id" class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white outline-none">
                                 <option value="">-- Sem Plano --</option>
                                 @foreach($plans as $plan)
                                     <option value="{{ $plan->id }}" {{ old('plan_id', $user->plan_id) == $plan->id ? 'selected' : '' }}>
@@ -152,10 +152,10 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Expira em</label>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Expira em</label>
                             <input type="date" name="plan_expires_at" 
                                    value="{{ old('plan_expires_at', $user->plan_expires_at ? $user->plan_expires_at->format('Y-m-d') : '') }}"
-                                   class="w-full rounded-xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                                   class="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white outline-none">
                         </div>
                     </div>
                 </div>

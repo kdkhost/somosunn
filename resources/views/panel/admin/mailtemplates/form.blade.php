@@ -5,25 +5,13 @@
 @push('styles')
     <!-- Summernote Lite CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
-    <style>
-        .note-editor.note-frame {
-            border-radius: 0.75rem;
-            border-color: #e2e8f0;
-        }
-
-        .note-toolbar {
-            border-top-left-radius: 0.75rem;
-            border-top-right-radius: 0.75rem;
-            background-color: #f8fafc !important;
-            border-bottom-color: #e2e8f0;
-        }
-    </style>
+@endpush
 @endpush
 
 @section('panel_breadcrumb')
-    <a href="{{ route('panel.admin.mailtemplates.index') }}" class="hover:underline">Templates</a>
-    <span class="mx-2">/</span>
-    <span class="text-slate-500">{{ $template->id ? 'Editar' : 'Novo' }}</span>
+    <a href="{{ route('panel.admin.mailtemplates.index') }}" class="hover:underline transition-all">Templates</a>
+    <span class="mx-2 text-slate-300 dark:text-slate-700 transition-colors">/</span>
+    <span class="text-slate-500 dark:text-slate-400 transition-colors">{{ $template->id ? 'Editar' : 'Novo' }}</span>
 @endsection
 
 @section('panel_content')
@@ -37,12 +25,12 @@
 
         <div class="space-y-6">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-slate-800">
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-white transition-colors">
                     {{ $template->id ? 'Editar' : 'Novo' }} Modelo de E-mail
                 </h2>
                 <div class="flex gap-3">
                     <a href="{{ route('panel.admin.mailtemplates.index') }}"
-                        class="bg-white border border-slate-200 text-slate-600 font-bold py-2 px-4 rounded-xl hover:bg-slate-50 transition">
+                        class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-bold py-2 px-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                         Cancelar
                     </a>
                     <button type="submit"

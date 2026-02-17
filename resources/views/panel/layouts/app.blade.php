@@ -11,6 +11,60 @@
 
     <!-- Tagify CSS -->
     <link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        /* Summernote Dark Mode Global Overrides */
+        .note-editor.note-frame {
+            border-radius: 1.25rem !important;
+            border-color: #e2e8f0 !important;
+            overflow: hidden;
+        }
+
+        .note-toolbar {
+            background-color: #f8fafc !important;
+            border-bottom-color: #e2e8f0 !important;
+            padding: 0.75rem !important;
+        }
+
+        .dark .note-editor.note-frame {
+            border-color: #1e293b !important;
+            background-color: #020617 !important;
+        }
+
+        .dark .note-toolbar {
+            background-color: #0f172a !important;
+            border-bottom-color: #1e293b !important;
+        }
+
+        .dark .note-btn {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        .dark .note-editable {
+            background-color: #020617 !important;
+            color: #f8fafc !important;
+        }
+
+        .dark .note-statusbar {
+            background-color: #0f172a !important;
+            border-top-color: #1e293b !important;
+        }
+
+        .dark .note-dropdown-menu {
+            background-color: #0f172a !important;
+            border-color: #1e293b !important;
+        }
+
+        .dark .note-dropdown-item {
+            color: #f8fafc !important;
+        }
+
+        .dark .note-dropdown-item:hover {
+            background-color: #1e293b !important;
+        }
+    </style>
 @endpush
 
 @section('content')

@@ -7,19 +7,20 @@
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">
                     {{ $event->exists ? 'Editar Evento' : 'Novo Evento' }}
                 </h1>
-                <p class="text-sm text-slate-500 mt-1">Configure datas, local e venda de ingressos para seu evento.</p>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">Configure datas, local e venda
+                    de ingressos para seu evento.</p>
             </div>
 
             <div class="flex items-center gap-3">
                 <a href="{{ route('panel.admin.events.index') }}"
-                    class="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all">
+                    class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all">
                     Cancelar
                 </a>
                 <button type="submit" form="eventForm"
-                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center gap-2">
+                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2">
                     <i class="fas fa-save"></i>
                     <span>Salvar Evento</span>
                 </button>
@@ -27,28 +28,29 @@
         </div>
 
         {{-- Tabs Navigation --}}
-        <div class="bg-white p-1 rounded-2xl shadow-sm border border-slate-200 inline-flex items-center gap-1">
+        <div
+            class="bg-white dark:bg-slate-950 p-1 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 inline-flex items-center gap-1 transition-colors duration-300">
             <button @click="tab = 'general'"
-                :class="tab === 'general' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'"
+                :class="tab === 'general' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
                 class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                 <i class="fas fa-info-circle"></i>
                 <span>Geral</span>
             </button>
             <button @click="tab = 'location'"
-                :class="tab === 'location' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'"
+                :class="tab === 'location' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
                 class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                 <i class="fas fa-map-marker-alt"></i>
                 <span>Local & Capacidade</span>
             </button>
             <button @click="tab = 'pricing'"
-                :class="tab === 'pricing' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'"
+                :class="tab === 'pricing' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
                 class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                 <i class="fas fa-tag"></i>
                 <span>Preço & Ingressos</span>
             </button>
             @if($event->exists)
                 <button @click="tab = 'certificate'"
-                    :class="tab === 'certificate' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'"
+                    :class="tab === 'certificate' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
                     class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                     <i class="fas fa-certificate"></i>
                     <span>Certificado</span>
@@ -65,61 +67,75 @@
             {{-- Tab: General --}}
             <div x-show="tab === 'general'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 space-y-6">
+                    <div
+                        class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6 transition-colors duration-300">
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Título do Evento</label>
+                            <label
+                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Título
+                                do Evento</label>
                             <input type="text" name="title" value="{{ old('title', $event->title) }}" required
-                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 font-medium">
+                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Início</label>
+                                <label
+                                    class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Início</label>
                                 <input type="datetime-local" name="start_at"
                                     value="{{ old('start_at', $event->start_at ? $event->start_at->format('Y-m-d\TH:i') : '') }}"
                                     required
-                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 font-medium">
+                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Fim (Opcional)</label>
+                                <label
+                                    class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Fim
+                                    (Opcional)</label>
                                 <input type="datetime-local" name="end_at"
                                     value="{{ old('end_at', $event->end_at ? $event->end_at->format('Y-m-d\TH:i') : '') }}"
-                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 font-medium">
+                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">
                             </div>
                         </div>
 
                         <div class="flex items-center gap-6">
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" name="all_day" id="allDay" value="1" @checked(old('all_day', $event->all_day))
-                                    class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500">
-                                <label for="allDay" class="text-sm font-semibold text-slate-700">Dia Todo</label>
+                                    class="w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-700 rounded focus:ring-blue-500 bg-white dark:bg-slate-950">
+                                <label for="allDay"
+                                    class="text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors">Dia
+                                    Todo</label>
                             </div>
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" name="published" id="published" value="1" @checked(old('published', $event->exists ? $event->published : true))
-                                    class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500">
-                                <label for="published" class="text-sm font-semibold text-slate-700">Publicado</label>
+                                    class="w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-700 rounded focus:ring-blue-500 bg-white dark:bg-slate-950">
+                                <label for="published"
+                                    class="text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors">Publicado</label>
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Descrição</label>
+                            <label
+                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Descrição</label>
                             <textarea name="description" rows="8"
-                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 font-medium">{{ old('description', $event->description) }}</textarea>
+                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">{{ old('description', $event->description) }}</textarea>
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-6">
                     {{-- Cover Image --}}
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-4">Capa do Evento</label>
+                    <div
+                        class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
+                        <label
+                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-4 transition-colors">Capa
+                            do Evento</label>
                         <div class="space-y-4">
                             <div
-                                class="aspect-video w-full rounded-2xl bg-slate-100 overflow-hidden border border-slate-200 relative group">
+                                class="aspect-video w-full rounded-2xl bg-slate-100 dark:bg-slate-950 overflow-hidden border border-slate-200 dark:border-slate-800 relative group">
                                 @if($event->image)
                                     <img src="{{ asset('storage/' . $event->image) }}" class="w-full h-full object-cover">
                                 @else
-                                    <div class="w-full h-full flex flex-col items-center justify-center text-slate-400">
+                                    <div
+                                        class="w-full h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 transition-colors">
                                         <i class="fas fa-image text-4xl mb-2"></i>
                                         <span class="text-xs font-bold text-center px-4 italic">Formatos: JPG, PNG, GIF. Máx:
                                             5MB</span>
@@ -127,17 +143,22 @@
                                 @endif
                             </div>
                             <input type="file" name="image"
-                                class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all cursor-pointer">
+                                class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50 transition-all cursor-pointer">
                         </div>
                     </div>
 
                     {{-- Event Color --}}
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-4">Cor no Calendário</label>
+                    <div
+                        class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
+                        <label
+                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-4 transition-colors">Cor
+                            no Calendário</label>
                         <div class="flex items-center gap-3">
                             <input type="color" name="color" value="{{ old('color', $event->color ?: '#3b82f6') }}"
                                 class="w-12 h-12 rounded-xl border-none p-0 cursor-pointer overflow-hidden transition-transform hover:scale-105 shadow-sm">
-                            <span class="text-sm font-semibold text-slate-600">Representação visual</span>
+                            <span
+                                class="text-sm font-semibold text-slate-600 dark:text-slate-400 transition-colors">Representação
+                                visual</span>
                         </div>
                     </div>
                 </div>
@@ -145,26 +166,26 @@
 
             {{-- Tab: Location --}}
             <div x-show="tab === 'location'" class="max-w-4xl space-y-6">
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 space-y-6">
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6 transition-colors duration-300">
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Nome do Local</label>
+                        <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Nome do Local</label>
                         <input type="text" name="location" value="{{ old('location', $event->location) }}"
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 font-medium"
+                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
                             placeholder="Ex: Espaço Solarium / Online">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Endereço Completo</label>
+                        <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Endereço Completo</label>
                         <input type="text" name="address" value="{{ old('address', $event->address) }}"
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 font-medium"
+                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
                             placeholder="Ex: Av. Paulista, 1000 - São Paulo, SP">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Capacidade Máxima</label>
+                            <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Capacidade Máxima</label>
                             <input type="number" name="capacity" value="{{ old('capacity', $event->capacity) }}"
-                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 font-bold"
+                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-bold"
                                 placeholder="Ex: 100 (0 para ilimitado)">
                         </div>
                     </div>
@@ -173,34 +194,34 @@
 
             {{-- Tab: Pricing --}}
             <div x-show="tab === 'pricing'" class="max-w-3xl space-y-6">
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 space-y-6">
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6 transition-colors duration-300">
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Preço do Ingresso (R$)</label>
+                        <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Preço do Ingresso (R$)</label>
                         <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">R$</span>
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold transition-colors">R$</span>
                             <input type="text" name="price"
                                 value="{{ old('price', number_format($event->price, 2, ',', '.')) }}"
-                                class="mask-money w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 font-bold text-lg">
+                                class="mask-money w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-bold text-lg">
                         </div>
                     </div>
 
-                    <div class="p-6 bg-emerald-50 rounded-2xl border border-emerald-100 space-y-6">
-                        <div class="flex items-center gap-3 text-emerald-700 font-bold">
+                    <div class="p-6 bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-100 dark:border-emerald-800/30 space-y-6 transition-colors">
+                        <div class="flex items-center gap-3 text-emerald-700 dark:text-emerald-400 font-bold">
                             <i class="fas fa-bolt"></i>
                             <span>Preço Promocional Flash</span>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-bold text-emerald-600 uppercase mb-2">Valor Flash</label>
+                                <label class="block text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 transition-colors">Valor Flash</label>
                                 <input type="text" name="flash_sale_price"
                                     value="{{ old('flash_sale_price', $event->flash_sale_price ? number_format($event->flash_sale_price, 2, ',', '.') : '') }}"
-                                    class="mask-money w-full px-4 py-3 bg-white border border-emerald-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-emerald-900 font-bold">
+                                    class="mask-money w-full px-4 py-3 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-emerald-900 dark:text-white font-bold">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-emerald-600 uppercase mb-2">Expira em</label>
+                                <label class="block text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 transition-colors">Expira em</label>
                                 <input type="datetime-local" name="flash_sale_ends_at"
                                     value="{{ old('flash_sale_ends_at', $event->flash_sale_ends_at ? $event->flash_sale_ends_at->format('Y-m-d\TH:i') : '') }}"
-                                    class="w-full px-4 py-3 bg-white border border-emerald-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-emerald-900 font-medium">
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-emerald-900 dark:text-white font-medium">
                             </div>
                         </div>
                     </div>
@@ -213,13 +234,13 @@
                     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         {{-- Preview Canvas --}}
                         <div
-                            class="xl:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-slate-200 min-h-[600px] flex flex-col">
+                            class="xl:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 min-h-[600px] flex flex-col transition-colors duration-300">
                             <div class="flex items-center justify-between mb-6">
-                                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Editor do Certificado</h3>
+                                <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider transition-colors">Editor do Certificado</h3>
                             </div>
 
                             <div
-                                class="flex-1 bg-slate-100 rounded-2xl p-8 flex items-center justify-center overflow-auto border-2 border-dashed border-slate-200">
+                                class="flex-1 bg-slate-100 dark:bg-slate-950 rounded-2xl p-8 flex items-center justify-center overflow-auto border-2 border-dashed border-slate-200 dark:border-slate-800 transition-colors">
                                 <div id="cert-canvas" class="relative bg-white shadow-2xl overflow-hidden shrink-0"
                                     style="width: 842px; height: 595px;">
                                     @if($event->certificate_bg)
@@ -233,23 +254,23 @@
 
                         {{-- Settings --}}
                         <div class="space-y-6">
-                            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                            <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
                                 <div class="flex items-center gap-3 mb-6">
-                                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors">
                                         <i class="fas fa-cog"></i>
                                     </div>
-                                    <h3 class="text-sm font-bold text-slate-900 uppercase">Configurações</h3>
+                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase transition-colors">Configurações</h3>
                                 </div>
 
                                 <div class="space-y-6">
                                     <div
-                                        class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <span class="text-xs font-bold text-slate-700 uppercase">Habilitar Certificado</span>
+                                        class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 transition-colors">
+                                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase transition-colors">Habilitar Certificado</span>
                                         <label class="relative inline-flex items-center cursor-pointer">
                                             <input type="checkbox" name="is_certificate_enabled" value="1"
                                                 @checked($event->is_certificate_enabled) class="sr-only peer">
                                             <div
-                                                class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                                class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 dark:after:border-slate-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors">
                                             </div>
                                         </label>
                                     </div>

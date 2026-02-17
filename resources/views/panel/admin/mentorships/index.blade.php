@@ -7,8 +7,10 @@
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900">Mentorias</h1>
-                <p class="text-sm text-slate-500 mt-1">Crie e gerencie seus programas de mentoria, slots e agendamentos.</p>
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">Mentorias
+                </h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">Crie e gerencie seus programas
+                    de mentoria, slots e agendamentos.</p>
             </div>
 
             <div class="flex items-center gap-3">
@@ -22,14 +24,18 @@
 
         {{-- Stats Cards (Quick Overview) --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div
+                class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors">
                         <i class="fas fa-chalkboard-teacher text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-slate-500">Total de Mentorias</p>
-                        <p class="text-2xl font-bold text-slate-900">{{ $mentorships->total() }}</p>
+                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400 transition-colors">Total de
+                            Mentorias</p>
+                        <p class="text-2xl font-bold text-slate-900 dark:text-white transition-colors">
+                            {{ $mentorships->total() }}</p>
                     </div>
                 </div>
             </div>
@@ -37,19 +43,21 @@
         </div>
 
         {{-- Table / List --}}
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+        <div
+            class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
             {{-- Filters/Search --}}
-            <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+            <div
+                class="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-colors">
                 <form action="{{ route('panel.admin.mentorships.index') }}" method="GET"
                     class="flex flex-col md:flex-row gap-4">
                     <div class="flex-1 relative group">
                         <i
-                            class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
+                            class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors"></i>
                         <input type="text" name="q" value="{{ $search }}" placeholder="Buscar por título ou descrição..."
-                            class="w-full pl-11 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium">
+                            class="w-full pl-11 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium">
                     </div>
                     <button type="submit"
-                        class="px-6 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm">
+                        class="px-6 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm">
                         Filtrar
                     </button>
                 </form>
@@ -58,36 +66,48 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-50/50">
-                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">Mentoria
+                        <tr class="bg-slate-50/50 dark:bg-slate-950 transition-colors">
+                            <th
+                                class="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
+                                Mentoria
                             </th>
-                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">Mentor</th>
-                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">Tipo / Vagas
+                            <th
+                                class="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
+                                Mentor</th>
+                            <th
+                                class="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
+                                Tipo / Vagas
                             </th>
-                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">Preço</th>
-                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 text-right">
+                            <th
+                                class="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
+                                Preço</th>
+                            <th
+                                class="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800 text-right">
                                 Ações</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @forelse($mentorships as $mentorship)
                             <tr class="group hover:bg-slate-50/50 transition-all">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-4">
                                         @if($mentorship->image)
                                             <img src="{{ asset($mentorship->image) }}"
-                                                class="w-12 h-12 rounded-lg object-cover border border-slate-100 shadow-sm">
+                                                class="w-12 h-12 rounded-lg object-cover border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
                                         @else
                                             <div
-                                                class="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400">
+                                                class="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-600 transition-colors">
                                                 <i class="fas fa-chalkboard-teacher"></i>
                                             </div>
                                         @endif
                                         <div>
                                             <p
-                                                class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                                                {{ $mentorship->title }}</p>
-                                            <p class="text-[10px] text-slate-400 mt-0.5 uppercase tracking-wider">ID:
+                                                class="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                                {{ $mentorship->title }}
+                                            </p>
+                                            <p
+                                                class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 uppercase tracking-wider transition-colors">
+                                                ID:
                                                 #{{ $mentorship->id }}</p>
                                         </div>
                                     </div>
@@ -95,29 +115,31 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
                                         <div
-                                            class="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold">
+                                            class="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center text-[10px] font-bold transition-colors">
                                             {{ strtoupper(substr($mentorship->mentor->name ?? 'M', 0, 1)) }}
                                         </div>
                                         <span
-                                            class="text-sm font-medium text-slate-600">{{ $mentorship->mentor->name ?? 'N/A' }}</span>
+                                            class="text-sm font-medium text-slate-600 dark:text-slate-400 transition-colors">{{ $mentorship->mentor->name ?? 'N/A' }}</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="space-y-1">
                                         <span
-                                            class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider {{ $mentorship->type == 'online' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100' }}">
+                                            class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider {{ $mentorship->type == 'online' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-800/50' }} transition-colors">
                                             {{ $mentorship->type }}
                                         </span>
-                                        <p class="text-xs text-slate-500 font-medium">{{ $mentorship->slots ?? '∞' }} vagas</p>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium transition-colors">
+                                            {{ $mentorship->slots ?? '∞' }} vagas</p>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="space-y-0.5">
-                                        <p class="text-sm font-bold text-slate-900">R$
-                                            {{ number_format($mentorship->price, 2, ',', '.') }}</p>
+                                        <p class="text-sm font-bold text-slate-900 dark:text-white transition-colors">R$
+                                            {{ number_format($mentorship->price, 2, ',', '.') }}
+                                        </p>
                                         @if($mentorship->flash_sale_price)
                                             <p
-                                                class="text-[10px] text-emerald-500 font-bold uppercase tracking-tight flex items-center gap-1">
+                                                class="text-[10px] text-emerald-500 dark:text-emerald-400 font-bold uppercase tracking-tight flex items-center gap-1 transition-colors">
                                                 <i class="fas fa-bolt"></i>
                                                 Flash: R$ {{ number_format($mentorship->flash_sale_price, 2, ',', '.') }}
                                             </p>
@@ -127,7 +149,7 @@
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
                                         <a href="{{ route('panel.admin.mentorships.edit', $mentorship) }}"
-                                            class="p-2 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all border border-transparent hover:border-blue-100 text-slate-400"
+                                            class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all border border-transparent hover:border-blue-100 dark:hover:border-blue-800/50 text-slate-400 dark:text-slate-500"
                                             title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
@@ -136,7 +158,7 @@
                                             class="inline">
                                             @csrf @method('DELETE')
                                             <button type="submit"
-                                                class="p-2 hover:bg-red-50 hover:text-red-700 rounded-xl transition-all border border-transparent hover:border-red-100 text-slate-400"
+                                                class="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-400 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-800/50 text-slate-400 dark:text-slate-500"
                                                 title="Excluir">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
@@ -146,14 +168,16 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-12 text-center">
+                                <td colspan="5" class="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
                                     <div class="flex flex-col items-center">
                                         <div
-                                            class="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 mb-4">
+                                            class="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-4 transition-colors">
                                             <i class="fas fa-chalkboard-teacher text-2xl"></i>
                                         </div>
-                                        <h3 class="text-sm font-bold text-slate-900">Nenhuma mentoria encontrada</h3>
-                                        <p class="text-xs text-slate-500 mt-1">Tente ajustar seus filtros ou crie uma nova
+                                        <h3 class="text-sm font-bold text-slate-900 dark:text-white transition-colors">Nenhuma
+                                            mentoria encontrada</h3>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 transition-colors">Tente
+                                            ajustar seus filtros ou crie uma nova
                                             mentoria.</p>
                                     </div>
                                 </td>
@@ -164,7 +188,8 @@
             </div>
 
             @if($mentorships->hasPages())
-                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+                <div
+                    class="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-colors duration-300">
                     {{ $mentorships->links() }}
                 </div>
             @endif

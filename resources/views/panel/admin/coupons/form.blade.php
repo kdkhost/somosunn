@@ -6,7 +6,7 @@
     <div class="max-w-4xl mx-auto space-y-6">
         {{-- Header --}}
         <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 transition-colors">
+            <div class="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-500 transition-colors">
                 <a href="{{ route('panel.admin.coupons.index') }}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Cupons</a>
                 <i class="fas fa-chevron-right text-xs"></i>
                 <span class="text-slate-900 dark:text-white font-medium transition-colors">{{ $coupon->id ? 'Editar Cupom' : 'Novo Cupom' }}</span>

@@ -21,10 +21,12 @@
         </div>
         <div id="mercadopago_card" class="hidden p-6 border-t border-slate-200 dark:border-slate-800">
             <div class="mb-6">
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Ambiente de
+                <label
+                    class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 transition-colors">Ambiente
+                    de
                     Execução</label>
                 <select name="mercadopago_env"
-                    class="gateway-env-select w-full rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+                    class="gateway-env-select w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium"
                     data-gateway="mercadopago">
                     <option value="sandbox" {{ ($settings['mercadopago_env'] ?? 'sandbox') == 'sandbox' ? 'selected' : '' }}>Sandbox (Ambiente de Testes)</option>
                     <option value="production" {{ ($settings['mercadopago_env'] ?? 'sandbox') == 'production' ? 'selected' : '' }}>Produção (Ambiente Real)</option>
@@ -38,18 +40,22 @@
                         class="fas fa-tools mr-1"></i> Credenciais de Sandbox</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Public Key
+                        <label
+                            class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Public
+                            Key
                             (Sandbox)</label>
                         <input type="text" name="mercadopago_sandbox_public_key"
                             value="{{ $settings['mercadopago_sandbox_public_key'] ?? '' }}"
-                            class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                            class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Access Token
+                        <label
+                            class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Access
+                            Token
                             (Sandbox)</label>
                         <input type="text" name="mercadopago_sandbox_access_token"
                             value="{{ $settings['mercadopago_sandbox_access_token'] ?? '' }}"
-                            class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                            class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                     </div>
                 </div>
             </div>
@@ -61,29 +67,34 @@
                         class="fas fa-check-circle mr-1"></i> Credenciais de Produção</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Public Key
+                        <label
+                            class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Public
+                            Key
                             (Produção)</label>
                         <input type="text" name="mercadopago_prod_public_key"
                             value="{{ $settings['mercadopago_prod_public_key'] ?? '' }}"
-                            class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                            class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Access Token
+                        <label
+                            class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Access
+                            Token
                             (Produção)</label>
                         <input type="text" name="mercadopago_prod_access_token"
                             value="{{ $settings['mercadopago_prod_access_token'] ?? '' }}"
-                            class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                            class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                     </div>
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Webhook URL</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Webhook
+                    URL</label>
                 <div class="flex">
                     <input type="text" readonly value="{{ route('api.webhooks.mercadopago') }}"
-                        class="w-full rounded-l-2xl border-slate-400 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-colors">
+                        class="w-full rounded-l-2xl border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm focus:outline-none transition-colors">
                     <button type="button" onclick="copyToClipboard('{{ route('api.webhooks.mercadopago') }}')"
-                        class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-750 border border-l-0 border-slate-400 dark:border-slate-700 rounded-r-2xl px-4 text-slate-600 dark:text-slate-300 font-medium transition-colors">
+                        class="bg-slate-100 dark:bg-slate-800 h-10 hover:bg-slate-200 dark:hover:bg-slate-750 border border-l-0 border-slate-200 dark:border-slate-800 rounded-r-2xl px-4 text-slate-600 dark:text-slate-300 font-medium transition-colors">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
@@ -104,16 +115,20 @@
         <div id="pagseguro_card" class="hidden p-6 border-t border-slate-200 dark:border-slate-800">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">E-mail da
+                    <label
+                        class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">E-mail
+                        da
                         Conta</label>
                     <input type="email" name="pagseguro_email" value="{{ $settings['pagseguro_email'] ?? '' }}"
-                        class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                        class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Ambiente de
+                    <label
+                        class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Ambiente
+                        de
                         Execução</label>
                     <select name="pagseguro_env"
-                        class="gateway-env-select w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium"
+                        class="gateway-env-select w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium"
                         data-gateway="pagseguro">
                         <option value="sandbox" {{ ($settings['pagseguro_env'] ?? 'sandbox') == 'sandbox' ? 'selected' : '' }}>Sandbox (Testes)</option>
                         <option value="production" {{ ($settings['pagseguro_env'] ?? 'sandbox') == 'production' ? 'selected' : '' }}>Produção</option>
@@ -126,11 +141,12 @@
                 <h4 class="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-4"><i
                         class="fas fa-tools mr-1"></i> Credenciais de Sandbox</h4>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Token
+                    <label
+                        class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Token
                         (Sandbox)</label>
                     <input type="text" name="pagseguro_sandbox_token"
                         value="{{ $settings['pagseguro_sandbox_token'] ?? '' }}"
-                        class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                        class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                 </div>
             </div>
 
@@ -139,20 +155,22 @@
                 <h4 class="text-xs font-bold text-green-700 dark:text-green-500 uppercase tracking-wider mb-4"><i
                         class="fas fa-check-circle mr-1"></i> Credenciais de Produção</h4>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Token
+                    <label
+                        class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Token
                         (Produção)</label>
                     <input type="text" name="pagseguro_prod_token" value="{{ $settings['pagseguro_prod_token'] ?? '' }}"
-                        class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                        class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Webhook URL</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Webhook
+                    URL</label>
                 <div class="flex">
                     <input type="text" readonly value="{{ route('api.webhooks.pagseguro') }}"
-                        class="w-full rounded-l-2xl border-slate-400 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-colors">
+                        class="w-full rounded-l-2xl border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm focus:outline-none transition-colors">
                     <button type="button" onclick="copyToClipboard('{{ route('api.webhooks.pagseguro') }}')"
-                        class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-750 border border-l-0 border-slate-400 dark:border-slate-700 rounded-r-2xl px-4 text-slate-600 dark:text-slate-300 font-medium transition-colors">
+                        class="bg-slate-100 dark:bg-slate-800 h-10 hover:bg-slate-200 dark:hover:bg-slate-750 border border-l-0 border-slate-200 dark:border-slate-800 rounded-r-2xl px-4 text-slate-600 dark:text-slate-300 font-medium transition-colors">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
@@ -174,38 +192,44 @@
                     {{ ($settings['gateway_transparent_checkout'] ?? 0) ? 'checked' : '' }}>
             </div>
             <div class="text-sm">
-                <label for="gateway_transparent_checkout" class="font-bold text-slate-700 dark:text-slate-300">Habilitar
+                <label for="gateway_transparent_checkout"
+                    class="font-bold text-slate-700 dark:text-slate-300 transition-colors">Habilitar
                     Checkout Transparente</label>
-                <p class="text-slate-500 dark:text-slate-400">Se desativado, o usuário será redirecionado para a página
+                <p class="text-slate-500 dark:text-slate-400 transition-colors">Se desativado, o usuário será
+                    redirecionado para a página
                     de pagamento do gateway.</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Juros de Parcelamento (%
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Juros
+                    de Parcelamento (%
                     a.m.)</label>
                 <div class="relative">
                     <input type="number" step="0.01" name="gateway_installment_tax"
                         value="{{ $settings['gateway_installment_tax'] ?? '0.00' }}"
-                        class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white pr-8">
+                        class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-8">
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <span class="text-slate-500 dark:text-slate-400">%</span>
                     </div>
                 </div>
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Máx. Parcelas sem
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Máx.
+                    Parcelas sem
                     Juros</label>
                 <input type="number" name="gateway_max_installments_no_interest"
                     value="{{ $settings['gateway_max_installments_no_interest'] ?? '1' }}"
-                    class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                    class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Repassar Taxas ao
+                <label
+                    class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Repassar
+                    Taxas ao
                     Cliente?</label>
                 <select name="gateway_pass_tax_to_client"
-                    class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                    class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                     <option value="0" {{ ($settings['gateway_pass_tax_to_client'] ?? 0) == 0 ? 'selected' : '' }}>Não
                         (Empresa absorve)</option>
                     <option value="1" {{ ($settings['gateway_pass_tax_to_client'] ?? 0) == 1 ? 'selected' : '' }}>Sim

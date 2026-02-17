@@ -6,7 +6,7 @@
     <div class="max-w-5xl mx-auto space-y-6">
         {{-- Header --}}
         <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 transition-colors">
+            <div class="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-500 transition-colors">
                 <a href="{{ route('panel.admin.invoices.index') }}"
                     class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Faturas</a>
                 <i class="fas fa-chevron-right text-xs"></i>
@@ -88,7 +88,7 @@
                             <table class="w-full" id="itemsTable">
                                 <thead>
                                     <tr
-                                        class="bg-slate-50/50 dark:bg-slate-950 text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider transition-colors">
+                                        class="bg-slate-50/50 dark:bg-slate-950 text-[10px] uppercase font-bold text-slate-500 dark:text-slate-500 tracking-wider transition-colors border-b border-slate-100 dark:border-slate-800">
                                         <th class="px-6 py-3 text-left">Descrição</th>
                                         <th class="px-6 py-3 text-center w-24">Qtd.</th>
                                         <th class="px-6 py-3 text-right w-36">Preço Unit.</th>
@@ -234,23 +234,23 @@
 
                 $('#addRow').on('click', function () {
                     const row = `
-                            <tr class="item-row group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
-                                <td class="px-6 py-4">
-                                    <input type="text" name="items_description[]" class="w-full bg-transparent border-none p-0 text-sm font-medium text-slate-900 dark:text-white focus:ring-0 placeholder-slate-300 dark:placeholder-slate-600 transition-colors" placeholder="Descrição do item...">
-                                </td>
-                                <td class="px-6 py-4">
-                                    <input type="number" name="items_quantity[]" value="1" min="1" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-700 rounded-lg text-center py-1.5 text-sm text-slate-800 dark:text-white transition-colors">
-                                </td>
-                                <td class="px-6 py-4">
-                                    <input type="text" name="items_unit_price[]" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-700 rounded-lg text-right py-1.5 px-3 text-sm font-mono text-slate-800 dark:text-white money transition-colors">
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <button type="button" class="remove-row text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
-                                        <i class="fas fa-times-circle"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
+                                    <tr class="item-row group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <input type="text" name="items_description[]" class="w-full bg-transparent border-none p-0 text-sm font-medium text-slate-900 dark:text-white focus:ring-0 placeholder-slate-300 dark:placeholder-slate-600 transition-colors" placeholder="Descrição do item...">
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <input type="number" name="items_quantity[]" value="1" min="1" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-700 rounded-lg text-center py-1.5 text-sm text-slate-800 dark:text-white transition-colors">
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <input type="text" name="items_unit_price[]" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-700 rounded-lg text-right py-1.5 px-3 text-sm font-mono text-slate-800 dark:text-white money transition-colors">
+                                        </td>
+                                        <td class="px-6 py-4 text-center">
+                                            <button type="button" class="remove-row text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+                                                <i class="fas fa-times-circle"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
                     $('#itemsTable tbody').append(row);
                     $('.money').mask('#.##0,00', { reverse: true });
                 });

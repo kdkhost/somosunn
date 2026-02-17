@@ -16,20 +16,23 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="md:col-span-2">
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Host SMTP</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Host
+                    SMTP</label>
                 <input type="text" name="smtp_host" value="{{ $settings['smtp_host'] ?? '' }}"
                     placeholder="smtp.exemplo.com"
-                    class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                    class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Porta</label>
+                <label
+                    class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Porta</label>
                 <input type="number" name="smtp_port" value="{{ $settings['smtp_port'] ?? '587' }}"
-                    class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                    class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Criptografia</label>
+                <label
+                    class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Criptografia</label>
                 <select name="smtp_encryption"
-                    class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                    class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                     <option value="tls" {{ ($settings['smtp_encryption'] ?? '') === 'tls' ? 'selected' : '' }}>TLS
                         (Recomendado)</option>
                     <option value="ssl" {{ ($settings['smtp_encryption'] ?? '') === 'ssl' ? 'selected' : '' }}>SSL
@@ -42,15 +45,17 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Usuário (E-mail)</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Usuário
+                    (E-mail)</label>
                 <input type="text" name="smtp_username" value="{{ $settings['smtp_username'] ?? '' }}"
-                    class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                    class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Senha</label>
+                <label
+                    class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Senha</label>
                 <div class="relative">
                     <input type="password" name="smtp_password" value="{{ $settings['smtp_password'] ?? '' }}"
-                        class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white pr-10">
+                        class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-10">
                     <button type="button" onclick="togglePassword(this)"
                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300">
                         <i class="fas fa-eye"></i>
@@ -69,34 +74,41 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">E-mail Remetente
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">E-mail
+                    Remetente
                     (From)</label>
                 <input type="email" name="smtp_from_email" value="{{ $settings['smtp_from_email'] ?? '' }}"
-                    class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Geralmente o mesmo que o usuário SMTP.</p>
+                    class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 transition-colors">Geralmente o mesmo que o
+                    usuário SMTP.</p>
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Nome do Remetente</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Nome do
+                    Remetente</label>
                 <input type="text" name="smtp_from_name" value="{{ $settings['smtp_from_name'] ?? config('app.name') }}"
-                    class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                    class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Cópia (CC)</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Cópia
+                    (CC)</label>
                 <input type="text" name="smtp_cc" value="{{ $settings['smtp_cc'] ?? '' }}"
                     placeholder="email@exemplo.com"
-                    class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Opcional. Separe por vírgulas.</p>
+                    class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 transition-colors">Opcional. Separe por
+                    vírgulas.</p>
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Cópia Oculta
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Cópia
+                    Oculta
                     (BCC)</label>
                 <input type="text" name="smtp_bcc" value="{{ $settings['smtp_bcc'] ?? '' }}"
                     placeholder="auditoria@exemplo.com"
-                    class="w-full rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Opcional. Separe por vírgulas.</p>
+                    class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 transition-colors">Opcional. Separe por
+                    vírgulas.</p>
             </div>
         </div>
     </div>
@@ -113,9 +125,9 @@
                 para:</label>
             <div class="flex gap-2">
                 <input type="email" id="smtp_test_email_input" placeholder="seu@email.com"
-                    class="flex-1 rounded-2xl border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium text-slate-800 dark:text-white">
+                    class="flex-1 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                 <button type="button" id="btnTestSmtp"
-                    class="bg-slate-800 hover:bg-slate-900 dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-2xl px-6 py-2 transition flex items-center gap-2 whitespace-nowrap shadow-md">
+                    class="bg-slate-800 hover:bg-slate-900 dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-2xl px-6 py-2 transition flex items-center gap-2 whitespace-nowrap shadow-md font-bold">
                     <i class="fas fa-paper-plane"></i> Testar
                 </button>
             </div>
