@@ -13,7 +13,7 @@
 @endphp
 
 <div
-    class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 p-6 sticky top-24 transition-colors duration-300">
+    class="{{ ($mobile ?? false) ? '' : 'bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 p-6 sticky top-24' }} transition-colors duration-300">
     <div class="flex items-center gap-4 mb-8">
         <div
             class="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">

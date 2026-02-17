@@ -106,7 +106,7 @@
             </nav>
 
             <div class="flex flex-col md:flex-row gap-8">
-                <aside class="w-full md:w-72 shrink-0 h-auto md:h-full">
+                <aside class="hidden md:block w-72 shrink-0 h-full">
                     @include('panel.partials.sidebar')
                 </aside>
                 <div class="flex-1 min-w-0">

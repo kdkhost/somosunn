@@ -95,19 +95,19 @@
                 @auth
                     <!-- Notification Hub (Bell) -->
                     <div class="relative" x-data="{
-                                open: false,
-                                total: 0,
-                                items: [],
-                                loading: true,
-                                async fetchNotifications() {
-                                    try {
-                                        const r = await fetch('{{ route('notifications.hub') }}');
-                                        const data = await r.json();
-                                        this.total = data.total;
-                                        this.items = data.items.filter(i => i.count > 0);
-                                    } catch(e) { console.error(e) } finally { this.loading = false }
-                                }
-                             }" x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 30000)">
+                                    open: false,
+                                    total: 0,
+                                    items: [],
+                                    loading: true,
+                                    async fetchNotifications() {
+                                        try {
+                                            const r = await fetch('{{ route('notifications.hub') }}');
+                                            const data = await r.json();
+                                            this.total = data.total;
+                                            this.items = data.items.filter(i => i.count > 0);
+                                        } catch(e) { console.error(e) } finally { this.loading = false }
+                                    }
+                                 }" x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 30000)">
 
                         <button @click="open = !open; fetchNotifications()"
                             class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition relative p-2 focus:outline-none">
@@ -166,7 +166,7 @@
 
                 <!-- Mobile Toggle -->
                 <button id="mobile-menu-toggle"
-                    class="lg:hidden inline-flex items-center justify-center rounded-full border-0 sm:border sm:border-[#1F5EDB] px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
+                    class="lg:hidden inline-flex items-center justify-center rounded-full border-0 px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
                     <span class="sr-only">Abrir menu</span>
                     <i class="fas fa-bars text-lg"></i>
                 </button>
@@ -283,8 +283,17 @@
                 </div>
             </div>
             <button id="mobile-menu-close"
-                class="text-gray-500 hover:text-gray-900 text-3xl leading-none">&times;</button>
+                class="text-gray-500 hover:text-gray-900 text-3xl leading-none px-4">&times;</button>
         </div>
+
+        @if(request()->routeIs('panel.*') || request()->is('painel*') || request()->is('admin*'))
+            <div class="px-6 py-4">
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Navegação do Painel</div>
+                @include('panel.partials.sidebar', ['mobile' => true])
+            </div>
+            <div class="border-t border-slate-100 my-2"></div>
+        @endif
+
         <nav class="px-6 py-4 flex flex-col gap-1 text-gray-700">
             @foreach($menuItems as $item)
                 <div>
