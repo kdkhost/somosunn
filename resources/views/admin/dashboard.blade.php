@@ -45,91 +45,29 @@
 
     <div class="row">
         @if($isAdmin)
-            <!-- Balance -->
             <div class="col-lg-3 col-sm-6 col-12">
-                <div class="small-box bg-success">
-                    <div class="inner">
-                        <h3>R$ {{ number_format($totalRevenue, 2, ',', '.') }}</h3>
-                        <p>Saldo Total (Vendas)</p>
-                    </div>
-                    <div class="icon"><i class="fas fa-wallet"></i></div>
-                    <a href="{{ route('admin.orders.index') }}" class="small-box-footer">Ver detalhes <i
-                            class="fas fa-arrow-circle-right"></i></a>
-                </div>
+                <x-widgets.metric title="Saldo Total (Vendas)" icon="fas fa-wallet" :value="$totalRevenue ?? 0" color="green" />
             </div>
-
-            <!-- Refunds -->
             <div class="col-lg-3 col-sm-6 col-12">
-                <div class="small-box bg-danger">
-                    <div class="inner">
-                        <h3>R$ {{ number_format($refundedAmount, 2, ',', '.') }}</h3>
-                        <p>Reembolsados</p>
-                    </div>
-                    <div class="icon"><i class="fas fa-undo"></i></div>
-                    <a href="{{ route('admin.orders.index') }}" class="small-box-footer">Ver detalhes <i
-                            class="fas fa-arrow-circle-right"></i></a>
-                </div>
+                <x-widgets.metric title="Reembolsados" icon="fas fa-undo" :value="$refundedAmount ?? 0" color="red" />
             </div>
-
-            <!-- Users -->
             <div class="col-lg-3 col-sm-6 col-12">
-                <div class="small-box bg-warning">
-                    <div class="inner">
-                        <h3>{{ $totalUsers }}</h3>
-                        <p>Usuários Registrados</p>
-                    </div>
-                    <div class="icon"><i class="fas fa-users"></i></div>
-                    <a href="{{ route('admin.users.index') }}" class="small-box-footer">Gerenciar <i
-                            class="fas fa-arrow-circle-right"></i></a>
-                </div>
+                <x-widgets.metric title="Usuários Registrados" icon="fas fa-users" :value="$totalUsers ?? 0" color="yellow" />
             </div>
-
-            <!-- Orders -->
             <div class="col-lg-3 col-sm-6 col-12">
-                <div class="small-box bg-info">
-                    <div class="inner">
-                        <h3>{{ $totalOrders }}</h3>
-                        <p>Total de Pedidos</p>
-                    </div>
-                    <div class="icon"><i class="fas fa-shopping-bag"></i></div>
-                    <a href="{{ route('admin.orders.index') }}" class="small-box-footer">Ver todos <i
-                            class="fas fa-arrow-circle-right"></i></a>
-                </div>
+                <x-widgets.metric title="Total de Pedidos" icon="fas fa-shopping-bag" :value="$totalOrders ?? 0" color="blue" />
             </div>
         @endif
 
         {{-- Widgets Comuns (Membros + Admin) --}}
         <div class="col-md-4">
-            <div class="info-box mb-3 bg-gradient-primary">
-                <span class="info-box-icon"><i class="fas fa-graduation-cap"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Meus Cursos</span>
-                    <span class="info-box-number">Acessar</span>
-                </div>
-                <a href="{{ route('courses.index') }}" class="stretched-link"></a>
-            </div>
+            <x-widgets.metric title="Meus Cursos" icon="fas fa-graduation-cap" :value="$coursesCount ?? 0" color="blue" />
         </div>
-
         <div class="col-md-4">
-            <div class="info-box mb-3 bg-gradient-success">
-                <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Mentorias</span>
-                    <span class="info-box-number">Ver Disponíveis</span>
-                </div>
-                <a href="{{ route('admin.mentorships.available') }}" class="stretched-link"></a>
-            </div>
+            <x-widgets.metric title="Mentorias" icon="fas fa-chalkboard-teacher" :value="$mentorshipsCount ?? 0" color="green" />
         </div>
-
         <div class="col-md-4">
-            <div class="info-box mb-3 bg-gradient-warning">
-                <span class="info-box-icon"><i class="fas fa-calendar-alt"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Eventos</span>
-                    <span class="info-box-number">Calendário</span>
-                </div>
-                <a href="{{ route('events.index') }}" class="stretched-link"></a>
-            </div>
+            <x-widgets.metric title="Eventos" icon="fas fa-calendar-alt" :value="$eventsCount ?? 0" color="yellow" />
         </div>
     </div>
 
