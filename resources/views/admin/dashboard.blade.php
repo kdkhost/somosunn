@@ -1,138 +1,99 @@
                 @push('scripts')
                 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
                     // Exemplo: notificação de sucesso
-                    function showSuccess(msg) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Sucesso',
-                            text: msg,
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    }
-                    // Exemplo: notificação de erro
-                    function showError(msg) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Erro',
-                            text: msg,
-                            timer: 3000,
-                            showConfirmButton: true
-                        });
-                    }
-                    // Exemplo: confirmação
-                    function showConfirm(msg, callback) {
-                        Swal.fire({
-                            icon: 'question',
-                            title: 'Confirmação',
-                            text: msg,
-                            showCancelButton: true,
-                            confirmButtonText: 'Sim',
-                            cancelButtonText: 'Não'
-                        }).then((result) => {
-                            if (result.isConfirmed && typeof callback === 'function') callback();
-                        });
-                    }
-                    // Exemplo de uso automático (remova se não quiser)
-                    // showSuccess('Dashboard carregada com sucesso!');
-                <!-- Gráficos principais -->
-                <div class="row">
-                    <div class="col-lg-8 col-12">
-                        <div class="card card-primary card-outline">
-                            <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-chart-line mr-2"></i>Histórico de Vendas</h3>
+                    <!-- Grid institucional premium: KPIs e métricas em uma única linha -->
+                    <div class="row mb-4">
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="card bg-success text-white h-100" data-toggle="tooltip" title="Receita total acumulada" aria-label="Saldo Total">
+                                <div class="card-body p-2 text-center">
+                                    <div class="text-xs mb-1">Saldo Total</div>
+                                    <div class="h4 mb-0">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</div>
+                                    <i class="fas fa-wallet fa-lg mt-2"></i>
+                                    <canvas id="saldoChart" height="20" aria-label="Gráfico de saldo"></canvas>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <canvas id="salesChart" style="height:220px;"></canvas>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="card bg-danger text-white h-100" data-toggle="tooltip" title="Total reembolsado no período" aria-label="Reembolsados">
+                                <div class="card-body p-2 text-center">
+                                    <div class="text-xs mb-1">Reembolsados</div>
+                                    <div class="h4 mb-0">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</div>
+                                    <i class="fas fa-undo fa-lg mt-2"></i>
+                                    <canvas id="reembolsoChart" height="20" aria-label="Gráfico de reembolso"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="card bg-warning text-dark h-100" data-toggle="tooltip" title="Total de usuários cadastrados" aria-label="Usuários">
+                                <div class="card-body p-2 text-center">
+                                    <div class="text-xs mb-1">Usuários</div>
+                                    <div class="h4 mb-0">{{ $totalUsers ?? 0 }}</div>
+                                    <i class="fas fa-users fa-lg mt-2"></i>
+                                    <canvas id="usuariosChart" height="20" aria-label="Gráfico de usuários"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="card bg-info text-white h-100" data-toggle="tooltip" title="Total de pedidos realizados" aria-label="Pedidos">
+                                <div class="card-body p-2 text-center">
+                                    <div class="text-xs mb-1">Pedidos</div>
+                                    <div class="h4 mb-0">{{ $totalOrders ?? 0 }}</div>
+                                    <i class="fas fa-shopping-bag fa-lg mt-2"></i>
+                                    <canvas id="pedidosChart" height="20" aria-label="Gráfico de pedidos"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="card bg-primary text-white h-100" data-toggle="tooltip" title="Total de cursos cadastrados" aria-label="Cursos">
+                                <div class="card-body p-2 text-center">
+                                    <div class="text-xs mb-1">Cursos</div>
+                                    <div class="h5 mb-0">{{ $coursesCount ?? 0 }}</div>
+                                    <i class="fas fa-graduation-cap fa-lg mt-2"></i>
+                                    <canvas id="cursosChart" height="20" aria-label="Gráfico de cursos"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="card bg-success text-white h-100" data-toggle="tooltip" title="Total de mentorias ativas" aria-label="Mentorias">
+                                <div class="card-body p-2 text-center">
+                                    <div class="text-xs mb-1">Mentorias</div>
+                                    <div class="h5 mb-0">{{ $mentorshipsCount ?? 0 }}</div>
+                                    <i class="fas fa-chalkboard-teacher fa-lg mt-2"></i>
+                                    <canvas id="mentoriasChart" height="20" aria-label="Gráfico de mentorias"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="card bg-warning text-dark h-100" data-toggle="tooltip" title="Total de eventos realizados" aria-label="Eventos">
+                                <div class="card-body p-2 text-center">
+                                    <div class="text-xs mb-1">Eventos</div>
+                                    <div class="h5 mb-0">{{ $eventsCount ?? 0 }}</div>
+                                    <i class="fas fa-calendar-alt fa-lg mt-2"></i>
+                                    <canvas id="eventosChart" height="20" aria-label="Gráfico de eventos"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="card bg-secondary text-white h-100" data-toggle="tooltip" title="Total de certificados emitidos" aria-label="Certificados">
+                                <div class="card-body p-2 text-center">
+                                    <div class="text-xs mb-1">Certificados</div>
+                                    <div class="h5 mb-0">{{ $certificatesCount ?? 0 }}</div>
+                                    <i class="fas fa-certificate fa-lg mt-2"></i>
+                                    <canvas id="certificadosChart" height="20" aria-label="Gráfico de certificados"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="card bg-dark text-white h-100" data-toggle="tooltip" title="Jobs pendentes de execução" aria-label="Jobs Pendentes">
+                                <div class="card-body p-2 text-center">
+                                    <div class="text-xs mb-1">Jobs Pendentes</div>
+                                    <div class="h5 mb-0">{{ $pendingJobsCount ?? 0 }}</div>
+                                    <i class="fas fa-tasks fa-lg mt-2"></i>
+                                    <canvas id="jobsChart" height="20" aria-label="Gráfico de jobs"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-12">
-                        <div class="card card-info card-outline">
-                            <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-chart-pie mr-2"></i>Pedidos por Status</h3>
-                            </div>
-                            <div class="card-body">
-                                <canvas id="ordersStatusChart" style="height:220px;"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        <!-- KPIs principais -->
-        <div class="row mb-3">
-            <div class="col-6 col-md-3 mb-3">
-                <div class="card bg-success text-white h-100" data-toggle="tooltip" title="Receita total acumulada." aria-label="Saldo Total">
-                    <div class="card-body p-2">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-xs">Saldo Total</div>
-                                <div class="h4 mb-0">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</div>
-                            </div>
-                            <i class="fas fa-wallet fa-2x"></i>
-                        </div>
-                        <canvas id="saldoChart" height="30" aria-label="Gráfico de saldo"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 mb-3">
-                <div class="card bg-danger text-white h-100" data-toggle="tooltip" title="Total reembolsado no período." aria-label="Reembolsados">
-                    <div class="card-body p-2">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-xs">Reembolsados</div>
-                                <div class="h4 mb-0">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</div>
-                            </div>
-                            <i class="fas fa-undo fa-2x"></i>
-                        </div>
-                        <canvas id="reembolsoChart" height="30" aria-label="Gráfico de reembolso"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 mb-3">
-                <div class="card bg-warning text-dark h-100" data-toggle="tooltip" title="Total de usuários cadastrados." aria-label="Usuários">
-                    <div class="card-body p-2">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-xs">Usuários</div>
-                                <div class="h4 mb-0">{{ $totalUsers ?? 0 }}</div>
-                            </div>
-                            <i class="fas fa-users fa-2x"></i>
-                        </div>
-                        <canvas id="usuariosChart" height="30" aria-label="Gráfico de usuários"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 mb-3">
-                <div class="card bg-info text-white h-100" data-toggle="tooltip" title="Total de pedidos realizados." aria-label="Pedidos">
-                    <div class="card-body p-2">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-xs">Pedidos</div>
-                                <div class="h4 mb-0">{{ $totalOrders ?? 0 }}</div>
-                            </div>
-                            <i class="fas fa-shopping-bag fa-2x"></i>
-                        </div>
-                        <canvas id="pedidosChart" height="30" aria-label="Gráfico de pedidos"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Grid de métricas secundárias -->
-        <div class="row mb-3">
-            <div class="col-6 col-md-2 mb-3">
-                <div class="card bg-primary text-white h-100" data-toggle="tooltip" title="Total de cursos cadastrados." aria-label="Cursos">
-                    <div class="card-body p-2">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-xs">Cursos</div>
-                                <div class="h5 mb-0">{{ $coursesCount ?? 0 }}</div>
-                            </div>
-                            <i class="fas fa-graduation-cap fa-lg"></i>
-                        </div>
-                        <canvas id="cursosChart" height="20" aria-label="Gráfico de cursos"></canvas>
-                    </div>
-                </div>
             </div>
             <div class="col-6 col-md-2 mb-3">
                 <div class="card bg-success text-white h-100" data-toggle="tooltip" title="Total de mentorias ativas." aria-label="Mentorias">
