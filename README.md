@@ -145,6 +145,23 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
   - Correção no registro de conclusão usando `enrollable_id` e `enrollable_type`.
   - Atualização de status para "completed" ao finalizar curso.
 
+### 17/02/2026 — Migração do Painel Admin (Fases 3 e 4)
+- **Migração Completa de Módulos:**
+  - 12+ módulos administrativos migrados para Tailwind CSS e novos controllers em `Panel\Admin`.
+- **Módulos de Conteúdo:**
+  - **Cursos:** CRUD completo com gestão de aulas via modal e reordenamento drag-and-drop.
+  - **Mentorias:** Form de edição por abas para agenda, preços e links dinâmicos.
+  - **Eventos:** Integração com **FullCalendar 6** para exibição dinâmica de agenda.
+  - **Certificados:** Painel de gestão de emissão direta para alunos pendentes.
+- **CMS e Engajamento:**
+  - **FAQ:** Gestão aprimorada com editor Summernote.
+  - **Depoimentos:** Fluxo de moderação (Aprovar/Recusar) para testemunhos de usuários.
+  - **CMS:** Novo editor de conteúdo do site (Home, Sobre, Rodapé) com abas e preview.
+  - **Gamificação:** Gestão de Regras de Pontos e **Ranking Geral** com pódio visual.
+- **UX e Navegação:**
+  - **Novo Dashboard Admin:** Central premium com cards de acesso rápido para todos os módulos.
+  - **Sidebar Reorganizada:** Categorias lógicas (**Gestão, Conteúdo, Ajustes**) para melhor fluxo de trabalho.
+  - **Correção de Paginação:** Substituição de `withQueryString` legado por `appends()` para estabilidade em servidores cPanel.
 
 ---
 © 2026 UNN Networking. Todos os direitos reservados.

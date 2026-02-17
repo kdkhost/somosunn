@@ -12,7 +12,22 @@ class MailTemplateController extends Controller
 {
     public function index()
     {
-        $templates = MailTemplate::orderBy('category')->orderBy('name')->paginate(20);
+        $query = MailTemplate::orderBy('category')->orderBy('name');
+
+        if (request()->has('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('subject', 'like', "%{$search}%")
+                    ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+
+        if (request()->has('category') && request('category') != '') {
+            $query->where('category', request('category'));
+        }
+
+        $templates = $query->paginate(20);
 
         if (request()->routeIs('panel.*')) {
             return view('panel.admin.mailtemplates.index', compact('templates'));
@@ -24,6 +39,10 @@ class MailTemplateController extends Controller
     public function create()
     {
         if (request()->routeIs('panel.*')) {
+            if (request()->ajax()) {
+                $template = new MailTemplate();
+                return view('panel.admin.mailtemplates.partials.form-content', compact('template'))->render();
+            }
             return view('panel.admin.mailtemplates.form', ['template' => new MailTemplate]);
         }
         return view('admin.mailtemplates.form', ['template' => new MailTemplate]);
@@ -43,9 +62,16 @@ class MailTemplateController extends Controller
         $data['category'] = $data['category'] ?? 'sistema';
         $data['locale'] = $data['locale'] ?? 'pt-BR';
         $data['is_active'] = $request->boolean('is_active', true);
-        MailTemplate::create($data);
+        $template = MailTemplate::create($data);
 
         if ($request->routeIs('panel.*')) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Template criado com sucesso!',
+                    'redirect' => route('panel.admin.mailtemplates.index')
+                ]);
+            }
             return redirect()->route('panel.admin.mailtemplates.index')->with('success', 'Template salvo');
         }
         return redirect()->route('admin.mailtemplates.index')->with('success', 'Template salvo');
@@ -54,6 +80,9 @@ class MailTemplateController extends Controller
     public function edit(MailTemplate $mailtemplate)
     {
         if (request()->routeIs('panel.*')) {
+            if (request()->ajax()) {
+                return view('panel.admin.mailtemplates.partials.form-content', ['template' => $mailtemplate])->render();
+            }
             return view('panel.admin.mailtemplates.form', ['template' => $mailtemplate]);
         }
         return view('admin.mailtemplates.form', ['template' => $mailtemplate]);
@@ -76,6 +105,13 @@ class MailTemplateController extends Controller
         $mailtemplate->update($data);
 
         if ($request->routeIs('panel.*')) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Template atualizado com sucesso!',
+                    'redirect' => route('panel.admin.mailtemplates.index')
+                ]);
+            }
             return redirect()->route('panel.admin.mailtemplates.index')->with('success', 'Template atualizado');
         }
         return redirect()->route('admin.mailtemplates.index')->with('success', 'Template atualizado');

@@ -324,6 +324,69 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::delete('/mailtemplates/{mailtemplate}', [\App\Http\Controllers\Admin\MailTemplateController::class, 'destroy'])->name('mailtemplates.destroy');
         Route::get('/mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('mailtemplates.preview');
         Route::post('/mailtemplates/{mailtemplate}/send-preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
+
+        // Users Management
+        Route::resource('users', \App\Http\Controllers\Panel\Admin\UserController::class);
+
+        // Plans Management
+        Route::post('plans/{plan}/toggle-active', [\App\Http\Controllers\Panel\Admin\PlanController::class, 'toggleActive'])->name('plans.toggle-active');
+        Route::resource('plans', \App\Http\Controllers\Panel\Admin\PlanController::class);
+
+        // Orders Management
+        Route::post('orders/{order}/refund', [\App\Http\Controllers\Panel\Admin\OrderController::class, 'refund'])->name('orders.refund');
+        Route::resource('orders', \App\Http\Controllers\Panel\Admin\OrderController::class)->only(['index', 'show']);
+        Route::post('orders/{order}/invoice', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'issueForOrder'])->name('orders.invoice');
+
+        // Invoices Management
+        Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'pdf'])->name('invoices.pdf');
+        Route::post('invoices/{invoice}/send', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'send'])->name('invoices.send');
+        Route::resource('invoices', \App\Http\Controllers\Panel\Admin\InvoiceController::class);
+
+        // Coupons Management
+        Route::resource('coupons', \App\Http\Controllers\Panel\Admin\CouponController::class);
+
+        // Courses Management
+        Route::resource('courses', \App\Http\Controllers\Panel\Admin\CourseController::class);
+        Route::post('courses/{course}/lessons/reorder', [\App\Http\Controllers\Panel\Admin\CourseController::class, 'reorderLessons'])->name('courses.lessons.reorder');
+        // Mentorships Management
+        Route::resource('mentorships', \App\Http\Controllers\Panel\Admin\MentorshipController::class);
+
+        // Events Management
+        Route::resource('events', \App\Http\Controllers\Panel\Admin\EventController::class);
+
+        // Certificates Management
+        Route::resource('certificates', \App\Http\Controllers\Panel\Admin\CertificateController::class);
+
+        // CMS & Engagement (Phase 4)
+        Route::resource('faqs', \App\Http\Controllers\Panel\Admin\FaqController::class);
+        Route::resource('testimonials', \App\Http\Controllers\Panel\Admin\TestimonialController::class);
+        Route::post('testimonials/{testimonial}/approve', [\App\Http\Controllers\Panel\Admin\TestimonialController::class, 'approve'])->name('testimonials.approve');
+        Route::post('testimonials/{testimonial}/reject', [\App\Http\Controllers\Panel\Admin\TestimonialController::class, 'reject'])->name('testimonials.reject');
+
+        Route::group(['prefix' => 'cms', 'as' => 'cms.'], function () {
+            Route::get('/', [\App\Http\Controllers\Panel\Admin\CMSController::class, 'index'])->name('index');
+            Route::post('/{slug}', [\App\Http\Controllers\Panel\Admin\CMSController::class, 'update'])->name('update');
+        });
+
+        Route::get('logs', [\App\Http\Controllers\Panel\Admin\ActivityLogController::class, 'index'])->name('logs.index');
+
+        // Engagement Tools
+        Route::resource('points-rules', \App\Http\Controllers\Panel\Admin\PointsRuleController::class);
+        Route::get('ranking', [\App\Http\Controllers\Panel\Admin\RankingController::class, 'index'])->name('ranking.index');
+
+        Route::prefix('courses/{course}')->name('courses.')->group(function () {
+            Route::post('lessons', [\App\Http\Controllers\LessonController::class, 'store'])->name('lessons.store');
+            Route::prefix('lessons/{lesson}')->name('lessons.')->group(function () {
+                Route::put('/', [\App\Http\Controllers\LessonController::class, 'update'])->name('update');
+                Route::delete('/', [\App\Http\Controllers\LessonController::class, 'destroy'])->name('destroy');
+                Route::get('details', [\App\Http\Controllers\LessonController::class, 'getDetails'])->name('details');
+
+                // Attachments
+                Route::post('attachments', [\App\Http\Controllers\LessonController::class, 'uploadAttachment'])->name('attachments.store');
+                Route::put('attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'renameAttachment'])->name('attachments.rename');
+                Route::delete('attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'deleteAttachment'])->name('attachments.destroy');
+            });
+        });
     });
 
     // Perfil (completo) - permitido mesmo sem plano ativo (whitelist no middleware)

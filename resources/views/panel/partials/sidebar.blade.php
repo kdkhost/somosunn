@@ -91,7 +91,7 @@
 
         @if($user->isAdmin())
             <div class="pt-4 mt-4 border-t border-slate-100">
-                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-4">
                     Administração
                 </div>
 
@@ -100,15 +100,69 @@
                     <i class="fas fa-shield-alt w-5 opacity-80"></i>
                     Painel administrativo
                 </a>
+
+                {{-- Gestão --}}
+                <div class="mt-4 mb-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gestão</div>
+                <a href="{{ route('panel.admin.users.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.users.*')) }}">
+                    <i class="fas fa-users-cog w-5 opacity-80"></i>
+                    Usuários
+                </a>
+                <a href="{{ route('panel.admin.plans.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.plans.*')) }}">
+                    <i class="fas fa-gem w-5 opacity-80"></i>
+                    Planos / Pacotes
+                </a>
+                <a href="{{ route('panel.admin.orders.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.orders.*')) }}">
+                    <i class="fas fa-shopping-cart w-5 opacity-80"></i>
+                    Vendas
+                </a>
+                <a href="{{ route('panel.admin.invoices.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.invoices.*')) }}">
+                    <i class="fas fa-file-invoice w-5 opacity-80"></i>
+                    Faturas
+                </a>
+                <a href="{{ route('panel.admin.coupons.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.coupons.*')) }}">
+                    <i class="fas fa-ticket-alt w-5 opacity-80"></i>
+                    Cupons
+                </a>
+
+                {{-- Conteúdo --}}
+                <div class="mt-4 mb-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Conteúdo</div>
+                <a href="{{ route('panel.admin.courses.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.courses.*')) }}">
+                    <i class="fas fa-graduation-cap w-5 opacity-80"></i>
+                    Cursos
+                </a>
+                <a href="{{ route('panel.admin.mentorships.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.mentorships.*')) }}">
+                    <i class="fas fa-chalkboard-teacher w-5 opacity-80"></i>
+                    Mentorias
+                </a>
+                <a href="{{ route('panel.admin.events.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.events.*')) }}">
+                    <i class="fas fa-calendar-alt w-5 opacity-80"></i>
+                    Eventos
+                </a>
+                <a href="{{ route('panel.admin.certificates.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.certificates.*')) }}">
+                    <i class="fas fa-certificate w-5 opacity-80"></i>
+                    Certificados
+                </a>
+
+                {{-- Configurações --}}
+                <div class="mt-4 mb-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ajustes</div>
                 <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'general') }}">
                     <i class="fas fa-cogs w-5 opacity-80"></i>
-                    Configurações gerais
+                    Gerais
                 </a>
                 <a href="{{ route('panel.admin.settings', ['group' => 'gateway']) }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'gateway') }}">
                     <i class="fas fa-credit-card w-5 opacity-80"></i>
-                    Gateway / Pagamentos
+                    Pagamentos
                 </a>
                 <a href="{{ route('panel.admin.settings', ['group' => 'smtp']) }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'smtp') }}">
@@ -118,7 +172,7 @@
                 <a href="{{ route('panel.admin.mailtemplates.index') }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.mailtemplates.*')) }}">
                     <i class="fas fa-at w-5 opacity-80"></i>
-                    Templates de e-mail
+                    E-mails
                 </a>
             </div>
         @endif

@@ -2,194 +2,475 @@
 
 @section('title', 'Modelos de E-mail')
 
+@push('styles')
+    <!-- Summernote Lite CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+    <style>
+        .note-modal-backdrop {
+            z-index: 40 !important;
+        }
+
+        .note-editor.note-frame {
+            border-radius: 0.75rem;
+            border-color: #e2e8f0;
+        }
+
+        .note-toolbar {
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+            background-color: #f8fafc !important;
+            border-bottom-color: #e2e8f0;
+        }
+
+        .note-statusbar {
+            border-bottom-left-radius: 0.75rem;
+            border-bottom-right-radius: 0.75rem;
+        }
+    </style>
+@endpush
+
 @section('panel_breadcrumb')
     <a href="{{ route('panel.admin.mailtemplates.index') }}" class="hover:underline">Templates</a>
 @endsection
 
 @section('panel_content')
     <div class="space-y-6">
-        <div class="flex justify-between items-center">
-            <h2 class="text-xl font-bold text-slate-800">
-                Modelos de E-mail
-            </h2>
-            <a href="{{ route('panel.admin.mailtemplates.create') }}" 
-               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-blue-500/30 transition transform hover:scale-[1.02] flex items-center gap-2">
-                <i class="fas fa-plus"></i> Novo Modelo
-            </a>
+
+        <!-- Header & Toolbar -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800">Modelos de E-mail</h2>
+                <p class="text-slate-500 text-sm">Gerencie os templates de notificação do sistema.</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <form action="{{ route('panel.admin.mailtemplates.index') }}" method="GET"
+                    class="relative group w-full sm:w-64">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-slate-400 group-focus-within:text-blue-500 transition"></i>
+                    </div>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar templates..."
+                        class="pl-10 w-full rounded-xl border-slate-300 bg-white focus:border-blue-500 focus:ring-blue-500 transition shadow-sm">
+                </form>
+                <button onclick="openEditor()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-xl shadow-lg shadow-blue-500/30 transition transform hover:scale-[1.02] flex items-center justify-center gap-2 whitespace-nowrap">
+                    <i class="fas fa-plus"></i> Novo Modelo
+                </button>
+            </div>
         </div>
 
+        <!-- Filters (Optional - Categories) -->
+        <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+            <a href="{{ route('panel.admin.mailtemplates.index') }}"
+                class="px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition {{ !request('category') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200' }}">
+                Todos
+            </a>
+            @foreach(['sistema', 'conta', 'financeiro', 'marketing'] as $cat)
+                <a href="{{ route('panel.admin.mailtemplates.index', ['category' => $cat]) }}"
+                    class="px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request('category') == $cat ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200' }}">
+                    {{ ucfirst($cat) }}
+                </a>
+            @endforeach
+        </div>
+
+        <!-- Table -->
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500">
+                    <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-500 tracking-wider">
                         <tr>
-                            <th class="px-6 py-4">Nome</th>
-                            <th class="px-6 py-4">Slug</th>
+                            <th class="px-6 py-4">Nome / Slug</th>
                             <th class="px-6 py-4">Categoria</th>
                             <th class="px-6 py-4">Assunto</th>
-                            <th class="px-6 py-4">Ativo</th>
+                            <th class="px-6 py-4 text-center">Status</th>
                             <th class="px-6 py-4 text-right">Ações</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
-                        @foreach($templates as $t)
-                            <tr class="hover:bg-slate-50 transition">
-                                <td class="px-6 py-4 font-medium text-slate-900">{{ $t->name }}</td>
-                                <td class="px-6 py-4 text-xs font-mono bg-slate-100 rounded px-2 py-1 text-slate-600 w-fit">
-                                    {{ $t->slug }}
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        {{ ucfirst($t->category) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 truncate max-w-xs">{{ $t->subject }}</td>
-                                <td class="px-6 py-4">
-                                    @if($t->is_active)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Sim
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
-                                            Não
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 text-right space-x-2">
-                                    <a href="{{ route('panel.admin.mailtemplates.edit', $t) }}" 
-                                       class="text-slate-400 hover:text-blue-500 transition" title="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button onclick="preview({{ $t->id }})" 
-                                            class="text-slate-400 hover:text-blue-500 transition" title="Pré-visualizar">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <form action="{{ route('panel.admin.mailtemplates.destroy', $t) }}" method="POST" class="inline-block" 
-                                          onsubmit="return confirm('Tem certeza que deseja remover este modelo?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-slate-400 hover:text-red-500 transition" title="Remover">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
+                        @forelse($templates as $t)
+                                        <tr class="hover:bg-slate-50 transition group">
+                                            <td class="px-6 py-4">
+                                                <div class="font-bold text-slate-800">{{ $t->name }}</div>
+                                                <div class="text-xs font-mono text-slate-400 mt-0.5">{{ $t->slug }}</div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold 
+                                                                                {{ $t->category == 'financeiro' ? 'bg-green-100 text-green-700' :
+                            ($t->category == 'conta' ? 'bg-purple-100 text-purple-700' :
+                                ($t->category == 'sistema' ? 'bg-slate-100 text-slate-700' : 'bg-blue-100 text-blue-700')) }}">
+                                                    {{ ucfirst($t->category) }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 max-w-xs truncate" title="{{ $t->subject }}">
+                                                {{ $t->subject }}
+                                            </td>
+                                            <td class="px-6 py-4 text-center">
+                                                @if($t->is_active)
+                                                    <div class="w-2 h-2 rounded-full bg-green-500 mx-auto" title="Ativo"></div>
+                                                @else
+                                                    <div class="w-2 h-2 rounded-full bg-red-400 mx-auto" title="Inativo"></div>
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 text-right">
+                                                <div
+                                                    class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onclick="openEditor('{{ route('panel.admin.mailtemplates.edit', $t) }}', '{{ route('panel.admin.mailtemplates.update', $t) }}')"
+                                                        class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition"
+                                                        title="Editar">
+                                                        <i class="fas fa-pen"></i>
+                                                    </button>
+                                                    <button onclick="preview({{ $t->id }})"
+                                                        class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition"
+                                                        title="Pré-visualizar">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <form action="{{ route('panel.admin.mailtemplates.destroy', $t) }}" method="POST"
+                                                        onsubmit="return confirm('Tem certeza que deseja remover este modelo?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit"
+                                                            class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition"
+                                                            title="Remover">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-10 text-center text-slate-400">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <i class="fas fa-inbox text-4xl opacity-20"></i>
+                                        <p>Nenhum template encontrado.</p>
+                                    </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @endforelse
                     </tbody>
                 </table>
             </div>
             @if($templates->hasPages())
-                <div class="px-6 py-4 border-t border-slate-100">
+                <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
                     {{ $templates->links() }}
                 </div>
             @endif
         </div>
     </div>
 
-    <!-- Preview Modal -->
-    <div id="previewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-300">
-            <div class="flex justify-between items-center p-6 border-b border-slate-100">
-                <h3 class="text-lg font-bold text-slate-800">Pré-visualização</h3>
-                <button onclick="closePreview()" class="text-slate-400 hover:text-slate-600">
-                    <i class="fas fa-times text-xl"></i>
+    <!-- Editor Modal -->
+    <div id="editorModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div
+            class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] flex flex-col transform scale-95 transition-transform duration-300">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+                <div>
+                    <h3 id="modalTitle" class="text-lg font-bold text-slate-800">Novo Modelo</h3>
+                    <p class="text-xs text-slate-500">Preencha as informações abaixo.</p>
+                </div>
+                <button onclick="closeEditor()"
+                    class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+                    <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
-            
-            <div class="flex-1 overflow-auto p-0 bg-slate-100">
-                <div id="previewBody" class="w-full h-full min-h-[400px]"></div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-6 bg-slate-50 custom-scrollbar relative" id="editorBody">
+                <!-- Content injected via AJAX -->
+                <div class="flex flex-col items-center justify-center h-40 text-slate-400">
+                    <i class="fas fa-circle-notch fa-spin text-3xl mb-3 text-blue-500"></i>
+                    <p>Carregando editor...</p>
+                </div>
             </div>
 
-            <div class="p-6 border-t border-slate-100 bg-slate-50 rounded-b-2xl">
-                <div class="flex gap-4">
-                    <input type="email" id="previewEmail" placeholder="Enviar para e-mail de teste" 
-                           class="flex-1 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
-                    <button id="sendPreviewBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-xl transition">
-                        Enviar
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t border-slate-100 bg-white rounded-b-2xl flex justify-between items-center gap-4">
+                <div class="text-xs text-slate-400 hidden sm:block">
+                    <i class="fas fa-info-circle mr-1"></i> Todos os campos marcados são obrigatórios.
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="closeEditor()"
+                        class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition">
+                        Cancelar
+                    </button>
+                    <button id="btnSaveTemplate"
+                        class="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition flex items-center gap-2">
+                        <i class="fas fa-save"></i> <span>Salvar Template</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    @push('scripts')
+    <!-- Preview Modal (Simplified reused) -->
+    <div id="previewModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 hidden opacity-0 transition-opacity duration-300">
+        <div
+            class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-300">
+            <div class="flex justify-between items-center p-4 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800">Pré-visualização</h3>
+                <button onclick="closePreview()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-hidden bg-slate-100 p-0 relative">
+                <div id="previewLoader" class="absolute inset-0 flex items-center justify-center bg-slate-100 z-10">
+                    <i class="fas fa-spinner fa-spin text-3xl text-blue-500"></i>
+                </div>
+                <iframe id="previewFrame" class="w-full h-full border-0"></iframe>
+            </div>
+            <div class="p-4 border-t border-slate-100 bg-white">
+                <div class="flex gap-3">
+                    <input type="email" id="previewEmail" placeholder="E-mail para teste"
+                        class="flex-1 rounded-xl border-slate-200">
+                    <button id="sendPreviewBtn"
+                        class="bg-slate-800 text-white px-6 rounded-xl font-bold hover:bg-slate-900 transition">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@endsection
+
+@push('scripts')
+    <!-- jQuery (Required for Summernote) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Summernote -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-pt-BR.min.js"></script>
+
     <script>
-        const modal = document.getElementById('previewModal');
-        const modalContent = modal.querySelector('div');
+        // Modal & Editor Logic
+        const editorModal = document.getElementById('editorModal');
+        const editorBody = document.getElementById('editorBody');
+        const modalTitle = document.getElementById('modalTitle');
+        let currentAction = '';
+        let currentMethod = 'POST';
+
+        function openEditor(editUrl = null, updateUrl = null) {
+            // Show modal
+            editorModal.classList.remove('hidden');
+            void editorModal.offsetWidth; // trigger reflow
+            editorModal.classList.remove('opacity-0');
+            editorModal.querySelector('div').classList.remove('scale-95');
+            editorModal.querySelector('div').classList.add('scale-100');
+
+            // Reset Content
+            editorBody.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-40 text-slate-400">
+                            <i class="fas fa-circle-notch fa-spin text-3xl mb-3 text-blue-500"></i>
+                            <p>Carregando editor...</p>
+                        </div>
+                    `;
+
+            const url = editUrl || '{{ route("panel.admin.mailtemplates.create") }}';
+            currentAction = updateUrl || '{{ route("panel.admin.mailtemplates.store") }}';
+            currentMethod = updateUrl ? 'PUT' : 'POST';
+            modalTitle.innerText = editUrl ? 'Editar Modelo' : 'Novo Modelo';
+
+            // Fetch Form
+            fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(r => r.text())
+                .then(html => {
+                    editorBody.innerHTML = html;
+                    initSummernote();
+                    initScripts(); // Re-init specific scripts for the form
+                })
+                .catch(err => {
+                    editorBody.innerHTML = '<div class="text-red-500 text-center p-10">Erro ao carregar formulário.</div>';
+                    console.error(err);
+                });
+        }
+
+        function closeEditor() {
+            // Destroy Summernote to prevent leaks
+            if ($('#bodyEditor').length > 0) {
+                $('#bodyEditor').summernote('destroy');
+            }
+
+            editorModal.classList.add('opacity-0');
+            editorModal.querySelector('div').classList.remove('scale-100');
+            editorModal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                editorModal.classList.add('hidden');
+            }, 300);
+        }
+
+        function initSummernote() {
+            $('#bodyEditor').summernote({
+                placeholder: 'Conteúdo do e-mail...',
+                tabsize: 2,
+                height: 350,
+                lang: 'pt-BR',
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'hr']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ],
+                callbacks: {
+                    onPaste: function (e) {
+                        var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
+                        e.preventDefault();
+                        document.execCommand('insertText', false, bufferText);
+                    }
+                }
+            });
+        }
+
+        function initScripts() {
+            // Re-bind click events for variables
+            $('.insert-var').off('click').on('click', function () {
+                var v = $(this).data('var');
+                $('#bodyEditor').summernote('pasteHTML', v);
+            });
+
+            // Auto slug for new items
+            if (currentMethod === 'POST') {
+                $('#tpl_name').off('keyup change').on('keyup change', function () {
+                    if ($('#tpl_slug').val().trim() !== '') return;
+                    const slug = $(this).val().toString()
+                        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                    $('#tpl_slug').val(slug);
+                });
+            }
+
+            // Test Email Button inside Editor
+            $('#btnSendTest').off('click').on('click', function () {
+                const url = $(this).data('url');
+                if (!url) return alert('Salve o template antes de testar.');
+                const email = $('#test_email_input').val();
+                if (!email) return alert('Digite um e-mail.');
+
+                const btn = $(this);
+                const original = btn.html();
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+                $.ajax({
+                    url: url, method: 'POST',
+                    data: { email: email, _token: '{{ csrf_token() }}' },
+                    success: (res) => alert(res.message || 'Enviado!'),
+                    error: () => alert('Erro.'),
+                    complete: () => btn.prop('disabled', false).html(original)
+                });
+            });
+        }
+
+        // Save Template
+        document.getElementById('btnSaveTemplate').addEventListener('click', function () {
+            const btn = this;
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+            const formData = new FormData();
+            formData.append('_token', '{{ csrf_token() }}');
+            if (currentMethod === 'PUT') formData.append('_method', 'PUT');
+
+            // Gather fields manually or use form element if wrapped (partial is just divs)
+            // Since partial is just divs, we select inputs inside #editorBody
+            const inputs = editorBody.querySelectorAll('input, select, textarea');
+            inputs.forEach(el => {
+                // Skip body, we handle it via Summernote API
+                if (el.name && el.name !== 'body') formData.append(el.name, el.value);
+            });
+
+            // Get Summernote Content
+            if ($('#bodyEditor').length > 0) {
+                formData.append('body', $('#bodyEditor').summernote('code'));
+            }
+
+            fetch(currentAction, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                body: formData
+            })
+                .then(async res => {
+                    const data = await res.json();
+                    if (!res.ok) throw data;
+                    return data;
+                })
+                .then(data => {
+                    // Success
+                    // toastr.success(data.message); // If toastr exists
+                    alert(data.message || 'Salvo com sucesso!');
+                    window.location.reload(); // Reload to update table
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (err.errors) {
+                        let msg = '';
+                        for (let k in err.errors) msg += err.errors[k].join('\n') + '\n';
+                        alert('Erro de validação:\n' + msg);
+                    } else {
+                        alert('Erro ao salvar.');
+                    }
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = original;
+                });
+        });
+
+        // Preview Logic (Reused)
+        const previewModal = document.getElementById('previewModal');
         let currentPreviewId = null;
 
         function preview(id) {
             currentPreviewId = id;
-            
-            // Show modal
-            modal.classList.remove('hidden');
-            // Trigger reflow
-            void modal.offsetWidth;
-            
-            modal.classList.remove('opacity-0');
-            modalContent.classList.remove('scale-95');
-            modalContent.classList.add('scale-100');
+            previewModal.classList.remove('hidden');
+            void previewModal.offsetWidth;
+            previewModal.classList.remove('opacity-0');
+            previewModal.querySelector('div').classList.remove('scale-95');
+            previewModal.querySelector('div').classList.add('scale-100');
 
-            document.getElementById('previewBody').innerHTML = '<div class="flex items-center justify-center h-full p-10"><i class="fas fa-spinner fa-spin text-4xl text-blue-500"></i></div>';
+            const loader = document.getElementById('previewLoader');
+            const iframe = document.getElementById('previewFrame');
+            loader.style.display = 'flex';
 
             fetch('{{ url("painel/admin/mailtemplates") }}/' + id + '/preview')
                 .then(r => r.json())
                 .then(data => {
-                    // Create an iframe to isolate styles
-                    const iframe = document.createElement('iframe');
-                    iframe.style.width = '100%';
-                    iframe.style.height = '100%';
-                    iframe.style.border = 'none';
-                    document.getElementById('previewBody').innerHTML = '';
-                    document.getElementById('previewBody').appendChild(iframe);
-                    
                     const doc = iframe.contentWindow.document;
                     doc.open();
                     doc.write(data.html);
                     doc.close();
+                    loader.style.display = 'none';
                 });
         }
 
         function closePreview() {
-            modal.classList.add('opacity-0');
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+            previewModal.classList.add('opacity-0');
+            previewModal.querySelector('div').classList.remove('scale-100');
+            previewModal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => { previewModal.classList.add('hidden'); }, 300);
         }
 
-        document.getElementById('sendPreviewBtn').addEventListener('click', function() {
+        document.getElementById('sendPreviewBtn').addEventListener('click', function () {
             const email = document.getElementById('previewEmail').value;
-            if(!email) return alert('Digite um e-mail');
+            if (!email) return alert('Digite um e-mail');
 
             const btn = this;
-            const originalText = btn.innerText;
-            btn.innerText = 'Enviando...';
             btn.disabled = true;
+            btn.innerText = 'Enviando...';
 
             fetch('{{ url("painel/admin/mailtemplates") }}/' + currentPreviewId + '/send-preview', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 body: JSON.stringify({ email: email })
             })
-            .then(r => r.json())
-            .then(data => {
-                alert(data.message || 'E-mail enviado!');
-            })
-            .catch(e => {
-                console.error(e);
-                alert('Erro ao enviar');
-            })
-            .finally(() => {
-                btn.innerText = originalText;
-                btn.disabled = false;
-            });
+                .then(r => r.json())
+                .then(d => alert(d.message || 'Enviado!'))
+                .catch(() => alert('Erro'))
+                .finally(() => { btn.disabled = false; btn.innerText = 'Enviar'; });
         });
     </script>
-    @endpush
-@endsection
+@endpush

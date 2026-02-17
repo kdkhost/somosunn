@@ -3,71 +3,132 @@
 @section('title', 'Painel Administrativo')
 
 @section('panel_content')
-    <div class="space-y-6">
-        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl shadow-blue-500/20">
-            <h2 class="text-2xl font-bold mb-2">Área Administrativa</h2>
-            <p class="text-blue-100 opacity-90">
-                Bem-vindo à área de administração integrada ao painel. Aqui você pode gerenciar configurações essenciais.
-            </p>
+    <div class="space-y-8">
+        {{-- Hero Section --}}
+        <div
+            class="bg-gradient-to-br from-blue-600 via-indigo-700 to-violet-800 rounded-[2.5rem] p-10 text-white shadow-2xl shadow-blue-500/20 relative overflow-hidden">
+            <div class="relative z-10">
+                <h2 class="text-3xl font-bold mb-3">Central de Administração</h2>
+                <p class="text-blue-100/90 max-w-2xl text-lg font-medium">
+                    Gerencie todos os aspectos da sua plataforma em um único lugar, com interface moderna e ferramentas
+                    otimizadas.
+                </p>
+            </div>
+            {{-- Abstract background shapes --}}
+            <div
+                class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-white/10 rounded-full blur-3xl">
+            </div>
+            <div
+                class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-blue-400/20 rounded-full blur-2xl">
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Settings -->
-            <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
-                class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition group">
-                <div
-                    class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <i class="fas fa-cogs text-xl"></i>
+        {{-- Section: Gestão & Financeiro --}}
+        <div>
+            <div class="flex items-center gap-3 mb-6 px-2">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                    <i class="fas fa-wallet text-sm"></i>
                 </div>
-                <h3 class="font-bold text-slate-800 text-lg mb-1">Configurações Gerais</h3>
-                <p class="text-sm text-slate-500">Dados da empresa, endereço e informações básicas.</p>
-            </a>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Gestão & Financeiro</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                @php
+                    $gestao = [
+                        ['route' => 'panel.admin.users.index', 'icon' => 'fa-users-cog', 'color' => 'blue', 'title' => 'Usuários', 'desc' => 'Membros e níveis'],
+                        ['route' => 'panel.admin.plans.index', 'icon' => 'fa-gem', 'color' => 'indigo', 'title' => 'Planos', 'desc' => 'Pacotes e preços'],
+                        ['route' => 'panel.admin.orders.index', 'icon' => 'fa-shopping-basket', 'color' => 'emerald', 'title' => 'Vendas', 'desc' => 'Pedidos realizados'],
+                        ['route' => 'panel.admin.invoices.index', 'icon' => 'fa-file-invoice-dollar', 'color' => 'amber', 'title' => 'Faturas', 'desc' => 'Gestão de faturamento'],
+                    ];
+                @endphp
 
-            <!-- Gateway -->
-            <a href="{{ route('panel.admin.settings', ['group' => 'gateway']) }}"
-                class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition group">
-                <div
-                    class="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <i class="fas fa-credit-card text-xl"></i>
+                @foreach($gestao as $item)
+                    <a href="{{ route($item['route']) }}"
+                        class="group bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-{{ $item['color'] }}-500/5 hover:-translate-y-1 transition-all duration-300">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-{{ $item['color'] }}-50 text-{{ $item['color'] }}-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
+                            <i class="fas {{ $item['icon'] }} text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-lg mb-1">{{ $item['title'] }}</h4>
+                        <p class="text-sm text-slate-500 font-medium leading-relaxed">{{ $item['desc'] }}</p>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Section: Conteúdo --}}
+        <div>
+            <div class="flex items-center gap-3 mb-6 px-2">
+                <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                    <i class="fas fa-layer-group text-sm"></i>
                 </div>
-                <h3 class="font-bold text-slate-800 text-lg mb-1">Pagamentos</h3>
-                <p class="text-sm text-slate-500">Configure gateways (MercadoPago, PagSeguro) e taxas.</p>
-            </a>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Educação & Conteúdo</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                @php
+                    $conteudo = [
+                        ['route' => 'panel.admin.courses.index', 'icon' => 'fa-graduation-cap', 'color' => 'purple', 'title' => 'Cursos', 'desc' => 'Trilhas e aulas'],
+                        ['route' => 'panel.admin.mentorships.index', 'icon' => 'fa-chalkboard-teacher', 'color' => 'fuchsia', 'title' => 'Mentorias', 'desc' => 'Agenda e sessões'],
+                        ['route' => 'panel.admin.events.index', 'icon' => 'fa-calendar-day', 'color' => 'rose', 'title' => 'Eventos', 'desc' => 'Workshops e lives'],
+                        ['route' => 'panel.admin.certificates.index', 'icon' => 'fa-award', 'color' => 'orange', 'title' => 'Certificados', 'desc' => 'Emissão e design'],
+                    ];
+                @endphp
 
-            <!-- SMTP -->
-            <a href="{{ route('panel.admin.settings', ['group' => 'smtp']) }}"
-                class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition group">
-                <div
-                    class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <i class="fas fa-envelope text-xl"></i>
+                @foreach($conteudo as $item)
+                    <a href="{{ route($item['route']) }}"
+                        class="group bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-{{ $item['color'] }}-500/5 hover:-translate-y-1 transition-all duration-300">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-{{ $item['color'] }}-50 text-{{ $item['color'] }}-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
+                            <i class="fas {{ $item['icon'] }} text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-lg mb-1">{{ $item['title'] }}</h4>
+                        <p class="text-sm text-slate-500 font-medium leading-relaxed">{{ $item['desc'] }}</p>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Section: Ajustes Técnicos --}}
+        <div>
+            <div class="flex items-center gap-3 mb-6 px-2">
+                <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                    <i class="fas fa-sliders-h text-sm"></i>
                 </div>
-                <h3 class="font-bold text-slate-800 text-lg mb-1">SMTP</h3>
-                <p class="text-sm text-slate-500">Servidor de e-mail para notificações e transações.</p>
-            </a>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Ajustes & Configurações</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                @php
+                    $ajustes = [
+                        ['route' => 'panel.admin.settings', 'icon' => 'fa-sliders-h', 'color' => 'slate', 'title' => 'Gerais', 'desc' => 'Identidade e dados', 'param' => ['group' => 'general']],
+                        ['route' => 'panel.admin.settings', 'icon' => 'fa-credit-card', 'color' => 'sky', 'title' => 'Gateways', 'desc' => 'Meios de pagamento', 'param' => ['group' => 'gateway']],
+                        ['route' => 'panel.admin.settings', 'icon' => 'fa-envelope-open-text', 'color' => 'cyan', 'title' => 'SMTP', 'desc' => 'Envio de e-mails', 'param' => ['group' => 'smtp']],
+                        ['route' => 'panel.admin.mailtemplates.index', 'icon' => 'fa-at', 'color' => 'violet', 'title' => 'Templates', 'desc' => 'Design das mensagens'],
+                    ];
+                @endphp
 
-            <!-- Mail Templates -->
-            <a href="{{ route('panel.admin.mailtemplates.index') }}"
-                class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition group">
-                <div
-                    class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <i class="fas fa-at text-xl"></i>
-                </div>
-                <h3 class="font-bold text-slate-800 text-lg mb-1">Templates de E-mail</h3>
-                <p class="text-sm text-slate-500">Personalize os e-mails enviados pelo sistema.</p>
-            </a>
+                @foreach($ajustes as $item)
+                    <a href="{{ route($item['route'], $item['param'] ?? []) }}"
+                        class="group bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-{{ $item['color'] }}-500/5 hover:-translate-y-1 transition-all duration-300">
+                        <div
+                            class="w-13 h-13 rounded-2xl bg-{{ $item['color'] }}-50 text-{{ $item['color'] }}-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
+                            <i class="fas {{ $item['icon'] }} text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-lg mb-1">{{ $item['title'] }}</h4>
+                        <p class="text-sm text-slate-500 font-medium leading-relaxed">{{ $item['desc'] }}</p>
+                    </a>
+                @endforeach
 
-            <!-- Link to old panel if needed -->
-            @if(auth()->user()->isSuperAdmin())
-                <a href="{{ route('admin.dashboard') }}" target="_blank"
-                    class="bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition group border-dashed">
-                    <div
-                        class="w-12 h-12 rounded-2xl bg-slate-200 text-slate-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-external-link-alt text-xl"></i>
-                    </div>
-                    <h3 class="font-bold text-slate-800 text-lg mb-1">Painel Legacy</h3>
-                    <p class="text-sm text-slate-500">Acessar painel completo (AdminLTE).</p>
-                </a>
-            @endif
+                @if(auth()->user()->isSuperAdmin())
+                    <a href="{{ route('admin.dashboard') }}" target="_blank"
+                        class="group bg-slate-50 p-6 rounded-3xl border border-slate-200 border-dashed hover:border-blue-300 hover:bg-blue-50/30 transition-all duration-300">
+                        <div
+                            class="w-13 h-13 rounded-2xl bg-white text-slate-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
+                            <i class="fas fa-external-link-alt text-lg"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-500 text-lg mb-1">Painel Legacy</h4>
+                        <p class="text-xs text-slate-400 font-medium italic">Acesso fallback ao AdminLTE</p>
+                    </a>
+                @endif
+            </div>
         </div>
     </div>
 @endsection
