@@ -25,6 +25,7 @@ class DashboardController extends Controller
             'orders_paid_total' => 0.0,
             'seller_paid_count' => 0,
             'seller_net_total' => 0.0,
+            'community_count' => (int) \App\Models\User::count(),
         ];
         $salesChart = null;
         try {
