@@ -7,13 +7,13 @@
     {{-- Header --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Gamificação: Regras</h1>
-            <p class="text-sm text-slate-500 mt-1">Configure como os usuários ganham pontos ao interagir com a plataforma.</p>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">Gamificação: Regras</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">Configure como os usuários ganham pontos ao interagir com a plataforma.</p>
         </div>
 
         <div class="flex items-center gap-3">
             <a href="{{ route('panel.admin.ranking.index') }}" 
-               class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-semibold rounded-xl transition-all flex items-center gap-2">
+               class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-xl transition-all flex items-center gap-2">
                 <i class="fas fa-trophy"></i>
                 <span>Ver Ranking</span>
             </a>
@@ -30,10 +30,10 @@
         @foreach($rulesGrouped as $category => $rules)
         <div class="space-y-4">
             <div class="flex items-center gap-3 px-2">
-                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs">
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs transition-colors">
                     <i class="fas fa-tags"></i>
                 </div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                <h3 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors">
                     {{ $categories[$category] ?? ucfirst($category) }}
                 </h3>
             </div>
@@ -58,9 +58,9 @@
                             
                             <div class="mt-4 flex flex-wrap gap-2">
                                 @if($rule->active)
-                                    <span class="text-[9px] font-bold text-emerald-500 uppercase tracking-tighter bg-emerald-50 px-2 py-0.5 rounded">Ativa</span>
+                                    <span class="text-[9px] font-bold text-emerald-500 dark:text-emerald-400 uppercase tracking-tighter bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded border border-emerald-100/50 dark:border-emerald-800/50 transition-colors">Ativa</span>
                                 @else
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter bg-slate-50 px-2 py-0.5 rounded">Inativa</span>
+                                    <span class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 transition-colors">Inativa</span>
                                 @endif
 
                                 @if($rule->repeatable)

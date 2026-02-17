@@ -35,7 +35,8 @@
                         <p class="text-sm font-medium text-slate-500 dark:text-slate-400 transition-colors">Total de
                             Mentorias</p>
                         <p class="text-2xl font-bold text-slate-900 dark:text-white transition-colors">
-                            {{ $mentorships->total() }}</p>
+                            {{ $mentorships->total() }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -54,7 +55,7 @@
                         <i
                             class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors"></i>
                         <input type="text" name="q" value="{{ $search }}" placeholder="Buscar por título ou descrição..."
-                            class="w-full pl-11 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium">
+                            class="w-full pl-11 pr-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium">
                     </div>
                     <button type="submit"
                         class="px-6 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm">
@@ -129,7 +130,8 @@
                                             {{ $mentorship->type }}
                                         </span>
                                         <p class="text-xs text-slate-500 dark:text-slate-400 font-medium transition-colors">
-                                            {{ $mentorship->slots ?? '∞' }} vagas</p>
+                                            {{ $mentorship->slots ?? '∞' }} vagas
+                                        </p>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">

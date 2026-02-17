@@ -15,40 +15,52 @@
 
         {{-- Stats Cards --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+            <div
+                class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center transition-colors">
                         <i class="fas fa-clock text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Aguardando</p>
-                        <p class="text-2xl font-bold text-slate-900">
+                        <p
+                            class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider transition-colors">
+                            Aguardando</p>
+                        <p class="text-2xl font-bold text-slate-900 dark:text-white transition-colors">
                             {{ \App\Models\Testimonial::where('status', 'pending')->count() }}
                         </p>
                     </div>
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+            <div
+                class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-colors">
                         <i class="fas fa-check-circle text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Aprovados</p>
-                        <p class="text-2xl font-bold text-slate-900">
+                        <p
+                            class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider transition-colors">
+                            Aprovados</p>
+                        <p class="text-2xl font-bold text-slate-900 dark:text-white transition-colors">
                             {{ \App\Models\Testimonial::where('status', 'approved')->count() }}
                         </p>
                     </div>
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+            <div
+                class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors">
                         <i class="fas fa-star text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Em Destaque</p>
-                        <p class="text-2xl font-bold text-slate-900">
+                        <p
+                            class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider transition-colors">
+                            Em Destaque</p>
+                        <p class="text-2xl font-bold text-slate-900 dark:text-white transition-colors">
                             {{ \App\Models\Testimonial::where('is_featured', true)->count() }}
                         </p>
                     </div>
@@ -84,16 +96,28 @@
         </div>
 
         {{-- Testimonials Table --}}
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+        <div
+            class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
-                        <tr class="bg-slate-50/50 border-b border-slate-200">
-                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Autor</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Depoimento</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Avaliação</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Ações
+                        <tr
+                            class="bg-slate-50/50 dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 transition-colors">
+                            <th
+                                class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                                Autor</th>
+                            <th
+                                class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                                Depoimento</th>
+                            <th
+                                class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                                Avaliação</th>
+                            <th
+                                class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                                Status</th>
+                            <th
+                                class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right transition-colors">
+                                Ações
                             </th>
                         </tr>
                     </thead>

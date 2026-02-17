@@ -17,7 +17,7 @@
                     <i
                         class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors"></i>
                     <input type="text" name="q" value="{{ $search }}" placeholder="Buscar cursos..."
-                        class="pl-10 pr-4 py-2 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm">
+                        class="pl-10 pr-4 py-2 w-64 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm">
                 </form>
 
                 <a href="{{ route('panel.admin.courses.create') }}"
@@ -34,7 +34,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr
-                            class="bg-slate-50/50 dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold transition-colors">
+                            class="bg-slate-50/50 dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold transition-colors">
                             <th class="px-6 py-4">Curso</th>
                             <th class="px-6 py-4">Instrutor</th>
                             <th class="px-6 py-4">Preço</th>
@@ -99,10 +99,10 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
                                         $statusClasses = [
-                                            'published' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
-                                            'draft' => 'bg-slate-50 text-slate-600 border-slate-200',
-                                            'archived' => 'bg-red-50 text-red-700 border-red-100',
-                                            'paused' => 'bg-amber-50 text-amber-700 border-amber-100',
+                                            'published' => 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/50',
+                                            'draft' => 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+                                            'archived' => 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-100 dark:border-red-800/50',
+                                            'paused' => 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800/50',
                                         ];
                                         $statusLabels = [
                                             'published' => 'Publicado',
@@ -113,7 +113,7 @@
                                         $currentStatus = $course->status ?? 'draft';
                                     @endphp
                                     <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $statusClasses[$currentStatus] ?? 'bg-slate-50 text-slate-600 border-slate-200' }}">
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $statusClasses[$currentStatus] ?? 'bg-slate-50 text-slate-600 border-slate-200' }} transition-colors">
                                         {{ $statusLabels[$currentStatus] ?? ucfirst($currentStatus) }}
                                     </span>
                                 </td>

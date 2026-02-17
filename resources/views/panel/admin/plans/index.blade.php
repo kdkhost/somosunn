@@ -21,10 +21,10 @@
         </div>
 
         <!-- Plans Table -->
-        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors duration-300">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-slate-600 dark:text-slate-400">
-                    <thead class="bg-slate-50 dark:bg-slate-950 text-xs uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">
+                <table class="w-full text-left text-sm text-slate-600 dark:text-slate-400 border-collapse">
+                    <thead class="bg-slate-50/50 dark:bg-slate-950 text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">
                         <tr>
                             <th class="px-6 py-4 border-b border-slate-100 dark:border-slate-800">Plano</th>
                             <th class="px-6 py-4 border-b border-slate-100 dark:border-slate-800">Preço / Ciclo</th>
@@ -141,10 +141,10 @@
         .then(data => {
             if(data.status === 'success') {
                 if(data.is_active) {
-                    btn.className = 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold transition cursor-pointer hover:opacity-80 bg-green-100 text-green-700';
+                    btn.className = 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold transition cursor-pointer hover:opacity-80 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400';
                     btn.innerText = 'Ativo';
                 } else {
-                    btn.className = 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold transition cursor-pointer hover:opacity-80 bg-slate-100 text-slate-500';
+                    btn.className = 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold transition cursor-pointer hover:opacity-80 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 font-bold';
                     btn.innerText = 'Oculto';
                 }
             } else {

@@ -27,7 +27,7 @@
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors"></i>
                 <input type="text" name="q" value="{{ $q ?? '' }}" 
                     placeholder="Buscar por número, nome ou e-mail..." 
-                    class="pl-10 pr-4 py-2 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm hover:border-slate-300 dark:hover:border-slate-600">
+                    class="pl-10 pr-4 py-2 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm">
             </div>
         </form>
     </div>
@@ -37,7 +37,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50/50 dark:bg-slate-950 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-100 dark:border-slate-800">
+                    <tr class="bg-slate-50/50 dark:bg-slate-950 text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold border-b border-slate-100 dark:border-slate-800 transition-colors">
                         <th class="px-6 py-4">Fatura</th>
                         <th class="px-6 py-4">Cliente</th>
                         <th class="px-6 py-4">Pedido</th>
@@ -98,7 +98,7 @@
                                         default => 'Emitida',
                                     };
                                 @endphp
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $statusClasses }} transition-colors">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $statusClasses }} transition-colors">
                                     {{ $label }}
                                 </span>
                             </td>

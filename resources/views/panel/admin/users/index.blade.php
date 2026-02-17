@@ -21,7 +21,7 @@
                     </div>
                     <input type="text" name="search" value="{{ request('search') }}" 
                            placeholder="Buscar por nome ou e-mail..." 
-                           class="pl-10 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white focus:border-blue-500 focus:ring-blue-500 transition-all shadow-sm">
+                           class="pl-10 w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm">
                     @if(request('role'))
                         <input type="hidden" name="role" value="{{ request('role') }}">
                     @endif
@@ -58,7 +58,7 @@
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors duration-300">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600 dark:text-slate-400">
-                    <thead class="bg-slate-50 dark:bg-slate-950 text-xs uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">
+                    <thead class="bg-slate-50/50 dark:bg-slate-950 text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">
                         <tr>
                             <th class="px-6 py-4">Usuário</th>
                             <th class="px-6 py-4">Função / Nível</th>

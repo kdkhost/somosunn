@@ -25,7 +25,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50/50 dark:bg-slate-950 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-100 dark:border-slate-800 transition-colors">
+                    <tr class="bg-slate-50/50 dark:bg-slate-950 text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold border-b border-slate-100 dark:border-slate-800 transition-colors">
                         <th class="px-6 py-4">Código</th>
                         <th class="px-6 py-4">Tipo</th>
                         <th class="px-6 py-4 text-right">Valor</th>

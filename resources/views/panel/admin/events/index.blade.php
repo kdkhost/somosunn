@@ -14,7 +14,7 @@
 
             <div class="flex items-center gap-3">
                 <a href="{{ route('panel.admin.events.create') }}"
-                    class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-200 dark:shadow-blue-900/40 transition-all transform hover:scale-[1.02]">
+                    class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:scale-[1.02]">
                     <i class="fas fa-plus"></i>
                     <span>Novo Evento</span>
                 </a>
