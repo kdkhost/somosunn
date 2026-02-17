@@ -29,29 +29,37 @@
 
         {{-- Tabs Navigation --}}
         <div
-            class="bg-slate-100/50 dark:bg-slate-800 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1.5 transition-all duration-300">
+            class="bg-slate-100/80 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 inline-flex items-center gap-1.5 transition-all duration-300">
             <button type="button" @click="tab = 'general'"
-                :class="tab === 'general' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : 'text-slate-500 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                :class="tab === 'general' 
+                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50' 
+                        : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-semibold bg-transparent'"
+                class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                 <i class="fas fa-info-circle"></i>
                 <span>Geral</span>
             </button>
             <button type="button" @click="tab = 'location'"
-                :class="tab === 'location' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : 'text-slate-500 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                :class="tab === 'location' 
+                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50' 
+                        : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-semibold bg-transparent'"
+                class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                 <i class="fas fa-map-marker-alt"></i>
                 <span>Local & Capacidade</span>
             </button>
             <button type="button" @click="tab = 'pricing'"
-                :class="tab === 'pricing' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : 'text-slate-500 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                :class="tab === 'pricing' 
+                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50' 
+                        : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-semibold bg-transparent'"
+                class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                 <i class="fas fa-tag"></i>
                 <span>Preço & Ingressos</span>
             </button>
             @if($event->exists)
                 <button type="button" @click="tab = 'certificate'"
-                    :class="tab === 'certificate' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : 'text-slate-500 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'"
-                    class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                    :class="tab === 'certificate' 
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50' 
+                                : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-semibold bg-transparent'"
+                    class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                     <i class="fas fa-certificate"></i>
                     <span>Certificado</span>
                 </button>
