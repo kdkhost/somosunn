@@ -180,8 +180,8 @@
                 <div class="card-header bg-white border-0 pb-2">
                     <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-user-plus mr-1"></i>Novos Usuários por Mês</h6>
                 </div>
-                <div class="card-body pt-0">
-                    <canvas id="usersByMonthChart" height="120"></canvas>
+                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
+                    <canvas id="usersByMonthChart" style="height:100% !important; max-height:100% !important;"></canvas>
                 </div>
             </div>
         </div>
@@ -190,8 +190,8 @@
                 <div class="card-header bg-white border-0 pb-2">
                     <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-layer-group mr-1"></i>Distribuição de Conteúdo</h6>
                 </div>
-                <div class="card-body pt-0">
-                    <canvas id="contentDistributionChart" height="120"></canvas>
+                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
+                    <canvas id="contentDistributionChart" style="height:100% !important; max-height:100% !important;"></canvas>
                 </div>
             </div>
         </div>
@@ -200,8 +200,8 @@
                 <div class="card-header bg-white border-0 pb-2">
                     <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-certificate mr-1"></i>Certificados Emitidos por Mês</h6>
                 </div>
-                <div class="card-body pt-0">
-                    <canvas id="certificatesByMonthChart" height="120"></canvas>
+                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
+                    <canvas id="certificatesByMonthChart" style="height:100% !important; max-height:100% !important;"></canvas>
                 </div>
             </div>
         </div>
@@ -210,8 +210,8 @@
                 <div class="card-header bg-white border-0 pb-2">
                     <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-tasks mr-1"></i>Jobs Pendentes x Concluídos</h6>
                 </div>
-                <div class="card-body pt-0">
-                    <canvas id="jobsStatusChart" height="120"></canvas>
+                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
+                    <canvas id="jobsStatusChart" style="height:100% !important; max-height:100% !important;"></canvas>
                 </div>
             </div>
         </div>
@@ -220,8 +220,8 @@
                 <div class="card-header bg-white border-0 pb-2">
                     <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-history mr-1"></i>Logs por Tipo</h6>
                 </div>
-                <div class="card-body pt-0">
-                    <canvas id="logsByTypeChart" height="120"></canvas>
+                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
+                    <canvas id="logsByTypeChart" style="height:100% !important; max-height:100% !important;"></canvas>
                 </div>
             </div>
         </div>
