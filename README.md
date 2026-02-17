@@ -173,10 +173,11 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 ### 17/02/2026 (Noite) — Correção de Bloqueio de Cliques Mobile
 - **Auditoria Completa:** Identificação e correção de todos os overlays que bloqueavam cliques no mobile.
 - **Navbar Mobile:** Removido `pointer-events-none` do container principal do menu mobile.
-- **Member Layout:** Adicionado JavaScript completo de toggle para `pointer-events` no menu mobile de membros.
+- **Member Layout:** Removido `pointer-events-none` INLINE da classe do overlay (BUG CRÍTICO).
+- **JavaScript Completo:** Adicionado toggle para `pointer-events` no menu mobile de membros.
 - **Cache-Busting v=3:** Atualização de versão do FilePond para forçar reload de assets.
 - **Rota de Assinatura:** Adicionada rota POST `subscription.process` faltante.
-- **Commits:** `1e1526e`, `765f11a`, `e9ad637`
+- **Commits:** `1e1526e`, `765f11a`, `e9ad637`, `e211fe2`, `ca8f434`, `0c1fe6b` (CRÍTICO)
 
 ---
 © 2026 UNN Networking. Todos os direitos reservados.
