@@ -44,84 +44,144 @@
     @endif
 
     @if($isAdmin)
-    <form id="dashboardFilterForm" class="mb-3 d-flex flex-wrap align-items-center gap-2">
+    <form id="dashboardFilterForm" class="mb-4 d-flex flex-wrap align-items-center gap-2 bg-white rounded shadow-sm p-3">
         <label class="mr-2 font-weight-bold">Período:</label>
-        <select name="period" id="dashboardPeriod" class="form-control form-control-sm w-auto">
+        <select name="period" id="dashboardPeriod" class="form-control form-control-lg w-auto">
             <option value="30">Últimos 30 dias</option>
             <option value="7">Últimos 7 dias</option>
             <option value="90">Últimos 90 dias</option>
             <option value="365">Ano atual</option>
         </select>
-        <button type="button" class="btn btn-sm btn-outline-primary ml-2" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
+        <button type="button" class="btn btn-lg btn-gradient-primary ml-2" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
     </form>
+    <!-- KPIs premium -->
     <div class="row mb-4">
-        <div class="col-6 col-md-3 mb-3">
-            <div class="card text-center shadow-sm border-0">
-                <div class="card-body py-3">
-                    <div class="mb-1"><i class="fas fa-wallet fa-2x text-success"></i></div>
-                    <div class="h4 mb-0">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</div>
-                    <small class="text-muted">Saldo Total</small>
+        <div class="col-12 d-flex flex-wrap justify-content-between align-items-stretch gap-3">
+            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0" style="min-width:220px;">
+                <div class="card-body py-4">
+                    <div class="mb-2"><i class="fas fa-wallet fa-3x text-gradient-success"></i></div>
+                    <div class="display-4 font-weight-bold mb-1">R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</div>
+                    <div class="text-muted font-weight-bold">Saldo Total</div>
                 </div>
             </div>
-        </div>
-        <div class="col-6 col-md-3 mb-3">
-            <div class="card text-center shadow-sm border-0">
-                <div class="card-body py-3">
-                    <div class="mb-1"><i class="fas fa-undo fa-2x text-danger"></i></div>
-                    <div class="h4 mb-0">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</div>
-                    <small class="text-muted">Reembolsados</small>
+            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0" style="min-width:220px;">
+                <div class="card-body py-4">
+                    <div class="mb-2"><i class="fas fa-undo fa-3x text-gradient-danger"></i></div>
+                    <div class="display-4 font-weight-bold mb-1">R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</div>
+                    <div class="text-muted font-weight-bold">Reembolsados</div>
                 </div>
             </div>
-        </div>
-        <div class="col-6 col-md-3 mb-3">
-            <div class="card text-center shadow-sm border-0">
-                <div class="card-body py-3">
-                    <div class="mb-1"><i class="fas fa-users fa-2x text-warning"></i></div>
-                    <div class="h4 mb-0">{{ $totalUsers ?? 0 }}</div>
-                    <small class="text-muted">Usuários</small>
+            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0" style="min-width:220px;">
+                <div class="card-body py-4">
+                    <div class="mb-2"><i class="fas fa-users fa-3x text-gradient-warning"></i></div>
+                    <div class="display-4 font-weight-bold mb-1">{{ $totalUsers ?? 0 }}</div>
+                    <div class="text-muted font-weight-bold">Usuários</div>
                 </div>
             </div>
-        </div>
-        <div class="col-6 col-md-3 mb-3">
-            <div class="card text-center shadow-sm border-0">
-                <div class="card-body py-3">
-                    <div class="mb-1"><i class="fas fa-shopping-bag fa-2x text-info"></i></div>
-                    <div class="h4 mb-0">{{ $totalOrders ?? 0 }}</div>
-                    <small class="text-muted">Pedidos</small>
+            <div class="card kpi-card flex-fill text-center shadow-lg border-0 p-0 m-0" style="min-width:220px;">
+                <div class="card-body py-4">
+                    <div class="mb-2"><i class="fas fa-shopping-bag fa-3x text-gradient-info"></i></div>
+                    <div class="display-4 font-weight-bold mb-1">{{ $totalOrders ?? 0 }}</div>
+                    <div class="text-muted font-weight-bold">Pedidos</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Gráficos principais (apenas 3) -->
+    <!-- Gráficos premium -->
     <div class="row mb-4">
-        <div class="col-lg-4 col-12 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white border-0 pb-2">
-                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-line mr-1"></i>Histórico de Vendas</h6>
+        <div class="col-lg-8 col-12 mb-3">
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header bg-gradient-primary text-white border-0 pb-2 d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-line mr-2"></i>Histórico de Vendas</h5>
+                    <span class="badge badge-light text-primary">R$</span>
                 </div>
-                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
+                <div class="card-body pt-2" style="height:340px; min-height:340px; max-height:340px;">
                     <canvas id="salesChart" style="height:100% !important; max-height:100% !important;"></canvas>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-12 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white border-0 pb-2">
-                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-pie mr-1"></i>Pedidos por Status</h6>
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header bg-gradient-info text-white border-0 pb-2 d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-chart-pie mr-2"></i>Pedidos por Status</h5>
                 </div>
-                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
+                <div class="card-body pt-2" style="height:340px; min-height:340px; max-height:340px;">
                     <canvas id="ordersStatusChart" style="height:100% !important; max-height:100% !important;"></canvas>
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row mb-4">
         <div class="col-lg-4 col-12 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white border-0 pb-2">
-                    <h6 class="card-title mb-0 font-weight-bold"><i class="fas fa-user-plus mr-1"></i>Novos Usuários por Mês</h6>
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header bg-gradient-warning text-white border-0 pb-2 d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-user-plus mr-2"></i>Novos Usuários por Mês</h5>
                 </div>
-                <div class="card-body pt-0" style="height:320px; min-height:320px; max-height:320px;">
+                <div class="card-body pt-2" style="height:340px; min-height:340px; max-height:340px;">
                     <canvas id="usersByMonthChart" style="height:100% !important; max-height:100% !important;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 col-12 mb-3">
+            <div class="row h-100">
+                <div class="col-md-4 col-6 mb-3">
+                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center">
+                        <span class="info-box-icon text-primary mb-2"><i class="fas fa-graduation-cap fa-2x"></i></span>
+                        <div class="info-box-content text-center">
+                            <span class="info-box-text font-weight-bold">Cursos</span>
+                            <span class="info-box-number display-4">{{ $coursesCount ?? 0 }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-6 mb-3">
+                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center">
+                        <span class="info-box-icon text-success mb-2"><i class="fas fa-chalkboard-teacher fa-2x"></i></span>
+                        <div class="info-box-content text-center">
+                            <span class="info-box-text font-weight-bold">Mentorias</span>
+                            <span class="info-box-number display-4">{{ $mentorshipsCount ?? 0 }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-12 mb-3">
+                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center">
+                        <span class="info-box-icon text-warning mb-2"><i class="fas fa-calendar-alt fa-2x"></i></span>
+                        <div class="info-box-content text-center">
+                            <span class="info-box-text font-weight-bold">Eventos</span>
+                            <span class="info-box-number display-4">{{ $eventsCount ?? 0 }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-6 mb-3">
+                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center">
+                        <span class="info-box-icon text-secondary mb-2"><i class="fas fa-certificate fa-2x"></i></span>
+                        <div class="info-box-content text-center">
+                            <span class="info-box-text font-weight-bold">Certificados</span>
+                            <span class="info-box-number display-4">{{ $certificatesCount ?? 0 }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-6 mb-3">
+                    <div class="info-box bg-white shadow-sm h-100 border rounded-lg d-flex flex-column align-items-center justify-content-center">
+                        <span class="info-box-icon text-dark mb-2"><i class="fas fa-tasks fa-2x"></i></span>
+                        <div class="info-box-content text-center">
+                            <span class="info-box-text font-weight-bold">Jobs Pendentes</span>
+                            <span class="info-box-number display-4">{{ $pendingJobsCount ?? 0 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Calendário premium -->
+    <div class="row mb-4">
+        <div class="col-lg-5 col-12 mb-3">
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header bg-gradient-secondary text-white border-0 pb-2 d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0 font-weight-bold"><i class="fas fa-calendar-alt mr-2"></i>Calendário</h5>
+                </div>
+                <div class="card-body pt-2" style="height:340px; min-height:340px; max-height:340px;">
+                    <div id="calendar" style="width:100%; min-height: 320px; max-height: 320px; overflow-y: auto;"></div>
                 </div>
             </div>
         </div>
