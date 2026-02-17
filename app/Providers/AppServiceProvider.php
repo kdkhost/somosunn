@@ -266,52 +266,55 @@ class AppServiceProvider extends ServiceProvider
                     'mercadopago_sandbox_access_token',
                     // PagSeguro
                     'pagseguro_email',
-                $mpPublicKeySandbox = trim((string) (($paymentSettings['gateway_mercadopago_public_key_sandbox'] ?? '') ?: ($paymentSettings['mercadopago_sandbox_public_key'] ?? '')));
+                    'pagseguro_token',
+                    'pagseguro_sandbox_token',
+                    'pagseguro_prod_token',
+                ])->pluck('value', 'key')->toArray();
 
-                $mpAccessTokenProd = trim((string) (($paymentSettings['gateway_mercadopago_access_token_prod'] ?? '') ?: ($paymentSettings['mercadopago_prod_access_token'] ?? '')));
-                $mpPublicKeyProd = trim((string) (($paymentSettings['gateway_mercadopago_public_key_prod'] ?? '') ?: ($paymentSettings['mercadopago_prod_public_key'] ?? '')));
-
-                $mpAccessToken = $mpSandbox ? $mpAccessTokenSandbox : $mpAccessTokenProd;
-                $mpPublicKey = $mpSandbox ? $mpPublicKeySandbox : $mpPublicKeyProd;
-
-                if ($mpAccessToken) {
-                    config(['payments.mercadopago.access_token' => $mpAccessToken]);
-                    config(['payments.mercadopago.public_key' => $mpPublicKey]);
-                    config(['payments.mercadopago.sandbox' => $mpSandbox]);
+                // 1. Mercado Pago App Credentials (OAuth) - Always needed for splits
+                if (!empty($paymentSettings['mercadopago_client_id'])) {
+                    config(['payments.mercadopago.client_id' => $paymentSettings['mercadopago_client_id']]);
+                }
+                if (!empty($paymentSettings['mercadopago_client_secret'])) {
+                    config(['payments.mercadopago.client_secret' => $paymentSettings['mercadopago_client_secret']]);
                 }
 
-                // MercadoPago OAuth (Platform Credentials)
-                $mpClientId = trim((string) ($paymentSettings['mercadopago_client_id'] ?? ''));
-                $mpClientSecret = trim((string) ($paymentSettings['mercadopago_client_secret'] ?? ''));
-                $mpRedirectUri = trim((string) ($paymentSettings['mercadopago_redirect_uri'] ?? ''));
-
-                if ($mpClientId !== '') {
-                    config(['payments.mercadopago.client_id' => $mpClientId]);
-                }
-                if ($mpClientSecret !== '') {
-                    config(['payments.mercadopago.client_secret' => $mpClientSecret]);
-                }
-                if ($mpRedirectUri !== '') {
-                    config(['payments.mercadopago.redirect_uri' => $mpRedirectUri]);
-                }
-
-                // PagSeguro
-                $psEnv = trim((string) ($paymentSettings['pagseguro_env'] ?? ''));
-                $psSandbox = (bool) ($paymentSettings['gateway_pagseguro_sandbox'] ?? 0);
-                if ($psEnv !== '') {
-                    $psSandbox = $psEnv === 'sandbox';
+                // 2. Mercado Pago Platform Access (Check Environment)
+                $mpEnv = $paymentSettings['mercadopago_env'] ?? 'sandbox';
+                if ($mpEnv === 'production') {
+                    if (!empty($paymentSettings['mercadopago_prod_public_key'])) {
+                        config(['payments.mercadopago.public_key' => $paymentSettings['mercadopago_prod_public_key']]);
+                    }
+                    if (!empty($paymentSettings['mercadopago_prod_access_token'])) {
+                        config(['payments.mercadopago.access_token' => $paymentSettings['mercadopago_prod_access_token']]);
+                    }
+                } else {
+                    // Sandbox
+                    if (!empty($paymentSettings['mercadopago_sandbox_public_key'])) {
+                        config(['payments.mercadopago.public_key' => $paymentSettings['mercadopago_sandbox_public_key']]);
+                    }
+                    if (!empty($paymentSettings['mercadopago_sandbox_access_token'])) {
+                        config(['payments.mercadopago.access_token' => $paymentSettings['mercadopago_sandbox_access_token']]);
+                    }
                 }
 
-                $psTokenSandbox = trim((string) (($paymentSettings['gateway_pagseguro_token_sandbox'] ?? '') ?: ($paymentSettings['pagseguro_sandbox_token'] ?? '')));
-                $psTokenProd = trim((string) (($paymentSettings['gateway_pagseguro_token_prod'] ?? '') ?: ($paymentSettings['pagseguro_prod_token'] ?? '')));
-                $psToken = $psSandbox ? $psTokenSandbox : $psTokenProd;
+                // 3. PagSeguro Platform
+                if (!empty($paymentSettings['pagseguro_email'])) {
+                    config(['payments.pagseguro.email' => $paymentSettings['pagseguro_email']]);
+                }
 
-                $psEmail = trim((string) (($paymentSettings['gateway_pagseguro_email'] ?? '') ?: ($paymentSettings['pagseguro_email'] ?? '')));
-
-                if ($psToken && $psEmail) {
-                    config(['payments.pagseguro.email' => $psEmail]);
-                    config(['payments.pagseguro.token' => $psToken]);
-                    config(['payments.pagseguro.sandbox' => $psSandbox]);
+                $psEnv = $paymentSettings['pagseguro_env'] ?? 'sandbox';
+                if ($psEnv === 'production') {
+                    if (!empty($paymentSettings['pagseguro_prod_token'])) {
+                        config(['payments.pagseguro.token' => $paymentSettings['pagseguro_prod_token']]);
+                    }
+                } else {
+                    if (!empty($paymentSettings['pagseguro_sandbox_token'])) {
+                        config(['payments.pagseguro.token' => $paymentSettings['pagseguro_sandbox_token']]);
+                    } elseif (!empty($paymentSettings['pagseguro_token'])) {
+                        // Fallback legacy
+                        config(['payments.pagseguro.token' => $paymentSettings['pagseguro_token']]);
+                    }
                 }
 
             } catch (\Throwable $e) {
