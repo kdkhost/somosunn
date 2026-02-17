@@ -258,6 +258,9 @@ class AppServiceProvider extends ServiceProvider
                     'mercadopago_prod_public_key',
                     'mercadopago_sandbox_access_token',
                     'mercadopago_sandbox_public_key',
+                    'mercadopago_client_id',
+                    'mercadopago_client_secret',
+                    'mercadopago_redirect_uri',
                     'pagseguro_env',
                     'pagseguro_prod_token',
                     'pagseguro_sandbox_token',
@@ -296,6 +299,21 @@ class AppServiceProvider extends ServiceProvider
                     config(['payments.mercadopago.access_token' => $mpAccessToken]);
                     config(['payments.mercadopago.public_key' => $mpPublicKey]);
                     config(['payments.mercadopago.sandbox' => $mpSandbox]);
+                }
+
+                // MercadoPago OAuth (Platform Credentials)
+                $mpClientId = trim((string) ($paymentSettings['mercadopago_client_id'] ?? ''));
+                $mpClientSecret = trim((string) ($paymentSettings['mercadopago_client_secret'] ?? ''));
+                $mpRedirectUri = trim((string) ($paymentSettings['mercadopago_redirect_uri'] ?? ''));
+
+                if ($mpClientId !== '') {
+                    config(['payments.mercadopago.client_id' => $mpClientId]);
+                }
+                if ($mpClientSecret !== '') {
+                    config(['payments.mercadopago.client_secret' => $mpClientSecret]);
+                }
+                if ($mpRedirectUri !== '') {
+                    config(['payments.mercadopago.redirect_uri' => $mpRedirectUri]);
                 }
 
                 // PagSeguro

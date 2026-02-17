@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class SettingController extends Controller
@@ -807,6 +808,74 @@ class SettingController extends Controller
             return response()->json(['success' => true, 'message' => 'E-mail de teste enviado com sucesso!']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erro ao enviar e-mail: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function testGateway(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'gateway' => 'required|in:mercadopago,pagseguro',
+                'env' => 'required|in:sandbox,production',
+                'access_token' => 'nullable|string',
+                'token' => 'nullable|string',
+                'email' => 'nullable|email'
+            ]);
+
+            $success = false;
+            $message = '';
+
+            if ($data['gateway'] === 'mercadopago') {
+                $token = $data['access_token'];
+                if (!$token) {
+                    throw new \Exception('Access Token não informado.');
+                }
+
+                // Teste MP: Get Stores ou User Info
+                $response = Http::withToken($token)->get('https://api.mercadopago.com/users/me');
+
+                if ($response->successful()) {
+                    $json = $response->json();
+                    $userName = $json['first_name'] . ' ' . $json['last_name'];
+                    $success = true;
+                    $message = "Conexão com Mercado Pago [{$data['env']}] realizada com sucesso! Usuário: {$userName}";
+                } else {
+                    $error = $response->json()['message'] ?? 'Erro desconhecido';
+                    throw new \Exception("Falha na conexão MP: {$error}");
+                }
+
+            } elseif ($data['gateway'] === 'pagseguro') {
+                $token = $data['token'];
+                $email = $data['email'];
+
+                if (!$token) {
+                    throw new \Exception('Token não informado.');
+                }
+
+                // URL base depende do ambiente
+                $baseUrl = $data['env'] === 'sandbox'
+                    ? 'https://ws.sandbox.pagseguro.uol.com.br'
+                    : 'https://ws.pagseguro.uol.com.br';
+
+                // Teste PagSeguro V2 Session
+                $response = Http::asForm()->post("{$baseUrl}/v2/sessions?email={$email}&token={$token}");
+
+                if ($response->successful()) {
+                    $success = true;
+                    $message = "Conexão com PagSeguro [{$data['env']}] realizada com sucesso!";
+                } else {
+                    $body = $response->body();
+                    if (str_contains($body, 'Unauthorized') || $response->status() == 401) {
+                        throw new \Exception("Falha na autenticação PagSeguro. Verifique E-mail e Token.");
+                    }
+                    throw new \Exception("Falha na conexão PagSeguro. Status: " . $response->status());
+                }
+            }
+
+            return response()->json(['success' => $success, 'message' => $message]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 }

@@ -259,6 +259,13 @@ Route::middleware('auth')->group(function () {
 
 // (events.show/events.index defined above as public routes)
 
+
+// Gateway OAuth Routes
+Route::middleware(['auth'])->prefix('gateway/mercadopago')->name('gateway.mercadopago.')->group(function () {
+    Route::get('connect', [\App\Http\Controllers\GatewayAccountController::class, 'connect'])->name('connect');
+    Route::get('callback', [\App\Http\Controllers\GatewayAccountController::class, 'callback'])->name('callback');
+});
+
 // Auth Required Routes
 Route::middleware(['auth', 'check.plan'])->group(function () {
 
@@ -318,6 +325,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::get('/settings/{group?}', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
         Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
         Route::post('/settings/test-smtp', [\App\Http\Controllers\Admin\SettingController::class, 'testSmtp'])->name('settings.test-smtp');
+        Route::post('/settings/test-gateway', [\App\Http\Controllers\Admin\SettingController::class, 'testGateway'])->name('settings.test-gateway');
 
         // Mail Templates
         Route::get('/mailtemplates', [\App\Http\Controllers\Admin\MailTemplateController::class, 'index'])->name('mailtemplates.index');
@@ -523,6 +531,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         Route::get('/settings/{group?}', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
         Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
         Route::post('/settings/test-smtp', [\App\Http\Controllers\Admin\SettingController::class, 'testSmtp'])->name('settings.test-smtp');
+        Route::post('/settings/test-gateway', [\App\Http\Controllers\Admin\SettingController::class, 'testGateway'])->name('settings.test-gateway');
 
         // Usuários
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('users');
