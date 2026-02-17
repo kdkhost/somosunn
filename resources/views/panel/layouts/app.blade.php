@@ -2,10 +2,10 @@
 
 @push('styles')
     <!-- FilePond CSS (local) -->
-    <link href="{{ asset('vendor/filepond/filepond.css') }}" rel="stylesheet">
-    <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-image-preview.css') }}" rel="stylesheet">
-    <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-size.css') }}" rel="stylesheet">
-    <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-type.css') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/filepond/filepond.css') }}?v=2" rel="stylesheet">
+    <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-image-preview.css') }}?v=2" rel="stylesheet">
+    <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-size.css') }}?v=2" rel="stylesheet">
+    <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-type.css') }}?v=2" rel="stylesheet">
 
     <!-- Tagify CSS -->
     <link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
@@ -116,10 +116,10 @@
 
     @push('scripts')
         <!-- FilePond JS (local) -->
-        <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-image-preview.js') }}"></script>
-        <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-size.js') }}"></script>
-        <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-type.js') }}"></script>
-        <script src="{{ asset('vendor/filepond/filepond.js') }}"></script>
+        <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-image-preview.js') }}?v=2"></script>
+        <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-size.js') }}?v=2"></script>
+        <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-type.js') }}?v=2"></script>
+        <script src="{{ asset('vendor/filepond/filepond.js') }}?v=2"></script>
 
         <!-- Tagify JS -->
         <script src="https://unpkg.com/@yaireo/tagify"></script>
