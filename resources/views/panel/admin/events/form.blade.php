@@ -29,28 +29,28 @@
 
         {{-- Tabs Navigation --}}
         <div
-            class="bg-white dark:bg-slate-950 p-1 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 inline-flex items-center gap-1 transition-colors duration-300">
-            <button @click="tab = 'general'"
-                :class="tab === 'general' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
+            class="bg-slate-100 dark:bg-slate-800/50 p-1 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1 transition-colors duration-300">
+            <button type="button" @click="tab = 'general'"
+                :class="tab === 'general' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
                 class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                 <i class="fas fa-info-circle"></i>
                 <span>Geral</span>
             </button>
-            <button @click="tab = 'location'"
-                :class="tab === 'location' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
+            <button type="button" @click="tab = 'location'"
+                :class="tab === 'location' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
                 class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                 <i class="fas fa-map-marker-alt"></i>
                 <span>Local & Capacidade</span>
             </button>
-            <button @click="tab = 'pricing'"
-                :class="tab === 'pricing' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
+            <button type="button" @click="tab = 'pricing'"
+                :class="tab === 'pricing' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
                 class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                 <i class="fas fa-tag"></i>
                 <span>Preço & Ingressos</span>
             </button>
             @if($event->exists)
-                <button @click="tab = 'certificate'"
-                    :class="tab === 'certificate' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
+                <button type="button" @click="tab = 'certificate'"
+                    :class="tab === 'certificate' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
                     class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                     <i class="fas fa-certificate"></i>
                     <span>Certificado</span>
@@ -166,16 +166,21 @@
 
             {{-- Tab: Location --}}
             <div x-show="tab === 'location'" class="max-w-4xl space-y-6">
-                <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6 transition-colors duration-300">
+                <div
+                    class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6 transition-colors duration-300">
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Nome do Local</label>
+                        <label
+                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Nome
+                            do Local</label>
                         <input type="text" name="location" value="{{ old('location', $event->location) }}"
                             class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
                             placeholder="Ex: Espaço Solarium / Online">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Endereço Completo</label>
+                        <label
+                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Endereço
+                            Completo</label>
                         <input type="text" name="address" value="{{ old('address', $event->address) }}"
                             class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
                             placeholder="Ex: Av. Paulista, 1000 - São Paulo, SP">
@@ -183,7 +188,9 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Capacidade Máxima</label>
+                            <label
+                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Capacidade
+                                Máxima</label>
                             <input type="number" name="capacity" value="{{ old('capacity', $event->capacity) }}"
                                 class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-bold"
                                 placeholder="Ex: 100 (0 para ilimitado)">
@@ -194,31 +201,40 @@
 
             {{-- Tab: Pricing --}}
             <div x-show="tab === 'pricing'" class="max-w-3xl space-y-6">
-                <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6 transition-colors duration-300">
+                <div
+                    class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6 transition-colors duration-300">
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Preço do Ingresso (R$)</label>
+                        <label
+                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Preço
+                            do Ingresso (R$)</label>
                         <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold transition-colors">R$</span>
+                            <span
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold transition-colors">R$</span>
                             <input type="text" name="price"
                                 value="{{ old('price', number_format($event->price, 2, ',', '.')) }}"
                                 class="mask-money w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-bold text-lg">
                         </div>
                     </div>
 
-                    <div class="p-6 bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-100 dark:border-emerald-800/30 space-y-6 transition-colors">
+                    <div
+                        class="p-6 bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-100 dark:border-emerald-800/30 space-y-6 transition-colors">
                         <div class="flex items-center gap-3 text-emerald-700 dark:text-emerald-400 font-bold">
                             <i class="fas fa-bolt"></i>
                             <span>Preço Promocional Flash</span>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 transition-colors">Valor Flash</label>
+                                <label
+                                    class="block text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 transition-colors">Valor
+                                    Flash</label>
                                 <input type="text" name="flash_sale_price"
                                     value="{{ old('flash_sale_price', $event->flash_sale_price ? number_format($event->flash_sale_price, 2, ',', '.') : '') }}"
                                     class="mask-money w-full px-4 py-3 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-emerald-900 dark:text-white font-bold">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 transition-colors">Expira em</label>
+                                <label
+                                    class="block text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 transition-colors">Expira
+                                    em</label>
                                 <input type="datetime-local" name="flash_sale_ends_at"
                                     value="{{ old('flash_sale_ends_at', $event->flash_sale_ends_at ? $event->flash_sale_ends_at->format('Y-m-d\TH:i') : '') }}"
                                     class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-emerald-900 dark:text-white font-medium">
@@ -236,7 +252,9 @@
                         <div
                             class="xl:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 min-h-[600px] flex flex-col transition-colors duration-300">
                             <div class="flex items-center justify-between mb-6">
-                                <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider transition-colors">Editor do Certificado</h3>
+                                <h3
+                                    class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider transition-colors">
+                                    Editor do Certificado</h3>
                             </div>
 
                             <div
@@ -254,18 +272,23 @@
 
                         {{-- Settings --}}
                         <div class="space-y-6">
-                            <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
+                            <div
+                                class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
                                 <div class="flex items-center gap-3 mb-6">
-                                    <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors">
+                                    <div
+                                        class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors">
                                         <i class="fas fa-cog"></i>
                                     </div>
-                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase transition-colors">Configurações</h3>
+                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase transition-colors">
+                                        Configurações</h3>
                                 </div>
 
                                 <div class="space-y-6">
                                     <div
                                         class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 transition-colors">
-                                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase transition-colors">Habilitar Certificado</span>
+                                        <span
+                                            class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase transition-colors">Habilitar
+                                            Certificado</span>
                                         <label class="relative inline-flex items-center cursor-pointer">
                                             <input type="checkbox" name="is_certificate_enabled" value="1"
                                                 @checked($event->is_certificate_enabled) class="sr-only peer">

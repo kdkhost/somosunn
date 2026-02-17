@@ -29,28 +29,28 @@
 
         {{-- Tabs Navigation --}}
         <div
-            class="bg-white dark:bg-slate-900 p-1 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 inline-flex items-center gap-1 transition-colors duration-300">
-            <button @click="tab = 'general'"
-                :class="tab === 'general' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
+            class="bg-slate-100 dark:bg-slate-800/50 p-1 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1 transition-colors duration-300">
+            <button type="button" @click="tab = 'general'"
+                :class="tab === 'general' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
                 class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                 <i class="fas fa-info-circle"></i>
                 <span>Geral</span>
             </button>
-            <button @click="tab = 'pricing'"
-                :class="tab === 'pricing' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
+            <button type="button" @click="tab = 'pricing'"
+                :class="tab === 'pricing' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
                 class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                 <i class="fas fa-tag"></i>
                 <span>Preço & Vagas</span>
             </button>
-            <button @click="tab = 'schedule'"
-                :class="tab === 'schedule' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
+            <button type="button" @click="tab = 'schedule'"
+                :class="tab === 'schedule' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
                 class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Agenda & Links</span>
             </button>
             @if($mentorship->exists)
-                <button @click="tab = 'certificate'"
-                    :class="tab === 'certificate' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'"
+                <button type="button" @click="tab = 'certificate'"
+                    :class="tab === 'certificate' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
                     class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
                     <i class="fas fa-certificate"></i>
                     <span>Certificado</span>
