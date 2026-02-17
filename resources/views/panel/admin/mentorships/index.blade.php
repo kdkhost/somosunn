@@ -2,7 +2,11 @@
 
 @section('title', 'Gestão de Mentorias')
 
-@section('content')
+@section('panel_breadcrumb')
+    <a href="{{ route('panel.admin.mentorships.index') }}" class="hover:underline">Mentorias</a>
+@endsection
+
+@section('panel_content')
     <div class="space-y-6">
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
