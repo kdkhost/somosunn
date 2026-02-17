@@ -20,7 +20,7 @@
 
         {{-- Tabs Navigation --}}
         <div
-            class="bg-slate-100/80 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 inline-flex items-center gap-1.5 transition-all">
+            class="bg-slate-50 dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 inline-flex items-center gap-1.5 mb-6">
             <button @click="tab = 'issued'"
                 :class="tab === 'issued' 
                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50' 
