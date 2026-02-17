@@ -58,12 +58,37 @@
             <button type="button" class="btn btn-sm btn-primary rounded-pill px-4" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
         </div>
     </form>
-    <!-- Linha de detalhes do sistema e disponibilidade -->
+    <!-- Filtros rápidos no topo -->
+    <div class="row mb-3">
+        <div class="col-12 d-flex flex-wrap align-items-center gap-2">
+            <form class="form-inline flex-wrap" method="get" action="">
+                <div class="form-group mr-2 mb-2">
+                    <label for="periodo" class="mr-1">Período:</label>
+                    <select name="periodo" id="periodo" class="form-control form-control-sm">
+                        <option value="7">Últimos 7 dias</option>
+                        <option value="30">Últimos 30 dias</option>
+                        <option value="90">Últimos 90 dias</option>
+                        <option value="all">Todo o período</option>
+                    </select>
+                </div>
+                <div class="form-group mr-2 mb-2">
+                    <label for="status" class="mr-1">Status:</label>
+                    <select name="status" id="status" class="form-control form-control-sm">
+                        <option value="all">Todos</option>
+                        <option value="success">Sucesso</option>
+                        <option value="pending">Pendente</option>
+                        <option value="fail">Falha</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm mb-2">Filtrar</button>
+            </form>
+        </div>
+    </div>
     <div class="row mb-2">
-        <div class="col-md-3 col-12">
-            <div class="card card-outline card-primary h-100">
+        <div class="col-md-3 col-12 mb-2">
+            <div class="card card-outline card-primary h-100" data-toggle="tooltip" title="Informações do sistema e ambiente.">
                 <div class="card-header py-2 px-3">
-                    <h3 class="card-title text-sm">Detalhes do Sistema</h3>
+                    <h3 class="card-title text-sm">Detalhes do Sistema <i class="fas fa-info-circle text-muted ml-1"></i></h3>
                 </div>
                 <div class="card-body p-2">
                     <ul class="list-unstyled mb-0">
@@ -76,20 +101,20 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-12">
-            <div class="card card-outline card-success h-100">
+        <div class="col-md-3 col-12 mb-2">
+            <div class="card card-outline card-success h-100" data-toggle="tooltip" title="Percentual de disponibilidade do sistema.">
                 <div class="card-header py-2 px-3">
-                    <h3 class="card-title text-sm">Disponibilidade</h3>
+                    <h3 class="card-title text-sm">Disponibilidade <i class="fas fa-question-circle text-muted ml-1"></i></h3>
                 </div>
                 <div class="card-body p-2 d-flex align-items-center justify-content-center">
                     <canvas id="availabilityChart" width="80" height="80"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-12">
+        <div class="col-md-6 col-12 mb-2">
             <div class="row h-100">
-                <div class="col-4">
-                    <div class="card bg-success text-white mb-2">
+                <div class="col-12 col-sm-4 mb-2">
+                    <div class="card bg-success text-white h-100" data-toggle="tooltip" title="Receita total acumulada.">
                         <div class="card-body p-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -102,8 +127,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-4">
-                    <div class="card bg-danger text-white mb-2">
+                <div class="col-12 col-sm-4 mb-2">
+                    <div class="card bg-danger text-white h-100" data-toggle="tooltip" title="Total reembolsado no período.">
                         <div class="card-body p-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -116,8 +141,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-4">
-                    <div class="card bg-warning text-dark mb-2">
+                <div class="col-12 col-sm-4 mb-2">
+                    <div class="card bg-warning text-dark h-100" data-toggle="tooltip" title="Total de usuários cadastrados.">
                         <div class="card-body p-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -136,8 +161,8 @@
 
     <!-- Grid de métricas principais e secundárias -->
     <div class="row">
-        <div class="col-md-2 col-6 mb-2">
-            <div class="card bg-info text-white">
+        <div class="col-12 col-sm-6 col-md-2 mb-2">
+            <div class="card bg-info text-white h-100" data-toggle="tooltip" title="Total de pedidos realizados.">
                 <div class="card-body p-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -150,8 +175,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2 col-6 mb-2">
-            <div class="card bg-primary text-white">
+        <div class="col-12 col-sm-6 col-md-2 mb-2">
+            <div class="card bg-primary text-white h-100" data-toggle="tooltip" title="Total de cursos cadastrados.">
                 <div class="card-body p-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -164,8 +189,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2 col-6 mb-2">
-            <div class="card bg-success text-white">
+        <div class="col-12 col-sm-6 col-md-2 mb-2">
+            <div class="card bg-success text-white h-100" data-toggle="tooltip" title="Total de mentorias ativas.">
                 <div class="card-body p-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -178,8 +203,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2 col-6 mb-2">
-            <div class="card bg-warning text-dark">
+        <div class="col-12 col-sm-6 col-md-2 mb-2">
+            <div class="card bg-warning text-dark h-100" data-toggle="tooltip" title="Total de eventos realizados.">
                 <div class="card-body p-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -192,8 +217,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2 col-6 mb-2">
-            <div class="card bg-secondary text-white">
+        <div class="col-12 col-sm-6 col-md-2 mb-2">
+            <div class="card bg-secondary text-white h-100" data-toggle="tooltip" title="Total de certificados emitidos.">
                 <div class="card-body p-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -206,8 +231,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2 col-6 mb-2">
-            <div class="card bg-dark text-white">
+        <div class="col-12 col-sm-6 col-md-2 mb-2">
+            <div class="card bg-dark text-white h-100" data-toggle="tooltip" title="Jobs pendentes de execução.">
                 <div class="card-body p-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -274,6 +299,15 @@
         // Uptime fake (substitua por valor real se disponível)
         const uptimeSeconds = 86400 * 12 + 3600 * 6 + 60 * 23; // 12 dias, 6h, 23min
         document.getElementById('uptime').innerText = formatUptime(uptimeSeconds);
+
+        // Ativa tooltips Bootstrap/AdminLTE
+        if (window.$ && $.fn.tooltip) {
+            $('[data-toggle="tooltip"]').tooltip();
+        } else {
+            document.querySelectorAll('[data-toggle="tooltip"]').forEach(function(el) {
+                el.setAttribute('title', el.getAttribute('title'));
+            });
+        }
 
         // Dados fake para mini-gráficos
         const miniData = (max) => Array.from({length: 10}, () => Math.floor(Math.random() * max));
