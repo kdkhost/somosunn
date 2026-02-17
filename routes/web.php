@@ -412,6 +412,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::prefix('marketplace')->name('marketplace.')->middleware('check.marketplace.seller')->group(function () {
         Route::get('/', [\App\Http\Controllers\Panel\MarketplaceController::class, 'index'])->name('index');
         Route::get('/pagamentos', [\App\Http\Controllers\Panel\MarketplaceController::class, 'payments'])->name('payments');
+        Route::get('/pagamentos/configurar', [\App\Http\Controllers\Panel\MarketplaceController::class, 'editPayment'])->name('payments.edit');
         Route::get('/vendas', [\App\Http\Controllers\Panel\MarketplaceController::class, 'sales'])->name('sales');
     });
 });

@@ -34,7 +34,8 @@
             </div>
             <div class="flex-1">
                 <div class="font-extrabold text-slate-900 dark:text-white transition-colors">
-                    {{ $paymentsConfigured ? 'MercadoPago habilitado' : 'MercadoPago não configurado' }}</div>
+                    {{ $paymentsConfigured ? 'MercadoPago habilitado' : 'MercadoPago não configurado' }}
+                </div>
                 <p class="text-slate-600 dark:text-slate-400 mt-1 transition-colors">
                     Este sistema utiliza <strong>uma única configuração</strong> do gateway (multi-tenant) para toda a
                     plataforma.
@@ -44,7 +45,7 @@
 
                 @if($isAdmin)
                     <div class="mt-4">
-                        <a href="{{ route('admin.settings', ['group' => 'gateway']) }}"
+                        <a href="{{ route('panel.marketplace.payments.edit') }}"
                             class="inline-flex items-center justify-center rounded-full bg-blue-600 text-white px-6 py-3 text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-blue-500/20">
                             <i class="fas fa-cogs mr-2"></i> Abrir configurações do gateway
                         </a>

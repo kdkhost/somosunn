@@ -47,6 +47,12 @@ class MarketplaceController extends Controller
         return view('panel.marketplace.payments', compact('paymentsConfigured', 'webhookUrl'));
     }
 
+    public function editPayment()
+    {
+        $gateway = \App\Models\GatewayAccount::firstOrNew(['user_id' => Auth::id(), 'provider' => 'mercadopago']);
+        return view('settings.payment', compact('gateway'));
+    }
+
     public function sales()
     {
         $userId = (int) Auth::id();
