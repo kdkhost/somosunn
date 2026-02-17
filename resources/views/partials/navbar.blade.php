@@ -38,7 +38,8 @@
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0">
             <div class="inline-flex h-12 md:h-16 w-auto items-center justify-center overflow-hidden">
-                <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain" onerror="this.style.display='none';">
+                <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain"
+                    onerror="this.style.display='none';">
             </div>
         </a>
 
@@ -55,12 +56,14 @@
                     @if($isEnabled)
                         @if(isset($item['children']))
                             <div class="relative group">
-                                <a href="{{ $item['href'] }}" class="inline-flex items-center gap-1 hover:text-[#1F5EDB] transition-colors py-2">
+                                <a href="{{ $item['href'] }}"
+                                    class="inline-flex items-center gap-1 hover:text-[#1F5EDB] transition-colors py-2">
                                     {{ $item['label'] }}
                                     <i class="fas fa-chevron-down text-xs ml-0.5 opacity-70"></i>
                                 </a>
                                 <div class="absolute right-0 top-full pt-2 hidden group-hover:block z-40">
-                                    <div class="rounded-2xl bg-white shadow-xl border border-slate-100 min-w-[220px] py-2 overflow-hidden">
+                                    <div
+                                        class="rounded-2xl bg-white shadow-xl border border-slate-100 min-w-[220px] py-2 overflow-hidden">
                                         @foreach($item['children'] as $child)
                                             @php
                                                 $childSettingKey = $child['setting_key'] ?? null;
@@ -71,7 +74,8 @@
                                                 }
                                             @endphp
                                             @if($childEnabled)
-                                                <a href="{{ $child['href'] }}" class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                <a href="{{ $child['href'] }}"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
                                                     {{ $child['label'] }}
                                                 </a>
                                             @endif
@@ -87,7 +91,8 @@
             </div>
 
             <!-- Mobile Toggle -->
-            <button id="mobile-menu-toggle" class="lg:hidden inline-flex items-center justify-center rounded-full border-0 sm:border sm:border-[#1F5EDB] px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
+            <button id="mobile-menu-toggle"
+                class="lg:hidden inline-flex items-center justify-center rounded-full border-0 sm:border sm:border-[#1F5EDB] px-3 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10">
                 <span class="sr-only">Abrir menu</span>
                 <i class="fas fa-bars text-lg"></i>
             </button>
@@ -95,75 +100,88 @@
             <!-- Action Buttons -->
             <div class="hidden lg:flex items-center gap-3">
                 @guest
-                    <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition-all whitespace-nowrap">
+                    <a href="{{ route('login') }}"
+                        class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition-all whitespace-nowrap">
                         Entrar
                     </a>
                 @else
                     <div class="relative group mr-2" id="connection-notifications-bubble">
                         <a href="{{ route('social.feed') }}" class="text-gray-500 hover:text-blue-600 transition relative">
                             <i class="fas fa-bell text-xl"></i>
-                            <span id="connection-notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1 rounded-full hidden">0</span>
+                            <span id="connection-notification-count"
+                                class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1 rounded-full hidden">0</span>
                         </a>
                     </div>
 
                     <!-- Dropdown Minha Conta -->
                     <div class="relative group">
-                        <button class="inline-flex items-center gap-2 rounded-full {{ $cta['class'] }} px-7 py-3 text-sm font-bold text-white transition-all transform hover:scale-105 active:scale-95 whitespace-nowrap">
+                        <button
+                            class="inline-flex items-center gap-2 rounded-full {{ $cta['class'] }} px-7 py-3 text-sm font-bold text-white transition-all transform hover:scale-105 active:scale-95 whitespace-nowrap">
                             Minha Conta
                             <i class="fas fa-chevron-down text-xs opacity-70"></i>
                         </button>
 
-                        <div class="absolute right-0 top-full pt-3 hidden group-hover:block z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                            <div class="rounded-2xl bg-white shadow-2xl border border-slate-100 min-w-[240px] py-3 overflow-hidden">
-                                 <div class="px-5 py-2 border-b border-slate-50 mb-2">
-                                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Membro UNN</p>
-                                     <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
-                                 </div>
+                        <div
+                            class="absolute right-0 top-full pt-3 hidden group-hover:block z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                            <div
+                                class="rounded-2xl bg-white shadow-2xl border border-slate-100 min-w-[240px] py-3 overflow-hidden">
+                                <div class="px-5 py-2 border-b border-slate-50 mb-2">
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Membro UNN</p>
+                                    <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
+                                </div>
 
-                                 <a href="{{ route('panel.dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                     <i class="fas fa-th-large w-5 opacity-70"></i>
-                                     Painel
-                                 </a>
+                                <a href="{{ route('panel.dashboard') }}"
+                                    class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                    <i class="fas fa-th-large w-5 opacity-70"></i>
+                                    Painel
+                                </a>
 
-                                 <a href="{{ route('panel.profile.edit') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                     <i class="fas fa-user-circle w-5 opacity-70"></i>
-                                     Meu perfil
-                                 </a>
+                                <a href="{{ route('panel.profile.edit') }}"
+                                    class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                    <i class="fas fa-user-circle w-5 opacity-70"></i>
+                                    Meu perfil
+                                </a>
 
-                                 <a href="{{ route('marketplace.index') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                     <i class="fas fa-store w-5 opacity-70"></i>
-                                     Marketplace
-                                 </a>
+                                <a href="{{ route('marketplace.index') }}"
+                                    class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                    <i class="fas fa-store w-5 opacity-70"></i>
+                                    Marketplace
+                                </a>
 
-                                 @if(Auth::user()->canSellOnMarketplace())
-                                     <a href="{{ route('panel.marketplace.payments') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                         <i class="fas fa-credit-card w-5 opacity-70"></i>
-                                         Configurar pagamentos
-                                     </a>
-                                 @endif
+                                @if(Auth::user()->canSellOnMarketplace())
+                                    <a href="{{ route('panel.marketplace.payments') }}"
+                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-credit-card w-5 opacity-70"></i>
+                                        Configurar pagamentos
+                                    </a>
+                                @endif
 
-                                 @if(Auth::user()->canSellOnMarketplace())
-                                     <a href="{{ route('panel.marketplace.sales') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                         <i class="fas fa-receipt w-5 opacity-70"></i>
-                                         Minhas vendas
-                                     </a>
-                                 @endif
+                                @if(Auth::user()->canSellOnMarketplace())
+                                    <a href="{{ route('panel.marketplace.sales') }}"
+                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-receipt w-5 opacity-70"></i>
+                                        Minhas vendas
+                                    </a>
+                                @endif
 
-                                 @if(Auth::user()->isAdmin())
-                                     <a href="{{ route('panel.admin') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                         <i class="fas fa-th-large w-5 opacity-70"></i>
-                                         Painel Administrativo
-                                     </a>
-                                     <a href="{{ route('panel.admin', ['to' => 'settings/general']) }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                         <i class="fas fa-cogs w-5 opacity-70"></i>
-                                         Configurações
-                                     </a>
-                                 @endif
+                                @if(Auth::user()->isAdmin())
+                                    <a href="{{ route('panel.admin.dashboard') }}"
+                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-th-large w-5 opacity-70"></i>
+                                        Painel Administrativo
+                                    </a>
+                                    <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
+                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-cogs w-5 opacity-70"></i>
+                                        Configurações
+                                    </a>
+                                @endif
 
                                 <div class="mt-2 pt-2 border-t border-slate-50">
                                     <form action="{{ route('logout') }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="flex w-full items-center gap-3 px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-all font-semibold">
+                                        <button type="submit"
+                                            class="flex w-full items-center gap-3 px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-all font-semibold">
                                             <i class="fas fa-sign-out-alt w-5 opacity-70"></i>
                                             Sair da conta
                                         </button>
@@ -175,7 +193,8 @@
                 @endguest
 
                 @guest
-                    <a href="{{ $cta['href'] }}" class="inline-flex items-center gap-2 rounded-full {{ $cta['class'] }} px-7 py-3 text-sm font-bold whitespace-nowrap">
+                    <a href="{{ $cta['href'] }}"
+                        class="inline-flex items-center gap-2 rounded-full {{ $cta['class'] }} px-7 py-3 text-sm font-bold whitespace-nowrap">
                         {{ $cta['label'] }}
                     </a>
                 @endguest
@@ -185,20 +204,25 @@
 </nav>
 
 <div id="mobile-menu" class="fixed inset-0 z-40 hidden" aria-hidden="true">
-    <div id="mobile-menu-overlay" class="absolute inset-0 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
-    <div id="mobile-menu-panel" class="relative z-10 w-4/5 max-w-sm h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out overflow-y-auto">
+    <div id="mobile-menu-overlay"
+        class="absolute inset-0 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    <div id="mobile-menu-panel"
+        class="relative z-10 w-4/5 max-w-sm h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out overflow-y-auto">
         <div class="flex items-center justify-between border-b border-slate-100 px-6 py-5">
             <div class="flex items-center gap-3">
                 <div class="inline-flex h-12 w-auto items-center justify-center overflow-hidden">
-                    <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain" onerror="this.style.display='none';">
+                    <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain"
+                        onerror="this.style.display='none';">
                 </div>
             </div>
-            <button id="mobile-menu-close" class="text-gray-500 hover:text-gray-900 text-3xl leading-none">&times;</button>
+            <button id="mobile-menu-close"
+                class="text-gray-500 hover:text-gray-900 text-3xl leading-none">&times;</button>
         </div>
         <nav class="px-6 py-4 flex flex-col gap-1 text-gray-700">
             @foreach($menuItems as $item)
                 <div>
-                    <a href="{{ $item['href'] }}" class="block rounded-2xl px-4 py-2 font-semibold hover:bg-slate-100 transition-colors">
+                    <a href="{{ $item['href'] }}"
+                        class="block rounded-2xl px-4 py-2 font-semibold hover:bg-slate-100 transition-colors">
                         {{ $item['label'] }}
                     </a>
                     @if(isset($item['children']))
@@ -208,7 +232,8 @@
                                     $childRequiresAuth = (bool) ($child['requires_auth'] ?? false);
                                 @endphp
                                 @if(!$childRequiresAuth || Auth::check())
-                                    <a href="{{ $child['href'] }}" class="block rounded-xl px-3 py-1.5 text-sm text-gray-600 hover:bg-slate-100 transition-colors">
+                                    <a href="{{ $child['href'] }}"
+                                        class="block rounded-xl px-3 py-1.5 text-sm text-gray-600 hover:bg-slate-100 transition-colors">
                                         {{ $child['label'] }}
                                     </a>
                                 @endif
@@ -220,10 +245,12 @@
         </nav>
         <div class="px-6 mt-2 mb-6 space-y-3">
             @guest
-                <a href="{{ route('login') }}" class="inline-flex w-full items-center justify-center rounded-full border border-[#1F5EDB] px-6 py-3 text-sm font-semibold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
+                <a href="{{ route('login') }}"
+                    class="inline-flex w-full items-center justify-center rounded-full border border-[#1F5EDB] px-6 py-3 text-sm font-semibold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
                     Entrar
                 </a>
-                <a href="{{ route('register') }}" class="inline-flex w-full items-center justify-center rounded-full {{ $cta['class'] }} px-6 py-3 text-sm font-bold text-white transition">
+                <a href="{{ route('register') }}"
+                    class="inline-flex w-full items-center justify-center rounded-full {{ $cta['class'] }} px-6 py-3 text-sm font-bold text-white transition">
                     Fazer parte
                 </a>
             @else
@@ -231,46 +258,54 @@
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Membro UNN</p>
                     <p class="font-bold text-gray-800">{{ Auth::user()->name }}</p>
                 </div>
-                
-                <a href="{{ route('panel.profile.edit') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+
+                <a href="{{ route('panel.profile.edit') }}"
+                    class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                     <i class="fas fa-user-circle w-5 opacity-70"></i> Meu perfil
                 </a>
 
-                <a href="{{ route('marketplace.index') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                <a href="{{ route('marketplace.index') }}"
+                    class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                     <i class="fas fa-store w-5 opacity-70"></i> Marketplace
                 </a>
 
                 @if(Auth::user()->canSellOnMarketplace())
-                    <a href="{{ route('panel.marketplace.payments') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <a href="{{ route('panel.marketplace.payments') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                         <i class="fas fa-credit-card w-5 opacity-70"></i> Configurar pagamentos
                     </a>
                 @endif
 
                 @if(Auth::user()->canSellOnMarketplace())
-                    <a href="{{ route('panel.marketplace.sales') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <a href="{{ route('panel.marketplace.sales') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                         <i class="fas fa-receipt w-5 opacity-70"></i> Minhas vendas
                     </a>
                 @endif
-                
+
                 @if(Auth::user()->isAdmin())
-                    <a href="{{ route('panel.admin') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <a href="{{ route('panel.admin.dashboard') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                         <i class="fas fa-th-large w-5 opacity-70"></i> Painel Administrativo
                     </a>
-                    <a href="{{ route('panel.admin', ['to' => 'settings/general']) }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
+                    <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
                         <i class="fas fa-cogs w-5 opacity-70"></i> Configurações
                     </a>
                 @endif
-                
+
                 <form action="{{ route('logout') }}" method="POST" class="mt-4">
                     @csrf
-                    <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 transition">
+                    <button type="submit"
+                        class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 transition">
                         <i class="fas fa-sign-out-alt w-5 opacity-70"></i> Sair da conta
                     </button>
                 </form>
             @endguest
 
             @if(!empty($pwaEnabled))
-                <button onclick="showInstallModal()" class="w-full mt-3 inline-flex items-center justify-center rounded-full bg-slate-100 px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">
+                <button onclick="showInstallModal()"
+                    class="w-full mt-3 inline-flex items-center justify-center rounded-full bg-slate-100 px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">
                     <i class="fas fa-download mr-2"></i> Instalar App
                 </button>
             @endif

@@ -132,7 +132,7 @@
 
             document.getElementById('previewBody').innerHTML = '<div class="flex items-center justify-center h-full p-10"><i class="fas fa-spinner fa-spin text-4xl text-blue-500"></i></div>';
 
-            fetch('{{ url("panel/admin/mailtemplates") }}/' + id + '/preview')
+            fetch('{{ url("painel/admin/mailtemplates") }}/' + id + '/preview')
                 .then(r => r.json())
                 .then(data => {
                     // Create an iframe to isolate styles
@@ -169,7 +169,7 @@
             btn.innerText = 'Enviando...';
             btn.disabled = true;
 
-            fetch('{{ url("panel/admin/mailtemplates") }}/' + currentPreviewId + '/send-preview', {
+            fetch('{{ url("painel/admin/mailtemplates") }}/' + currentPreviewId + '/send-preview', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
