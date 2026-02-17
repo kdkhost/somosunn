@@ -1057,7 +1057,7 @@
 </div>
 
 @if($marketplaceExitEnabled)
-    <div id="mp-exit-modal" class="fixed inset-0 z-[9999] hidden pointer-events-none items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+    <div id="mp-exit-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
         data-delay-ms="{{ $marketplaceExitDelaySeconds * 1000 }}">
         <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-100 relative">
             <button type="button" data-exit-close
