@@ -506,7 +506,7 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Erro ao testar conexão. Verifique o console.');
+                        toastr.error('Erro ao testar conexão. Verifique o console.');
                     })
                     .finally(() => {
                         btn.disabled = false;

@@ -143,7 +143,7 @@
 
                                         @if($u->id !== auth()->id() && ($u->role !== 'superadmin' || auth()->user()->role === 'superadmin'))
                                             <form action="{{ route('panel.admin.users.destroy', $u) }}" method="POST" 
-                                                  onsubmit="return confirm('Tem certeza que deseja remover este usuário? Esta ação não pode ser desfeita.');">
+                                                  onsubmit="return confirmAction(event, 'Remover usuário?', 'Tem certeza que deseja remover este usuário? Esta ação não pode ser desfeita.');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition" title="Remover">

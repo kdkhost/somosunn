@@ -93,10 +93,10 @@
                 const url = $(this).data('url');
                 // ... (rest of test logic copied from original/partial logic if needed)
                 // For standalone form, we can just use the same logic or alert
-                if (!url) return alert('Salve o template primeiro antes de testar.');
+                if (!url) return toastr.warning('Salve o template primeiro antes de testar.');
 
                 const email = $('#test_email_input').val();
-                if (!email) return alert('Digite um e-mail para teste.');
+                if (!email) return toastr.warning('Digite um e-mail para teste.');
 
                 const btn = $(this);
                 const originalContent = btn.html();
@@ -110,11 +110,11 @@
                         _token: '{{ csrf_token() }}'
                     },
                     success: function (res) {
-                        alert(res.message || 'E-mail enviado com sucesso!');
+                        toastr.success(res.message || 'E-mail enviado com sucesso!');
                     },
                     error: function (xhr) {
                         console.error(xhr);
-                        alert('Erro ao enviar e-mail.');
+                        toastr.error('Erro ao enviar e-mail.');
                     },
                     complete: function () {
                         btn.prop('disabled', false).html(originalContent);

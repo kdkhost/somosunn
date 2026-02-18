@@ -82,7 +82,7 @@
                         <code class="text-[10px] text-slate-400 font-mono">{{ $rule->key }}</code>
                         <div class="flex items-center gap-2">
                             <a href="{{ route('panel.admin.points-rules.edit', $rule) }}" class="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors">Editar</a>
-                            <form action="{{ route('panel.admin.points-rules.destroy', $rule) }}" method="POST" onsubmit="return confirm('Excluir regra?')">
+                            <form action="{{ route('panel.admin.points-rules.destroy', $rule) }}" method="POST" onsubmit="return confirmAction(event, 'Excluir regra?', 'Excluir regra?')">
                                 @csrf @method('DELETE')
                                 <button class="text-xs font-bold text-slate-400 hover:text-red-500 transition-colors">Remover</button>
                             </form>

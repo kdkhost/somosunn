@@ -201,7 +201,7 @@
                                         class="flex items-center justify-end gap-2 text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
                                         @if($order->status === 'paid')
                                             <form action="{{ route('panel.admin.orders.refund', $order->id) }}" method="POST"
-                                                onsubmit="return confirm('Tem certeza que deseja reembolsar este pedido?');">
+                                                onsubmit="return confirmAction(event, 'Reembolsar pedido?', 'Tem certeza que deseja reembolsar este pedido?');">
                                                 @csrf
                                                 <button type="submit"
                                                     class="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-800/50"

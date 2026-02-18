@@ -38,7 +38,8 @@
                     <span class="font-bold text-lg text-slate-900 dark:text-white transition-colors">{{ $course->title }}</span>
                 </div>
                 <div class="text-slate-600 dark:text-slate-400 mb-4 line-clamp-2 transition-colors">
-                    {{ $course->short_description }}</div>
+                    {{ $course->short_description }}
+                </div>
                 <div class="flex-1"></div>
                 <div
                     class="flex items-center justify-between mt-4 pt-4 border-t border-slate-50 dark:border-slate-800 transition-colors">
@@ -46,7 +47,7 @@
                         <a href="{{ route('panel.courses.edit', $course) }}"
                             class="text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline">Editar</a>
                         <form action="{{ route('panel.courses.destroy', $course) }}" method="POST"
-                            onsubmit="return confirm('Tem certeza que deseja excluir este curso?')">
+                            onsubmit="return confirmAction(event, 'Excluir curso?', 'Tem certeza que deseja excluir este curso?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit"

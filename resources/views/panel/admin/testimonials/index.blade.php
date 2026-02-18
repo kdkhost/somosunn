@@ -193,7 +193,7 @@
                                         </a>
 
                                         <form action="{{ route('panel.admin.testimonials.destroy', $test) }}" method="POST"
-                                            onsubmit="return confirm('Excluir este depoimento?')">
+                                            onsubmit="return confirmAction(event, 'Excluir depoimento?', 'Excluir este depoimento?')">
                                             @csrf @method('DELETE')
                                             <button
                                                 class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-400 hover:bg-red-500 hover:text-white transition-all">

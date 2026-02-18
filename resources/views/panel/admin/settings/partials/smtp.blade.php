@@ -158,7 +158,7 @@
             const email = document.getElementById('smtp_test_email_input').value;
 
             if (!email) {
-                alert('Digite um e-mail para teste');
+                toastr.warning('Digite um e-mail para teste');
                 return;
             }
 
@@ -179,14 +179,14 @@
                 .then(response => response.json().then(data => ({ status: response.status, body: data })))
                 .then(({ status, body }) => {
                     if (status >= 200 && status < 300) {
-                        alert(body.message || 'E-mail enviado com sucesso!');
+                        toastr.success(body.message || 'E-mail enviado com sucesso!');
                     } else {
-                        alert(body.message || 'Erro ao enviar e-mail');
+                        toastr.error(body.message || 'Erro ao enviar e-mail');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Erro ao processar requisição.');
+                    toastr.error('Erro ao processar requisição.');
                 })
                 .finally(() => {
                     btn.disabled = false;

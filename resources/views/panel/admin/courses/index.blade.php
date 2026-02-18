@@ -134,7 +134,7 @@
                                         </a>
 
                                         <form action="{{ route('panel.admin.courses.destroy', $course) }}" method="POST"
-                                              onsubmit="return confirm('Tem certeza que deseja excluir este curso? Todas as aulas relacionadas serão removidas.');"
+                                              onsubmit="return confirmAction(event, 'Excluir curso?', 'Tem certeza que deseja excluir este curso? Todas as aulas relacionadas serão removidas.');"
                                               class="inline">
                                             @csrf
                                             @method('DELETE')

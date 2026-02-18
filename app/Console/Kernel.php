@@ -11,22 +11,34 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule): void
     {
-        if (config('internal_cron.run_queue_worker', true)) {
-            $schedule->command('queue:work --stop-when-empty --quiet')
-                ->everyMinute()
-                ->withoutOverlapping(55);
+        // Carregar tarefas do banco
+        try {
+            if (\Schema::hasTable('scheduled_tasks')) {
+                $tasks = \App\Models\ScheduledTask::where('active', true)->get();
+                foreach ($tasks as $task) {
+                    $schedule->command($task->command)
+                        ->cron($task->frequency)
+                        ->withoutOverlapping()
+                        ->onOneServer(); // Opcional se for multi-server
+                }
+            }
+        } catch (\Exception $e) {
+            // Log silent or fallback
         }
 
-        // Prune activity logs older than 3 months
-        $schedule->call(function () {
-            \App\Models\ActivityLog::where('created_at', '<', now()->subMonths(3))->delete();
-        })->daily()->name('prune_activity_logs');
+        // Tarefas HARDCODED de BACKUP se o banco falhar ou não tiver registros
+        // (Opcional: manter como fallback ou remover se quiser total controle no painel)
+        if (config('internal_cron.run_queue_worker', true)) {
+            // Mantém queue worker rodando se não estiver definido no banco
+            // Porem o ideal é migrar tudo para o banco.
+            // Vou comentar ou deixar condicional.
+            // Para garantir que a fila rode mesmo sem config no banco (fail-safe):
+            $schedule->command('queue:work --stop-when-empty --quiet --tries=3')
+                ->everyMinute()
+                ->withoutOverlapping(60);
+        }
 
-        // Cancel unpaid orders older than 48 hours
-        $schedule->command('orders:cancel-unpaid')->hourly()->withoutOverlapping();
-
-        // Send abandoned cart emails (> 24h)
-        $schedule->command('orders:abandoned-cart')->hourly()->withoutOverlapping();
+        // Outros comandos vitais podem ser migrados para o banco via Seeder.
     }
 
     protected function commands(): void

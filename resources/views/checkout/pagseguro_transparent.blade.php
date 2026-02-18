@@ -138,9 +138,9 @@
 
     <!-- SDK do PagSeguro (Exemplo V4/V2 JS se existir - Placeholder logic pura JS) -->
     <!-- PagSeguro V4 doesn't have a direct 'JS SDK' for card tokenization like MP V2 in the same way publicly documented without Auth. 
-             Usually uses 'PagSeguro Direct Payment' (legacy) or direct API calls if PCI compliant.
-             HOWEVER, for 'Transparent' without PCI, we usually use the old 'DirectPayment' JS from PagSeguro.
-             Let's assume we use the STANDARD PagSeguro Direct Payment JS for tokenization. -->
+                         Usually uses 'PagSeguro Direct Payment' (legacy) or direct API calls if PCI compliant.
+                         HOWEVER, for 'Transparent' without PCI, we usually use the old 'DirectPayment' JS from PagSeguro.
+                         Let's assume we use the STANDARD PagSeguro Direct Payment JS for tokenization. -->
     <script type="text/javascript"
         src="https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js"></script>
     <!-- Note: Sandbox URL: https://stc.sandbox.pagseguro.uol.com.br/... -->
@@ -212,21 +212,21 @@
                     if (data.success) {
                         // Show QR Code
                         document.getElementById('pix-content').innerHTML = `
-                            <p class="mb-4">Copie e cole o código abaixo:</p>
-                            <div class="bg-slate-100 p-2 rounded mb-4 break-all text-xs font-mono select-all">
-                                ${data.qr_code}
-                            </div>
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qr_code)}" class="mx-auto mb-4">
-                            <a href="${data.redirect || '#'}" class="btn btn-primary">Já Paguei</a>
-                         `;
+                                        <p class="mb-4">Copie e cole o código abaixo:</p>
+                                        <div class="bg-slate-100 p-2 rounded mb-4 break-all text-xs font-mono select-all">
+                                            ${data.qr_code}
+                                        </div>
+                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qr_code)}" class="mx-auto mb-4">
+                                        <a href="${data.redirect || '#'}" class="btn btn-primary">Já Paguei</a>
+                                     `;
                         document.getElementById('pix-modal').classList.remove('hidden');
                     } else {
-                        alert('Erro: ' + (data.error || 'Desconhecido'));
+                        Swal.fire('Erro', data.error || 'Desconhecido', 'error');
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    alert('Erro de comunicação.');
+                    Swal.fire('Erro', 'Erro de comunicação.', 'error');
                 })
                 .finally(() => {
                     btn.innerHTML = originalText;
@@ -239,7 +239,12 @@
             e.preventDefault();
             // TODO: Tokenize card here if library available. 
             // For now, alerting user that this is a demo or requires real library.
-            alert('Para Cartão de Crédito no PagSeguro Transparente, é necessário integrar a Biblioteca JS de Criptografia (JSEncrypt ou DirectPayment). Por segurança, implemente a obtenção do Card Token.');
+            Swal.fire({
+                icon: 'info',
+                title: 'Atenção',
+                text: 'Para Cartão de Crédito no PagSeguro Transparente, é necessário integrar a Biblioteca JS de Criptografia (JSEncrypt ou DirectPayment). Por segurança, implemente a obtenção do Card Token.',
+                confirmButtonColor: '#3085d6'
+            });
 
             // In a real scenario, we'd use PagSeguroDirectPayment.createCardToken(...)
         });

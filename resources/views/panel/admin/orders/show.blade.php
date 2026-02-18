@@ -123,7 +123,7 @@
                             não pode ser desfeita.
                         </p>
                         <form action="{{ route('panel.admin.orders.refund', $order->id) }}" method="POST"
-                            onsubmit="return confirm('ATENÇÃO: Isso irá devolver o dinheiro ao cliente. Tem certeza?');">
+                            onsubmit="return confirmAction(event, 'ATENÇÃO: Isso irá devolver o dinheiro ao cliente. Tem certeza?');">
                             @csrf
                             <button type="submit"
                                 class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 hover:bg-red-100 text-red-700 text-sm font-bold rounded-xl transition-all border border-red-200">

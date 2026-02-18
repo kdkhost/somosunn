@@ -111,7 +111,7 @@
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <form action="{{ route('panel.admin.certificates.destroy', $cert) }}" method="POST"
-                                            onsubmit="return confirm('Excluir certificado permanentemente?')">
+                                            onsubmit="return confirmAction(event, 'Excluir certificado?', 'Excluir este certificado?')">
                                             @csrf @method('DELETE')
                                             <button
                                                 class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-red-500 dark:hover:bg-red-500 hover:text-white dark:hover:text-white transition-all border border-transparent hover:border-red-100 dark:hover:border-red-900/40 shadow-sm"

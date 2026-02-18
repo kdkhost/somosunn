@@ -165,7 +165,8 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form action="{{ route('panel.admin.mentorships.destroy', $mentorship) }}" method="POST"
-                                            onsubmit="return confirm('Tem certeza que deseja excluir esta mentoria?');"
+                                            onsubmit="return confirmAction(event, 'Excluir mentoria?', 'Tem certeza que deseja excluir esta mentoria?')">
+                                            ;"
                                             class="inline">
                                             @csrf @method('DELETE')
                                             <button type="submit"

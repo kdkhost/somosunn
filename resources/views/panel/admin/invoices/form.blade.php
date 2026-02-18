@@ -234,23 +234,23 @@
 
                 $('#addRow').on('click', function () {
                     const row = `
-                                    <tr class="item-row group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
-                                        <td class="px-6 py-4">
-                                            <input type="text" name="items_description[]" class="w-full bg-transparent border-none p-0 text-sm font-medium text-slate-900 dark:text-white focus:ring-0 placeholder-slate-300 dark:placeholder-slate-600 transition-colors" placeholder="Descrição do item...">
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <input type="number" name="items_quantity[]" value="1" min="1" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-700 rounded-lg text-center py-1.5 text-sm text-slate-800 dark:text-white transition-colors">
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <input type="text" name="items_unit_price[]" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-700 rounded-lg text-right py-1.5 px-3 text-sm font-mono text-slate-800 dark:text-white money transition-colors">
-                                        </td>
-                                        <td class="px-6 py-4 text-center">
-                                            <button type="button" class="remove-row text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
-                                                <i class="fas fa-times-circle"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `;
+                                            <tr class="item-row group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                                                <td class="px-6 py-4">
+                                                    <input type="text" name="items_description[]" class="w-full bg-transparent border-none p-0 text-sm font-medium text-slate-900 dark:text-white focus:ring-0 placeholder-slate-300 dark:placeholder-slate-600 transition-colors" placeholder="Descrição do item...">
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <input type="number" name="items_quantity[]" value="1" min="1" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-700 rounded-lg text-center py-1.5 text-sm text-slate-800 dark:text-white transition-colors">
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <input type="text" name="items_unit_price[]" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-700 rounded-lg text-right py-1.5 px-3 text-sm font-mono text-slate-800 dark:text-white money transition-colors">
+                                                </td>
+                                                <td class="px-6 py-4 text-center">
+                                                    <button type="button" class="remove-row text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+                                                        <i class="fas fa-times-circle"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        `;
                     $('#itemsTable tbody').append(row);
                     $('.money').mask('#.##0,00', { reverse: true });
                 });
@@ -259,7 +259,7 @@
                     if ($('#itemsTable tbody tr').length > 1) {
                         $(this).closest('tr').remove();
                     } else {
-                        alert('A fatura deve ter pelo menos um item.');
+                        toastr.warning('A fatura deve ter pelo menos um item.');
                     }
                 });
             });

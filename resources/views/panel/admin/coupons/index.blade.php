@@ -141,7 +141,7 @@
                                        title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('panel.admin.coupons.destroy', $coupon) }}" method="POST" class="inline" onsubmit="return confirm('Tem certeza que deseja remover este cupom?');">
+                                    <form action="{{ route('panel.admin.coupons.destroy', $coupon) }}" method="POST" class="inline" onsubmit="return confirmAction(event, 'Tem certeza que deseja remover este cupom?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 rounded-lg transition-colors border border-transparent" title="Excluir">

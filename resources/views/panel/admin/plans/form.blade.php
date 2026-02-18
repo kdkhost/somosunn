@@ -235,10 +235,11 @@
     }
 
     function removeImage() {
-        if(confirm('A imagem será removida ao salvar. Continuar?')) {
+        showConfirm('A imagem será removida ao salvar. Continuar?', function() {
             document.getElementById('remove_image_input').checked = true;
             // Visual feedback could be added here
-        }
+            toastr.info('Imagem marcada para remoção. Salve o formulário.');
+        });
     }
 </script>
 @endpush

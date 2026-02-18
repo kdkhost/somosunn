@@ -89,34 +89,39 @@
 
     @push('scripts')
         <script>
-            async function toggleWishlist(courseId, btn) {
-                if (!confirm('Remover este curso da sua lista?')) return;
-
-                try {
-                    const response = await fetch(`{{ url('/painel/minha-lista/toggle') }}/${courseId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        }
-                    });
-                    const data = await response.json();
-                    if (data.success && !data.is_wishlisted) {
-                        // Remove card visually
-                        const card = btn.closest('.group');
-                        card.classList.add('opacity-0', 'scale-95');
-                        setTimeout(() => {
-                            card.remove();
-                            // Reload if empty to show empty state
-                            if (document.querySelectorAll('.group').length === 0) {
-                                window.location.reload();
+            function toggleWishlist(courseId, btn) {
+                showConfirm('Deseja remover este curso da sua lista de desejos?', async function () {
+                    try {
+                        const response = await fetch(`{{ url('/painel/minha-lista/toggle') }}/${courseId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             }
-                        }, 300);
+                        });
+                        const data = await response.json();
+                        if (data.success && !data.is_wishlisted) {
+                            // Remove card visually
+                            const card = btn.closest('.group');
+                            card.classList.add('opacity-0', 'scale-95');
+                            setTimeout(() => {
+                                card.remove();
+                                // Reload if empty to show empty state
+                                if (document.querySelectorAll('.group').length === 0) {
+                                    window.location.reload();
+                                }
+                            }, 300);
+                        }
+                    } catch (err) {
+                        console.error('Erro ao remover', err);
+                        // Use toaster if available or alert
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error('Erro ao processar solicitação.');
+                        } else {
+                            alert('Erro ao processar solicitação.');
+                        }
                     }
-                } catch (err) {
-                    console.error('Erro ao remover', err);
-                    alert('Erro ao processar solicitação.');
-                }
+                });
             }
         </script>
     @endpush

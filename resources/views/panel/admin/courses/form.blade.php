@@ -37,16 +37,16 @@
             class="bg-slate-50 dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 inline-flex items-center gap-1.5 mb-6">
             <button type="button" @click="tab = 'general'"
                 :class="tab === 'general' 
-                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
+                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
                 class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                 <i class="fas fa-info-circle"></i>
                 <span>Geral</span>
             </button>
             <button type="button" @click="tab = 'pricing'"
                 :class="tab === 'pricing' 
-                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
+                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
                 class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                 <i class="fas fa-tag"></i>
                 <span>Preço</span>
@@ -54,16 +54,16 @@
             @if($course->exists)
                 <button type="button" @click="tab = 'lessons'"
                     :class="tab === 'lessons' 
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
+                                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
                     class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                     <i class="fas fa-layer-group"></i>
                     <span>Conteúdo ({{ $course->lessons_count ?? $course->lessons()->count() }})</span>
                 </button>
                 <button type="button" @click="tab = 'certificate'"
                     :class="tab === 'certificate' 
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
+                                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
                     class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                     <i class="fas fa-certificate"></i>
                     <span>Certificado</span>
@@ -264,11 +264,11 @@
                                 </div>
                                 <input type="file" name="thumbnail" x-ref="thumbnail" class="hidden" accept="image/*"
                                     @change="
-                                                            photoName = $event.target.files[0].name;
-                                                            const reader = new FileReader();
-                                                            reader.onload = (e) => { photoPreview = e.target.result; };
-                                                            reader.readAsDataURL($event.target.files[0]);
-                                                           ">
+                                                                    photoName = $event.target.files[0].name;
+                                                                    const reader = new FileReader();
+                                                                    reader.onload = (e) => { photoPreview = e.target.result; };
+                                                                    reader.readAsDataURL($event.target.files[0]);
+                                                                   ">
                             </div>
                         </div>
                     </div>
@@ -402,7 +402,8 @@
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <form action="{{ route('courses.lessons.destroy', [$course, $lesson]) }}" method="POST"
-                                        onsubmit="return confirm('Tem certeza que deseja excluir esta aula?');" class="inline">
+                                        onsubmit="return confirmAction(event, 'Excluir aula?', 'Tem certeza que deseja excluir esta aula?');"
+                                        class="inline">
                                         @csrf @method('DELETE')
                                         <button type="submit"
                                             class="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-900 text-slate-400 dark:text-slate-500"
@@ -583,13 +584,13 @@
                     if (lesson.attachments && lesson.attachments.length) {
                         lesson.attachments.forEach(att => {
                             $list.append(`
-                                                                        <li class="flex items-center justify-between p-2 bg-slate-50 rounded-lg border border-slate-200">
-                                                                            <span class="text-xs font-medium text-slate-700">${att.file_name}</span>
-                                                                            <button type="button" onclick="deleteAttachment(${id}, ${att.id})" class="text-red-500 hover:text-red-700">
-                                                                                <i class="fas fa-trash-alt"></i>
-                                                                            </button>
-                                                                        </li>
-                                                                    `);
+                                                                                        <li class="flex items-center justify-between p-2 bg-slate-50 rounded-lg border border-slate-200">
+                                                                                            <span class="text-xs font-medium text-slate-700">${att.file_name}</span>
+                                                                                            <button type="button" onclick="deleteAttachment(${id}, ${att.id})" class="text-red-500 hover:text-red-700">
+                                                                                                <i class="fas fa-trash-alt"></i>
+                                                                                            </button>
+                                                                                        </li>
+                                                                                    `);
                         });
                     }
 
@@ -620,15 +621,16 @@
             });
 
             function deleteAttachment(lessonId, attId) {
-                if (!confirm('Excluir anexo?')) return;
-                $.ajax({
-                    url: `/admin/courses/{{ $course->id }}/lessons/${lessonId}/attachments/${attId}`,
-                    type: 'DELETE',
-                    data: { _token: '{{ csrf_token() }}' },
-                    success: function () {
-                        toastr.success('Anexo removido');
-                        editLesson(lessonId); // Refresh list
-                    }
+                showConfirm('Excluir este anexo?', function () {
+                    $.ajax({
+                        url: `/admin/courses/{{ $course->id }}/lessons/${lessonId}/attachments/${attId}`,
+                        type: 'DELETE',
+                        data: { _token: '{{ csrf_token() }}' },
+                        success: function () {
+                            toastr.success('Anexo removido');
+                            editLesson(lessonId); // Refresh list
+                        }
+                    });
                 });
             }
             // Certificate Editor Logic

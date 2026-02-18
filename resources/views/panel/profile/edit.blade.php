@@ -476,6 +476,50 @@
                     });
                 }
 
+                // --- 4.1 Auto-Preenchimento de CNPJ ---
+                const docInput = document.querySelector('[name="doc"]');
+                const companyInput = document.querySelector('[name="company"]');
+
+                if (docInput && companyInput) {
+                    docInput.addEventListener('input', function (e) {
+                        let doc = e.target.value.replace(/\D/g, '');
+
+                        // CNPJ tem 14 dígitos
+                        if (doc.length === 14) {
+                            companyInput.parentElement.classList.add('opacity-50');
+
+                            fetch(`https://brasilapi.com.br/api/cnpj/v1/${doc}`)
+                                .then(response => {
+                                    if (!response.ok) throw new Error('CNPJ não encontrado');
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.razao_social) {
+                                        companyInput.value = data.razao_social;
+                                        // Também preenche o nome fantasia se disponível e o campo empresa estiver vazio ou igual à razão social
+                                        if (data.nome_fantasia && (companyInput.value === '' || companyInput.value === data.razao_social)) {
+                                            companyInput.value = data.nome_fantasia; // Preferencia por nome fantasia ou manter razao social? O usuario pediu "nome da empresa". Geralmente Razão Social é mais formal. Vou usar Razão Social como principal mas se tiver fantasia talvez seja melhor. O usuario disse "nome da empresa devera ser preenchido automaticamente de acordo com o resistrado na receita federal". Receita usa Razão Social.
+                                            // Vou manter Razão Social primeiro, mas se quiser fantasia podemos ajustar.
+                                            // Ajuste: O usuário pediu "nome da empresa... de acordo com o registrado na receita federal". Isso soa como Razão Social.
+                                            companyInput.value = data.razao_social;
+                                        }
+
+                                        // Opcional: Preencher endereço se disponível e campos estiverem vazios
+                                        if (data.cep && (!document.getElementById('profile_cep').value)) {
+                                            document.getElementById('profile_cep').value = data.cep;
+                                            // Disparar evento de input no CEP para buscar o endereço completo via ViaCEP (ou usar os dados da BrasilAPI)
+                                            document.getElementById('profile_cep').dispatchEvent(new Event('input'));
+                                        }
+                                    }
+                                })
+                                .catch(err => console.error('Erro BrasilAPI:', err))
+                                .finally(() => {
+                                    companyInput.parentElement.classList.remove('opacity-50');
+                                });
+                        }
+                    });
+                }
+
                 // --- 5. Lógica de Segmento e Interesses (Outros) ---
                 const segmentSelect = document.getElementById('segment_select');
                 const segmentCustom = document.getElementById('segment_custom');

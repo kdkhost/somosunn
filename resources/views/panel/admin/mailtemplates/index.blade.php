@@ -109,7 +109,7 @@
                                                         <i class="fas fa-eye text-xs"></i>
                                                     </button>
                                                     <form action="{{ route('panel.admin.mailtemplates.destroy', $t) }}" method="POST"
-                                                        onsubmit="return confirm('Tem certeza que deseja remover este modelo?');">
+                                                        onsubmit="return confirmAction(event, 'Excluir template?', 'Excluir este template?')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit"
@@ -330,9 +330,9 @@
             // Test Email Button inside Editor
             $('#btnSendTest').off('click').on('click', function () {
                 const url = $(this).data('url');
-                if (!url) return alert('Salve o template antes de testar.');
+                if (!url) return toastr.warning('Salve o template antes de testar.');
                 const email = $('#test_email_input').val();
-                if (!email) return alert('Digite um e-mail.');
+                if (!email) return toastr.warning('Digite um e-mail.');
 
                 const btn = $(this);
                 const original = btn.html();
@@ -341,8 +341,8 @@
                 $.ajax({
                     url: url, method: 'POST',
                     data: { email: email, _token: '{{ csrf_token() }}' },
-                    success: (res) => alert(res.message || 'Enviado!'),
-                    error: () => alert('Erro.'),
+                    success: (res) => toastr.success(res.message || 'Enviado!'),
+                    error: () => toastr.error('Erro.'),
                     complete: () => btn.prop('disabled', false).html(original)
                 });
             });
@@ -384,8 +384,7 @@
                 })
                 .then(data => {
                     // Success
-                    // toastr.success(data.message); // If toastr exists
-                    alert(data.message || 'Salvo com sucesso!');
+                    toastr.success(data.message || 'Salvo com sucesso!');
                     window.location.reload(); // Reload to update table
                 })
                 .catch(err => {
@@ -393,9 +392,9 @@
                     if (err.errors) {
                         let msg = '';
                         for (let k in err.errors) msg += err.errors[k].join('\n') + '\n';
-                        alert('Erro de validação:\n' + msg);
+                        toastr.error('Erro de validação:<br>' + msg.replace(/\n/g, '<br>'));
                     } else {
-                        alert('Erro ao salvar.');
+                        toastr.error('Erro ao salvar.');
                     }
                 })
                 .finally(() => {
@@ -447,7 +446,7 @@
 
         document.getElementById('sendPreviewBtn').addEventListener('click', function () {
             const email = document.getElementById('previewEmail').value;
-            if (!email) return alert('Digite um e-mail');
+            if (!email) return toastr.warning('Digite um e-mail');
 
             const btn = this;
             btn.disabled = true;
@@ -459,8 +458,8 @@
                 body: JSON.stringify({ email: email })
             })
                 .then(r => r.json())
-                .then(d => alert(d.message || 'Enviado!'))
-                .catch(() => alert('Erro'))
+                .then(d => toastr.success(d.message || 'Enviado!'))
+                .catch(() => toastr.error('Erro'))
                 .finally(() => { btn.disabled = false; btn.innerText = 'Enviar'; });
         });
     </script>

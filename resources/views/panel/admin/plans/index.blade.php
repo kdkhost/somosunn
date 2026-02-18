@@ -86,7 +86,7 @@
                                             <i class="fas fa-pen"></i>
                                         </a>
                                         <form action="{{ route('panel.admin.plans.destroy', $plan) }}" method="POST" 
-                                              onsubmit="return confirm('Tem certeza que deseja remover este plano?');">
+                                              onsubmit="return confirmAction(event, 'Excluir plano?', 'Excluir este plano?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition shadow-sm border border-transparent hover:border-red-100 dark:hover:border-red-800/50" title="Remover">
@@ -148,13 +148,13 @@
                     btn.innerText = 'Oculto';
                 }
             } else {
-                alert('Erro ao alterar status.');
+                toastr.error('Erro ao alterar status.');
                 btn.innerText = originalText;
             }
         })
         .catch(err => {
             console.error(err);
-            alert('Erro de conexão.');
+            toastr.error('Erro de conexão.');
             btn.innerText = originalText;
         })
         .finally(() => {
