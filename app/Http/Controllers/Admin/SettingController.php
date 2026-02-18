@@ -455,14 +455,13 @@ class SettingController extends Controller
                 $data[$cbKey] = $request->boolean($cbKey) ? '1' : '0';
             }
         }
-        // DEBUG: Logar dados de gateway para diagnóstico
+        // DEBUG: Logar TUDO para diagnóstico
         if ($currentGroup === 'gateway') {
-            \Log::info('[SETTINGS DEBUG] Grupo: gateway');
-            \Log::info('[SETTINGS DEBUG] gateway_checkout_theme recebido: ' . ($data['gateway_checkout_theme'] ?? 'NAO_EXISTE'));
-            \Log::info('[SETTINGS DEBUG] gateway_checkout_primary_color recebido: ' . ($data['gateway_checkout_primary_color'] ?? 'NAO_EXISTE'));
-            \Log::info('[SETTINGS DEBUG] mercadopago_method_credit_card: ' . ($data['mercadopago_method_credit_card'] ?? 'NAO_EXISTE'));
-            \Log::info('[SETTINGS DEBUG] mercadopago_method_ticket: ' . ($data['mercadopago_method_ticket'] ?? 'NAO_EXISTE'));
-            \Log::info('[SETTINGS DEBUG] Total de chaves no $data: ' . count($data));
+            \Log::info('[SETTINGS DEBUG] URL: ' . $request->fullUrl());
+            \Log::info('[SETTINGS DEBUG] Route: ' . ($request->route() ? $request->route()->getName() : 'N/A'));
+            \Log::info('[SETTINGS DEBUG] TODAS as chaves: ' . implode(', ', array_keys($data)));
+            \Log::info('[SETTINGS DEBUG] gateway_checkout_theme = ' . ($data['gateway_checkout_theme'] ?? 'NAO_EXISTE'));
+            \Log::info('[SETTINGS DEBUG] gateway_checkout_primary_color = ' . ($data['gateway_checkout_primary_color'] ?? 'NAO_EXISTE'));
         }
 
         foreach ($data as $key => $value) {
