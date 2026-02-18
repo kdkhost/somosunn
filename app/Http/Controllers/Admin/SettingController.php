@@ -950,4 +950,51 @@ class SettingController extends Controller
         }
     }
 
+    public function uploadFile(Request $request)
+    {
+        try {
+            $request->validate([
+                'file' => 'required|file|max:10240', // 10MB max
+                'key' => 'required|string',
+            ]);
+
+            $file = $request->file('file');
+            $key = $request->input('key');
+
+            // Define allowed directories based on key prefix or mapping
+            $directory = 'uploads/imagens/geral';
+            if (str_contains($key, 'marketplace'))
+                $directory = 'uploads/imagens/marketplace';
+            if (str_contains($key, 'hero'))
+                $directory = 'uploads/imagens/marketplace/hero';
+            if (str_contains($key, 'exit'))
+                $directory = 'uploads/imagens/marketplace/exit';
+            if (str_contains($key, 'pwa'))
+                $directory = 'uploads/imagens/pwa';
+
+            $this->ensurePublicDir($directory);
+
+            // Generate filename
+            $path = $this->storePublic($file, $directory);
+
+            // Remove old file if exists
+            $this->removeFile($key);
+
+            // Update Database
+            Setting::updateOrCreate(['key' => $key], ['value' => $path]);
+
+            return response()->json([
+                'success' => true,
+                'path' => asset($path),
+                'message' => 'Arquivo enviado com sucesso!'
+            ]);
+
+        } catch (\Throwable $e) {
+            \Log::error('Settings Upload Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao processar upload: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

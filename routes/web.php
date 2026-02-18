@@ -457,6 +457,7 @@ Route::get('/admin/stop-impersonating', [\App\Http\Controllers\Admin\Impersonate
 
 // Admin routes (granular)
 Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class, \App\Http\Middleware\EnsureUserIsAdmin::class, 'check.plan'])->group(function () {
+    Route::post('/settings/upload', [\App\Http\Controllers\Admin\SettingController::class, 'uploadFile'])->name('settings.upload'); // AJAX Upload
     // Rotas de Membro (Comum a todos no painel)
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/balance', [\App\Http\Controllers\Admin\DashboardController::class, 'getMpBalance'])->name('dashboard.balance'); // AJAX Balance

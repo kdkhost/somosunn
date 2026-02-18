@@ -4,6 +4,9 @@
     </div>
 
     <h5 class="text-primary mb-3"><i class="fas fa-percent mr-2"></i> Taxas da Plataforma</h5>
+    <style>
+        .border-dashed { border-style: dashed !important; }
+    </style>
 
     <div class="row">
         <div class="col-md-6">
@@ -91,20 +94,18 @@
                     <strong>Slide 1</strong>
                 </div>
                 <div class="card-body">
-                    @if($slide1Image)
-                        <img src="{{ $slide1Image }}" class="img-fluid rounded mb-2" style="max-height: 140px; width: 100%; object-fit: cover;" alt="Slide 1">
-                    @endif
-                    <div class="custom-file mb-2">
-                        <input type="file" name="marketplace_hero_slide_1_image" class="custom-file-input" id="marketplace_hero_slide_1_image" accept="image/*">
-                        <label class="custom-file-label" for="marketplace_hero_slide_1_image" data-browse="Buscar">Imagem do slide</label>
-                    </div>
+                <div class="card-body">
+                    @include('components.forms.data-upload', [
+                        'name' => 'marketplace_hero_slide_1_image',
+                        'label' => 'Imagem do Slide 1',
+                        'currentValue' => $slide1Image
+                    ])
+                    
                     @if($slide1Image)
                         <div class="custom-control custom-switch mb-3">
                             <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_1_image" name="remove_marketplace_hero_slide_1_image" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_hero_slide_1_image">Remover imagem</label>
+                            <label class="custom-control-label" for="remove_marketplace_hero_slide_1_image">Remover imagem existente</label>
                         </div>
-                    @else
-                        <div class="mb-3"></div>
                     @endif
 
                     <div class="form-group">
@@ -137,20 +138,17 @@
                     <strong>Slide 2</strong>
                 </div>
                 <div class="card-body">
-                    @if($slide2Image)
-                        <img src="{{ $slide2Image }}" class="img-fluid rounded mb-2" style="max-height: 140px; width: 100%; object-fit: cover;" alt="Slide 2">
-                    @endif
-                    <div class="custom-file mb-2">
-                        <input type="file" name="marketplace_hero_slide_2_image" class="custom-file-input" id="marketplace_hero_slide_2_image" accept="image/*">
-                        <label class="custom-file-label" for="marketplace_hero_slide_2_image" data-browse="Buscar">Imagem do slide</label>
-                    </div>
+                    @include('components.forms.data-upload', [
+                        'name' => 'marketplace_hero_slide_2_image',
+                        'label' => 'Imagem do Slide 2',
+                        'currentValue' => $slide2Image
+                    ])
+
                     @if($slide2Image)
                         <div class="custom-control custom-switch mb-3">
                             <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_2_image" name="remove_marketplace_hero_slide_2_image" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_hero_slide_2_image">Remover imagem</label>
+                            <label class="custom-control-label" for="remove_marketplace_hero_slide_2_image">Remover imagem existente</label>
                         </div>
-                    @else
-                        <div class="mb-3"></div>
                     @endif
 
                     <div class="form-group">
@@ -183,20 +181,17 @@
                     <strong>Slide 3</strong>
                 </div>
                 <div class="card-body">
-                    @if($slide3Image)
-                        <img src="{{ $slide3Image }}" class="img-fluid rounded mb-2" style="max-height: 140px; width: 100%; object-fit: cover;" alt="Slide 3">
-                    @endif
-                    <div class="custom-file mb-2">
-                        <input type="file" name="marketplace_hero_slide_3_image" class="custom-file-input" id="marketplace_hero_slide_3_image" accept="image/*">
-                        <label class="custom-file-label" for="marketplace_hero_slide_3_image" data-browse="Buscar">Imagem do slide</label>
-                    </div>
+                    @include('components.forms.data-upload', [
+                        'name' => 'marketplace_hero_slide_3_image',
+                        'label' => 'Imagem do Slide 3',
+                        'currentValue' => $slide3Image
+                    ])
+
                     @if($slide3Image)
                         <div class="custom-control custom-switch mb-3">
                             <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_3_image" name="remove_marketplace_hero_slide_3_image" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_hero_slide_3_image">Remover imagem</label>
+                            <label class="custom-control-label" for="remove_marketplace_hero_slide_3_image">Remover imagem existente</label>
                         </div>
-                    @else
-                        <div class="mb-3"></div>
                     @endif
 
                     <div class="form-group">
@@ -283,17 +278,17 @@
                     <strong>Imagem do Popup</strong>
                 </div>
                 <div class="card-body">
-                    @if($exitImage)
-                        <img src="{{ $exitImage }}" class="img-fluid rounded mb-2" style="max-height: 180px; width: 100%; object-fit: cover;" alt="Banner de saída">
-                    @endif
-                    <div class="custom-file mb-2">
-                        <input type="file" name="marketplace_exit_banner_image" class="custom-file-input" id="marketplace_exit_banner_image" accept="image/*">
-                        <label class="custom-file-label" for="marketplace_exit_banner_image" data-browse="Buscar">Imagem do popup</label>
-                    </div>
+                <div class="card-body">
+                    @include('components.forms.data-upload', [
+                        'name' => 'marketplace_exit_banner_image',
+                        'label' => 'Imagem do Popup de Saída',
+                        'currentValue' => $exitImage
+                    ])
+
                     @if($exitImage)
                         <div class="custom-control custom-switch">
                             <input type="checkbox" class="custom-control-input" id="remove_marketplace_exit_banner_image" name="remove_marketplace_exit_banner_image" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_exit_banner_image">Remover imagem</label>
+                            <label class="custom-control-label" for="remove_marketplace_exit_banner_image">Remover imagem existente</label>
                         </div>
                     @endif
                 </div>
