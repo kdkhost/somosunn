@@ -24,7 +24,8 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
                 <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white transition-colors">Olá,
-                    {{ auth()->user()->name }}!</h1>
+                    {{ auth()->user()->name }}!
+                </h1>
                 <p class="text-slate-600 dark:text-slate-400 mt-1 transition-colors">
                     {{ $plan?->name ? 'Plano ativo: ' . $plan->name : 'Você ainda não possui um plano ativo.' }}
                 </p>
@@ -44,17 +45,35 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6" id="dashboard-widgets">
         @if($canAccessCourses)
-            <x-widgets.metric title="Meus Cursos" icon="fas fa-graduation-cap" :value="$coursesCount ?? 0" color="blue" :href="route('courses.index')" id="counter-curso" />
+            <x-widgets.metric title="Meus Cursos" icon="fas fa-graduation-cap" :value="$coursesCount ?? 0" color="blue"
+                :href="route('courses.index')" id="counter-curso" />
         @endif
-        <x-widgets.metric title="Compras pagas" icon="fas fa-check-circle" :value="$ordersPaidCount ?? 0" color="emerald" :href="route('marketplace.index')" id="counter-orders" />
+        <x-widgets.metric title="Compras pagas" icon="fas fa-check-circle" :value="$ordersPaidCount ?? 0" color="emerald"
+            :href="route('marketplace.index')" id="counter-orders" />
         <x-widgets.metric title="Total em compras" icon="fas fa-wallet" :value="number_format($ordersPaidTotal ?? 0, 2, ',', '.')" color="green" :href="route('marketplace.index')" id="counter-orders-total" />
         @if($canSellOnMarketplace)
             <x-widgets.metric title="Vendas realizadas" icon="fas fa-shopping-cart" :value="$sellerPaidCount ?? 0"
                 color="purple" :href="route('panel.marketplace.sales')" id="counter-seller" />
             <x-widgets.metric title="Receita líquida" icon="fas fa-coins" :value="number_format($sellerNetTotal ?? 0, 2, ',', '.')" color="yellow" :href="route('panel.marketplace.payments')" id="counter-seller-total" />
+
+            {{-- WIDGET DE SALDO MP --}}
+            <div
+                class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4 transition-all duration-300">
+                <div
+                    class="w-12 h-12 rounded-full flex items-center justify-center text-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Saldo Mercado Pago</p>
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1" id="counter-mp-balance">
+                        <i class="fas fa-spinner fa-spin text-sm"></i>
+                    </h3>
+                </div>
+            </div>
         @endif
         @if($canAccessCommunity)
-            <x-widgets.metric title="Comunidade" icon="fas fa-users" :value="$communityCount ?? 0" color="cyan" :href="route('social.feed')" id="counter-community" />
+            <x-widgets.metric title="Comunidade" icon="fas fa-users" :value="$communityCount ?? 0" color="cyan"
+                :href="route('social.feed')" id="counter-community" />
         @endif
     </div>
 
@@ -80,9 +99,11 @@
                             @endif
                         </div>
                         <h3 class="font-bold text-slate-800 dark:text-white text-sm line-clamp-1 transition-colors">
-                            {{ $sUser->name }}</h3>
+                            {{ $sUser->name }}
+                        </h3>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mb-3 line-clamp-1 transition-colors">
-                            {{ $sUser->occupation ?? 'Membro' }}</p>
+                            {{ $sUser->occupation ?? 'Membro' }}
+                        </p>
 
                         @php
                             $commonTags = [];
@@ -147,12 +168,22 @@
                         const elSellerTotal = document.getElementById('counter-seller-total');
                         if (elSellerTotal) elSellerTotal.textContent = 'R$ ' + (data.stats.seller_net_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
+                        const elMpBalance = document.getElementById('counter-mp-balance');
+                        if (elMpBalance) {
+                            if (data.stats.mp_balance) {
+                                let val = data.stats.mp_balance.total_amount || 0;
+                                elMpBalance.textContent = 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                            } else {
+                                elMpBalance.innerHTML = '<span class="text-xs text-gray-400">N/D</span>';
+                            }
+                        }
+
                         const elCommunity = document.getElementById('counter-community');
                         if (elCommunity) elCommunity.textContent = data.stats.community_count;
 
                         const elCursoMsg = document.getElementById('widget-cursos-msg');
                         if (elCursoMsg) elCursoMsg.textContent = '';
-                        
+
                         // Remove animação de loading
                         document.querySelectorAll('.animate-pulse').forEach(e => e.classList.remove('animate-pulse'));
                     }

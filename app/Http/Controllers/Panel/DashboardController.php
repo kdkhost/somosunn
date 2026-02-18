@@ -26,6 +26,7 @@ class DashboardController extends Controller
             'seller_paid_count' => 0,
             'seller_net_total' => 0.0,
             'community_count' => (int) \App\Models\User::count(),
+            'mp_balance' => null, // Saldo MP
         ];
         $salesChart = null;
         try {
@@ -56,6 +57,15 @@ class DashboardController extends Controller
                         'labels' => $labels,
                         'data' => $data,
                     ];
+
+                    // Tentar buscar saldo MP do admin/plataforma
+                    try {
+                        $mpService = new \App\Services\Payment\MercadoPagoService();
+                        $stats['mp_balance'] = $mpService->getBalance(null);
+                    } catch (\Throwable $e) {
+                        // Ignorar erro de saldo
+                    }
+
                 } else {
                     $stats['courses_count'] = (int) \App\Models\Course::where('user_id', $user->id)->count();
                     $stats['orders_paid_count'] = (int) \App\Models\Order::where('user_id', $user->id)->where('status', 'paid')->count();
@@ -81,6 +91,16 @@ class DashboardController extends Controller
                         'labels' => $labels,
                         'data' => $data,
                     ];
+
+                    // Tentar buscar saldo MP do vendedor (se tiver conta conectada/token)
+                    if ($user->canSellOnMarketplace()) {
+                        try {
+                            $mpService = new \App\Services\Payment\MercadoPagoService();
+                            $stats['mp_balance'] = $mpService->getBalance($user->id);
+                        } catch (\Throwable $e) {
+                            // Erro silencioso se não configurado
+                        }
+                    }
                 }
             }
         } catch (\Throwable $e) {

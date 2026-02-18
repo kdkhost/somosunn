@@ -62,17 +62,18 @@
                                     class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
+                    {{-- MP BALANCE WIDGET --}}
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-danger">
+                        <div class="small-box bg-primary" id="mp-balance-widget">
                             <div class="inner">
-                                <h3>R$ {{ number_format($refundedAmount ?? 0, 2, ',', '.') }}</h3>
-                                <p>Total Reembolsado</p>
+                                <h3 id="mp-balance-value"><i class="fas fa-spinner fa-spin text-sm"></i></h3>
+                                <p>Saldo Mercado Pago</p>
                             </div>
                             <div class="icon">
-                                <i class="fas fa-undo"></i>
+                                <i class="fas fa-university"></i>
                             </div>
-                            <a href="{{ route('admin.orders.index') }}" class="small-box-footer">Ver Detalhes <i
-                                    class="fas fa-arrow-circle-right"></i></a>
+                            <a href="#" onclick="fetchMpBalance(); return false;" class="small-box-footer">Atualizar <i
+                                    class="fas fa-sync"></i></a>
                         </div>
                     </div>
                     <div class="col-lg-3 col-6">
@@ -318,9 +319,36 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pt-br.js"></script>
 
     <script>
+        function fetchMpBalance() {
+            const el = document.getElementById('mp-balance-value');
+            if (!el) return;
+
+            el.innerHTML = '<i class="fas fa-spinner fa-spin text-sm"></i>';
+
+            fetch('{{ route('admin.dashboard.balance') }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const total = data.balance.total_amount || 0;
+                        el.innerText = 'R$ ' + parseFloat(total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                    } else {
+                        el.innerHTML = '<span class="text-xs">Erro</span>';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    el.innerHTML = '<span class="text-xs">Erro</span>';
+                });
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
-            // --- 1. Init FullCalendar ---
-            var calendarEl = document.getElementById('calendar');
+            // Fetch Balance immediately
+            @if(isset($isAdmin) && $isAdmin)
+                fetchMpBalance();
+            @endif
+
+                // --- 1. Init FullCalendar ---
+                var calendarEl = document.getElementById('calendar');
             if (calendarEl) {
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
@@ -419,6 +447,6 @@
                     });
                 }
             @endif
-        });
+                });
     </script>
 @endpush

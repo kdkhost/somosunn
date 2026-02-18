@@ -155,6 +155,7 @@ class MercadoPagoService
         }
 
         $response = Http::withToken($token)
+            ->withHeaders(['X-Idempotency-Key' => 'sub-' . uniqid() . '-' . time()])
             ->post("{$this->baseUrl}/preapproval", $subscriptionData);
 
         if ($response->failed()) {
@@ -382,6 +383,7 @@ class MercadoPagoService
 
         // Refund full amount
         $response = Http::withToken($accessToken)
+            ->withHeaders(['X-Idempotency-Key' => 'refund-' . $paymentId . '-' . time()])
             ->post("{$this->baseUrl}/v1/payments/{$paymentId}/refunds");
 
         if ($response->failed()) {

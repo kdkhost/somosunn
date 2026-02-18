@@ -200,4 +200,26 @@ class DashboardController extends Controller
             'jobsStatus',
         ));
     }
+    public function getMpBalance()
+    {
+        try {
+            $service = new \App\Services\Payment\MercadoPagoService();
+            $balance = $service->getBalance(null); // Platform balance
+
+            return response()->json([
+                'success' => true,
+                'balance' => $balance
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'balance' => [
+                    'total_amount' => 0,
+                    'available_balance' => 0,
+                    'unavailable_balance' => 0
+                ]
+            ]);
+        }
+    }
 }
