@@ -194,6 +194,16 @@
         };
 
         const renderPaymentBrick = async (bricksBuilder) => {
+            // Construir paymentMethods dinamicamente — omitir a chave desabilita o método
+            const paymentMethods = {};
+            @if($methodCreditCard) paymentMethods.creditCard = "all"; @endif
+            @if($methodDebitCard) paymentMethods.debitCard = "all"; @endif
+            @if($methodPix) paymentMethods.bankTransfer = "all"; @endif
+            @if($methodTicket) paymentMethods.ticket = "all"; @endif
+            @if($methodMercadoPago) paymentMethods.mercadoPago = "all"; @endif
+
+            console.log('Payment Methods configurados:', paymentMethods);
+
             const settings = {
                 initialization: {
                     amount: {{ $order->total_amount }},
@@ -203,13 +213,7 @@
                     }
                 },
                 customization: {
-                    paymentMethods: {
-                        creditCard: {{ $methodCreditCard ? '"all"' : '[]' }},
-                        debitCard: {{ $methodDebitCard ? '"all"' : '[]' }},
-                        bankTransfer: {{ $methodPix ? '"all"' : '[]' }},
-                        ticket: {{ $methodTicket ? '"all"' : '[]' }},
-                        mercadoPago: {{ $methodMercadoPago ? '"all"' : '[]' }},
-                    },
+                    paymentMethods: paymentMethods,
                     visual: {
                         style: {
                             theme: '{{ $theme }}',
