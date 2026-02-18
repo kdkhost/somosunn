@@ -116,27 +116,48 @@
                 <p class="text-sm text-muted mb-3">Selecione quais métodos de pagamento estarão disponíveis no checkout
                     para os cursos e planos da plataforma.</p>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-2">
                         <div class="custom-control custom-checkbox border p-2 rounded">
+                            <input type="hidden" name="mercadopago_method_credit_card" value="0">
                             <input type="checkbox" class="custom-control-input" id="method_credit_card"
                                 name="mercadopago_method_credit_card" value="1" {{ ($settings['mercadopago_method_credit_card'] ?? 1) ? 'checked' : '' }}>
                             <label class="custom-control-label font-weight-bold" for="method_credit_card">Cartão de
                                 Crédito</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-2">
                         <div class="custom-control custom-checkbox border p-2 rounded">
+                            <input type="hidden" name="mercadopago_method_debit_card" value="0">
+                            <input type="checkbox" class="custom-control-input" id="method_debit_card"
+                                name="mercadopago_method_debit_card" value="1" {{ ($settings['mercadopago_method_debit_card'] ?? 0) ? 'checked' : '' }}>
+                            <label class="custom-control-label font-weight-bold" for="method_debit_card">Cartão de
+                                Débito</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <div class="custom-control custom-checkbox border p-2 rounded">
+                            <input type="hidden" name="mercadopago_method_pix" value="0">
                             <input type="checkbox" class="custom-control-input" id="method_pix"
                                 name="mercadopago_method_pix" value="1" {{ ($settings['mercadopago_method_pix'] ?? 1) ? 'checked' : '' }}>
                             <label class="custom-control-label font-weight-bold" for="method_pix">Pix</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-2">
                         <div class="custom-control custom-checkbox border p-2 rounded">
+                            <input type="hidden" name="mercadopago_method_ticket" value="0">
                             <input type="checkbox" class="custom-control-input" id="method_ticket"
-                                name="mercadopago_method_ticket" value="1" {{ ($settings['mercadopago_method_ticket'] ?? 1) ? 'checked' : '' }}>
+                                name="mercadopago_method_ticket" value="1" {{ ($settings['mercadopago_method_ticket'] ?? 0) ? 'checked' : '' }}>
                             <label class="custom-control-label font-weight-bold" for="method_ticket">Boleto
                                 (Ticket)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <div class="custom-control custom-checkbox border p-2 rounded">
+                            <input type="hidden" name="mercadopago_method_mercadopago" value="0">
+                            <input type="checkbox" class="custom-control-input" id="method_mercadopago"
+                                name="mercadopago_method_mercadopago" value="1" {{ ($settings['mercadopago_method_mercadopago'] ?? 0) ? 'checked' : '' }}>
+                            <label class="custom-control-label font-weight-bold" for="method_mercadopago">Carteira
+                                Mercado Pago</label>
                         </div>
                     </div>
                 </div>

@@ -176,8 +176,10 @@
 
             // Ler configuração de meios de pagamento habilitados pelo admin
             $methodCreditCard = (bool) \App\Models\Setting::get('mercadopago_method_credit_card', 1);
+            $methodDebitCard = (bool) \App\Models\Setting::get('mercadopago_method_debit_card', 0);
             $methodPix = (bool) \App\Models\Setting::get('mercadopago_method_pix', 1);
             $methodTicket = (bool) \App\Models\Setting::get('mercadopago_method_ticket', 0);
+            $methodMercadoPago = (bool) \App\Models\Setting::get('mercadopago_method_mercadopago', 0);
         @endphp
 
         const showLoading = (show) => {
@@ -202,16 +204,11 @@
                 },
                 customization: {
                     paymentMethods: {
-                        // Cartão de Crédito
                         creditCard: {{ $methodCreditCard ? '"all"' : '[]' }},
-                        // Cartão de Débito (segue a config de crédito)
-                        debitCard: {{ $methodCreditCard ? '"all"' : '[]' }},
-                        // PIX (bankTransfer no Brick)
+                        debitCard: {{ $methodDebitCard ? '"all"' : '[]' }},
                         bankTransfer: {{ $methodPix ? '"all"' : '[]' }},
-                        // Boleto (ticket no Brick)
                         ticket: {{ $methodTicket ? '"all"' : '[]' }},
-                        // Wallet do Mercado Pago (desabilitado — não confundir com os métodos diretos)
-                        mercadoPago: [],
+                        mercadoPago: {{ $methodMercadoPago ? '"all"' : '[]' }},
                     },
                     visual: {
                         style: {
