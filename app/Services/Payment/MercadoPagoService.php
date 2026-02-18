@@ -73,6 +73,7 @@ class MercadoPagoService
         }
 
         $response = Http::withToken($token)
+            ->withHeaders(['X-Idempotency-Key' => 'pix-' . $order->id . '-' . time()])
             ->post("{$this->baseUrl}/v1/payments", $paymentData);
 
         if ($response->failed()) {
@@ -121,6 +122,7 @@ class MercadoPagoService
         }
 
         $response = Http::withToken($token)
+            ->withHeaders(['X-Idempotency-Key' => 'cc-' . $order->id . '-' . time()])
             ->post("{$this->baseUrl}/v1/payments", $paymentData);
 
         if ($response->failed()) {

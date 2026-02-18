@@ -29,7 +29,7 @@
                         <div class="border-t border-gray-100 py-4 space-y-2">
                             <div class="flex justify-between text-gray-600">
                                 <span>Subtotal</span>
-                                <span>R$ {{ number_format($plan->price, 2, ',', '.') }}</span>
+                                <span>R$ {{ number_format((float) $plan->price, 2, ',', '.') }}</span>
                             </div>
                             <div class="flex justify-between text-green-600 font-medium">
                                 <span>Desconto</span>
@@ -41,7 +41,7 @@
                             <div class="flex justify-between items-center">
                                 <span class="font-bold text-gray-900">Total</span>
                                 <span class="text-2xl font-black text-blue-600">R$
-                                    {{ number_format($plan->price, 2, ',', '.') }}</span>
+                                    {{ number_format((float) $plan->price, 2, ',', '.') }}</span>
                             </div>
                         </div>
 
@@ -214,6 +214,47 @@
     </div>
 
     @push('scripts')
+        <style>
+            /* Reset básico para garantir que o Brick do MP renderize corretamente */
+            #cardPaymentBrick_container {
+                font-family: 'Inter', sans-serif;
+                line-height: normal;
+                /* Fix para labels flutuantes desalinhados */
+                text-align: left;
+            }
+
+            #cardPaymentBrick_container form {
+                margin: 0;
+                padding: 0;
+            }
+
+            /* Resetar estilos globais que podem quebrar o Brick */
+            #cardPaymentBrick_container label {
+                display: inline-block !important;
+                margin-bottom: 0 !important;
+                font-weight: normal !important;
+                width: auto !important;
+                position: static !important;
+            }
+
+            #cardPaymentBrick_container .form-group,
+            #cardPaymentBrick_container .form-control {
+                margin-bottom: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+
+            #cardPaymentBrick_container input {
+                height: auto !important;
+                /* Deixar o brick controlar a altura */
+            }
+
+            /* Isolar o container de estilos globais */
+            #cardPaymentBrick_container * {
+                box-sizing: border-box;
+            }
+        </style>
         @if(($paymentConfigured ?? false) && ($plan->price ?? 0) > 0)
             @php
                 $theme = \App\Models\Setting::get('gateway_checkout_theme', 'default');
