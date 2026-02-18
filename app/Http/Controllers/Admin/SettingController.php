@@ -455,28 +455,31 @@ class SettingController extends Controller
                 $data[$cbKey] = $request->boolean($cbKey) ? '1' : '0';
             }
         }
-        // CORREÇÃO DE EMERGÊNCIA: Sanitizar valores inválidos "1"
+        // PROTEÇÃO: Sanitizar valores inválidos para as NOVAS chaves
         if ($currentGroup === 'gateway') {
-            // Se vier '1', forçar valor default
-            if (isset($data['gateway_checkout_theme']) && ($data['gateway_checkout_theme'] === '1' || $data['gateway_checkout_theme'] === 1)) {
-                $data['gateway_checkout_theme'] = 'default';
-                \Log::warning('[SETTINGS FIXED] gateway_checkout_theme era "1", forçado para "default"');
+            // Se vier '1', forçar valor default nas novas chaves também
+            if (isset($data['gateway_checkout_theme_selected']) && ($data['gateway_checkout_theme_selected'] === '1' || $data['gateway_checkout_theme_selected'] === 1)) {
+                $data['gateway_checkout_theme_selected'] = 'default';
+                \Log::warning('[SETTINGS FIXED] gateway_checkout_theme_selected era "1", forçado para "default"');
             }
-            if (isset($data['gateway_checkout_primary_color']) && ($data['gateway_checkout_primary_color'] === '1' || $data['gateway_checkout_primary_color'] === 1)) {
-                $data['gateway_checkout_primary_color'] = '#1F5EDB';
-                \Log::warning('[SETTINGS FIXED] gateway_checkout_primary_color era "1", forçado para "#1F5EDB"');
+            if (isset($data['gateway_checkout_primary_color_hex']) && ($data['gateway_checkout_primary_color_hex'] === '1' || $data['gateway_checkout_primary_color_hex'] === 1)) {
+                $data['gateway_checkout_primary_color_hex'] = '#1F5EDB';
+                \Log::warning('[SETTINGS FIXED] gateway_checkout_primary_color_hex era "1", forçado para "#1F5EDB"');
             }
 
-            // Remover chaves que não pertencem ao gateway (ex: video_plyr vindas de cache maluco)
-            if (isset($data['video_plyr_options_json'])) {
-                unset($data['video_plyr_options_json']);
+            // Remover chaves ANTIGAS e lixo que não pertencem ao gateway
+            $trashKeys = ['video_plyr_options_json', 'gateway_checkout_theme', 'gateway_checkout_primary_color'];
+            foreach ($trashKeys as $trash) {
+                if (isset($data[$trash])) {
+                    unset($data[$trash]);
+                }
             }
 
             \Log::info('[SETTINGS DEBUG] URL: ' . $request->fullUrl());
             \Log::info('[SETTINGS DEBUG] Route: ' . ($request->route() ? $request->route()->getName() : 'N/A'));
             \Log::info('[SETTINGS DEBUG] TODAS as chaves: ' . implode(', ', array_keys($data)));
-            \Log::info('[SETTINGS DEBUG] gateway_checkout_theme = ' . ($data['gateway_checkout_theme'] ?? 'NAO_EXISTE'));
-            \Log::info('[SETTINGS DEBUG] gateway_checkout_primary_color = ' . ($data['gateway_checkout_primary_color'] ?? 'NAO_EXISTE'));
+            \Log::info('[SETTINGS DEBUG] checkout_theme_selected = ' . ($data['gateway_checkout_theme_selected'] ?? 'NAO_EXISTE'));
+            \Log::info('[SETTINGS DEBUG] checkout_primary_color_hex = ' . ($data['gateway_checkout_primary_color_hex'] ?? 'NAO_EXISTE'));
         }
 
         foreach ($data as $key => $value) {
