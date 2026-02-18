@@ -455,31 +455,16 @@ class SettingController extends Controller
                 $data[$cbKey] = $request->boolean($cbKey) ? '1' : '0';
             }
         }
-        // PROTEÇÃO: Sanitizar valores inválidos para as NOVAS chaves
         if ($currentGroup === 'gateway') {
-            // Se vier '1', forçar valor default nas novas chaves também
-            if (isset($data['gateway_checkout_theme_selected']) && ($data['gateway_checkout_theme_selected'] === '1' || $data['gateway_checkout_theme_selected'] === 1)) {
-                $data['gateway_checkout_theme_selected'] = 'default';
-                \Log::warning('[SETTINGS FIXED] gateway_checkout_theme_selected era "1", forçado para "default"');
-            }
-            if (isset($data['gateway_checkout_primary_color_hex']) && ($data['gateway_checkout_primary_color_hex'] === '1' || $data['gateway_checkout_primary_color_hex'] === 1)) {
-                $data['gateway_checkout_primary_color_hex'] = '#1F5EDB';
-                \Log::warning('[SETTINGS FIXED] gateway_checkout_primary_color_hex era "1", forçado para "#1F5EDB"');
-            }
-
             // Remover chaves ANTIGAS e lixo que não pertencem ao gateway
-            $trashKeys = ['video_plyr_options_json', 'gateway_checkout_theme', 'gateway_checkout_primary_color'];
+            $trashKeys = ['video_plyr_options_json', 'gateway_checkout_theme', 'gateway_checkout_primary_color', 'gateway_checkout_theme_selected', 'gateway_checkout_primary_color_hex'];
             foreach ($trashKeys as $trash) {
                 if (isset($data[$trash])) {
                     unset($data[$trash]);
                 }
             }
 
-            \Log::info('[SETTINGS DEBUG] URL: ' . $request->fullUrl());
-            \Log::info('[SETTINGS DEBUG] Route: ' . ($request->route() ? $request->route()->getName() : 'N/A'));
-            \Log::info('[SETTINGS DEBUG] TODAS as chaves: ' . implode(', ', array_keys($data)));
-            \Log::info('[SETTINGS DEBUG] checkout_theme_selected = ' . ($data['gateway_checkout_theme_selected'] ?? 'NAO_EXISTE'));
-            \Log::info('[SETTINGS DEBUG] checkout_primary_color_hex = ' . ($data['gateway_checkout_primary_color_hex'] ?? 'NAO_EXISTE'));
+            \Log::info('[SETTINGS DEBUG] Gateway settings updated by Admin.');
         }
 
         foreach ($data as $key => $value) {

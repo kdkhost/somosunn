@@ -171,8 +171,9 @@
         const bricksBuilder = mp.bricks();
 
         @php
-            $theme = \App\Models\Setting::get('gateway_checkout_theme_selected', 'default');
-            $primaryColor = \App\Models\Setting::get('gateway_checkout_primary_color_hex', '#1F5EDB');
+            // TEMA PADRÃO (Funcionalidade de customização removida)
+            $theme = 'default';
+            $primaryColor = '#1F5EDB';
 
             // Ler configuração de meios de pagamento habilitados pelo admin
             $methodCreditCard = (bool) \App\Models\Setting::get('mercadopago_method_credit_card', 1);

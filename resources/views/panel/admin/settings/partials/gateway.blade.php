@@ -188,40 +188,7 @@
                 </div>
             </div>
 
-            {{-- Customização do Checkout Transparente --}}
-            <div
-                class="mt-6 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
-                <h4 class="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-4">
-                    <i class="fas fa-palette mr-1"></i> Customização do Checkout Transparente
-                </h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Tema do
-                            Checkout</label>
-                        <select name="gateway_checkout_theme_selected"
-                            class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium">
-                            <option value="default" {{ ($settings['gateway_checkout_theme_selected'] ?? 'default') == 'default' ? 'selected' : '' }}>Padrão (Mercado Pago)</option>
-                            <option value="dark" {{ ($settings['gateway_checkout_theme_selected'] ?? '') == 'dark' ? 'selected' : '' }}>Escuro (Dark)</option>
-                            <option value="bootstrap" {{ ($settings['gateway_checkout_theme_selected'] ?? '') == 'bootstrap' ? 'selected' : '' }}>Bootstrap</option>
-                            <option value="flat" {{ ($settings['gateway_checkout_theme_selected'] ?? '') == 'flat' ? 'selected' : '' }}>Flat (Moderno)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Cor Primária
-                            (Botões e Destaques)</label>
-                        <div class="flex gap-2">
-                            <input type="color" id="panel_color_picker" name="gateway_checkout_primary_color_hex"
-                                value="{{ $settings['gateway_checkout_primary_color_hex'] ?? '#1F5EDB' }}"
-                                class="h-10 w-14 rounded-xl border-slate-200 dark:border-slate-800 cursor-pointer"
-                                oninput="document.getElementById('panel_color_text').value = this.value">
-                            <input type="text" id="panel_color_text"
-                                value="{{ $settings['gateway_checkout_primary_color_hex'] ?? '#1F5EDB' }}"
-                                class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white font-medium"
-                                readonly>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </div>
 
@@ -402,7 +369,7 @@
 
             const checkbox = element.querySelector('input[type="checkbox"]');
             checkbox.checked = !checkbox.checked;
-            
+
             updateCardVisual(element, checkbox.checked);
         }
 
@@ -413,28 +380,28 @@
             if (isChecked) {
                 element.classList.remove('border-slate-200', 'dark:border-slate-800');
                 element.classList.add('border-blue-500', 'bg-blue-50/50', 'dark:bg-blue-900/20');
-                
+
                 icon.classList.remove('text-slate-400');
                 icon.classList.add('text-blue-500');
-                
+
                 text.classList.remove('text-slate-500', 'dark:text-slate-400');
                 text.classList.add('text-blue-700', 'dark:text-blue-400');
             } else {
                 element.classList.add('border-slate-200', 'dark:border-slate-800');
                 element.classList.remove('border-blue-500', 'bg-blue-50/50', 'dark:bg-blue-900/20');
-                
+
                 icon.classList.add('text-slate-400');
                 icon.classList.remove('text-blue-500');
-                
+
                 text.classList.add('text-slate-500', 'dark:text-slate-400');
                 text.classList.remove('text-blue-700', 'dark:text-blue-400');
             }
         }
-        
+
         // Inicializar listeners nos checkboxes para garantir sincronia se clicados diretamente
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('input[type="checkbox"][name^="mercadopago_method_"]').forEach(cb => {
-                cb.addEventListener('change', function() {
+                cb.addEventListener('change', function () {
                     updateCardVisual(this.closest('label'), this.checked);
                 });
             });
