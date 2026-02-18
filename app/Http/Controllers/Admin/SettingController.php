@@ -439,6 +439,20 @@ class SettingController extends Controller
             $data['s3_path_style'] = $request->boolean('s3_path_style') ? 1 : 0;
         }
 
+        // Garantir que checkboxes de meios de pagamento sejam salvos como 0/1
+        $paymentMethodCheckboxes = [
+            'mercadopago_method_credit_card',
+            'mercadopago_method_debit_card',
+            'mercadopago_method_pix',
+            'mercadopago_method_ticket',
+            'mercadopago_method_mercadopago',
+        ];
+        foreach ($paymentMethodCheckboxes as $cbKey) {
+            if (array_key_exists($cbKey, $data)) {
+                $data[$cbKey] = $request->boolean($cbKey) ? '1' : '0';
+            }
+        }
+
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
         }
