@@ -94,7 +94,7 @@
                     <strong>Slide 1</strong>
                 </div>
                 <div class="card-body">
-                <div class="card-body">
+
                     @include('components.forms.data-upload', [
                         'name' => 'marketplace_hero_slide_1_image',
                         'label' => 'Imagem do Slide 1',
@@ -278,7 +278,7 @@
                     <strong>Imagem do Popup</strong>
                 </div>
                 <div class="card-body">
-                <div class="card-body">
+
                     @include('components.forms.data-upload', [
                         'name' => 'marketplace_exit_banner_image',
                         'label' => 'Imagem do Popup de Saída',
