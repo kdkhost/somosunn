@@ -279,468 +279,518 @@
                                                         <button type="button" class="text-gray-400 hover:text-gray-600" title="Mais opcoes"
                                                             onclick="togglePanel('menu-{{ $post->id }}')">
                                                             <i class="fas fa-ellipsis-h"></i>
-                                                                                </button>
-                                                                                <div id="menu-{{ $post->id }}"
-                                                                                    class="hidden absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow z-10">
-                                                                                    <div class="py-1 text-sm text-gray-700">
-                                                                                        @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                                                                            <form action="{{ route('social.post.destroy', $post) }}" method="POST"
-                                                                                                class="js-confirm-delete" data-confirm-title="Remover publicacao?"
-                                                                                                data-confirm-text="Esta acao nao pode ser desfeita.">
-                                                                                                @csrf
-                                                                                                <button type="submit"
-                                                                                                    class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2">
-                                                                                                    <i class="fas fa-trash"></i>
-                                                                                                    <span>Remover</span>
-                                                                                                </button>
-                                                                                            </form>
-                                                                                            <form action="{{ route('social.post.unpublish', $post) }}" method="POST">
-                                                                                                @csrf
-                                                                                                <button type="submit"
-                                                                                                    class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
-                                                                                                    <i class="fas fa-eye-slash"></i>
-                                                                                                    <span>Despublicar</span>
-                                                                                                </button>
-                                                                                            </form>
-                                                                                        @endif
-                                                                                        @auth
-                                                                                            <form action="{{ route('social.post.hide', $post) }}" method="POST">
-                                                                                                @csrf
-                                                                                                <button type="submit"
-                                                                                                    class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
-                                                                                                    <i class="fas fa-eye"></i>
-                                                                                                    <span>Ocultar postagem</span>
-                                                                                                </button>
-                                                                                            </form>
-                                                                                        @endauth
-                                                                                        @auth
-                                                                                            @if(!(Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                                                                                <button type="button"
-                                                                                                    class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2"
-                                                                                                    onclick="togglePanel('report-{{ $post->id }}'); togglePanel('menu-{{ $post->id }}');">
-                                                                                                    <i class="fas fa-flag"></i>
-                                                                                                    <span>Denunciar</span>
-                                                                                                </button>
-                                                                                            @endif
-                                                                                        @endauth
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
+                                                        </button>
+                                                        <div id="menu-{{ $post->id }}"
+                                                            class="hidden absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow z-10">
+                                                            <div class="py-1 text-sm text-gray-700">
+                                                                @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                                    <form action="{{ route('social.post.destroy', $post) }}" method="POST"
+                                                                        class="js-confirm-delete" data-confirm-title="Remover publicacao?"
+                                                                        data-confirm-text="Esta acao nao pode ser desfeita.">
+                                                                        @csrf
+                                                                        <button type="submit"
+                                                                            class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2">
+                                                                            <i class="fas fa-trash"></i>
+                                                                            <span>Remover</span>
+                                                                        </button>
+                                                                    </form>
+                                                                    <form action="{{ route('social.post.unpublish', $post) }}" method="POST">
+                                                                        @csrf
+                                                                        <button type="submit"
+                                                                            class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
+                                                                            <i class="fas fa-eye-slash"></i>
+                                                                            <span>Despublicar</span>
+                                                                        </button>
+                                                                    </form>
+                                                                @endif
+                                                                @auth
+                                                                    <form action="{{ route('social.post.hide', $post) }}" method="POST">
+                                                                        @csrf
+                                                                        <button type="submit"
+                                                                            class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
+                                                                            <i class="fas fa-eye"></i>
+                                                                            <span>Ocultar postagem</span>
+                                                                        </button>
+                                                                    </form>
+                                                                @endauth
+                                                                @auth
+                                                                    @if(!(Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                                        <button type="button"
+                                                                            class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2"
+                                                                            onclick="togglePanel('report-{{ $post->id }}'); togglePanel('menu-{{ $post->id }}');">
+                                                                            <i class="fas fa-flag"></i>
+                                                                            <span>Denunciar</span>
+                                                                        </button>
+                                                                    @endif
+                                                                @endauth
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                                                                        <div class="prose max-w-none text-gray-800 mb-4">
-                                                                            {!! preg_replace(
+                                                <div class="prose max-w-none text-gray-800 mb-4">
+                                                    {!! preg_replace(
                                 '/(https?:\/\/[^\s<>"]+)/i',
                                 '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline break-all">$1</a>',
                                 nl2br(e($post->content))
                             ) !!}
-                                                                        </div>
+                                                </div>
 
-                                                                        @if($post->media->isNotEmpty())
-                                                                            <div class="mb-4">
-                                                                                @php
-                                                                                    $mediaCount = $post->media->count();
-                                                                                @endphp
-                                                                                @if($mediaCount === 1)
-                                                                                    <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
-                                                                                        class="w-full rounded-lg object-cover">
-                                                                                @else
-                                                                                    <div class="relative" data-carousel data-total="{{ $mediaCount }}">
-                                                                                        <div class="overflow-hidden rounded-lg">
-                                                                                            <div class="flex transition-transform duration-300" data-track>
-                                                                                                @foreach($post->media as $media)
-                                                                                                    <img src="{{ asset($media->path) }}" alt="Midia do post"
-                                                                                                        class="w-full shrink-0 object-cover">
-                                                                                                @endforeach
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <button type="button" data-prev
-                                                                                            class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
-                                                                                            <i class="fas fa-chevron-left"></i>
-                                                                                        </button>
-                                                                                        <button type="button" data-next
-                                                                                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
-                                                                                            <i class="fas fa-chevron-right"></i>
-                                                                                        </button>
-                                                                                        <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full"
-                                                                                            data-counter>
-                                                                                            1/{{ $mediaCount }}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                @endif
-                                                                            </div>
-                                                                        @endif
+                                                @if($post->media->isNotEmpty())
+                                                    <div class="mb-4">
+                                                        @php
+                                                            $mediaCount = $post->media->count();
+                                                        @endphp
+                                                        @if($mediaCount === 1)
+                                                            <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
+                                                                class="w-full rounded-lg object-cover">
+                                                        @else
+                                                            <div class="relative" data-carousel data-total="{{ $mediaCount }}">
+                                                                <div class="overflow-hidden rounded-lg">
+                                                                    <div class="flex transition-transform duration-300" data-track>
+                                                                        @foreach($post->media as $media)
+                                                                            <img src="{{ asset($media->path) }}" alt="Midia do post"
+                                                                                class="w-full shrink-0 object-cover">
+                                                                        @endforeach
+                                                                    </div>
+                                                                </div>
+                                                                <button type="button" data-prev
+                                                                    class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
+                                                                    <i class="fas fa-chevron-left"></i>
+                                                                </button>
+                                                                <button type="button" data-next
+                                                                    class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
+                                                                    <i class="fas fa-chevron-right"></i>
+                                                                </button>
+                                                                <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full"
+                                                                    data-counter>
+                                                                    1/{{ $mediaCount }}
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                @endif
 
-                                                                        <div class="flex items-center justify-between pt-3 border-t text-sm text-gray-500">
-                                                                            @auth
-                                                                                <form action="{{ route('social.post.react', $post) }}" method="POST">
-                                                                                    @csrf
-                                                                                    <button type="submit" aria-label="Curtir"
-                                                                                        class="flex items-center gap-2 transition {{ $hasLiked ? 'text-blue-600' : 'hover:text-blue-600' }}">
-                                                                                        <i class="{{ $hasLiked ? 'fas' : 'far' }} fa-thumbs-up"></i>
-                                                                                        <span class="hidden sm:inline">Curtir</span>
-                                                                                    </button>
-                                                                                </form>
-                                                                            @else
-                                                                                <span class="flex items-center gap-2" aria-label="Curtir">
-                                                                                    <i class="far fa-thumbs-up"></i>
-                                                                                    <span class="hidden sm:inline">Curtir</span>
-                                                                                </span>
-                                                                            @endauth
+                                                <div class="flex items-center justify-between pt-3 border-t text-sm text-gray-500">
+                                                    @auth
+                                                        <form action="{{ route('social.post.react', $post) }}" method="POST">
+                                                            @csrf
+                                                            <button type="submit" aria-label="Curtir"
+                                                                class="flex items-center gap-2 transition {{ $hasLiked ? 'text-blue-600' : 'hover:text-blue-600' }}">
+                                                                <i class="{{ $hasLiked ? 'fas' : 'far' }} fa-thumbs-up"></i>
+                                                                <span class="hidden sm:inline">Curtir</span>
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <span class="flex items-center gap-2" aria-label="Curtir">
+                                                            <i class="far fa-thumbs-up"></i>
+                                                            <span class="hidden sm:inline">Curtir</span>
+                                                        </span>
+                                                    @endauth
 
-                                                                            <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
-                                                                                onclick="document.getElementById('comment-{{ $post->id }}').focus();"
-                                                                                aria-label="Comentar">
-                                                                                <i class="far fa-comment"></i>
-                                                                                <span class="hidden sm:inline">Comentar</span>
-                                                                            </button>
+                                                    <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
+                                                        onclick="document.getElementById('comment-{{ $post->id }}').focus();"
+                                                        aria-label="Comentar">
+                                                        <i class="far fa-comment"></i>
+                                                        <span class="hidden sm:inline">Comentar</span>
+                                                    </button>
 
-                                                                            <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
-                                                                                onclick="togglePanel('share-{{ $post->id }}')" aria-label="Compartilhar">
-                                                                                <i class="fas fa-share"></i>
-                                                                                <span class="hidden sm:inline">Compartilhar</span>
-                                                                            </button>
-                                                                        </div>
-                                                                        <div id="share-{{ $post->id }}" class="hidden mt-3 border-t pt-3 space-y-3">
-                                                                            <div class="flex flex-wrap gap-3 text-sm">
-                                                                                <button type="button" class="text-blue-600" data-copy="{{ $postLink }}"
-                                                                                    onclick="copyPostLink(this)">Copiar link</button>
-                                                                                <a class="text-green-600" target="_blank" rel="noopener"
-                                                                                    href="https://wa.me/?text={{ urlencode($postLink) }}">WhatsApp</a>
-                                                                                <a class="text-blue-500" target="_blank" rel="noopener"
-                                                                                    href="https://t.me/share/url?url={{ urlencode($postLink) }}">Telegram</a>
-                                                                                <a class="text-blue-700" target="_blank" rel="noopener"
-                                                                                    href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($postLink) }}">Facebook</a>
-                                                                            </div>
+                                                    <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
+                                                        onclick="togglePanel('share-{{ $post->id }}')" aria-label="Compartilhar">
+                                                        <i class="fas fa-share"></i>
+                                                        <span class="hidden sm:inline">Compartilhar</span>
+                                                    </button>
+                                                </div>
+                                                <div id="share-{{ $post->id }}" class="hidden mt-3 border-t pt-3 space-y-3">
+                                                    <div class="flex flex-wrap gap-3 text-sm">
+                                                        <button type="button" class="text-blue-600" data-copy="{{ $postLink }}"
+                                                            onclick="copyPostLink(this)">Copiar link</button>
+                                                        <a class="text-green-600" target="_blank" rel="noopener"
+                                                            href="https://wa.me/?text={{ urlencode($postLink) }}">WhatsApp</a>
+                                                        <a class="text-blue-500" target="_blank" rel="noopener"
+                                                            href="https://t.me/share/url?url={{ urlencode($postLink) }}">Telegram</a>
+                                                        <a class="text-blue-700" target="_blank" rel="noopener"
+                                                            href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($postLink) }}">Facebook</a>
+                                                    </div>
 
-                                                                            @auth
-                                                                                <form action="{{ route('social.post.share', $post) }}" method="POST">
-                                                                                    @csrf
-                                                                                    <button type="submit" class="text-sm text-gray-600 hover:text-blue-600">
-                                                                                        Compartilhar na comunidade
-                                                                                    </button>
-                                                                                </form>
+                                                    @auth
+                                                        <form action="{{ route('social.post.share', $post) }}" method="POST">
+                                                            @csrf
+                                                            <button type="submit" class="text-sm text-gray-600 hover:text-blue-600">
+                                                                Compartilhar na comunidade
+                                                            </button>
+                                                        </form>
 
-                                                                                @if($shareTargets->isNotEmpty())
-                                                                                    <form action="{{ route('social.post.share.user', $post) }}" method="POST"
-                                                                                        class="flex flex-col gap-2">
-                                                                                        @csrf
-                                                                                        <div class="flex flex-wrap gap-2">
-                                                                                            <select name="target_user_id"
-                                                                                                class="border border-gray-200 rounded px-3 py-2 text-sm">
-                                                                                                @foreach($shareTargets as $target)
-                                                                                                    <option value="{{ $target->id }}">{{ $target->name }}</option>
-                                                                                                @endforeach
-                                                                                            </select>
-                                                                                            <input type="text" name="message" placeholder="Mensagem opcional"
-                                                                                                class="flex-1 border border-gray-200 rounded px-3 py-2 text-sm">
-                                                                                            <button type="submit"
-                                                                                                class="bg-blue-600 text-white px-3 py-2 rounded text-sm">Enviar</button>
-                                                                                        </div>
-                                                                                    </form>
-                                                                                @endif
-                                                                            @endauth
-                                                                        </div>
+                                                        @if($shareTargets->isNotEmpty())
+                                                            <form action="{{ route('social.post.share.user', $post) }}" method="POST"
+                                                                class="flex flex-col gap-2">
+                                                                @csrf
+                                                                <div class="flex flex-wrap gap-2">
+                                                                    <select name="target_user_id"
+                                                                        class="border border-gray-200 rounded px-3 py-2 text-sm">
+                                                                        @foreach($shareTargets as $target)
+                                                                            <option value="{{ $target->id }}">{{ $target->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                    <input type="text" name="message" placeholder="Mensagem opcional"
+                                                                        class="flex-1 border border-gray-200 rounded px-3 py-2 text-sm">
+                                                                    <button type="submit"
+                                                                        class="bg-blue-600 text-white px-3 py-2 rounded text-sm">Enviar</button>
+                                                                </div>
+                                                            </form>
+                                                        @endif
+                                                    @endauth
+                                                </div>
 
-                                                                        <div id="report-{{ $post->id }}" class="hidden mt-3 border-t pt-3">
-                                                                            @auth
-                                                                                <form action="{{ route('social.post.report', $post) }}" method="POST"
-                                                                                    class="flex flex-col gap-2">
-                                                                                    @csrf
-                                                                                    <textarea name="reason" rows="2" required placeholder="Descreva o motivo da denuncia"
-                                                                                        class="border border-gray-200 rounded px-3 py-2 text-sm"></textarea>
-                                                                                    <button type="submit" class="text-sm text-red-600">Denunciar</button>
-                                                                                </form>
-                                                                            @endauth
-                                                                        </div>
+                                                <div id="report-{{ $post->id }}" class="hidden mt-3 border-t pt-3">
+                                                    @auth
+                                                        <form action="{{ route('social.post.report', $post) }}" method="POST"
+                                                            class="flex flex-col gap-2">
+                                                            @csrf
+                                                            <textarea name="reason" rows="2" required placeholder="Descreva o motivo da denuncia"
+                                                                class="border border-gray-200 rounded px-3 py-2 text-sm"></textarea>
+                                                            <button type="submit" class="text-sm text-red-600">Denunciar</button>
+                                                        </form>
+                                                    @endauth
+                                                </div>
 
-                                                                        <div class="mt-2 text-xs text-gray-400 flex gap-3">
-                                                                            <span>{{ $likeCount }} curtida{{ $likeCount === 1 ? '' : 's' }}</span>
-                                                                            <span>{{ $commentCount }} comentario{{ $commentCount === 1 ? '' : 's' }}</span>
-                                                                        </div>
+                                                <div class="mt-2 text-xs text-gray-400 flex gap-3">
+                                                    <span>{{ $likeCount }} curtida{{ $likeCount === 1 ? '' : 's' }}</span>
+                                                    <span>{{ $commentCount }} comentario{{ $commentCount === 1 ? '' : 's' }}</span>
+                                                </div>
 
-                                                                        @if($post->comments->isNotEmpty())
-                                                                            <div class="mt-4 space-y-3">
-                                                                                @foreach($post->comments as $comment)
-                                                                                    @php
-                                                                                        $commentUser = $comment->user;
-                                                                                        $commentAvatar = $commentUser
-                                                                                            ? $commentUser->profile_photo_url
-                                                                                            : asset('img/default-user.svg');
-                                                                                        $commentName = $commentUser ? $commentUser->name : 'Usuario';
-                                                                                    @endphp
-                                                                                    <div class="flex gap-3">
-                                                                                        <div class="rounded-full w-8 h-8 overflow-hidden flex-shrink-0">
-                                                                                            <img src="{{ $commentAvatar }}" alt="Avatar" class="w-8 h-8 object-cover"
-                                                                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                                                                        </div>
-                                                                                        <div class="bg-gray-50 rounded-lg px-3 py-2 w-full">
-                                                                                            <div class="flex justify-between items-center">
-                                                                                                <p class="text-xs font-semibold text-gray-700">{{ $commentName }}</p>
-                                                                                                @if(Auth::check() && (Auth::id() === $comment->user_id || Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                                                                                    <form action="{{ route('social.comment.destroy', $comment) }}" method="POST"
-                                                                                                        class="js-confirm-delete" data-confirm-title="Remover comentario?"
-                                                                                                        data-confirm-text="Esta acao nao pode ser desfeita.">
-                                                                                                        @csrf
-                                                                                                        @method('DELETE')
-                                                                                                        <button type="submit" class="text-xs text-red-500" title="Remover">
-                                                                                                            <i class="fas fa-trash"></i>
-                                                                                                        </button>
-                                                                                                    </form>
-                                                                                                @endif
-                                                                                            </div>
-                                                                                            <p class="text-sm text-gray-700">{{ $comment->content }}</p>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                @endforeach
-                                                                            </div>
-                                                                        @endif
-
-                                                                        @auth
-                                                                            <form action="{{ route('social.post.comment', $post) }}" method="POST" class="mt-3 flex gap-2">
+                                                @if($post->comments->isNotEmpty())
+                                                    <div class="mt-4 space-y-3">
+                                                        @foreach($post->comments as $comment)
+                                                            @php
+                                                                $commentUser = $comment->user;
+                                                                $commentAvatar = $commentUser
+                                                                    ? $commentUser->profile_photo_url
+                                                                    : asset('img/default-user.svg');
+                                                                $commentName = $commentUser ? $commentUser->name : 'Usuario';
+                                                            @endphp
+                                                            <div class="flex gap-3">
+                                                                <div class="rounded-full w-8 h-8 overflow-hidden flex-shrink-0">
+                                                                    <img src="{{ $commentAvatar }}" alt="Avatar" class="w-8 h-8 object-cover"
+                                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                                </div>
+                                                                <div class="bg-gray-50 rounded-lg px-3 py-2 w-full">
+                                                                    <div class="flex justify-between items-center">
+                                                                        <p class="text-xs font-semibold text-gray-700">{{ $commentName }}</p>
+                                                                        @if(Auth::check() && (Auth::id() === $comment->user_id || Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                                            <form action="{{ route('social.comment.destroy', $comment) }}" method="POST"
+                                                                                class="js-confirm-delete" data-confirm-title="Remover comentario?"
+                                                                                data-confirm-text="Esta acao nao pode ser desfeita.">
                                                                                 @csrf
-                                                                                <input type="text" name="content" id="comment-{{ $post->id }}"
-                                                                                    placeholder="Escreva um comentario..."
-                                                                                    class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-                                                                                <div class="relative">
-                                                                                    <button type="button" class="comment-emoji-toggle text-gray-500 hover:text-blue-600"
-                                                                                        data-picker="comment-emoji-{{ $post->id }}" title="Inserir emoji">
-                                                                                        <i class="far fa-smile"></i>
-                                                                                    </button>
-                                                                                    <div id="comment-emoji-{{ $post->id }}" data-target="comment-{{ $post->id }}"
-                                                                                        class="emoji-picker-panel hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
-                                                                                        @include('social.partials.emoji_tabs')
-                                                                                        @include('social.partials.emoji_grid')
-                                                                                    </div>
-                                                                                </div>
-                                                                                <button type="submit"
-                                                                                    class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition">
-                                                                                    Enviar
+                                                                                @method('DELETE')
+                                                                                <button type="submit" class="text-xs text-red-500" title="Remover">
+                                                                                    <i class="fas fa-trash"></i>
                                                                                 </button>
                                                                             </form>
-                                                                        @endauth
+                                                                        @endif
                                                                     </div>
-                                                                    @if($adsEnabled && $loop->iteration % $adsenseFrequency === 0)
-                                                                        <div class="bg-white rounded-lg shadow p-4 ad-container">
-                                                                            @if($hasAdsense)
-                                                                                <ins class="adsbygoogle" style="display:block" data-ad-client="{{ $adsensePublisherId }}"
-                                                                                    data-ad-slot="{{ $adsenseSlotId }}" data-ad-format="{{ $adsenseFormat }}"
-                                                                                    data-full-width-responsive="true"></ins>
-                                                                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-                                                                            @elseif(!empty($adsCode))
-                                                                                {!! $adsCode !!}
-                                                                            @endif
-                                                                        </div>
-                                                                    @endif
-                        @empty
-                                <div class="text-center py-10 text-gray-500">
-                                    <p>Nenhum post ainda. Seja o primeiro a publicar!</p>
-                                </div>
-                            @endforelse
+                                                                    <p class="text-sm text-gray-700">{{ $comment->content }}</p>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
 
-                            {{ $posts->links() }}
-                        </div>
-
-                        <div id="chat-panel" class="space-y-6" hidden>
-                            <div class="bg-white rounded-lg shadow p-4">
-                                <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-100"
-                                            id="conversation-avatar-wrap">
-                                            <img id="conversation-avatar" src="{{ asset('img/default-user.svg') }}" alt="Avatar"
-                                                class="w-10 h-10 object-cover">
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold text-gray-900" id="conversation-name">Selecione uma conversa
-                                            </p>
-                                            <p class="text-xs text-gray-500" id="conversation-meta">Mensagens recentes</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <button type="button" onclick="toggleConversationInfo()"
-                                            class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 rounded-full hover:bg-gray-100 transition"
-                                            title="Informações da conversa">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                        <div class="relative">
-                                            <button type="button" class="text-gray-400 hover:text-gray-600" title="Mais opções"
-                                                onclick="togglePanel('conversation-menu-main')">
-                                                <i class="fas fa-ellipsis-h"></i>
-                                            </button>
-                                            <div id="conversation-menu-main"
-                                                class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1">
-                                                <button type="button"
-                                                    class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
-                                                    <i class="fas fa-bell-slash"></i> Silenciar
-                                                </button>
-                                                <button type="button"
-                                                    class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600">
-                                                    <i class="fas fa-trash"></i> Excluir conversa
-                                                </button>
+                                                @auth
+                                                    <form action="{{ route('social.post.comment', $post) }}" method="POST" class="mt-3 flex gap-2">
+                                                        @csrf
+                                                        <input type="text" name="content" id="comment-{{ $post->id }}"
+                                                            placeholder="Escreva um comentario..."
+                                                            class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                                        <div class="relative">
+                                                            <button type="button" class="comment-emoji-toggle text-gray-500 hover:text-blue-600"
+                                                                data-picker="comment-emoji-{{ $post->id }}" title="Inserir emoji">
+                                                                <i class="far fa-smile"></i>
+                                                            </button>
+                                                            <div id="comment-emoji-{{ $post->id }}" data-target="comment-{{ $post->id }}"
+                                                                class="emoji-picker-panel hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
+                                                                @include('social.partials.emoji_tabs')
+                                                                @include('social.partials.emoji_grid')
+                                                            </div>
+                                                        </div>
+                                                        <button type="submit"
+                                                            class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition">
+                                                            Enviar
+                                                        </button>
+                                                    </form>
+                                                @endauth
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div id="conversation-messages" class="h-[520px] overflow-y-auto space-y-3 pr-2">
-                                    <p class="text-sm text-gray-500">Selecione um membro para ver a conversa.</p>
-                                </div>
-                                <form id="conversation-form" class="mt-4 flex items-center gap-2">
-                                    <div class="relative">
-                                        <button type="button" id="conversation-emoji-toggle"
-                                            class="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100"
-                                            title="Inserir emoji">
-                                            <i class="far fa-smile"></i>
-                                        </button>
-                                        <div id="conversation-emoji-picker" data-target="conversation-input"
-                                            class="emoji-picker-panel hidden absolute left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
-                                            @include('social.partials.emoji_tabs')
-                                            @include('social.partials.emoji_grid')
-                                        </div>
-                                    </div>
-                                    <input type="text" id="conversation-input"
-                                        class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="Digite uma mensagem...">
-                                    <button type="submit"
-                                        class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center">
-                                        <i class="fas fa-paper-plane"></i>
-                                    </button>
-                                </form>
+                                            @if($adsEnabled && $loop->iteration % $adsenseFrequency === 0)
+                                                <div class="bg-white rounded-lg shadow p-4 ad-container">
+                                                    @if($hasAdsense)
+                                                        <ins class="adsbygoogle" style="display:block" data-ad-client="{{ $adsensePublisherId }}"
+                                                            data-ad-slot="{{ $adsenseSlotId }}" data-ad-format="{{ $adsenseFormat }}"
+                                                            data-full-width-responsive="true"></ins>
+                                                        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                                                    @elseif(!empty($adsCode))
+                                                        {!! $adsCode !!}
+                                                    @endif
+                                                </div>
+                                            @endif
+                        @empty
+                            <div class="text-center py-10 text-gray-500">
+                                <p>Nenhum post ainda. Seja o primeiro a publicar!</p>
                             </div>
-                        </div>
+                        @endforelse
+
+                        {{ $posts->links() }}
                     </div>
 
-                    @unless($isAdminContext)
-                        <!-- Sidebar Right (Info) -->
-                        <div class="hidden md:block md:col-span-3">
-                            <div id="right-recommendations" class="bg-white rounded-lg shadow p-4 sticky top-24">
-                                <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
-                                <div class="space-y-4">
-                                    @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
-                                        @php
-                                            $connectionMap = $connectionMap ?? [];
-                                            $authUserId = auth()->id();
-                                        @endphp
-                                        @foreach($recommendedUsers as $user)
-                                            @php
-                                                $connection = $connectionMap[$user->id] ?? null;
-                                                $isPending = $connection && $connection->status === 'pending';
-                                                $isConnected = $connection && $connection->status === 'accepted';
-                                                $isRequester = $connection && $authUserId && $connection->requester_id === $authUserId;
-                                                $pendingTime = $connection ? $connection->created_at->diffForHumans() : '';
-                                            @endphp
+                    <div id="chat-panel" class="space-y-6" hidden>
+                        <div class="bg-white rounded-lg shadow p-4">
+                            <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-100"
+                                        id="conversation-avatar-wrap">
+                                        <img id="conversation-avatar" src="{{ asset('img/default-user.svg') }}" alt="Avatar"
+                                            class="w-10 h-10 object-cover">
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-900" id="conversation-name">Selecione uma conversa
+                                        </p>
+                                        <p class="text-xs text-gray-500" id="conversation-meta">Mensagens recentes</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" onclick="toggleConversationInfo()"
+                                        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 rounded-full hover:bg-gray-100 transition"
+                                        title="Informações da conversa">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                    <div class="relative">
+                                        <button type="button" class="text-gray-400 hover:text-gray-600" title="Mais opções"
+                                            onclick="togglePanel('conversation-menu-main')">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <div id="conversation-menu-main"
+                                            class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1">
+                                            <button type="button"
+                                                class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
+                                                <i class="fas fa-bell-slash"></i> Silenciar
+                                            </button>
+                                            <button type="button"
+                                                class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600">
+                                                <i class="fas fa-trash"></i> Excluir conversa
+                                            </button>
+                                            <button type="button" onclick="blockUser(activeConversationUserId)"
+                                                class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-red-800 font-medium border-t border-gray-100">
+                                                <i class="fas fa-ban"></i> Bloquear usuário
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="conversation-messages" class="h-[520px] overflow-y-auto space-y-3 pr-2">
+                                <p class="text-sm text-gray-500">Selecione um membro para ver a conversa.</p>
+                            </div>
+                            <form id="conversation-form" class="mt-4 flex items-center gap-2">
+                                <div class="relative">
+                                    <button type="button" id="conversation-emoji-toggle"
+                                        class="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100"
+                                        title="Inserir emoji">
+                                        <i class="far fa-smile"></i>
+                                    </button>
+                                    <div id="conversation-emoji-picker" data-target="conversation-input"
+                                        class="emoji-picker-panel hidden absolute left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
+                                        @include('social.partials.emoji_tabs')
+                                        @include('social.partials.emoji_grid')
+                                    </div>
+                                </div>
+                                <input type="text" id="conversation-input"
+                                    class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Digite uma mensagem...">
+                                <button type="submit"
+                                    class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                @unless($isAdminContext)
+                    <!-- Sidebar Right (Info) -->
+                    <div class="hidden md:block md:col-span-3">
+                        <div id="right-recommendations" class="bg-white rounded-lg shadow p-4 sticky top-24">
+                            @if(isset($pendingRequests) && $pendingRequests->isNotEmpty())
+                                <div class="mb-6 pb-6 border-b border-gray-100">
+                                    <h3 class="font-bold text-gray-900 mb-4 flex items-center justify-between">
+                                        <span>Solicitações de Conexão</span>
+                                        <span
+                                            class="bg-blue-100 text-blue-600 text-[10px] px-2 py-0.5 rounded-full">{{ $pendingRequests->count() }}</span>
+                                    </h3>
+                                    <div class="space-y-4">
+                                        @foreach($pendingRequests as $request)
                                             <div class="flex items-center justify-between gap-3">
                                                 <div class="flex items-center gap-3">
-                                                    <a class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0"
-                                                        href="{{ route('social.profile', $user->id) }}">
-                                                        <img src="{{ $user->profile_photo_url }}" alt="Avatar"
+                                                    <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
+                                                        <img src="{{ $request->requester->profile_photo_url }}" alt="Avatar"
                                                             class="w-10 h-10 object-cover"
                                                             onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                                    </a>
+                                                    </div>
                                                     <div>
-                                                        <a href="{{ route('social.profile', $user->id) }}"
-                                                            class="text-sm font-semibold text-gray-800 hover:text-blue-600">
-                                                            {{ $user->name }}
-                                                        </a>
-                                                        <p class="text-xs text-gray-500">Membro</p>
+                                                        <p class="text-sm font-semibold text-gray-800">{{ $request->requester->name }}
+                                                        </p>
+                                                        <p class="text-[10px] text-gray-500">{{ $request->created_at->diffForHumans() }}
+                                                        </p>
                                                     </div>
                                                 </div>
-                                                <div class="text-right">
-                                                    @if($isConnected)
-                                                        <span class="text-xs text-gray-400">Conectado</span>
-                                                    @elseif($isPending && $isRequester)
-                                                        <div class="text-[11px] text-gray-400">Pendente {{ $pendingTime }}</div>
-                                                        <button type="button" class="text-xs text-red-600 hover:text-red-700 font-medium"
-                                                            onclick="cancelInvite({{ $user->id }})">
-                                                            Cancelar
-                                                        </button>
-                                                    @elseif($isPending)
-                                                        <div class="text-[11px] text-gray-400">Solicitacao recebida</div>
-                                                        <button type="button" class="text-xs text-green-600 hover:text-green-700 font-medium"
-                                                            onclick="acceptInvite({{ $user->id }})">
-                                                            Aceitar
-                                                        </button>
-                                                    @else
-                                                        <button type="button" class="text-xs text-blue-600 hover:text-blue-700 font-medium"
-                                                            onclick="requestInvite({{ $user->id }})">
-                                                            Conectar
-                                                        </button>
-                                                    @endif
+                                                <div class="flex flex-col gap-1">
+                                                    <button type="button"
+                                                        class="bg-blue-600 text-white text-[11px] px-3 py-1 rounded-full font-medium hover:bg-blue-700 transition"
+                                                        onclick="acceptInvite({{ $request->requester_id }})">
+                                                        Aceitar
+                                                    </button>
+                                                    <button type="button"
+                                                        class="text-gray-500 text-[11px] hover:text-red-500 transition"
+                                                        onclick="refuseInvite({{ $request->requester_id }})">
+                                                        Recusar
+                                                    </button>
+                                                    <button type="button"
+                                                        class="text-gray-400 text-[10px] hover:text-red-700 transition"
+                                                        onclick="blockUser({{ $request->requester_id }})">
+                                                        Bloquear
+                                                    </button>
                                                 </div>
                                             </div>
                                         @endforeach
-                                    @else
-                                        <p class="text-xs text-gray-500">Sem recomendacoes no momento.</p>
-                                    @endif
+                                    </div>
                                 </div>
+                            @endif
+
+                            <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
+                            <div class="space-y-4">
+                                @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
+                                    @php
+                                        $connectionMap = $connectionMap ?? [];
+                                        $authUserId = auth()->id();
+                                    @endphp
+                                    @foreach($recommendedUsers as $user)
+                                        @php
+                                            $connection = $connectionMap[$user->id] ?? null;
+                                            $isPending = $connection && $connection->status === 'pending';
+                                            $isConnected = $connection && $connection->status === 'accepted';
+                                            $isRequester = $connection && $authUserId && $connection->requester_id === $authUserId;
+                                            $pendingTime = $connection ? $connection->created_at->diffForHumans() : '';
+                                        @endphp
+                                        <div class="flex items-center justify-between gap-3">
+                                            <div class="flex items-center gap-3">
+                                                <a class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0"
+                                                    href="{{ route('social.profile', $user->id) }}">
+                                                    <img src="{{ $user->profile_photo_url }}" alt="Avatar"
+                                                        class="w-10 h-10 object-cover"
+                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                </a>
+                                                <div>
+                                                    <a href="{{ route('social.profile', $user->id) }}"
+                                                        class="text-sm font-semibold text-gray-800 hover:text-blue-600">
+                                                        {{ $user->name }}
+                                                    </a>
+                                                    <p class="text-xs text-gray-500">Membro</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                @if($isConnected)
+                                                    <span class="text-xs text-gray-400">Conectado</span>
+                                                @elseif($isPending && $isRequester)
+                                                    <div class="text-[11px] text-gray-400">Pendente {{ $pendingTime }}</div>
+                                                    <button type="button" class="text-xs text-red-600 hover:text-red-700 font-medium"
+                                                        onclick="cancelInvite({{ $user->id }})">
+                                                        Cancelar
+                                                    </button>
+                                                @elseif($isPending)
+                                                    <div class="text-[11px] text-gray-400">Solicitacao recebida</div>
+                                                    <button type="button" class="text-xs text-green-600 hover:text-green-700 font-medium"
+                                                        onclick="acceptInvite({{ $user->id }})">
+                                                        Aceitar
+                                                    </button>
+                                                @else
+                                                    <button type="button" class="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                                                        onclick="requestInvite({{ $user->id }})">
+                                                        Conectar
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <p class="text-xs text-gray-500">Sem recomendacoes no momento.</p>
+                                @endif
                             </div>
-                            <div id="right-conversation-info" class="bg-white rounded-lg shadow p-4 sticky top-24 hidden">
-                                <div class="flex flex-col items-center text-center mb-4">
-                                    <div class="w-20 h-20 rounded-full overflow-hidden bg-gray-100 mb-3">
-                                        <img id="conversation-info-avatar" src="{{ asset('img/default-user.svg') }}" alt="Avatar"
-                                            class="w-20 h-20 object-cover">
-                                    </div>
-                                    <p class="font-semibold text-gray-900" id="conversation-info-name">Selecione uma conversa</p>
-                                    <p class="text-xs text-gray-500" id="conversation-info-status">Online recentemente</p>
+                        </div>
+                        <div id="right-conversation-info" class="bg-white rounded-lg shadow p-4 sticky top-24 hidden">
+                            <div class="flex flex-col items-center text-center mb-4">
+                                <div class="w-20 h-20 rounded-full overflow-hidden bg-gray-100 mb-3">
+                                    <img id="conversation-info-avatar" src="{{ asset('img/default-user.svg') }}" alt="Avatar"
+                                        class="w-20 h-20 object-cover">
                                 </div>
-                                <div class="grid grid-cols-3 gap-2 text-center text-xs text-gray-500 mb-4">
-                                    <button type="button" class="py-2 rounded-lg hover:bg-gray-100">
-                                        <i class="fas fa-user text-gray-400"></i>
-                                        <span class="block mt-1">Perfil</span>
-                                    </button>
-                                    <button type="button" class="py-2 rounded-lg hover:bg-gray-100">
-                                        <i class="fas fa-bell text-gray-400"></i>
-                                        <span class="block mt-1">Silenciar</span>
-                                    </button>
-                                    <button type="button" class="py-2 rounded-lg hover:bg-gray-100">
-                                        <i class="fas fa-search text-gray-400"></i>
-                                        <span class="block mt-1">Pesquisar</span>
-                                    </button>
-                                </div>
-                                <div class="border-t border-gray-100 pt-3">
-                                    <button type="button"
-                                        class="w-full text-left text-sm font-semibold text-gray-700 flex items-center justify-between">
-                                        Informacoes da conversa
-                                        <i class="fas fa-chevron-down text-xs text-gray-400"></i>
-                                    </button>
-                                </div>
-                                <div class="border-t border-gray-100 pt-3">
-                                    <button type="button"
-                                        class="w-full text-left text-sm font-semibold text-gray-700 flex items-center justify-between">
-                                        Personalizar conversa
-                                        <i class="fas fa-chevron-down text-xs text-gray-400"></i>
-                                    </button>
-                                </div>
-                                <div class="border-t border-gray-100 pt-3">
-                                    <button type="button"
-                                        class="w-full text-left text-sm font-semibold text-gray-700 flex items-center justify-between">
-                                        Midia e arquivos
-                                        <i class="fas fa-chevron-down text-xs text-gray-400"></i>
-                                    </button>
-                                    <div id="conversation-shared" class="mt-3 space-y-2 text-xs text-gray-500">
-                                        <p>Sem itens compartilhados.</p>
-                                    </div>
+                                <p class="font-semibold text-gray-900" id="conversation-info-name">Selecione uma conversa</p>
+                                <p class="text-xs text-gray-500" id="conversation-info-status">Online recentemente</p>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-center text-xs text-gray-500 mb-4">
+                                <button type="button" class="py-2 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-user text-gray-400"></i>
+                                    <span class="block mt-1">Perfil</span>
+                                </button>
+                                <button type="button" class="py-2 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-bell text-gray-400"></i>
+                                    <span class="block mt-1">Silenciar</span>
+                                </button>
+                                <button type="button" class="py-2 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-search text-gray-400"></i>
+                                    <span class="block mt-1">Pesquisar</span>
+                                </button>
+                            </div>
+                            <div class="border-t border-gray-100 pt-3">
+                                <button type="button"
+                                    class="w-full text-left text-sm font-semibold text-gray-700 flex items-center justify-between">
+                                    Informacoes da conversa
+                                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                                </button>
+                            </div>
+                            <div class="border-t border-gray-100 pt-3">
+                                <button type="button"
+                                    class="w-full text-left text-sm font-semibold text-gray-700 flex items-center justify-between">
+                                    Personalizar conversa
+                                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                                </button>
+                            </div>
+                            <div class="border-t border-gray-100 pt-3">
+                                <button type="button"
+                                    class="w-full text-left text-sm font-semibold text-gray-700 flex items-center justify-between">
+                                    Midia e arquivos
+                                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                                </button>
+                                <div id="conversation-shared" class="mt-3 space-y-2 text-xs text-gray-500">
+                                    <p>Sem itens compartilhados.</p>
                                 </div>
                             </div>
                         </div>
-                    @endunless
-                </div>
+                    </div>
+                @endunless
             </div>
         </div>
+    </div>
 
-        @unless($isAdminContext)
-            <div id="floating-chat-dock" class="fixed bottom-4 right-4 z-50 flex items-end gap-3 flex-row-reverse">
-                <div id="chat-overflow" class="relative hidden">
-                    <button id="chat-overflow-toggle"
-                        class="bg-white border border-gray-200 text-gray-700 rounded-full px-3 py-2 text-xs shadow hover:bg-gray-50">
-                        +0
-                    </button>
-                    <div id="chat-overflow-list"
-                        class="hidden absolute bottom-12 right-0 bg-white border border-gray-200 rounded-lg shadow p-2 w-56"></div>
-                </div>
-                <div id="chat-boxes" class="flex items-end gap-3 flex-row-reverse"></div>
+    @unless($isAdminContext)
+        <div id="floating-chat-dock" class="fixed bottom-4 right-4 z-50 flex items-end gap-3 flex-row-reverse">
+            <div id="chat-overflow" class="relative hidden">
+                <button id="chat-overflow-toggle"
+                    class="bg-white border border-gray-200 text-gray-700 rounded-full px-3 py-2 text-xs shadow hover:bg-gray-50">
+                    +0
+                </button>
+                <div id="chat-overflow-list"
+                    class="hidden absolute bottom-12 right-0 bg-white border border-gray-200 rounded-lg shadow p-2 w-56"></div>
             </div>
-        @endunless
+            <div id="chat-boxes" class="flex items-end gap-3 flex-row-reverse"></div>
+        </div>
+    @endunless
 @endsection
 
 @push('styles')
@@ -1273,15 +1323,15 @@
                         // Update inner HTML only if content changed or if it was empty
                         const unreadHtml = (conv.unread_count || 0) > 0 ? `<span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${conv.unread_count}</span>` : '';
                         const contentHtml = `
-                                    <img src="${avatar || '/img/default-user.svg'}" class="w-10 h-10 rounded-full object-cover" onerror="this.onerror=null;this.src='/img/default-user.svg';" />
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center justify-between">
-                                            <p class="text-sm font-semibold text-gray-800 truncate" data-role="conversation-name">${otherUser.name}</p>
-                                            ${unreadHtml}
-                                        </div>
-                                        <p class="text-xs text-gray-500 truncate" data-role="conversation-message">${lastMessage}</p>
-                                    </div>
-                                `;
+                                                    <img src="${avatar || '/img/default-user.svg'}" class="w-10 h-10 rounded-full object-cover" onerror="this.onerror=null;this.src='/img/default-user.svg';" />
+                                                    <div class="flex-1 min-w-0">
+                                                        <div class="flex items-center justify-between">
+                                                            <p class="text-sm font-semibold text-gray-800 truncate" data-role="conversation-name">${otherUser.name}</p>
+                                                            ${unreadHtml}
+                                                        </div>
+                                                        <p class="text-xs text-gray-500 truncate" data-role="conversation-message">${lastMessage}</p>
+                                                    </div>
+                                                `;
 
                         if (row.innerHTML !== contentHtml) {
                             row.innerHTML = contentHtml;
@@ -1430,26 +1480,26 @@
             const chat = document.createElement('div');
             chat.className = 'bg-white w-72 rounded-xl shadow-xl border border-gray-200 flex flex-col';
             chat.innerHTML = `
-                            <div class="bg-[#1F5EDB] text-white px-3 py-2 rounded-t-xl flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <img src="${userPhoto || '/img/default-user.svg'}" class="w-7 h-7 rounded-full object-cover" onerror="this.onerror=null;this.src='/img/default-user.svg';" />
-                                    <span class="text-sm font-semibold truncate" style="max-width: 140px;">${userName}</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <button type="button" class="text-white text-xs" data-action="minimize"><i class="fas fa-minus"></i></button>
-                                    <button type="button" class="text-white text-xs" data-action="close"><i class="fas fa-times"></i></button>
-                                </div>
-                            </div>
-                            <div class="p-3 bg-slate-50 space-y-2 overflow-y-auto" style="height: 220px;"></div>
-                            <div class="border-t border-gray-200 p-2 bg-white rounded-b-xl">
-                                <form class="flex items-center gap-2">
-                                    <input type="text" class="flex-1 border border-gray-200 rounded-full px-3 py-1 text-sm" placeholder="Digite...">
-                                    <button type="submit" class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
-                                        <i class="fas fa-paper-plane text-xs"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        `;
+                                            <div class="bg-[#1F5EDB] text-white px-3 py-2 rounded-t-xl flex items-center justify-between">
+                                                <div class="flex items-center gap-2">
+                                                    <img src="${userPhoto || '/img/default-user.svg'}" class="w-7 h-7 rounded-full object-cover" onerror="this.onerror=null;this.src='/img/default-user.svg';" />
+                                                    <span class="text-sm font-semibold truncate" style="max-width: 140px;">${userName}</span>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <button type="button" class="text-white text-xs" data-action="minimize"><i class="fas fa-minus"></i></button>
+                                                    <button type="button" class="text-white text-xs" data-action="close"><i class="fas fa-times"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="p-3 bg-slate-50 space-y-2 overflow-y-auto" style="height: 220px;"></div>
+                                            <div class="border-t border-gray-200 p-2 bg-white rounded-b-xl">
+                                                <form class="flex items-center gap-2">
+                                                    <input type="text" class="flex-1 border border-gray-200 rounded-full px-3 py-1 text-sm" placeholder="Digite...">
+                                                    <button type="submit" class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                                                        <i class="fas fa-paper-plane text-xs"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        `;
 
             const body = chat.children[1];
             const footer = chat.children[2];
@@ -1649,398 +1699,472 @@
             });
         }
 
-        function acceptInvite(userId) {
-            fetch(`/connection/accept/${userId}`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire('Conexao aceita!', data.message, 'success').then(() => location.reload());
-                    } else {
-                        Swal.fire('Ops!', data.message, 'warning');
-                    }
-                })
-                .catch(() => {
-                    Swal.fire('Ops!', 'Erro ao aceitar.', 'error');
-                });
-        }
-
-        function togglePanel(id) {
-            const panel = document.getElementById(id);
-            if (!panel) {
-                return;
-            }
-
-            panel.classList.toggle('hidden');
-        }
-
-        function copyPostLink(button) {
-            const link = button.getAttribute('data-copy');
-            if (!link) {
-                return;
-            }
-
-            navigator.clipboard.writeText(link).then(() => {
-                button.textContent = 'Link copiado';
-                setTimeout(() => {
-                    button.textContent = 'Copiar link';
-                }, 1500);
-            });
-        }
-
-        document.querySelectorAll('.js-confirm-delete').forEach((form) => {
-            form.addEventListener('submit', (event) => {
-                event.preventDefault();
-
-                Swal.fire({
-                    title: form.dataset.confirmTitle || 'Remover?'
-                    ,
-                    text: form.dataset.confirmText || 'Esta acao nao pode ser desfeita.'
-                    ,
-                    icon: 'warning'
-                    ,
-                    showCancelButton: true
-                    ,
-                    confirmButtonColor: '#d33'
-                    ,
-                    cancelButtonColor: '#6c757d'
-                    ,
-                    confirmButtonText: 'Sim, remover'
-                    ,
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-        });
-
-        const postForm = document.getElementById('post-form');
-        const postMedia = document.getElementById('post-media');
-        const dropzone = document.getElementById('post-dropzone');
-        const selectFile = document.getElementById('post-select-file');
-        const progressWrap = document.getElementById('post-upload-progress');
-        const progressBar = document.getElementById('post-upload-bar');
-        const progressText = document.getElementById('post-upload-text');
-        const uploadName = document.getElementById('post-upload-name');
-        const previewTop = document.getElementById('post-preview-top');
-        const previewTopImg = document.getElementById('post-preview-top-img');
-        const previewInline = document.getElementById('post-preview-inline');
-        const previewInlineImg = document.getElementById('post-preview-inline-img');
-        const previewInlineName = document.getElementById('post-preview-inline-name');
-        const previewRemove = document.getElementById('post-preview-remove');
-        const emojiToggle = document.getElementById('emoji-toggle');
-        const emojiPicker = document.getElementById('emoji-picker');
-        const maxPostImages = 5;
-
-        const showUploadLimitAlert = (message) => {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire('Atenção', message, 'warning');
-            } else if (typeof toastr !== 'undefined') {
-                toastr.warning(message);
-            } else {
-                console.warn(message);
-            }
-        };
-
-        const validatePostImages = (files) => {
-            const count = files ? files.length : 0;
-            if (count < 1) {
-                showUploadLimitAlert('Selecione pelo menos 1 imagem para publicar.');
-                return false;
-            }
-            if (count > maxPostImages) {
-                showUploadLimitAlert(`Você pode enviar no máximo ${maxPostImages} imagens.`);
-                return false;
-            }
-            return true;
-        };
-
-        const formatUploadName = (files) => {
-            if (!files || !files.length) {
-                return 'Nenhuma imagem selecionada';
-            }
-
-            if (files.length === 1) {
-                return files[0].name;
-            }
-
-            return `${files.length} imagens selecionadas`;
-        };
-
-        const updateUploadName = (files) => {
-            if (!uploadName) {
-                return;
-            }
-
-            uploadName.textContent = formatUploadName(files);
-        };
-
-        const showPreview = (file, total) => {
-            if (!file || !previewTopImg || !previewInlineImg) {
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const src = event.target ? event.target.result : null;
-                if (!src) {
+        function refuseInvite(userId) {
+            Swal.fire({
+                title: 'Recusar solicitacao?',
+                text: 'Deseja recusar este pedido de conexao?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, recusar',
+                cancelButtonText: 'Voltar'
+            }).then((result) => {
+                if (!result.isConfirmed) {
                     return;
                 }
 
-                previewTopImg.src = src;
-                previewInlineImg.src = src;
-                if (previewInlineName) {
-                    const extra = total && total > 1 ? ` (+${total - 1})` : '';
-                    previewInlineName.textContent = `${file.name}${extra}`;
-                }
-                if (previewTop) {
-                    previewTop.classList.remove('hidden');
-                }
-                if (previewInline) {
-                    previewInline.classList.remove('hidden');
-                    previewInline.classList.add('flex');
-                }
-            };
-            reader.readAsDataURL(file);
-        };
-
-        const clearPreview = () => {
-            if (previewTop) {
-                previewTop.classList.add('hidden');
-            }
-            if (previewInline) {
-                previewInline.classList.add('hidden');
-                previewInline.classList.remove('flex');
-            }
-            if (previewTopImg) {
-                previewTopImg.src = '';
-            }
-            if (previewInlineImg) {
-                previewInlineImg.src = '';
-            }
-            if (previewInlineName) {
-                previewInlineName.textContent = '';
-            }
-        };
-
-        if (selectFile && postMedia) {
-            selectFile.addEventListener('click', () => postMedia.click());
+                fetch(`/connection/remove/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Recusado!', data.message, 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Ops!', data.message, 'warning');
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire('Ops!', 'Erro ao recusar.', 'error');
+                    });
+            });
         }
 
-        if (postMedia) {
-            postMedia.addEventListener('change', () => {
-                const files = postMedia.files;
-                if (files && files.length > maxPostImages) {
+        function blockUser(userId) {
+                if (!userId) return;
+
+                Swal.fire({
+                    title: 'Bloquear usuario?',
+                    text: 'Voce deixara de ver as publicacoes desta pessoa e ela nao podera mais te enviar mensagens. Esta acao pode ser desfeita nas configuracoes.',
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sim, bloquear',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+
+                    fetch(`/connection/block/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Bloqueado!', data.message || 'Usuario bloqueado com sucesso.', 'success').then(() => location.reload());
+                            } else {
+                                Swal.fire('Ops!', data.message || 'Nao foi possivel bloquear o usuario.', 'warning');
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire('Ops!', 'Erro ao processar o bloqueio.', 'error');
+                        });
+                });
+            }
+
+            function acceptInvite(userId) {
+                fetch(`/connection/accept/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Conexao aceita!', data.message, 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Ops!', data.message, 'warning');
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire('Ops!', 'Erro ao aceitar.', 'error');
+                    });
+            }
+
+            function togglePanel(id) {
+                const panel = document.getElementById(id);
+                if (!panel) {
+                    return;
+                }
+
+                panel.classList.toggle('hidden');
+            }
+
+            function copyPostLink(button) {
+                const link = button.getAttribute('data-copy');
+                if (!link) {
+                    return;
+                }
+
+                navigator.clipboard.writeText(link).then(() => {
+                    button.textContent = 'Link copiado';
+                    setTimeout(() => {
+                        button.textContent = 'Copiar link';
+                    }, 1500);
+                });
+            }
+
+            document.querySelectorAll('.js-confirm-delete').forEach((form) => {
+                form.addEventListener('submit', (event) => {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: form.dataset.confirmTitle || 'Remover?'
+                        ,
+                        text: form.dataset.confirmText || 'Esta acao nao pode ser desfeita.'
+                        ,
+                        icon: 'warning'
+                        ,
+                        showCancelButton: true
+                        ,
+                        confirmButtonColor: '#d33'
+                        ,
+                        cancelButtonColor: '#6c757d'
+                        ,
+                        confirmButtonText: 'Sim, remover'
+                        ,
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            const postForm = document.getElementById('post-form');
+            const postMedia = document.getElementById('post-media');
+            const dropzone = document.getElementById('post-dropzone');
+            const selectFile = document.getElementById('post-select-file');
+            const progressWrap = document.getElementById('post-upload-progress');
+            const progressBar = document.getElementById('post-upload-bar');
+            const progressText = document.getElementById('post-upload-text');
+            const uploadName = document.getElementById('post-upload-name');
+            const previewTop = document.getElementById('post-preview-top');
+            const previewTopImg = document.getElementById('post-preview-top-img');
+            const previewInline = document.getElementById('post-preview-inline');
+            const previewInlineImg = document.getElementById('post-preview-inline-img');
+            const previewInlineName = document.getElementById('post-preview-inline-name');
+            const previewRemove = document.getElementById('post-preview-remove');
+            const emojiToggle = document.getElementById('emoji-toggle');
+            const emojiPicker = document.getElementById('emoji-picker');
+            const maxPostImages = 5;
+
+            const showUploadLimitAlert = (message) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire('Atenção', message, 'warning');
+                } else if (typeof toastr !== 'undefined') {
+                    toastr.warning(message);
+                } else {
+                    console.warn(message);
+                }
+            };
+
+            const validatePostImages = (files) => {
+                const count = files ? files.length : 0;
+                if (count < 1) {
+                    showUploadLimitAlert('Selecione pelo menos 1 imagem para publicar.');
+                    return false;
+                }
+                if (count > maxPostImages) {
+                    showUploadLimitAlert(`Você pode enviar no máximo ${maxPostImages} imagens.`);
+                    return false;
+                }
+                return true;
+            };
+
+            const formatUploadName = (files) => {
+                if (!files || !files.length) {
+                    return 'Nenhuma imagem selecionada';
+                }
+
+                if (files.length === 1) {
+                    return files[0].name;
+                }
+
+                return `${files.length} imagens selecionadas`;
+            };
+
+            const updateUploadName = (files) => {
+                if (!uploadName) {
+                    return;
+                }
+
+                uploadName.textContent = formatUploadName(files);
+            };
+
+            const showPreview = (file, total) => {
+                if (!file || !previewTopImg || !previewInlineImg) {
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const src = event.target ? event.target.result : null;
+                    if (!src) {
+                        return;
+                    }
+
+                    previewTopImg.src = src;
+                    previewInlineImg.src = src;
+                    if (previewInlineName) {
+                        const extra = total && total > 1 ? ` (+${total - 1})` : '';
+                        previewInlineName.textContent = `${file.name}${extra}`;
+                    }
+                    if (previewTop) {
+                        previewTop.classList.remove('hidden');
+                    }
+                    if (previewInline) {
+                        previewInline.classList.remove('hidden');
+                        previewInline.classList.add('flex');
+                    }
+                };
+                reader.readAsDataURL(file);
+            };
+
+            const clearPreview = () => {
+                if (previewTop) {
+                    previewTop.classList.add('hidden');
+                }
+                if (previewInline) {
+                    previewInline.classList.add('hidden');
+                    previewInline.classList.remove('flex');
+                }
+                if (previewTopImg) {
+                    previewTopImg.src = '';
+                }
+                if (previewInlineImg) {
+                    previewInlineImg.src = '';
+                }
+                if (previewInlineName) {
+                    previewInlineName.textContent = '';
+                }
+            };
+
+            if (selectFile && postMedia) {
+                selectFile.addEventListener('click', () => postMedia.click());
+            }
+
+            if (postMedia) {
+                postMedia.addEventListener('change', () => {
+                    const files = postMedia.files;
+                    if (files && files.length > maxPostImages) {
+                        postMedia.value = '';
+                        updateUploadName(null);
+                        clearPreview();
+                        showUploadLimitAlert(`Você pode selecionar no máximo ${maxPostImages} imagens.`);
+                        return;
+                    }
+                    const file = files && files.length ? files[0] : null;
+                    updateUploadName(files);
+                    if (file) {
+                        showPreview(file, files.length);
+                    } else {
+                        clearPreview();
+                    }
+                });
+            }
+
+            if (previewRemove && postMedia) {
+                previewRemove.addEventListener('click', () => {
                     postMedia.value = '';
                     updateUploadName(null);
                     clearPreview();
-                    showUploadLimitAlert(`Você pode selecionar no máximo ${maxPostImages} imagens.`);
-                    return;
-                }
-                const file = files && files.length ? files[0] : null;
-                updateUploadName(files);
-                if (file) {
-                    showPreview(file, files.length);
-                } else {
-                    clearPreview();
-                }
-            });
-        }
-
-        if (previewRemove && postMedia) {
-            previewRemove.addEventListener('click', () => {
-                postMedia.value = '';
-                updateUploadName(null);
-                clearPreview();
-            });
-        }
-
-        if (dropzone && postMedia) {
-            dropzone.addEventListener('dragover', (event) => {
-                event.preventDefault();
-                dropzone.classList.add('is-dragover');
-            });
-
-            dropzone.addEventListener('dragleave', () => {
-                dropzone.classList.remove('is-dragover');
-            });
-
-            dropzone.addEventListener('drop', (event) => {
-                event.preventDefault();
-                dropzone.classList.remove('is-dragover');
-
-                const files = event.dataTransfer ? event.dataTransfer.files : [];
-                if (!files || !files.length) {
-                    return;
-                }
-
-                if (files.length > maxPostImages) {
-                    showUploadLimitAlert(`Você pode enviar no máximo ${maxPostImages} imagens.`);
-                    return;
-                }
-
-                const dataTransfer = new DataTransfer();
-                Array.from(files).forEach((file) => dataTransfer.items.add(file));
-                postMedia.files = dataTransfer.files;
-                const file = postMedia.files[0];
-                updateUploadName(postMedia.files);
-                showPreview(file, postMedia.files.length);
-            });
-        }
-
-        const initCarousels = () => {
-            document.querySelectorAll('[data-carousel]').forEach((carousel) => {
-                const track = carousel.querySelector('[data-track]');
-                if (!track) {
-                    return;
-                }
-
-                const total = parseInt(carousel.getAttribute('data-total') || track.children.length, 10);
-                let index = parseInt(carousel.getAttribute('data-index') || '0', 10);
-                const counter = carousel.querySelector('[data-counter]');
-                const prev = carousel.querySelector('[data-prev]');
-                const next = carousel.querySelector('[data-next]');
-
-                const update = () => {
-                    if (total <= 1) {
-                        return;
-                    }
-                    if (index < 0) {
-                        index = total - 1;
-                    }
-                    if (index >= total) {
-                        index = 0;
-                    }
-                    track.style.transform = `translateX(-${index * 100}%)`;
-                    if (counter) {
-                        counter.textContent = `${index + 1}/${total}`;
-                    }
-                    carousel.setAttribute('data-index', String(index));
-                };
-
-                if (prev) {
-                    prev.addEventListener('click', () => {
-                        index -= 1;
-                        update();
-                    });
-                }
-
-                if (next) {
-                    next.addEventListener('click', () => {
-                        index += 1;
-                        update();
-                    });
-                }
-
-                update();
-            });
-        };
-
-        initCarousels();
-
-        if (postForm) {
-            postForm.addEventListener('submit', (event) => {
-                if (!postMedia || !validatePostImages(postMedia.files)) {
-                    event.preventDefault();
-                    return;
-                }
-            });
-        }
-
-        const closeAllEmojiPickers = () => {
-            document.querySelectorAll('.emoji-picker-panel').forEach((panel) => {
-                panel.classList.add('hidden');
-            });
-        };
-
-        const initEmojiPicker = (toggle, picker) => {
-            if (!toggle || !picker) {
-                return;
+                });
             }
 
-            const emojiTabs = picker.querySelectorAll('.emoji-tab');
-            const emojiItems = picker.querySelectorAll('.emoji-item');
-            const targetId = picker.getAttribute('data-target');
-
-            const applyEmojiCategory = (category) => {
-                emojiItems.forEach((item) => {
-                    const itemCategory = item.getAttribute('data-category');
-                    const show = category === 'all' || itemCategory === category;
-                    item.classList.toggle('hidden', !show);
+            if (dropzone && postMedia) {
+                dropzone.addEventListener('dragover', (event) => {
+                    event.preventDefault();
+                    dropzone.classList.add('is-dragover');
                 });
 
-                emojiTabs.forEach((tab) => {
-                    tab.classList.toggle('is-active', tab.getAttribute('data-category') === category);
+                dropzone.addEventListener('dragleave', () => {
+                    dropzone.classList.remove('is-dragover');
+                });
+
+                dropzone.addEventListener('drop', (event) => {
+                    event.preventDefault();
+                    dropzone.classList.remove('is-dragover');
+
+                    const files = event.dataTransfer ? event.dataTransfer.files : [];
+                    if (!files || !files.length) {
+                        return;
+                    }
+
+                    if (files.length > maxPostImages) {
+                        showUploadLimitAlert(`Você pode enviar no máximo ${maxPostImages} imagens.`);
+                        return;
+                    }
+
+                    const dataTransfer = new DataTransfer();
+                    Array.from(files).forEach((file) => dataTransfer.items.add(file));
+                    postMedia.files = dataTransfer.files;
+                    const file = postMedia.files[0];
+                    updateUploadName(postMedia.files);
+                    showPreview(file, postMedia.files.length);
+                });
+            }
+
+            const initCarousels = () => {
+                document.querySelectorAll('[data-carousel]').forEach((carousel) => {
+                    const track = carousel.querySelector('[data-track]');
+                    if (!track) {
+                        return;
+                    }
+
+                    const total = parseInt(carousel.getAttribute('data-total') || track.children.length, 10);
+                    let index = parseInt(carousel.getAttribute('data-index') || '0', 10);
+                    const counter = carousel.querySelector('[data-counter]');
+                    const prev = carousel.querySelector('[data-prev]');
+                    const next = carousel.querySelector('[data-next]');
+
+                    const update = () => {
+                        if (total <= 1) {
+                            return;
+                        }
+                        if (index < 0) {
+                            index = total - 1;
+                        }
+                        if (index >= total) {
+                            index = 0;
+                        }
+                        track.style.transform = `translateX(-${index * 100}%)`;
+                        if (counter) {
+                            counter.textContent = `${index + 1}/${total}`;
+                        }
+                        carousel.setAttribute('data-index', String(index));
+                    };
+
+                    if (prev) {
+                        prev.addEventListener('click', () => {
+                            index -= 1;
+                            update();
+                        });
+                    }
+
+                    if (next) {
+                        next.addEventListener('click', () => {
+                            index += 1;
+                            update();
+                        });
+                    }
+
+                    update();
                 });
             };
 
-            if (emojiTabs.length) {
-                emojiTabs.forEach((tab) => {
-                    tab.addEventListener('click', () => {
-                        const category = tab.getAttribute('data-category') || 'all';
-                        applyEmojiCategory(category);
-                    });
-                });
+            initCarousels();
 
-                const initial = picker.querySelector('.emoji-tab.is-active') || emojiTabs[0];
-                const initialCategory = initial ? initial.getAttribute('data-category') : 'all';
-                applyEmojiCategory(initialCategory || 'all');
-            }
-
-            toggle.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const isHidden = picker.classList.contains('hidden');
-                closeAllEmojiPickers();
-                picker.classList.toggle('hidden', !isHidden);
-            });
-
-            emojiItems.forEach((button) => {
-                button.addEventListener('click', () => {
-                    const emoji = button.getAttribute('data-emoji') || '';
-                    const target = targetId ? document.getElementById(targetId) : null;
-                    if (!target || emoji === '') {
+            if (postForm) {
+                postForm.addEventListener('submit', (event) => {
+                    if (!postMedia || !validatePostImages(postMedia.files)) {
+                        event.preventDefault();
                         return;
                     }
-
-                    const start = target.selectionStart || 0;
-                    const end = target.selectionEnd || 0;
-                    const value = target.value || '';
-                    target.value = value.slice(0, start) + emoji + value.slice(end);
-                    target.focus();
-                    target.selectionStart = target.selectionEnd = start + emoji.length;
                 });
-            });
-        };
-
-        if (emojiToggle && emojiPicker) {
-            initEmojiPicker(emojiToggle, emojiPicker);
-        }
-
-        if (conversationEmojiToggle && conversationEmojiPicker) {
-            initEmojiPicker(conversationEmojiToggle, conversationEmojiPicker);
-        }
-
-        document.querySelectorAll('.comment-emoji-toggle').forEach((toggle) => {
-            const pickerId = toggle.getAttribute('data-picker');
-            const picker = pickerId ? document.getElementById(pickerId) : null;
-            initEmojiPicker(toggle, picker);
-        });
-
-        document.addEventListener('click', (event) => {
-            if (event.target.closest('.emoji-picker-panel') || event.target.closest('.comment-emoji-toggle') || event.target.closest('#emoji-toggle') || event.target.closest('#conversation-emoji-toggle')) {
-                return;
             }
 
-            closeAllEmojiPickers();
-        });
+            const closeAllEmojiPickers = () => {
+                document.querySelectorAll('.emoji-picker-panel').forEach((panel) => {
+                    panel.classList.add('hidden');
+                });
+            };
 
-        setActivePanel('feed');
-    </script>
+            const initEmojiPicker = (toggle, picker) => {
+                if (!toggle || !picker) {
+                    return;
+                }
+
+                const emojiTabs = picker.querySelectorAll('.emoji-tab');
+                const emojiItems = picker.querySelectorAll('.emoji-item');
+                const targetId = picker.getAttribute('data-target');
+
+                const applyEmojiCategory = (category) => {
+                    emojiItems.forEach((item) => {
+                        const itemCategory = item.getAttribute('data-category');
+                        const show = category === 'all' || itemCategory === category;
+                        item.classList.toggle('hidden', !show);
+                    });
+
+                    emojiTabs.forEach((tab) => {
+                        tab.classList.toggle('is-active', tab.getAttribute('data-category') === category);
+                    });
+                };
+
+                if (emojiTabs.length) {
+                    emojiTabs.forEach((tab) => {
+                        tab.addEventListener('click', () => {
+                            const category = tab.getAttribute('data-category') || 'all';
+                            applyEmojiCategory(category);
+                        });
+                    });
+
+                    const initial = picker.querySelector('.emoji-tab.is-active') || emojiTabs[0];
+                    const initialCategory = initial ? initial.getAttribute('data-category') : 'all';
+                    applyEmojiCategory(initialCategory || 'all');
+                }
+
+                toggle.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const isHidden = picker.classList.contains('hidden');
+                    closeAllEmojiPickers();
+                    picker.classList.toggle('hidden', !isHidden);
+                });
+
+                emojiItems.forEach((button) => {
+                    button.addEventListener('click', () => {
+                        const emoji = button.getAttribute('data-emoji') || '';
+                        const target = targetId ? document.getElementById(targetId) : null;
+                        if (!target || emoji === '') {
+                            return;
+                        }
+
+                        const start = target.selectionStart || 0;
+                        const end = target.selectionEnd || 0;
+                        const value = target.value || '';
+                        target.value = value.slice(0, start) + emoji + value.slice(end);
+                        target.focus();
+                        target.selectionStart = target.selectionEnd = start + emoji.length;
+                    });
+                });
+            };
+
+            if (emojiToggle && emojiPicker) {
+                initEmojiPicker(emojiToggle, emojiPicker);
+            }
+
+            if (conversationEmojiToggle && conversationEmojiPicker) {
+                initEmojiPicker(conversationEmojiToggle, conversationEmojiPicker);
+            }
+
+            document.querySelectorAll('.comment-emoji-toggle').forEach((toggle) => {
+                const pickerId = toggle.getAttribute('data-picker');
+                const picker = pickerId ? document.getElementById(pickerId) : null;
+                initEmojiPicker(toggle, picker);
+            });
+
+            document.addEventListener('click', (event) => {
+                if (event.target.closest('.emoji-picker-panel') || event.target.closest('.comment-emoji-toggle') || event.target.closest('#emoji-toggle') || event.target.closest('#conversation-emoji-toggle')) {
+                    return;
+                }
+
+                closeAllEmojiPickers();
+            });
+
+            setActivePanel('feed');
+        </script>
 @endpush

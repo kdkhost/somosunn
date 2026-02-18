@@ -10,9 +10,33 @@ use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
+    private function getBlockedUserIds()
+    {
+        if (!Auth::check())
+            return [];
+
+        return \App\Models\Connection::where('status', 'blocked')
+            ->where(function ($q) {
+                $q->where('requester_id', Auth::id())->orWhere('requested_id', Auth::id());
+            })
+            ->get()
+            ->map(function ($connection) {
+                return $connection->requester_id === Auth::id()
+                    ? $connection->requested_id
+                    : $connection->requester_id;
+            })
+            ->unique()
+            ->values()
+            ->toArray();
+    }
+
     public function index()
     {
+        $blockedUserIds = $this->getBlockedUserIds();
         $conversations = Auth::user()->conversations()
+            ->whereDoesntHave('users', function ($q) use ($blockedUserIds) {
+                $q->whereIn('users.id', $blockedUserIds);
+            })
             ->with(['users'])
             ->withCount([
                 'messages as unread_count' => function ($q) {
@@ -26,6 +50,10 @@ class ChatController extends Controller
 
     public function start($userId)
     {
+        if (in_array($userId, $this->getBlockedUserIds())) {
+            return redirect()->route('chat.index')->with('error', 'Usuário bloqueado.');
+        }
+
         $targetUser = User::findOrFail($userId);
         $me = Auth::user();
 
@@ -55,6 +83,16 @@ class ChatController extends Controller
 
     public function show(Conversation $conversation)
     {
+        $blockedUserIds = $this->getBlockedUserIds();
+
+        // Check if any user in the conversation is blocked
+        if ($conversation->users()->whereIn('users.id', $blockedUserIds)->exists()) {
+            if (request()->ajax() || request()->expectsJson()) {
+                return response()->json(['error' => 'Usuário bloqueado.'], 403);
+            }
+            return redirect()->route('chat.index')->with('error', 'Usuário bloqueado.');
+        }
+
         if (!$conversation->users->contains(Auth::id())) {
             abort(403);
         }
@@ -72,6 +110,9 @@ class ChatController extends Controller
         }
 
         $conversations = Auth::user()->conversations()
+            ->whereDoesntHave('users', function ($q) use ($blockedUserIds) {
+                $q->whereIn('users.id', $blockedUserIds);
+            })
             ->with(['users'])
             ->withCount([
                 'messages as unread_count' => function ($q) {
@@ -92,12 +133,18 @@ class ChatController extends Controller
         }
 
         $userId = Auth::id();
-        $conversations = Auth::user()->conversations()->with([
-            'users',
-            'messages' => function ($q) {
-                $q->latest()->limit(1);
-            }
-        ])
+        $blockedUserIds = $this->getBlockedUserIds();
+
+        $conversations = Auth::user()->conversations()
+            ->whereDoesntHave('users', function ($q) use ($blockedUserIds) {
+                $q->whereIn('users.id', $blockedUserIds);
+            })
+            ->with([
+                'users',
+                'messages' => function ($q) {
+                    $q->latest()->limit(1);
+                }
+            ])
             ->withCount([
                 'messages as unread_count' => function ($q) {
                     $q->where('user_id', '!=', Auth::id())->whereNull('read_at');
@@ -116,6 +163,12 @@ class ChatController extends Controller
     {
         if (!$conversation->users->contains(Auth::id())) {
             abort(403);
+        }
+
+        // Prevent sending to blocked users
+        $blockedUserIds = $this->getBlockedUserIds();
+        if ($conversation->users()->whereIn('users.id', $blockedUserIds)->exists()) {
+            return response()->json(['error' => 'Usuário bloqueado.'], 403);
         }
 
         $request->validate(['body' => 'required']);
@@ -150,6 +203,10 @@ class ChatController extends Controller
      */
     public function withUser(User $user)
     {
+        if (in_array($user->id, $this->getBlockedUserIds())) {
+            return response()->json(['success' => false, 'message' => 'Usuário bloqueado.'], 403);
+        }
+
         $me = Auth::user();
 
         $conversation = $me->conversations()->whereHas('users', function ($q) use ($user) {
@@ -196,6 +253,10 @@ class ChatController extends Controller
      */
     public function storeMessageWithUser(Request $request, User $user)
     {
+        if (in_array($user->id, $this->getBlockedUserIds())) {
+            return response()->json(['success' => false, 'message' => 'Usuário bloqueado.'], 403);
+        }
+
         $me = Auth::user();
 
         $conversation = $me->conversations()->whereHas('users', function ($q) use ($user) {

@@ -90,9 +90,19 @@ class SocialController extends Controller
             abort(404, 'Comunidade temporariamente indisponível');
         }
 
-        $blockedUserIds = Connection::where(function ($q) {
-            $q->where('requester_id', Auth::id())->orWhere('requested_id', Auth::id());
-        })->where('status', 'blocked')->pluck('requester_id', 'requested_id')->flatten()->unique()->toArray();
+        $blockedUserIds = Connection::where('status', 'blocked')
+            ->where(function ($q) {
+                $q->where('requester_id', Auth::id())->orWhere('requested_id', Auth::id());
+            })
+            ->get()
+            ->map(function ($connection) {
+                return $connection->requester_id === Auth::id()
+                    ? $connection->requested_id
+                    : $connection->requester_id;
+            })
+            ->unique()
+            ->values()
+            ->toArray();
 
         $connectedUserIds = Connection::where('status', 'accepted')
             ->where(function ($q) {
@@ -114,21 +124,38 @@ class SocialController extends Controller
                 ->suggest(Auth::user(), $blockedUserIds, $connectedUserIds, 5);
         }
 
-        $connectionMap = [];
-        if (Auth::check() && $recommendedUsers->isNotEmpty()) {
-            $authId = Auth::id();
-            $recommendedIds = $recommendedUsers->pluck('id')->all();
-            $connections = Connection::where(function ($q) use ($authId, $recommendedIds) {
-                $q->where('requester_id', $authId)->whereIn('requested_id', $recommendedIds);
-            })->orWhere(function ($q) use ($authId, $recommendedIds) {
-                $q->where('requested_id', $authId)->whereIn('requester_id', $recommendedIds);
-            })->get();
+        $pendingRequests = collect();
+        if (Auth::check()) {
+            $pendingRequests = Connection::where('requested_id', Auth::id())
+                ->where('status', 'pending')
+                ->with('requester')
+                ->get();
+        }
 
-            foreach ($connections as $connection) {
-                $otherId = $connection->requester_id === $authId
-                    ? $connection->requested_id
-                    : $connection->requester_id;
-                $connectionMap[$otherId] = $connection;
+        $connectionMap = [];
+        if (Auth::check()) {
+            $authId = Auth::id();
+
+            // Map received pending requests
+            foreach ($pendingRequests as $conn) {
+                $connectionMap[$conn->requester_id] = $conn;
+            }
+
+            // Map recommended users connections
+            if ($recommendedUsers->isNotEmpty()) {
+                $recommendedIds = $recommendedUsers->pluck('id')->all();
+                $connections = Connection::where(function ($q) use ($authId, $recommendedIds) {
+                    $q->where('requester_id', $authId)->whereIn('requested_id', $recommendedIds);
+                })->orWhere(function ($q) use ($authId, $recommendedIds) {
+                    $q->where('requested_id', $authId)->whereIn('requester_id', $recommendedIds);
+                })->get();
+
+                foreach ($connections as $connection) {
+                    $otherId = $connection->requester_id === $authId
+                        ? $connection->requested_id
+                        : $connection->requester_id;
+                    $connectionMap[$otherId] = $connection;
+                }
             }
         }
 
@@ -153,7 +180,15 @@ class SocialController extends Controller
             ->pluck('post_id')
             ->all();
 
-        $posts = Post::with(['user', 'sharedTo', 'comments.user', 'reactions', 'media'])
+        $posts = Post::with([
+            'user',
+            'sharedTo',
+            'comments' => function ($q) use ($blockedUserIds) {
+                $q->whereNotIn('user_id', $blockedUserIds)->with('user');
+            },
+            'reactions',
+            'media'
+        ])
             ->whereNotIn('user_id', $blockedUserIds)
             ->when(!empty($hiddenPostIds), function ($query) use ($hiddenPostIds) {
                 $query->whereNotIn('posts.id', $hiddenPostIds);
@@ -215,6 +250,7 @@ class SocialController extends Controller
                 'isDemo' => true,
                 'shareTargets' => User::whereIn('id', $connectedUserIds)->orderBy('name')->get(['id', 'name']),
                 'recommendedUsers' => $recommendedUsers,
+                'pendingRequests' => $pendingRequests,
                 'connectionMap' => $connectionMap,
                 'adsEnabled' => $adsEnabled,
                 'adsCode' => $adsCode,
@@ -226,6 +262,7 @@ class SocialController extends Controller
             'posts' => $posts,
             'shareTargets' => User::whereIn('id', $connectedUserIds)->orderBy('name')->get(['id', 'name']),
             'recommendedUsers' => $recommendedUsers,
+            'pendingRequests' => $pendingRequests,
             'connectionMap' => $connectionMap,
             'adsEnabled' => $adsEnabled,
             'adsCode' => $adsCode,
@@ -256,7 +293,32 @@ class SocialController extends Controller
             }
         }
 
-        $postsQuery = Post::with(['user', 'sharedTo', 'comments.user', 'reactions', 'media'])
+        $blockedUserIds = [];
+        if (Auth::check()) {
+            $blockedUserIds = Connection::where('status', 'blocked')
+                ->where(function ($q) {
+                    $q->where('requester_id', Auth::id())->orWhere('requested_id', Auth::id());
+                })
+                ->get()
+                ->map(function ($connection) {
+                    return $connection->requester_id === Auth::id()
+                        ? $connection->requested_id
+                        : $connection->requester_id;
+                })
+                ->unique()
+                ->values()
+                ->toArray();
+        }
+
+        $postsQuery = Post::with([
+            'user',
+            'sharedTo',
+            'comments' => function ($q) use ($blockedUserIds) {
+                $q->whereNotIn('user_id', $blockedUserIds)->with('user');
+            },
+            'reactions',
+            'media'
+        ])
             ->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
                     ->orWhere('shared_to_user_id', $user->id);

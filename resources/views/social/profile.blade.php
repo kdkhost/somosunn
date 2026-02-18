@@ -196,6 +196,12 @@
                                     <i class="fas fa-user-plus"></i>
                                 </button>
                             @endif
+
+                            <button type="button" onclick="blockUser({{ $user->id }})"
+                                class="bg-gray-100 text-gray-500 w-12 h-12 rounded-full font-bold hover:bg-red-50 hover:text-red-600 transition shadow flex items-center justify-center"
+                                title="Bloquear usuario" aria-label="Bloquear usuario">
+                                <i class="fas fa-ban"></i>
+                            </button>
                         @endif
                     </div>
                 </div>
@@ -203,6 +209,44 @@
         </div>
         @push('scripts')
             <script>
+                function blockUser(userId) {
+                    if (!userId) return;
+
+                    Swal.fire({
+                        title: 'Bloquear usuario?',
+                        text: 'Voce deixara de ver as publicacoes desta pessoa e ela nao podera mais te enviar mensagens.',
+                        icon: 'error',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sim, bloquear',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+                        fetch(`/connection/block/${userId}`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Bloqueado!', data.message || 'Usuario bloqueado com sucesso.', 'success').then(() => location.reload());
+                                } else {
+                                    Swal.fire('Ops!', data.message || 'Nao foi possivel bloquear o usuario.', 'warning');
+                                }
+                            })
+                            .catch(() => {
+                                Swal.fire('Ops!', 'Erro ao processar o bloqueio.', 'error');
+                            });
+                    });
+                }
+
                 function requestConnection(userId) {
                     Swal.fire({
                         title: 'Conectar com este usuário?',
@@ -366,6 +410,10 @@
                                                 class="text-xs text-red-600 hover:text-red-700 font-medium" title="Recusar">
                                                 Recusar
                                             </button>
+                                            <button type="button" onclick="blockUser({{ $requester->id }})"
+                                                class="text-xs text-gray-400 hover:text-red-800" title="Bloquear">
+                                                Bloquear
+                                            </button>
                                         </div>
                                     </div>
                                 @endif
@@ -407,279 +455,279 @@
                 <h3 class="font-bold text-xl text-gray-800">Publicações</h3>
 
                 @forelse($posts as $post)
-                    <div class="bg-white rounded-lg shadow p-4" id="post-{{ $post->id }}">
-                        @php
-                            $viewerId = Auth::id();
-                            $hasLiked = $viewerId ? $post->reactions->firstWhere('user_id', $viewerId) : null;
-                            $likeCount = $post->reactions->count();
-                            $commentCount = $post->comments->count();
-                            $postAvatar = $post->user->profile_photo_url ?? asset('img/default-user.svg');
-                            $postLink = route('social.post.public', $post);
-                        @endphp
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center gap-3">
-                                <a href="{{ route('social.profile', $post->user->email) }}" class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0 block">
-                                    <img src="{{ $postAvatar }}" alt="Avatar" class="w-10 h-10 object-cover hover:opacity-80 transition"
-                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                </a>
-                                <div>
-                                    <a href="{{ route('social.profile', $post->user->email) }}" class="font-bold text-gray-900 hover:text-blue-600 transition">
-                                        {{ $post->user->name }}
-                                    </a>
-                                    <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
-                                </div>
-                            </div>
-                            <div class="relative">
-                                <button type="button" class="text-gray-400 hover:text-gray-600" title="Mais opcoes"
-                                    onclick="togglePanel('menu-{{ $post->id }}')">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </button>
-                                <div id="menu-{{ $post->id }}"
-                                    class="hidden absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow z-10">
-                                    <div class="py-1 text-sm text-gray-700">
-                                        @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                            <form action="{{ route('social.post.destroy', $post) }}" method="POST"
-                                                class="js-confirm-delete" data-confirm-title="Remover publicacao?"
-                                                data-confirm-text="Esta acao nao pode ser desfeita.">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                    class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2">
-                                                    <i class="fas fa-trash"></i>
-                                                    <span>Remover</span>
-                                                </button>
-                                            </form>
-                                            <form action="{{ route('social.post.unpublish', $post) }}" method="POST">
-                                                @csrf
-                                                <button type="submit"
-                                                    class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
-                                                    <i class="fas fa-eye-slash"></i>
-                                                    <span>Despublicar</span>
-                                                </button>
-                                            </form>
-                                        @endif
-                                        @auth
-                                            <form action="{{ route('social.post.hide', $post) }}" method="POST">
-                                                @csrf
-                                                <button type="submit"
-                                                    class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
-                                                    <i class="fas fa-eye"></i>
-                                                    <span>Ocultar postagem</span>
-                                                </button>
-                                            </form>
-                                        @endauth
-                                        @auth
-                                            @if(!(Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                                <button type="button"
-                                                    class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2"
-                                                    onclick="togglePanel('report-{{ $post->id }}'); togglePanel('menu-{{ $post->id }}');">
-                                                    <i class="fas fa-flag"></i>
-                                                    <span>Denunciar</span>
-                                                </button>
-                                            @endif
-                                        @endauth
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="prose max-w-none text-gray-800">
-                            {!! preg_replace(
-                                '/(https?:\/\/[^\s<>"]+)/i',
-                                '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline break-all">$1</a>',
-                                nl2br(e($post->content))
-                            ) !!}
-                        </div>
-
-                        @if($post->media->isNotEmpty())
-                            <div class="mt-3">
+                            <div class="bg-white rounded-lg shadow p-4" id="post-{{ $post->id }}">
                                 @php
-                                    $mediaCount = $post->media->count();
+                                    $viewerId = Auth::id();
+                                    $hasLiked = $viewerId ? $post->reactions->firstWhere('user_id', $viewerId) : null;
+                                    $likeCount = $post->reactions->count();
+                                    $commentCount = $post->comments->count();
+                                    $postAvatar = $post->user->profile_photo_url ?? asset('img/default-user.svg');
+                                    $postLink = route('social.post.public', $post);
                                 @endphp
-                                @if($mediaCount === 1)
-                                    <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
-                                        class="w-full rounded-lg object-cover">
-                                @else
-                                    <div class="relative" data-carousel data-total="{{ $mediaCount }}">
-                                        <div class="overflow-hidden rounded-lg">
-                                            <div class="flex transition-transform duration-300" data-track>
-                                                @foreach($post->media as $media)
-                                                    <img src="{{ asset($media->path) }}" alt="Midia do post"
-                                                        class="w-full shrink-0 object-cover">
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                        <button type="button" data-prev
-                                            class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
-                                            <i class="fas fa-chevron-left"></i>
-                                        </button>
-                                        <button type="button" data-next
-                                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
-                                            <i class="fas fa-chevron-right"></i>
-                                        </button>
-                                        <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full" data-counter>
-                                            1/{{ $mediaCount }}
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <a href="{{ route('social.profile', $post->user->email) }}"
+                                            class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0 block">
+                                            <img src="{{ $postAvatar }}" alt="Avatar"
+                                                class="w-10 h-10 object-cover hover:opacity-80 transition"
+                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                        </a>
+                                        <div>
+                                            <a href="{{ route('social.profile', $post->user->email) }}"
+                                                class="font-bold text-gray-900 hover:text-blue-600 transition">
+                                                {{ $post->user->name }}
+                                            </a>
+                                            <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
                                         </div>
                                     </div>
-                                @endif
-                            </div>
-                        @endif
-
-                        <div class="flex items-center justify-between pt-3 mt-3 border-t text-sm text-gray-500">
-                            @auth
-                                <form action="{{ route('social.post.react', $post) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" aria-label="Curtir"
-                                        class="flex items-center gap-2 transition {{ $hasLiked ? 'text-blue-600' : 'hover:text-blue-600' }}">
-                                        <i class="{{ $hasLiked ? 'fas' : 'far' }} fa-thumbs-up"></i>
-                                        <span class="hidden sm:inline">Curtir</span>
-                                    </button>
-                                </form>
-                            @else
-                                <span class="flex items-center gap-2" aria-label="Curtir">
-                                    <i class="far fa-thumbs-up"></i>
-                                    <span class="hidden sm:inline">Curtir</span>
-                                </span>
-                            @endauth
-
-                            <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
-                                onclick="document.getElementById('comment-{{ $post->id }}').focus();" aria-label="Comentar">
-                                <i class="far fa-comment"></i>
-                                <span class="hidden sm:inline">Comentar</span>
-                            </button>
-
-                            <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
-                                onclick="togglePanel('share-{{ $post->id }}')" aria-label="Compartilhar">
-                                <i class="fas fa-share"></i>
-                                <span class="hidden sm:inline">Compartilhar</span>
-                            </button>
-                        </div>
-
-                        <div class="mt-2 text-xs text-gray-400 flex gap-3">
-                            <span>{{ $likeCount }} curtida{{ $likeCount === 1 ? '' : 's' }}</span>
-                            <span>{{ $commentCount }} comentario{{ $commentCount === 1 ? '' : 's' }}</span>
-                        </div>
-
-                        <div id="share-{{ $post->id }}" class="hidden mt-3 border-t pt-3 space-y-3">
-                            <div class="flex flex-wrap gap-3 text-sm">
-                                <button type="button" class="text-blue-600" data-copy="{{ $postLink }}"
-                                    onclick="copyPostLink(this)">Copiar link</button>
-                                <a class="text-green-600" target="_blank" rel="noopener"
-                                    href="https://wa.me/?text={{ urlencode($postLink) }}">WhatsApp</a>
-                                <a class="text-blue-500" target="_blank" rel="noopener"
-                                    href="https://t.me/share/url?url={{ urlencode($postLink) }}">Telegram</a>
-                                <a class="text-blue-700" target="_blank" rel="noopener"
-                                    href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($postLink) }}">Facebook</a>
-                            </div>
-
-                            @auth
-                                <form action="{{ route('social.post.share', $post) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="text-sm text-gray-600 hover:text-blue-600">
-                                        Compartilhar na comunidade
-                                    </button>
-                                </form>
-
-                                @if($shareTargets->isNotEmpty())
-                                    <form action="{{ route('social.post.share.user', $post) }}" method="POST"
-                                        class="flex flex-col gap-2">
-                                        @csrf
-                                        <div class="flex flex-wrap gap-2">
-                                            <select name="target_user_id" class="border border-gray-200 rounded px-3 py-2 text-sm">
-                                                @foreach($shareTargets as $target)
-                                                    <option value="{{ $target->id }}">{{ $target->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <input type="text" name="message" placeholder="Mensagem opcional"
-                                                class="flex-1 border border-gray-200 rounded px-3 py-2 text-sm">
-                                            <button type="submit"
-                                                class="bg-blue-600 text-white px-3 py-2 rounded text-sm">Enviar</button>
-                                        </div>
-                                    </form>
-                                @endif
-                            @endauth
-                        </div>
-
-                        <div id="report-{{ $post->id }}" class="hidden mt-3 border-t pt-3">
-                            @auth
-                                <form action="{{ route('social.post.report', $post) }}" method="POST"
-                                    class="flex flex-col gap-2">
-                                    @csrf
-                                    <textarea name="reason" rows="2" required
-                                        placeholder="Descreva o motivo da denuncia"
-                                        class="border border-gray-200 rounded px-3 py-2 text-sm"></textarea>
-                                    <button type="submit" class="text-sm text-red-600">Denunciar</button>
-                                </form>
-                            @endauth
-                        </div>
-
-                        @if($post->comments->isNotEmpty())
-                            <div class="mt-4 space-y-3">
-                                @foreach($post->comments as $comment)
-                                    @php
-                                        $commentUser = $comment->user;
-                                        $commentAvatar = $commentUser
-                                            ? $commentUser->profile_photo_url
-                                            : asset('img/default-user.svg');
-                                        $commentName = $commentUser ? $commentUser->name : 'Usuario';
-                                    @endphp
-                                    <div class="flex gap-3">
-                                        <div class="rounded-full w-8 h-8 overflow-hidden flex-shrink-0">
-                                            <img src="{{ $commentAvatar }}" alt="Avatar"
-                                                class="w-8 h-8 object-cover"
-                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                        </div>
-                                        <div class="bg-gray-50 rounded-lg px-3 py-2 w-full">
-                                            <div class="flex justify-between items-center">
-                                                <p class="text-xs font-semibold text-gray-700">{{ $commentName }}</p>
-                                                @if(Auth::check() && (Auth::id() === $comment->user_id || Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                                    <form action="{{ route('social.comment.destroy', $comment) }}" method="POST"
-                                                            class="js-confirm-delete" data-confirm-title="Remover comentario?"
-                                                            data-confirm-text="Esta acao nao pode ser desfeita.">
+                                    <div class="relative">
+                                        <button type="button" class="text-gray-400 hover:text-gray-600" title="Mais opcoes"
+                                            onclick="togglePanel('menu-{{ $post->id }}')">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <div id="menu-{{ $post->id }}"
+                                            class="hidden absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow z-10">
+                                            <div class="py-1 text-sm text-gray-700">
+                                                @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                    <form action="{{ route('social.post.destroy', $post) }}" method="POST"
+                                                        class="js-confirm-delete" data-confirm-title="Remover publicacao?"
+                                                        data-confirm-text="Esta acao nao pode ser desfeita.">
                                                         @csrf
                                                         @method('DELETE')
-                                                            <button type="submit" class="text-xs text-red-500" title="Remover">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
+                                                        <button type="submit"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2">
+                                                            <i class="fas fa-trash"></i>
+                                                            <span>Remover</span>
+                                                        </button>
+                                                    </form>
+                                                    <form action="{{ route('social.post.unpublish', $post) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
+                                                            <i class="fas fa-eye-slash"></i>
+                                                            <span>Despublicar</span>
+                                                        </button>
                                                     </form>
                                                 @endif
+                                                @auth
+                                                    <form action="{{ route('social.post.hide', $post) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2">
+                                                            <i class="fas fa-eye"></i>
+                                                            <span>Ocultar postagem</span>
+                                                        </button>
+                                                    </form>
+                                                @endauth
+                                                @auth
+                                                    @if(!(Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                        <button type="button"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center gap-2"
+                                                            onclick="togglePanel('report-{{ $post->id }}'); togglePanel('menu-{{ $post->id }}');">
+                                                            <i class="fas fa-flag"></i>
+                                                            <span>Denunciar</span>
+                                                        </button>
+                                                    @endif
+                                                @endauth
                                             </div>
-                                            <p class="text-sm text-gray-700">{{ $comment->content }}</p>
                                         </div>
                                     </div>
-                                @endforeach
-                            </div>
-                        @endif
-
-                        @auth
-                            <form action="{{ route('social.post.comment', $post) }}" method="POST"
-                                class="mt-3 flex gap-2">
-                                @csrf
-                                <input type="text" name="content" id="comment-{{ $post->id }}"
-                                    placeholder="Escreva um comentario..."
-                                    class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-                                <div class="relative">
-                                    <button type="button" class="comment-emoji-toggle text-gray-500 hover:text-blue-600"
-                                        data-picker="comment-emoji-{{ $post->id }}" title="Inserir emoji">
-                                        <i class="far fa-smile"></i>
-                                    </button>
-                                    <div id="comment-emoji-{{ $post->id }}" data-target="comment-{{ $post->id }}"
-                                        class="emoji-picker-panel hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
-                                        @include('social.partials.emoji_tabs')
-                                        @include('social.partials.emoji_grid')
-                                    </div>
                                 </div>
-                                <button type="submit"
-                                    class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition">
-                                    Enviar
-                                </button>
-                            </form>
-                        @endauth
-                    </div>
-                    @if(!empty($adsEnabled) && !empty($adsCode) && $loop->iteration % 3 === 0)
-                        <div class="bg-white rounded-lg shadow p-4">
-                            {!! $adsCode !!}
-                        </div>
-                    @endif
+                                <div class="prose max-w-none text-gray-800">
+                                    {!! preg_replace(
+                        '/(https?:\/\/[^\s<>"]+)/i',
+                        '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline break-all">$1</a>',
+                        nl2br(e($post->content))
+                    ) !!}
+                                </div>
+
+                                @if($post->media->isNotEmpty())
+                                    <div class="mt-3">
+                                        @php
+                                            $mediaCount = $post->media->count();
+                                        @endphp
+                                        @if($mediaCount === 1)
+                                            <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
+                                                class="w-full rounded-lg object-cover">
+                                        @else
+                                            <div class="relative" data-carousel data-total="{{ $mediaCount }}">
+                                                <div class="overflow-hidden rounded-lg">
+                                                    <div class="flex transition-transform duration-300" data-track>
+                                                        @foreach($post->media as $media)
+                                                            <img src="{{ asset($media->path) }}" alt="Midia do post"
+                                                                class="w-full shrink-0 object-cover">
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                                <button type="button" data-prev
+                                                    class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </button>
+                                                <button type="button" data-next
+                                                    class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </button>
+                                                <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full"
+                                                    data-counter>
+                                                    1/{{ $mediaCount }}
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                <div class="flex items-center justify-between pt-3 mt-3 border-t text-sm text-gray-500">
+                                    @auth
+                                        <form action="{{ route('social.post.react', $post) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" aria-label="Curtir"
+                                                class="flex items-center gap-2 transition {{ $hasLiked ? 'text-blue-600' : 'hover:text-blue-600' }}">
+                                                <i class="{{ $hasLiked ? 'fas' : 'far' }} fa-thumbs-up"></i>
+                                                <span class="hidden sm:inline">Curtir</span>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="flex items-center gap-2" aria-label="Curtir">
+                                            <i class="far fa-thumbs-up"></i>
+                                            <span class="hidden sm:inline">Curtir</span>
+                                        </span>
+                                    @endauth
+
+                                    <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
+                                        onclick="document.getElementById('comment-{{ $post->id }}').focus();" aria-label="Comentar">
+                                        <i class="far fa-comment"></i>
+                                        <span class="hidden sm:inline">Comentar</span>
+                                    </button>
+
+                                    <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
+                                        onclick="togglePanel('share-{{ $post->id }}')" aria-label="Compartilhar">
+                                        <i class="fas fa-share"></i>
+                                        <span class="hidden sm:inline">Compartilhar</span>
+                                    </button>
+                                </div>
+
+                                <div class="mt-2 text-xs text-gray-400 flex gap-3">
+                                    <span>{{ $likeCount }} curtida{{ $likeCount === 1 ? '' : 's' }}</span>
+                                    <span>{{ $commentCount }} comentario{{ $commentCount === 1 ? '' : 's' }}</span>
+                                </div>
+
+                                <div id="share-{{ $post->id }}" class="hidden mt-3 border-t pt-3 space-y-3">
+                                    <div class="flex flex-wrap gap-3 text-sm">
+                                        <button type="button" class="text-blue-600" data-copy="{{ $postLink }}"
+                                            onclick="copyPostLink(this)">Copiar link</button>
+                                        <a class="text-green-600" target="_blank" rel="noopener"
+                                            href="https://wa.me/?text={{ urlencode($postLink) }}">WhatsApp</a>
+                                        <a class="text-blue-500" target="_blank" rel="noopener"
+                                            href="https://t.me/share/url?url={{ urlencode($postLink) }}">Telegram</a>
+                                        <a class="text-blue-700" target="_blank" rel="noopener"
+                                            href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($postLink) }}">Facebook</a>
+                                    </div>
+
+                                    @auth
+                                        <form action="{{ route('social.post.share', $post) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="text-sm text-gray-600 hover:text-blue-600">
+                                                Compartilhar na comunidade
+                                            </button>
+                                        </form>
+
+                                        @if($shareTargets->isNotEmpty())
+                                            <form action="{{ route('social.post.share.user', $post) }}" method="POST"
+                                                class="flex flex-col gap-2">
+                                                @csrf
+                                                <div class="flex flex-wrap gap-2">
+                                                    <select name="target_user_id" class="border border-gray-200 rounded px-3 py-2 text-sm">
+                                                        @foreach($shareTargets as $target)
+                                                            <option value="{{ $target->id }}">{{ $target->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <input type="text" name="message" placeholder="Mensagem opcional"
+                                                        class="flex-1 border border-gray-200 rounded px-3 py-2 text-sm">
+                                                    <button type="submit"
+                                                        class="bg-blue-600 text-white px-3 py-2 rounded text-sm">Enviar</button>
+                                                </div>
+                                            </form>
+                                        @endif
+                                    @endauth
+                                </div>
+
+                                <div id="report-{{ $post->id }}" class="hidden mt-3 border-t pt-3">
+                                    @auth
+                                        <form action="{{ route('social.post.report', $post) }}" method="POST" class="flex flex-col gap-2">
+                                            @csrf
+                                            <textarea name="reason" rows="2" required placeholder="Descreva o motivo da denuncia"
+                                                class="border border-gray-200 rounded px-3 py-2 text-sm"></textarea>
+                                            <button type="submit" class="text-sm text-red-600">Denunciar</button>
+                                        </form>
+                                    @endauth
+                                </div>
+
+                                @if($post->comments->isNotEmpty())
+                                    <div class="mt-4 space-y-3">
+                                        @foreach($post->comments as $comment)
+                                            @php
+                                                $commentUser = $comment->user;
+                                                $commentAvatar = $commentUser
+                                                    ? $commentUser->profile_photo_url
+                                                    : asset('img/default-user.svg');
+                                                $commentName = $commentUser ? $commentUser->name : 'Usuario';
+                                            @endphp
+                                            <div class="flex gap-3">
+                                                <div class="rounded-full w-8 h-8 overflow-hidden flex-shrink-0">
+                                                    <img src="{{ $commentAvatar }}" alt="Avatar" class="w-8 h-8 object-cover"
+                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                </div>
+                                                <div class="bg-gray-50 rounded-lg px-3 py-2 w-full">
+                                                    <div class="flex justify-between items-center">
+                                                        <p class="text-xs font-semibold text-gray-700">{{ $commentName }}</p>
+                                                        @if(Auth::check() && (Auth::id() === $comment->user_id || Auth::id() === $post->user_id || Auth::user()->isAdmin()))
+                                                            <form action="{{ route('social.comment.destroy', $comment) }}" method="POST"
+                                                                class="js-confirm-delete" data-confirm-title="Remover comentario?"
+                                                                data-confirm-text="Esta acao nao pode ser desfeita.">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="text-xs text-red-500" title="Remover">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    </div>
+                                                    <p class="text-sm text-gray-700">{{ $comment->content }}</p>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                @auth
+                                    <form action="{{ route('social.post.comment', $post) }}" method="POST" class="mt-3 flex gap-2">
+                                        @csrf
+                                        <input type="text" name="content" id="comment-{{ $post->id }}"
+                                            placeholder="Escreva um comentario..."
+                                            class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                        <div class="relative">
+                                            <button type="button" class="comment-emoji-toggle text-gray-500 hover:text-blue-600"
+                                                data-picker="comment-emoji-{{ $post->id }}" title="Inserir emoji">
+                                                <i class="far fa-smile"></i>
+                                            </button>
+                                            <div id="comment-emoji-{{ $post->id }}" data-target="comment-{{ $post->id }}"
+                                                class="emoji-picker-panel hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
+                                                @include('social.partials.emoji_tabs')
+                                                @include('social.partials.emoji_grid')
+                                            </div>
+                                        </div>
+                                        <button type="submit"
+                                            class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition">
+                                            Enviar
+                                        </button>
+                                    </form>
+                                @endauth
+                            </div>
+                            @if(!empty($adsEnabled) && !empty($adsCode) && $loop->iteration % 3 === 0)
+                                <div class="bg-white rounded-lg shadow p-4">
+                                    {!! $adsCode !!}
+                                </div>
+                            @endif
                 @empty
                     <div class="text-center py-10 text-gray-500 bg-white rounded-lg shadow">
                         <p>Nenhuma publicação ainda.</p>
@@ -733,8 +781,8 @@
                 <input type="text" id="chatInput" placeholder="Digite sua mensagem..."
                     class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-[#1F5EDB] focus:ring-1 focus:ring-[#1F5EDB]">
                 <div class="relative">
-                    <button type="button" class="emoji-toggle text-gray-500 hover:text-blue-600" data-picker="chat-emoji-picker"
-                        title="Inserir emoji">
+                    <button type="button" class="emoji-toggle text-gray-500 hover:text-blue-600"
+                        data-picker="chat-emoji-picker" title="Inserir emoji">
                         <i class="far fa-smile"></i>
                     </button>
                     <div id="chat-emoji-picker" data-target="chatInput"
@@ -796,10 +844,12 @@
         }
 
         @keyframes emoji-float {
+
             0%,
             100% {
                 transform: translateY(0);
             }
+
             50% {
                 transform: translateY(-3px);
             }

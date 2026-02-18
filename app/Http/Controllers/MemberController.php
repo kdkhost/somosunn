@@ -23,15 +23,27 @@ class MemberController extends Controller
 
         $blockedUserIds = [];
         $connectedUserIds = [];
+        $connectionMap = [];
 
         if (auth()->check()) {
-            $blockedUserIds = \App\Models\Connection::where(function ($q) {
+            $connectionRecords = \App\Models\Connection::where(function ($q) {
                 $q->where('requester_id', auth()->id())->orWhere('requested_id', auth()->id());
-            })->where('status', 'blocked')->pluck('requester_id', 'requested_id')->flatten()->unique()->toArray();
+            })->get();
 
-            $connectedUserIds = \App\Models\Connection::where(function ($q) {
-                $q->where('requester_id', auth()->id())->orWhere('requested_id', auth()->id());
-            })->where('status', 'accepted')->pluck('requester_id', 'requested_id')->flatten()->unique()->toArray();
+            $connectionMap = $connectionRecords->mapWithKeys(function ($conn) {
+                $otherId = $conn->requester_id === auth()->id() ? $conn->requested_id : $conn->requester_id;
+                return [$otherId => $conn];
+            })->toArray();
+
+            $blockedUserIds = $connectionRecords->filter(fn($c) => $c->status === 'blocked')
+                ->map(function ($conn) {
+                    return $conn->requester_id === auth()->id() ? $conn->requested_id : $conn->requester_id;
+                })->toArray();
+
+            $connectedUserIds = $connectionRecords->filter(fn($c) => $c->status === 'accepted')
+                ->map(function ($conn) {
+                    return $conn->requester_id === auth()->id() ? $conn->requested_id : $conn->requester_id;
+                })->toArray();
         }
 
         $members = collect();
@@ -165,9 +177,13 @@ class MemberController extends Controller
                 ],
             ]);
 
-            return view('site.membros', ['members' => $members, 'isDemo' => true]);
+            return view('site.membros', [
+                'members' => $members,
+                'isDemo' => true,
+                'connectionMap' => $connectionMap
+            ]);
         }
 
-        return view('site.membros', compact('members'));
+        return view('site.membros', compact('members', 'connectionMap'));
     }
 }

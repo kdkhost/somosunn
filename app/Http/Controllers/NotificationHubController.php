@@ -18,8 +18,21 @@ class NotificationHubController extends Controller
     {
         $user = Auth::user();
 
-        // 1. Unread Messages Count
+        // 1. Unread Messages Count (Filtering out blocked users)
+        $blockedUserIds = Connection::where('status', 'blocked')
+            ->where(function ($q) use ($user) {
+                $q->where('requester_id', $user->id)->orWhere('requested_id', $user->id);
+            })
+            ->get()
+            ->map(function ($connection) use ($user) {
+                return $connection->requester_id === $user->id
+                    ? $connection->requested_id
+                    : $connection->requester_id;
+            })
+            ->toArray();
+
         $unreadMessagesCount = Message::where('user_id', '!=', $user->id)
+            ->whereNotIn('user_id', $blockedUserIds)
             ->whereHas('conversation', function ($q) use ($user) {
                 $q->whereHas('users', function ($uq) use ($user) {
                     $uq->where('users.id', $user->id);
