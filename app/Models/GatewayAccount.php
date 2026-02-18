@@ -25,8 +25,6 @@ class GatewayAccount extends Model
     protected $casts = [
         'enabled' => 'boolean',
         'extra' => 'array',
-        'access_token' => 'encrypted', // Secure storage
-        'client_secret' => 'encrypted',
     ];
 
     public function user()

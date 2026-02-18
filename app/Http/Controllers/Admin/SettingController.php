@@ -444,15 +444,23 @@ class SettingController extends Controller
         }
 
         // Se o Admin estiver salvando chaves globais do Mercado Pago, sincronizar com o gateway_account dele
-        // para manter consistência entre o painel AdminLTE e o novo Marketplace
+        // para manter consistência entre o painel AdminLTE e o Marketplace
         if ($currentGroup === 'gateway') {
             $userId = Auth::id();
+
+            // Determinar qual ambiente está ativo para pegar as chaves corretas
+            $mpEnv = $data['mercadopago_env'] ?? Setting::where('key', 'mercadopago_env')->value('value') ?? 'sandbox';
+            $prefix = $mpEnv === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
+
+            $publicKey = $data[$prefix . 'public_key'] ?? null;
+            $accessToken = $data[$prefix . 'access_token'] ?? null;
+
             $mpAccount = \App\Models\GatewayAccount::firstOrNew(['user_id' => $userId, 'provider' => 'mercadopago']);
 
-            if (isset($data['mercadopago_public_key']))
-                $mpAccount->public_key = $data['mercadopago_public_key'];
-            if (isset($data['mercadopago_access_token']))
-                $mpAccount->access_token = $data['mercadopago_access_token'];
+            if (!empty($publicKey))
+                $mpAccount->public_key = $publicKey;
+            if (!empty($accessToken))
+                $mpAccount->access_token = $accessToken;
 
             // Ativar se tiver as chaves
             if ($mpAccount->public_key && $mpAccount->access_token) {

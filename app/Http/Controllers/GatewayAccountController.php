@@ -67,13 +67,16 @@ class GatewayAccountController extends Controller
             $data
         );
 
-        // Se for o Admin principal, sincronizar com os Settings globais para que as assinaturas do portal também usem essas chaves
+        // Se for o Admin principal, sincronizar com os Settings globais para que o checkout também use essas chaves
         if ($provider === 'mercadopago' && Auth::user()->isAdmin()) {
+            $mpEnv = \App\Models\Setting::get('mercadopago_env', 'sandbox');
+            $prefix = $mpEnv === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
+
             if (!empty($data['public_key'])) {
-                \App\Models\Setting::updateOrCreate(['key' => 'mercadopago_public_key'], ['value' => $data['public_key']]);
+                \App\Models\Setting::updateOrCreate(['key' => $prefix . 'public_key'], ['value' => $data['public_key']]);
             }
             if (!empty($data['access_token'])) {
-                \App\Models\Setting::updateOrCreate(['key' => 'mercadopago_access_token'], ['value' => $data['access_token']]);
+                \App\Models\Setting::updateOrCreate(['key' => $prefix . 'access_token'], ['value' => $data['access_token']]);
             }
         }
 
