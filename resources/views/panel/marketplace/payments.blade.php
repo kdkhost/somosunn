@@ -15,8 +15,9 @@
             <div>
                 <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white transition-colors">Pagamentos
                 </h1>
-                <p class="text-slate-600 dark:text-slate-400 mt-1 transition-colors">Configuração compartilhada
-                    (multi-tenant) para toda a plataforma.</p>
+                <p class="text-slate-600 dark:text-slate-400 mt-1 transition-colors">
+                    Configure seus meios de pagamento para receber por suas vendas.
+                </p>
             </div>
             <a href="{{ route('panel.marketplace.index') }}"
                 class="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
@@ -37,26 +38,20 @@
                     {{ $paymentsConfigured ? 'MercadoPago habilitado' : 'MercadoPago não configurado' }}
                 </div>
                 <p class="text-slate-600 dark:text-slate-400 mt-1 transition-colors">
-                    Este sistema utiliza <strong>uma única configuração</strong> do gateway (multi-tenant) para toda a
-                    plataforma.
-                    Cada venda é registrada com <strong>vendedor</strong> e <strong>tipo</strong> (curso, mentoria, evento e
-                    marketplace).
+                    @if($paymentsConfigured)
+                        Suas credenciais estão configuradas e você pode receber pagamentos normalmente.
+                    @else
+                        Configure suas credenciais do Mercado Pago para começar a receber pagamentos das suas vendas.
+                    @endif
                 </p>
 
-                @if($isAdmin)
-                    <div class="mt-4">
-                        <a href="{{ route('panel.marketplace.payments.edit') }}"
-                            class="inline-flex items-center justify-center rounded-full bg-blue-600 text-white px-6 py-3 text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-blue-500/20">
-                            <i class="fas fa-cogs mr-2"></i> Abrir configurações do gateway
-                        </a>
-                    </div>
-                @else
-                    <div
-                        class="mt-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 p-4 text-sm text-slate-700 dark:text-slate-400 transition-colors">
-                        <i class="fas fa-info-circle mr-2 text-slate-500 dark:text-slate-500"></i>
-                        As credenciais do gateway são gerenciadas pelos administradores da plataforma.
-                    </div>
-                @endif
+                <div class="mt-4">
+                    <a href="{{ route('panel.marketplace.payments.edit') }}"
+                        class="inline-flex items-center justify-center rounded-full bg-blue-600 text-white px-6 py-3 text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-blue-500/20">
+                        <i class="fas fa-cogs mr-2"></i>
+                        {{ $paymentsConfigured ? 'Editar configurações do gateway' : 'Configurar gateway de pagamento' }}
+                    </a>
+                </div>
             </div>
         </div>
     </div>
