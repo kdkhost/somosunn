@@ -203,7 +203,9 @@
             @if($methodMercadoPago) paymentMethods.mercadoPago = "all"; @endif
 
             console.log('Payment Methods configurados:', paymentMethods);
-            console.log('Checkout Theme:', '{{ $theme }}', '| Primary Color:', '{{ $primaryColor }}');
+            console.log('Payment Methods configurados:', paymentMethods);
+            console.log('Checkout Theme Raw:', '{{ $theme }}');
+            console.log('Primary Color Raw:', '{{ $primaryColor }}');
 
             const settings = {
                 initialization: {
