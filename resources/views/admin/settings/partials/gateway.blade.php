@@ -4,6 +4,25 @@
         essenciais para aprovação automática.
     </div>
 
+    {{-- DEBUG TEMPORÁRIO - Valores atuais no banco --}}
+    @php
+        $dbTheme = \App\Models\Setting::where('key', 'gateway_checkout_theme')->first();
+        $dbColor = \App\Models\Setting::where('key', 'gateway_checkout_primary_color')->first();
+        $dbCreditCard = \App\Models\Setting::where('key', 'mercadopago_method_credit_card')->first();
+        $dbTicket = \App\Models\Setting::where('key', 'mercadopago_method_ticket')->first();
+    @endphp
+    <div class="alert alert-warning mb-4">
+        <strong><i class="fas fa-bug mr-1"></i> DEBUG (remover depois):</strong><br>
+        <small>
+            <b>gateway_checkout_theme:</b> {{ $dbTheme ? $dbTheme->value : 'NÃO EXISTE NO BANCO' }}
+            (via $settings: {{ $settings['gateway_checkout_theme'] ?? 'NÃO EXISTE' }})<br>
+            <b>gateway_checkout_primary_color:</b> {{ $dbColor ? $dbColor->value : 'NÃO EXISTE' }}
+            (via $settings: {{ $settings['gateway_checkout_primary_color'] ?? 'NÃO EXISTE' }})<br>
+            <b>mercadopago_method_credit_card:</b> {{ $dbCreditCard ? $dbCreditCard->value : 'NÃO EXISTE' }}<br>
+            <b>mercadopago_method_ticket:</b> {{ $dbTicket ? $dbTicket->value : 'NÃO EXISTE' }}
+        </small>
+    </div>
+
     {{-- MERCADO PAGO --}}
     <div class="card card-outline card-success collapsed-card mb-3">
         <div class="card-header d-flex align-items-center">
