@@ -46,9 +46,12 @@ class SettingController extends Controller
 
     public function update(Request $request)
     {
+        $currentGroup = $request->input('current_group', 'general');
+
         $data = $request->except([
             '_token',
             '_method',
+            'current_group',
             // arquivos (tratados separadamente)
             'pwa_icon_192',
             'pwa_icon_512',
