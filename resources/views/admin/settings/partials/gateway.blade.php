@@ -179,11 +179,12 @@
                     <div class="col-md-6 form-group">
                         <label>Cor Primária (Botões e Destaques)</label>
                         <div class="input-group">
-                            <input type="color" name="gateway_checkout_primary_color"
+                            <input type="color" id="gateway_color_picker" name="gateway_checkout_primary_color"
                                 class="form-control form-control-color"
                                 value="{{ $settings['gateway_checkout_primary_color'] ?? '#1F5EDB' }}"
-                                style="max-width: 60px; height: 38px;">
-                            <input type="text" class="form-control"
+                                style="max-width: 60px; height: 38px;"
+                                oninput="document.getElementById('gateway_color_text').value = this.value">
+                            <input type="text" id="gateway_color_text" class="form-control"
                                 value="{{ $settings['gateway_checkout_primary_color'] ?? '#1F5EDB' }}" readonly>
                         </div>
                     </div>
