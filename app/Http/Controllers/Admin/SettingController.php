@@ -455,9 +455,25 @@ class SettingController extends Controller
                 $data[$cbKey] = $request->boolean($cbKey) ? '1' : '0';
             }
         }
+        // DEBUG: Logar dados de gateway para diagnóstico
+        if ($currentGroup === 'gateway') {
+            \Log::info('[SETTINGS DEBUG] Grupo: gateway');
+            \Log::info('[SETTINGS DEBUG] gateway_checkout_theme recebido: ' . ($data['gateway_checkout_theme'] ?? 'NAO_EXISTE'));
+            \Log::info('[SETTINGS DEBUG] gateway_checkout_primary_color recebido: ' . ($data['gateway_checkout_primary_color'] ?? 'NAO_EXISTE'));
+            \Log::info('[SETTINGS DEBUG] mercadopago_method_credit_card: ' . ($data['mercadopago_method_credit_card'] ?? 'NAO_EXISTE'));
+            \Log::info('[SETTINGS DEBUG] mercadopago_method_ticket: ' . ($data['mercadopago_method_ticket'] ?? 'NAO_EXISTE'));
+            \Log::info('[SETTINGS DEBUG] Total de chaves no $data: ' . count($data));
+        }
 
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
+        }
+
+        // DEBUG: Confirmar o que foi salvo
+        if ($currentGroup === 'gateway') {
+            $savedTheme = Setting::where('key', 'gateway_checkout_theme')->value('value');
+            $savedColor = Setting::where('key', 'gateway_checkout_primary_color')->value('value');
+            \Log::info('[SETTINGS DEBUG] Apos salvar - theme: ' . ($savedTheme ?? 'NULL') . ' | color: ' . ($savedColor ?? 'NULL'));
         }
 
         // Se o Admin estiver salvando chaves globais do Mercado Pago, sincronizar com o gateway_account dele
