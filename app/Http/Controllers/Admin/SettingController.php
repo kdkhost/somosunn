@@ -236,7 +236,9 @@ class SettingController extends Controller
                 'gateway_pass_tax_to_client',
                 'mercadopago_method_credit_card',
                 'mercadopago_method_pix',
-                'mercadopago_method_ticket'
+                'mercadopago_method_ticket',
+                'gateway_checkout_theme',
+                'gateway_checkout_primary_color'
             ],
             'marketplace' => ['marketplace_hero_enabled', 'marketplace_hero_autoplay', 'marketplace_exit_enabled', 'marketplace_events_popup_enabled'],
             'social' => [

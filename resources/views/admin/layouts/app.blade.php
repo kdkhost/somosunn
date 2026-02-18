@@ -420,6 +420,30 @@
     @include('admin.partials.chat-widget')
     @stack('scripts')
     <script>
+        window.showSuccess = function (msg) {
+            toastr.success(msg || 'Sucesso');
+        };
+
+        window.showError = function (msg) {
+            toastr.error(msg || 'Erro na operação');
+        };
+
+        window.showConfirm = function (text, onConfirm) {
+            Swal.fire({
+                title: 'Confirmar ação',
+                text: text || 'Confirme para continuar.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed && typeof onConfirm === 'function') {
+                    onConfirm();
+                }
+            });
+        };
+
         $(function () {
             const container = '#pjax-container';
             $(document).pjax('a[data-pjax="true"]', container, { timeout: 8000 });
@@ -506,7 +530,7 @@
                 const redirect = $btn.data('redirect') || null;
                 const $form = $btn.closest('form');
 
-                showConfirm('Confirme para continuar.', function() {
+                showConfirm('Confirme para continuar.', function () {
                     // Prefer form submission quando explicitamente solicitado
                     if ($btn.is('[data-confirm-delete]') || (!url && $form.length)) {
                         if ($form.length) {

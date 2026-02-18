@@ -142,6 +142,33 @@
                 </div>
             </div>
 
+            <div class="p-3 bg-white rounded border mb-3">
+                <h6 class="text-dark mb-3"><i class="fas fa-magic mr-1"></i> Customização do Checkout Transparente</h6>
+                <p class="text-sm text-muted mb-3">Personalize a aparência do checkout para combinar com sua marca.</p>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Tema do Checkout</label>
+                        <select name="gateway_checkout_theme" class="form-control">
+                            <option value="default" {{ ($settings['gateway_checkout_theme'] ?? 'default') == 'default' ? 'selected' : '' }}>Padrão (Mercado Pago)</option>
+                            <option value="dark" {{ ($settings['gateway_checkout_theme'] ?? '') == 'dark' ? 'selected' : '' }}>Escuro (Dark)</option>
+                            <option value="bootstrap" {{ ($settings['gateway_checkout_theme'] ?? '') == 'bootstrap' ? 'selected' : '' }}>Bootstrap</option>
+                            <option value="flat" {{ ($settings['gateway_checkout_theme'] ?? '') == 'flat' ? 'selected' : '' }}>Flat (Moderno)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Cor Primária (Botões e Destaques)</label>
+                        <div class="input-group">
+                            <input type="color" name="gateway_checkout_primary_color"
+                                class="form-control form-control-color"
+                                value="{{ $settings['gateway_checkout_primary_color'] ?? '#1F5EDB' }}"
+                                style="max-width: 60px; height: 38px;">
+                            <input type="text" class="form-control"
+                                value="{{ $settings['gateway_checkout_primary_color'] ?? '#1F5EDB' }}" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
