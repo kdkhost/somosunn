@@ -105,6 +105,93 @@
                     </button>
                 </div>
             </div>
+
+            {{-- Meios de Pagamento Aceitos --}}
+            <div
+                class="mt-6 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
+                <h4 class="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-4">
+                    <i class="fas fa-list-check mr-1"></i> Meios de Pagamento Aceitos
+                </h4>
+                <p class="text-xs text-slate-400 mb-3">Selecione quais métodos de pagamento estarão disponíveis no
+                    checkout.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <label
+                        class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                        <input type="hidden" name="mercadopago_method_credit_card" value="0">
+                        <input type="checkbox" name="mercadopago_method_credit_card" value="1"
+                            class="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 dark:bg-slate-900"
+                            {{ ($settings['mercadopago_method_credit_card'] ?? 1) ? 'checked' : '' }}>
+                        <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Cartão de Crédito</span>
+                    </label>
+                    <label
+                        class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                        <input type="hidden" name="mercadopago_method_debit_card" value="0">
+                        <input type="checkbox" name="mercadopago_method_debit_card" value="1"
+                            class="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 dark:bg-slate-900"
+                            {{ ($settings['mercadopago_method_debit_card'] ?? 0) ? 'checked' : '' }}>
+                        <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Cartão de Débito</span>
+                    </label>
+                    <label
+                        class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                        <input type="hidden" name="mercadopago_method_pix" value="0">
+                        <input type="checkbox" name="mercadopago_method_pix" value="1"
+                            class="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 dark:bg-slate-900"
+                            {{ ($settings['mercadopago_method_pix'] ?? 1) ? 'checked' : '' }}>
+                        <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Pix</span>
+                    </label>
+                    <label
+                        class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                        <input type="hidden" name="mercadopago_method_ticket" value="0">
+                        <input type="checkbox" name="mercadopago_method_ticket" value="1"
+                            class="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 dark:bg-slate-900"
+                            {{ ($settings['mercadopago_method_ticket'] ?? 0) ? 'checked' : '' }}>
+                        <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Boleto (Ticket)</span>
+                    </label>
+                    <label
+                        class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                        <input type="hidden" name="mercadopago_method_mercadopago" value="0">
+                        <input type="checkbox" name="mercadopago_method_mercadopago" value="1"
+                            class="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 dark:bg-slate-900"
+                            {{ ($settings['mercadopago_method_mercadopago'] ?? 0) ? 'checked' : '' }}>
+                        <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Carteira Mercado Pago</span>
+                    </label>
+                </div>
+            </div>
+
+            {{-- Customização do Checkout Transparente --}}
+            <div
+                class="mt-6 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
+                <h4 class="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-4">
+                    <i class="fas fa-palette mr-1"></i> Customização do Checkout Transparente
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Tema do
+                            Checkout</label>
+                        <select name="gateway_checkout_theme"
+                            class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium">
+                            <option value="default" {{ ($settings['gateway_checkout_theme'] ?? 'default') == 'default' ? 'selected' : '' }}>Padrão (Mercado Pago)</option>
+                            <option value="dark" {{ ($settings['gateway_checkout_theme'] ?? '') == 'dark' ? 'selected' : '' }}>Escuro (Dark)</option>
+                            <option value="bootstrap" {{ ($settings['gateway_checkout_theme'] ?? '') == 'bootstrap' ? 'selected' : '' }}>Bootstrap</option>
+                            <option value="flat" {{ ($settings['gateway_checkout_theme'] ?? '') == 'flat' ? 'selected' : '' }}>Flat (Moderno)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Cor Primária
+                            (Botões e Destaques)</label>
+                        <div class="flex gap-2">
+                            <input type="color" id="panel_color_picker" name="gateway_checkout_primary_color"
+                                value="{{ $settings['gateway_checkout_primary_color'] ?? '#1F5EDB' }}"
+                                class="h-10 w-14 rounded-xl border-slate-200 dark:border-slate-800 cursor-pointer"
+                                oninput="document.getElementById('panel_color_text').value = this.value">
+                            <input type="text" id="panel_color_text"
+                                value="{{ $settings['gateway_checkout_primary_color'] ?? '#1F5EDB' }}"
+                                class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white font-medium"
+                                readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
