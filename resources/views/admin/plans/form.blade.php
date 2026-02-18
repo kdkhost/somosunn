@@ -59,11 +59,18 @@
                         <label class="custom-control-label" for="coupons_enabled">Permitir cupons</label>
                     </div>
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-4">
                         <input type="hidden" name="is_active" value="0">
                         <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" value="1" {{ old('is_active',$plan->is_active ?? true) ? 'checked' : '' }}>
                         <label class="custom-control-label" for="is_active">Plano ativo</label>
+                    </div>
+                </div>
+                <div class="form-group col-md-3">
+                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-primary mt-4">
+                        <input type="hidden" name="is_recurring" value="0">
+                        <input type="checkbox" class="custom-control-input" id="is_recurring" name="is_recurring" value="1" {{ old('is_recurring',$plan->is_recurring) ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="is_recurring">Assinatura (Recorrente)</label>
                     </div>
                 </div>
             </div>

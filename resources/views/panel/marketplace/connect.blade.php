@@ -69,11 +69,91 @@
                     @endif
                 </div>
 
+                <!-- Configurações Advanced -->
+                <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-4 text-sm"><i
+                            class="fas fa-cog mr-2 text-slate-400"></i>Configurações de Venda</h4>
+
+                    <form action="{{ route('settings.payment.update') }}" method="POST" class="space-y-6">
+                        @csrf
+                        <input type="hidden" name="provider" value="mercadopago">
+
+                        <!-- Meios de Pagamento -->
+                        <div class="space-y-3">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Meios de
+                                Pagamento Aceitos</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                @php
+                                    $enabledMethods = data_get($mercadopago->extra, 'enabled_methods', ['credit_card', 'pix', 'ticket']);
+                                @endphp
+                                <label
+                                    class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
+                                    <input type="checkbox" name="methods[]" value="credit_card" {{ in_array('credit_card', $enabledMethods) ? 'checked' : '' }}
+                                        class="rounded text-blue-600 focus:ring-blue-500/20 border-slate-300">
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Cartão</span>
+                                </label>
+                                <label
+                                    class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
+                                    <input type="checkbox" name="methods[]" value="pix" {{ in_array('pix', $enabledMethods) ? 'checked' : '' }}
+                                        class="rounded text-blue-600 focus:ring-blue-500/20 border-slate-300">
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">PIX</span>
+                                </label>
+                                <label
+                                    class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
+                                    <input type="checkbox" name="methods[]" value="ticket" {{ in_array('ticket', $enabledMethods) ? 'checked' : '' }}
+                                        class="rounded text-blue-600 focus:ring-blue-500/20 border-slate-300">
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Boleto</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Parcelamento -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Máximo
+                                    de Parcelas</label>
+                                <select name="max_installments"
+                                    class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white text-sm px-4 py-2.5">
+                                    @php $maxInst = (int) data_get($mercadopago->extra, 'max_installments', 12); @endphp
+                                    @for($i = 1; $i <= 12; $i++)
+                                        <option value="{{ $i }}" {{ $maxInst == $i ? 'selected' : '' }}>{{ $i }}x</option>
+                                    @endfor
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Repasse de Taxas -->
+                        <div
+                            class="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-800/50">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-sm font-bold text-amber-900 dark:text-amber-300">Repassar taxas ao
+                                        cliente?</div>
+                                    <p class="text-[10px] text-amber-700 dark:text-amber-400 mt-0.5">O valor da venda será
+                                        acrescido da taxa do MP.</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="hidden" name="pass_fee" value="0">
+                                    <input type="checkbox" name="pass_fee" value="1" {{ data_get($mercadopago->extra, 'pass_fee') ? 'checked' : '' }} class="sr-only peer">
+                                    <div
+                                        class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full py-3.5 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-extrabold text-sm hover:opacity-90 transition-all shadow-xl shadow-slate-900/10 dark:shadow-none">
+                            <i class="fas fa-save mr-2"></i> Salvar Configurações
+                        </button>
+                    </form>
+                </div>
+
                 <!-- Expander Manual Config -->
-                <div x-data="{ open: false }">
+                <div x-data="{ open: false }" class="mt-4">
                     <button @click="open = !open" type="button"
-                        class="flex items-center text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors w-full justify-between group">
-                        <span>Configuração Manual (Avançado)</span>
+                        class="flex items-center text-xs font-bold text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors w-full justify-between group">
+                        <span>Chaves API (Manual)</span>
                         <i class="fas fa-chevron-down transition-transform duration-300" :class="{'rotate-180': open}"></i>
                     </button>
 
@@ -100,8 +180,8 @@
                                     </div>
                                 </div>
                                 <button type="submit"
-                                    class="w-full py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-sm hover:opacity-90 transition-all">
-                                    Salvar Manualmente
+                                    class="w-full py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-xs hover:opacity-90 transition-all">
+                                    Atualizar Chaves
                                 </button>
                             </div>
                         </form>

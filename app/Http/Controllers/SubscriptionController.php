@@ -72,7 +72,7 @@ class SubscriptionController extends Controller
                     'level' => 'Iniciante',
                 ]);
                 Auth::login($user);
-                
+
                 // Enviar email de boas-vindas
                 try {
                     Mail::to($user)->send(new WelcomeMail($user));
@@ -137,7 +137,32 @@ class SubscriptionController extends Controller
             ]);
 
             // Charge via MercadoPago
-            if ($request->payment_method === 'pix') {
+            if ($plan->is_recurring && !empty($plan->mp_plan_id)) {
+                $paymentResult = $this->mpService->subscribeUser($plan->mp_plan_id, [
+                    'email' => $user->email,
+                    'card_token' => $request->token,
+                    'reason' => 'Assinatura: ' . $plan->name,
+                    'external_reference' => (string) $order->id,
+                    'back_url' => route('subscription.success', $order),
+                ]);
+
+                // Se gerou um init_point (não tinha token), redirecionamos
+                if (!empty($paymentResult['init_point']) && empty($request->token)) {
+                    $order->update([
+                        'metadata' => array_merge($order->metadata ?? [], [
+                            'mercadopago_preapproval_id' => $paymentResult['id'] ?? null,
+                            'mercadopago_init_point' => $paymentResult['init_point'] ?? null,
+                        ]),
+                    ]);
+                    DB::commit();
+                    return redirect($paymentResult['init_point']);
+                }
+
+                // Se processou direto
+                if (in_array($paymentResult['status'] ?? '', ['authorized', 'active'])) {
+                    $paymentResult['status'] = 'approved'; // Map to approved for common logic below
+                }
+            } else if ($request->payment_method === 'pix') {
                 $paymentResult = $this->mpService->createPixPayment($order, [
                     'email' => $user->email,
                     'name' => $user->name,
@@ -154,17 +179,17 @@ class SubscriptionController extends Controller
                 ]);
             }
 
-                if (($paymentResult['status'] ?? '') === 'approved') {
-                    $order->update([
-                        'status' => 'paid',
-                        'transaction_id' => (string) ($paymentResult['id'] ?? null),
-                    ]);
+            if (($paymentResult['status'] ?? '') === 'approved') {
+                $order->update([
+                    'status' => 'paid',
+                    'transaction_id' => (string) ($paymentResult['id'] ?? null),
+                ]);
                 // Ativar plano no usuário
                 $user->update([
                     'plan_id' => $plan->id,
                     'plan_expires_at' => $this->planExpiresAt($plan),
                 ]);
-                
+
                 // Enviar email de confirmação
                 try {
                     Mail::to($user)->send(new PaymentConfirmedMail($order));
@@ -185,11 +210,11 @@ class SubscriptionController extends Controller
             DB::commit();
 
             if ($request->payment_method === 'pix') {
-                 return view('site.subscription.pix', [
-                     'order' => $order,
-                     'qr_code' => $paymentResult['qr_code'],
-                     'qr_code_base64' => $paymentResult['qr_code_base64']
-                 ]);
+                return view('site.subscription.pix', [
+                    'order' => $order,
+                    'qr_code' => $paymentResult['qr_code'],
+                    'qr_code_base64' => $paymentResult['qr_code_base64']
+                ]);
             }
 
             return redirect()->route('subscription.success', $order);
@@ -209,7 +234,7 @@ class SubscriptionController extends Controller
         $order->load('items');
         $planName = optional($order->items->firstWhere('item_type', 'plan'))->title;
 
-            return view('site.subscription.success', compact('order', 'planName'));
+        return view('site.subscription.success', compact('order', 'planName'));
     }
 
     private function planExpiresAt(Plan $plan): ?\Carbon\Carbon

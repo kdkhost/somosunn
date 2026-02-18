@@ -135,6 +135,102 @@ class MercadoPagoService
         ];
     }
 
+    public function subscribeUser(string $mpPlanId, array $userData): array
+    {
+        $token = $this->accessToken();
+
+        $subscriptionData = [
+            'preapproval_plan_id' => $mpPlanId,
+            'payer_email' => $userData['email'],
+            'back_url' => $userData['back_url'] ?? route('panel.dashboard'),
+            'status' => 'authorized',
+            'reason' => $userData['reason'] ?? 'Assinatura',
+            'external_reference' => $userData['external_reference'] ?? '',
+        ];
+
+        if (!empty($userData['card_token'])) {
+            $subscriptionData['card_token_id'] = $userData['card_token'];
+        }
+
+        $response = Http::withToken($token)
+            ->post("{$this->baseUrl}/preapproval", $subscriptionData);
+
+        if ($response->failed()) {
+            throw new Exception('Erro ao criar assinatura MP: ' . $response->body());
+        }
+
+        return (array) $response->json();
+    }
+
+    public function cancelSubscription(string $preapprovalId): array
+    {
+        $token = $this->accessToken();
+        $response = Http::withToken($token)
+            ->put("{$this->baseUrl}/preapproval/{$preapprovalId}", [
+                'status' => 'cancelled'
+            ]);
+
+        if ($response->failed()) {
+            throw new Exception('Erro ao cancelar assinatura MP: ' . $response->body());
+        }
+
+        return (array) $response->json();
+    }
+
+    public function getPreapproval(string $preapprovalId): array
+    {
+        $token = $this->accessToken();
+        $response = Http::withToken($token)
+            ->get("{$this->baseUrl}/preapproval/{$preapprovalId}");
+
+        if ($response->failed()) {
+            throw new Exception('Erro ao buscar assinatura MP: ' . $response->body());
+        }
+
+        return (array) $response->json();
+    }
+
+    public function createPreapprovalPlan(array $data): array
+    {
+        $token = $this->accessToken();
+
+        // Marketplace application_fee (split) em assinaturas
+        // Nota: O MP não suporta 'application_fee' diretamente no preapproval_plan.
+        // O split deve ser feito na captura do pagamento gerado pela assinatura.
+        // No entanto, podemos definir o 'collector_id' se estivermos usando aplicação marketplace.
+
+        $planData = [
+            'reason' => $data['name'],
+            'auto_setup' => [
+                'frequency' => (int) ($data['billing_cycle'] ?? 1),
+                'frequency_type' => $this->mapPeriod($data['period'] ?? 'months'),
+                'transaction_amount' => (float) $data['price'],
+                'currency_id' => 'BRL',
+            ],
+            'back_url' => route('marketplace.index'),
+            'status' => 'active',
+        ];
+
+        $response = Http::withToken($token)
+            ->post("{$this->baseUrl}/preapproval_plan", $planData);
+
+        if ($response->failed()) {
+            throw new Exception('Erro ao criar plano recorrente MP: ' . $response->body());
+        }
+
+        return (array) $response->json();
+    }
+
+    private function mapPeriod(string $period): string
+    {
+        return match (strtolower($period)) {
+            'day', 'days' => 'days',
+            'month', 'months', 'mensal' => 'months',
+            'year', 'years', 'anual' => 'months', // MP recorrente anual costuma ser 12 meses
+            default => 'months',
+        };
+    }
+
     private function accessToken(): string
     {
         $token = trim((string) config('payments.mercadopago.access_token'));
@@ -157,12 +253,33 @@ class MercadoPagoService
     private function buildPreferenceData(Order $order, array $options = []): array
     {
         $items = [];
+        $passFee = false;
+        $maxInstallments = 12;
+        $enabledMethods = ['credit_card', 'pix', 'ticket'];
+
+        // Buscar config do vendedor para customizar o checkout
+        if ($order->seller_id) {
+            $account = GatewayAccount::where('user_id', $order->seller_id)
+                ->where('provider', 'mercadopago')
+                ->where('enabled', true)
+                ->first();
+
+            if ($account && is_array($account->extra)) {
+                $passFee = (bool) data_get($account->extra, 'pass_fee', false);
+                $maxInstallments = (int) data_get($account->extra, 'max_installments', 12);
+                $enabledMethods = data_get($account->extra, 'enabled_methods', ['credit_card', 'pix', 'ticket']);
+            }
+        }
+
+        // Se o vendedor repassar a taxa, aumentamos o valor do item proporcionalmente (estimativa de 5% se não houver taxa exata)
+        $feeMultiplier = $passFee ? 1.05 : 1.0;
+
         foreach ($order->items as $item) {
             $items[] = [
                 'title' => $item->title,
                 'quantity' => $item->quantity,
                 'currency_id' => 'BRL',
-                'unit_price' => (float) $item->price
+                'unit_price' => round((float) $item->price * $feeMultiplier, 2)
             ];
         }
 
@@ -205,6 +322,23 @@ class MercadoPagoService
             $statementDescriptor = 'UNN PLATAFORMA';
         }
 
+        // Configurar métodos de pagamento e parcelas
+        $paymentMethods = [
+            'installments' => $maxInstallments,
+        ];
+
+        $excludedMethods = [];
+        if (!in_array('credit_card', $enabledMethods))
+            $excludedMethods[] = ['id' => 'credit_card'];
+        if (!in_array('pix', $enabledMethods))
+            $excludedMethods[] = ['id' => 'pix'];
+        if (!in_array('ticket', $enabledMethods))
+            $excludedMethods[] = ['id' => 'ticket'];
+
+        if (!empty($excludedMethods)) {
+            $paymentMethods['excluded_payment_types'] = $excludedMethods;
+        }
+
         return [
             'items' => $items,
             'payer' => [
@@ -216,6 +350,7 @@ class MercadoPagoService
             'external_reference' => (string) $order->id,
             'statement_descriptor' => $statementDescriptor,
             'notification_url' => $this->notificationUrl(),
+            'payment_methods' => $paymentMethods,
         ];
     }
 
@@ -242,6 +377,42 @@ class MercadoPagoService
 
         return (array) $response->json();
     }
+    public function getBalance(?int $sellerId = null): array
+    {
+        $token = null;
+
+        if ($sellerId) {
+            $account = GatewayAccount::where('user_id', $sellerId)
+                ->where('provider', 'mercadopago')
+                ->where('enabled', true)
+                ->first();
+            $token = $account->access_token ?? null;
+        }
+
+        if (!$token) {
+            $token = trim((string) config('payments.mercadopago.access_token'));
+        }
+
+        if (empty($token)) {
+            throw new Exception('Token do Mercado Pago não encontrado.');
+        }
+
+        $response = Http::withToken($token)
+            ->get("{$this->baseUrl}/users/me/mercadopago_account/balance");
+
+        if ($response->failed()) {
+            // Se falhar, tenta o endpoint alternativo ou retorna zerado
+            return [
+                'total_amount' => 0,
+                'available_balance' => 0,
+                'unavailable_balance' => 0,
+                'currency_id' => 'BRL'
+            ];
+        }
+
+        return (array) $response->json();
+    }
+
     private function getSellerConfig(Order $order): array
     {
         // Default: Platform Config

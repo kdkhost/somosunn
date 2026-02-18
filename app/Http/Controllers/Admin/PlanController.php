@@ -12,6 +12,12 @@ use Illuminate\Validation\Rule;
 
 class PlanController extends Controller
 {
+    protected $mpService;
+
+    public function __construct(\App\Services\Payment\MercadoPagoService $mpService)
+    {
+        $this->mpService = $mpService;
+    }
     /**
      * Recursos disponíveis para planos.
      * Esses controlam o que o MEMBRO pode acessar no site.
@@ -85,6 +91,10 @@ class PlanController extends Controller
         DB::transaction(function () use ($data) {
             $plan = Plan::create($data);
             $this->enforceSingleHighlight($plan);
+
+            if ($plan->is_recurring && empty($plan->mp_plan_id)) {
+                $this->syncWithMercadoPago($plan);
+            }
         });
 
         if ($request->expectsJson()) {
@@ -119,6 +129,10 @@ class PlanController extends Controller
         DB::transaction(function () use ($plan, $data) {
             $plan->update($data);
             $this->enforceSingleHighlight($plan);
+
+            if ($plan->is_recurring) {
+                $this->syncWithMercadoPago($plan);
+            }
         });
 
         if ($request->expectsJson()) {
@@ -186,6 +200,7 @@ class PlanController extends Controller
             'comparison.individual_mentorship' => 'nullable|string|max:50',
             'comparison.priority_support' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
+            'is_recurring' => 'nullable|boolean',
         ]);
 
         $data['slug'] = $this->generateUniqueSlug($data['slug'] ?: $data['name'], $id);
@@ -193,6 +208,7 @@ class PlanController extends Controller
         $data['is_featured'] = $data['highlight'];
         $data['coupons_enabled'] = $request->boolean('coupons_enabled');
         $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_recurring'] = $request->boolean('is_recurring');
 
         // Handle benefits from textarea
         $benefitsRaw = $request->input('benefits', '');
@@ -249,6 +265,29 @@ class PlanController extends Controller
             ]);
     }
 
+    private function syncWithMercadoPago(Plan $plan): void
+    {
+        try {
+            // Se já tem um ID, talvez queiramos atualizar no futuro. 
+            // Por enquanto, focamos em criar se for novo e for recorrente.
+            if ($plan->is_recurring && empty($plan->mp_plan_id)) {
+                $mpPlan = $this->mpService->createPreapprovalPlan([
+                    'name' => $plan->name,
+                    'price' => $plan->price,
+                    'period' => $plan->period,
+                    'billing_cycle' => $plan->billing_cycle ?: 1,
+                ]);
+
+                if (isset($mpPlan['id'])) {
+                    Plan::where('id', $plan->id)->update(['mp_plan_id' => $mpPlan['id']]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Erro ao sincronizar plano com Mercado Pago: ' . $e->getMessage());
+            // Opcional: Notificar o admin sem travar a transação do BD local
+        }
+    }
+
     private function generateUniqueSlug(string $value, ?int $ignoreId = null): string
     {
         $base = Str::slug($value);
@@ -261,7 +300,7 @@ class PlanController extends Controller
 
         while (
             Plan::query()
-                ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+                ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
                 ->where('slug', $slug)
                 ->exists()
         ) {

@@ -11,6 +11,12 @@ use App\Models\Course;
 
 class CourseController extends Controller
 {
+    protected $mpService;
+
+    public function __construct(\App\Services\Payment\MercadoPagoService $mpService)
+    {
+        $this->mpService = $mpService;
+    }
     public function available(Request $request)
     {
         $q = trim((string) $request->input('q', ''));
@@ -102,12 +108,18 @@ class CourseController extends Controller
             'thumbnail' => 'nullable|image|max:10240', // 10MB Max
             'video_floating_width' => 'nullable|integer|min:260|max:960',
             'video_floating_height' => 'nullable|integer|min:160|max:720',
+            'is_recurring' => 'nullable|boolean',
+            'period' => 'nullable|string|max:50',
+            'billing_cycle' => 'nullable|integer|min:1',
         ]);
 
         $data['is_featured'] = $request->has('is_featured');
         $data['is_certificate_enabled'] = $request->has('is_certificate_enabled');
         $data['video_block_download'] = $request->has('video_block_download');
         $data['video_floating_enabled'] = $request->has('video_floating_enabled');
+        $data['is_recurring'] = $request->boolean('is_recurring');
+        $data['period'] = $request->input('period', 'months');
+        $data['billing_cycle'] = (int) $request->input('billing_cycle', 1);
 
         // Handle Certificate Settings
         if ($request->has('certificate_settings')) {
@@ -138,7 +150,11 @@ class CourseController extends Controller
             $data['thumbnail'] = 'uploads/course-thumbs/' . $fileName;
         }
 
-        Course::create($data + ['user_id' => auth()->id()]);
+        $course = Course::create($data + ['user_id' => auth()->id()]);
+
+        if ($course->is_recurring) {
+            $this->syncWithMercadoPago($course);
+        }
 
         return response()->json(['success' => true]);
     }
@@ -187,12 +203,18 @@ class CourseController extends Controller
             'presentation_text' => 'nullable|string|max:500',
             'video_floating_width' => 'nullable|integer|min:260|max:960',
             'video_floating_height' => 'nullable|integer|min:160|max:720',
+            'is_recurring' => 'nullable|boolean',
+            'period' => 'nullable|string|max:50',
+            'billing_cycle' => 'nullable|integer|min:1',
         ]);
 
         $data['is_featured'] = $request->has('is_featured');
         $data['is_certificate_enabled'] = $request->has('is_certificate_enabled');
         $data['video_block_download'] = $request->has('video_block_download');
         $data['video_floating_enabled'] = $request->has('video_floating_enabled');
+        $data['is_recurring'] = $request->boolean('is_recurring');
+        $data['period'] = $request->input('period', $course->period ?? 'months');
+        $data['billing_cycle'] = (int) $request->input('billing_cycle', $course->billing_cycle ?? 1);
 
         // Handle Certificate Settings
         if ($request->has('certificate_settings')) {
@@ -263,7 +285,31 @@ class CourseController extends Controller
 
         $course->update($data);
 
+        if ($course->is_recurring && empty($course->mp_plan_id)) {
+            $this->syncWithMercadoPago($course);
+        }
+
         return response()->json(['success' => true]);
+    }
+
+    private function syncWithMercadoPago(Course $course): void
+    {
+        try {
+            if ($course->is_recurring && empty($course->mp_plan_id)) {
+                $mpPlan = $this->mpService->createPreapprovalPlan([
+                    'name' => 'Curso: ' . $course->title,
+                    'price' => $course->getEffectivePriceAttribute(),
+                    'period' => $course->period ?: 'months',
+                    'billing_cycle' => $course->billing_cycle ?: 1,
+                ]);
+
+                if (isset($mpPlan['id'])) {
+                    Course::where('id', $course->id)->update(['mp_plan_id' => $mpPlan['id']]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Erro ao sincronizar curso com Mercado Pago: ' . $e->getMessage());
+        }
     }
 
     public function destroy(Course $course)

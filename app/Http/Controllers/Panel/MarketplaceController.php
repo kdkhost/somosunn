@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class MarketplaceController extends Controller
 {
-    public function index()
+    public function index(\App\Services\Payment\MercadoPagoService $mpService)
     {
         $userId = (int) Auth::id();
 
@@ -20,10 +20,25 @@ class MarketplaceController extends Controller
         $pendingCount = (int) Order::where('seller_id', $userId)->where('status', 'pending')->count();
         $platformFeePercent = MarketplaceFee::percent();
 
-        $mpAccessToken = (string) (config('payments.mercadopago.access_token') ?? '');
-        $mpPublicKey = (string) (config('payments.mercadopago.public_key') ?? '');
+        $mpAccount = \App\Models\GatewayAccount::where('user_id', $userId)
+            ->where('provider', 'mercadopago')
+            ->first();
 
-        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+        $paymentsConfigured = $mpAccount && !empty($mpAccount->access_token);
+
+        $balance = ['total_amount' => 0, 'available_balance' => 0, 'unavailable_balance' => 0];
+        if ($paymentsConfigured) {
+            try {
+                $balanceData = $mpService->getBalance($userId);
+                $balance = [
+                    'total_amount' => data_get($balanceData, 'total_amount', 0),
+                    'available_balance' => data_get($balanceData, 'available_balance', 0),
+                    'unavailable_balance' => data_get($balanceData, 'unavailable_balance', 0),
+                ];
+            } catch (\Exception $e) {
+                \Log::warning('Erro ao buscar saldo MP: ' . $e->getMessage());
+            }
+        }
 
         return view('panel.marketplace.index', compact(
             'paidTotal',
@@ -32,7 +47,8 @@ class MarketplaceController extends Controller
             'paidCount',
             'pendingCount',
             'paymentsConfigured',
-            'platformFeePercent'
+            'platformFeePercent',
+            'balance'
         ));
     }
 

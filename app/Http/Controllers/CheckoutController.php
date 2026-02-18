@@ -155,6 +155,27 @@ class CheckoutController extends Controller
 
         try {
             $order->load('items', 'user');
+
+            if ($course->is_recurring && !empty($course->mp_plan_id)) {
+                $subscription = $mpService->subscribeUser($course->mp_plan_id, [
+                    'email' => Auth::user()->email,
+                    'reason' => 'Assinatura: ' . $course->title,
+                    'external_reference' => (string) $order->id,
+                    'back_url' => route('panel.dashboard'),
+                ]);
+
+                $order->update([
+                    'metadata' => array_merge($order->metadata ?? [], [
+                        'mercadopago_preapproval_id' => $subscription['id'] ?? null,
+                        'mercadopago_init_point' => $subscription['init_point'] ?? null,
+                    ]),
+                ]);
+
+                if (!empty($subscription['init_point'])) {
+                    return redirect($subscription['init_point']);
+                }
+            }
+
             $preference = $mpService->createPreference($order, [
                 'statement_descriptor' => 'UNN CURSOS',
             ]);

@@ -28,23 +28,38 @@ class GatewayAccountController extends Controller
             ]);
 
             $data = [
-                'client_id' => $validated['email'], // Using client_id to store email for consistency or extra field
+                'client_id' => $validated['email'],
                 'access_token' => $validated['token'],
                 'enabled' => true,
             ];
-            // Or prioritize extra fields if preferred, but usually access_token is fine for token
         } else {
-            // Mercado Pago Default
+            // Mercado Pago
             $validated = $request->validate([
-                'public_key' => 'required|string',
-                'access_token' => 'required|string',
+                'public_key' => 'nullable|string',
+                'access_token' => 'nullable|string',
+                'max_installments' => 'nullable|integer|min:1|max:12',
+                'pass_fee' => 'nullable|boolean',
+                'methods' => 'nullable|array'
             ]);
 
             $data = [
-                'public_key' => $validated['public_key'],
-                'access_token' => $validated['access_token'],
                 'enabled' => true,
             ];
+
+            if ($request->has('public_key'))
+                $data['public_key'] = $validated['public_key'];
+            if ($request->has('access_token'))
+                $data['access_token'] = $validated['access_token'];
+
+            // Store advanced settings in 'extra' JSON column
+            $account = GatewayAccount::where('user_id', Auth::id())->where('provider', 'mercadopago')->first();
+            $extra = $account ? (array) $account->extra : [];
+
+            $extra['max_installments'] = (int) ($validated['max_installments'] ?? 12);
+            $extra['pass_fee'] = (bool) ($validated['pass_fee'] ?? false);
+            $extra['enabled_methods'] = $validated['methods'] ?? ['credit_card', 'pix', 'ticket'];
+
+            $data['extra'] = $extra;
         }
 
         GatewayAccount::updateOrCreate(

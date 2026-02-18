@@ -422,9 +422,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings/payment', function () {
         return redirect()->route('panel.marketplace.payments');
     })->name('settings.payment');
-    Route::post('/settings/payment', function () {
-        return redirect()->route('panel.marketplace.payments');
-    })->name('settings.payment.update');
+    Route::post('/settings/payment', [\App\Http\Controllers\GatewayAccountController::class, 'update'])->name('settings.payment.update');
 });
 
 Route::get('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show');

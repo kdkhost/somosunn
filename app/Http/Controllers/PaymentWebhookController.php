@@ -23,6 +23,12 @@ class PaymentWebhookController extends Controller
     public function mercadopago(Request $request, $seller_id = 'platform')
     {
         $type = $request->input('type') ?? $request->input('topic');
+
+        // Se for preapproval (assinatura iniciada/autorizada)
+        if ($type === 'subscription_preapproval' || $type === 'preapproval') {
+            return $this->handleMPPreapproval($request);
+        }
+
         if ($type !== 'payment') {
             return response('OK', 200);
         }
@@ -60,36 +66,72 @@ class PaymentWebhookController extends Controller
                 return response('OK', 200);
             }
 
-            $wasPaid = (string) $order->status === 'paid';
+            $this->processPaidOrder($order, $paymentId, $data);
 
-            if (!$wasPaid) {
-                $order->update([
-                    'status' => 'paid',
-                    'transaction_id' => (string) $paymentId,
-                    'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
-                ]);
-                Log::info("Order #{$orderId} marked as PAID via MP Webhook");
-            } else {
-                $order->update([
-                    'transaction_id' => $order->transaction_id ?: (string) $paymentId,
-                    'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
-                ]);
-            }
-
-            app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
-            $this->confirmEventRegistrationsForOrder($order);
-            $this->activatePlanForOrder($order);
-            $this->fulfillDigitalItemsForOrder($order);
-            app(InvoiceService::class)->issueAndQueueForOrder($order);
-
-            if (!$wasPaid || !data_get($order->metadata, 'emails.marketplace_paid_sent_at')) {
-                SendMarketplaceOrderPaidEmailsJob::dispatch((int) $order->id);
-            }
         } catch (\Throwable $e) {
             Log::error('MP Webhook Error: ' . $e->getMessage(), ['seller_id' => $seller_id]);
         }
 
         return response('OK', 200);
+    }
+
+    private function handleMPPreapproval(Request $request)
+    {
+        try {
+            $preapprovalId = $request->input('data.id') ?? $request->input('id');
+            if (!$preapprovalId)
+                return response('OK', 200);
+
+            $mpService = app(\App\Services\Payment\MercadoPagoService::class);
+            $data = $mpService->getPreapproval($preapprovalId);
+
+            $orderId = $data['external_reference'] ?? null;
+            $status = (string) ($data['status'] ?? '');
+
+            if (!$orderId || !in_array($status, ['authorized', 'active'])) {
+                return response('OK', 200);
+            }
+
+            $order = Order::find($orderId);
+            if (!$order)
+                return response('OK', 200);
+
+            $this->processPaidOrder($order, $preapprovalId, $data);
+
+        } catch (\Throwable $e) {
+            Log::error('MP Preapproval Webhook Error: ' . $e->getMessage());
+        }
+
+        return response('OK', 200);
+    }
+
+    private function processPaidOrder(Order $order, $transactionId, $data)
+    {
+        $wasPaid = (string) $order->status === 'paid';
+
+        if (!$wasPaid) {
+            $order->update([
+                'status' => 'paid',
+                'transaction_id' => (string) $transactionId,
+                'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
+            ]);
+            Log::info("Order #{$order->id} marked as PAID via Webhook");
+        } else {
+            $order->update([
+                'transaction_id' => $order->transaction_id ?: (string) $transactionId,
+                'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
+            ]);
+        }
+
+        app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
+        $this->confirmEventRegistrationsForOrder($order);
+        $this->activatePlanForOrder($order);
+        $this->fulfillDigitalItemsForOrder($order);
+        app(InvoiceService::class)->issueAndQueueForOrder($order);
+
+        if (!$wasPaid || !data_get($order->metadata, 'emails.marketplace_paid_sent_at')) {
+            SendMarketplaceOrderPaidEmailsJob::dispatch((int) $order->id);
+        }
     }
 
     public function pagSeguro(Request $request)

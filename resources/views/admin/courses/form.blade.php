@@ -293,6 +293,38 @@
                                                         value="{{ old('author_name', $course->author_name ?? Auth::user()->name) }}">
                                                 </div>
 
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group mb-3">
+                                                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-primary">
+                                                                <input type="hidden" name="is_recurring" value="0">
+                                                                <input type="checkbox" class="custom-control-input" name="is_recurring" id="is_recurring" value="1" {{ $course->is_recurring ? 'checked' : '' }} onchange="toggleRecurringOptions(this)">
+                                                                <label class="custom-control-label font-weight-bold" for="is_recurring">Venda como Assinatura (Recorrente)</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div id="recurring_options" style="{{ $course->is_recurring ? '' : 'display:none;' }}">
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <div class="form-group mb-3">
+                                                                <label class="small text-muted">Período</label>
+                                                                <select name="period" class="form-control form-control-sm">
+                                                                    <option value="months" {{ $course->period == 'months' ? 'selected' : '' }}>Mensal</option>
+                                                                    <option value="days" {{ $course->period == 'days' ? 'selected' : '' }}>Diário</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <div class="form-group mb-3">
+                                                                <label class="small text-muted">A cada (ciclo)</label>
+                                                                <input type="number" name="billing_cycle" class="form-control form-control-sm" value="{{ $course->billing_cycle ?? 1 }}" min="1">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                                 <div class="form-group mb-4">
                                                     <div class="custom-control custom-switch">
                                                         <input type="checkbox" class="custom-control-input"
@@ -301,6 +333,12 @@
                                                             for="is_featured">Destaque na Home</label>
                                                     </div>
                                                 </div>
+
+                                                <script>
+                                                    function toggleRecurringOptions(el) {
+                                                        document.getElementById('recurring_options').style.display = el.checked ? 'block' : 'none';
+                                                    }
+                                                </script>
 
                                                 <div class="form-group mb-4">
                                                     <h6 class="text-muted mb-2"><i

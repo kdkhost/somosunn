@@ -25,7 +25,9 @@ class Plan extends Model
         'benefits',
         'permissions',
         'comparison',
-        'is_active'
+        'is_active',
+        'mp_plan_id',
+        'is_recurring'
     ];
 
     protected $casts = [
@@ -35,6 +37,7 @@ class Plan extends Model
         'coupons_enabled' => 'boolean',
         'is_active' => 'boolean',
         'prorata' => 'boolean',
+        'is_recurring' => 'boolean',
         'benefits' => 'array',
         'permissions' => 'array',
         'comparison' => 'array',
@@ -185,10 +188,12 @@ class Plan extends Model
             $aliases[] = 'courses_lessons_attachments_download';
         }
 
-        if (in_array($feature, [
-            'courses_lessons_attachments_upload',
-            'courses_lessons_attachments_edit',
-        ], true)) {
+        if (
+            in_array($feature, [
+                'courses_lessons_attachments_upload',
+                'courses_lessons_attachments_edit',
+            ], true)
+        ) {
             $aliases[] = 'courses.edit';
             $aliases[] = 'courses_edit';
         } elseif ($feature === 'courses_lessons_attachments_delete') {
@@ -213,7 +218,7 @@ class Plan extends Model
             $aliases[] = 'marketplace.buy';
         }
 
-        $aliases = array_values(array_unique(array_filter($aliases, static fn ($v) => is_string($v) && trim($v) !== '' && $v !== $feature)));
+        $aliases = array_values(array_unique(array_filter($aliases, static fn($v) => is_string($v) && trim($v) !== '' && $v !== $feature)));
         return $aliases;
     }
 }

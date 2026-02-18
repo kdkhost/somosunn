@@ -88,6 +88,10 @@ class Course extends Model
         'video_floating_enabled',
         'video_floating_width',
         'video_floating_height',
+        'mp_plan_id',
+        'is_recurring',
+        'period',
+        'billing_cycle',
     ];
 
     protected $casts = [
@@ -101,6 +105,7 @@ class Course extends Model
         'video_floating_enabled' => 'boolean',
         'video_floating_width' => 'integer',
         'video_floating_height' => 'integer',
+        'is_recurring' => 'boolean',
     ];
 
     public function isFlashSaleActive(): bool
