@@ -37,6 +37,27 @@
                         class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm dark:bg-slate-950 dark:text-white focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
+                    <label for="cpf" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">CPF</label>
+                    <input type="text" name="cpf" id="cpf" value="{{ old('cpf', $user->cpf) }}"
+                        class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="gender"
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Gênero</label>
+                    <select name="gender" id="gender"
+                        class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Selecione...</option>
+                        <option value="male" {{ old('gender', $user->gender) === 'male' ? 'selected' : '' }}>Masculino
+                        </option>
+                        <option value="female" {{ old('gender', $user->gender) === 'female' ? 'selected' : '' }}>Feminino
+                        </option>
+                        <option value="other" {{ old('gender', $user->gender) === 'other' ? 'selected' : '' }}>Outro</option>
+                        <option value="prefer_not_to_say" {{ old('gender', $user->gender) === 'prefer_not_to_say' ? 'selected' : '' }}>Prefiro não dizer</option>
+                    </select>
+                </div>
+
+                <div>
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">E-mail *</label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}" required maxlength="120"
                         placeholder="exemplo@email.com"

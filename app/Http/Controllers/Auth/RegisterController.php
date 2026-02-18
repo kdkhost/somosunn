@@ -18,6 +18,7 @@ class RegisterController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8|confirmed',
             'doc' => 'nullable|string',
+            'gender' => 'nullable|string|in:male,female,other,prefer_not_to_say',
             'phone' => 'nullable|string',
             'cep' => 'nullable|string',
             'address' => 'nullable|string'
@@ -28,6 +29,7 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'doc' => $data['doc'] ?? null,
+            'gender' => $data['gender'] ?? null,
             'phone' => $data['phone'] ?? null,
             'cep' => $data['cep'] ?? null,
             'address' => $data['address'] ?? null,

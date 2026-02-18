@@ -56,7 +56,8 @@
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <strong>Fatura</strong>
                             @if($order->invoice)
-                                <span class="badge badge-info">{{ $order->invoice->number ?: ('#' . $order->invoice->id) }}</span>
+                                <span
+                                    class="badge badge-info">{{ $order->invoice->number ?: ('#' . $order->invoice->id) }}</span>
                             @else
                                 <span class="badge badge-secondary">Não emitida</span>
                             @endif
@@ -92,28 +93,28 @@
                     </div>
 
                     @if($order->status === 'paid')
-                        <form action="{{ route('admin.orders.refund', $order->id) }}" method="POST" class="d-grid gap-2">
+                        <form action="{{ route('admin.orders.refund', $order->id) }}" method="POST" class="d-grid gap-2" id="form-refund-{{ $order->id }}">
                             @csrf
-                            <button type="submit" class="btn btn-danger btn-block btn-delete"
-                                onclick="return confirm('Tem certeza que deseja reembolsar este pedido?');">
+                            <button type="button" class="btn btn-danger btn-block btn-delete"
+                                onclick="confirmRefund('{{ $order->id }}')">
                                 <i class="fas fa-undo mr-1"></i> Reembolsar Pedido
                             </button>
                             <small class="text-muted text-center mt-2 d-block">Esta ação estornará o pagamento no
                                 gateway.</small>
                         </form>
                     @elseif($order->status === 'pending')
-                        <div class="d-grid gap-2">
-                            <form action="{{ route('admin.orders.approve', $order->id) }}" method="POST">
+                        @if($order->status !== 'paid' && $order->status !== 'refunded')
+                            <form action="{{ route('admin.orders.approve_manually', $order->id) }}" method="POST" class="inline-block" id="form-approve-{{ $order->id }}">
                                 @csrf
-                                <button type="submit" class="btn btn-success btn-block"
-                                    onclick="return confirm('Confirmar aprovação manual (sem pagamento no gateway)?');">
+                                <button type="button" onclick="confirmApprove('{{ $order->id }}')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                                     <i class="fas fa-check mr-1"></i> Aprovar Manualmente (Permuta)
                                 </button>
                             </form>
-                            <form action="{{ route('admin.orders.cancel', $order->id) }}" method="POST" class="mt-2">
+                            <form action="{{ route('admin.orders.cancel', $order->id) }}" method="POST" class="mt-2"
+                                id="form-cancel-{{ $order->id }}">
                                 @csrf
-                                <button type="submit" class="btn btn-warning btn-block"
-                                    onclick="return confirm('Tem certeza que deseja cancelar este pedido?');">
+                                <button type="button" class="btn btn-warning btn-block"
+                                    onclick="confirmCancel('{{ $order->id }}');">
                                     <i class="fas fa-times mr-1"></i> Cancelar Pedido
                                 </button>
                             </form>

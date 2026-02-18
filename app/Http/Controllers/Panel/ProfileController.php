@@ -22,11 +22,12 @@ class ProfileController extends Controller
         $wasProfileComplete = method_exists($user, 'isProfileComplete') ? $user->isProfileComplete() : false;
 
         $data = $request->validate([
-            'name' => 'required|string|max:120',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6|confirmed',
             'phone' => 'nullable|string|max:20',
-            'doc' => 'nullable|string|max:20',
+            'cpf' => 'nullable|string|max:14',
+            'gender' => 'nullable|string|in:male,female,other,prefer_not_to_say',
             'occupation' => 'nullable|string|max:100',
             'company' => 'nullable|string|max:100',
 
