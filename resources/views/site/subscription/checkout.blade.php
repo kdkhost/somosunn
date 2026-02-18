@@ -215,44 +215,52 @@
 
     @push('scripts')
         <style>
-            /* Reset básico para garantir que o Brick do MP renderize corretamente */
+            /* Reset agressivo para isolar o Brick do MercadoPago dos estilos globais (Tailwind/Bootstrap) */
             #cardPaymentBrick_container {
                 font-family: 'Inter', sans-serif;
-                line-height: normal;
-                /* Fix para labels flutuantes desalinhados */
+                line-height: normal !important;
                 text-align: left;
+                width: 100%;
+            }
+
+            #cardPaymentBrick_container * {
+                box-sizing: border-box !important;
             }
 
             #cardPaymentBrick_container form {
-                margin: 0;
-                padding: 0;
-            }
-
-            /* Resetar estilos globais que podem quebrar o Brick */
-            #cardPaymentBrick_container label {
-                display: inline-block !important;
-                margin-bottom: 0 !important;
-                font-weight: normal !important;
-                width: auto !important;
-                position: static !important;
-            }
-
-            #cardPaymentBrick_container .form-group,
-            #cardPaymentBrick_container .form-control {
-                margin-bottom: 0 !important;
-                border: none !important;
-                box-shadow: none !important;
+                margin: 0 !important;
                 padding: 0 !important;
             }
 
-            #cardPaymentBrick_container input {
-                height: auto !important;
-                /* Deixar o brick controlar a altura */
+            /* Resets específicos para inputs e labels */
+            #cardPaymentBrick_container label {
+                display: block !important;
+                margin-bottom: 4px !important;
+                font-weight: normal !important;
+                width: auto !important;
+                position: static !important;
+                float: none !important;
             }
 
-            /* Isolar o container de estilos globais */
-            #cardPaymentBrick_container * {
-                box-sizing: border-box;
+            #cardPaymentBrick_container input,
+            #cardPaymentBrick_container select,
+            #cardPaymentBrick_container textarea {
+                height: 48px !important;
+                /* Altura padrão para inputs do MP */
+                min-height: 48px !important;
+                padding: 10px 12px !important;
+                font-size: 16px !important;
+                /* Evita zoom no iOS */
+                line-height: normal !important;
+                margin: 0 !important;
+                border-radius: 6px !important;
+                box-shadow: none !important;
+            }
+
+            /* Corrigir placeholders e inputs que parecem desalinhados */
+            #cardPaymentBrick_container .input-container {
+                position: relative !important;
+                margin-bottom: 16px !important;
             }
         </style>
         @if(($paymentConfigured ?? false) && ($plan->price ?? 0) > 0)
