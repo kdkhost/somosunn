@@ -19,6 +19,9 @@ class EnsureConnectionIsAccepted
     public function handle(Request $request, Closure $next)
     {
         if (!Auth::check()) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['message' => 'Não autenticado.'], 401);
+            }
             return redirect()->route('login');
         }
 
@@ -30,8 +33,16 @@ class EnsureConnectionIsAccepted
         // Check for conversation if applicable
         $conversation = $request->route('conversation');
         if ($conversation) {
+            // Allow if user is part of the conversation (especially for groups)
+            if ($conversation->users->contains(Auth::id())) {
+                return $next($request);
+            }
+
             $otherUser = $conversation->users()->where('users.id', '!=', Auth::id())->first();
             if ($otherUser && !Auth::user()->isConnectedWith($otherUser->id)) {
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['message' => 'Você precisa de uma conexão aceita para conversar com este membro.'], 403);
+                }
                 return redirect()->route('portal')->with('error', 'Você precisa de uma conexão aceita para conversar com este membro.');
             }
         }
@@ -39,8 +50,17 @@ class EnsureConnectionIsAccepted
         // Check for direct user chat start if applicable
         $userId = $request->route('user');
         if ($userId) {
-            $otherUser = User::find($userId);
-            if ($otherUser && !Auth::user()->isConnectedWith($otherUser->id)) {
+            $id = $userId instanceof User ? $userId->id : $userId;
+
+            // Allow if a conversation already exists
+            $hasConversation = Auth::user()->conversations()->whereHas('users', function ($q) use ($id) {
+                $q->where('users.id', $id);
+            })->exists();
+
+            if (!$hasConversation && !Auth::user()->isConnectedWith($id)) {
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['message' => 'Solicite uma conexão primeiro.'], 403);
+                }
                 return redirect()->route('portal')->with('error', 'Solicite uma conexão primeiro.');
             }
         }
