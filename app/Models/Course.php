@@ -177,6 +177,21 @@ class Course extends Model
         return $this->status === 'published';
     }
 
+    /**
+     * Verifica se o curso foi concluído por um determinado usuário.
+     */
+    public function isCompletedBy($user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        return $this->enrollments()
+            ->where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->exists();
+    }
+
     public function certificates()
     {
         return $this->hasMany(Certificate::class);
