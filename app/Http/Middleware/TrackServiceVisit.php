@@ -21,16 +21,20 @@ class TrackServiceVisit
             $name = $route->getName();
             if (str_starts_with($name, 'courses.')) {
                 $serviceType = 'curso';
-                $serviceId = $route->parameter('course') ?? null;
+                $p = $route->parameter('course');
+                $serviceId = is_object($p) ? $p->id : ($p ?? null);
             } elseif (str_starts_with($name, 'events.')) {
                 $serviceType = 'evento';
-                $serviceId = $route->parameter('event') ?? null;
+                $p = $route->parameter('event');
+                $serviceId = is_object($p) ? $p->id : ($p ?? null);
             } elseif (str_starts_with($name, 'mentorships.')) {
                 $serviceType = 'mentoria';
-                $serviceId = $route->parameter('mentorship') ?? null;
+                $p = $route->parameter('mentorship');
+                $serviceId = is_object($p) ? $p->id : ($p ?? null);
             } elseif (str_starts_with($name, 'talks.')) {
                 $serviceType = 'palestra';
-                $serviceId = $route->parameter('talk') ?? null;
+                $p = $route->parameter('talk');
+                $serviceId = is_object($p) ? $p->id : ($p ?? null);
             } elseif ($request->is('/')) {
                 $serviceType = 'site';
             }
