@@ -43,22 +43,37 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6" id="dashboard-widgets">
+    {{-- ROW 1: Visão Geral (Educação & Compras) --}}
+    <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-4 px-1">Visão Geral</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5" id="dashboard-widgets-row1">
         @if($canAccessCourses)
             <x-widgets.metric title="Meus Cursos" icon="fas fa-graduation-cap" :value="$coursesCount ?? 0" color="blue"
                 :href="route('courses.index')" id="counter-curso" />
         @endif
+
+        @if($canAccessCommunity)
+            <x-widgets.metric title="Comunidade" icon="fas fa-users" :value="$communityCount ?? 0" color="cyan"
+                :href="route('social.feed')" id="counter-community" />
+        @endif
+
         <x-widgets.metric title="Compras pagas" icon="fas fa-check-circle" :value="$ordersPaidCount ?? 0" color="emerald"
             :href="route('marketplace.index')" id="counter-orders" />
+
         <x-widgets.metric title="Total em compras" icon="fas fa-wallet" :value="number_format($ordersPaidTotal ?? 0, 2, ',', '.')" color="green" :href="route('marketplace.index')" id="counter-orders-total" />
-        @if($canSellOnMarketplace)
+    </div>
+
+    {{-- ROW 2: Financeiro (Vendedor) --}}
+    @if($canSellOnMarketplace)
+        <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300 mt-8 mb-4 px-1">Financeiro (Vendas)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5" id="dashboard-widgets-row2">
             <x-widgets.metric title="Vendas realizadas" icon="fas fa-shopping-cart" :value="$sellerPaidCount ?? 0"
                 color="purple" :href="route('panel.marketplace.sales')" id="counter-seller" />
+
             <x-widgets.metric title="Receita líquida" icon="fas fa-coins" :value="number_format($sellerNetTotal ?? 0, 2, ',', '.')" color="yellow" :href="route('panel.marketplace.payments')" id="counter-seller-total" />
 
             {{-- WIDGET DE SALDO MP --}}
             <div
-                class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4 transition-all duration-300">
+                class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4 transition-all duration-300 h-full">
                 <div
                     class="w-12 h-12 rounded-full flex items-center justify-center text-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
                     <i class="fas fa-university"></i>
@@ -70,12 +85,8 @@
                     </h3>
                 </div>
             </div>
-        @endif
-        @if($canAccessCommunity)
-            <x-widgets.metric title="Comunidade" icon="fas fa-users" :value="$communityCount ?? 0" color="cyan"
-                :href="route('social.feed')" id="counter-community" />
-        @endif
-    </div>
+        </div>
+    @endif
 
     @if(isset($suggestedUsers) && $suggestedUsers->count() > 0)
         <div

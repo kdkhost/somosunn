@@ -37,16 +37,20 @@
                         class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm dark:bg-slate-950 dark:text-white focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label for="cpf" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">CPF</label>
-                    <input type="text" name="cpf" id="cpf" value="{{ old('cpf', $user->cpf) }}"
-                        class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500">
+                    <label for="person_type" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tipo
+                        de Pessoa</label>
+                    <select name="person_type" id="person_type"
+                        class="w-full rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-sm">
+                        <option value="F" {{ old('person_type', strlen($user->doc) > 11 ? 'J' : 'F') == 'F' ? 'selected' : '' }}>Pessoa Física</option>
+                        <option value="J" {{ old('person_type', strlen($user->doc) > 11 ? 'J' : 'F') == 'J' ? 'selected' : '' }}>Pessoa Jurídica</option>
+                    </select>
                 </div>
 
                 <div>
                     <label for="gender"
                         class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Gênero</label>
                     <select name="gender" id="gender"
-                        class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500">
+                        class="w-full rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-sm">
                         <option value="">Selecione...</option>
                         <option value="male" {{ old('gender', $user->gender) === 'male' ? 'selected' : '' }}>Masculino
                         </option>
@@ -70,9 +74,10 @@
                         class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm dark:bg-slate-950 dark:text-white focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Documento</label>
-                    <input name="doc" value="{{ old('doc', $user->doc) }}" maxlength="18" inputmode="numeric"
-                        autocomplete="off" data-mask-doc placeholder="CPF ou CNPJ"
+                    <label class="text-sm font-bold text-slate-700 dark:text-slate-300" id="doc_label">Documento
+                        (CPF)</label>
+                    <input name="doc" id="profile_doc" value="{{ old('doc', $user->doc) }}" maxlength="18"
+                        inputmode="numeric" autocomplete="off" data-mask-doc placeholder="000.000.000-00"
                         class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm dark:bg-slate-950 dark:text-white focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
@@ -434,8 +439,37 @@
                     // Telefone
                     Inputmask({ mask: ['(99) 9999-9999', '(99) 99999-9999'], keepStatic: true }).mask(document.querySelectorAll('[data-mask-phone]'));
 
-                    // CPF/CNPJ
-                    Inputmask({ mask: ['999.999.999-99', '99.999.999/9999-99'], keepStatic: true }).mask(document.querySelectorAll('[data-mask-doc]'));
+                    // CPF/CNPJ Mask Logic
+                    const docInput = document.getElementById('profile_doc');
+                    const personTypeSelect = document.getElementById('person_type');
+                    const docLabel = document.getElementById('doc_label');
+
+                    function updateDocMask() {
+                        if (!docInput || !personTypeSelect) return;
+                        
+                        const isJuridica = personTypeSelect.value === 'J';
+                        const mask = isJuridica ? '99.999.999/9999-99' : '999.999.999-99';
+                        const placeholder = isJuridica ? '00.000.000/0000-00' : '000.000.000-00';
+                        const label = isJuridica ? 'Documento (CNPJ)' : 'Documento (CPF)';
+                        
+                        if (docInput.inputmask) docInput.inputmask.remove();
+                        Inputmask({ mask: mask, keepStatic: true }).mask(docInput);
+                        
+                        docInput.placeholder = placeholder;
+                        if(docLabel) docLabel.textContent = label;
+                    }
+
+                    if (personTypeSelect) {
+                        personTypeSelect.addEventListener('change', function() {
+                            docInput.value = ''; // Clear on change to avoid mask conflict
+                            updateDocMask();
+                        });
+                        // Init
+                        updateDocMask();
+                    } else {
+                        // Fallback if no select
+                         Inputmask({ mask: ['999.999.999-99', '99.999.999/9999-99'], keepStatic: true }).mask(docInput);
+                    }
 
                     // CEP
                     Inputmask('99999-999').mask(document.querySelectorAll('[data-mask-cep]'));
