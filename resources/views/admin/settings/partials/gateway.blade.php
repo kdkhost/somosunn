@@ -110,6 +110,38 @@
                 </div>
             </div>
 
+            <div class="p-3 bg-white rounded border mb-3">
+                <h6 class="text-dark mb-3"><i class="fas fa-list-check mr-1"></i> Meios de Pagamento Aceitos
+                    (Plataforma)</h6>
+                <p class="text-sm text-muted mb-3">Selecione quais métodos de pagamento estarão disponíveis no checkout
+                    para os cursos e planos da plataforma.</p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="custom-control custom-checkbox border p-2 rounded">
+                            <input type="checkbox" class="custom-control-input" id="method_credit_card"
+                                name="mercadopago_method_credit_card" value="1" {{ ($settings['mercadopago_method_credit_card'] ?? 1) ? 'checked' : '' }}>
+                            <label class="custom-control-label font-weight-bold" for="method_credit_card">Cartão de
+                                Crédito</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="custom-control custom-checkbox border p-2 rounded">
+                            <input type="checkbox" class="custom-control-input" id="method_pix"
+                                name="mercadopago_method_pix" value="1" {{ ($settings['mercadopago_method_pix'] ?? 1) ? 'checked' : '' }}>
+                            <label class="custom-control-label font-weight-bold" for="method_pix">Pix</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="custom-control custom-checkbox border p-2 rounded">
+                            <input type="checkbox" class="custom-control-input" id="method_ticket"
+                                name="mercadopago_method_ticket" value="1" {{ ($settings['mercadopago_method_ticket'] ?? 1) ? 'checked' : '' }}>
+                            <label class="custom-control-label font-weight-bold" for="method_ticket">Boleto
+                                (Ticket)</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 

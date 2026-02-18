@@ -231,7 +231,13 @@ class SettingController extends Controller
                 'video_watermark_animate'
             ],
             'ads' => ['ads_enabled', 'ads_inter_feed_enabled'],
-            'gateway' => ['gateway_transparent_checkout', 'gateway_pass_tax_to_client'],
+            'gateway' => [
+                'gateway_transparent_checkout',
+                'gateway_pass_tax_to_client',
+                'mercadopago_method_credit_card',
+                'mercadopago_method_pix',
+                'mercadopago_method_ticket'
+            ],
             'marketplace' => ['marketplace_hero_enabled', 'marketplace_hero_autoplay', 'marketplace_exit_enabled', 'marketplace_events_popup_enabled'],
             'social' => [
                 'social_login_enabled',

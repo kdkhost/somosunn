@@ -255,9 +255,20 @@ class MercadoPagoService
         $items = [];
         $passFee = false;
         $maxInstallments = 12;
-        $enabledMethods = ['credit_card', 'pix', 'ticket'];
+        $enabledMethods = [];
+        if (Setting::get('mercadopago_method_credit_card', 1))
+            $enabledMethods[] = 'credit_card';
+        if (Setting::get('mercadopago_method_pix', 1))
+            $enabledMethods[] = 'pix';
+        if (Setting::get('mercadopago_method_ticket', 1))
+            $enabledMethods[] = 'ticket';
 
-        // Buscar config do vendedor para customizar o checkout
+        // Fallback se nada estiver configurado (segurança)
+        if (empty($enabledMethods)) {
+            $enabledMethods = ['credit_card', 'pix', 'ticket'];
+        }
+
+        // Buscar config do vendedor para customizar o checkout (sobrescreve plataforma se for marketplace)
         if ($order->seller_id) {
             $account = GatewayAccount::where('user_id', $order->seller_id)
                 ->where('provider', 'mercadopago')
@@ -267,7 +278,7 @@ class MercadoPagoService
             if ($account && is_array($account->extra)) {
                 $passFee = (bool) data_get($account->extra, 'pass_fee', false);
                 $maxInstallments = (int) data_get($account->extra, 'max_installments', 12);
-                $enabledMethods = data_get($account->extra, 'enabled_methods', ['credit_card', 'pix', 'ticket']);
+                $enabledMethods = data_get($account->extra, 'enabled_methods', $enabledMethods);
             }
         }
 
