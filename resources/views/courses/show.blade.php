@@ -4,31 +4,7 @@
 
 @push('styles')
     <style>
-        .unn-star-rating {
-            display: inline-flex;
-            flex-direction: row-reverse;
-            justify-content: flex-end;
-            gap: 6px;
-        }
-
-        .unn-star-rating input {
-            display: none;
-        }
-
-        .unn-star-rating label {
-            cursor: pointer;
-            color: #cbd5e1;
-            font-size: 24px;
-            line-height: 1;
-            margin: 0;
-            transition: color 0.15s ease;
-        }
-
-        .unn-star-rating input:checked ~ label,
-        .unn-star-rating label:hover,
-        .unn-star-rating label:hover ~ label {
-            color: #f59e0b;
-        }
+        /* Rating styles managed in partials/reviews/form.blade.php */
     </style>
 @endpush
 
@@ -132,6 +108,41 @@
 
             <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
                 <h2 class="text-2xl font-bold mb-6">Conteúdo do curso</h2>
+                {{-- Certificate Button --}}
+                @auth
+                    @if($course->isCompletedBy(auth()->user()))
+                        @php
+                            $userCert = auth()->user()->certificates()->where('course_id', $course->id)->first();
+                        @endphp
+                        
+                        <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0">
+                                    <i class="fas fa-trophy text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-green-800">Parabéns! Você concluiu este curso.</h3>
+                                    <p class="text-sm text-green-700">Seu certificado de conclusão já está disponível.</p>
+                                </div>
+                            </div>
+                            
+                            @if($userCert)
+                                <a href="{{ route('panel.certificates.download', $userCert->id) }}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition shadow-sm flex items-center gap-2 whitespace-nowrap">
+                                    <i class="fas fa-download"></i> Baixar Certificado
+                                </a>
+                            @else
+                                <form action="{{ route('panel.certificates.generate') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="course_id" value="{{ $course->id }}">
+                                    <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition shadow-sm flex items-center gap-2 whitespace-nowrap">
+                                        <i class="fas fa-certificate"></i> Gerar Certificado
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    @endif
+                @endauth
+
                 <div class="border rounded-lg divide-y">
                     @forelse($course->lessons as $lesson)
                         <div class="p-4 hover:bg-gray-50 flex items-center justify-between transition group">
@@ -175,83 +186,12 @@
                     @endif
                 </div>
 
-                @if($myReview)
-                    <div class="mb-4 rounded-lg px-4 py-3 border {{ $myReview->status === 'approved' ? 'bg-green-50 border-green-200 text-green-700' : ($myReview->status === 'rejected' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-yellow-50 border-yellow-200 text-yellow-700') }}">
-                        @if($myReview->status === 'approved')
-                            Sua avaliação está publicada.
-                        @elseif($myReview->status === 'rejected')
-                            Sua avaliação foi recusada. Você pode ajustar e enviar novamente.
-                        @else
-                            Sua avaliação está em moderação.
-                        @endif
-                    </div>
-                @endif
+                @include('reviews.list', ['reviews' => $reviews])
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    @forelse($reviews as $review)
-                        <article class="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
-                            <div class="flex items-center justify-between gap-3 mb-3">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center shrink-0 overflow-hidden">
-                                        @if(!empty($review->user->photo))
-                                            <img src="{{ $review->user->profile_photo_url ?? '' }}" alt="Foto de {{ $review->user->name ?? 'Usuário' }}" class="w-full h-full object-cover rounded-full">
-                                        @else
-                                            {{ strtoupper(mb_substr((string) ($review->user->name ?? 'U'), 0, 1)) }}
-                                        @endif
-                                    </div>
-                                    <div class="min-w-0">
-                                        <div class="font-semibold text-gray-900 truncate">{{ $review->user->name ?? 'Usuário' }}</div>
-                                        <div class="text-xs text-gray-500">{{ optional($review->created_at)->format('d/m/Y') }}</div>
-                                    </div>
-                                </div>
-                                <div class="text-amber-500 text-sm whitespace-nowrap">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <i class="{{ $i <= $review->rating ? 'fas' : 'far' }} fa-star"></i>
-                                    @endfor
-                                </div>
-                            </div>
-                            <p class="text-sm text-gray-700 leading-relaxed">{!! nl2br(e($review->comment)) !!}</p>
-                        </article>
-                    @empty
-                        <div class="md:col-span-2 rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center text-slate-500">
-                            Este curso ainda não possui avaliações aprovadas.
-                        </div>
-                    @endforelse
-                </div>
-
-                @auth
-                    <form method="POST" action="{{ route('courses.reviews.store', $course->id) }}" class="border border-slate-200 rounded-xl p-5">
-                        @csrf
-                        <h3 class="text-lg font-bold text-gray-900 mb-1">Envie sua avaliação</h3>
-                        <p class="text-sm text-gray-500 mb-4">Sua avaliação será moderada antes de aparecer na página.</p>
-
-                        <div class="mb-4">
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Nota</label>
-                            <div class="unn-star-rating" role="radiogroup" aria-label="Avaliação por estrelas">
-                                @for($i = 5; $i >= 1; $i--)
-                                    <input type="radio" id="course-rating-{{ $i }}" name="rating" value="{{ $i }}" {{ (string) $selectedRating === (string) $i ? 'checked' : '' }}>
-                                    <label for="course-rating-{{ $i }}" title="{{ $i }} de 5"><i class="fas fa-star"></i></label>
-                                @endfor
-                            </div>
-                            @error('rating')<p class="text-red-600 text-sm mt-2">{{ $message }}</p>@enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="course-review-comment" class="block text-sm font-semibold text-gray-800 mb-2">Comentário</label>
-                            <textarea id="course-review-comment" name="comment" rows="4" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Conte como foi sua experiência com este curso...">{{ old('comment', optional($myReview)->comment) }}</textarea>
-                            @error('comment')<p class="text-red-600 text-sm mt-2">{{ $message }}</p>@enderror
-                        </div>
-
-                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#1F5EDB] hover:bg-blue-700 text-white font-semibold px-5 py-2.5 transition">
-                            <i class="fas fa-paper-plane"></i>
-                            {{ $myReview ? 'Atualizar avaliação' : 'Enviar avaliação' }}
-                        </button>
-                    </form>
-                @else
-                    <div class="rounded-lg border border-dashed border-slate-300 px-4 py-5 text-sm text-slate-600">
-                        Faça <a href="{{ route('login') }}" class="text-blue-600 font-semibold">login</a> para avaliar este curso.
-                    </div>
-                @endauth
+                @include('reviews.form', [
+                    'action' => route('courses.reviews.store', $course->id),
+                    'myReview' => $myReview
+                ])
             </div>
         </div>
     </div>

@@ -31,15 +31,8 @@ class OrderController extends Controller
                 $service = new \App\Services\Payment\MercadoPagoService();
                 $service->refundPayment($order);
             } elseif ($order->gateway === 'pagseguro') {
-                $account = $order->gatewayAccount;
-                if (!$account) {
-                    // Fallback: tenta conta do vendedor (legado)
-                    $account = \App\Models\GatewayAccount::where('user_id', $order->seller_id)
-                        ->where('provider', $order->gateway)
-                        ->firstOrFail();
-                }
                 $service = new \App\Services\Payment\PagSeguroService();
-                $service->refundPayment($order, $account);
+                $service->refundPayment($order);
             } else {
                 return back()->with('error', 'Gateway não suportado para reembolso automático.');
             }
@@ -54,5 +47,54 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Erro ao processar reembolso: ' . $e->getMessage());
         }
+    }
+    public function approveManually(Order $order)
+    {
+        if ($order->status === 'paid') {
+            return back()->with('error', 'Pedido já está pago.');
+        }
+
+        $manualEnabled = \App\Models\Setting::get('marketplace_manual_approval_enabled', 0);
+        if (!$manualEnabled && !auth()->user()->isSuperAdmin()) {
+            return back()->with('error', 'Aprovação manual desabilitada.');
+        }
+
+        $order->update([
+            'status' => 'paid',
+            'paid_at' => now(), // Important for stats
+            'payment_method' => 'manual_approval',
+            'metadata' => array_merge($order->metadata ?? [], ['manual_approver_id' => auth()->id()])
+        ]);
+
+        return back()->with('success', 'Pedido aprovado manualmente com sucesso (Permuta).');
+    }
+
+    public function cancel(Order $order)
+    {
+        if ($order->status === 'paid') {
+            return $this->refund($order);
+        }
+
+        if ($order->status === 'cancelled') {
+            return back()->with('error', 'Pedido já cancelado.');
+        }
+
+        if ($order->gateway === 'mercadopago' && $order->transaction_id) {
+            try {
+                $service = new \App\Services\Payment\MercadoPagoService();
+                $service->cancelPayment($order);
+            } catch (\Exception $e) {
+                \Log::error('Erro ao cancelar no MP: ' . $e->getMessage());
+                // Proceed with local cancellation
+            }
+        }
+
+        $order->update([
+            'status' => 'cancelled',
+            'cancelled_at' => now(),
+            'metadata' => array_merge($order->metadata ?? [], ['cancelled_by' => auth()->id()])
+        ]);
+
+        return back()->with('success', 'Pedido cancelado.');
     }
 }

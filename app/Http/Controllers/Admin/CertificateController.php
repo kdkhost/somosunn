@@ -130,7 +130,14 @@ class CertificateController extends Controller
         }
 
         // 2. Regenerate PDF content
-        $output = $this->generatePdfContent($certificate->user, $type, $product, $certificate->cert_hash);
+        $generator = app(\App\Services\Certificate\CertificateGenerator::class);
+        $output = $generator->generatePdfContent(
+            $certificate->user,
+            $type,
+            $product,
+            $certificate->cert_hash,
+            $certificate->workload ?? 0
+        );
 
         // 3. Ensure pdf_path exists, create if null (for legacy certificates)
         if (!$certificate->pdf_path) {
@@ -177,10 +184,21 @@ class CertificateController extends Controller
 
         $certHash = Str::random(24);
 
-        $output = $this->generatePdfContent($user, $type, $product, $certHash);
+        // Use Service
+        $generator = app(\App\Services\Certificate\CertificateGenerator::class);
+        $output = $generator->generatePdfContent($user, $type, $product, $certHash);
 
         $path = "certificates/{$certHash}.pdf";
         Storage::disk('public')->put($path, $output);
+
+        // Calculate workload to save in DB
+        $workload = 0;
+        if ($type === 'course')
+            $workload = $product->total_hours;
+        elseif ($type === 'mentorship')
+            $workload = $product->total_hours ?? 0;
+        elseif ($type === 'event')
+            $workload = $product->duration_hours ?? 0;
 
         return Certificate::create([
             'user_id' => $user->id,
@@ -189,96 +207,12 @@ class CertificateController extends Controller
             'event_id' => $type === 'event' ? $id : null,
             'cert_hash' => $certHash,
             'pdf_path' => $path,
-            'issued_at' => now()
+            'issued_at' => now(),
+            'workload' => $workload
         ]);
     }
 
-    private function generatePdfContent($user, $type, $product, $certHash)
-    {
-        // Use the same template, but it needs a unified "product" object for background/settings
-        // We'll prepare specific labels for different product types
-        $authorName = 'Instrutor';
-        $workload = 0;
-
-        if ($type === 'course') {
-            $authorName = $product->author_name;
-            // Use stored workload from certificate if available (passed via $product if it was a certificate object, but here $product is Course)
-            // Wait, $product is the Course/Mentorship model. We need the Certificate object to get the stored workload.
-            // The method signature is generatePdfContent($user, $type, $product, $certHash).
-            // We can look up the certificate by hash to get the workload.
-            $cert = Certificate::where('cert_hash', $certHash)->first();
-            if ($cert && $cert->workload) {
-                $workload = $cert->workload;
-            } else {
-                $workload = $product->total_hours;
-            }
-        } elseif ($type === 'mentorship') {
-            $authorName = $product->mentor ? $product->mentor->name : 'Mentor';
-            $cert = Certificate::where('cert_hash', $certHash)->first();
-            if ($cert && $cert->workload) {
-                $workload = $cert->workload;
-            } else {
-                $workload = $product->total_hours ?? 0;
-            }
-            // Mentorships might not have certificate settings yet, use defaults or course structure
-        } elseif ($type === 'event') {
-            $authorName = $product->user ? $product->user->name : 'Organizador';
-            $cert = Certificate::where('cert_hash', $certHash)->first();
-            if ($cert && $cert->workload) {
-                $workload = $cert->workload;
-            } else {
-                $workload = $product->duration_hours ?? 0;
-            }
-        }
-
-        // Configure DomPDF
-        $dompdfStorageDir = storage_path('app/dompdf');
-        $fontDir = $dompdfStorageDir . DIRECTORY_SEPARATOR . 'fonts';
-        $fontCache = $dompdfStorageDir . DIRECTORY_SEPARATOR . 'font-cache';
-        $tempDir = $dompdfStorageDir . DIRECTORY_SEPARATOR . 'tmp';
-
-        foreach ([$fontDir, $fontCache, $tempDir] as $dir) {
-            if (!is_dir($dir)) {
-                @mkdir($dir, 0775, true);
-            }
-        }
-
-        $options = new Options();
-        $options->set('isRemoteEnabled', true); // Allow remote images (http/https)
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('chroot', public_path()); // Allow access to public folder
-        $options->set('dpi', 72); // Align pixels with editor canvas (842x595)
-        $options->set('fontDir', $fontDir);
-        $options->set('fontCache', $fontCache);
-        $options->set('tempDir', $tempDir);
-
-        $dompdf = new Dompdf($options);
-
-        // Sanitize background path for Windows (DomPDF prefers forward slashes)
-        if ($product->certificate_bg) {
-            $product->certificate_bg = str_replace('\\', '/', $product->certificate_bg);
-        }
-
-        $fontCss = app(CertificateFontCssGenerator::class)->buildFontCss($product->certificate_settings ?? [], false);
-
-        $html = view('admin.certificates.template', [
-            'user' => $user,
-            'course' => $product, // $product is passed as $course to the view
-            'certHash' => $certHash,
-            'authorName' => $authorName,
-            'workload' => $workload,
-            'type' => $type,
-            'fontCss' => $fontCss,
-            'isPreview' => false // Explicitly set for PDF generation
-        ])->render();
-
-        $dompdf->loadHtml($html, 'UTF-8');
-        // Set paper to standard A4 Landscape
-        $dompdf->setPaper('A4', 'landscape');
-        $dompdf->render();
-
-        return $dompdf->output();
-    }
+    // Removed generatePdfContent as it is now in Service
 
     public function sendEmail(Certificate $certificate)
     {
@@ -347,7 +281,15 @@ class CertificateController extends Controller
                 }
 
                 if ($product) {
-                    $output = $this->generatePdfContent($user, $type, $product, $cert->cert_hash);
+                    $generator = app(\App\Services\Certificate\CertificateGenerator::class);
+                    $output = $generator->generatePdfContent(
+                        $user,
+                        $type,
+                        $product,
+                        $cert->cert_hash,
+                        $cert->workload ?? 0
+                    );
+
                     $newPath = "certificates/{$cert->cert_hash}.pdf";
                     \Storage::disk('public')->put($newPath, $output);
                     $cert->update(['pdf_path' => $newPath]);

@@ -51,9 +51,16 @@
                 </div>
             </div>
         @empty
-            <div class="col-span-2 py-12 text-center text-slate-400 dark:text-slate-600 transition-colors">
-                <i class="fas fa-award text-5xl mb-4 opacity-20"></i>
-                <p class="font-medium text-lg">Nenhum certificado encontrado.</p>
+            <div
+                class="col-span-1 md:col-span-2 py-12 text-center text-slate-400 dark:text-slate-600 transition-colors bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
+                <i class="fas fa-award text-6xl mb-4 opacity-20"></i>
+                <h3 class="font-bold text-lg text-slate-700 dark:text-slate-300 mb-2">Nenhum certificado encontrado</h3>
+                <p class="text-slate-500 mb-6 max-w-md mx-auto">Complete seus cursos para desbloquear seus certificados e
+                    exibi-los aqui.</p>
+                <a href="{{ route('courses.index') }}"
+                    class="inline-flex items-center gap-2 px-6 py-3 bg-[#1F5EDB] hover:bg-blue-700 text-white rounded-xl font-bold transition shadow-lg shadow-blue-500/20">
+                    <i class="fas fa-graduation-cap"></i> Ir para meus cursos
+                </a>
             </div>
         @endforelse
     </div>

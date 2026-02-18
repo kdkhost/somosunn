@@ -183,6 +183,10 @@ class MailTemplateController extends Controller
             ],
             'course' => ['title' => 'Curso de Networking'],
             'mentorship' => ['title' => 'Mentoria Premium'],
+            'abandoned_cart' => [
+                'link' => url('/checkout/recuperar/PED-12345'),
+                'items' => 'Curso de Laravel, Mentoria Elite'
+            ]
         ];
     }
 

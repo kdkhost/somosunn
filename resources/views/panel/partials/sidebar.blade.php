@@ -43,6 +43,12 @@
             Meu perfil
         </a>
 
+        <a href="{{ route('panel.wishlist.index') }}"
+            class="{{ $navItemClass(request()->routeIs('panel.wishlist.*')) }}">
+            <i class="fas fa-heart w-5 opacity-80"></i>
+            Minha Lista
+        </a>
+
         <a href="{{ route('portal') }}" class="{{ $navItemClass(request()->is('portal')) }}">
             <i class="fas fa-home w-5 opacity-80"></i>
             Portal

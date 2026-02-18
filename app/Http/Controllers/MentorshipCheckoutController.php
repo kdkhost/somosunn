@@ -29,20 +29,25 @@ class MentorshipCheckoutController extends Controller
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
         }
 
+        // Check MercadoPago
         $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
         $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
-        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+        $mpEnabled = $mpAccessToken !== '' && $mpPublicKey !== '';
 
-        if (!$paymentsConfigured) {
+        // Check PagSeguro
+        $psToken = trim((string) config('payments.pagseguro.access_token'));
+        $psEnabled = $psToken !== '';
+
+        if (!$mpEnabled && !$psEnabled) {
             return redirect()
                 ->route('mentorships.show', $mentorship)
-                ->with('error', 'Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.');
+                ->with('error', 'Nenhum método de pagamento disponível no momento.');
         }
 
-        return view('checkout.mentorship', compact('mentorship'));
+        return view('checkout.mentorship', compact('mentorship', 'mpEnabled', 'psEnabled'));
     }
 
-    public function process(Request $request, Mentorship $mentorship, MercadoPagoService $mpService, CouponService $couponService)
+    public function process(Request $request, Mentorship $mentorship, MercadoPagoService $mpService, \App\Services\Payment\PagSeguroService $psService, CouponService $couponService)
     {
         if (!Auth::check()) {
             return redirect()->guest(route('login'))->with('error', 'Faça login para finalizar a compra da mentoria.');
@@ -55,25 +60,23 @@ class MentorshipCheckoutController extends Controller
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
         }
 
-        $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
-        $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
-        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
-
-        if (!$paymentsConfigured) {
-            return redirect()
-                ->route('mentorships.show', $mentorship)
-                ->with('error', 'Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.');
-        }
-
         $request->validate([
             'coupon_code' => 'nullable|string|max:40',
+            'gateway_provider' => 'nullable|string|in:mercadopago,pagseguro',
         ]);
+
+        $gatewayProvider = $request->input('gateway_provider', 'mercadopago');
+        if ($gatewayProvider === 'mercadopago') {
+            $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
+            if (empty($mpAccessToken))
+                $gatewayProvider = 'pagseguro';
+        }
 
         $order = null;
         $couponCode = $couponService->normalizeCode($request->input('coupon_code'));
 
         try {
-            DB::transaction(function () use ($mentorship, $couponCode, $couponService, &$order) {
+            DB::transaction(function () use ($mentorship, $couponCode, $couponService, &$order, $gatewayProvider) {
                 $regularUnitPrice = round((float) ($mentorship->price ?? 0), 2);
                 $effectiveUnitPrice = round((float) ($mentorship->effective_price ?? $regularUnitPrice), 2);
                 $originalTotal = $effectiveUnitPrice;
@@ -105,7 +108,7 @@ class MentorshipCheckoutController extends Controller
                     'fee_amount' => 0,
                     'platform_fee_amount' => $platformFeeAmount,
                     'currency' => 'BRL',
-                    'gateway' => 'mercadopago',
+                    'gateway' => $gatewayProvider,
                     'gateway_account_id' => null,
                     'metadata' => [
                         'context' => 'mentorship',
@@ -155,27 +158,34 @@ class MentorshipCheckoutController extends Controller
 
         try {
             $order->load('items', 'user');
-            $preference = $mpService->createPreference($order, [
-                'statement_descriptor' => 'UNN MENTORIAS',
-            ]);
 
-            $order->update([
-                'metadata' => array_merge($order->metadata ?? [], [
-                    'mercadopago_preference_id' => $preference['id'] ?? null,
-                    'mercadopago_init_point' => $preference['init_point'] ?? null,
-                    'mercadopago_sandbox_init_point' => $preference['sandbox_init_point'] ?? null,
-                ]),
-            ]);
+            if ($gatewayProvider === 'pagseguro') {
+                return view('checkout.pagseguro_transparent', [
+                    'order' => $order,
+                    'publicKey' => config('payments.pagseguro.public_key')
+                ]);
+            } else {
+                $preference = $mpService->createPreference($order, [
+                    'statement_descriptor' => 'UNN MENTORIAS',
+                ]);
 
-            return view('checkout.transparent', [
-                'order' => $order,
-                'preferenceId' => $preference['id'] ?? '',
-                'publicKey' => $mpPublicKey,
-            ]);
+                $order->update([
+                    'metadata' => array_merge($order->metadata ?? [], [
+                        'mercadopago_preference_id' => $preference['id'] ?? null,
+                        'mercadopago_init_point' => $preference['init_point'] ?? null,
+                        'mercadopago_sandbox_init_point' => $preference['sandbox_init_point'] ?? null,
+                    ]),
+                ]);
+
+                return view('checkout.transparent', [
+                    'order' => $order,
+                    'preferenceId' => $preference['id'] ?? '',
+                    'publicKey' => config('payments.mercadopago.public_key'),
+                ]);
+            }
+
         } catch (\Exception $e) {
             return back()->with('error', 'Erro ao processar pagamento: ' . $e->getMessage());
         }
-
-        return back()->with('error', 'Gateway não suportado.');
     }
 }

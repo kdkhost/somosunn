@@ -50,15 +50,8 @@ class OrderController extends Controller
                 $service = new \App\Services\Payment\MercadoPagoService();
                 $service->refundPayment($order);
             } elseif ($order->gateway === 'pagseguro') {
-                $account = $order->gatewayAccount;
-                if (!$account) {
-                    // Fallback: tenta conta do vendedor (legado)
-                    $account = \App\Models\GatewayAccount::where('user_id', $order->seller_id)
-                        ->where('provider', $order->gateway)
-                        ->firstOrFail();
-                }
                 $service = new \App\Services\Payment\PagSeguroService();
-                $service->refundPayment($order, $account);
+                $service->refundPayment($order);
             } else {
                 return back()->with('error', 'Gateway não suportado para reembolso automático.');
             }

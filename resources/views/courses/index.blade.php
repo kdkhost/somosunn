@@ -55,6 +55,8 @@
         $featuredRouteParam = $featured?->slug ?: ($featured?->id ?? null);
         $featuredShowUrl = (!$isDemo && $featuredRouteParam) ? route('courses.show', $featuredRouteParam) : '#';
         $featuredCheckoutUrl = (!$isDemo && !empty($featured?->id)) ? route('checkout.show', $featured->id) : '#';
+
+        $wishlistIds = auth()->check() ? auth()->user()->wishlist()->pluck('course_id')->toArray() : [];
     @endphp
 
     <div class="min-h-screen">
@@ -113,6 +115,11 @@
                                                 </span>
                                             </div>
                                         @endif
+                                        
+                                        <button class="btn-wishlist absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur flex items-center justify-center transition group" 
+                                            data-id="{{ $featured->id }}" title="Adicionar à lista">
+                                            <i class="{{ in_array($featured->id, $wishlistIds) ? 'fas text-red-500' : 'far text-white group-hover:text-red-500' }} fa-heart text-lg transition-transform duration-200"></i>
+                                        </button>
                                     </div>
 
                                     <div class="p-8 md:p-10 bg-white">
@@ -312,6 +319,11 @@
                                                     </span>
                                                 @endif
                                             </div>
+
+                                            <button class="btn-wishlist absolute top-4 right-4 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow-sm transition group" 
+                                                data-id="{{ $course->id }}" title="Minha Lista">
+                                                <i class="{{ in_array($course->id, $wishlistIds) ? 'fas text-red-500' : 'far text-slate-400 group-hover:text-red-500' }} fa-heart transition-transform duration-200"></i>
+                                            </button>
                                         </div>
 
                                         <div class="p-6">
@@ -429,6 +441,10 @@
             </div>
         </section>
 
+                </div>
+            </div>
+        </section>
+
         <section class="unn-courses-cta py-12 md:py-16 px-4 md:px-12 lg:px-24 text-white">
             <div class="max-w-7xl mx-auto">
                 <div class="rounded-[32px] border border-white/15 bg-white/10 backdrop-blur p-10 md:p-12 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
@@ -450,4 +466,75 @@
             </div>
         </section>
     </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const wishlistBtns = document.querySelectorAll('.btn-wishlist');
+
+            wishlistBtns.forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    if (!{{ auth()->check() ? 'true' : 'false' }}) {
+                        window.location.href = '{{ route('login') }}';
+                        return;
+                    }
+
+                    const courseId = btn.dataset.id;
+                    const icon = btn.querySelector('i');
+
+                    // Optimistic UI update
+                    const isActive = icon.classList.contains('fas');
+                    if (isActive) {
+                        icon.classList.replace('fas', 'far'); // empty
+                        icon.classList.remove('text-red-500');
+                        icon.classList.add('text-slate-400');
+                    } else {
+                        icon.classList.replace('far', 'fas'); // filled
+                        icon.classList.remove('text-slate-400');
+                        icon.classList.add('text-red-500');
+                    }
+                    // Animate
+                    icon.classList.add('scale-125');
+                    setTimeout(() => icon.classList.remove('scale-125'), 200);
+
+                    try {
+                        const response = await fetch(`/painel/minha-lista/toggle/${courseId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+                        const data = await response.json();
+                        
+                        // Sync state across all buttons for same course
+                        document.querySelectorAll(`.btn-wishlist[data-id="${courseId}"] i`).forEach(i => {
+                            if(data.is_wishlisted) {
+                                i.classList.replace('far', 'fas');
+                                i.classList.remove('text-slate-400');
+                                i.classList.add('text-red-500');
+                            } else {
+                                i.classList.replace('fas', 'far');
+                                i.classList.remove('text-red-500');
+                                i.classList.add('text-slate-400');
+                            }
+                        });
+
+                    } catch (err) {
+                        console.error('Erro ao atualizar wishlist', err);
+                        // Revert on error
+                        if (isActive) {
+                             icon.classList.replace('far', 'fas');
+                             icon.classList.add('text-red-500');
+                        } else {
+                             icon.classList.replace('fas', 'far');
+                             icon.classList.remove('text-red-500');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    @endpush
 @endsection

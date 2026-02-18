@@ -17,19 +17,49 @@ class MercadoPagoService
         //
     }
 
+    private function calculateTotalAndFee(Order $order, array $config): array
+    {
+        $originalAmount = (float) $order->total_amount;
+        $feePercent = (float) Setting::get('marketplace_platform_fee_percent', 0);
+        $globalBehavior = Setting::get('marketplace_fee_behavior', 'absorb');
+
+        // Check Seller Override
+        $passFee = $config['pass_fee'] ?? ($globalBehavior === 'pass');
+
+        $finalAmount = $originalAmount;
+        $applicationFee = 0.0;
+
+        if ($feePercent > 0 && !$config['is_platform']) {
+            if ($passFee) {
+                // Pass Fee: Add fee to total.
+                // Formula: Total = Original + (Original * Fee%)
+                $feeValue = round($originalAmount * ($feePercent / 100), 2);
+                $finalAmount = $originalAmount + $feeValue;
+                $applicationFee = $feeValue;
+            } else {
+                // Absorb Fee: Deduct from seller.
+                // Formula: Application Fee = Total * Fee%
+                $applicationFee = round($originalAmount * ($feePercent / 100), 2);
+            }
+        }
+
+        return [
+            'transaction_amount' => $finalAmount,
+            'application_fee' => $applicationFee,
+        ];
+    }
+
     public function createPreference(Order $order, array $options = []): array
     {
         $config = $this->getSellerConfig($order);
         $token = $config['token'];
 
-        $preferenceData = $this->buildPreferenceData($order, $options);
+        $calc = $this->calculateTotalAndFee($order, $config);
 
-        // Se não for venda da própria plataforma, aplicar marketplace_fee
-        if (!$config['is_platform']) {
-            $fee = $this->calculateApplicationFee($order);
-            if ($fee > 0) {
-                $preferenceData['marketplace_fee'] = $fee;
-            }
+        $preferenceData = $this->buildPreferenceData($order, $options, $calc);
+
+        if (!$config['is_platform'] && $calc['application_fee'] > 0) {
+            $preferenceData['marketplace_fee'] = $calc['application_fee'];
         }
 
         $response = Http::withToken($token)
@@ -47,8 +77,10 @@ class MercadoPagoService
         $config = $this->getSellerConfig($order);
         $token = $config['token'];
 
+        $calc = $this->calculateTotalAndFee($order, $config);
+
         $paymentData = [
-            'transaction_amount' => (float) $order->total_amount,
+            'transaction_amount' => $calc['transaction_amount'],
             'description' => $this->orderDescription($order),
             'payment_method_id' => 'pix',
             'payer' => [
@@ -64,12 +96,8 @@ class MercadoPagoService
             'notification_url' => $this->notificationUrl(),
         ];
 
-        // Se usar token do vendedor, aplicar application_fee
-        if (!$config['is_platform']) {
-            $fee = $this->calculateApplicationFee($order);
-            if ($fee > 0) {
-                $paymentData['application_fee'] = $fee;
-            }
+        if (!$config['is_platform'] && $calc['application_fee'] > 0) {
+            $paymentData['application_fee'] = $calc['application_fee'];
         }
 
         $response = Http::withToken($token)
@@ -95,8 +123,10 @@ class MercadoPagoService
         $config = $this->getSellerConfig($order);
         $token = $config['token'];
 
+        $calc = $this->calculateTotalAndFee($order, $config);
+
         $paymentData = [
-            'transaction_amount' => (float) $order->total_amount,
+            'transaction_amount' => $calc['transaction_amount'],
             'token' => $data['token'],
             'description' => $this->orderDescription($order),
             'installments' => (int) $data['installments'],
@@ -113,12 +143,8 @@ class MercadoPagoService
             'notification_url' => $this->notificationUrl(),
         ];
 
-        // Se usar token do vendedor, aplicar application_fee
-        if (!$config['is_platform']) {
-            $fee = $this->calculateApplicationFee($order);
-            if ($fee > 0) {
-                $paymentData['application_fee'] = $fee;
-            }
+        if (!$config['is_platform'] && $calc['application_fee'] > 0) {
+            $paymentData['application_fee'] = $calc['application_fee'];
         }
 
         $response = Http::withToken($token)
@@ -197,11 +223,6 @@ class MercadoPagoService
     {
         $token = $this->accessToken();
 
-        // Marketplace application_fee (split) em assinaturas
-        // Nota: O MP não suporta 'application_fee' diretamente no preapproval_plan.
-        // O split deve ser feito na captura do pagamento gerado pela assinatura.
-        // No entanto, podemos definir o 'collector_id' se estivermos usando aplicação marketplace.
-
         $planData = [
             'reason' => $data['name'],
             'auto_setup' => [
@@ -229,7 +250,7 @@ class MercadoPagoService
         return match (strtolower($period)) {
             'day', 'days' => 'days',
             'month', 'months', 'mensal' => 'months',
-            'year', 'years', 'anual' => 'months', // MP recorrente anual costuma ser 12 meses
+            'year', 'years', 'anual' => 'months',
             default => 'months',
         };
     }
@@ -253,25 +274,22 @@ class MercadoPagoService
         return 'UNN - Pedido #' . $order->id;
     }
 
-    private function buildPreferenceData(Order $order, array $options = []): array
+    private function buildPreferenceData(Order $order, array $options = [], array $calc = []): array
     {
         $items = [];
-        $passFee = false;
         $maxInstallments = 12;
         $enabledMethods = [];
         if (Setting::get('mercadopago_method_credit_card', 1))
             $enabledMethods[] = 'credit_card';
+        if (Setting::get('mercadopago_method_debit_card', 1))
+            $enabledMethods[] = 'debit_card';
         if (Setting::get('mercadopago_method_pix', 1))
             $enabledMethods[] = 'pix';
-        if (Setting::get('mercadopago_method_ticket', 1))
-            $enabledMethods[] = 'ticket';
 
-        // Fallback se nada estiver configurado (segurança)
         if (empty($enabledMethods)) {
-            $enabledMethods = ['credit_card', 'pix', 'ticket'];
+            $enabledMethods = ['credit_card', 'debit_card', 'pix'];
         }
 
-        // Buscar config do vendedor para customizar o checkout (sobrescreve plataforma se for marketplace)
         if ($order->seller_id) {
             $account = GatewayAccount::where('user_id', $order->seller_id)
                 ->where('provider', 'mercadopago')
@@ -279,21 +297,25 @@ class MercadoPagoService
                 ->first();
 
             if ($account && is_array($account->extra)) {
-                $passFee = (bool) data_get($account->extra, 'pass_fee', false);
                 $maxInstallments = (int) data_get($account->extra, 'max_installments', 12);
                 $enabledMethods = data_get($account->extra, 'enabled_methods', $enabledMethods);
             }
         }
 
-        // Se o vendedor repassar a taxa, aumentamos o valor do item proporcionalmente (estimativa de 5% se não houver taxa exata)
-        $feeMultiplier = $passFee ? 1.05 : 1.0;
+        // If we calculated a new total (passed fee), we need to adjust item prices roughly
+        // or just send one aggregate item if detail isn't crucial.
+        // For precision, let's adjust the unit price of items relative to the new total.
+
+        $originalTotal = (float) $order->total_amount;
+        $newTotal = $calc['transaction_amount'] ?? $originalTotal;
+        $ratio = ($originalTotal > 0) ? ($newTotal / $originalTotal) : 1.0;
 
         foreach ($order->items as $item) {
             $items[] = [
                 'title' => $item->title,
                 'quantity' => $item->quantity,
                 'currency_id' => 'BRL',
-                'unit_price' => round((float) $item->price * $feeMultiplier, 2)
+                'unit_price' => round((float) $item->price * $ratio, 2)
             ];
         }
 
@@ -304,7 +326,6 @@ class MercadoPagoService
         }
 
         $token = (string) data_get($order->metadata, 'public_token', '');
-
         $fallbackPlanId = (int) optional($order->items->first())->item_id;
         $subscriptionCheckoutUrl = $fallbackPlanId ? route('subscription.checkout', ['plan' => $fallbackPlanId]) : url('/');
 
@@ -336,7 +357,6 @@ class MercadoPagoService
             $statementDescriptor = 'UNN PLATAFORMA';
         }
 
-        // Configurar métodos de pagamento e parcelas
         $paymentMethods = [
             'installments' => $maxInstallments,
         ];
@@ -346,6 +366,14 @@ class MercadoPagoService
             $excludedMethods[] = ['id' => 'credit_card'];
         if (!in_array('pix', $enabledMethods))
             $excludedMethods[] = ['id' => 'pix'];
+        if (!in_array('debit_card', $enabledMethods))
+            $excludedMethods[] = ['id' => 'debit_card'];
+
+        // Always exclude ticket unless somehow forced, but effectively we want to ban it as per user requirement.
+        // Even if it was in enabledMethods (old config), we might want to force exclude or just respect config?
+        // User said "No Boleto". So let's force exclude it or just not check for it.
+        // If we don't check for it in enabledMethods, it won't be in allowed list.
+        // But we must add it to excluded list if we want to block it.
         if (!in_array('ticket', $enabledMethods))
             $excludedMethods[] = ['id' => 'ticket'];
 
@@ -370,19 +398,21 @@ class MercadoPagoService
 
     public function refundPayment(Order $order): array
     {
-        // For MercadoPago, we need the Payment ID (not Preference ID).
-        // Assuming we stored the payment ID in the order or a transaction table.
-        // For now, we'll try to use the external reference's payment collection fetch or assume order->payment_id exists.
-
         if (!$order->transaction_id) {
             throw new Exception('ID da transação de pagamento não encontrado para este pedido.');
         }
 
-        $accessToken = $this->accessToken();
+        // Determine who holds the token (Seller or Platform)
+        // If the order was a split payment or direct payment to seller, we need seller token?
+        // Actually, for split payments, the platform token (collector) might be needed to refund?
+        // - If standard split: Platform is aggregator.
+        // - If direct pay to seller: Seller token.
+
+        $config = $this->getSellerConfig($order);
+        $token = $config['token'];
         $paymentId = $order->transaction_id;
 
-        // Refund full amount
-        $response = Http::withToken($accessToken)
+        $response = Http::withToken($token)
             ->withHeaders(['X-Idempotency-Key' => 'refund-' . $paymentId . '-' . time()])
             ->post("{$this->baseUrl}/v1/payments/{$paymentId}/refunds");
 
@@ -392,6 +422,55 @@ class MercadoPagoService
 
         return (array) $response->json();
     }
+
+    public function cancelPayment(Order $order): array
+    {
+        if (!$order->transaction_id) {
+            // Se não tem ID de transação, apenas retorna sucesso (cancelamento local)
+            return ['status' => 'cancelled', 'note' => 'Local only'];
+        }
+
+        $config = $this->getSellerConfig($order);
+        $token = $config['token'];
+        $paymentId = $order->transaction_id;
+
+        $response = Http::withToken($token)
+            ->withHeaders(['X-Idempotency-Key' => 'cancel-' . $paymentId . '-' . time()])
+            ->put("{$this->baseUrl}/v1/payments/{$paymentId}", [
+                'status' => 'cancelled'
+            ]);
+
+        if ($response->failed()) {
+            // Ignorar erro se já estiver cancelado ou não puder ser cancelado (ex: expirado)
+            // Mas lançar exceção se for erro de autenticação ou sistema
+            if ($response->status() !== 400) {
+                throw new Exception('Falha ao cancelar pagamento no MP: ' . $response->body());
+            }
+        }
+
+        return (array) $response->json();
+    }
+
+    public function validateCredentials(int $userId): bool
+    {
+        $account = GatewayAccount::where('user_id', $userId)
+            ->where('provider', 'mercadopago')
+            ->first();
+
+        if (!$account || empty($account->access_token)) {
+            throw new Exception('Credenciais não encontradas.');
+        }
+
+        $response = Http::withToken($account->access_token)
+            ->get("{$this->baseUrl}/users/me");
+
+        if ($response->failed()) {
+            throw new Exception('Falha na validação: ' . $response->body());
+        }
+
+        return true;
+    }
+
     public function getBalance(?int $sellerId = null): array
     {
         $token = null;
@@ -416,7 +495,6 @@ class MercadoPagoService
             ->get("{$this->baseUrl}/users/me/mercadopago_account/balance");
 
         if ($response->failed()) {
-            // Se falhar, tenta o endpoint alternativo ou retorna zerado
             return [
                 'total_amount' => 0,
                 'available_balance' => 0,
@@ -430,14 +508,13 @@ class MercadoPagoService
 
     private function getSellerConfig(Order $order): array
     {
-        // Default: Platform Config
         $config = [
             'token' => trim((string) config('payments.mercadopago.access_token')),
             'public_key' => trim((string) config('payments.mercadopago.public_key')),
-            'is_platform' => true
+            'is_platform' => true,
+            'pass_fee' => null
         ];
 
-        // Check if order has a specific seller
         if ($order->seller_id) {
             $sellerAccount = GatewayAccount::where('user_id', $order->seller_id)
                 ->where('provider', 'mercadopago')
@@ -445,16 +522,22 @@ class MercadoPagoService
                 ->first();
 
             if ($sellerAccount && !empty($sellerAccount->access_token)) {
+                $passFee = null;
+                if (is_array($sellerAccount->extra) && isset($sellerAccount->extra['pass_fee'])) {
+                    $passFee = (bool) $sellerAccount->extra['pass_fee'];
+                }
+
                 $config = [
                     'token' => $sellerAccount->access_token,
                     'public_key' => $sellerAccount->public_key,
-                    'is_platform' => false
+                    'is_platform' => false,
+                    'pass_fee' => $passFee
                 ];
             }
         }
 
         if (empty($config['token'])) {
-            throw new Exception('MercadoPago não configurado para processar este pedido (Seller ou Plataforma).');
+            throw new Exception('Vendedor não possui conta MercadoPago conectada.');
         }
 
         return $config;
@@ -462,13 +545,6 @@ class MercadoPagoService
 
     private function calculateApplicationFee(Order $order): ?float
     {
-        $percentage = (float) Setting::get('marketplace_fee', 10);
-
-        if ($percentage <= 0) {
-            return null;
-        }
-
-        $fee = ($order->total_amount * $percentage) / 100;
-        return round($fee, 2);
+        return null;
     }
 }

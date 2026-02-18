@@ -7,6 +7,10 @@ use App\Models\Order;
 use App\Support\MarketplaceFee;
 use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Http\Request;
+use App\Services\Payment\MercadoPagoService;
+use App\Services\Payment\PagSeguroService; // Ensure this class exists namespace
+
 class MarketplaceController extends Controller
 {
     public function index(\App\Services\Payment\MercadoPagoService $mpService)
@@ -89,5 +93,23 @@ class MarketplaceController extends Controller
 
         return view('panel.marketplace.sales', compact('orders', 'paidTotal', 'platformFeeTotal', 'netTotal', 'paidCount'));
     }
-}
 
+    public function testCredentials(Request $request)
+    {
+        $provider = $request->input('provider', 'mercadopago');
+
+        try {
+            if ($provider === 'pagseguro') {
+                $service = new PagSeguroService();
+                $service->validateCredentials(auth()->id());
+            } else {
+                $service = new MercadoPagoService();
+                $service->validateCredentials(auth()->id());
+            }
+
+            return redirect()->back()->with('success', 'Conexão testada com sucesso! Credenciais válidas.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Falha na conexão: ' . $e->getMessage());
+        }
+    }
+}

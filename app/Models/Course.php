@@ -202,4 +202,9 @@ class Course extends Model
     {
         return (int) $this->reviews()->approved()->count();
     }
+
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'wishlists', 'course_id', 'user_id')->withTimestamps();
+    }
 }

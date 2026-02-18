@@ -21,6 +21,12 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             \App\Models\ActivityLog::where('created_at', '<', now()->subMonths(3))->delete();
         })->daily()->name('prune_activity_logs');
+
+        // Cancel unpaid orders older than 48 hours
+        $schedule->command('orders:cancel-unpaid')->hourly()->withoutOverlapping();
+
+        // Send abandoned cart emails (> 24h)
+        $schedule->command('orders:abandoned-cart')->hourly()->withoutOverlapping();
     }
 
     protected function commands(): void

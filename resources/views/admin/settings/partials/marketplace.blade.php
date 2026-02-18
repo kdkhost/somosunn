@@ -24,6 +24,28 @@
                     Percentual descontado do vendedor em cada venda (não altera o preço exibido para o comprador).
                 </small>
             </div>
+
+            <div class="form-group">
+                <label>Comportamento da Taxa</label>
+                <select name="marketplace_fee_behavior" class="form-control">
+                    @php $behavior = $settings['marketplace_fee_behavior'] ?? 'absorb'; @endphp
+                    <option value="absorb" {{ $behavior === 'absorb' ? 'selected' : '' }}>Absorver (Descontar do Vendedor)</option>
+                    <option value="pass" {{ $behavior === 'pass' ? 'selected' : '' }}>Repassar (Adicionar ao Cliente)</option>
+                </select>
+                <small class="text-muted">
+                    Defina se a taxa será descontada do valor recebido pelo vendedor ou acrescida ao valor pago pelo cliente.
+                </small>
+            </div>
+
+            <div class="form-group mb-4">
+                <div class="custom-control custom-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
+                    <input type="hidden" name="marketplace_manual_approval_enabled" value="0">
+                    <input type="checkbox" class="custom-control-input" id="marketplace_manual_approval_enabled"
+                        name="marketplace_manual_approval_enabled" value="1" {{ ($settings['marketplace_manual_approval_enabled'] ?? 0) ? 'checked' : '' }}>
+                    <label class="custom-control-label font-weight-bold" for="marketplace_manual_approval_enabled">Habilitar Aprovação Manual (Permuta)</label>
+                </div>
+                <small class="text-muted">Permite admins aprovarem pedidos sem pagamento financeiro (ex: negociação direta/permuta).</small>
+            </div>
         </div>
     </div>
 

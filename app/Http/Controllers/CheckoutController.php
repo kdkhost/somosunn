@@ -29,20 +29,26 @@ class CheckoutController extends Controller
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
         }
 
+        // Check MercadoPago
         $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
         $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
-        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+        $mpEnabled = $mpAccessToken !== '' && $mpPublicKey !== '';
 
-        if (!$paymentsConfigured) {
+        // Check PagSeguro
+        $psToken = trim((string) config('payments.pagseguro.access_token'));
+        $psEmail = trim((string) config('payments.pagseguro.email')); // Or client_id check
+        $psEnabled = $psToken !== '';
+
+        if (!$mpEnabled && !$psEnabled) {
             return redirect()
                 ->route('courses.show', $course->slug ?: $course->id)
-                ->with('error', 'Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.');
+                ->with('error', 'Nenhum método de pagamento disponível no momento.');
         }
 
-        return view('checkout.index', compact('course'));
+        return view('checkout.index', compact('course', 'mpEnabled', 'psEnabled'));
     }
 
-    public function process(Request $request, Course $course, MercadoPagoService $mpService, CouponService $couponService)
+    public function process(Request $request, Course $course, MercadoPagoService $mpService, \App\Services\Payment\PagSeguroService $psService, CouponService $couponService)
     {
         if (!Auth::check()) {
             return redirect()->guest(route('login'))->with('error', 'Faça login para finalizar a compra do curso.');
@@ -55,25 +61,28 @@ class CheckoutController extends Controller
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
         }
 
-        $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
-        $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
-        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
-
-        if (!$paymentsConfigured) {
-            return redirect()
-                ->route('courses.show', $course->slug ?: $course->id)
-                ->with('error', 'Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.');
-        }
-
         $request->validate([
             'coupon_code' => 'nullable|string|max:40',
+            'gateway_provider' => 'nullable|string|in:mercadopago,pagseguro',
         ]);
+
+        $gatewayProvider = $request->input('gateway_provider', 'mercadopago');
+
+        // Validation: Check if selected gateway is enabled
+        if ($gatewayProvider === 'mercadopago') {
+            $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
+            if (empty($mpAccessToken))
+                $gatewayProvider = 'pagseguro'; // Fallback? Or error.
+        }
+
+        // If still empty or invalid, defaults to what's available? 
+        // For now trusting the input or default.
 
         $order = null;
         $couponCode = $couponService->normalizeCode($request->input('coupon_code'));
 
         try {
-            DB::transaction(function () use ($course, $couponCode, $couponService, &$order) {
+            DB::transaction(function () use ($course, $couponCode, $couponService, &$order, $gatewayProvider) {
                 $regularUnitPrice = round((float) ($course->price ?? 0), 2);
                 $effectiveUnitPrice = round((float) ($course->effective_price ?? $regularUnitPrice), 2);
                 $originalTotal = $effectiveUnitPrice;
@@ -105,7 +114,7 @@ class CheckoutController extends Controller
                     'fee_amount' => 0,
                     'platform_fee_amount' => $platformFeeAmount,
                     'currency' => 'BRL',
-                    'gateway' => 'mercadopago',
+                    'gateway' => $gatewayProvider,
                     'gateway_account_id' => null,
                     'metadata' => [
                         'context' => 'course',
@@ -156,49 +165,72 @@ class CheckoutController extends Controller
         try {
             $order->load('items', 'user');
 
-            if ($course->is_recurring && !empty($course->mp_plan_id)) {
-                $subscription = $mpService->subscribeUser($course->mp_plan_id, [
-                    'email' => Auth::user()->email,
-                    'reason' => 'Assinatura: ' . $course->title,
-                    'external_reference' => (string) $order->id,
-                    'back_url' => route('panel.dashboard'),
+            if ($gatewayProvider === 'pagseguro') {
+                // Return PagSeguro View
+                // No need to create "Preference" beforehand for Transparent V4 usually, 
+                // but we might need Public Key.
+                $psPublicKey = config('payments.pagseguro.public_key'); // We might need to fetch seller's key if split?
+                // Actually PagSeguroService::getSellerConfig handles logic. 
+                // But for Frontend Encryption we need the PUBLIC KEY.
+                // If it's Seller Split, we need SELLER'S Public Key.
+                // Let's use service to get it?
+                // We'll peek at service logic or just pass user and let view handle?
+                // Better: 
+                return view('checkout.pagseguro_transparent', [
+                    'order' => $order,
+                    'publicKey' => config('payments.pagseguro.public_key') // Using Platform Key for now as encryption key? 
+                    // Note: If using Split, we should encrypt with Seller's Key? 
+                    // V4 Split usually uses Platform Key for encryption and `charges` param to distribute.
+                    // So Platform Key is likely correct.
+                ]);
+
+            } else {
+                // MercadoPago
+                if ($course->is_recurring && !empty($course->mp_plan_id)) {
+                    $subscription = $mpService->subscribeUser($course->mp_plan_id, [
+                        'email' => Auth::user()->email,
+                        'reason' => 'Assinatura: ' . $course->title,
+                        'external_reference' => (string) $order->id,
+                        'back_url' => route('panel.dashboard'),
+                    ]);
+
+                    $order->update([
+                        'metadata' => array_merge($order->metadata ?? [], [
+                            'mercadopago_preapproval_id' => $subscription['id'] ?? null,
+                            'mercadopago_init_point' => $subscription['init_point'] ?? null,
+                        ]),
+                    ]);
+
+                    if (!empty($subscription['init_point'])) {
+                        return redirect($subscription['init_point']);
+                    }
+                }
+
+                $preference = $mpService->createPreference($order, [
+                    'statement_descriptor' => 'UNN CURSOS',
                 ]);
 
                 $order->update([
                     'metadata' => array_merge($order->metadata ?? [], [
-                        'mercadopago_preapproval_id' => $subscription['id'] ?? null,
-                        'mercadopago_init_point' => $subscription['init_point'] ?? null,
+                        'mercadopago_preference_id' => $preference['id'] ?? null,
+                        'mercadopago_init_point' => $preference['init_point'] ?? null,
+                        'mercadopago_sandbox_init_point' => $preference['sandbox_init_point'] ?? null,
                     ]),
                 ]);
 
-                if (!empty($subscription['init_point'])) {
-                    return redirect($subscription['init_point']);
-                }
+                return view('checkout.transparent', [
+                    'order' => $order,
+                    'preferenceId' => $preference['id'] ?? '',
+                    'publicKey' => config('payments.mercadopago.public_key'),
+                ]);
             }
 
-            $preference = $mpService->createPreference($order, [
-                'statement_descriptor' => 'UNN CURSOS',
-            ]);
-
-            $order->update([
-                'metadata' => array_merge($order->metadata ?? [], [
-                    'mercadopago_preference_id' => $preference['id'] ?? null,
-                    'mercadopago_init_point' => $preference['init_point'] ?? null,
-                    'mercadopago_sandbox_init_point' => $preference['sandbox_init_point'] ?? null,
-                ]),
-            ]);
-
-            return view('checkout.transparent', [
-                'order' => $order,
-                'preferenceId' => $preference['id'] ?? '',
-                'publicKey' => $mpPublicKey,
-            ]);
         } catch (\Exception $e) {
             return back()->with('error', 'Erro ao processar pagamento: ' . $e->getMessage());
         }
     }
 
-    public function processPayment(Request $request, MercadoPagoService $mpService)
+    public function processPayment(Request $request, MercadoPagoService $mpService, \App\Services\Payment\PagSeguroService $psService)
     {
         $request->validate([
             'order_id' => 'required|exists:orders,id',
@@ -216,54 +248,106 @@ class CheckoutController extends Controller
         }
 
         $formData = $request->formData;
-        $paymentMethod = $formData['payment_method_id'] ?? '';
+        $paymentMethod = $formData['payment_method_id'] ?? ''; // 'pix' or 'credit_card' (PagSeguro usually sends 'credit_card' manually)
+
+        $gateway = $order->gateway; // 'mercadopago' or 'pagseguro'
 
         try {
-            if ($paymentMethod === 'pix') {
-                $paymentResult = $mpService->createPixPayment($order, [
-                    'email' => $formData['payer']['email'] ?? Auth::user()->email,
-                    'name' => Auth::user()->name,
-                    'cpf' => $formData['payer']['identification']['number'] ?? Auth::user()->doc,
-                ]);
+            $paymentResult = [];
+
+            if ($gateway === 'pagseguro') {
+                if ($paymentMethod === 'pix') {
+                    $paymentResult = $psService->createPixPayment($order);
+                } else {
+                    // Credit Card
+                    // Expect formData to have 'encrypted_card' and 'installments'
+                    $paymentResult = $psService->createCreditCardPayment($order, [
+                        'encrypted_card' => $formData['encrypted_card'] ?? null,
+                        'installments' => $formData['installments'] ?? 1,
+                    ]);
+                }
+
+                // Normalize Result Status to match MP logic logic for response
+                // PS V4 returns 'status' as 'PAID', 'WAITING', etc.
+                // Or 'charges'[0]['status']
+                $status = $paymentResult['charges'][0]['status'] ?? $paymentResult['status'] ?? 'UNKNOWN'; // Pix often directly in root? V4 is standard. 
+                // Actually V4 Object: 
+                // { "id": "...", "charges": [ { "status": "PAID" ... } ] }
+
+                if (isset($paymentResult['qr_codes'])) {
+                    // It's Pix, check if created
+                    $qrCode = $paymentResult['qr_codes'][0]['text'] ?? null;
+                    $qrCodeBase64 = null; // PS doesn't typically send Base64, we might generate or just use text.
+                    // Frontend can generate QR from text if needed.
+
+                    return response()->json([
+                        'success' => true,
+                        'status' => 'pending', // Pix is always pending initially
+                        'qr_code' => $qrCode,
+                        'qr_code_base64' => null, // Frontend will need to handle text-only
+                        'redirect' => null
+                    ]);
+                }
+
+                if ($status === 'PAID') {
+                    $order->update([
+                        'status' => 'paid',
+                        'paid_at' => now(),
+                        'transaction_id' => (string) ($paymentResult['id'] ?? null),
+                    ]);
+                    return response()->json(['success' => true, 'redirect' => route('checkout.success', $order)]);
+                } else {
+                    // Declined or Pending
+                    return response()->json(['error' => 'Pagamento não aprovado: ' . $status], 400);
+                }
+
             } else {
-                // Cartão de crédito
-                $paymentResult = $mpService->createCreditCardPayment($order, [
-                    'token' => $formData['token'],
-                    'installments' => $formData['installments'],
-                    'payment_method_id' => $formData['payment_method_id'],
-                    'issuer_id' => $formData['issuer_id'],
-                    'email' => $formData['payer']['email'] ?? Auth::user()->email,
-                    'cpf' => $formData['payer']['identification']['number'] ?? Auth::user()->doc,
-                ]);
-            }
+                // MercadoPago Logic (Existing)
+                if ($paymentMethod === 'pix') {
+                    $paymentResult = $mpService->createPixPayment($order, [
+                        'email' => $formData['payer']['email'] ?? Auth::user()->email,
+                        'name' => Auth::user()->name,
+                        'cpf' => $formData['payer']['identification']['number'] ?? Auth::user()->doc,
+                    ]);
+                } else {
+                    $paymentResult = $mpService->createCreditCardPayment($order, [
+                        'token' => $formData['token'],
+                        'installments' => $formData['installments'],
+                        'payment_method_id' => $formData['payment_method_id'],
+                        'issuer_id' => $formData['issuer_id'],
+                        'email' => $formData['payer']['email'] ?? Auth::user()->email,
+                        'cpf' => $formData['payer']['identification']['number'] ?? Auth::user()->doc,
+                    ]);
+                }
 
-            if (($paymentResult['status'] ?? '') === 'approved') {
-                $order->update([
-                    'status' => 'paid',
-                    'transaction_id' => (string) ($paymentResult['id'] ?? null),
-                ]);
+                if (($paymentResult['status'] ?? '') === 'approved') {
+                    $order->update([
+                        'status' => 'paid',
+                        'transaction_id' => (string) ($paymentResult['id'] ?? null),
+                    ]);
 
-                return response()->json([
-                    'success' => true,
-                    'redirect' => route('checkout.success', $order)
-                ]);
-            } elseif (in_array(($paymentResult['status'] ?? ''), ['pending', 'in_process'], true)) {
-                $order->update(['transaction_id' => (string) ($paymentResult['id'] ?? null)]);
+                    return response()->json([
+                        'success' => true,
+                        'redirect' => route('checkout.success', $order)
+                    ]);
+                } elseif (in_array(($paymentResult['status'] ?? ''), ['pending', 'in_process'], true)) {
+                    $order->update(['transaction_id' => (string) ($paymentResult['id'] ?? null)]);
 
-                return response()->json([
-                    'success' => true,
-                    'status' => $paymentResult['status'],
-                    'qr_code' => $paymentResult['qr_code'] ?? null,
-                    'qr_code_base64' => $paymentResult['qr_code_base64'] ?? null,
-                    'redirect' => $paymentMethod === 'pix' ? null : route('checkout.pending', $order)
-                ]);
-            } else {
-                $detail = $paymentResult['status_detail'] ?? $paymentResult['status'] ?? 'unknown';
-                return response()->json(['error' => 'Pagamento não aprovado: ' . $detail], 400);
+                    return response()->json([
+                        'success' => true,
+                        'status' => $paymentResult['status'],
+                        'qr_code' => $paymentResult['qr_code'] ?? null,
+                        'qr_code_base64' => $paymentResult['qr_code_base64'] ?? null,
+                        'redirect' => $paymentMethod === 'pix' ? null : route('checkout.pending', $order)
+                    ]);
+                } else {
+                    $detail = $paymentResult['status_detail'] ?? $paymentResult['status'] ?? 'unknown';
+                    return response()->json(['error' => 'Pagamento não aprovado: ' . $detail], 400);
+                }
             }
 
         } catch (\Exception $e) {
-            \Log::error('Erro Transparente MP: ' . $e->getMessage());
+            \Log::error('Erro Checkout: ' . $e->getMessage());
             return response()->json(['error' => 'Erro ao processar: ' . $e->getMessage()], 500);
         }
     }

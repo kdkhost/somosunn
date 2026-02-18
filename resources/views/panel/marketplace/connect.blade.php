@@ -38,6 +38,13 @@
                             <span class="inline-flex items-center text-emerald-600 dark:text-emerald-400 font-bold">
                                 <i class="fas fa-check-circle mr-1"></i> Ativo
                             </span>
+                            <form action="{{ route('panel.marketplace.payments.test') }}" method="POST" class="ml-3">
+                                @csrf
+                                <button type="submit"
+                                    class="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors font-bold">
+                                    <i class="fas fa-plug mr-1"></i> Testar Conexão
+                                </button>
+                            </form>
                         @else
                             <span class="inline-flex items-center text-slate-500 dark:text-slate-500">
                                 <i class="fas fa-circle mr-1 text-[8px]"></i> Inativo
@@ -84,25 +91,27 @@
                                 Pagamento Aceitos</label>
                             <div class="grid grid-cols-2 gap-3">
                                 @php
-                                    $enabledMethods = data_get($mercadopago->extra, 'enabled_methods', ['credit_card', 'pix', 'ticket']);
+                                    $enabledMethods = data_get($mercadopago->extra, 'enabled_methods', ['credit_card', 'debit_card', 'pix']);
                                 @endphp
                                 <label
                                     class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
                                     <input type="checkbox" name="methods[]" value="credit_card" {{ in_array('credit_card', $enabledMethods) ? 'checked' : '' }}
                                         class="rounded text-blue-600 focus:ring-blue-500/20 border-slate-300">
-                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Cartão</span>
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Cartão de
+                                        Crédito</span>
+                                </label>
+                                <label
+                                    class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
+                                    <input type="checkbox" name="methods[]" value="debit_card" {{ in_array('debit_card', $enabledMethods) ? 'checked' : '' }}
+                                        class="rounded text-blue-600 focus:ring-blue-500/20 border-slate-300">
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Cartão de
+                                        Débito</span>
                                 </label>
                                 <label
                                     class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
                                     <input type="checkbox" name="methods[]" value="pix" {{ in_array('pix', $enabledMethods) ? 'checked' : '' }}
                                         class="rounded text-blue-600 focus:ring-blue-500/20 border-slate-300">
                                     <span class="text-sm font-medium text-slate-700 dark:text-slate-300">PIX</span>
-                                </label>
-                                <label
-                                    class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
-                                    <input type="checkbox" name="methods[]" value="ticket" {{ in_array('ticket', $enabledMethods) ? 'checked' : '' }}
-                                        class="rounded text-blue-600 focus:ring-blue-500/20 border-slate-300">
-                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Boleto</span>
                                 </label>
                             </div>
                         </div>
@@ -241,10 +250,19 @@
                     </div>
 
                     <div class="pt-4">
-                        <button type="submit"
-                            class="w-full inline-flex items-center justify-center rounded-xl bg-lime-600 text-white px-6 py-3.5 text-sm font-bold hover:bg-lime-700 transition-all shadow-lg shadow-lime-500/20 hover:shadow-xl hover:-translate-y-1">
-                            <i class="fas fa-save mr-2"></i> Salvar PagSeguro
-                        </button>
+                        <div class="flex gap-3">
+                            <button type="submit"
+                                class="flex-1 inline-flex items-center justify-center rounded-xl bg-lime-600 text-white px-6 py-3.5 text-sm font-bold hover:bg-lime-700 transition-all shadow-lg shadow-lime-500/20 hover:shadow-xl hover:-translate-y-1">
+                                <i class="fas fa-save mr-2"></i> Salvar PagSeguro
+                            </button>
+
+                            @if($pagseguro->enabled && $pagseguro->access_token)
+                                <a href="{{ route('settings.payment.test', ['provider' => 'pagseguro']) }}"
+                                    class="inline-flex items-center justify-center rounded-xl bg-white border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white px-6 py-3.5 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                                    <i class="fas fa-sync-alt mr-2"></i> Testar Conexão
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 </form>
             </div>

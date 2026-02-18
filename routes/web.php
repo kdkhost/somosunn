@@ -174,6 +174,12 @@ Route::get('/api/ranking', [RankingController::class, 'index'])->name('api.ranki
 Route::get('/manifest.webmanifest', [\App\Http\Controllers\PwaController::class, 'manifest'])->name('manifest');
 Route::get('/offline', fn() => view('offline'))->name('offline');
 
+// Sitemap & Robots
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+Route::get('/robots.txt', function () {
+    return response("User-agent: *\nAllow: /\nSitemap: " . url('sitemap.xml'), 200, ['Content-Type' => 'text/plain']);
+});
+
 
 
 // Cursos (público: vitrine/SEO; acesso às aulas continua restrito por permissões/compra)
@@ -408,13 +414,26 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::get('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'update'])->name('profile.update');
 
+    // Certificados (Aluno)
+    Route::get('/certificados', [\App\Http\Controllers\Panel\CertificateController::class, 'index'])->name('certificates.index');
+    Route::post('/certificados/gerar', [\App\Http\Controllers\Panel\CertificateController::class, 'generate'])->name('certificates.generate');
+    // Note: show/download routes might be missing or exist elsewhere. Let's check Controller methods.
+    // Panel\CertificateController has show/download. We need routes for them too.
+    Route::get('/certificados/{certificate}', [\App\Http\Controllers\Panel\CertificateController::class, 'show'])->name('certificates.show');
+    Route::get('/certificados/{certificate}/download', [\App\Http\Controllers\Panel\CertificateController::class, 'download'])->name('certificates.download');
+
     // Marketplace (Painel do vendedor)
     Route::prefix('marketplace')->name('marketplace.')->middleware('check.marketplace.seller')->group(function () {
         Route::get('/', [\App\Http\Controllers\Panel\MarketplaceController::class, 'index'])->name('index');
         Route::get('/pagamentos', [\App\Http\Controllers\Panel\MarketplaceController::class, 'payments'])->name('payments');
         Route::get('/pagamentos/configurar', [\App\Http\Controllers\Panel\MarketplaceController::class, 'editPayment'])->name('payments.edit');
+        Route::post('/pagamentos/testar', [\App\Http\Controllers\Panel\MarketplaceController::class, 'testCredentials'])->name('payments.test');
         Route::get('/vendas', [\App\Http\Controllers\Panel\MarketplaceController::class, 'sales'])->name('sales');
     });
+
+    // Wishlist
+    Route::get('/minha-lista', [\App\Http\Controllers\Panel\WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/minha-lista/toggle/{course}', [\App\Http\Controllers\Panel\WishlistController::class, 'toggle'])->name('wishlist.toggle');
 });
 
 // Payments (legacy) - redireciona para o painel do marketplace (admin)
@@ -624,6 +643,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         // Plans
         Route::post('orders/{order}/refund', [\App\Http\Controllers\Admin\OrderController::class, 'refund'])
             ->middleware('check.feature:orders_refund')->name('orders.refund');
+        Route::post('orders/{order}/approve', [\App\Http\Controllers\Admin\OrderController::class, 'approveManually'])
+            ->name('orders.approve');
+        Route::post('orders/{order}/cancel', [\App\Http\Controllers\Admin\OrderController::class, 'cancel'])
+            ->name('orders.cancel');
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)
             ->middleware('check.feature:orders_access')->only(['index', 'show'])->names('orders');
 

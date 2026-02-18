@@ -329,6 +329,11 @@ class User extends Authenticatable
         return app(ProfilePhotoService::class)->urlFor($this);
     }
 
+    public function wishlist()
+    {
+        return $this->belongsToMany(Course::class, 'wishlists', 'user_id', 'course_id')->withTimestamps();
+    }
+
     /**
      * Envia notificação de reset de senha em português.
      */
