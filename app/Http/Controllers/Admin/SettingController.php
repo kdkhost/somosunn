@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class SettingController extends Controller
 {
@@ -432,6 +433,25 @@ class SettingController extends Controller
 
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
+        }
+
+        // Se o Admin estiver salvando chaves globais do Mercado Pago, sincronizar com o gateway_account dele
+        // para manter consistência entre o painel AdminLTE e o novo Marketplace
+        if ($currentGroup === 'gateway') {
+            $userId = Auth::id();
+            $mpAccount = \App\Models\GatewayAccount::firstOrNew(['user_id' => $userId, 'provider' => 'mercadopago']);
+
+            if (isset($data['mercadopago_public_key']))
+                $mpAccount->public_key = $data['mercadopago_public_key'];
+            if (isset($data['mercadopago_access_token']))
+                $mpAccount->access_token = $data['mercadopago_access_token'];
+
+            // Ativar se tiver as chaves
+            if ($mpAccount->public_key && $mpAccount->access_token) {
+                $mpAccount->enabled = true;
+            }
+
+            $mpAccount->save();
         }
 
         return redirect()->back()->with('success', 'Configurações salvas');

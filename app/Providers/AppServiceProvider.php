@@ -264,6 +264,9 @@ class AppServiceProvider extends ServiceProvider
                     // Mercado Pago Sandbox
                     'mercadopago_sandbox_public_key',
                     'mercadopago_sandbox_access_token',
+                    // Generic Overrides (Marketplace Sync)
+                    'mercadopago_public_key',
+                    'mercadopago_access_token',
                     // PagSeguro
                     'pagseguro_email',
                     'pagseguro_token',
@@ -298,7 +301,15 @@ class AppServiceProvider extends ServiceProvider
                     }
                 }
 
-                // 3. PagSeguro Platform
+                // 3. Generic Overrides (Higher Priority for synchronized Admin keys)
+                if (!empty($paymentSettings['mercadopago_public_key'])) {
+                    config(['payments.mercadopago.public_key' => $paymentSettings['mercadopago_public_key']]);
+                }
+                if (!empty($paymentSettings['mercadopago_access_token'])) {
+                    config(['payments.mercadopago.access_token' => $paymentSettings['mercadopago_access_token']]);
+                }
+
+                // 4. PagSeguro Platform
                 if (!empty($paymentSettings['pagseguro_email'])) {
                     config(['payments.pagseguro.email' => $paymentSettings['pagseguro_email']]);
                 }

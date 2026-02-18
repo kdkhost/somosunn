@@ -54,13 +54,15 @@ class MarketplaceController extends Controller
 
     public function payments()
     {
-        $mpAccessToken = (string) (config('payments.mercadopago.access_token') ?? '');
-        $mpPublicKey = (string) (config('payments.mercadopago.public_key') ?? '');
+        $userId = Auth::id();
+        $account = \App\Models\GatewayAccount::where('user_id', $userId)
+            ->where('provider', 'mercadopago')
+            ->first();
 
-        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
-        $webhookUrl = route('api.webhooks.mercadopago');
+        $paymentsConfigured = $account && !empty($account->access_token) && !empty($account->public_key);
+        $webhookUrl = route('api.webhooks.mercadopago', ['seller_id' => $userId]);
 
-        return view('panel.marketplace.payments', compact('paymentsConfigured', 'webhookUrl'));
+        return view('panel.marketplace.payments', compact('paymentsConfigured', 'webhookUrl', 'account'));
     }
 
     public function editPayment()
