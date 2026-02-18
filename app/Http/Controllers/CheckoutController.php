@@ -196,7 +196,75 @@ class CheckoutController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Erro ao processar pagamento: ' . $e->getMessage());
         }
+    }
 
-        return back()->with('error', 'Gateway não suportado.');
+    public function processPayment(Request $request, MercadoPagoService $mpService)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'formData' => 'required|array',
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+
+        if ($order->user_id !== Auth::id()) {
+            return response()->json(['error' => 'Acesso negado.'], 403);
+        }
+
+        if ($order->status === 'paid') {
+            return response()->json(['success' => true, 'redirect' => route('checkout.success', $order)]);
+        }
+
+        $formData = $request->formData;
+        $paymentMethod = $formData['payment_method_id'] ?? '';
+
+        try {
+            if ($paymentMethod === 'pix') {
+                $paymentResult = $mpService->createPixPayment($order, [
+                    'email' => $formData['payer']['email'] ?? Auth::user()->email,
+                    'name' => Auth::user()->name,
+                    'cpf' => $formData['payer']['identification']['number'] ?? Auth::user()->doc,
+                ]);
+            } else {
+                // Cartão de crédito
+                $paymentResult = $mpService->createCreditCardPayment($order, [
+                    'token' => $formData['token'],
+                    'installments' => $formData['installments'],
+                    'payment_method_id' => $formData['payment_method_id'],
+                    'issuer_id' => $formData['issuer_id'],
+                    'email' => $formData['payer']['email'] ?? Auth::user()->email,
+                    'cpf' => $formData['payer']['identification']['number'] ?? Auth::user()->doc,
+                ]);
+            }
+
+            if (($paymentResult['status'] ?? '') === 'approved') {
+                $order->update([
+                    'status' => 'paid',
+                    'transaction_id' => (string) ($paymentResult['id'] ?? null),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'redirect' => route('checkout.success', $order)
+                ]);
+            } elseif (in_array(($paymentResult['status'] ?? ''), ['pending', 'in_process'], true)) {
+                $order->update(['transaction_id' => (string) ($paymentResult['id'] ?? null)]);
+
+                return response()->json([
+                    'success' => true,
+                    'status' => $paymentResult['status'],
+                    'qr_code' => $paymentResult['qr_code'] ?? null,
+                    'qr_code_base64' => $paymentResult['qr_code_base64'] ?? null,
+                    'redirect' => $paymentMethod === 'pix' ? null : route('checkout.pending', $order)
+                ]);
+            } else {
+                $detail = $paymentResult['status_detail'] ?? $paymentResult['status'] ?? 'unknown';
+                return response()->json(['error' => 'Pagamento não aprovado: ' . $detail], 400);
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Erro Transparente MP: ' . $e->getMessage());
+            return response()->json(['error' => 'Erro ao processar: ' . $e->getMessage()], 500);
+        }
     }
 }

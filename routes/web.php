@@ -430,6 +430,7 @@ Route::post('/checkout/{course}', [\App\Http\Controllers\CheckoutController::cla
 Route::get('/checkout/success/{order}', fn() => view('checkout.success'))->name('checkout.success');
 Route::get('/checkout/failure/{order}', fn() => view('checkout.failure'))->name('checkout.failure');
 Route::get('/checkout/pending/{order}', fn() => view('checkout.pending'))->name('checkout.pending');
+Route::post('/checkout/process-payment', [\App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('checkout.process_payment');
 
 Route::get('/checkout/mentorships/{mentorship}', [\App\Http\Controllers\MentorshipCheckoutController::class, 'show'])->name('mentorships.checkout.show');
 Route::post('/checkout/mentorships/{mentorship}', [\App\Http\Controllers\MentorshipCheckoutController::class, 'process'])->name('mentorships.checkout.process');

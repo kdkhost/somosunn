@@ -97,16 +97,71 @@
     </div>
 
     <style>
-        /* Ajustes finos para o Brick não quebrar layout */
+        /* Ajustes críticos para evitar conflitos de labels sobrepostas e estilos globais */
         #paymentBrick_container {
-            min-height: 400px;
+            min-height: 450px;
+            text-align: left; /* Garantir alinhamento à esquerda */
         }
-
-        /* Estilização para o seletor de parcelas e outros inputs do MP */
-        .mp-checkout-custom .svelte-payment-brick {
-            font-family: 'Inter', sans-serif !important;
+        #paymentBrick_container iframe {
+            max-width: 100% !important;
+        }
+        
+        /* Resetar estilos globais que podem quebrar o Brick */
+        #paymentBrick_container label {
+            display: inline-block !important;
+            margin-bottom: 0 !important;
+            font-weight: normal !important;
+            width: auto !important;
+            position: static !important;
+        }
+        #paymentBrick_container .form-group, 
+        #paymentBrick_container .form-control {
+            margin-bottom: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+        #paymentBrick_container input {
+            height: auto !important; /* Deixar o brick controlar a altura */
+        }
+        
+        /* Isolar o container de estilos globais */
+        #paymentBrick_container * {
+            box-sizing: border-box;
+        }
+        
+        /* Feedback de carregamento */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(255,255,255,0.8);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
     </style>
+
+    <div class="loading-overlay" id="checkout-loading">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-unn-azul-2 mb-4"></div>
+        <p class="text-slate-900 font-bold">Processando seu pagamento...</p>
+    </div>
+
+    <!-- Modal Pix -->
+    <div id="pix-modal" class="hidden fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+            <h3 class="text-2xl font-bold mb-4">Pagamento via Pix</h3>
+            <p class="text-slate-600 mb-6">Escaneie o QR Code abaixo ou copie o código para pagar.</p>
+            <div id="pix-qr-container" class="flex justify-center mb-6"></div>
+            <div class="bg-slate-100 p-3 rounded-lg flex items-center space-x-2 mb-6">
+                <input type="text" id="pix-code" readonly class="bg-transparent border-none text-xs flex-1 outline-none">
+                <button onclick="copyPixCode()" class="text-unn-azul-2 font-bold px-2">Copiar</button>
+            </div>
+            <p class="text-sm text-slate-500 mb-6">O acesso será liberado após a confirmação.</p>
+            <a href="{{ route('panel.dashboard') }}" class="block w-full bg-slate-900 text-white font-bold py-3 rounded-xl">Já paguei / Ir para o Painel</a>
+        </div>
+    </div>
 
     <script src="https://sdk.mercadopago.com/js/v2"></script>
     <script>
@@ -119,6 +174,17 @@
             $theme = \App\Models\Setting::get('gateway_checkout_theme', 'default');
             $primaryColor = \App\Models\Setting::get('gateway_checkout_primary_color', '#1F5EDB');
         @endphp
+
+        const showLoading = (show) => {
+            document.getElementById('checkout-loading').style.display = show ? 'flex' : 'none';
+        };
+
+        const copyPixCode = () => {
+            const el = document.getElementById('pix-code');
+            el.select();
+            document.execCommand('copy');
+            toastr.success('Código Pix copiado!');
+        };
 
         const renderPaymentBrick = async (bricksBuilder) => {
             const settings = {
@@ -156,10 +222,50 @@
                         console.log('Payment Brick Ready');
                     },
                     onSubmit: ({ selectedPaymentMethod, formData }) => {
-                        // O processamento é feito via preference ID configurado no controller
+                        return new Promise((resolve, reject) => {
+                            showLoading(true);
+                            
+                            fetch('{{ route('checkout.process_payment') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    order_id: '{{ $order->id }}',
+                                    formData: formData
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                showLoading(false);
+                                if (data.success) {
+                                    if (data.qr_code) {
+                                        // Mostrar modal Pix
+                                        document.getElementById('pix-qr-container').innerHTML = `<img src="data:image/png;base64,${data.qr_code_base64}" alt="Pix QR" class="w-48 h-48">`;
+                                        document.getElementById('pix-code').value = data.qr_code;
+                                        document.getElementById('pix-modal').classList.remove('hidden');
+                                        resolve();
+                                    } else if (data.redirect) {
+                                        window.location.href = data.redirect;
+                                        resolve();
+                                    }
+                                } else {
+                                    toastr.error(data.error || 'Erro ao processar pagamento');
+                                    reject();
+                                }
+                            })
+                            .catch(error => {
+                                showLoading(false);
+                                console.error('Checkout Error:', error);
+                                toastr.error('Erro de conexão. Tente novamente.');
+                                reject();
+                            });
+                        });
                     },
                     onError: (error) => {
                         console.error('Payment Brick Error:', error);
+                        toastr.error('Erro ao carregar o gateway de pagamento.');
                     },
                 },
             };
