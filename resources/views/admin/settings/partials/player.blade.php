@@ -17,7 +17,6 @@
 
 <div class="form-group mb-4">
     <div class="custom-control custom-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
-        <input type="hidden" name="video_player_enabled" value="0">
         <input type="checkbox" class="custom-control-input" id="video_player_enabled" name="video_player_enabled"
             value="1" {{ ($settings['video_player_enabled'] ?? 1) ? 'checked' : '' }}>
         <label class="custom-control-label font-weight-bold" for="video_player_enabled">Ativar Player Personalizado
