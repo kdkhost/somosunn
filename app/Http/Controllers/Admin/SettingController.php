@@ -522,6 +522,11 @@ class SettingController extends Controller
             $mpAccount->save();
         }
 
+        // Auto-save: Retornar JSON se for requisição AJAX
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Configurações salvas automaticamente.']);
+        }
+
         return redirect()->back()->with('success', 'Configurações salvas');
     }
 
