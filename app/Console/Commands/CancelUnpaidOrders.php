@@ -46,6 +46,17 @@ class CancelUnpaidOrders extends Command
             // We continue to cancel locally even if MP fails (e.g. expired)
         }
 
+        // Cancel associated Event Registrations
+        foreach ($order->items as $item) {
+            if ($item->item_type === 'event_registration') {
+                // Assuming item_id points to EventRegistration or we query by order_id
+                // EventRegistration table has order_id
+                \App\Models\EventRegistration::where('order_id', $order->id)
+                    ->where('status', '!=', 'cancelled')
+                    ->update(['status' => 'cancelled']);
+            }
+        }
+
         $order->update([
             'status' => 'cancelled',
             'cancelled_at' => now(),
