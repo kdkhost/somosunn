@@ -983,8 +983,9 @@
                     }
 
                     // Filter based on enabled settings
-                    if (plyr.rewindEnabled === false) controls = controls.filter(c => c !== 'rewind');
-                    if (plyr.fastForwardEnabled === false) controls = controls.filter(c => c !== 'fast-forward');
+                    // Trust the 'controls' list from backend configuration
+                    // if (plyr.rewindEnabled === false) controls = controls.filter(c => c !== 'rewind');
+                    // if (plyr.fastForwardEnabled === false) controls = controls.filter(c => c !== 'fast-forward');
                     // if (plyr.volumeEnabled === false) controls = controls.filter(c => c !== 'mute' && c !== 'volume'); // Force volume controls based on 'controls' list
                     
                     // Ensure buttons are present if enabled
