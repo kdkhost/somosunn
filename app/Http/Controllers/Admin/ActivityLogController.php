@@ -13,10 +13,4 @@ class ActivityLogController extends Controller
         $logs = ActivityLog::with('user')->latest()->take(1000)->get();
         return view('admin.activity_logs.index', compact('logs'));
     }
-
-    public function destroy()
-    {
-        ActivityLog::truncate();
-        return back()->with('success', 'Logs de atividade limpos com sucesso!');
-    }
 }

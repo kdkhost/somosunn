@@ -11,7 +11,12 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule): void
     {
-        // Carregar tarefas do banco
+        // Heartbeat para monitoramento no painel
+        $schedule->call(function () {
+            \Illuminate\Support\Facades\Cache::put('cron_heartbeat', now(), 120);
+        })->everyMinute();
+
+        // Carregar tarefas dinâmicas do banco
         try {
             if (\Schema::hasTable('scheduled_tasks')) {
                 $tasks = \App\Models\ScheduledTask::where('active', true)->get();
@@ -19,17 +24,12 @@ class Kernel extends ConsoleKernel
                     $schedule->command($task->command)
                         ->cron($task->frequency)
                         ->withoutOverlapping()
-                        ->onOneServer(); // Opcional se for multi-server
+                        ->onOneServer();
                 }
             }
         } catch (\Exception $e) {
-            // Log silent or fallback
+            \Log::error("Erro ao carregar scheduler do banco: " . $e->getMessage());
         }
-
-        // Tarefas agendadas são gerenciadas via Banco de Dados (Tabela scheduled_tasks)
-        // Para adicionar novas tarefas padrão, use o ScheduledTasksSeeder.
-
-        // Outros comandos vitais podem ser migrados para o banco via Seeder.
     }
 
     protected function commands(): void

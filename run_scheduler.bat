@@ -5,7 +5,4 @@ echo Mantenha esta janela aberta para que as tarefas automaticas funcionem.
 echo.
 cd /d "%~dp0"
 
-:loop
-php artisan schedule:run
-timeout /t 60 /nobreak >nul
-goto loop
+php artisan schedule:work

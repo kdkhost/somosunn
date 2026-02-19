@@ -12,7 +12,24 @@
             <div class="card">
                 <div class="card-header bg-gradient-primary text-white">
                     <h3 class="card-title">Tarefas Agendadas</h3>
-                    <a href="{{ route('admin.cron.create') }}" class="btn btn-light float-right">Nova Tarefa</a>
+                    <div class="card-tools">
+                        @php
+                            $lastHeartbeat = \Illuminate\Support\Facades\Cache::get('cron_heartbeat');
+                            $isRunning = $lastHeartbeat && $lastHeartbeat->diffInMinutes(now()) < 5;
+                        @endphp
+                        @if($isRunning)
+                            <span class="badge badge-light text-success p-2 mr-2 blink_me">
+                                <i class="fas fa-check-circle"></i> Sincronizado: {{ $lastHeartbeat->format('H:i') }}
+                            </span>
+                        @else
+                            <span class="badge badge-light text-danger p-2 mr-2">
+                                <i class="fas fa-exclamation-triangle"></i> Agendador não detectado
+                            </span>
+                        @endif
+                        <a href="{{ route('admin.cron.create') }}" class="btn btn-sm btn-light font-weight-bold">
+                            <i class="fas fa-plus mr-1"></i> Nova Tarefa
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered table-hover">
@@ -74,6 +91,20 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+    <style>
+        .blink_me {
+            animation: blinker 2s linear infinite;
+        }
+
+        @keyframes blinker {
+            50% {
+                opacity: 0.6;
+            }
+        }
+    </style>
+@endpush
 
 @push('scripts')
     <script>

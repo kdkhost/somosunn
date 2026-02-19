@@ -138,7 +138,6 @@ class User extends Authenticatable
         'plan_id',
         'plan_expires_at',
         'extra_features',
-        'birth_date',
         // Endereço
         'cep',
         'street',
@@ -167,7 +166,6 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'plan_expires_at' => 'datetime',
-        'birth_date' => 'date',
         'extra_features' => 'array',
         'social_links' => 'array',
         'hide_profile' => 'boolean'
