@@ -26,7 +26,7 @@ class ProfileController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6|confirmed',
             'phone' => 'nullable|string|max:20',
-            'cpf' => 'nullable|string|max:14',
+            'doc' => 'nullable|string|max:20',
             'gender' => 'nullable|string|in:male,female,other,prefer_not_to_say',
             'occupation' => 'nullable|string|max:100',
             'company' => 'nullable|string|max:100',
