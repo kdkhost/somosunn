@@ -518,11 +518,11 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="d-flex align-items-center flex-nowrap">
-                                                <button type="button" class="btn btn-sm btn-outline-primary btn-edit-lesson mr-1"
+                                            <div class="d-flex align-items-center flex-nowrap" style="gap: 5px;">
+                                                <button type="button" class="btn btn-sm btn-outline-primary btn-edit-lesson"
                                                     data-id="{{ $lesson->id }}" title="Editar"><i class="fas fa-edit"></i></button>
                                                 <form action="{{ route('courses.lessons.destroy', [$course, $lesson]) }}"
-                                                    method="POST" class="d-inline ajax-delete ml-1">
+                                                    method="POST" class="d-inline ajax-delete">
                                                     @csrf @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir"><i
                                                             class="fas fa-trash"></i></button>
