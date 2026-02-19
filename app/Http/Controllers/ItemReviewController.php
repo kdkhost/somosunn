@@ -58,6 +58,24 @@ class ItemReviewController extends Controller
             ]
         );
 
+        // Notificar o criador (instrutor/mentor)
+        $creator = null;
+        if ($reviewable instanceof Course) {
+            $creator = $reviewable->creator;
+        } elseif ($reviewable instanceof Mentorship) {
+            $creator = $reviewable->user; // Mentorship might use 'user_id' directly or 'user' relation
+        }
+
+        if ($creator && $creator->id !== Auth::id()) {
+            $typeName = ($reviewable instanceof Course) ? 'curso' : 'mentoria';
+            $creator->notify(new \App\Notifications\AppNotification([
+                'message' => Auth::user()->name . " enviou uma nova avaliação para o seu {$typeName}: \"{$reviewable->title}\".",
+                'type' => 'ReviewSubmitted',
+                'action_url' => '#', // Admin ou Painel do Instrutor se houver
+                'action_label' => 'Ver feedback'
+            ]));
+        }
+
         $message = $existingReview
             ? 'Sua avaliação foi atualizada e voltou para moderação.'
             : $successMessage;

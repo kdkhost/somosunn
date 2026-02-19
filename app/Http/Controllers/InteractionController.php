@@ -34,6 +34,14 @@ class InteractionController extends Controller
             'meta' => $data['meta'] ?? null,
         ]);
 
+        // Notificar o destinatário da interação
+        $to->notify(new \App\Notifications\AppNotification([
+            'message' => $from->name . ' registrou uma nova conexão com você.',
+            'type' => 'NewInteraction',
+            'action_url' => route('social.feed'),
+            'action_label' => 'Ver detalhes'
+        ]));
+
         return response()->json([
             'message' => 'Conexão registrada',
             'interaction' => $interaction,

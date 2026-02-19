@@ -39,6 +39,14 @@ class ConnectionController extends Controller
             'status' => 'pending'
         ]);
 
+        // Notificar via Painel Geral
+        $user->notify(new \App\Notifications\AppNotification([
+            'message' => Auth::user()->name . ' enviou uma solicitação de conexão para você.',
+            'type' => 'ConnectionRequest',
+            'action_url' => route('social.feed'),
+            'action_label' => 'Ver solicitações'
+        ]));
+
         if (!empty($user->email)) {
             try {
                 $requesterName = Auth::user()->name;
@@ -71,6 +79,14 @@ class ConnectionController extends Controller
             'status' => 'accepted',
             'responded_at' => now()
         ]);
+
+        // Notificar quem solicitou que foi aceito
+        $user->notify(new \App\Notifications\AppNotification([
+            'message' => Auth::user()->name . ' aceitou seu pedido de conexão!',
+            'type' => 'ConnectionAccepted',
+            'action_url' => route('chat.index'),
+            'action_label' => 'Conversar agora'
+        ]));
 
         return response()->json(['success' => true, 'message' => 'Conexão aceita! Agora vocês podem conversar.']);
     }

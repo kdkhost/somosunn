@@ -314,6 +314,11 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
 
         // Notification Hub
         Route::get('/api/notifications/hub', [\App\Http\Controllers\NotificationHubController::class, 'index'])->name('notifications.hub');
+
+        // General Notification Panel
+        Route::get('/notificacoes', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notificacoes/read/{id?}', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.markRead');
+        Route::delete('/notificacoes/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 });
 

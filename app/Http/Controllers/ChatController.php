@@ -179,6 +179,16 @@ class ChatController extends Controller
             'type' => 'text'
         ]);
 
+        // Notificar outros participantes da conversa
+        foreach ($conversation->users->where('id', '!=', Auth::id()) as $recipient) {
+            $recipient->notify(new \App\Notifications\AppNotification([
+                'message' => 'Nova mensagem de ' . Auth::user()->name,
+                'type' => 'NewMessage',
+                'action_url' => route('chat.show', $conversation->id),
+                'action_label' => 'Abrir chat'
+            ]));
+        }
+
         return response()->json($msg->load('user'));
     }
 
@@ -276,6 +286,14 @@ class ChatController extends Controller
             'body' => $request->input('message'),
             'type' => 'text'
         ]);
+
+        // Notificar o destinatário
+        $user->notify(new \App\Notifications\AppNotification([
+            'message' => 'Nova mensagem de ' . $me->name,
+            'type' => 'NewMessage',
+            'action_url' => route('chat.index'), // Para o chat flutuante, o index costuma ser suficiente
+            'action_label' => 'Responder'
+        ]));
 
         return response()->json(['success' => true, 'message' => $msg]);
     }

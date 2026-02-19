@@ -488,6 +488,16 @@ class SocialController extends Controller
                 'user_id' => Auth::id(),
                 'type' => $type,
             ]);
+
+            // Notificar o autor do post (se não for o próprio autor reagindo)
+            if ($post->user_id !== Auth::id()) {
+                $post->user->notify(new \App\Notifications\AppNotification([
+                    'message' => Auth::user()->name . ' reagiu à sua publicação: "' . Str::limit($post->content, 50) . '"',
+                    'type' => 'PostReaction',
+                    'action_url' => route('social.feed'), // Ou uma rota específica do post se existir
+                    'action_label' => 'Ver publicação'
+                ]));
+            }
         }
 
         return back();
@@ -500,12 +510,35 @@ class SocialController extends Controller
             'parent_id' => 'nullable|integer|exists:post_comments,id',
         ]);
 
-        PostComment::create([
+        $comment = PostComment::create([
             'post_id' => $post->id,
             'user_id' => Auth::id(),
             'parent_id' => $validated['parent_id'] ?? null,
             'content' => $validated['content'],
         ]);
+
+        // Notificar o autor do post (se não for o próprio autor comentando)
+        if ($post->user_id !== Auth::id()) {
+            $post->user->notify(new \App\Notifications\AppNotification([
+                'message' => Auth::user()->name . ' comentou na sua publicação.',
+                'type' => 'PostComment',
+                'action_url' => route('social.feed'),
+                'action_label' => 'Ver comentário'
+            ]));
+        }
+
+        // Se for uma resposta, notificar o autor do comentário pai
+        if ($comment->parent_id) {
+            $parentComment = PostComment::find($comment->parent_id);
+            if ($parentComment && $parentComment->user_id !== Auth::id()) {
+                $parentComment->user->notify(new \App\Notifications\AppNotification([
+                    'message' => Auth::user()->name . ' respondeu ao seu comentário.',
+                    'type' => 'CommentReply',
+                    'action_url' => route('social.feed'),
+                    'action_label' => 'Ver resposta'
+                ]));
+            }
+        }
 
         return back();
     }
@@ -533,6 +566,16 @@ class SocialController extends Controller
             'visibility' => 'community',
         ]);
 
+        // Notificar o autor original
+        if ($post->user_id !== Auth::id()) {
+            $post->user->notify(new \App\Notifications\AppNotification([
+                'message' => Auth::user()->name . ' compartilhou sua publicação na comunidade.',
+                'type' => 'PostShared',
+                'action_url' => route('social.feed'),
+                'action_label' => 'Ver detalhes'
+            ]));
+        }
+
         return back()->with('success', 'Post compartilhado!');
     }
 
@@ -558,6 +601,27 @@ class SocialController extends Controller
             'visibility' => 'connections',
             'shared_to_user_id' => $targetUserId,
         ]);
+
+        $targetUser = User::find($targetUserId);
+        if ($targetUser) {
+            // Notificar o usuário que recebeu o post na timeline
+            $targetUser->notify(new \App\Notifications\AppNotification([
+                'message' => Auth::user()->name . ' compartilhou uma publicação diretamente com você.',
+                'type' => 'TimelineShare',
+                'action_url' => route('social.profile', $targetUser->username ?? $targetUser->id),
+                'action_label' => 'Ver timeline'
+            ]));
+        }
+
+        // Notificar o autor original (se houver autor e não for quem está compartilhando)
+        if ($post->user_id && $post->user_id !== Auth::id()) {
+            $post->user->notify(new \App\Notifications\AppNotification([
+                'message' => Auth::user()->name . ' compartilhou sua publicação com um amigo.',
+                'type' => 'PostShared',
+                'action_url' => route('social.feed'),
+                'action_label' => 'Ver detalhes'
+            ]));
+        }
 
         return back()->with('success', 'Post compartilhado na linha do tempo do membro.');
     }

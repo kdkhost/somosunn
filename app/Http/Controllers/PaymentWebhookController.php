@@ -131,6 +131,29 @@ class PaymentWebhookController extends Controller
 
         if (!$wasPaid || !data_get($order->metadata, 'emails.marketplace_paid_sent_at')) {
             SendMarketplaceOrderPaidEmailsJob::dispatch((int) $order->id);
+
+            // Notificar Vendedor (se houver seller_id e não for a plataforma)
+            if ($order->seller_id && $order->seller_id !== 'platform') {
+                $seller = \App\Models\User::find($order->seller_id);
+                if ($seller) {
+                    $seller->notify(new \App\Notifications\AppNotification([
+                        'message' => 'Parabéns! Você realizou uma nova venda no valor de R$ ' . number_format($order->total, 2, ',', '.') . '.',
+                        'type' => 'SaleConfirmed',
+                        'action_url' => route('panel.marketplace.sales'),
+                        'action_label' => 'Ver vendas'
+                    ]));
+                }
+            }
+
+            // Notificar Comprador
+            if ($order->user) {
+                $order->user->notify(new \App\Notifications\AppNotification([
+                    'message' => 'Seu pagamento foi confirmado! O acesso aos seus itens foi liberado.',
+                    'type' => 'PaymentConfirmed',
+                    'action_url' => route('panel.dashboard'),
+                    'action_label' => 'Acessar agora'
+                ]));
+            }
         }
     }
 
