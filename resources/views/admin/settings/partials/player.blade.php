@@ -237,40 +237,50 @@
             });
 
             // Auto-Save Logic
+            // Auto-Save Logic with robust event delegation
             let autoSaveTimer;
-            const form = $('form[action*="/admin/settings"]'); // Target the main settings form
-            const inputs = form.find('input:not([type=file]), select, textarea');
+            const formSelector = 'form[action*="/admin/settings"]';
 
             function triggerAutoSave() {
+                var form = $(this).closest('form');
+                if (form.length === 0) return;
+
                 clearTimeout(autoSaveTimer);
-                autoSaveTimer = setTimeout(function() {
-                    const formData = new FormData(form[0]);
-                    
+                autoSaveTimer = setTimeout(function () {
+                    var formData = new FormData(form[0]);
+
                     $('#auto-save-badge').removeClass('d-none').removeClass('badge-success').addClass('badge-warning').html('<i class="fas fa-sync fa-spin mr-1"></i> Salvando...');
 
                     $.ajax({
                         url: form.attr('action'),
                         method: 'POST',
                         data: formData,
-                        processData: false, // Important for FormData
-                        contentType: false, // Important for FormData
-                        success: function(response) {
-                             $('#auto-save-badge').removeClass('badge-warning').addClass('badge-success').html('<i class="fas fa-check mr-1"></i> Salvo');
-                             setTimeout(() => {
-                                 $('#auto-save-badge').addClass('d-none');
-                             }, 2000);
-                             console.log('Auto-save success:', response);
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
                         },
-                        error: function(xhr) {
+                        success: function (response) {
+                            $('#auto-save-badge').removeClass('badge-warning').addClass('badge-success').html('<i class="fas fa-check mr-1"></i> Salvo');
+                            setTimeout(() => {
+                                $('#auto-save-badge').addClass('d-none');
+                            }, 2000);
+                        },
+                        error: function (xhr) {
                             $('#auto-save-badge').removeClass('badge-warning').addClass('badge-danger').html('<i class="fas fa-times mr-1"></i> Erro');
-                             console.error('Auto-save error:', xhr);
+                            console.error('Auto-save error:', xhr);
                         }
                     });
-                }, 500); // Debounce 500ms
+                }, 500);
             }
 
-            // Bind events
-            inputs.on('change', triggerAutoSave);
+            // Use delegation to ensure it works even if DOM content changes
+            $(document).on('change', formSelector + ' input:not([type=file]), ' + formSelector + ' select, ' + formSelector + ' textarea', triggerAutoSave);
+
+            // For color pickers (they might not trigger standard change events on the input immediately)
+            $('.colorpicker-element').on('colorpickerChange', function (e) {
+                triggerAutoSave.call(this);
+            });
         });
     </script>
 @endpush
