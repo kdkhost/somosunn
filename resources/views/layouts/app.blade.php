@@ -1251,7 +1251,9 @@
                     wrapper.innerHTML = '';
                     bindPlaybackProtections(wrapper, disableContextMenu, blockDownload);
 
-                    const host = wrapper.closest('[data-unn-video-host]') || wrapper;
+                    // Decide host early, but if plyr initializes, it might wrap it.
+                    // We will re-evaluate 'host' after Plyr init if needed.
+                    let host = wrapper.closest('[data-unn-video-host]') || wrapper;
 
                     let target;
                     if (youtubeId) {
