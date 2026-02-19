@@ -97,40 +97,17 @@
     </div>
 
     <style>
-        /* Ajustes críticos para evitar conflitos de labels sobrepostas e estilos globais */
+        /* Garantir container limpo mas sem forçar display block em tudo */
         #paymentBrick_container {
             min-height: 500px;
-            text-align: left;
-        }
-        
-        /* Resetar estilos globais que podem quebrar o Brick */
-        #paymentBrick_container label {
-            display: block !important;
-            margin-bottom: 4px !important;
-            font-weight: 600 !important;
-            width: auto !important;
-            position: relative !important;
-            transform: none !important;
-            color: #334155 !important;
         }
 
-        #paymentBrick_container .form-group, 
-        #paymentBrick_container .form-control,
-        #paymentBrick_container input {
-            all: unset !important;
-            box-sizing: border-box !important;
-        }
-        
-        /* Permitir que o Brick controle seus próprios iframes sem interferência */
-        #paymentBrick_container iframe {
-            max-width: 100% !important;
-            display: block !important;
-        }
-
-        /* Garantir que o container não tenha flex ou grid que desalinhe os campos */
-        #paymentBrick_container > div {
-            display: block !important;
-        }
+        /* 
+           O Brick do MercadoPago injeta seu próprio CSS usando Shadow DOM ou iframes em alguns casos,
+           mas também usa elementos normais.
+           Forçar 'all: unset' e 'display: block' nos labels quebra o layout flutuante (floating labels).
+           Vamos remover as regras agressivas e apenas garantir que o container não tenha padding/margin estranhos.
+        */
 
         /* Feedback de carregamento */
         .loading-overlay {
