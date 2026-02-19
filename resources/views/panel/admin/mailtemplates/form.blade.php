@@ -30,11 +30,11 @@
                 </h2>
                 <div class="flex gap-3">
                     <a href="{{ route('panel.admin.mailtemplates.index') }}"
-                        class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-bold py-2 px-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-bold py-2 px-6 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                         Cancelar
                     </a>
                     <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-xl shadow-lg shadow-blue-500/30 transition transform hover:scale-[1.02]">
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-2xl shadow-lg shadow-blue-500/30 transition transform hover:scale-[1.02]">
                         <i class="fas fa-save mr-2"></i> Salvar
                     </button>
                 </div>

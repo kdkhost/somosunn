@@ -455,7 +455,14 @@
                 if (typeof toastr !== 'undefined') {
                     toastr.success('Copiado para a área de transferência!');
                 } else {
-                    alert('Copiado!');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Copiado!',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
                 }
             }, function (err) {
                 console.error('Could not copy text: ', err);

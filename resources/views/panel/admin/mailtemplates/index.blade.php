@@ -32,10 +32,10 @@
                         <i class="fas fa-search text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition"></i>
                     </div>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar templates..."
-                        class="pl-10 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500 transition shadow-sm">
+                        class="pl-10 py-3 w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium transition shadow-sm">
                 </form>
                 <button onclick="openEditor()"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-xl shadow-lg shadow-blue-500/30 transition transform hover:scale-[1.02] flex items-center justify-center gap-2 whitespace-nowrap">
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-blue-500/30 transition transform hover:scale-[1.02] flex items-center justify-center gap-2 whitespace-nowrap">
                     <i class="fas fa-plus"></i> Novo Modelo
                 </button>
             </div>
@@ -175,11 +175,11 @@
                 </div>
                 <div class="flex gap-3">
                     <button onclick="closeEditor()"
-                        class="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        class="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                         Cancelar
                     </button>
                     <button id="btnSaveTemplate"
-                        class="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition flex items-center gap-2">
+                        class="px-6 py-2.5 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition transform hover:scale-[1.02] flex items-center gap-2">
                         <i class="fas fa-save"></i> <span>Salvar Template</span>
                     </button>
                 </div>
@@ -193,7 +193,9 @@
         <div
             class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-800">
             <div class="flex justify-between items-center p-4 border-b border-slate-100 dark:border-slate-800">
-                <h3 class="font-bold text-slate-800 dark:text-white">Pré-visualização</h3>
+                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-eye text-blue-500"></i> Pré-visualização
+                </h3>
                 <button onclick="closePreview()" class="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
                     <i class="fas fa-times text-xl"></i>
                 </button>
@@ -205,12 +207,12 @@
                 <iframe id="previewFrame" class="w-full border-0 transition-all duration-300"
                     style="min-height: 500px;"></iframe>
             </div>
-            <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-b-2xl">
+            <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-b-2xl">
                 <div class="flex gap-3">
                     <input type="email" id="previewEmail" placeholder="E-mail para teste"
-                        class="flex-1 rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-blue-500">
+                        class="flex-1 px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                     <button id="sendPreviewBtn"
-                        class="bg-slate-800 dark:bg-blue-600 text-white px-6 rounded-xl font-bold hover:bg-slate-900 dark:hover:bg-blue-700 transition shadow-lg shadow-blue-500/10">Enviar</button>
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-8 rounded-2xl font-bold shadow-lg shadow-blue-500/30 transition transform hover:scale-[1.02] whitespace-nowrap">Enviar</button>
                 </div>
             </div>
         </div>

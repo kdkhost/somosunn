@@ -24,16 +24,24 @@
                 @php
                     $tabs = [
                         'general' => ['label' => 'Geral', 'icon' => 'fa-cogs'],
+                        'appearance' => ['label' => 'Aparência', 'icon' => 'fa-palette'],
+                        'images' => ['label' => 'Imagens', 'icon' => 'fa-images'],
+                        'player' => ['label' => 'Player', 'icon' => 'fa-play-circle'],
+                        'ads' => ['label' => 'Anúncios', 'icon' => 'fa-ad'],
+                        'pwa' => ['label' => 'PWA', 'icon' => 'fa-mobile-alt'],
+                        'marketplace' => ['label' => 'Marketplace', 'icon' => 'fa-store'],
                         'gateway' => ['label' => 'Pagamentos', 'icon' => 'fa-credit-card'],
-                        'smtp' => ['label' => 'SMTP (E-mail)', 'icon' => 'fa-envelope'],
-                        // Add other groups as needed or migrate them gradually
+                        'smtp' => ['label' => 'SMTP', 'icon' => 'fa-envelope'],
+                        'social' => ['label' => 'Social', 'icon' => 'fa-share-alt'],
+                        'seo' => ['label' => 'SEO', 'icon' => 'fa-search'],
+                        'system' => ['label' => 'Sistema', 'icon' => 'fa-server'],
                     ];
                 @endphp
 
                 @foreach($tabs as $key => $tab)
                         <a href="{{ route('panel.admin.settings', ['group' => $key]) }}"
                             class="flex items-center gap-2 px-6 py-4 text-sm transition whitespace-nowrap border-b-4
-                                                                  {{ $group === $key
+                                                                              {{ $group === $key
                     ? 'border-blue-600 text-blue-600 font-black bg-blue-50 dark:bg-blue-900/30'
                     : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-slate-50 dark:hover:bg-slate-800' }}">
                             <i class="fas {{ $tab['icon'] }}"></i>
