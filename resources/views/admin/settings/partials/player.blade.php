@@ -244,6 +244,9 @@
                 var form = $(this).closest('form');
                 if (form.length === 0) return;
 
+                // Sync controls before saving
+                updatePlyrJson();
+
                 clearTimeout(autoSaveTimer);
                 autoSaveTimer = setTimeout(function () {
                     var formData = new FormData(form[0]);
