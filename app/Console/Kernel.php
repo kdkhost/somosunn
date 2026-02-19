@@ -38,6 +38,9 @@ class Kernel extends ConsoleKernel
                 ->withoutOverlapping(60);
         }
 
+        // Limpeza diária de notificações antigas (> 30 dias)
+        $schedule->command('notifications:cleanup')->daily();
+
         // Outros comandos vitais podem ser migrados para o banco via Seeder.
     }
 
