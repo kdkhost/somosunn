@@ -596,6 +596,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         // Logs de Atividade
         Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])
             ->name('activity_logs.index');
+        Route::delete('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'destroy'])
+            ->name('activity_logs.destroy');
 
         // Events CRUD
         Route::get('events/feed', [\App\Http\Controllers\Admin\EventController::class, 'feed'])

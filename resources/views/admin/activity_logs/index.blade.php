@@ -9,6 +9,16 @@
     <div class="card card-outline card-primary">
         <div class="card-header">
             <h3 class="card-title"><i class="fas fa-history mr-2"></i>Histórico de Ações</h3>
+            <div class="card-tools">
+                <form action="{{ route('admin.activity_logs.destroy') }}" method="POST" class="d-inline"
+                    onsubmit="return confirm('Tem certeza que deseja apagar TODOS os logs histórico? Esta ação não pode ser desfeita.');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm" title="Limpar todos os registros">
+                        <i class="fas fa-trash-alt mr-1"></i> Limpar Logs
+                    </button>
+                </form>
+            </div>
         </div>
         <div class="card-body">
             <table id="table_logs" class="table table-bordered table-striped table-hover">
@@ -40,7 +50,13 @@
                                 <span class="badge badge-info">{{ $log->action }}</span>
                             </td>
                             <td>{{ $log->ip_address }}</td>
-                            <td>{{ $log->description }}</td>
+                            <td>
+                                @if($log->description == 'User performed an action.')
+                                    Usuário realizou uma ação no sistema.
+                                @else
+                                    {{ $log->description }}
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
