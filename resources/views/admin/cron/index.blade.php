@@ -41,13 +41,22 @@
                                     </td>
                                     <td>{{ $task->last_run_at ? $task->last_run_at->format('d/m/Y H:i') : '-' }}</td>
                                     <td>
-                                        <a href="{{ route('admin.cron.edit', $task) }}"
-                                            class="btn btn-sm btn-primary">Editar</a>
-                                        <a href="{{ route('admin.cron.logs', $task) }}" class="btn btn-sm btn-info">Logs</a>
+                                        <form action="{{ route('admin.cron.run', $task) }}" method="POST" class="d-inline"
+                                            onsubmit="return confirm('Deseja executar este comando manualmente agora? Isso pode levar alguns segundos.')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-success" title="Executar Agora">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                        </form>
+                                        <a href="{{ route('admin.cron.edit', $task) }}" class="btn btn-sm btn-primary"
+                                            title="Editar"><i class="fas fa-edit"></i></a>
+                                        <a href="{{ route('admin.cron.logs', $task) }}" class="btn btn-sm btn-info"
+                                            title="Logs"><i class="fas fa-list"></i></a>
                                         <form action="{{ route('admin.cron.destroy', $task) }}" method="POST" class="d-inline"
-                                            onsubmit="return confirmAction(event, 'Excluir esta tarefa?')">
+                                            onsubmit="return confirm('Tem certeza que deseja excluir esta tarefa?')">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Excluir"><i
+                                                    class="fas fa-trash"></i></button>
                                         </form>
                                     </td>
                                 </tr>
