@@ -105,19 +105,22 @@
                         </a>
                         <ul class="nav nav-treeview pl-4">
                             <li class="nav-item">
-                                <a href="{{ route('admin.marketplace.index') }}" class="nav-link {{ $is('admin.marketplace.index') }}">
+                                <a href="{{ route('admin.marketplace.index') }}"
+                                    class="nav-link {{ $is('admin.marketplace.index') }}">
                                     <i class="fas fa-chart-line nav-icon"></i>
                                     <p>Painel</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.marketplace.payments') }}" class="nav-link {{ $is('admin.marketplace.payments') }}">
+                                <a href="{{ route('admin.marketplace.payments') }}"
+                                    class="nav-link {{ $is('admin.marketplace.payments') }}">
                                     <i class="fas fa-credit-card nav-icon"></i>
                                     <p>Pagamentos</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.marketplace.sales') }}" class="nav-link {{ $is('admin.marketplace.sales') }}">
+                                <a href="{{ route('admin.marketplace.sales') }}"
+                                    class="nav-link {{ $is('admin.marketplace.sales') }}">
                                     <i class="fas fa-receipt nav-icon"></i>
                                     <p>Minhas vendas</p>
                                 </a>
@@ -403,6 +406,12 @@
                                     class="nav-link {{ $is('admin.activity_logs.index') }}">
                                     <i class="fas fa-history nav-icon"></i>
                                     <p>Logs de Atividade</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.cron.index') }}" class="nav-link {{ $is('admin.cron.*') }}">
+                                    <i class="fas fa-clock nav-icon"></i>
+                                    <p>Tarefas Agendadas (Cron)</p>
                                 </a>
                             </li>
                         </ul>
