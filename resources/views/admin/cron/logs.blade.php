@@ -11,11 +11,13 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-gradient-primary text-white">
                     <h3 class="card-title">Logs da Tarefa: <code>{{ $task->command }}</code></h3>
-                    <a href="{{ route('admin.cron.index') }}" class="btn btn-sm btn-light text-primary font-weight-bold">
-                        <i class="fas fa-arrow-left mr-1"></i> Voltar
-                    </a>
+                    <div class="card-tools">
+                        <a href="{{ route('admin.cron.index') }}" class="btn btn-tool text-white">
+                            <i class="fas fa-arrow-left mr-1"></i> Voltar
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered table-hover">
