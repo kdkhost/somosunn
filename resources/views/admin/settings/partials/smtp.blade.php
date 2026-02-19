@@ -104,15 +104,21 @@
                 btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Testando...');
 
                 // Gather all SMTP fields
+                var form = btn.closest('form');
+                if (form.length === 0) {
+                    // Fallback if not inside a form
+                    form = btn.closest('.card-body');
+                }
+
                 var data = {
                     _token: '{{ csrf_token() }}',
-                    smtp_host: $('[name="smtp_host"]').val(),
-                    smtp_port: $('[name="smtp_port"]').val(),
-                    smtp_encryption: $('[name="smtp_encryption"]').val(),
-                    smtp_username: $('[name="smtp_username"]').val(),
-                    smtp_password: $('[name="smtp_password"]').val(),
-                    smtp_from_email: $('[name="smtp_from_email"]').val(),
-                    smtp_from_name: $('[name="smtp_from_name"]').val(),
+                    smtp_host: form.find('[name="smtp_host"]').val(),
+                    smtp_port: form.find('[name="smtp_port"]').val(),
+                    smtp_encryption: form.find('[name="smtp_encryption"]').val(),
+                    smtp_username: form.find('[name="smtp_username"]').val(),
+                    smtp_password: form.find('[name="smtp_password"]').val(),
+                    smtp_from_email: form.find('[name="smtp_from_email"]').val(),
+                    smtp_from_name: form.find('[name="smtp_from_name"]').val(),
                     smtp_test_email: email
                 };
 
