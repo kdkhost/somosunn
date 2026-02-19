@@ -19,13 +19,25 @@ class CertificateController extends Controller
     public function show(Certificate $certificate)
     {
         $this->authorize('view', $certificate);
-        return response()->file(public_path($certificate->pdf_path));
+
+        $storage = \Illuminate\Support\Facades\Storage::disk('public');
+        if (!$storage->exists($certificate->pdf_path)) {
+            abort(404, 'Arquivo do certificado não encontrado.');
+        }
+
+        return response()->file($storage->path($certificate->pdf_path));
     }
 
     public function download(Certificate $certificate)
     {
         $this->authorize('view', $certificate);
-        return response()->download(public_path($certificate->pdf_path));
+
+        $storage = \Illuminate\Support\Facades\Storage::disk('public');
+        if (!$storage->exists($certificate->pdf_path)) {
+            abort(404, 'Arquivo do certificado não encontrado.');
+        }
+
+        return response()->download($storage->path($certificate->pdf_path));
     }
 
     public function generate(Request $request)
