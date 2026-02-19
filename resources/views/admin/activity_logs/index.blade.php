@@ -7,8 +7,16 @@
 
 @section('content')
     <div class="card card-outline card-primary">
-        <div class="card-header">
+        <div class="card-header d-flex align-items-center">
             <h3 class="card-title"><i class="fas fa-history mr-2"></i>Histórico de Ações</h3>
+            <div class="card-tools ml-auto">
+                <form action="{{ route('admin.activity_logs.clear') }}" method="POST" id="form-clear-logs">
+                    @csrf
+                    <button type="button" class="btn btn-sm btn-danger btn-clear-logs">
+                        <i class="fas fa-trash-alt mr-1"></i> Limpar Histórico
+                    </button>
+                </form>
+            </div>
         </div>
         <div class="card-body">
             <table id="table_logs" class="table table-bordered table-striped table-hover">
@@ -84,6 +92,23 @@
                 },
                 "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
             }).buttons().container().appendTo('#table_logs_wrapper .col-md-6:eq(0)');
+
+            $('.btn-clear-logs').on('click', function() {
+                Swal.fire({
+                    title: 'Limpar Histórico?',
+                    text: "Esta ação é irreversível e apagará todos os registros de atividade de todos os usuários!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sim, limpar tudo!',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#form-clear-logs').submit();
+                    }
+                });
+            });
         });
     </script>
 @endpush

@@ -99,36 +99,39 @@
     <style>
         /* Ajustes críticos para evitar conflitos de labels sobrepostas e estilos globais */
         #paymentBrick_container {
-            min-height: 450px;
-            text-align: left; /* Garantir alinhamento à esquerda */
-        }
-        #paymentBrick_container iframe {
-            max-width: 100% !important;
+            min-height: 500px;
+            text-align: left;
         }
         
         /* Resetar estilos globais que podem quebrar o Brick */
         #paymentBrick_container label {
-            display: inline-block !important;
-            margin-bottom: 0 !important;
-            font-weight: normal !important;
+            display: block !important;
+            margin-bottom: 4px !important;
+            font-weight: 600 !important;
             width: auto !important;
+            position: relative !important;
+            transform: none !important;
+            color: #334155 !important;
         }
+
         #paymentBrick_container .form-group, 
-        #paymentBrick_container .form-control {
-            margin-bottom: 0 !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-        }
+        #paymentBrick_container .form-control,
         #paymentBrick_container input {
-            height: auto !important; /* Deixar o brick controlar a altura */
+            all: unset !important;
+            box-sizing: border-box !important;
         }
         
-        /* Isolar o container de estilos globais */
-        #paymentBrick_container * {
-            box-sizing: border-box;
+        /* Permitir que o Brick controle seus próprios iframes sem interferência */
+        #paymentBrick_container iframe {
+            max-width: 100% !important;
+            display: block !important;
         }
-        
+
+        /* Garantir que o container não tenha flex ou grid que desalinhe os campos */
+        #paymentBrick_container > div {
+            display: block !important;
+        }
+
         /* Feedback de carregamento */
         .loading-overlay {
             display: none;

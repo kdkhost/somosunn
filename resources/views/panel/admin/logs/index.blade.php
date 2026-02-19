@@ -14,9 +14,17 @@
                 <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">Logs de
                     Atividade</h1>
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">Rastreie as ações realizadas
-                    por usuários e administradores no
-                    sistema.</p>
+                    por usuários e administradores no sistema.</p>
             </div>
+
+            <form action="{{ route('panel.admin.logs.clear') }}" method="POST" id="form-clear-logs">
+                @csrf
+                <button type="button"
+                    class="btn-clear-logs px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-bold rounded-2xl shadow-lg shadow-red-500/20 transition-all flex items-center gap-2">
+                    <i class="fas fa-trash-alt"></i>
+                    Limpar Histórico
+                </button>
+            </form>
         </div>
 
         {{-- Filters --}}
@@ -133,4 +141,26 @@
             @endif
         </div>
     </div>
+    @push('scripts')
+        <script>
+            $(function () {
+                $('.btn-clear-logs').on('click', function () {
+                    Swal.fire({
+                        title: 'Limpar Histórico?',
+                        text: "Esta ação é irreversível e apagará todos os registros de atividade!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Sim, limpar tudo!',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $('#form-clear-logs').submit();
+                        }
+                    });
+                });
+            });
+        </script>
+    @endpush
 @endsection

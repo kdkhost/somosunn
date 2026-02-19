@@ -392,6 +392,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         });
 
         Route::get('logs', [\App\Http\Controllers\Panel\Admin\ActivityLogController::class, 'index'])->name('logs.index');
+        Route::post('logs/clear', [\App\Http\Controllers\Panel\Admin\ActivityLogController::class, 'clear'])->name('logs.clear');
 
         // Engagement Tools
         Route::resource('points-rules', \App\Http\Controllers\Panel\Admin\PointsRuleController::class);
@@ -596,6 +597,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         // Logs de Atividade
         Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])
             ->name('activity_logs.index');
+        Route::post('/activity-logs/clear', [\App\Http\Controllers\Admin\ActivityLogController::class, 'clear'])
+            ->name('activity_logs.clear');
 
         // Events CRUD
         Route::get('events/feed', [\App\Http\Controllers\Admin\EventController::class, 'feed'])

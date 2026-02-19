@@ -33,6 +33,12 @@ class ActivityLogController extends Controller
         return view('panel.admin.logs.index', compact('logs', 'type', 'userId', 'q'));
     }
 
+    public function clear()
+    {
+        ActivityLog::truncate();
+        return redirect()->back()->with('success', 'Histórico de logs limpo com sucesso.');
+    }
+
     private function ensurePermission(string $perm)
     {
         if (!Auth::user()->isAdmin() && !Auth::user()->hasPermission($perm)) {

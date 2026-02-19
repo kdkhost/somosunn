@@ -457,7 +457,7 @@ class SettingController extends Controller
         }
         if ($currentGroup === 'gateway') {
             // Remover chaves ANTIGAS e lixo que não pertencem ao gateway
-            $trashKeys = ['video_plyr_options_json', 'gateway_checkout_theme', 'gateway_checkout_primary_color', 'gateway_checkout_theme_selected', 'gateway_checkout_primary_color_hex'];
+            $trashKeys = ['video_plyr_options_json', 'gateway_checkout_theme_selected', 'gateway_checkout_primary_color_hex'];
             foreach ($trashKeys as $trash) {
                 if (isset($data[$trash])) {
                     unset($data[$trash]);
