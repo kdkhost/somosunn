@@ -29,13 +29,21 @@ class CronController extends Controller
 
     public function store(Request $request)
     {
+        // Map UI inputs to Model attributes
+        $request->merge([
+            'command' => $request->input('real_command'),
+            'frequency' => $request->input('real_frequency'),
+        ]);
+
         $data = $request->validate([
             'command' => 'required|string',
             'frequency' => 'required|string',
             'active' => 'boolean',
         ]);
         $data['active'] = $request->has('active');
+
         ScheduledTask::create($data);
+
         return redirect()->route('admin.cron.index')->with('success', 'Tarefa criada!');
     }
 
@@ -46,13 +54,21 @@ class CronController extends Controller
 
     public function update(Request $request, ScheduledTask $task)
     {
+        // Map UI inputs to Model attributes
+        $request->merge([
+            'command' => $request->input('real_command'),
+            'frequency' => $request->input('real_frequency'),
+        ]);
+
         $data = $request->validate([
             'command' => 'required|string',
             'frequency' => 'required|string',
             'active' => 'boolean',
         ]);
         $data['active'] = $request->has('active');
+
         $task->update($data);
+
         return redirect()->route('admin.cron.index')->with('success', 'Tarefa atualizada!');
     }
 
@@ -73,24 +89,30 @@ class CronController extends Controller
         if (!$task->active) {
             return back()->with('error', 'Tarefa inativa.');
         }
+
         $output = '';
         $success = true;
+
         try {
-            $exitCode = Artisan::call($task->command, [], $output);
+            // Fix: Artisan::call returns exit code. Output is captured via Artisan::output()
+            $exitCode = Artisan::call($task->command);
             $output = Artisan::output();
             $success = $exitCode === 0;
         } catch (\Throwable $e) {
             $output = $e->getMessage();
             $success = false;
         }
+
         $task->last_run_at = now();
         $task->save();
+
         ScheduledTaskLog::create([
             'scheduled_task_id' => $task->id,
             'executed_at' => now(),
             'output' => $output,
             'success' => $success,
         ]);
+
         return back()->with($success ? 'success' : 'error', $success ? 'Executada com sucesso!' : 'Falha na execução.');
     }
 }

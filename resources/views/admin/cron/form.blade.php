@@ -41,90 +41,28 @@
                                 value="{{ old('command', $task->command) }}" placeholder="ex: schedule:run">
                         </div>
 
-                        <div class="form-group">
-                            <label>Frequência</label>
-                            <select name="frequency_select" id="frequency_select" class="form-control"
-                                onchange="toggleCustomFrequency()">
-                                <option value="* * * * *" {{ $task->frequency == '* * * * *' ? 'selected' : '' }}>A cada
-                                    minuto (* * * * *)</option>
-                                <option value="0 * * * *" {{ $task->frequency == '0 * * * *' ? 'selected' : '' }}>Uma vez por
-                                    hora (0 * * * *)</option>
-                                <option value="0 0 * * *" {{ $task->frequency == '0 0 * * *' ? 'selected' : '' }}>Diariamente
-                                    à Meia-noite (0 0 * * *)</option>
-                                <option value="0 12 * * *" {{ $task->frequency == '0 12 * * *' ? 'selected' : '' }}>
-                                    Diariamente ao Meio-dia (0 12 * * *)</option>
-                                <option value="0 0 * * 0" {{ $task->frequency == '0 0 * * 0' ? 'selected' : '' }}>Semanalmente
-                                    (Domingo 00:00)</option>
-                                <option value="custom" {{ !in_array($task->frequency, ['* * * * *', '0 * * * *', '0 0 * * *', '0 12 * * *', '0 0 * * 0']) && $task->exists ? 'selected' : '' }}>Outra
-                                    (Personalizada)</option>
-                            </select>
-                        </div>
-                        <div class="form-group {{ !in_array($task->frequency, ['* * * * *', '0 * * * *', '0 0 * * *', '0 12 * * *', '0 0 * * 0']) && $task->exists ? '' : 'd-none' }}"
-                            id="custom_frequency_div">
-                            <label>Frequência Personalizada (Cron)</label>
-                            <input type="text" name="frequency_custom" id="frequency_custom" class="form-control"
-                                value="{{ old('frequency', $task->frequency) }}" placeholder="* * * * *">
-                        </div>
+                        // Let's use JS to populate a hidden input 'command' and 'frequency' before submit
 
-                        <script>
-                            function toggleCustomCommand() {
-                                const select = document.getElementById('command_select');
-                                const customDiv = document.getElementById('custom_command_div');
-                                const customInput = document.getElementById('command_custom');
+                        let finalCmd = cmdSelect.value === 'custom' ? cmdCustom.value : cmdSelect.value;
+                        let finalFreq = document.getElementById('frequency_select').value === 'custom' ?
+                        document.getElementById('frequency_custom').value :
+                        document.getElementById('frequency_select').value;
 
-                                if (select.value === 'custom') {
-                                    customDiv.classList.remove('d-none');
-                                    customInput.required = true;
-                                } else {
-                                    customDiv.classList.add('d-none');
-                                    customInput.required = false;
-                                    customInput.value = select.value; // Sync value just in case
-                                }
-                            }
+                        // We can't easily change the request payload without hidden fields if we want to keep controller
+                        same.
+                        // BUT, I'll update the controller to handle this or use the existing 'command' input if I can reuse
+                        it.
 
-                            function toggleCustomFrequency() {
-                                const select = document.getElementById('frequency_select');
-                                const customDiv = document.getElementById('custom_frequency_div');
-                                const customInput = document.getElementById('frequency_custom');
+                        // Let's create hidden fields if they don't exist, or update the existing ones if we change the
+                        layout.
+                        // Start SIMPLE: Rename the visible inputs to something else, and use hidden inputs for the real
+                        submission.
+                        });
 
-                                if (select.value === 'custom') {
-                                    customDiv.classList.remove('d-none');
-                                    customInput.required = true;
-                                } else {
-                                    customDiv.classList.add('d-none');
-                                    customInput.required = false;
-                                    customInput.value = select.value;
-                                }
-                            }
-
-                            // On submit, ensure the correct value is sent
-                            document.querySelector('form').addEventListener('submit', function (e) {
-                                const cmdSelect = document.getElementById('command_select');
-                                const cmdCustom = document.getElementById('command_custom');
-
-                                // If not custom, force custom input to match select (since controller likely reads 'command' or we need to change controller)
-                                // Better yet: Controller expects 'command' and 'frequency'. 
-                                // Let's create hidden inputs or just rely on the controller logic?
-                                // EASIEST: modify controller to read properly. 
-                                // OR: Rename inputs in form to 'command' (for custom) and remove name from select? 
-                                // No, select needs a name.
-
-                                // Let's use JS to populate a hidden input 'command' and 'frequency' before submit
-
-                                let finalCmd = cmdSelect.value === 'custom' ? cmdCustom.value : cmdSelect.value;
-                                let finalFreq = document.getElementById('frequency_select').value === 'custom' ? document.getElementById('frequency_custom').value : document.getElementById('frequency_select').value;
-
-                                // We can't easily change the request payload without hidden fields if we want to keep controller same.
-                                // BUT, I'll update the controller to handle this or use the existing 'command' input if I can reuse it.
-
-                                // Let's create hidden fields if they don't exist, or update the existing ones if we change the layout.
-                                // Start SIMPLE: Rename the visible inputs to something else, and use hidden inputs for the real submission.
-                            });
-
-                            // Wait, simpler approach:
-                            // Update controller to look for 'command_select' and 'command_custom'.
-                            // But I can't update controller easily in this step (single file edit tool).
-                            // I'll stick to JS populating the input.
+                        // Wait, simpler approach:
+                        // Update controller to look for 'command_select' and 'command_custom'.
+                        // But I can't update controller easily in this step (single file edit tool).
+                        // I'll stick to JS populating the input.
                         </script>
 
                         <!-- Hidden inputs for actual submission -->
