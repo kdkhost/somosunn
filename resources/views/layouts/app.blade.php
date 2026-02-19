@@ -1191,7 +1191,7 @@
 
                     if (target.tagName === 'VIDEO') {
                         target.setAttribute('controlsList', 'nodownload noplaybackrate noremoteplayback');
-                        target.setAttribute('disablePictureInPicture', '');
+                        // target.setAttribute('disablePictureInPicture', ''); // Allow PiP even if download is blocked
                         target.setAttribute('disableRemotePlayback', '');
                         // Prevent standard "Save Video As" in some older browsers
                         target.addEventListener('mousedown', function (e) {
