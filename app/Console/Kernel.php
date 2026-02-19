@@ -26,20 +26,8 @@ class Kernel extends ConsoleKernel
             // Log silent or fallback
         }
 
-        // Tarefas HARDCODED de BACKUP se o banco falhar ou não tiver registros
-        // (Opcional: manter como fallback ou remover se quiser total controle no painel)
-        if (config('internal_cron.run_queue_worker', true)) {
-            // Mantém queue worker rodando se não estiver definido no banco
-            // Porem o ideal é migrar tudo para o banco.
-            // Vou comentar ou deixar condicional.
-            // Para garantir que a fila rode mesmo sem config no banco (fail-safe):
-            $schedule->command('queue:work --stop-when-empty --quiet --tries=3')
-                ->everyMinute()
-                ->withoutOverlapping(60);
-        }
-
-        // Limpeza diária de notificações antigas (> 30 dias)
-        $schedule->command('notifications:cleanup')->daily();
+        // Tarefas agendadas são gerenciadas via Banco de Dados (Tabela scheduled_tasks)
+        // Para adicionar novas tarefas padrão, use o ScheduledTasksSeeder.
 
         // Outros comandos vitais podem ser migrados para o banco via Seeder.
     }
