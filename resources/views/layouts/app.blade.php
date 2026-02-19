@@ -1438,20 +1438,20 @@
                     }
 
                     // Expose toggle capability to the wrapper for external buttons
-                    if (host.dataset.unnVideoPlayer) {
-                         host.toggleFloating = function() {
-                             manualToggle = !host.classList.contains('unn-video-float');
-                             disabled = !manualToggle;
-                             setFloating(manualToggle);
-                         };
-                    } else {
-                        // Attempt to finding the wrapper inside or outside
-                        const wrapper = host.querySelector('[data-unn-video-player]') || host;
-                        wrapper.toggleFloating = function() {
-                             manualToggle = !host.classList.contains('unn-video-float');
-                             disabled = !manualToggle;
-                             setFloating(manualToggle);
-                        };
+                    // ALWAYS attach to the host we are passed, because that is what the button uses.
+                    host.toggleFloating = function() {
+                         console.log('UNN Video: toggleFloating called');
+                         manualToggle = !host.classList.contains('unn-video-float');
+                         disabled = !manualToggle;
+                         setFloating(manualToggle);
+                    };
+
+                    // For backward compatibility or if something else looks for it on the wrapper
+                    if (host !== host.querySelector('[data-unn-video-player]')) {
+                        const wrapper = host.querySelector('[data-unn-video-player]');
+                        if (wrapper) {
+                            wrapper.toggleFloating = host.toggleFloating;
+                        }
                     }
 
                     if ('IntersectionObserver' in window) {
