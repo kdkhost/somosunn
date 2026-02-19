@@ -988,20 +988,9 @@
                     if (plyr.volumeEnabled === false) controls = controls.filter(c => c !== 'mute' && c !== 'volume');
                     
                     // Ensure buttons are present if enabled
-                    if (plyr.rewindEnabled && !controls.includes('rewind')) {
-                        const playIdx = controls.indexOf('play');
-                        controls.splice(playIdx + 1, 0, 'rewind');
-                    }
-                    if (plyr.fastForwardEnabled && !controls.includes('fast-forward')) {
-                        const rewindIdx = controls.indexOf('rewind');
-                        if (rewindIdx >= 0) {
-                            controls.splice(rewindIdx + 1, 0, 'fast-forward');
-                        } else {
-                            const playIdx = controls.indexOf('play');
-                            controls.splice(playIdx + 1, 0, 'fast-forward');
-                        }
-                    }
-
+                    // REMOVED FORCED INSERTION: Trust the 'controls' list from backend configuration.
+                    // If the user unchecks 'rewind' in "Visible Controls", it should not appear even if 'rewindEnabled' is true.
+                    
                     base.controls = controls;
                     if (Array.isArray(plyr.settings) && plyr.settings.length) {
                         base.settings = plyr.settings;
@@ -1381,6 +1370,7 @@
 
                     let disabled = false;
                     let manualToggle = false; // Track manual toggle state
+                    let pipWindow = null; // Store reference to PiP window
 
                     const clampInt = function (value, fallback, min, max) {
                         const parsed = parseInt(String(value || ''), 10);
@@ -1394,6 +1384,17 @@
                     host.style.setProperty('--unn-float-width', width + 'px');
                     host.style.setProperty('--unn-float-height', height + 'px');
 
+                    // Placeholder to keep space in the original document
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'unn-video-float-placeholder';
+                    placeholder.style.display = 'none';
+                    if (host.parentNode) {
+                        try {
+                            host.parentNode.insertBefore(placeholder, host);
+                        } catch(e) {}
+                    }
+
+                    // In-page Close button (only visible when floating in-page)
                     const closeBtn = document.createElement('button');
                     closeBtn.type = 'button';
                     closeBtn.className = 'unn-video-float-close';
@@ -1406,25 +1407,99 @@
                     });
                     host.appendChild(closeBtn);
 
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'unn-video-float-placeholder';
-                    placeholder.style.display = 'none';
-                    if (host.parentNode) {
-                        host.parentNode.insertBefore(placeholder, host);
+                    async function enterDocumentPiP() {
+                        if (!('documentPictureInPicture' in window)) {
+                            return false;
+                        }
+
+                        try {
+                            pipWindow = await window.documentPictureInPicture.requestWindow({
+                                width: host.clientWidth || width,
+                                height: host.clientHeight || height,
+                            });
+
+                            // Copy style sheets
+                            [...document.styleSheets].forEach((styleSheet) => {
+                                try {
+                                    const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
+                                    const style = document.createElement('style');
+                                    style.textContent = cssRules;
+                                    pipWindow.document.head.appendChild(style);
+                                } catch (e) {
+                                    const link = document.createElement('link');
+                                    link.rel = 'stylesheet';
+                                    link.type = styleSheet.type;
+                                    link.media = styleSheet.media;
+                                    link.href = styleSheet.href;
+                                    pipWindow.document.head.appendChild(link);
+                                }
+                            });
+                            
+                            // Specific adjustments for PiP window
+                             const style = document.createElement('style');
+                             style.textContent = `
+                                body { margin: 0; display: flex; justify-content: center; align-items: center; background: #000; height: 100vh; overflow: hidden; }
+                                .unn-video-player { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; }
+                                .unn-video-float-close { display: none !important; } /* Hide close button in window */
+                                .unn-video-watermark { --unn-wm-margin: 8px !important; min-width: 40px; }
+                             `;
+                             pipWindow.document.head.appendChild(style);
+
+                            // Move player to PiP window
+                            pipWindow.document.body.append(host);
+                            placeholder.style.height = (height) + 'px'; // Approximate height or keep original rect
+                            placeholder.style.display = 'block';
+
+                            pipWindow.addEventListener('pagehide', (event) => {
+                                // Restore when window closes
+                                if (placeholder && placeholder.parentNode) {
+                                    placeholder.parentNode.insertBefore(host, placeholder);
+                                    placeholder.style.display = 'none';
+                                }
+                                pipWindow = null;
+                                manualToggle = false;
+                                
+                                // Clean up checks
+                                if (player && typeof player.resize === 'function') {
+                                     setTimeout(() => player.resize(), 50);
+                                }
+                            });
+                            
+                            return true;
+                        } catch (err) {
+                            console.error('Failed to open Document PiP:', err);
+                            return false;
+                        }
                     }
 
-                    function setFloating(on) {
+                    async function setFloating(on) {
                         if (disabled && !manualToggle) on = false;
 
                         if (on) {
-                            if (!host.classList.contains('unn-video-float')) {
+                            // Priority 1: Document PiP (New Window + Watermark)
+                            // Only triggered via manual toggle
+                            if (manualToggle && 'documentPictureInPicture' in window) {
+                                if (!pipWindow) {
+                                    const success = await enterDocumentPiP();
+                                    if (success) return;
+                                } else {
+                                    return; // Already open
+                                }
+                            }
+
+                            // Fallback: In-Page Float (Classic)
+                            // Used if Document PiP fails OR if it is an auto-scroll trigger
+                            if (!pipWindow && !host.classList.contains('unn-video-float')) {
                                 const rect = host.getBoundingClientRect();
                                 placeholder.style.height = rect.height + 'px';
                                 placeholder.style.display = 'block';
                                 host.classList.add('unn-video-float');
                             }
                         } else {
-                            if (host.classList.contains('unn-video-float')) {
+                            // Turn Off
+                            if (pipWindow) {
+                                pipWindow.close(); // This triggers pagehide which restores elements
+                            } else if (host.classList.contains('unn-video-float')) {
                                 host.classList.remove('unn-video-float');
                                 placeholder.style.display = 'none';
                             }
@@ -1441,9 +1516,16 @@
                     // ALWAYS attach to the host we are passed, because that is what the button uses.
                     host.toggleFloating = function() {
                          console.log('UNN Video: toggleFloating called');
-                         manualToggle = !host.classList.contains('unn-video-float');
-                         disabled = !manualToggle;
-                         setFloating(manualToggle);
+                         // If we are in PiP window, toggle means close it
+                         if (pipWindow) {
+                             manualToggle = false;
+                             disabled = false;
+                             setFloating(false);
+                         } else {
+                             manualToggle = !host.classList.contains('unn-video-float');
+                             disabled = !manualToggle;
+                             setFloating(manualToggle);
+                         }
                     };
 
                     // For backward compatibility or if something else looks for it on the wrapper
@@ -1457,8 +1539,8 @@
                     if ('IntersectionObserver' in window) {
                         const observer = new IntersectionObserver(function (entries) {
                             for (const entry of entries) {
-                                // Auto-float only if not manually disabled
-                                if (!manualToggle) {
+                                // Auto-float (In-Page) only if not manually disabled and not in PiP window
+                                if (!manualToggle && !pipWindow) {
                                      setFloating(!entry.isIntersecting);
                                 }
                             }
@@ -1466,7 +1548,7 @@
                         observer.observe(host);
                     } else {
                         const onScroll = function () {
-                            if (manualToggle) return;
+                            if (manualToggle || pipWindow) return;
                             const rect = host.getBoundingClientRect();
                             const inView = rect.bottom > 100 && rect.top < (window.innerHeight - 100);
                             setFloating(!inView);
