@@ -985,7 +985,7 @@
                     // Filter based on enabled settings
                     if (plyr.rewindEnabled === false) controls = controls.filter(c => c !== 'rewind');
                     if (plyr.fastForwardEnabled === false) controls = controls.filter(c => c !== 'fast-forward');
-                    if (plyr.volumeEnabled === false) controls = controls.filter(c => c !== 'mute' && c !== 'volume');
+                    // if (plyr.volumeEnabled === false) controls = controls.filter(c => c !== 'mute' && c !== 'volume'); // Force volume controls based on 'controls' list
                     
                     // Ensure buttons are present if enabled
                     // REMOVED FORCED INSERTION: Trust the 'controls' list from backend configuration.
@@ -995,7 +995,7 @@
                     if (Array.isArray(plyr.settings) && plyr.settings.length) {
                         base.settings = plyr.settings;
                     }
-                    if (Number.isFinite(plyr.volume) && plyr.volumeEnabled !== false) {
+                    if (Number.isFinite(plyr.volume) && true) { // Always apply volume setting
                         base.volume = Math.max(0, Math.min(1, Number(plyr.volume)));
                     }
                     if (Array.isArray(plyr.speedOptions) && plyr.speedOptions.length) {
