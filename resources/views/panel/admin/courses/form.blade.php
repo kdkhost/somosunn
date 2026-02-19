@@ -2,69 +2,80 @@
 
 @section('title', $course->exists ? 'Editar Curso' : 'Novo Curso')
 
-@section('content')
-    <div x-data="{ tab: 'general' }" class="space-y-6">
+@section('panel_breadcrumb')
+    <a href="{{ route('panel.admin.courses.index') }}" class="hover:underline transition-all">Cursos</a>
+    <span class="mx-2 text-slate-300 dark:text-slate-700 transition-colors">/</span>
+    <span class="text-slate-500 dark:text-slate-400 transition-colors">{{ $course->exists ? 'Editar' : 'Novo' }}</span>
+@endsection
+
+@section('panel_content')
+    <div x-data="{ tab: 'general', floating: {{ $course->video_floating_enabled ? 'true' : 'false' }} }" class="space-y-8">
         {{-- Header --}}
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div class="flex items-center gap-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-6">
+            <div class="flex items-center gap-5">
                 <a href="{{ route('panel.admin.courses.index') }}"
-                    class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 transition-all shadow-sm">
-                    <i class="fas fa-arrow-left"></i>
+                    class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-900 transition-all shadow-sm group">
+                    <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
                 </a>
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">
-                        {{ $course->exists ? 'Editar Curso' : 'Novo Curso' }}
+                    <h1 class="text-3xl font-black tracking-tight text-slate-800 dark:text-white transition-colors">
+                        {{ $course->exists ? 'Editar' : 'Novo' }} Curso
                     </h1>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">
-                        {{ $course->exists ? 'Atualize os detalhes e o conteúdo do curso.' : 'Preencha as informações para criar um novo curso.' }}
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors font-medium">
+                        {{ $course->exists ? 'Atualize os detalhes e o conteúdo pedagógico.' : 'Configure as informações para o novo treinamento.' }}
                     </p>
                 </div>
             </div>
 
-            @if($course->exists)
-                <div class="flex items-center gap-2">
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                @if($course->exists)
                     <a href="{{ route('courses.show', $course->slug ?: $course->id) }}" target="_blank"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all shadow-sm">
+                        class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm">
                         <i class="fas fa-external-link-alt text-slate-400 dark:text-slate-500"></i>
                         <span>Ver na Loja</span>
                     </a>
-                </div>
-            @endif
+                @endif
+                <button type="submit" form="courseForm"
+                    class="flex-1 sm:flex-none px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl shadow-blue-500/20 transition transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i>
+                    <span>Salvar</span>
+                </button>
+            </div>
         </div>
 
         {{-- Tabs Navigation --}}
         <div
-            class="bg-slate-50 dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 inline-flex items-center gap-1.5 mb-6">
+            class="bg-slate-50 dark:bg-slate-950 p-2 rounded-[2rem] border border-slate-100 dark:border-slate-800 inline-flex items-center gap-2 mb-2 transition-all shadow-inner">
             <button type="button" @click="tab = 'general'"
                 :class="tab === 'general' 
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
-                class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
+                                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 font-black scale-105' 
+                                    : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-white dark:hover:bg-slate-900'"
+                class="px-6 py-3 rounded-2xl text-xs uppercase tracking-widest transition-all flex items-center gap-2">
                 <i class="fas fa-info-circle"></i>
                 <span>Geral</span>
             </button>
             <button type="button" @click="tab = 'pricing'"
                 :class="tab === 'pricing' 
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
-                class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
+                                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 font-black scale-105' 
+                                    : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-white dark:hover:bg-slate-900'"
+                class="px-6 py-3 rounded-2xl text-xs uppercase tracking-widest transition-all flex items-center gap-2">
                 <i class="fas fa-tag"></i>
                 <span>Preço</span>
             </button>
             @if($course->exists)
                 <button type="button" @click="tab = 'lessons'"
                     :class="tab === 'lessons' 
-                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
-                    class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
+                                                        ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 font-black scale-105' 
+                                                        : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-white dark:hover:bg-slate-900'"
+                    class="px-6 py-3 rounded-2xl text-xs uppercase tracking-widest transition-all flex items-center gap-2">
                     <i class="fas fa-layer-group"></i>
-                    <span>Conteúdo ({{ $course->lessons_count ?? $course->lessons()->count() }})</span>
+                    <span>Grade Curricular ({{ $course->lessons_count ?? $course->lessons()->count() }})</span>
                 </button>
                 <button type="button" @click="tab = 'certificate'"
                     :class="tab === 'certificate' 
-                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
-                    class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
+                                                        ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 font-black scale-105' 
+                                                        : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-white dark:hover:bg-slate-900'"
+                    class="px-6 py-3 rounded-2xl text-xs uppercase tracking-widest transition-all flex items-center gap-2">
                     <i class="fas fa-certificate"></i>
                     <span>Certificado</span>
                 </button>
@@ -76,107 +87,120 @@
             enctype="multipart/form-data">
             @csrf
             @if($course->exists) @method('PUT') @endif
+            <input type="hidden" name="certificate_settings" id="certificate_settings_input">
 
             {{-- Tab: General --}}
-            <div x-show="tab === 'general'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 space-y-6">
+            <div x-show="tab === 'general'" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-8">
                     <div
-                        class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
-                        <h3
-                            class="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2 transition-colors">
-                            <i class="fas fa-file-alt text-blue-500"></i>
-                            Informações Principais
-                        </h3>
+                        class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
+                        <div class="flex items-center gap-3 border-b border-slate-50 dark:border-slate-800 pb-5 mb-8">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h3 class="font-bold text-xl text-slate-800 dark:text-white transition-colors">Informações
+                                Principais</h3>
+                        </div>
 
-                        <div class="space-y-4">
+                        <div class="space-y-6">
                             <div>
                                 <label
-                                    class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Título
+                                    class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 transition-colors">Título
                                     do Curso</label>
                                 <input type="text" name="title" value="{{ old('title', $course->title) }}" required
-                                    class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-lg font-bold"
+                                    class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all text-xl font-bold placeholder:text-slate-300"
                                     placeholder="Ex: Domínio do Backend com Laravel">
                             </div>
 
                             <div>
                                 <label
-                                    class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Descrição
+                                    class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 transition-colors">Descrição
                                     Curta</label>
                                 <textarea name="short_description" rows="3" maxlength="500"
-                                    class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+                                    class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-700 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all resize-none font-medium placeholder:text-slate-300"
                                     placeholder="Um breve resumo que aparece nos cards de curso...">{{ old('short_description', $course->short_description) }}</textarea>
-                                <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1 transition-colors">Máximo 500
-                                    caracteres.</p>
+                                <p
+                                    class="text-[10px] text-slate-400 dark:text-slate-500 mt-2 font-medium italic transition-colors text-right">
+                                    Máximo 500 caracteres.</p>
                             </div>
 
                             <div>
                                 <label
-                                    class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Descrição
+                                    class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 transition-colors">Descrição
                                     Completa</label>
                                 <textarea name="full_description" id="fullDescription" rows="10"
-                                    class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">{{ old('full_description', $course->full_description) }}</textarea>
+                                    class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-700 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all">{{ old('full_description', $course->full_description) }}</textarea>
                             </div>
                         </div>
                     </div>
 
                     <div
-                        class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
-                        <h3
-                            class="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2 transition-colors">
-                            <i class="fas fa-video text-blue-500"></i>
-                            Vodeon & Player
-                        </h3>
+                        class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
+                        <div class="flex items-center gap-3 border-b border-slate-50 dark:border-slate-800 pb-5 mb-8">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <h3 class="font-bold text-xl text-slate-800 dark:text-white transition-colors">Player &
+                                Experiência</h3>
+                        </div>
 
                         <div class="space-y-6">
-                            <div
-                                class="flex items-start gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 transition-colors">
-                                <div class="flex items-center h-5">
+                            <label
+                                class="flex items-start gap-4 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-900 transition-all cursor-pointer group">
+                                <div class="flex items-center h-5 mt-1">
                                     <input type="checkbox" name="video_block_download" id="video_block_download" value="1"
                                         {{ $course->video_block_download ? 'checked' : '' }}
-                                        class="w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-700 rounded focus:ring-blue-500 bg-white dark:bg-slate-900">
+                                        class="w-5 h-5 text-blue-600 border-slate-300 dark:border-slate-800 rounded-lg focus:ring-blue-500 bg-white dark:bg-slate-900 transition-all">
                                 </div>
                                 <div>
-                                    <label for="video_block_download"
-                                        class="block text-sm font-bold text-slate-900 dark:text-white transition-colors">Bloquear
-                                        download do vídeo</label>
-                                    <p class="text-xs text-slate-500 dark:text-slate-400 transition-colors">Remove
-                                        botões/menus de download nativos do player.</p>
+                                    <span
+                                        class="block text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">Bloquear
+                                        Download</span>
+                                    <p
+                                        class="text-xs text-slate-500 dark:text-slate-400 transition-colors mt-0.5 font-medium">
+                                        Remove botões e menus de download nativos do navegador.</p>
                                 </div>
-                            </div>
+                            </label>
 
                             <div
-                                class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 space-y-4 transition-colors">
-                                <div class="flex items-start gap-4">
-                                    <div class="flex items-center h-5">
+                                class="p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800 space-y-5 transition-all">
+                                <label class="flex items-start gap-4 cursor-pointer group">
+                                    <div class="flex items-center h-5 mt-1">
                                         <input type="checkbox" x-model="floating" id="video_floating_enabled" value="1"
                                             name="video_floating_enabled" {{ $course->video_floating_enabled ? 'checked' : '' }}
-                                            class="w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-700 rounded focus:ring-blue-500 bg-white dark:bg-slate-900">
+                                            class="w-5 h-5 text-blue-600 border-slate-300 dark:border-slate-800 rounded-lg focus:ring-blue-500 bg-white dark:bg-slate-900 transition-all">
                                     </div>
                                     <div>
-                                        <label for="video_floating_enabled"
-                                            class="block text-sm font-bold text-slate-900 dark:text-white transition-colors">Mini
-                                            player flutuante</label>
-                                        <p class="text-xs text-slate-500 dark:text-slate-400 transition-colors">Ao rolar a
-                                            página, o vídeo fica fixo no canto da tela.</p>
+                                        <span
+                                            class="block text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">Mini
+                                            Player Flutuante</span>
+                                        <p
+                                            class="text-xs text-slate-500 dark:text-slate-400 transition-colors mt-0.5 font-medium">
+                                            Ao rolar a página, o vídeo fica fixo no canto da tela (Picture-in-Picture).</p>
                                     </div>
-                                </div>
+                                </label>
 
-                                <div x-show="floating" x-transition class="grid grid-cols-2 gap-4 ml-8">
-                                    <div>
+                                <div x-show="floating" x-transition:enter="transition ease-out duration-300"
+                                    x-transition:enter-start="opacity-0 -translate-y-2"
+                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                    class="grid grid-cols-2 gap-6 pl-9 pt-2">
+                                    <div class="space-y-2">
                                         <label
-                                            class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase transition-colors">Largura
+                                            class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors">Largura
                                             (px)</label>
                                         <input type="number" name="video_floating_width"
                                             value="{{ $course->video_floating_width ?? 420 }}"
-                                            class="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
                                     </div>
-                                    <div>
+                                    <div class="space-y-2">
                                         <label
-                                            class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase transition-colors">Altura
+                                            class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors">Altura
                                             (px)</label>
                                         <input type="number" name="video_floating_height"
                                             value="{{ $course->video_floating_height ?? 236 }}"
-                                            class="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
                                     </div>
                                 </div>
                             </div>
@@ -184,22 +208,25 @@
                     </div>
                 </div>
 
-                <div class="space-y-6">
+                <div class="space-y-8">
                     {{-- Publish Action --}}
                     <div
-                        class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
-                        <button type="submit"
-                            class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2 mb-4">
-                            <i class="fas fa-save"></i>
-                            <span>{{ $course->exists ? 'Salvar Alterações' : 'Criar Curso' }}</span>
-                        </button>
+                        class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-800 dark:text-white transition-colors">Publicação</h3>
+                        </div>
 
-                        <div class="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800 transition-colors">
+                        <div class="space-y-6">
                             <div>
                                 <label
-                                    class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Status</label>
+                                    class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 transition-colors">Status
+                                    do Curso</label>
                                 <select name="status"
-                                    class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm font-medium">
+                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all text-sm font-bold">
                                     <option value="draft" {{ $course->status == 'draft' ? 'selected' : '' }}>Rascunho</option>
                                     <option value="published" {{ $course->status == 'published' ? 'selected' : '' }}>Publicado
                                     </option>
@@ -210,143 +237,169 @@
                                 </select>
                             </div>
 
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" name="is_featured" id="is_featured" value="1" {{ $course->is_featured ? 'checked' : '' }}
-                                    class="w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-700 rounded focus:ring-blue-500 bg-white dark:bg-slate-900">
-                                <label for="is_featured"
-                                    class="text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors">Destaque
-                                    na Home</label>
-                            </div>
+                            <div class="space-y-4 pt-4 border-t border-slate-50 dark:border-slate-800">
+                                <label
+                                    class="flex items-center justify-between cursor-pointer group p-3 rounded-2xl border border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30">
+                                    <span
+                                        class="text-sm font-bold text-slate-700 dark:text-slate-300 transition-colors">Destaque
+                                        na Home</span>
+                                    <div class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="is_featured" value="1" class="sr-only peer" {{ $course->is_featured ? 'checked' : '' }}>
+                                        <div
+                                            class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500">
+                                        </div>
+                                    </div>
+                                </label>
 
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" name="is_certificate_enabled" id="is_certificate_enabled" value="1"
-                                    {{ $course->is_certificate_enabled ? 'checked' : '' }}
-                                    class="w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-700 rounded focus:ring-blue-500 bg-white dark:bg-slate-900">
-                                <label for="is_certificate_enabled"
-                                    class="text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors">Habilitar
-                                    Certificado</label>
+                                <label
+                                    class="flex items-center justify-between cursor-pointer group p-3 rounded-2xl border border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30">
+                                    <span
+                                        class="text-sm font-bold text-slate-700 dark:text-slate-300 transition-colors">Certificado</span>
+                                    <div class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="is_certificate_enabled" value="1" class="sr-only peer"
+                                            {{ $course->is_certificate_enabled ? 'checked' : '' }}>
+                                        <div
+                                            class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600">
+                                        </div>
+                                    </div>
+                                </label>
                             </div>
                         </div>
                     </div>
 
                     {{-- Image Thumbnail --}}
                     <div
-                        class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
-                        <h5
-                            class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2 transition-colors">
-                            <i class="fas fa-image text-blue-500"></i>
-                            Imagem de Capa
-                        </h5>
+                        class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-800 dark:text-white transition-colors">Capa do Curso</h3>
+                        </div>
 
-                        <div x-data="{ photoName: null, photoPreview: '{{ $course->thumbnail ? asset($course->thumbnail) : '' }}' }"
+                        <div x-data="{ photoPreview: '{{ $course->thumbnail ? asset($course->thumbnail) : '' }}' }"
                             class="space-y-4">
-                            <div class="relative group">
-                                <div
-                                    class="aspect-video w-full rounded-xl bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden transition-all group-hover:border-blue-300 dark:group-hover:border-blue-500">
-                                    <template x-if="!photoPreview">
-                                        <div
-                                            class="flex flex-col items-center text-slate-400 dark:text-slate-500 transition-colors">
-                                            <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
-                                            <span
-                                                class="text-[10px] font-bold uppercase tracking-wider text-center px-4">Dimensionamento
-                                                sugerido: 1280x720 (16:9)</span>
-                                        </div>
-                                    </template>
-                                    <template x-if="photoPreview">
-                                        <img :src="photoPreview" class="w-full h-full object-cover">
-                                    </template>
-                                    <div @click="$refs.thumbnail.click()"
-                                        class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                            <div
+                                class="relative group aspect-video w-full rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden transition-all group-hover:border-blue-300 dark:group-hover:border-blue-500 shadow-inner">
+                                <template x-if="!photoPreview">
+                                    <div
+                                        class="flex flex-col items-center text-slate-400 dark:text-slate-600 transition-colors">
+                                        <i class="fas fa-cloud-upload-alt text-4xl mb-3"></i>
                                         <span
-                                            class="text-white text-xs font-bold bg-white/20 backdrop-blur-md px-4 py-2 rounded-lg border border-white/30">Alterar
-                                            Capa</span>
+                                            class="text-[10px] font-black uppercase tracking-widest text-center px-6">Upload
+                                            1280x720</span>
+                                    </div>
+                                </template>
+                                <template x-if="photoPreview">
+                                    <img :src="photoPreview" class="w-full h-full object-cover">
+                                </template>
+                                <div @click="$refs.thumbnail.click()"
+                                    class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center cursor-pointer backdrop-blur-sm">
+                                    <div class="flex flex-col items-center gap-2 text-white">
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/30">
+                                            <i class="fas fa-camera"></i>
+                                        </div>
+                                        <span class="text-[10px] font-black uppercase tracking-widest">Alterar Capa</span>
                                     </div>
                                 </div>
                                 <input type="file" name="thumbnail" x-ref="thumbnail" class="hidden" accept="image/*"
                                     @change="
-                                                                    photoName = $event.target.files[0].name;
-                                                                    const reader = new FileReader();
-                                                                    reader.onload = (e) => { photoPreview = e.target.result; };
-                                                                    reader.readAsDataURL($event.target.files[0]);
-                                                                   ">
+                                                const reader = new FileReader();
+                                                reader.onload = (e) => { photoPreview = e.target.result; toastr.success('Capa selecionada!'); };
+                                                reader.readAsDataURL($event.target.files[0]);
+                                            ">
                             </div>
                         </div>
                     </div>
 
                     <div
-                        class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
-                        <label
-                            class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 transition-colors">Instrutor
-                            / Autor</label>
+                        class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-800 dark:text-white transition-colors">Instrutor</h3>
+                        </div>
                         <input type="text" name="author_name"
                             value="{{ old('author_name', $course->author_name ?? Auth::user()->name) }}"
-                            class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium">
+                            class="w-full px-5 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all"
+                            placeholder="Nome do autor">
                     </div>
                 </div>
             </div>
 
             {{-- Tab: Pricing --}}
-            <div x-show="tab === 'pricing'" class="max-w-3xl space-y-6">
+            <div x-show="tab === 'pricing'" class="max-w-4xl space-y-8">
                 <div
-                    class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
-                    <h3
-                        class="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2 transition-colors">
-                        <i class="fas fa-coins text-amber-500"></i>
-                        Configuração de Preços
-                    </h3>
+                    class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
+                    <div class="flex items-center gap-3 border-b border-slate-50 dark:border-slate-800 pb-5 mb-8">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <h3 class="font-bold text-xl text-slate-800 dark:text-white transition-colors">Configuração de Venda
+                        </h3>
+                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-2">
                             <label
-                                class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 text-center transition-colors">Preço
-                                Padrão</label>
+                                class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 transition-colors">Preço
+                                do Investimento</label>
                             <div class="relative group">
                                 <span
-                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold group-focus-within:text-blue-500 transition-colors">R$</span>
+                                    class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-black group-focus-within:text-blue-600 transition-colors">R$</span>
                                 <input type="text" name="price" value="{{ old('price', $course->price) }}"
-                                    class="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xl font-bold mask-money"
+                                    class="w-full pl-14 pr-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all text-2xl font-black mask-money"
                                     placeholder="0,00">
                             </div>
+                            <p class="text-[10px] text-slate-400 font-medium italic">Valor principal exibido no checkout.
+                            </p>
                         </div>
                     </div>
                 </div>
 
                 <div
-                    class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 relative overflow-hidden group transition-colors duration-300">
-                    <div class="absolute top-0 right-0 p-4">
-                        <i
-                            class="fas fa-bolt text-4xl text-amber-100 dark:text-amber-900/20 group-hover:text-amber-200 dark:group-hover:text-amber-900/40 transition-colors"></i>
+                    class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden group transition-all hover:shadow-md">
+                    <div
+                        class="absolute -top-4 -right-4 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl group-hover:bg-amber-500/10 transition-all">
                     </div>
 
-                    <h3
-                        class="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2 transition-colors">
-                        <i class="fas fa-bolt text-amber-500"></i>
-                        Promoção Relâmpago
-                    </h3>
+                    <div class="flex items-center gap-3 border-b border-slate-50 dark:border-slate-800 pb-5 mb-8">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 flex items-center justify-center">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3 class="font-bold text-xl text-slate-800 dark:text-white transition-colors">Oferta de Lançamento
+                            / Relâmpago</h3>
+                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-2">
                             <label
-                                class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Preço
+                                class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 transition-colors">Preço
                                 Promocional</label>
-                            <div class="relative peer group">
+                            <div class="relative group">
                                 <span
-                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold group-focus-within:text-amber-500 transition-colors">R$</span>
+                                    class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 font-black group-focus-within:text-orange-500 transition-colors">R$</span>
                                 <input type="text" name="flash_sale_price"
                                     value="{{ old('flash_sale_price', $course->flash_sale_price) }}"
-                                    class="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-xl font-bold mask-money"
+                                    class="w-full pl-14 pr-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 transition-all text-2xl font-black mask-money"
                                     placeholder="0,00">
                             </div>
                         </div>
-                        <div>
+                        <div class="space-y-2">
                             <label
-                                class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Data
-                                de Expiração</label>
+                                class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 transition-colors">Encerramento
+                                da Oferta</label>
                             <input type="datetime-local" name="flash_sale_ends_at"
                                 value="{{ old('flash_sale_ends_at', $course->flash_sale_ends_at ? $course->flash_sale_ends_at->format('Y-m-d\TH:i') : '') }}"
-                                class="w-full px-4 py-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm font-medium">
-                            <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-2 italic transition-colors">A
-                                promoção será encerrada automaticamente nesta data e o preço voltará ao valor padrão.</p>
+                                class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 transition-all text-sm font-bold">
+                            <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-2 italic font-medium">O valor
+                                retornará ao preço padrão automaticamente nesta data.</p>
                         </div>
                     </div>
                 </div>
@@ -354,60 +407,67 @@
 
             @if($course->exists)
                 {{-- Tab: Content/Lessons --}}
-                <div x-show="tab === 'lessons'" class="space-y-6">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-bold text-slate-900 dark:text-white transition-colors">Grade Curricular</h3>
+                <div x-show="tab === 'lessons'" class="space-y-8">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h3 class="text-2xl font-black text-slate-800 dark:text-white transition-colors">Grade Curricular
+                            </h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium italic">Organize os módulos e aulas
+                                do seu treinamento.</p>
+                        </div>
                         <button type="button" @click="openModal('lesson-modal')"
-                            class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 border border-transparent rounded-xl text-sm font-semibold text-white hover:bg-emerald-700 transition-all shadow-sm shadow-emerald-500/30">
+                            class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl shadow-blue-500/20 transition transform hover:scale-[1.05] active:scale-[0.95]">
                             <i class="fas fa-plus"></i>
                             <span>Nova Aula</span>
                         </button>
                     </div>
 
-                    <div id="lessons-list" class="space-y-3">
+                    <div id="lessons-list" class="space-y-4">
                         @forelse($course->lessons as $lesson)
-                            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-4 group hover:border-blue-300 dark:hover:border-blue-500 transition-all"
+                            <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-6 group hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-xl hover:shadow-blue-500/5 transition-all"
                                 data-id="{{ $lesson->id }}">
                                 <div
-                                    class="cursor-move text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                                    class="cursor-move w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-slate-400 dark:text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 transition-all border border-slate-100 dark:border-slate-800">
                                     <i class="fas fa-grip-vertical"></i>
                                 </div>
-                                <div
-                                    class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-xs font-bold text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-800 transition-colors">
-                                    #{{ $lesson->order }}
-                                </div>
+
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-bold text-slate-900 dark:text-white truncate transition-colors">
-                                        {{ $lesson->title }}
-                                    </h4>
-                                    <div class="flex items-center gap-3 mt-0.5">
+                                    <div class="flex items-center gap-3 mb-1">
                                         <span
-                                            class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1 transition-colors">
-                                            <i class="fas fa-clock"></i>
+                                            class="px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-900/20 text-[10px] font-black text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50 uppercase tracking-tighter">
+                                            Aula {{ $lesson->order }}
+                                        </span>
+                                        <h4 class="font-bold text-lg text-slate-800 dark:text-white truncate transition-colors">
+                                            {{ $lesson->title }}
+                                        </h4>
+                                    </div>
+                                    <div class="flex items-center gap-4 text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                                        <span
+                                            class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950 px-2 py-1 rounded-lg border border-slate-100 dark:border-slate-800 transition-colors">
+                                            <i class="fas fa-clock text-blue-500"></i>
                                             {{ gmdate("H:i:s", $lesson->duration) }}
                                         </span>
                                         @if($lesson->is_free_preview)
                                             <span
-                                                class="text-[10px] font-bold uppercase tracking-wider text-blue-500 dark:text-blue-400 flex items-center gap-1 transition-colors">
-                                                <i class="fas fa-eye"></i>
+                                                class="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded-lg border border-emerald-100 dark:border-emerald-800/50 transition-colors">
+                                                <i class="fas fa-check-circle"></i>
                                                 Preview Grátis
                                             </span>
                                         @endif
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+
+                                <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                     <button type="button" @click="editLesson({{ $lesson->id }})"
-                                        class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors border border-transparent hover:border-blue-100 dark:hover:border-blue-900 text-slate-400 dark:text-slate-500"
-                                        title="Editar Aula">
+                                        class="w-10 h-10 inline-flex items-center justify-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-900 transition-all shadow-sm">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <form action="{{ route('courses.lessons.destroy', [$course, $lesson]) }}" method="POST"
-                                        onsubmit="return confirmAction(event, 'Excluir aula?', 'Tem certeza que deseja excluir esta aula?');"
+                                        onsubmit="return confirmAction(event, 'Excluir aula?', 'Deseja realmente remover esta aula?' );"
                                         class="inline">
                                         @csrf @method('DELETE')
                                         <button type="submit"
-                                            class="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-900 text-slate-400 dark:text-slate-500"
-                                            title="Excluir Aula">
+                                            class="w-10 h-10 inline-flex items-center justify-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-900 transition-all shadow-sm">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </form>
@@ -415,36 +475,73 @@
                             </div>
                         @empty
                             <div
-                                class="text-center py-12 bg-slate-50 dark:bg-slate-950 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 transition-colors">
-                                <i class="fas fa-layer-group text-4xl text-slate-200 dark:text-slate-800 mb-3"></i>
-                                <p class="text-slate-500 dark:text-slate-400 text-sm">Nenhuma aula cadastrada. Comece adicionando o
-                                    conteúdo!</p>
+                                class="flex flex-col items-center justify-center p-12 bg-slate-50/50 dark:bg-slate-950/50 rounded-[3rem] border-4 border-dashed border-slate-100 dark:border-slate-900 transition-all group hover:border-blue-100 dark:hover:border-blue-950">
+                                <div
+                                    class="w-20 h-20 rounded-3xl bg-white dark:bg-slate-900 shadow-xl flex items-center justify-center text-slate-200 dark:text-slate-800 mb-6 group-hover:scale-110 group-hover:rotate-12 transition-all">
+                                    <i class="fas fa-layer-group text-4xl"></i>
+                                </div>
+                                <h4 class="font-black text-xl text-slate-800 dark:text-white mb-2 transition-colors">Grade Vazia
+                                </h4>
+                                <p class="text-slate-500 dark:text-slate-400 text-center max-w-sm font-medium transition-colors">
+                                    Comece a estruturar seu curso adicionando sua primeira vídeo-aula agora mesmo!</p>
                             </div>
                         @endforelse
                     </div>
                 </div>
 
                 {{-- Tab: Certificate --}}
-                <div x-show="tab === 'certificate'" class="space-y-6">
-                    {{-- Certificate Editor Placeholder - We'll implement the Canvas Logic here --}}
-                    <div
-                        class="alert alert-info bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800/30 text-blue-700 dark:text-blue-400 rounded-2xl p-4 flex items-start gap-4 transition-colors">
-                        <i class="fas fa-info-circle text-xl mt-1"></i>
+                <div x-show="tab === 'certificate'" class="space-y-8">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <h5 class="font-bold mb-1">Editor de Certificado</h5>
-                            <p class="text-sm opacity-90 text-justify">O design do certificado é editado visualmente. Você pode
-                                arrastar os elementos, alterar fontes e fazer upload de fundos personalizados.</p>
+                            <h3 class="text-2xl font-black text-slate-800 dark:text-white transition-colors">Editor de
+                                Certificado</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium italic">Personalize o documento de
+                                conclusão dos seus alunos.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button type="button" @click="previewCertificate()"
+                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm">
+                                <i class="fas fa-eye"></i>
+                                <span>Preview PDF</span>
+                            </button>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <div
+                        class="bg-blue-600 rounded-[2.5rem] p-8 shadow-2xl shadow-blue-500/20 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden group">
+                        <div
+                            class="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full blur-3xl transition-transform group-hover:scale-150 duration-700">
+                        </div>
+                        <div
+                            class="absolute -left-20 -bottom-20 w-64 h-64 bg-black/10 rounded-full blur-3xl transition-transform group-hover:scale-150 duration-700">
+                        </div>
+
+                        <div
+                            class="w-16 h-16 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-3xl shrink-0 border border-white/30 shadow-inner">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <div class="relative z-10 flex-1 text-center md:text-left">
+                            <h5 class="text-2xl font-black text-white mb-2">Designer Visual Interativo</h5>
+                            <p class="text-white/80 font-medium text-sm leading-relaxed max-w-2xl">
+                                O design deste certificado é editado em tempo real. Arraste os elementos para posicionar
+                                assinaturas, nome do aluno e datas no local perfeito.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
                         {{-- Canvas Area --}}
                         <div class="lg:col-span-3">
-                            <div class="bg-slate-900 rounded-2xl p-8 border border-slate-800 dark:border-slate-700 shadow-2xl relative overflow-hidden flex items-center justify-center transition-colors"
-                                style="min-height: 500px;">
+                            <div
+                                class="bg-slate-900 rounded-[3rem] p-12 border border-slate-800 shadow-2xl relative overflow-hidden flex items-center justify-center transition-all">
+                                <div
+                                    class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent)] pointer-events-none">
+                                </div>
+
                                 {{-- Editor Canvas --}}
-                                <div id="cert-canvas" class="bg-white relative shadow-2xl origin-center transition-transform"
-                                    style="width: 842px; height: 595px;">
+                                <div id="cert-canvas"
+                                    class="bg-white relative shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] origin-center transition-all overflow-hidden"
+                                    style="width: 842px; height: 595px; border-radius: 4px;">
                                     {{-- BG Image --}}
                                     <img id="cert-bg-img"
                                         src="{{ $course->certificate_bg ? asset($course->certificate_bg) : '' }}"
@@ -453,6 +550,9 @@
                                     <div id="cert-elements-layer" class="absolute inset-0 z-10">
                                         {{-- Draggable elements will be injected here --}}
                                     </div>
+
+                                    {{-- Ruler/Guides Overlay --}}
+                                    <div class="absolute inset-0 border-[20px] border-black/5 pointer-events-none z-0"></div>
                                 </div>
                             </div>
                         </div>
@@ -460,52 +560,82 @@
                         {{-- Certificate Sidebar --}}
                         <div class="space-y-6">
                             <div
-                                class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
-                                <h4
-                                    class="text-sm font-bold text-slate-900 dark:text-white mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 transition-colors">
-                                    Plano de Fundo</h4>
+                                class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div
+                                        class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 dark:text-white transition-colors">Background</h4>
+                                </div>
 
-                                <div class="space-y-4">
-                                    <div>
+                                <div class="space-y-5">
+                                    <div class="group">
                                         <label
-                                            class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1 transition-colors">Imagem
+                                            class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 transition-colors">Imagem
                                             de Fundo</label>
-                                        <input type="file" name="certificate_bg" accept="image/*"
-                                            class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50 transition-all cursor-pointer">
+                                        <div class="relative">
+                                            <input type="file" name="certificate_bg" id="certificate_bg" accept="image/*"
+                                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                            <div
+                                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-500 flex items-center gap-2 group-hover:border-blue-300 transition-all shadow-inner">
+                                                <i class="fas fa-upload text-blue-500"></i>
+                                                <span>Selecionar Arquivo</span>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div>
                                         <label
-                                            class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1 transition-colors">Ajuste</label>
+                                            class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 transition-colors">Enquadramento</label>
                                         <select id="cert-bg-fit"
-                                            class="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
-                                            <option value="cover">Cobrir (Zoom)</option>
-                                            <option value="stretch">Esticar</option>
+                                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-black text-slate-800 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                                            <option value="cover">Cobrir (Aspecto)</option>
+                                            <option value="stretch">Esticar total</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
 
                             <div
-                                class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
-                                <h4
-                                    class="text-sm font-bold text-slate-900 dark:text-white mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 transition-colors">
-                                    Assinatura</h4>
-
-                                <div class="space-y-4">
+                                class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
+                                <div class="flex items-center gap-3 mb-6">
                                     <div
-                                        class="aspect-[3/1] rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden transition-colors">
+                                        class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs">
+                                        <i class="fas fa-signature"></i>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 dark:text-white transition-colors">Assinatura Digital
+                                    </h4>
+                                </div>
+
+                                <div class="space-y-5">
+                                    <div
+                                        class="aspect-[3/1] rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden transition-all shadow-inner relative group">
                                         @if($course->instructor_signature)
-                                            <img src="{{ asset($course->instructor_signature) }}" class="max-h-full object-contain">
+                                            <img src="{{ asset($course->instructor_signature) }}"
+                                                class="max-h-full object-contain p-2">
                                         @else
-                                            <i
-                                                class="fas fa-signature text-slate-300 dark:text-slate-700 text-xl transition-colors"></i>
+                                            <div class="flex flex-col items-center gap-1 text-slate-300 dark:text-slate-700">
+                                                <i class="fas fa-signature text-2xl transition-colors"></i>
+                                                <span class="text-[9px] font-black uppercase tracking-widest">Nenhuma</span>
+                                            </div>
                                         @endif
                                     </div>
-                                    <input type="file" name="instructor_signature" accept="image/png"
-                                        class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50 transition-all cursor-pointer">
-                                    <p class="text-[9px] text-slate-400 dark:text-slate-500 italic transition-colors">
-                                        Recomendado: PNG com fundo transparente.</p>
+
+                                    <div class="relative group">
+                                        <input type="file" name="instructor_signature" accept="image/png"
+                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                        <div
+                                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-500 flex items-center gap-2 group-hover:border-purple-300 transition-all shadow-inner">
+                                            <i class="fas fa-pen-nib text-purple-500"></i>
+                                            <span>Substituir Assinatura</span>
+                                        </div>
+                                    </div>
+
+                                    <p
+                                        class="text-[9px] text-slate-400 dark:text-slate-500 font-medium italic text-center transition-colors">
+                                        Utilize arquivos PNG com fundo transparente para melhor resultado.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -584,13 +714,16 @@
                     if (lesson.attachments && lesson.attachments.length) {
                         lesson.attachments.forEach(att => {
                             $list.append(`
-                                                                                        <li class="flex items-center justify-between p-2 bg-slate-50 rounded-lg border border-slate-200">
-                                                                                            <span class="text-xs font-medium text-slate-700">${att.file_name}</span>
-                                                                                            <button type="button" onclick="deleteAttachment(${id}, ${att.id})" class="text-red-500 hover:text-red-700">
-                                                                                                <i class="fas fa-trash-alt"></i>
-                                                                                            </button>
-                                                                                        </li>
-                                                                                    `);
+                                <li class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-paperclip text-blue-500"></i>
+                                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300">${att.file_name}</span>
+                                    </div>
+                                    <button type="button" onclick="deleteAttachment(${id}, ${att.id})" class="w-8 h-8 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </li>
+                            `);
                         });
                     }
 
@@ -621,16 +754,42 @@
             });
 
             function deleteAttachment(lessonId, attId) {
-                showConfirm('Excluir este anexo?', function () {
-                    $.ajax({
-                        url: `/admin/courses/{{ $course->id }}/lessons/${lessonId}/attachments/${attId}`,
-                        type: 'DELETE',
-                        data: { _token: '{{ csrf_token() }}' },
-                        success: function () {
-                            toastr.success('Anexo removido');
-                            editLesson(lessonId); // Refresh list
-                        }
-                    });
+                Swal.fire({
+                    title: 'Excluir anexo?',
+                    text: "Esta ação não pode ser desfeita.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3b82f6',
+                    cancelButtonColor: '#ef4444',
+                    confirmButtonText: 'Sim, excluir!',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'rounded-[1.5rem] dark:bg-slate-900 border-none shadow-2xl',
+                        title: 'text-2xl font-black text-slate-800 dark:text-white',
+                        htmlContainer: 'text-sm font-medium text-slate-500 dark:text-slate-400'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `/admin/courses/{{ $course->id }}/lessons/${lessonId}/attachments/${attId}`,
+                            type: 'DELETE',
+                            data: { _token: '{{ csrf_token() }}' },
+                            success: function () {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Anexo removido!',
+                                    showConfirmButton: false,
+                                    timer: 1500,
+                                    customClass: {
+                                        popup: 'rounded-[1.5rem] dark:bg-slate-900 border-none shadow-2xl',
+                                        title: 'text-xl font-black text-slate-800 dark:text-white',
+                                    }
+                                });
+                                editLesson(lessonId); // Refresh list
+                            }
+                        });
+                    }
                 });
             }
             // Certificate Editor Logic
@@ -701,98 +860,151 @@
                     });
                 }
 
-                renderCertElements();
+                // Global confirm action
+                window.confirmAction = function (event, title, text) {
+                    event.preventDefault();
+                    const form = event.target.closest('form') || event.target;
 
-                $('#courseForm').on('submit', function () {
+                    Swal.fire({
+                        title: title,
+                        text: text,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3b82f6',
+                        cancelButtonColor: '#ef4444',
+                        confirmButtonText: 'Sim, confirmar!',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true,
+                        customClass: {
+                            popup: 'rounded-[2rem] dark:bg-slate-900 border-none shadow-2xl',
+                            title: 'text-2xl font-black text-slate-800 dark:text-white',
+                            htmlContainer: 'text-sm font-medium text-slate-500 dark:text-slate-400',
+                            confirmButton: 'rounded-xl px-6 py-3 font-bold',
+                            cancelButton: 'rounded-xl px-6 py-3 font-bold'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                    return false;
+                };
+
+                window.previewCertificate = function() {
                     $('#certificate_settings_input').val(JSON.stringify(certDoc));
-                });
+                    const form = $('#courseForm')[0];
+                    const originalAction = form.action;
+                    const originalTarget = form.target;
+                    
+                    form.action = "{{ route('panel.admin.courses.certificate.preview', $course) }}";
+                    form.target = "_blank";
+                    form.submit();
+                    
+                    // Restore
+                    form.action = originalAction;
+                    form.target = originalTarget;
+                };
             });
         </script>
     @endpush
 
     {{-- Modal HTML --}}
     <div id="lesson-modal"
-        class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/10 backdrop-blur-xl p-4">
         <div
-            class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] transition-colors">
+            class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[3rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col max-h-[90vh] transition-all border border-slate-100 dark:border-slate-800">
             <div
-                class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between transition-colors">
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white transition-colors">Gerenciar Aula</h3>
+                class="p-8 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between transition-colors bg-slate-50/50 dark:bg-slate-950/50">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white transition-colors">Gerenciar Aula</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Editor de Conteúdo</p>
+                    </div>
+                </div>
                 <button @click="closeModal('lesson-modal')"
-                    class="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
-                    <i class="fas fa-times text-xl"></i>
+                    class="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-red-500 hover:border-red-100 transition-all shadow-sm flex items-center justify-center">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
 
-            <div class="p-6 overflow-y-auto flex-1 h-full space-y-6">
-                <form id="lessonForm" class="space-y-4">
+            <div class="p-8 overflow-y-auto flex-1 h-full space-y-8 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-transparent">
+                <form id="lessonForm" class="space-y-6">
                     @csrf
                     <input type="hidden" id="lessonId" name="lesson_id">
 
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
-                            <label
-                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1 transition-colors">Título</label>
-                            <input type="text" name="title" id="lessonTitle" required
-                                class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-slate-900 dark:text-white transition-all">
+                            <label class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Título da Aula</label>
+                            <input type="text" id="lessonTitle" name="title" required
+                                class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold placeholder:text-slate-300"
+                                placeholder="Ex: Introdução ao Mercado">
                         </div>
+
                         <div>
-                            <label
-                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1 transition-colors">Ordem</label>
-                            <input type="number" name="order" id="lessonOrder" value="1"
-                                class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-slate-900 dark:text-white transition-all">
+                            <label class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Ordem</label>
+                            <input type="number" id="lessonOrder" name="order" required
+                                class="w-full px-5 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold">
                         </div>
+
                         <div>
-                            <label
-                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1 transition-colors">Duração
-                                (s)</label>
-                            <input type="number" name="duration" id="lessonDuration" value="0"
-                                class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-slate-900 dark:text-white transition-all">
+                            <label class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Duração (seg)</label>
+                            <input type="number" id="lessonDuration" name="duration" required
+                                class="w-full px-5 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold"
+                                placeholder="Ex: 360">
                         </div>
-                    </div>
 
-                    <div>
-                        <label
-                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1 transition-colors">Link
-                            do Vídeo (YT/Vimeo)</label>
-                        <input type="text" name="video_url" id="lessonVideo"
-                            class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-slate-900 dark:text-white transition-all"
-                            placeholder="https://...">
-                    </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">URL do Vídeo (Vimeo/YouTube/Panda)</label>
+                            <div class="relative group">
+                                <div class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                                <input type="text" id="lessonVideo" name="video_url"
+                                    class="w-full pl-12 pr-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-300"
+                                    placeholder="https://...">
+                            </div>
+                        </div>
 
-                    <div>
-                        <label
-                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1 transition-colors">Conteúdo</label>
-                        <textarea name="content" id="lessonContent" rows="4"
-                            class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-slate-900 dark:text-white transition-all"></textarea>
-                    </div>
+                        <div class="md:col-span-2">
+                            <label class="flex items-center gap-3 cursor-pointer group p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 hover:border-blue-200 transition-all">
+                                <input type="checkbox" id="lessonPreview" name="is_free_preview" value="1"
+                                    class="w-5 h-5 text-blue-600 border-slate-300 rounded-lg focus:ring-blue-500 bg-white transition-all">
+                                <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Marcar como aula gratuita de preview</span>
+                            </label>
+                        </div>
 
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" name="is_free_preview" id="lessonPreview" value="1"
-                            class="w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-700 rounded focus:ring-blue-500 bg-white dark:bg-slate-950">
-                        <label for="lessonPreview"
-                            class="text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors">Aula Gratuita
-                            (Preview)</label>
-                    </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Descrição da Aula</label>
+                            <textarea id="lessonContent" name="content" rows="4"
+                                class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-700 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-none font-medium"></textarea>
+                        </div>
 
-                    <div class="pt-4 border-t border-slate-100 dark:border-slate-800 transition-colors">
-                        <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-3 transition-colors">Materiais de
-                            Apoio</h4>
-                        <input type="file" name="file"
-                            class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50 transition-all cursor-pointer">
-                        <ul id="attachmentList" class="mt-3 space-y-2"></ul>
+                        <div class="md:col-span-2 space-y-4">
+                            <label class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Materiais Complementares</label>
+                            <ul id="attachmentList" class="space-y-2"></ul>
+                            
+                            <div class="relative group">
+                                <input type="file" name="attachments[]" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                <div class="w-full px-5 py-4 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-400 flex items-center justify-center gap-2 group-hover:border-blue-400 group-hover:bg-blue-50/10 transition-all">
+                                    <i class="fas fa-cloud-upload-alt text-xl"></i>
+                                    <span>Adicionar Arquivos</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
 
-            <div
-                class="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex items-center justify-end gap-3 transition-colors">
+            <div class="p-8 border-t border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30 flex items-center justify-end gap-3 transition-colors">
                 <button @click="closeModal('lesson-modal')"
-                    class="px-6 py-2 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+                    class="px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-black text-slate-600 dark:text-slate-400 hover:bg-slate-50 transition-all">
                     Cancelar
                 </button>
                 <button type="button" id="btnSaveLesson"
-                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all">
+                    class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-500/20 transition transform hover:scale-[1.05] active:scale-[0.95]">
                     Salvar Aula
                 </button>
             </div>
