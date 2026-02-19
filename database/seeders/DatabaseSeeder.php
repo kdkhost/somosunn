@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             PermissionsSeeder::class,
             PlansSeederUtf8::class,
             MailTemplateSeeder::class,
+            ScheduledTasksSeeder::class,
         ]);
     }
 }
