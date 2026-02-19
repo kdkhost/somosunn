@@ -30,10 +30,11 @@
                                 <option value="orders:abandoned-cart" {{ $task->command == 'orders:abandoned-cart' ? 'selected' : '' }}>Email Carrinho Abandonado (>24h)</option>
                                 <option value="subscriptions:check-expired" {{ $task->command == 'subscriptions:check-expired' ? 'selected' : '' }}>Expira Planos Vencidos</option>
                                 <option value="auth:clear-resets" {{ $task->command == 'auth:clear-resets' ? 'selected' : '' }}>Limpar Tokens de Senha</option>
-                                <option value="custom" {{ !in_array($task->command, ['notifications:cleanup', 'queue:work --stop-when-empty --tries=3', 'orders:cancel-unpaid', 'orders:abandoned-cart', 'subscriptions:check-expired', 'auth:clear-resets']) && $task->exists ? 'selected' : '' }}>Outro (Personalizado)</option>
+                                <option value="sanctum:prune-expired" {{ $task->command == 'sanctum:prune-expired' ? 'selected' : '' }}>Limpar Tokens de API (Sanctum)</option>
+                                <option value="custom" {{ !in_array($task->command, ['notifications:cleanup', 'queue:work --stop-when-empty --tries=3', 'orders:cancel-unpaid', 'orders:abandoned-cart', 'subscriptions:check-expired', 'auth:clear-resets', 'sanctum:prune-expired']) && $task->exists ? 'selected' : '' }}>Outro (Personalizado)</option>
                             </select>
                         </div>
-                        <div class="form-group {{ !in_array($task->command, ['notifications:cleanup', 'queue:work --stop-when-empty --tries=3', 'orders:cancel-unpaid', 'orders:abandoned-cart', 'subscriptions:check-expired', 'auth:clear-resets']) && $task->exists ? '' : 'd-none' }}"
+                        <div class="form-group {{ !in_array($task->command, ['notifications:cleanup', 'queue:work --stop-when-empty --tries=3', 'orders:cancel-unpaid', 'orders:abandoned-cart', 'subscriptions:check-expired', 'auth:clear-resets', 'sanctum:prune-expired']) && $task->exists ? '' : 'd-none' }}"
                             id="custom_command_div">
                             <label>Comando Personalizado</label>
                             <input type="text" name="command_custom" id="command_custom" class="form-control"

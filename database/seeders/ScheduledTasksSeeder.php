@@ -45,6 +45,11 @@ class ScheduledTasksSeeder extends Seeder
                 'frequency' => '0 0 * * *', // Diariamente à meia-noite
                 'active' => true,
             ],
+            [
+                'command' => 'sanctum:prune-expired',
+                'frequency' => '0 0 * * *', // Diariamente à meia-noite
+                'active' => true,
+            ],
         ];
 
         foreach ($tasks as $taskData) {
