@@ -139,7 +139,7 @@
                         <input type="hidden" name="remove_watermark_image" id="remove_watermark_image" value="0">
                         <div class="upload-preview mb-2 text-center">
                             @if($url = $getUrl('watermark_image'))
-                                <img src="{{ $url }}" class="img-fluid" style="max-height: 50px;">
+                                <img src="{{ $url }}" class="img-fluid" style="max-height: 100px; max-width: 100px;">
                             @else
                                 <div class="text-muted p-2 border rounded bg-light">Sem imagem</div>
                             @endif

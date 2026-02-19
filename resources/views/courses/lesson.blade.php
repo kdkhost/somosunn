@@ -107,7 +107,38 @@
                                 }
                             }
                         @endphp
-                        @php $usePlyr = (string) \App\Models\Setting::get('video_player_enabled', '1') === '1'; @endphp
+                        @php
+                            $usePlyr = (string) \App\Models\Setting::get('video_player_enabled', '1') === '1';
+
+                            // Watermark Settings
+                            $wmEnabled = (bool) \App\Models\Setting::get('video_watermark_enabled', '0');
+                            $wmImage = \App\Models\Setting::get('video_watermark_image');
+                            if ($wmImage) {
+                                if (\Illuminate\Support\Str::startsWith($wmImage, 'storage/')) {
+                                    $wmImage = asset($wmImage);
+                                } elseif (\Illuminate\Support\Str::startsWith($wmImage, 'uploads/')) {
+                                    $wmImage = asset($wmImage);
+                                } else {
+                                    $wmImage = asset('storage/' . $wmImage);
+                                }
+                            }
+
+                            $wmTextEnabled = (bool) \App\Models\Setting::get('video_watermark_text_enabled', '0');
+                            $wmTextTemplate = \App\Models\Setting::get('video_watermark_text_template', '{name} - {email}');
+                            $wmOpacity = (float) \App\Models\Setting::get('video_watermark_opacity', '0.5');
+                            $wmPosition = \App\Models\Setting::get('video_watermark_position', 'top-right');
+
+                            // User Info for Text
+                            $currentUser = Auth::user();
+                            $wmText = '';
+                            if ($currentUser) {
+                                $wmText = str_replace(
+                                    ['{name}', '{email}', '{cpf}', '{id}'],
+                                    [$currentUser->name, $currentUser->email, $currentUser->cpf ?? '', $currentUser->id],
+                                    $wmTextTemplate
+                                );
+                            }
+                        @endphp
                         @if($usePlyr)
                             <div class="absolute inset-0" data-unn-video-player data-video-url="{{ $normalizedVideoUrl }}"
                                 data-progress-url="{{ route('courses.lessons.progress.update', [$course->id, $lesson->id]) }}"
@@ -117,7 +148,10 @@
                                 data-block-download="{{ !empty($course->video_block_download) ? '1' : '0' }}"
                                 data-floating-enabled="{{ !empty($course->video_floating_enabled) ? '1' : '0' }}"
                                 data-floating-width="{{ (int) ($course->video_floating_width ?? 420) }}"
-                                data-floating-height="{{ (int) ($course->video_floating_height ?? 236) }}">
+                                data-floating-height="{{ (int) ($course->video_floating_height ?? 236) }}"
+                                data-wm-enabled="{{ $wmEnabled ? '1' : '0' }}" data-wm-image="{{ $wmImage }}"
+                                data-wm-text-enabled="{{ $wmTextEnabled ? '1' : '0' }}" data-wm-text="{{ $wmText }}"
+                                data-wm-opacity="{{ $wmOpacity }}" data-wm-position="{{ $wmPosition }}">
                                 <video class="w-full h-full object-contain" controls playsinline preload="metadata">
                                     <source src="{{ $normalizedVideoUrl }}">
                                 </video>
@@ -445,14 +479,14 @@
                                 row.dataset.bookmarkId = String(result.bookmark.id);
                                 row.dataset.bookmarkSeconds = String(result.bookmark.position_seconds || 0);
                                 row.innerHTML = `
-                                                                            <div class="min-w-0">
-                                                                                <button type="button" class="text-sm font-bold text-[#1F5EDB] hover:underline text-left lesson-bookmark-jump">
-                                                                                    <i class="fas fa-play-circle mr-1"></i>${formatSeconds(result.bookmark.position_seconds || 0)}
-                                                                                </button>
-                                                                                <p class="text-sm text-gray-700 mt-1 break-words"></p>
-                                                                            </div>
-                                                                            <button type="button" class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 lesson-bookmark-delete">Excluir</button>
-                                                                        `;
+                                                                                    <div class="min-w-0">
+                                                                                        <button type="button" class="text-sm font-bold text-[#1F5EDB] hover:underline text-left lesson-bookmark-jump">
+                                                                                            <i class="fas fa-play-circle mr-1"></i>${formatSeconds(result.bookmark.position_seconds || 0)}
+                                                                                        </button>
+                                                                                        <p class="text-sm text-gray-700 mt-1 break-words"></p>
+                                                                                    </div>
+                                                                                    <button type="button" class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 lesson-bookmark-delete">Excluir</button>
+                                                                                `;
                                 row.querySelector('p').textContent = result.bookmark.note || '';
                                 bookmarkList.prepend(row);
                                 bookmarkNote.value = '';
@@ -560,7 +594,7 @@
                 const btnComplete = document.getElementById('btn-complete-course');
                 const formComplete = document.getElementById('form-complete-course');
                 if (btnComplete && formComplete) {
-                    btnComplete.addEventListener('click', function(e) {
+                    btnComplete.addEventListener('click', function (e) {
                         e.preventDefault();
                         Swal.fire({
                             title: 'Concluir Curso?',
