@@ -41,10 +41,12 @@
                                     </td>
                                     <td>{{ $task->last_run_at ? $task->last_run_at->format('d/m/Y H:i') : '-' }}</td>
                                     <td>
-                                        <form action="{{ route('admin.cron.run', $task) }}" method="POST" class="d-inline"
-                                            onsubmit="return confirm('Deseja executar este comando manualmente agora? Isso pode levar alguns segundos.')">
+                                    <td>
+                                        <form action="{{ route('admin.cron.run', $task) }}" method="POST"
+                                            class="d-inline run-cron-form">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm btn-success" title="Executar Agora">
+                                            <button type="button" class="btn btn-sm btn-success btn-run-cron"
+                                                title="Executar Agora">
                                                 <i class="fas fa-play"></i>
                                             </button>
                                         </form>
@@ -52,11 +54,11 @@
                                             title="Editar"><i class="fas fa-edit"></i></a>
                                         <a href="{{ route('admin.cron.logs', $task) }}" class="btn btn-sm btn-info"
                                             title="Logs"><i class="fas fa-list"></i></a>
-                                        <form action="{{ route('admin.cron.destroy', $task) }}" method="POST" class="d-inline"
-                                            onsubmit="return confirm('Tem certeza que deseja excluir esta tarefa?')">
+                                        <form action="{{ route('admin.cron.destroy', $task) }}" method="POST"
+                                            class="d-inline delete-cron-form">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" title="Excluir"><i
-                                                    class="fas fa-trash"></i></button>
+                                            <button type="button" class="btn btn-sm btn-danger btn-delete-cron"
+                                                title="Excluir"><i class="fas fa-trash"></i></button>
                                         </form>
                                     </td>
                                 </tr>
@@ -72,3 +74,53 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Run Button
+            document.querySelectorAll('.btn-run-cron').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const form = this.closest('form');
+                    Swal.fire({
+                        title: 'Executar agora?',
+                        text: "Isso vai forçar a execução imediata deste comando. Pode levar alguns segundos.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sim, executar!',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            // Delete Button
+            document.querySelectorAll('.btn-delete-cron').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const form = this.closest('form');
+                    Swal.fire({
+                        title: 'Tem certeza?',
+                        text: "Você não poderá reverter isso!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Sim, excluir!',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+@endpush
