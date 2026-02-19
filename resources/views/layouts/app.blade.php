@@ -734,6 +734,12 @@
             .unn-video-watermark--animate .unn-video-watermark-inner {
                 animation: unnWatermarkDrift 11s ease-in-out infinite;
             }
+
+            /* Adjustments for Floating Player */
+            .unn-video-float .unn-video-watermark {
+                min-width: 40px; /* Allow smaller watermark in mini player */
+                --unn-wm-margin: 8px !important; /* Smaller margin */
+            }
         @endif
     </style>
     <!-- Toastr CSS -->
@@ -957,6 +963,20 @@
                         ? [...plyr.controls] 
                         : [...defaultControls];
 
+                    // Replace native 'pip' with custom 'toggle-floating' to support watermark
+                    if (controls.includes('pip')) {
+                        const pipIdx = controls.indexOf('pip');
+                        controls[pipIdx] = 'toggle-floating';
+                    } else if (config.floatingEnabled !== false && !controls.includes('toggle-floating') && !controls.includes('pip')) {
+                        // If not present but floating enabled, add it near fullscreen or settings
+                        const fsIdx = controls.indexOf('fullscreen');
+                        if (fsIdx >= 0) {
+                            controls.splice(fsIdx, 0, 'toggle-floating');
+                        } else {
+                            controls.push('toggle-floating');
+                        }
+                    }
+
                     // Ensure play-large (big play button) is always present
                     if (!controls.includes('play-large')) {
                         controls.unshift('play-large');
@@ -996,6 +1016,9 @@
                             options: plyr.speedOptions.map(n => Number(n)).filter(n => Number.isFinite(n))
                         };
                     }
+                    
+                    // Add listeners for custom controls in initOne (Plyr setup) to bind 'toggle-floating'
+                    base.listeners = base.listeners || {};
 
                     const custom = plyr.customOptions && typeof plyr.customOptions === 'object'
                         ? plyr.customOptions
@@ -1310,6 +1333,43 @@
                         const width = Number.isFinite(floatingWidth) ? floatingWidth : 420;
                         const height = Number.isFinite(floatingHeight) ? floatingHeight : Math.round(width * 9 / 16);
                         setupFloatingPlayer(host, player, { width, height });
+
+                        // Inject custom button if configured in controls
+                        if (options.controls && options.controls.includes('toggle-floating')) {
+                             const controls = player.elements.controls;
+                             if (controls) {
+                                 // Create button
+                                 const btn = document.createElement('button');
+                                 btn.type = 'button';
+                                 btn.className = 'plyr__controls__item plyr__control';
+                                 btn.setAttribute('data-plyr', 'toggle-floating');
+                                 btn.setAttribute('aria-label', 'Mini Player');
+                                 // Icon (PiP icon)
+                                 btn.innerHTML = `
+                                    <svg aria-hidden="true" focusable="false" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" class="plyr__icon">
+                                        <path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z"></path>
+                                    </svg>
+                                    <span class="plyr__sr-only">Mini Player</span>
+                                 `;
+                                 
+                                 // Insert in correct position
+                                 // Ideally we find where 'toggle-floating' is in options.controls and place it accordingly relative to others
+                                 // But simplistically, we can append it or try to insert before fullscreen
+                                 
+                                 const fsBtn = controls.querySelector('[data-plyr="fullscreen"]');
+                                 if (fsBtn) {
+                                     controls.insertBefore(btn, fsBtn);
+                                 } else {
+                                     controls.appendChild(btn);
+                                 }
+
+                                 btn.addEventListener('click', function() {
+                                     if (host.toggleFloating) {
+                                         host.toggleFloating();
+                                     }
+                                 });
+                             }
+                        }
                     }
                 }
 
@@ -1318,6 +1378,7 @@
                     host.dataset.unnVideoFloatingInit = '1';
 
                     let disabled = false;
+                    let manualToggle = false; // Track manual toggle state
 
                     const clampInt = function (value, fallback, min, max) {
                         const parsed = parseInt(String(value || ''), 10);
@@ -1338,6 +1399,7 @@
                     closeBtn.innerHTML = '&times;';
                     closeBtn.addEventListener('click', function () {
                         disabled = true;
+                        manualToggle = false;
                         setFloating(false);
                     });
                     host.appendChild(closeBtn);
@@ -1350,7 +1412,7 @@
                     }
 
                     function setFloating(on) {
-                        if (disabled) on = false;
+                        if (disabled && !manualToggle) on = false;
 
                         if (on) {
                             if (!host.classList.contains('unn-video-float')) {
@@ -1373,16 +1435,36 @@
                         } catch (e) { /* ignore */ }
                     }
 
+                    // Expose toggle capability to the wrapper for external buttons
+                    if (host.dataset.unnVideoPlayer) {
+                         host.toggleFloating = function() {
+                             manualToggle = !host.classList.contains('unn-video-float');
+                             disabled = !manualToggle;
+                             setFloating(manualToggle);
+                         };
+                    } else {
+                        // Attempt to finding the wrapper inside or outside
+                        const wrapper = host.querySelector('[data-unn-video-player]') || host;
+                        wrapper.toggleFloating = function() {
+                             manualToggle = !host.classList.contains('unn-video-float');
+                             disabled = !manualToggle;
+                             setFloating(manualToggle);
+                        };
+                    }
+
                     if ('IntersectionObserver' in window) {
                         const observer = new IntersectionObserver(function (entries) {
                             for (const entry of entries) {
-                                // Float when the player is mostly out of view.
-                                setFloating(!entry.isIntersecting);
+                                // Auto-float only if not manually disabled
+                                if (!manualToggle) {
+                                     setFloating(!entry.isIntersecting);
+                                }
                             }
                         }, { threshold: 0.15 });
                         observer.observe(host);
                     } else {
                         const onScroll = function () {
+                            if (manualToggle) return;
                             const rect = host.getBoundingClientRect();
                             const inView = rect.bottom > 100 && rect.top < (window.innerHeight - 100);
                             setFloating(!inView);
