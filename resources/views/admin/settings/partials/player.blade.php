@@ -134,7 +134,8 @@
                             D'água (Imagem)</label>
                     </div>
                     <div class="upload-box" data-remove-input="#remove_watermark_image"
-                        data-existing-url="{{ $getUrl('watermark_image') }}">
+                        data-existing-url="{{ $getUrl('watermark_image') }}" data-preview-max-height="100"
+                        data-preview-max-width="100">
                         <input type="file" name="watermark_image" class="d-none" accept="image/*">
                         <input type="hidden" name="remove_watermark_image" id="remove_watermark_image" value="0">
                         <div class="upload-preview mb-2 text-center">

@@ -838,6 +838,12 @@
                     const acceptLower = String(input.attr('accept') || '').toLowerCase();
                     const sizeMb = (maxSize / 1024 / 1024).toFixed(2) + ' MB';
 
+                    // Custom preview constraints
+                    const previewMaxHeight = box.data('preview-max-height');
+                    const previewMaxWidth = box.data('preview-max-width');
+                    const previewStyle = (previewMaxHeight ? 'max-height:' + previewMaxHeight + 'px;' : '') +
+                        (previewMaxWidth ? 'max-width:' + previewMaxWidth + 'px;' : '');
+
                     if (help.length) {
                         help.text('Aceita: ' + accept + ' • Até ' + sizeMb + (crop ? ' • Possível recorte' : ''));
                     }
