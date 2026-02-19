@@ -62,11 +62,12 @@
         }
 
         $videoPlyrControlsRaw = (string) (\App\Models\Setting::get('video_plyr_controls') ?: 'play,progress,current-time,mute,volume,settings,fullscreen');
-        $videoPlyrControls = array_values(array_filter(array_map('trim', explode(',', $videoPlyrControlsRaw))));
+        // Robust parsing: Handle spaces, empty items, and ensure array
+        $videoPlyrControls = preg_split('/[\s,]+/', $videoPlyrControlsRaw, -1, PREG_SPLIT_NO_EMPTY);
 
         $videoPlyrSettingsRaw = (string) (\App\Models\Setting::get('video_plyr_settings') ?: 'captions,quality,speed,loop');
-        $videoPlyrSettings = array_values(array_filter(array_map('trim', explode(',', $videoPlyrSettingsRaw))));
-
+        $videoPlyrSettings = preg_split('/[\s,]+/', $videoPlyrSettingsRaw, -1, PREG_SPLIT_NO_EMPTY);
+        
         $videoPlyrSpeedOptionsRaw = (string) (\App\Models\Setting::get('video_plyr_speed_options') ?: '0.5,0.75,1,1.25,1.5,2');
         $videoPlyrSpeedOptions = array_values(array_filter(array_map(function ($value) {
             $value = trim((string) $value);
@@ -983,54 +984,31 @@
                     }
 
                     // Filter based on enabled settings
-                    // Trust the 'controls' list from backend configuration
-                    // if (plyr.rewindEnabled === false) controls = controls.filter(c => c !== 'rewind');
-                    // if (plyr.fastForwardEnabled === false) controls = controls.filter(c => c !== 'fast-forward');
-                    // if (plyr.volumeEnabled === false) controls = controls.filter(c => c !== 'mute' && c !== 'volume'); // Force volume controls based on 'controls' list
+                    // Trust the 'controls' list from backend configuration COMPLETELY.
+                    // We remove all manual filters that were based on hidden boolean flags.
                     
-                    // Ensure buttons are present if enabled
-                    // Robust "Self-Healing": If the string list is corrupted/partial, re-add using flags.
+                    // Robust "Self-Healing": If the string list is missing absolute essentials that are implicitly wanted.
+                    // However, we predominantly trust the list from Admin.
                     
-                    // Rewind
-                    if (plyr.rewindEnabled && !controls.includes('rewind')) {
-                         // Insert after play-large or at start
-                         const idx = controls.indexOf('play-large');
-                         controls.splice(idx + 1, 0, 'rewind');
+                    // If the list is empty, use defaults.
+                    if (!controls.length) {
+                        controls = [...defaultControls];
+                    }
+
+                    // Always ensure play-large for usability if not explicitly removed
+                    if (!controls.includes('play-large') && controls.includes('play')) {
+                         controls.unshift('play-large');
                     }
                     
-                    // Fast-Forward
-                    if (plyr.fastForwardEnabled && !controls.includes('fast-forward')) {
-                         const playIdx = controls.indexOf('play');
-                         const insertIdx = playIdx >= 0 ? playIdx + 1 : controls.length;
-                         controls.splice(insertIdx, 0, 'fast-forward');
-                    }
+                    // Ensure 'toggle-floating' is used instead of 'pip' (handled above)
+                    // We remove 'toggle-floating' from the array passed to Plyr to avoid "unknown control" issues,
+                    // but we keep track of it to inject manually in initOne.
+                    const needsFloating = controls.includes('toggle-floating');
+                    const cleanControls = controls.filter(c => c !== 'toggle-floating');
                     
-                    // Volume/Mute
-                    if (plyr.volumeEnabled !== false) {
-                        if (!controls.includes('mute')) controls.push('mute');
-                        if (!controls.includes('volume')) controls.push('volume');
-                    }
+                    base.controls = cleanControls;
+                    base.unnCustomFloating = needsFloating;
                     
-                    // Current Time
-                    if (!controls.includes('current-time')) {
-                         const progressIdx = controls.indexOf('progress');
-                         if (progressIdx >= 0) controls.splice(progressIdx + 1, 0, 'current-time');
-                         else controls.push('current-time');
-                    }
-                    
-                    // Download
-                    if (!controls.includes('download')) {
-                         // Admin panel checkbox for download might be missing in string
-                         // If we want to strictly follow admin panel "Visible Controls", we assume the string is authority.
-                         // But since user reports "Left column failing", we lean towards enabling if unsure.
-                         // However, for download, it's safer to trust the list to avoid unauthorized downloads.
-                         // Let's assume the user CHECKED it in admin (as per screenshot) so it SHOULD be in the list.
-                         // If the list is broken, we can't know for sure.
-                         // Compromise: If the list seems "too short" (indicating corruption), add it.
-                         if (controls.length < 5) controls.push('download'); 
-                    }
-                    
-                    base.controls = controls;
                     if (Array.isArray(plyr.settings) && plyr.settings.length) {
                         base.settings = plyr.settings;
                     }
@@ -1365,7 +1343,7 @@
                         setupFloatingPlayer(host, player, { width, height });
 
                         // Inject custom button if configured in controls
-                        if (options.controls && options.controls.includes('toggle-floating')) {
+                        if (options.unnCustomFloating) {
                              const controls = player.elements.controls;
                              if (controls) {
                                  // Create button
