@@ -35,6 +35,16 @@ class ScheduledTasksSeeder extends Seeder
                 'frequency' => '0 * * * *', // A cada hora
                 'active' => true,
             ],
+            [
+                'command' => 'subscriptions:check-expired',
+                'frequency' => '0 0 * * *', // Diariamente à meia-noite
+                'active' => true,
+            ],
+            [
+                'command' => 'auth:clear-resets',
+                'frequency' => '0 0 * * *', // Diariamente à meia-noite
+                'active' => true,
+            ],
         ];
 
         foreach ($tasks as $taskData) {
