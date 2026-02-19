@@ -15,6 +15,13 @@
                     <div class="card-tools">
                         @php
                             $lastHeartbeat = \Illuminate\Support\Facades\Cache::get('cron_heartbeat');
+                            if ($lastHeartbeat && !($lastHeartbeat instanceof \Carbon\Carbon)) {
+                                try {
+                                    $lastHeartbeat = \Carbon\Carbon::parse($lastHeartbeat);
+                                } catch (\Exception $e) {
+                                    $lastHeartbeat = null;
+                                }
+                            }
                             $isRunning = $lastHeartbeat && $lastHeartbeat->diffInMinutes(now()) < 5;
                         @endphp
                         @if($isRunning)
@@ -40,6 +47,7 @@
                                 <th>Frequência</th>
                                 <th>Status</th>
                                 <th>Última Execução</th>
+                                <th>Próxima Execução</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -58,6 +66,16 @@
                                     </td>
                                     <td>{{ $task->last_run_at ? $task->last_run_at->format('d/m/Y H:i') : '-' }}</td>
                                     <td>
+                                        @php
+                                            try {
+                                                $cron = new \Cron\CronExpression($task->frequency);
+                                                $nextRun = \Illuminate\Support\Carbon::instance($cron->getNextRunDate());
+                                                echo $nextRun->format('d/m/Y H:i');
+                                            } catch (\Exception $e) {
+                                                echo '<span class="text-danger">Inválido</span>';
+                                            }
+                                        @endphp
+                                    </td>
                                     <td>
                                         <form action="{{ route('admin.cron.run', $task) }}" method="POST"
                                             class="d-inline run-cron-form">
@@ -81,7 +99,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">Nenhuma tarefa cadastrada.</td>
+                                    <td colspan="7" class="text-center">Nenhuma tarefa cadastrada.</td>
                                 </tr>
                             @endforelse
                         </tbody>
