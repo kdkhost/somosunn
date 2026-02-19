@@ -180,5 +180,17 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Rota de Assinatura:** Adicionada rota POST `subscription.process` faltante.
 - **Commits:** `1e1526e`, `765f11a`, `e9ad637`, `e211fe2`, `ca8f434`, `0c1fe6b`, `003ffca` (CHAT)
 
+### 19/02/2026 — Padronização de UI (Fase 6)
+- **Formulário de Cursos Premium:**
+  - Redesign completo do formulário de gestão de cursos com interface modular baseada em abas.
+  - **Grade Curricular:** Nova interface para aulas com drag-and-drop (Sortable.js) e modal de edição redesenhado.
+  - **Designer de Certificados:** Modernização da interface de criação de certificados com preview interativo.
+- **Integração SweetAlert2:**
+  - Substituição global de alertas nativos por diálogos `SweetAlert2` personalizados para o admin.
+  - Nova helper `confirmAction` para padronizar confirmações de exclusão em todo o sistema.
+- **Refinamento de UX:**
+  - Melhoria na responsividade de modais e inputs no painel administrativo.
+  - Otimização de scripts de máscara de moeda e carregamento AJAX.
+
 ---
 © 2026 UNN Networking. Todos os direitos reservados.
