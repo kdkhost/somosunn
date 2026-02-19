@@ -116,50 +116,106 @@
                 <h6 class="text-dark mb-3"><i class="fas fa-list-check mr-1"></i> Meios de Pagamento Aceitos
                     (Plataforma)</h6>
                 <p class="text-sm text-muted mb-3">Selecione quais métodos de pagamento estarão disponíveis no checkout
-                    para os cursos e planos da plataforma.</p>
+                    para os cursos e planos da plataforma. As alterações são salvas automaticamente.</p>
+
                 <div class="row">
-                    <div class="col-md-4 mb-2">
-                        <div class="custom-control custom-checkbox border p-2 rounded">
-                            <input type="hidden" name="mercadopago_method_credit_card" value="0">
-                            <input type="checkbox" class="custom-control-input" id="method_credit_card"
-                                name="mercadopago_method_credit_card" value="1" {{ ($settings['mercadopago_method_credit_card'] ?? 1) ? 'checked' : '' }}>
-                            <label class="custom-control-label font-weight-bold" for="method_credit_card">Cartão de
-                                Crédito</label>
+                    <!-- Cartão de Crédito -->
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center justify-content-between p-3 border rounded">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-primary mr-3"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 font-weight-bold">Cartão de Crédito</h6>
+                                </div>
+                            </div>
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="method_credit_card"
+                                    onchange="toggleSetting('mercadopago_method_credit_card', this.checked)" {{ ($settings['mercadopago_method_credit_card'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="method_credit_card"></label>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-2">
-                        <div class="custom-control custom-checkbox border p-2 rounded">
-                            <input type="hidden" name="mercadopago_method_debit_card" value="0">
-                            <input type="checkbox" class="custom-control-input" id="method_debit_card"
-                                name="mercadopago_method_debit_card" value="1" {{ ($settings['mercadopago_method_debit_card'] ?? 0) ? 'checked' : '' }}>
-                            <label class="custom-control-label font-weight-bold" for="method_debit_card">Cartão de
-                                Débito</label>
+
+                    <!-- Cartão de Débito -->
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center justify-content-between p-3 border rounded">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-primary mr-3"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 font-weight-bold">Cartão de Débito</h6>
+                                </div>
+                            </div>
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="method_debit_card"
+                                    onchange="toggleSetting('mercadopago_method_debit_card', this.checked)" {{ ($settings['mercadopago_method_debit_card'] ?? 0) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="method_debit_card"></label>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-2">
-                        <div class="custom-control custom-checkbox border p-2 rounded">
-                            <input type="hidden" name="mercadopago_method_pix" value="0">
-                            <input type="checkbox" class="custom-control-input" id="method_pix"
-                                name="mercadopago_method_pix" value="1" {{ ($settings['mercadopago_method_pix'] ?? 1) ? 'checked' : '' }}>
-                            <label class="custom-control-label font-weight-bold" for="method_pix">Pix</label>
+
+                    <!-- Pix -->
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center justify-content-between p-3 border rounded">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-success mr-3"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="brands fa-pix"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 font-weight-bold">Pix</h6>
+                                </div>
+                            </div>
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="method_pix"
+                                    onchange="toggleSetting('mercadopago_method_pix', this.checked)" {{ ($settings['mercadopago_method_pix'] ?? 1) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="method_pix"></label>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-2">
-                        <div class="custom-control custom-checkbox border p-2 rounded">
-                            <input type="hidden" name="mercadopago_method_ticket" value="0">
-                            <input type="checkbox" class="custom-control-input" id="method_ticket"
-                                name="mercadopago_method_ticket" value="1" {{ ($settings['mercadopago_method_ticket'] ?? 0) ? 'checked' : '' }}>
-                            <label class="custom-control-label font-weight-bold" for="method_ticket">Boleto
-                                (Ticket)</label>
+
+                    <!-- Boleto -->
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center justify-content-between p-3 border rounded">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-warning mr-3"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="fas fa-barcode"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 font-weight-bold">Boleto (Ticket)</h6>
+                                </div>
+                            </div>
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="method_ticket"
+                                    onchange="toggleSetting('mercadopago_method_ticket', this.checked)" {{ ($settings['mercadopago_method_ticket'] ?? 0) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="method_ticket"></label>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-2">
-                        <div class="custom-control custom-checkbox border p-2 rounded">
-                            <input type="hidden" name="mercadopago_method_mercadopago" value="0">
-                            <input type="checkbox" class="custom-control-input" id="method_mercadopago"
-                                name="mercadopago_method_mercadopago" value="1" {{ ($settings['mercadopago_method_mercadopago'] ?? 0) ? 'checked' : '' }}>
-                            <label class="custom-control-label font-weight-bold" for="method_mercadopago">Carteira
-                                Mercado Pago</label>
+
+                    <!-- Carteira MP -->
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center justify-content-between p-3 border rounded">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-primary mr-3"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 font-weight-bold">Carteira Mercado Pago</h6>
+                                </div>
+                            </div>
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="method_mercadopago"
+                                    onchange="toggleSetting('mercadopago_method_mercadopago', this.checked)" {{ ($settings['mercadopago_method_mercadopago'] ?? 0) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="method_mercadopago"></label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -537,5 +593,63 @@
                 }
             }).trigger('change');
         });
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        function toggleSetting(key, checked) {
+            const url = "{{ route('admin.settings.toggle') }}";
+            const value = checked ? 1 : 0;
+
+            // SweetAlert2 is already available in the admin panel layout?
+            // If not, we might need a fallback. But assuming it is since it's used elsewhere.
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    key: key,
+                    value: value,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function (response) {
+                    if (response.success) {
+                        if (typeof Swal !== 'undefined') {
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                }
+                            });
+                            Toast.fire({
+                                icon: 'success',
+                                title: 'Atualizado com sucesso!'
+                            });
+                        } else if (typeof toastr !== 'undefined') {
+                            toastr.success('Configuração atualizada com sucesso!');
+                        }
+                    } else {
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error('Erro ao atualizar configuração.');
+                        } else {
+                            alert('Erro ao atualizar configuração.');
+                        }
+                    }
+                },
+                error: function () {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('Erro de conexão.');
+                    } else {
+                        alert('Erro de conexão.');
+                    }
+                }
+            });
+        }
     </script>
 @endpush
