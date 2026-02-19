@@ -37,11 +37,20 @@ class SettingController extends Controller
         $settings = Setting::all()->pluck('value', 'key')->toArray();
         $settings = $this->normalizeFileSettings($settings);
 
+        $getUrl = function ($key) use ($settings) {
+            $val = $settings[$key] ?? null;
+            if (!$val)
+                return null;
+            if (Str::startsWith($val, ['http://', 'https://']))
+                return $val;
+            return asset($val);
+        };
+
         if (request()->routeIs('panel.*')) {
-            return view('panel.admin.settings.index', compact('settings', 'group'));
+            return view('panel.admin.settings.index', compact('settings', 'group', 'getUrl'));
         }
 
-        return view('admin.settings.index', compact('settings', 'group'));
+        return view('admin.settings.index', compact('settings', 'group', 'getUrl'));
     }
 
     public function toggle(Request $request)
