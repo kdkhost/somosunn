@@ -26,7 +26,7 @@
                     de
                     Execução</label>
                 <select name="mercadopago_env"
-                    class="gateway-env-select w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium"
+                    class="gateway-env-select w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium"
                     data-gateway="mercadopago">
                     <option value="sandbox" {{ ($settings['mercadopago_env'] ?? 'sandbox') == 'sandbox' ? 'selected' : '' }}>Sandbox (Ambiente de Testes)</option>
                     <option value="production" {{ ($settings['mercadopago_env'] ?? 'sandbox') == 'production' ? 'selected' : '' }}>Produção (Ambiente Real)</option>
@@ -46,7 +46,7 @@
                             (Sandbox)</label>
                         <input type="text" name="mercadopago_sandbox_public_key"
                             value="{{ $settings['mercadopago_sandbox_public_key'] ?? '' }}"
-                            class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                     </div>
                     <div>
                         <label
@@ -55,7 +55,7 @@
                             (Sandbox)</label>
                         <input type="text" name="mercadopago_sandbox_access_token"
                             value="{{ $settings['mercadopago_sandbox_access_token'] ?? '' }}"
-                            class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                     </div>
                 </div>
             </div>
@@ -73,7 +73,7 @@
                             (Produção)</label>
                         <input type="text" name="mercadopago_prod_public_key"
                             value="{{ $settings['mercadopago_prod_public_key'] ?? '' }}"
-                            class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                     </div>
                     <div>
                         <label
@@ -83,7 +83,7 @@
                         <div class="flex gap-2">
                             <input type="text" name="mercadopago_prod_access_token"
                                 value="{{ $settings['mercadopago_prod_access_token'] ?? '' }}"
-                                class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                                class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                             <button type="button" onclick="testGatewayConnection('mercadopago')"
                                 class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl font-bold hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors whitespace-nowrap">
                                 <i class="fas fa-plug mr-2"></i> Testar
@@ -98,7 +98,7 @@
                     URL</label>
                 <div class="flex">
                     <input type="text" readonly value="{{ route('api.webhooks.mercadopago') }}"
-                        class="w-full rounded-l-2xl border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm focus:outline-none transition-colors">
+                        class="w-full px-4 py-2 rounded-l-2xl border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm focus:outline-none transition-colors">
                     <button type="button" onclick="copyToClipboard('{{ route('api.webhooks.mercadopago') }}')"
                         class="bg-slate-100 dark:bg-slate-800 h-10 hover:bg-slate-200 dark:hover:bg-slate-750 border border-l-0 border-slate-200 dark:border-slate-800 rounded-r-2xl px-4 text-slate-600 dark:text-slate-300 font-medium transition-colors">
                         <i class="fas fa-copy"></i>
@@ -245,7 +245,7 @@
                         da
                         Conta</label>
                     <input type="email" name="pagseguro_email" value="{{ $settings['pagseguro_email'] ?? '' }}"
-                        class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                 </div>
                 <div>
                     <label
@@ -253,7 +253,7 @@
                         de
                         Execução</label>
                     <select name="pagseguro_env"
-                        class="gateway-env-select w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium"
+                        class="gateway-env-select w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium"
                         data-gateway="pagseguro">
                         <option value="sandbox" {{ ($settings['pagseguro_env'] ?? 'sandbox') == 'sandbox' ? 'selected' : '' }}>Sandbox (Testes)</option>
                         <option value="production" {{ ($settings['pagseguro_env'] ?? 'sandbox') == 'production' ? 'selected' : '' }}>Produção</option>
@@ -271,7 +271,7 @@
                         (Sandbox)</label>
                     <input type="text" name="pagseguro_sandbox_token"
                         value="{{ $settings['pagseguro_sandbox_token'] ?? '' }}"
-                        class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                 </div>
             </div>
 
@@ -286,7 +286,7 @@
                     <div class="flex gap-2">
                         <input type="text" name="pagseguro_prod_token"
                             value="{{ $settings['pagseguro_prod_token'] ?? '' }}"
-                            class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                         <button type="button" onclick="testGatewayConnection('pagseguro')"
                             class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl font-bold hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors whitespace-nowrap">
                             <i class="fas fa-plug mr-2"></i> Testar
@@ -300,7 +300,7 @@
                     URL</label>
                 <div class="flex">
                     <input type="text" readonly value="{{ route('api.webhooks.pagseguro') }}"
-                        class="w-full rounded-l-2xl border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm focus:outline-none transition-colors">
+                        class="w-full px-4 py-2 rounded-l-2xl border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm focus:outline-none transition-colors">
                     <button type="button" onclick="copyToClipboard('{{ route('api.webhooks.pagseguro') }}')"
                         class="bg-slate-100 dark:bg-slate-800 h-10 hover:bg-slate-200 dark:hover:bg-slate-750 border border-l-0 border-slate-200 dark:border-slate-800 rounded-r-2xl px-4 text-slate-600 dark:text-slate-300 font-medium transition-colors">
                         <i class="fas fa-copy"></i>
@@ -341,7 +341,7 @@
                 <div class="relative">
                     <input type="number" step="0.01" name="gateway_installment_tax"
                         value="{{ $settings['gateway_installment_tax'] ?? '0.00' }}"
-                        class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-8">
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-8">
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <span class="text-slate-500 dark:text-slate-400">%</span>
                     </div>
@@ -353,7 +353,7 @@
                     Juros</label>
                 <input type="number" name="gateway_max_installments_no_interest"
                     value="{{ $settings['gateway_max_installments_no_interest'] ?? '1' }}"
-                    class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
             </div>
             <div>
                 <label
@@ -361,7 +361,7 @@
                     Taxas ao
                     Cliente?</label>
                 <select name="gateway_pass_tax_to_client"
-                    class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                     <option value="0" {{ ($settings['gateway_pass_tax_to_client'] ?? 0) == 0 ? 'selected' : '' }}>Não
                         (Empresa absorve)</option>
                     <option value="1" {{ ($settings['gateway_pass_tax_to_client'] ?? 0) == 1 ? 'selected' : '' }}>Sim
@@ -374,7 +374,7 @@
                 <div class="relative">
                     <input type="number" step="0.01" name="marketplace_fee"
                         value="{{ $settings['marketplace_fee'] ?? '10.00' }}"
-                        class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-8">
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-8">
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <span class="text-slate-500 dark:text-slate-400">%</span>
                     </div>
