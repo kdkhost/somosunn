@@ -202,10 +202,6 @@
                                 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
                             @elseif(isset($adsCode) && !empty($adsCode))
                                 {!! $adsCode !!}
-                            @else
-                                <div class="bg-gray-100 rounded h-32 flex items-center justify-center text-gray-400 text-sm">
-                                    Espaço Publicitário
-                                </div>
                             @endif
                         </div>
                     @endif
