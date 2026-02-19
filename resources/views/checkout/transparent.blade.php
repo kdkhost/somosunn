@@ -97,17 +97,30 @@
     </div>
 
     <style>
-        /* Garantir container limpo mas sem forçar display block em tudo */
+        /* Garantir container limpo */
         #paymentBrick_container {
             min-height: 500px;
         }
 
         /* 
-           O Brick do MercadoPago injeta seu próprio CSS usando Shadow DOM ou iframes em alguns casos,
-           mas também usa elementos normais.
-           Forçar 'all: unset' e 'display: block' nos labels quebra o layout flutuante (floating labels).
-           Vamos remover as regras agressivas e apenas garantir que o container não tenha padding/margin estranhos.
+           CORREÇÃO URGENTE: Placeholders deslocados em campos seguros (Cartão, Validade, CVV).
+           Esses campos usam iframes. Se houver line-height global alto ou padding herdado de frameworks,
+           o texto placeholder "cai" para fora do input.
         */
+        #paymentBrick_container iframe {
+            display: block !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            min-height: 100% !important; /* Força iframe ocupar altura do pai */
+        }
+        
+        /* Força alinhamento vertical dos containers de input do Brick */
+        #paymentBrick_container [data-testid="input-container"] {
+            display: flex !important;
+            align-items: center !important;
+            line-height: normal !important; /* Remove altura de linha excessiva */
+        }
 
         /* Feedback de carregamento */
         .loading-overlay {
