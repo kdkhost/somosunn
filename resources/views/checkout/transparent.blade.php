@@ -107,19 +107,35 @@
            Esses campos usam iframes. Se houver line-height global alto ou padding herdado de frameworks,
            o texto placeholder "cai" para fora do input.
         */
+        /* CRÍTICO: Correção de layout para iframes do Mercado Pago (Secure Fields) */
         #paymentBrick_container iframe {
             display: block !important;
+            width: 100% !important;
+            height: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
             border: none !important;
-            min-height: 100% !important; /* Força iframe ocupar altura do pai */
+            min-height: 0 !important; /* Remove min-height herança */
         }
         
-        /* Força alinhamento vertical dos containers de input do Brick */
+        /* Força o container do input a ser Flexbox para centralizar o iframe verticalmente */
         #paymentBrick_container [data-testid="input-container"] {
             display: flex !important;
             align-items: center !important;
-            line-height: normal !important; /* Remove altura de linha excessiva */
+            justify-content: flex-start !important;
+            height: 48px !important; /* Mesma altura configurada no JS v2.visual.style.customVariables.formInputsHeight */
+            min-height: 48px !important;
+            max-height: 48px !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+
+        /* Garante que divs intermediárias ocupem todo o espaço */
+        #paymentBrick_container [data-testid="input-container"] > div {
+            width: 100% !important;
+            height: 100% !important;
+            display: flex !important;
+            align-items: center !important;
         }
 
         /* Feedback de carregamento */
