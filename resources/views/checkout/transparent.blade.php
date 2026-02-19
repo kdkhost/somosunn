@@ -112,7 +112,6 @@
             margin-bottom: 0 !important;
             font-weight: normal !important;
             width: auto !important;
-            position: static !important;
         }
         #paymentBrick_container .form-group, 
         #paymentBrick_container .form-control {
@@ -171,9 +170,8 @@
         const bricksBuilder = mp.bricks();
 
         @php
-            // TEMA PADRÃO (Funcionalidade de customização removida)
-            $theme = 'default';
-            $primaryColor = '#1F5EDB';
+            $theme = \App\Models\Setting::get('gateway_checkout_theme', 'default');
+            $primaryColor = \App\Models\Setting::get('gateway_checkout_primary_color', '#1F5EDB');
 
             // Ler configuração de meios de pagamento habilitados pelo admin
             $methodCreditCard = (bool) \App\Models\Setting::get('mercadopago_method_credit_card', 1);
