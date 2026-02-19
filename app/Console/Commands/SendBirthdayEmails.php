@@ -21,7 +21,7 @@ class SendBirthdayEmails extends Command
      *
      * @var string
      */
-    protected $description = 'Send birthday emails to users born on this day';
+    protected $description = 'Envia e-mails de aniversário para usuários nascidos neste dia';
 
     /**
      * Execute the console command.
@@ -30,7 +30,7 @@ class SendBirthdayEmails extends Command
     {
         $today = now()->format('m-d');
 
-        $this->info("Checking for birthdays on $today...");
+        $this->info("Verificando aniversariantes de hoje ($today)...");
 
         // Assumes 'birth_date' column exists and is a date/datetime
         // Creating a fallback in case the column name is different, but standard is birth_date or birthday
@@ -39,7 +39,7 @@ class SendBirthdayEmails extends Command
         $users = User::whereRaw("DATE_FORMAT(birth_date, '%m-%d') = ?", [$today])->get();
 
         if ($users->isEmpty()) {
-            $this->info('No birthdays found today.');
+            $this->info('Nenhum aniversariante encontrado hoje.');
             return;
         }
 
@@ -49,10 +49,10 @@ class SendBirthdayEmails extends Command
                 $user->notify(new BirthdayGreeting());
                 $count++;
             } catch (\Exception $e) {
-                Log::error("Failed to send birthday email to user {$user->id}: " . $e->getMessage());
+                Log::error("Falha ao enviar e-mail de aniversário para o usuário {$user->id}: " . $e->getMessage());
             }
         }
 
-        $this->info("Sent $count birthday emails.");
+        $this->info("{$count} e-mails de aniversário enviados.");
     }
 }

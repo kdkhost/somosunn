@@ -21,14 +21,14 @@ class SendInvoiceOverdueReminders extends Command
      *
      * @var string
      */
-    protected $description = 'Send reminders for overdue invoices';
+    protected $description = 'Envia lembretes para faturas vencidas';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $this->info('Checking for overdue invoices...');
+        $this->info('Verificando faturas vencidas...');
 
         // Logic: Status is 'pending' or 'issued' AND due_at < now() AND not sent recently?
         // For simplicity, we'll send if it's overdue and hasn't been paid.
@@ -44,7 +44,7 @@ class SendInvoiceOverdueReminders extends Command
             ->get();
 
         if ($invoices->isEmpty()) {
-            $this->info('No invoices became overdue yesterday.');
+            $this->info('Nenhuma fatura venceu ontem.');
             return;
         }
 
@@ -56,10 +56,10 @@ class SendInvoiceOverdueReminders extends Command
                     $count++;
                 }
             } catch (\Exception $e) {
-                Log::error("Failed to send overdue reminder for invoice {$invoice->id}: " . $e->getMessage());
+                Log::error("Falha ao enviar lembrete de fatura vencida para a fatura {$invoice->id}: " . $e->getMessage());
             }
         }
 
-        $this->info("Sent $count overdue reminders.");
+        $this->info("$count lembretes de vencimento enviados.");
     }
 }
