@@ -273,7 +273,15 @@ class SettingController extends Controller
         $currentGroup = $request->input('current_group', 'general');
         if (isset($groupBools[$currentGroup])) {
             foreach ($groupBools[$currentGroup] as $b) {
-                $data[$b] = $request->has($b) ? 1 : 0;
+                // Check value explicitly to handle '0', 'false', 'off' sent by JS or hidden inputs
+                $inputVal = $request->input($b);
+
+                if (!is_null($inputVal)) {
+                    $data[$b] = filter_var($inputVal, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+                } else {
+                    // If missing (standard unchecked checkbox), assume 0
+                    $data[$b] = 0;
+                }
             }
         }
 
