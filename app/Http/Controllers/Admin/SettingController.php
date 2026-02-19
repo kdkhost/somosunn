@@ -44,6 +44,25 @@ class SettingController extends Controller
         return view('admin.settings.index', compact('settings', 'group'));
     }
 
+    public function toggle(Request $request)
+    {
+        $request->validate([
+            'key' => 'required|string',
+            'value' => 'required|boolean',
+        ]);
+
+        $key = $request->input('key');
+        $value = $request->boolean('value') ? 1 : 0;
+
+        // Segurança: permitir apenas chaves específicas se necessário, 
+        // mas como é admin, podemos confiar ou usar uma lista de permissões.
+        // Para os métodos de pagamento, as chaves são prefixadas.
+
+        Setting::set($key, $value);
+
+        return response()->json(['success' => true, 'message' => 'Configuração atualizada.']);
+    }
+
     public function update(Request $request)
     {
         $currentGroup = $request->input('current_group', 'general');

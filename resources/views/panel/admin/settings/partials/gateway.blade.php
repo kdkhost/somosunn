@@ -110,81 +110,116 @@
             <div
                 class="mt-6 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
                 <h4 class="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-4">
-                    <i class="fas fa-list-check mr-1"></i> Meios de Pagamento Aceitos
+                    <i class="fas fa-list-check mr-1"></i> Meios de Pagamento Aceitos (Checkout)
                 </h4>
-                <p class="text-xs text-slate-400 mb-3">Selecione quais métodos de pagamento estarão disponíveis no
-                    checkout.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <p class="text-xs text-slate-400 mb-6 font-medium">Ative ou desative os métodos que estarão dispiníveis
+                    no checkout. As alterações são salvas automaticamente.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <!-- Cartão de Crédito -->
-                    <label
-                        class="relative flex flex-col items-center justify-center p-4 bg-white dark:bg-slate-900 border-2 rounded-2xl cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800 group h-32 text-center {{ ($settings['mercadopago_method_credit_card'] ?? 1) ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20' : 'border-slate-200 dark:border-slate-800' }}"
-                        onclick="togglePaymentCard(this)">
-                        <input type="hidden" name="mercadopago_method_credit_card" value="0">
-                        <input type="checkbox" name="mercadopago_method_credit_card" value="1"
-                            class="absolute top-3 right-3 h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                            {{ ($settings['mercadopago_method_credit_card'] ?? 1) ? 'checked' : '' }}>
-                        <i
-                            class="fas fa-credit-card text-3xl mb-2 {{ ($settings['mercadopago_method_credit_card'] ?? 1) ? 'text-blue-500' : 'text-slate-400' }}"></i>
-                        <span
-                            class="text-sm font-bold {{ ($settings['mercadopago_method_credit_card'] ?? 1) ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400' }}">Crédito</span>
-                    </label>
+                    <div
+                        class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-800 dark:text-white text-sm">Cartão de Crédito</h5>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer"
+                                onchange="toggleSetting('mercadopago_method_credit_card', this.checked)" {{ ($settings['mercadopago_method_credit_card'] ?? 1) ? 'checked' : '' }}>
+                            <div
+                                class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                            </div>
+                        </label>
+                    </div>
 
                     <!-- Cartão de Débito -->
-                    <label
-                        class="relative flex flex-col items-center justify-center p-4 bg-white dark:bg-slate-900 border-2 rounded-2xl cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800 group h-32 text-center {{ ($settings['mercadopago_method_debit_card'] ?? 0) ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20' : 'border-slate-200 dark:border-slate-800' }}"
-                        onclick="togglePaymentCard(this)">
-                        <input type="hidden" name="mercadopago_method_debit_card" value="0">
-                        <input type="checkbox" name="mercadopago_method_debit_card" value="1"
-                            class="absolute top-3 right-3 h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                            {{ ($settings['mercadopago_method_debit_card'] ?? 0) ? 'checked' : '' }}>
-                        <i
-                            class="fas fa-credit-card text-3xl mb-2 {{ ($settings['mercadopago_method_debit_card'] ?? 0) ? 'text-blue-500' : 'text-slate-400' }}"></i>
-                        <span
-                            class="text-sm font-bold {{ ($settings['mercadopago_method_debit_card'] ?? 0) ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400' }}">Débito</span>
-                    </label>
+                    <div
+                        class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-800 dark:text-white text-sm">Cartão de Débito</h5>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer"
+                                onchange="toggleSetting('mercadopago_method_debit_card', this.checked)" {{ ($settings['mercadopago_method_debit_card'] ?? 0) ? 'checked' : '' }}>
+                            <div
+                                class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                            </div>
+                        </label>
+                    </div>
 
                     <!-- Pix -->
-                    <label
-                        class="relative flex flex-col items-center justify-center p-4 bg-white dark:bg-slate-900 border-2 rounded-2xl cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800 group h-32 text-center {{ ($settings['mercadopago_method_pix'] ?? 1) ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20' : 'border-slate-200 dark:border-slate-800' }}"
-                        onclick="togglePaymentCard(this)">
-                        <input type="hidden" name="mercadopago_method_pix" value="0">
-                        <input type="checkbox" name="mercadopago_method_pix" value="1"
-                            class="absolute top-3 right-3 h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                            {{ ($settings['mercadopago_method_pix'] ?? 1) ? 'checked' : '' }}>
-                        <i
-                            class="brands fa-pix text-3xl mb-2 {{ ($settings['mercadopago_method_pix'] ?? 1) ? 'text-blue-500' : 'text-slate-400' }}"></i>
-                        <span
-                            class="text-sm font-bold {{ ($settings['mercadopago_method_pix'] ?? 1) ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400' }}">Pix</span>
-                    </label>
+                    <div
+                        class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-500">
+                                <i class="brands fa-pix"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-800 dark:text-white text-sm">Pix</h5>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer"
+                                onchange="toggleSetting('mercadopago_method_pix', this.checked)" {{ ($settings['mercadopago_method_pix'] ?? 1) ? 'checked' : '' }}>
+                            <div
+                                class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600">
+                            </div>
+                        </label>
+                    </div>
 
                     <!-- Boleto -->
-                    <label
-                        class="relative flex flex-col items-center justify-center p-4 bg-white dark:bg-slate-900 border-2 rounded-2xl cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800 group h-32 text-center {{ ($settings['mercadopago_method_ticket'] ?? 0) ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20' : 'border-slate-200 dark:border-slate-800' }}"
-                        onclick="togglePaymentCard(this)">
-                        <input type="hidden" name="mercadopago_method_ticket" value="0">
-                        <input type="checkbox" name="mercadopago_method_ticket" value="1"
-                            class="absolute top-3 right-3 h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                            {{ ($settings['mercadopago_method_ticket'] ?? 0) ? 'checked' : '' }}>
-                        <i
-                            class="fas fa-barcode text-3xl mb-2 {{ ($settings['mercadopago_method_ticket'] ?? 0) ? 'text-blue-500' : 'text-slate-400' }}"></i>
-                        <span
-                            class="text-sm font-bold {{ ($settings['mercadopago_method_ticket'] ?? 0) ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400' }}">Boleto</span>
-                    </label>
+                    <div
+                        class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-500">
+                                <i class="fas fa-barcode"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-800 dark:text-white text-sm">Boleto (Ticket)</h5>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer"
+                                onchange="toggleSetting('mercadopago_method_ticket', this.checked)" {{ ($settings['mercadopago_method_ticket'] ?? 0) ? 'checked' : '' }}>
+                            <div
+                                class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 dark:peer-focus:ring-orange-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-orange-500">
+                            </div>
+                        </label>
+                    </div>
 
                     <!-- Carteira MP -->
-                    <label
-                        class="relative flex flex-col items-center justify-center p-4 bg-white dark:bg-slate-900 border-2 rounded-2xl cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800 group h-32 text-center {{ ($settings['mercadopago_method_mercadopago'] ?? 0) ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20' : 'border-slate-200 dark:border-slate-800' }}"
-                        onclick="togglePaymentCard(this)">
-                        <input type="hidden" name="mercadopago_method_mercadopago" value="0">
-                        <input type="checkbox" name="mercadopago_method_mercadopago" value="1"
-                            class="absolute top-3 right-3 h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                            {{ ($settings['mercadopago_method_mercadopago'] ?? 0) ? 'checked' : '' }}>
-                        <i
-                            class="fas fa-wallet text-3xl mb-2 {{ ($settings['mercadopago_method_mercadopago'] ?? 0) ? 'text-blue-500' : 'text-slate-400' }}"></i>
-                        <span
-                            class="text-sm font-bold {{ ($settings['mercadopago_method_mercadopago'] ?? 0) ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400' }}">Carteira
-                            MP</span>
-                    </label>
+                    <div
+                        class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-800 dark:text-white text-sm">Carteira MP</h5>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer"
+                                onchange="toggleSetting('mercadopago_method_mercadopago', this.checked)" {{ ($settings['mercadopago_method_mercadopago'] ?? 0) ? 'checked' : '' }}>
+                            <div
+                                class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-500">
+                            </div>
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -514,5 +549,67 @@
                     });
             };
         });
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        function toggleSetting(key, checked) {
+            const url = "{{ route('admin.settings.toggle') }}";
+            const value = checked ? 1 : 0;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ key: key, value: value })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        });
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Atualizado com sucesso!'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: 'Não foi possível atualizar a configuração.',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                        // Reverter o toggle visualmente se falhar? 
+                        // Para simplificar, deixamos assim, pois o usuário pode tentar novamente.
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Ocorreu um erro na requisição.',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                });
+        }
     </script>
 @endpush
