@@ -61,8 +61,14 @@ class InvoiceController extends Controller
 
         $invoice = $service->createManual($data, $items, (int) auth()->id());
 
-        if ($request->boolean('send_email')) {
-            $service->queueInvoiceEmail($invoice, true);
+        $sendType = $request->input('send_email_type', 'none');
+
+        if ($sendType === 'now') {
+            $service->queueInvoiceEmail($invoice, true, true); // Force + Sync
+            return redirect()->route('admin.invoices.show', $invoice)->with('success', 'Fatura criada e enviada com sucesso!');
+        } elseif ($sendType === 'queue') {
+            $service->queueInvoiceEmail($invoice, true, false); // Force + Queue
+            return redirect()->route('admin.invoices.show', $invoice)->with('success', 'Fatura criada e agendada para envio.');
         }
 
         return redirect()->route('admin.invoices.show', $invoice)->with('success', 'Fatura criada com sucesso.');
@@ -124,6 +130,7 @@ class InvoiceController extends Controller
         $invoice->discount_amount = max(0, (float) ($invoice->discount_amount ?? 0));
         $invoice->total_amount = max(0, round(((float) $invoice->subtotal) - ((float) $invoice->discount_amount), 2));
 
+        // Auto-pay logic
         if (($invoice->status ?? '') === 'paid' && !$invoice->paid_at) {
             $invoice->paid_at = now();
         }
@@ -131,8 +138,14 @@ class InvoiceController extends Controller
         $invoice->ensureNumber();
         $invoice->save();
 
-        if ($request->boolean('send_email')) {
-            $service->queueInvoiceEmail($invoice, true);
+        $sendType = $request->input('send_email_type', 'none');
+
+        if ($sendType === 'now') {
+            $service->queueInvoiceEmail($invoice, true, true); // Force + Sync
+            return redirect()->route('admin.invoices.show', $invoice)->with('success', 'Fatura atualizada e enviada!');
+        } elseif ($sendType === 'queue') {
+            $service->queueInvoiceEmail($invoice, true, false); // Force + Queue
+            return redirect()->route('admin.invoices.show', $invoice)->with('success', 'Fatura atualizada e agendada para envio.');
         }
 
         return redirect()->route('admin.invoices.show', $invoice)->with('success', 'Fatura atualizada.');

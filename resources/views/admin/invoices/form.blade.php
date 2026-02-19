@@ -127,18 +127,36 @@
                 </table>
             </div>
 
-            <div class="form-group">
-                <label>Observações (opcional)</label>
-                <textarea name="notes" class="form-control" rows="4"
-                    maxlength="5000">{{ old('notes', $invoice->notes) }}</textarea>
-            </div>
-
-            <div class="text-right">
-                <button class="btn btn-primary">Salvar</button>
-                <a href="{{ route('admin.invoices.index') }}" class="btn btn-secondary" data-pjax>Cancelar</a>
-            </div>
-        </form>
+            <label>Observações (opcional)</label>
+            <textarea name="notes" class="form-control" rows="4"
+                maxlength="5000">{{ old('notes', $invoice->notes) }}</textarea>
     </div>
+
+    <hr>
+
+    <div class="d-flex justify-content-between">
+        <a href="{{ route('admin.invoices.index') }}" class="btn btn-secondary" data-pjax>Cancelar</a>
+
+        <div class="btn-group">
+            <button type="submit" name="send_email_type" value="none" class="btn btn-primary">
+                <i class="fas fa-save"></i> Salvar (Sem enviar)
+            </button>
+            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <button type="submit" name="send_email_type" value="queue" class="dropdown-item">
+                    <i class="fas fa-clock"></i> Salvar e Enviar na Fila (Cron)
+                </button>
+                <button type="submit" name="send_email_type" value="now" class="dropdown-item text-bold">
+                    <i class="fas fa-paper-plane"></i> Salvar e Enviar AGORA
+                </button>
+            </div>
+        </div>
+    </div>
+    </form>
+</div>
 </div>
 @endsection
 
@@ -171,15 +189,15 @@
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><input name="items_description[]" class="form-control" required></td>
-                    <td><input name="items_quantity[]" class="form-control" type="number" min="1" value="1"></td>
-                    <td><input name="items_unit_price[]" class="form-control mask-money" required></td>
-                    <td class="text-center">
-                        <button type="button" class="btn btn-sm btn-outline-danger btnRemoveItem" title="Remover">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
+                        <td><input name="items_description[]" class="form-control" required></td>
+                        <td><input name="items_quantity[]" class="form-control" type="number" min="1" value="1"></td>
+                        <td><input name="items_unit_price[]" class="form-control mask-money" required></td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-danger btnRemoveItem" title="Remover">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
                 tbody.appendChild(tr);
 
                 // Reaplica máscaras e binds (admin layout já expõe initMask / initDateTimePickers via document ready)

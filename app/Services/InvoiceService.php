@@ -126,7 +126,7 @@ class InvoiceService
         });
     }
 
-    public function queueInvoiceEmail(Invoice $invoice, bool $force = false): void
+    public function queueInvoiceEmail(Invoice $invoice, bool $force = false, bool $sync = false): void
     {
         if (!$invoice->user || empty($invoice->user->email)) {
             return;
@@ -142,6 +142,12 @@ class InvoiceService
 
         $invoice->email_queued_at = now();
         $invoice->save();
+
+        if ($sync) {
+            // Immediate processing (no queue)
+            \App\Jobs\SendInvoiceEmailJob::dispatchSync((int) $invoice->id, $force);
+            return;
+        }
 
         $dispatch = function () use ($invoice, $force) {
             \App\Jobs\SendInvoiceEmailJob::dispatch((int) $invoice->id, $force);
