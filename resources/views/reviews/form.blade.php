@@ -30,9 +30,11 @@
 
 @auth
     @php
-        $selectedRating = old('rating', optional($myReview)->rating);
+        $selectedRating = old('rating');
         $selectedRating = is_numeric($selectedRating) ? max(1, min(5, (int) $selectedRating)) : null;
     @endphp
+
+
 
     @if($myReview)
         <div
@@ -67,7 +69,7 @@
             <label for="review-comment" class="block text-sm font-semibold text-gray-800 mb-2">Comentário</label>
             <textarea id="review-comment" name="comment" rows="4"
                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Conte como foi sua experiência...">{{ old('comment', optional($myReview)->comment) }}</textarea>
+                placeholder="Conte como foi sua experiência...">{{ old('comment') }}</textarea>
             @error('comment')<p class="text-red-600 text-sm mt-2">{{ $message }}</p>@enderror
         </div>
 
