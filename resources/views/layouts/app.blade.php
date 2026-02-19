@@ -1019,7 +1019,7 @@
                     }
                     
                     // Download
-                    if (!blockDownload && !controls.includes('download')) {
+                    if (!controls.includes('download')) {
                          // Admin panel checkbox for download might be missing in string
                          // If we want to strictly follow admin panel "Visible Controls", we assume the string is authority.
                          // But since user reports "Left column failing", we lean towards enabling if unsure.
