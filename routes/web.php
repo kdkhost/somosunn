@@ -92,8 +92,6 @@ Route::get('/membros', [\App\Http\Controllers\MemberController::class, 'index'])
 Route::get('/vagas-abertas', [\App\Http\Controllers\OportunidadesTesteController::class, 'index'])->name('jobs.public.index');
 Route::get('/vagas-abertas/{job}', [\App\Http\Controllers\JobPublicController::class, 'show'])->name('jobs.public.show');
 
-// Página de oportunidades de carreira (layout oficial)
-Route::get('/vagas-abertas', [\App\Http\Controllers\OportunidadesTesteController::class, 'index'])->name('jobs.public.index');
 
 // Eventos (público: vitrine/SEO; compra/reserva controla acesso por pedido/inscrição)
 Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');

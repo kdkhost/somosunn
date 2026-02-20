@@ -10,7 +10,7 @@ class JobPublicController extends Controller
     public function index()
     {
         $vacancies = JobVacancy::where('is_active', true)
-            ->whereIn('visibility', ['external', 'both'])
+            ->where('visibility', 'public')
             ->where(function ($q) {
                 $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
             })
@@ -22,7 +22,7 @@ class JobPublicController extends Controller
 
     public function show(JobVacancy $job)
     {
-        if (!$job->is_active || $job->visibility === 'internal') {
+        if (!$job->is_active || $job->visibility === 'private') {
             abort(404);
         }
 
