@@ -10,10 +10,33 @@
                     <p class="text-xs text-slate-500 dark:text-slate-400">Transforme seu site em um app instalável.</p>
                 </div>
             </div>
-            <div class="relative inline-flex items-center cursor-pointer">
+            <label class="relative inline-flex items-center cursor-pointer">
                 <input type="hidden" name="pwa_enabled" value="0">
                 <input type="checkbox" name="pwa_enabled" id="pwa_enabled" value="1" class="sr-only peer" {{ ($settings['pwa_enabled'] ?? 0) ? 'checked' : '' }}>
-                <div class="w-12 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <div class="w-12 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors duration-300"></div>
+            </label>
+        </div>
+
+        <hr class="border-slate-100 dark:border-slate-800">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
+                <div>
+                    <h4 class="font-bold text-slate-800 dark:text-white text-sm">Banner de Instalação</h4>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400">Mostrar convite para instalar o App.</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="pwa_prompt_enabled" value="0">
+                    <input type="checkbox" name="pwa_prompt_enabled" value="1" class="sr-only peer" {{ ($settings['pwa_prompt_enabled'] ?? 1) ? 'checked' : '' }}>
+                    <div class="w-10 h-5 bg-slate-200 dark:bg-slate-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 transition-colors duration-300"></div>
+                </label>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 space-y-2">
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest">Dias para Reexibição (Snooze)</label>
+                <input type="number" name="pwa_prompt_snooze_days" value="{{ $settings['pwa_prompt_snooze_days'] ?? 7 }}" min="0"
+                       class="w-full px-4 py-2 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold text-slate-800 dark:text-white text-sm">
+                <p class="text-[9px] text-slate-400">Tempo de espera após o usuário clicar em "Mais tarde".</p>
             </div>
         </div>
 
