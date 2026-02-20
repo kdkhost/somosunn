@@ -230,7 +230,8 @@
                                         {{ $vaga->title }}
                                     </h3>
                                     <p class="text-blue-600 font-bold text-sm mb-4">
-                                        {{ $vaga->company_name ?? 'Empresa Confidencial' }}</p>
+                                        {{ $vaga->company_name ?? 'Empresa Confidencial' }}
+                                    </p>
 
                                     <div class="space-y-2 mb-6">
                                         <div class="flex items-center gap-2 text-xs text-slate-500">
@@ -251,7 +252,7 @@
 
                                 <div class="mt-auto px-8 pb-8">
                                     <a href="{{ route('jobs.public.show', $vaga->id) }}"
-                                        class="w-full py-4 bg-slate-50 hover:bg-slate-900 border border-slate-100 hover:border-slate-900 text-slate-900 hover:text-white rounded-2xl font-bold text-center transition-all block">
+                                        class="w-full py-4 bg-slate-50 hover:btn-primary border border-slate-100 hover:border-transparent text-slate-900 hover:text-white rounded-2xl font-bold text-center transition-all block">
                                         Ver Detalhes
                                     </a>
                                 </div>
