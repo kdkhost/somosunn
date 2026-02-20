@@ -5,10 +5,8 @@
     <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto text-center mb-16">
             <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-6">Oportunidades de Carreira</h1>
-            <p class="text-xl text-slate-600">Confira as vagas abertas em nossa rede de empresas parceiras e na comunidade SOMOS UNN.</p>
+            <p class="text-xl text-slate-600">Confira as vagas abertas em nossa rede de empresas parceiras e na comunidade <span class="font-semibold text-primary">SOMOS UNN</span>.</p>
         </div>
-        <h1 class="text-4xl font-bold text-center text-primary mb-4">Oportunidades de Carreira</h1>
-        <p class="text-center text-lg text-gray-700 mb-8">Confira as vagas abertas em nossa rede de empresas parceiras e na comunidade <span class="font-semibold text-primary">SOMOS UNN</span>.</p>
 
         <form method="GET" action="" class="mb-8 bg-white rounded-2xl shadow p-6 flex flex-wrap gap-4 justify-center border border-slate-100">
             <div>
