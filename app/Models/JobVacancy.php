@@ -20,13 +20,16 @@ class JobVacancy extends Model
         'requirements',
         'benefits',
         'salary_range',
+        'image',
         'visibility',
         'is_active',
+        'is_demo',
         'expires_at',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_demo' => 'boolean',
         'expires_at' => 'datetime',
     ];
 

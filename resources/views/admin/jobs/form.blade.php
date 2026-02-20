@@ -16,7 +16,7 @@
                 </div>
 
                 <form action="{{ $vacancy->exists ? route('admin.jobs.update', $vacancy) : route('admin.jobs.store') }}"
-                    method="POST">
+                    method="POST" enctype="multipart/form-data">
                     @csrf
                     @if($vacancy->exists) @method('PUT') @endif
 
@@ -85,6 +85,40 @@
                                         <option value="external" @selected(old('visibility', $vacancy->visibility) == 'external')>Público</option>
                                         <option value="both" @selected(old('visibility', $vacancy->visibility) == 'both' || !$vacancy->exists)>Ambos</option>
                                     </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="image">Imagem da Vaga / Logo da Empresa</label>
+                                    @if($vacancy->image)
+                                        <div class="mb-2">
+                                            <img src="{{ asset($vacancy->image) }}" class="img-thumbnail"
+                                                style="max-height: 100px;">
+                                        </div>
+                                    @endif
+                                    <div class="custom-file">
+                                        <input type="file" name="image" class="custom-file-input" id="image"
+                                            accept="image/*">
+                                        <label class="custom-file-label" for="image" data-browse="Procurar">Escolher
+                                            arquivo...</label>
+                                    </div>
+                                    <small class="text-muted">Recomendado: 800x600px</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Opções Adicionais</label>
+                                    <div class="custom-control custom-switch pt-2">
+                                        <input type="checkbox" class="custom-control-input" id="is_demo" name="is_demo"
+                                            value="1" @checked(old('is_demo', $vacancy->is_demo))>
+                                        <label class="custom-control-label" for="is_demo">Esta é uma vaga fictícia
+                                            (Demonstração)?</label>
+                                    </div>
+                                    <small class="text-muted">Se ativado, aparecerá uma etiqueta de "Demonstração" na
+                                        listagem pública.</small>
                                 </div>
                             </div>
                         </div>

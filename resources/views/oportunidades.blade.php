@@ -75,14 +75,32 @@
                                         <div class="absolute inset-0 opacity-20"
                                             style="background-image: radial-gradient(var(--unn-azul-1) 1px, transparent 1px); background-size: 20px 20px;">
                                         </div>
-                                        <div class="relative z-10 text-center">
-                                            <div
-                                                class="w-24 h-24 rounded-3xl bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-6 backdrop-blur">
-                                                <i class="fas fa-briefcase text-4xl text-white"></i>
-                                            </div>
-                                            <div
-                                                class="inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/20 px-4 py-2 text-sm font-bold text-white backdrop-blur">
-                                                <i class="fas fa-star text-yellow-400"></i> Vaga em Destaque
+                                        <div class="relative z-10 text-center w-full">
+                                            @if($featuredJob->image)
+                                                <div
+                                                    class="w-32 h-32 rounded-[2rem] bg-white p-4 shadow-2xl mx-auto mb-6 flex items-center justify-center overflow-hidden">
+                                                    <img src="{{ asset($featuredJob->image) }}"
+                                                        alt="{{ $featuredJob->company_name }}"
+                                                        class="max-w-full max-h-full object-contain">
+                                                </div>
+                                            @else
+                                                <div
+                                                    class="w-24 h-24 rounded-3xl bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-6 backdrop-blur">
+                                                    <i class="fas fa-briefcase text-4xl text-white"></i>
+                                                </div>
+                                            @endif
+
+                                            <div class="flex flex-col items-center gap-2">
+                                                <div
+                                                    class="inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/20 px-4 py-2 text-sm font-bold text-white backdrop-blur">
+                                                    <i class="fas fa-star text-yellow-400"></i> Vaga em Destaque
+                                                </div>
+                                                @if($featuredJob->is_demo)
+                                                    <div
+                                                        class="inline-flex items-center gap-2 rounded-full bg-amber-500/20 border border-amber-500/30 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-200 backdrop-blur">
+                                                        <i class="fas fa-flask"></i> Demonstração
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -215,15 +233,31 @@
                             <div
                                 class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group overflow-hidden">
                                 <div class="px-8 pt-8 pb-4">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <span
-                                            class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100">
-                                            {{ $vaga->type ?? 'Integral' }}
-                                        </span>
-                                        <span class="text-[10px] font-bold text-slate-400">
-                                            <i class="far fa-calendar-alt mr-1"></i>
-                                            {{ $vaga->created_at ? $vaga->created_at->format('d/m/Y') : '' }}
-                                        </span>
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div class="flex flex-col gap-2">
+                                            <span
+                                                class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100 self-start">
+                                                {{ $vaga->type ?? 'Integral' }}
+                                            </span>
+                                            @if($vaga->is_demo)
+                                                <span
+                                                    class="inline-block px-3 py-1 rounded-full bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-widest border border-amber-100 self-start">
+                                                    <i class="fas fa-flask mr-1"></i> Demonstração
+                                                </span>
+                                            @endif
+                                        </div>
+                                        @if($vaga->image)
+                                            <div
+                                                class="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 p-2 flex items-center justify-center overflow-hidden">
+                                                <img src="{{ asset($vaga->image) }}" alt="{{ $vaga->company_name }}"
+                                                    class="max-w-full max-h-full object-contain">
+                                            </div>
+                                        @else
+                                            <span class="text-[10px] font-bold text-slate-400">
+                                                <i class="far fa-calendar-alt mr-1"></i>
+                                                {{ $vaga->created_at ? $vaga->created_at->format('d/m/Y') : '' }}
+                                            </span>
+                                        @endif
                                     </div>
                                     <h3
                                         class="text-xl font-black text-slate-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-2 min-h-[3.5rem]">

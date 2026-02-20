@@ -37,10 +37,18 @@ class JobController extends Controller
             'benefits' => 'nullable|string',
             'salary_range' => 'nullable|string|max:255',
             'expires_at' => 'nullable|date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'is_demo' => 'nullable|boolean',
         ]);
 
         $data['user_id'] = Auth::id();
         $data['is_active'] = $request->has('is_active');
+        $data['is_demo'] = $request->has('is_demo');
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('jobs', 'public');
+            $data['image'] = 'storage/' . $imagePath;
+        }
 
         JobVacancy::create($data);
 
@@ -67,9 +75,21 @@ class JobController extends Controller
             'benefits' => 'nullable|string',
             'salary_range' => 'nullable|string|max:255',
             'expires_at' => 'nullable|date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'is_demo' => 'nullable|boolean',
         ]);
 
         $data['is_active'] = $request->has('is_active');
+        $data['is_demo'] = $request->has('is_demo');
+
+        if ($request->hasFile('image')) {
+            // Remover imagem antiga se existir
+            if ($job->image && file_exists(public_path($job->image))) {
+                @unlink(public_path($job->image));
+            }
+            $imagePath = $request->file('image')->store('jobs', 'public');
+            $data['image'] = 'storage/' . $imagePath;
+        }
 
         $job->update($data);
 

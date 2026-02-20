@@ -42,10 +42,22 @@
                                     class="px-4 py-1 rounded-full bg-unn-azul-1/10 text-unn-azul-1 text-[10px] font-black uppercase tracking-widest border border-unn-azul-1/10">
                                     {{ $job->type }}
                                 </span>
+                                @if($job->is_demo)
+                                    <span
+                                        class="px-4 py-1 rounded-full bg-amber-500/10 text-amber-600 text-[10px] font-black uppercase tracking-widest border border-amber-500/10">
+                                        <i class="fas fa-flask mr-1"></i> Demonstração
+                                    </span>
+                                @endif
                                 <span
                                     class="px-4 py-1 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase tracking-widest border border-emerald-500/10">
                                     Vaga Aberta
                                 </span>
+                                @if(Auth::check() && Auth::user()->isAdmin())
+                                    <a href="{{ route('admin.jobs.edit', $job) }}"
+                                        class="px-4 py-1 rounded-full bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest hover:bg-black transition-colors">
+                                        <i class="fas fa-edit mr-1"></i> Editar no Painel
+                                    </a>
+                                @endif
                             </div>
                             <h1 class="text-4xl md:text-6xl font-black text-slate-900 leading-[1.1] mb-6">
                                 {{ $job->title }}
@@ -190,7 +202,8 @@
                                                 class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
                                                 Remuneração</p>
                                             <p class="font-extrabold text-slate-900">
-                                                {{ $job->salary_range ?? 'A combinar' }}</p>
+                                                {{ $job->salary_range ?? 'A combinar' }}
+                                            </p>
                                         </div>
                                     </div>
 
@@ -206,6 +219,20 @@
                                             <p class="font-extrabold text-slate-900">{{ $job->type }}</p>
                                         </div>
                                     </div>
+                                    @if($job->is_demo)
+                                        <div class="flex items-start gap-4">
+                                            <div
+                                                class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 flex-shrink-0">
+                                                <i class="fas fa-flask"></i>
+                                            </div>
+                                            <div>
+                                                <p
+                                                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                                                    Tipo de Vaga</p>
+                                                <p class="font-extrabold text-slate-900 text-sm">Apenas Demonstração</p>
+                                            </div>
+                                        </div>
+                                    @endif
 
                                     <div class="flex items-start gap-4">
                                         <div
