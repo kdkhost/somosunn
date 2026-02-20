@@ -145,13 +145,13 @@
                                             </div>
                                         </div>
 
-                                        <div class="mt-8 flex flex-col sm:flex-row gap-3">
+                                        <div class="mt-8 flex flex-col sm:flex-row gap-4">
                                             <a href="{{ route('jobs.public.show', $featuredJob->id) }}"
-                                                class="px-8 py-4 rounded-xl font-bold btn-primary shadow-lg hover:shadow-xl transition inline-flex items-center justify-center">
-                                                Ver Detalhes da Vaga
+                                                class="flex-1 px-8 py-4 rounded-2xl font-black btn-primary text-white shadow-xl shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3">
+                                                Ver Detalhes da Vaga <i class="fas fa-arrow-right text-sm"></i>
                                             </a>
                                             <a href="/cadastro-curriculo"
-                                                class="px-8 py-4 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center">
+                                                class="flex-1 px-8 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-600 hover:bg-slate-50 hover:border-slate-200 transition-all flex items-center justify-center">
                                                 Enviar Currículo
                                             </a>
                                         </div>
@@ -286,8 +286,8 @@
 
                                 <div class="mt-auto px-8 pb-8">
                                     <a href="{{ route('jobs.public.show', $vaga->id) }}"
-                                        class="w-full py-4 bg-slate-50 hover:btn-primary border border-slate-100 hover:border-transparent text-slate-900 hover:text-white rounded-2xl font-bold text-center transition-all block">
-                                        Ver Detalhes
+                                        class="w-full py-4 btn-primary text-white rounded-2xl font-black shadow-lg shadow-blue-500/10 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3">
+                                        Ver Detalhes <i class="fas fa-arrow-right text-xs"></i>
                                     </a>
                                 </div>
                             </div>

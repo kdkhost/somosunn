@@ -149,13 +149,13 @@
 
                                         @if(Auth::check())
                                             <a href="{{ route('panel.jobs.show', $job) }}"
-                                                class="px-8 py-4 btn-primary text-white rounded-2xl font-black shadow-xl shadow-blue-500/20 transition-all hover:scale-105 active:scale-95">
-                                                Candidatar-se Agora
+                                                class="px-8 py-4 btn-primary text-white rounded-2xl font-black shadow-xl shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
+                                                Candidatar-se Agora <i class="fas fa-arrow-right text-sm"></i>
                                             </a>
                                         @else
                                             <a href="{{ route('login') }}"
-                                                class="px-8 py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-black shadow-xl shadow-slate-900/20 transition-all hover:scale-105 active:scale-95">
-                                                Entrar para Candidatar
+                                                class="px-8 py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-black shadow-xl shadow-slate-900/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
+                                                Entrar para Candidatar <i class="fas fa-arrow-right text-sm"></i>
                                             </a>
                                         @endif
                                     </div>
@@ -197,11 +197,11 @@
                                             class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
                                             <i class="fas fa-money-bill-wave"></i>
                                         </div>
-                                        <div>
+                                        <div class="flex-1">
                                             <p
-                                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-tight mb-1">
                                                 Remuneração</p>
-                                            <p class="font-extrabold text-slate-900">
+                                            <p class="font-extrabold text-slate-900 leading-tight">
                                                 {{ $job->salary_range ?? 'A combinar' }}
                                             </p>
                                         </div>
@@ -212,7 +212,7 @@
                                             class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 flex-shrink-0">
                                             <i class="fas fa-clock"></i>
                                         </div>
-                                        <div>
+                                        <div class="flex-1">
                                             <p
                                                 class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
                                                 Carga Horária</p>
@@ -239,11 +239,11 @@
                                             class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 flex-shrink-0">
                                             <i class="fas fa-shield-halved"></i>
                                         </div>
-                                        <div>
+                                        <div class="flex-1">
                                             <p
-                                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-tight mb-1">
                                                 Nível</p>
-                                            <p class="font-extrabold text-slate-900">Não Informado</p>
+                                            <p class="font-extrabold text-slate-900 leading-tight">Não Informado</p>
                                         </div>
                                     </div>
                                 </div>
