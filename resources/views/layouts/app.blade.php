@@ -23,10 +23,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', \App\Models\Setting::get('seo_meta_title') ?: config('app.name', 'UNN'))</title>
     @php
-        $logoFront = \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
-        $logo = $logoFront ? asset(ltrim($logoFront, '/')) : asset('img/logo.svg');
-        $faviconValue = \App\Models\Setting::get('favicon_image');
-        $favicon = $faviconValue ? asset(ltrim($faviconValue, '/')) : asset('favicon.ico');
+        $logo = \App\Models\Setting::getUrl('logo_front') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg');
+        $favicon = \App\Models\Setting::getUrl('favicon_image') ?: asset('favicon.ico');
         $pwaEnabled = (string) \App\Models\Setting::get('pwa_enabled', '1') === '1';
         $pwaTheme = \App\Models\Setting::get('pwa_theme_color', '#1F5EDB');
 

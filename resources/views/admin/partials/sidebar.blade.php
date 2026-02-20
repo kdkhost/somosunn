@@ -3,31 +3,8 @@
     $open = fn($patterns) => request()->routeIs($patterns) ? 'menu-open' : '';
 @endphp
 @php
-    $brandLogo = asset('img/logo.svg'); // Default fallback
-    $brandFavicon = asset('img/logo.svg'); // Default fallback
-
-    try {
-        $logoAdmin = \App\Models\Setting::get('logo_admin');
-        $logoMain = \App\Models\Setting::get('logo_image');
-        $logoFavicon = \App\Models\Setting::get('favicon_image');
-
-        // Tenta usar logo_admin primeiro, depois logo_image
-        if ($logoAdmin && file_exists(public_path($logoAdmin))) {
-            $brandLogo = asset($logoAdmin);
-        } elseif ($logoMain && file_exists(public_path($logoMain))) {
-            $brandLogo = asset($logoMain);
-        }
-
-        // Tenta usar favicon personalizado
-        if ($logoFavicon && file_exists(public_path($logoFavicon))) {
-            $brandFavicon = asset($logoFavicon);
-        } elseif (file_exists(public_path('favicon.ico'))) {
-            $brandFavicon = asset('favicon.ico');
-        }
-    } catch (\Throwable $e) {
-        // Usa fallback padrão em caso de erro
-        \Log::error('Erro ao carregar logo da sidebar: ' . $e->getMessage());
-    }
+    $brandLogo = \App\Models\Setting::getUrl('logo_admin') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg');
+    $brandFavicon = \App\Models\Setting::getUrl('favicon_image') ?: asset('img/logo.svg');
 @endphp
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center justify-content-center p-0"

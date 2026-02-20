@@ -29,8 +29,16 @@
     @endif
     
     @php
-        $logoAuth = \App\Models\Setting::get('logo_auth') ?: \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
-        $logoAuthSrc = $logoAuth ? asset(ltrim($logoAuth, '/')) : asset('img/logo.svg');
+        $logoAuthSrc = \App\Models\Setting::getUrl('logo_auth');
+        if (!$logoAuthSrc) {
+            $logoAuthSrc = \App\Models\Setting::getUrl('logo_front');
+        }
+        if (!$logoAuthSrc) {
+            $logoAuthSrc = \App\Models\Setting::getUrl('logo_image');
+        }
+        if (!$logoAuthSrc) {
+            $logoAuthSrc = asset('img/logo.svg');
+        }
     @endphp
     
     <div class="relative z-10 flex flex-col items-center w-full">

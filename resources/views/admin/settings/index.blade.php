@@ -16,28 +16,6 @@
         'system' => 'Sistema',
     ];
     $currentLabel = $groupLabels[$group] ?? 'Configurações';
-
-    // Helper closure for URLs
-    $getUrl = function ($key) use ($settings) {
-        $val = $settings[$key] ?? null;
-        if (!$val)
-            return '';
-        if (filter_var($val, FILTER_VALIDATE_URL))
-            return $val;
-
-        // Se o valor já começar com 'storage/', usa direto no asset
-        if (str_starts_with($val, 'storage/')) {
-            return asset($val);
-        }
-
-        // Se começar com 'uploads/', é provável que esteja na raiz pública (legacy ou custom)
-        if (str_starts_with($val, 'uploads/')) {
-            return asset($val);
-        }
-
-        // Fallback genérico para storage (padrão Laravel)
-        return asset('storage/' . $val);
-    };
 @endphp
 
 @section('title', 'Configurações - ' . $currentLabel)

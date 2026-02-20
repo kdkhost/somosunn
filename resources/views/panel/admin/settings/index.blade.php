@@ -41,7 +41,7 @@
                 @foreach($tabs as $key => $tab)
                         <a href="{{ route('panel.admin.settings', ['group' => $key]) }}"
                             class="flex items-center gap-2 px-6 py-4 text-sm transition whitespace-nowrap border-b-4
-                                                                              {{ $group === $key
+                                                                                          {{ $group === $key
                     ? 'border-blue-600 text-blue-600 font-black bg-blue-50 dark:bg-blue-900/30'
                     : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-slate-50 dark:hover:bg-slate-800' }}">
                             <i class="fas {{ $tab['icon'] }}"></i>
@@ -86,7 +86,7 @@
                     </div>
                 @endif
 
-                @include('panel.admin.settings.partials.' . $group)
+                @include('panel.admin.settings.partials.' . $group, ['settings' => $settings, 'getUrl' => $getUrl])
 
                 <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
                     <button type="submit"

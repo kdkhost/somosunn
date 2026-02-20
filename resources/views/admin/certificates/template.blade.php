@@ -160,10 +160,10 @@
                 $logoStyle = $elements['platform_logo'] ?? ['x' => 50, 'y' => 10, 'width' => 120, 'height' => 60, 'zIndex' => 20];
 
                 $logoPath = \App\Models\Setting::get('logo_auth') ?: \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
-                $logoRelPath = $logoPath ? ltrim($logoPath, '/') : 'img/logo.png';
+                $logoRelPath = $logoPath ? ltrim((string) $logoPath, '/') : 'img/logo.svg';
 
                 if (isset($isPreview) && $isPreview) {
-                    $logoUrl = '/' . $logoRelPath;
+                    $logoUrl = asset($logoRelPath);
                 } else {
                     $logoUrl = public_path($logoRelPath);
                 }

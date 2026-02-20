@@ -536,13 +536,21 @@
                             if (typeof toastr !== 'undefined') {
                                 toastr.success(data.message);
                             } else {
-                                alert('Sucesso: ' + data.message);
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sucesso',
+                                    text: data.message
+                                });
                             }
                         } else {
                             if (typeof toastr !== 'undefined') {
                                 toastr.error(data.message);
                             } else {
-                                alert('Erro: ' + data.message);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Erro',
+                                    text: data.message
+                                });
                             }
                         }
                     })

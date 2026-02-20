@@ -637,16 +637,24 @@
                     } else {
                         if (typeof toastr !== 'undefined') {
                             toastr.error('Erro ao atualizar configuração.');
-                        } else {
-                            alert('Erro ao atualizar configuração.');
+                        } else if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro',
+                                text: 'Erro ao atualizar configuração.'
+                            });
                         }
                     }
                 },
                 error: function () {
                     if (typeof toastr !== 'undefined') {
                         toastr.error('Erro de conexão.');
-                    } else {
-                        alert('Erro de conexão.');
+                    } else if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: 'Erro de conexão.'
+                        });
                     }
                 }
             });

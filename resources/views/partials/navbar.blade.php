@@ -1,7 +1,6 @@
 {{-- Navbar UNN com submenus e sidebar mobile --}}
 @php
-    $logoFront = \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
-    $logoSrc = $logoFront ? asset(ltrim($logoFront, '/')) : asset('img/logo.svg');
+    $logoSrc = \App\Models\Setting::getUrl('logo_front') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg');
     $menuItems = [
         [
             'label' => 'Institucional',
@@ -95,20 +94,20 @@
                 @auth
                     <!-- Notification Hub (Bell) -->
                     <div class="relative" x-data="{
-                                                                open: false,
-                                                                total: 0,
-                                                                items: [],
-                                                                loading: true,
-                                                                 async fetchNotifications() {
-                                                                     try {
-                                                                         const r = await fetch('{{ route('notifications.hub') }}');
-                                                                         if (!r.ok) return;
-                                                                         const data = await r.json();
-                                                                         this.total = data.total || 0;
-                                                                         this.items = (data.items || []).filter(i => i.count > 0);
-                                                                     } catch(e) { console.error('Notification hub failed:', e) } finally { this.loading = false }
-                                                                 }
-                                                              }"
+                                                                    open: false,
+                                                                    total: 0,
+                                                                    items: [],
+                                                                    loading: true,
+                                                                     async fetchNotifications() {
+                                                                         try {
+                                                                             const r = await fetch('{{ route('notifications.hub') }}');
+                                                                             if (!r.ok) return;
+                                                                             const data = await r.json();
+                                                                             this.total = data.total || 0;
+                                                                             this.items = (data.items || []).filter(i => i.count > 0);
+                                                                         } catch(e) { console.error('Notification hub failed:', e) } finally { this.loading = false }
+                                                                     }
+                                                                  }"
                         x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
 
                         <button @click="open = !open; fetchNotifications()"

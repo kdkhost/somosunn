@@ -38,12 +38,7 @@ class SettingController extends Controller
         $settings = $this->normalizeFileSettings($settings);
 
         $getUrl = function ($key) use ($settings) {
-            $val = $settings[$key] ?? null;
-            if (!$val)
-                return null;
-            if (Str::startsWith($val, ['http://', 'https://']))
-                return $val;
-            return asset($val);
+            return \App\Models\Setting::getUrl($key);
         };
 
         if (request()->routeIs('panel.*')) {
