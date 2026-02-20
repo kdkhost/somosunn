@@ -311,6 +311,15 @@
     @stack('styles')
 
     <style>
+        /* Ajuste para ícones de input date no Dark Mode */
+        .dark input[type="date"]::-webkit-calendar-picker-indicator,
+        .dark input[type="time"]::-webkit-calendar-picker-indicator,
+        .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) brightness(100%) contrast(100%);
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
         * {
             font-family: 'Inter', sans-serif;
         }
@@ -1588,8 +1597,28 @@
         </script>
     @endif
 
-    {{-- Floating Chat Component (persiste entre páginas) --}}
-    @include('partials.floating-chat')
+    <!-- jQuery (necessário para Toastr e plugins do painel) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Toastr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
+    <script>
+        toastr.options = { positionClass: 'toast-top-right', timeOut: 4000, progressBar: true };
+        @if(session('success'))
+            toastr.success(@json(session('success')));
+        @endif
+        @if(session('status'))
+            toastr.success(@json(session('status')));
+        @endif
+        @if(session('error'))
+            toastr.error(@json(session('error')));
+        @endif
+        @if(session('warning'))
+            toastr.warning(@json(session('warning')));
+        @endif
+        @if(session('info'))
+            toastr.info(@json(session('info')));
+        @endif
+    </script>
 
     @stack('scripts')
 
@@ -1693,28 +1722,8 @@
             });
         </script>
     @endif
-    <!-- jQuery (necessário para Toastr) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Toastr JS -->
-    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
-    <script>
-        toastr.options = { positionClass: 'toast-top-right', timeOut: 4000, progressBar: true };
-        @if(session('success'))
-            toastr.success(@json(session('success')));
-        @endif
-        @if(session('status'))
-            toastr.success(@json(session('status')));
-        @endif
-        @if(session('error'))
-            toastr.error(@json(session('error')));
-        @endif
-        @if(session('warning'))
-            toastr.warning(@json(session('warning')));
-        @endif
-        @if(session('info'))
-            toastr.info(@json(session('info')));
-        @endif
-    </script>
+    {{-- Floating Chat Component (persiste entre páginas) --}}
+    @include('partials.floating-chat')
 </body>
 
 </html>
