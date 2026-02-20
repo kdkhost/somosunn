@@ -32,24 +32,24 @@
             class="bg-slate-50 dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 inline-flex items-center gap-1.5 mb-6">
             <button type="button" @click="tab = 'general'"
                 :class="tab === 'general' 
-                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
+                            : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
                 class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                 <i class="fas fa-info-circle"></i>
                 <span>Geral</span>
             </button>
             <button type="button" @click="tab = 'location'"
                 :class="tab === 'location' 
-                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
+                            : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
                 class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                 <i class="fas fa-map-marker-alt"></i>
                 <span>Local & Capacidade</span>
             </button>
             <button type="button" @click="tab = 'pricing'"
                 :class="tab === 'pricing' 
-                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
+                            : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
                 class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                 <i class="fas fa-tag"></i>
                 <span>Preço & Ingressos</span>
@@ -57,8 +57,8 @@
             @if($event->exists)
                 <button type="button" @click="tab = 'certificate'"
                     :class="tab === 'certificate' 
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
+                                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
                     class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                     <i class="fas fa-certificate"></i>
                     <span>Certificado</span>
@@ -123,7 +123,7 @@
                         <div>
                             <label
                                 class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Descrição</label>
-                            <textarea name="description" rows="8"
+                            <textarea name="description" id="eventDescription" rows="8"
                                 class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">{{ old('description', $event->description) }}</textarea>
                         </div>
                     </div>
@@ -320,6 +320,23 @@
         <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <script>
+            $(document).ready(function () {
+                $('#eventDescription').summernote({
+                    height: 300,
+                    placeholder: 'Descreva o evento aqui...',
+                    lang: 'pt-BR',
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'underline', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture', 'video']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ]
+                });
+            });
+
             // Money Mask
             document.querySelectorAll('.mask-money').forEach(input => {
                 input.addEventListener('input', function (e) {

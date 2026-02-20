@@ -380,6 +380,14 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         // Certificates Management
         Route::resource('certificates', \App\Http\Controllers\Panel\Admin\CertificateController::class);
 
+        // Mural de Vagas (Admin)
+        Route::resource('jobs', \App\Http\Controllers\Panel\Admin\JobController::class);
+
+        // Resgate de Pontos (Admin)
+        Route::post('redemptions/{redemption}/approve', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'approve'])->name('redemptions.approve');
+        Route::post('redemptions/{redemption}/cancel', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'cancel'])->name('redemptions.cancel');
+        Route::resource('redemptions', \App\Http\Controllers\Panel\Admin\RedemptionController::class);
+
         // CMS & Engagement (Phase 4)
         Route::resource('faqs', \App\Http\Controllers\Panel\Admin\FaqController::class);
         Route::resource('testimonials', \App\Http\Controllers\Panel\Admin\TestimonialController::class);
@@ -439,6 +447,15 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::post('/pagamentos/testar', [\App\Http\Controllers\Panel\MarketplaceController::class, 'testCredentials'])->name('payments.test');
         Route::get('/vendas', [\App\Http\Controllers\Panel\MarketplaceController::class, 'sales'])->name('sales');
     });
+
+    // Portal de Vagas (Usuário)
+    Route::get('/vagas', [\App\Http\Controllers\Panel\JobController::class, 'index'])->name('jobs.index');
+    Route::get('/vagas/{job}', [\App\Http\Controllers\Panel\JobController::class, 'show'])->name('jobs.show');
+    Route::post('/vagas/{job}/candidatar', [\App\Http\Controllers\Panel\JobController::class, 'apply'])->name('jobs.apply');
+
+    // Loja de Pontos (Usuário)
+    Route::get('/resgate', [\App\Http\Controllers\RedemptionItemController::class, 'index'])->name('redemptions.shop');
+    Route::post('/resgate/{item}', [\App\Http\Controllers\RedemptionItemController::class, 'redeem'])->name('redemptions.redeem');
 
     // Wishlist
     Route::get('/minha-lista', [\App\Http\Controllers\Panel\WishlistController::class, 'index'])->name('wishlist.index');
@@ -623,6 +640,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         // Ranking
         Route::get('/ranking', [\App\Http\Controllers\Admin\RankingController::class, 'index'])
             ->middleware('check.feature:ranking_access')->name('ranking');
+
+        // Portal de Vagas (Admin/Empresa)
+        Route::resource('jobs', \App\Http\Controllers\Panel\Admin\JobController::class)->names('jobs');
+
+        // Resgate de Pontos (Admin)
+        Route::resource('redemptions', \App\Http\Controllers\Panel\Admin\RedemptionController::class)->names('redemptions');
+
 
         // FAILSAFE ROUTES (DO NOT REMOVE)
         Route::get('/upload/test', fn() => null)->middleware('check.feature:uploads_access')->name('upload.test');

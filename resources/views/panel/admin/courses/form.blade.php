@@ -48,16 +48,16 @@
             class="bg-slate-50 dark:bg-slate-950 p-2 rounded-[2rem] border border-slate-100 dark:border-slate-800 inline-flex items-center gap-2 mb-2 transition-all shadow-inner">
             <button type="button" @click="tab = 'general'"
                 :class="tab === 'general' 
-                                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 font-black scale-105' 
-                                    : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-white dark:hover:bg-slate-900'"
+                                        ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 font-black scale-105' 
+                                        : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-white dark:hover:bg-slate-900'"
                 class="px-6 py-3 rounded-2xl text-xs uppercase tracking-widest transition-all flex items-center gap-2">
                 <i class="fas fa-info-circle"></i>
                 <span>Geral</span>
             </button>
             <button type="button" @click="tab = 'pricing'"
                 :class="tab === 'pricing' 
-                                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 font-black scale-105' 
-                                    : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-white dark:hover:bg-slate-900'"
+                                        ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 font-black scale-105' 
+                                        : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-white dark:hover:bg-slate-900'"
                 class="px-6 py-3 rounded-2xl text-xs uppercase tracking-widest transition-all flex items-center gap-2">
                 <i class="fas fa-tag"></i>
                 <span>Preço</span>
@@ -65,16 +65,16 @@
             @if($course->exists)
                 <button type="button" @click="tab = 'lessons'"
                     :class="tab === 'lessons' 
-                                                        ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 font-black scale-105' 
-                                                        : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-white dark:hover:bg-slate-900'"
+                                                                ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 font-black scale-105' 
+                                                                : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-white dark:hover:bg-slate-900'"
                     class="px-6 py-3 rounded-2xl text-xs uppercase tracking-widest transition-all flex items-center gap-2">
                     <i class="fas fa-layer-group"></i>
                     <span>Grade Curricular ({{ $course->lessons_count ?? $course->lessons()->count() }})</span>
                 </button>
                 <button type="button" @click="tab = 'certificate'"
                     :class="tab === 'certificate' 
-                                                        ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 font-black scale-105' 
-                                                        : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-white dark:hover:bg-slate-900'"
+                                                                ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 font-black scale-105' 
+                                                                : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-200 font-bold hover:bg-white dark:hover:bg-slate-900'"
                     class="px-6 py-3 rounded-2xl text-xs uppercase tracking-widest transition-all flex items-center gap-2">
                     <i class="fas fa-certificate"></i>
                     <span>Certificado</span>
@@ -306,10 +306,10 @@
                                 </div>
                                 <input type="file" name="thumbnail" x-ref="thumbnail" class="hidden" accept="image/*"
                                     @change="
-                                                const reader = new FileReader();
-                                                reader.onload = (e) => { photoPreview = e.target.result; toastr.success('Capa selecionada!'); };
-                                                reader.readAsDataURL($event.target.files[0]);
-                                            ">
+                                                    const reader = new FileReader();
+                                                    reader.onload = (e) => { photoPreview = e.target.result; toastr.success('Capa selecionada!'); };
+                                                    reader.readAsDataURL($event.target.files[0]);
+                                                ">
                             </div>
                         </div>
                     </div>
@@ -714,16 +714,16 @@
                     if (lesson.attachments && lesson.attachments.length) {
                         lesson.attachments.forEach(att => {
                             $list.append(`
-                                <li class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 transition-colors">
-                                    <div class="flex items-center gap-3">
-                                        <i class="fas fa-paperclip text-blue-500"></i>
-                                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300">${att.file_name}</span>
-                                    </div>
-                                    <button type="button" onclick="deleteAttachment(${id}, ${att.id})" class="w-8 h-8 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </li>
-                            `);
+                                        <li class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 transition-colors">
+                                            <div class="flex items-center gap-3">
+                                                <i class="fas fa-paperclip text-blue-500"></i>
+                                                <span class="text-xs font-bold text-slate-700 dark:text-slate-300">${att.file_name}</span>
+                                            </div>
+                                            <button type="button" onclick="deleteAttachment(${id}, ${att.id})" class="w-8 h-8 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </li>
+                                    `);
                         });
                     }
 
@@ -792,6 +792,24 @@
                     }
                 });
             }
+            // Summernote Initialization
+            const summernoteConfig = {
+                height: 300,
+                placeholder: 'Digite o conteúdo aqui...',
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['view', ['fullscreen', 'codeview', 'help']],
+                ]
+            };
+
+            $('#fullDescription').summernote(summernoteConfig);
+            $('#lessonContent').summernote(summernoteConfig);
+
             // Certificate Editor Logic
             $(document).ready(function () {
                 if ('{{ $course->exists }}' == '') return;
@@ -890,16 +908,16 @@
                     return false;
                 };
 
-                window.previewCertificate = function() {
+                window.previewCertificate = function () {
                     $('#certificate_settings_input').val(JSON.stringify(certDoc));
                     const form = $('#courseForm')[0];
                     const originalAction = form.action;
                     const originalTarget = form.target;
-                    
+
                     form.action = "{{ route('panel.admin.courses.certificate.preview', $course) }}";
                     form.target = "_blank";
                     form.submit();
-                    
+
                     // Restore
                     form.action = originalAction;
                     form.target = originalTarget;
@@ -916,12 +934,14 @@
             <div
                 class="p-8 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between transition-colors bg-slate-50/50 dark:bg-slate-950/50">
                 <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
+                    <div
+                        class="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
                         <i class="fas fa-video"></i>
                     </div>
                     <div>
                         <h3 class="text-xl font-black text-slate-800 dark:text-white transition-colors">Gerenciar Aula</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Editor de Conteúdo</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Editor de Conteúdo
+                        </p>
                     </div>
                 </div>
                 <button @click="closeModal('lesson-modal')"
@@ -930,34 +950,42 @@
                 </button>
             </div>
 
-            <div class="p-8 overflow-y-auto flex-1 h-full space-y-8 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-transparent">
+            <div
+                class="p-8 overflow-y-auto flex-1 h-full space-y-8 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-transparent">
                 <form id="lessonForm" class="space-y-6">
                     @csrf
                     <input type="hidden" id="lessonId" name="lesson_id">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Título da Aula</label>
+                            <label
+                                class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Título
+                                da Aula</label>
                             <input type="text" id="lessonTitle" name="title" required
                                 class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold placeholder:text-slate-300"
                                 placeholder="Ex: Introdução ao Mercado">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Ordem</label>
+                            <label
+                                class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Ordem</label>
                             <input type="number" id="lessonOrder" name="order" required
                                 class="w-full px-5 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Duração (seg)</label>
+                            <label
+                                class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Duração
+                                (seg)</label>
                             <input type="number" id="lessonDuration" name="duration" required
                                 class="w-full px-5 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold"
                                 placeholder="Ex: 360">
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">URL do Vídeo (Vimeo/YouTube/Panda)</label>
+                            <label
+                                class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">URL
+                                do Vídeo (Vimeo/YouTube/Panda)</label>
                             <div class="relative group">
                                 <div class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400">
                                     <i class="fas fa-link"></i>
@@ -969,26 +997,34 @@
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="flex items-center gap-3 cursor-pointer group p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 hover:border-blue-200 transition-all">
+                            <label
+                                class="flex items-center gap-3 cursor-pointer group p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 hover:border-blue-200 transition-all">
                                 <input type="checkbox" id="lessonPreview" name="is_free_preview" value="1"
                                     class="w-5 h-5 text-blue-600 border-slate-300 rounded-lg focus:ring-blue-500 bg-white transition-all">
-                                <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Marcar como aula gratuita de preview</span>
+                                <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Marcar como aula gratuita
+                                    de preview</span>
                             </label>
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Descrição da Aula</label>
+                            <label
+                                class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Descrição
+                                da Aula</label>
                             <textarea id="lessonContent" name="content" rows="4"
                                 class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-700 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-none font-medium"></textarea>
                         </div>
 
                         <div class="md:col-span-2 space-y-4">
-                            <label class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Materiais Complementares</label>
+                            <label
+                                class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Materiais
+                                Complementares</label>
                             <ul id="attachmentList" class="space-y-2"></ul>
-                            
+
                             <div class="relative group">
-                                <input type="file" name="attachments[]" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                                <div class="w-full px-5 py-4 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-400 flex items-center justify-center gap-2 group-hover:border-blue-400 group-hover:bg-blue-50/10 transition-all">
+                                <input type="file" name="attachments[]" multiple
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                <div
+                                    class="w-full px-5 py-4 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-400 flex items-center justify-center gap-2 group-hover:border-blue-400 group-hover:bg-blue-50/10 transition-all">
                                     <i class="fas fa-cloud-upload-alt text-xl"></i>
                                     <span>Adicionar Arquivos</span>
                                 </div>
@@ -998,7 +1034,8 @@
                 </form>
             </div>
 
-            <div class="p-8 border-t border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30 flex items-center justify-end gap-3 transition-colors">
+            <div
+                class="p-8 border-t border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30 flex items-center justify-end gap-3 transition-colors">
                 <button @click="closeModal('lesson-modal')"
                     class="px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-black text-slate-600 dark:text-slate-400 hover:bg-slate-50 transition-all">
                     Cancelar

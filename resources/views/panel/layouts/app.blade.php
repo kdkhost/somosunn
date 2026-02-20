@@ -10,6 +10,9 @@
     <!-- Tagify CSS -->
     <link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
 
+    <!-- Summernote Lite (No Bootstrap dependency) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+
     <style>
         /* Summernote Dark Mode Global Overrides */
         .note-editor.note-frame {
@@ -123,5 +126,8 @@
 
         <!-- Tagify JS -->
         <script src="https://unpkg.com/@yaireo/tagify"></script>
+
+        <!-- Summernote Lite JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
     @endpush
 @endsection

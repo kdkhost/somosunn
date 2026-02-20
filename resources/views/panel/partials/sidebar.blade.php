@@ -75,6 +75,17 @@
             </a>
         @endif
 
+        <a href="{{ route('panel.jobs.index') }}" class="{{ $navItemClass(request()->routeIs('panel.jobs.*')) }}">
+            <i class="fas fa-briefcase w-5 opacity-80"></i>
+            Vagas
+        </a>
+
+        <a href="{{ route('panel.redemptions.shop') }}"
+            class="{{ $navItemClass(request()->routeIs('panel.redemptions.*')) }}">
+            <i class="fas fa-gift w-5 opacity-80"></i>
+            Loja de Pontos
+        </a>
+
         @if((method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace()) || $isImpersonatingAdmin)
             <div class="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
                 <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 px-4">
@@ -138,6 +149,16 @@
                     class="{{ $navItemClass(request()->routeIs('panel.admin.coupons.*')) }}">
                     <i class="fas fa-ticket-alt w-5 opacity-80"></i>
                     Cupons
+                </a>
+                <a href="{{ route('panel.admin.jobs.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.jobs.*')) }}">
+                    <i class="fas fa-id-card w-5 opacity-80"></i>
+                    Vagas
+                </a>
+                <a href="{{ route('panel.admin.redemptions.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.redemptions.*')) }}">
+                    <i class="fas fa-exchange-alt w-5 opacity-80"></i>
+                    Resgates
                 </a>
 
                 {{-- Conteúdo --}}
