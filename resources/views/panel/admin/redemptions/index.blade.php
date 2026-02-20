@@ -2,7 +2,7 @@
 
 @section('title', 'Loja de Resgate de Pontos')
 
-@section('content')
+@section('panel_content')
     <div class="space-y-6">
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -63,7 +63,8 @@
                                                 @endif
                                                 <div>
                                                     <div class="text-sm font-bold text-slate-900 dark:text-white">
-                                                        {{ $item->name }}</div>
+                                                        {{ $item->name }}
+                                                    </div>
                                                     <div
                                                         class="text-xs {{ $item->is_active ? 'text-emerald-500' : 'text-slate-400' }}">
                                                         {{ $item->is_active ? 'Ativo' : 'Inativo' }}
@@ -124,7 +125,8 @@
                             <div class="text-sm font-bold text-slate-700 dark:text-slate-300">{{ $redemption->item->name }}
                             </div>
                             <div class="text-xs text-blue-600 font-bold mt-1">-
-                                {{ number_format($redemption->points_spent, 0, ',', '.') }} pts</div>
+                                {{ number_format($redemption->points_spent, 0, ',', '.') }} pts
+                            </div>
                         </div>
                         <div class="flex items-center gap-2">
                             <form action="{{ route('admin.redemptions.approve', $redemption) }}" method="POST" class="flex-1">

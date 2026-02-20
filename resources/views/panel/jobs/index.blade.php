@@ -2,7 +2,7 @@
 
 @section('title', 'Mural de Vagas')
 
-@section('content')
+@section('panel_content')
     <div class="space-y-6">
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -34,7 +34,8 @@
                     <div class="flex-1 space-y-2">
                         <h3
                             class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">
-                            {{ $vacancy->title }}</h3>
+                            {{ $vacancy->title }}
+                        </h3>
                         <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                             <i class="fas fa-building text-xs"></i>
                             <span>{{ $vacancy->company_name ?: 'Confidencial' }}</span>

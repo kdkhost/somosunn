@@ -2,7 +2,7 @@
 
 @section('title', $vacancy->exists ? 'Editar Vaga' : 'Nova Vaga')
 
-@section('content')
+@section('panel_content')
     <div class="max-w-4xl mx-auto space-y-6">
         {{-- Header --}}
         <div class="flex items-center justify-between">

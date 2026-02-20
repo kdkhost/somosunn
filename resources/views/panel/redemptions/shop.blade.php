@@ -2,7 +2,7 @@
 
 @section('title', 'Loja de Resgate de Pontos')
 
-@section('content')
+@section('panel_content')
 <div class="space-y-8">
     {{-- Header & Balance --}}
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">

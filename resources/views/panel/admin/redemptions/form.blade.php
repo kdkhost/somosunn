@@ -2,7 +2,7 @@
 
 @section('title', $item->exists ? 'Editar Item' : 'Novo Item de Resgate')
 
-@section('content')
+@section('panel_content')
     <div class="max-w-3xl mx-auto space-y-6">
         {{-- Header --}}
         <div class="flex items-center justify-between">
