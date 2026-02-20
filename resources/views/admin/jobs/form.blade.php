@@ -70,11 +70,21 @@
                                         placeholder="Ex: R$ 5.000 - R$ 7.000">
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="expires_at">Expira em (Opcional)</label>
                                     <input type="date" name="expires_at" id="expires_at" class="form-control"
                                         value="{{ old('expires_at', $vacancy->expires_at ? $vacancy->expires_at->format('Y-m-d') : '') }}">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="visibility">Visibilidade <span class="text-danger">*</span></label>
+                                    <select name="visibility" id="visibility" class="form-control custom-select">
+                                        <option value="internal" @selected(old('visibility', $vacancy->visibility) == 'internal')>Comunidade</option>
+                                        <option value="external" @selected(old('visibility', $vacancy->visibility) == 'external')>Público</option>
+                                        <option value="both" @selected(old('visibility', $vacancy->visibility) == 'both' || !$vacancy->exists)>Ambos</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

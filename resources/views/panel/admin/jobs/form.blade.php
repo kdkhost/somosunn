@@ -77,6 +77,19 @@
                             value="{{ old('expires_at', $vacancy->expires_at ? $vacancy->expires_at->format('Y-m-d') : '') }}"
                             class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">
                     </div>
+
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest">Visibilidade</label>
+                        <select name="visibility" required
+                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">
+                            <option value="internal" @selected(old('visibility', $vacancy->visibility) == 'internal')>Somente
+                                Comunidade (Interno)</option>
+                            <option value="external" @selected(old('visibility', $vacancy->visibility) == 'external')>Somente
+                                Público (Externo)</option>
+                            <option value="both" @selected(old('visibility', $vacancy->visibility) == 'both' || !$vacancy->exists)>Ambos (Interno e Público)</option>
+                        </select>
+                    </div>
                 </div>
 
                 {{-- Descriptions --}}

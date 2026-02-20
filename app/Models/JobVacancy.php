@@ -20,6 +20,7 @@ class JobVacancy extends Model
         'requirements',
         'benefits',
         'salary_range',
+        'visibility',
         'is_active',
         'expires_at',
     ];

@@ -37,6 +37,7 @@ class JobController extends Controller
             'benefits' => 'nullable|string',
             'salary_range' => 'nullable|string|max:255',
             'expires_at' => 'nullable|date',
+            'visibility' => 'required|in:internal,external,both',
         ]);
 
         $data['user_id'] = Auth::id();
@@ -68,6 +69,7 @@ class JobController extends Controller
             'salary_range' => 'nullable|string|max:255',
             'expires_at' => 'nullable|date',
             'is_active' => 'boolean',
+            'visibility' => 'required|in:internal,external,both',
         ]);
 
         $job->update($data);

@@ -13,6 +13,7 @@ class JobController extends Controller
     public function index()
     {
         $vacancies = JobVacancy::where('is_active', true)
+            ->whereIn('visibility', ['internal', 'both'])
             ->where(function ($q) {
                 $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
             })
