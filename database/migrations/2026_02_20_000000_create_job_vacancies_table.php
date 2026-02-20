@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->json('requirements')->nullable();
             $table->json('benefits')->nullable();
             $table->string('salary_range')->nullable();
-            $table->string('visibility')->default('public');
+            $table->enum('visibility', ['public', 'private'])->default('public');
             $table->boolean('is_active')->default(true);
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
