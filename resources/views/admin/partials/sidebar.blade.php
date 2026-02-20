@@ -209,6 +209,8 @@
                             'admin.certificates.*',
                             'admin.fonts.*',
                             'admin.faqs.*',
+                            'admin.jobs.*',
+                            'admin.redemptions.*',
                             'admin.settings*',
                         ];
                     @endphp
@@ -263,7 +265,20 @@
                                 <a href="{{ route('admin.points-rules.index') }}"
                                     class="nav-link {{ $is('admin.points-rules.*') }}">
                                     <i class="fas fa-star nav-icon"></i>
-                                    <p>Pontuação</p>
+                                    <p>Regras de Pontos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.redemptions.index') }}"
+                                    class="nav-link {{ $is('admin.redemptions.*') }}">
+                                    <i class="fas fa-gift nav-icon"></i>
+                                    <p>Resgates</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.jobs.index') }}" class="nav-link {{ $is('admin.jobs.*') }}">
+                                    <i class="fas fa-briefcase nav-icon"></i>
+                                    <p>Mural de Vagas</p>
                                 </a>
                             </li>
                             <li class="nav-item">

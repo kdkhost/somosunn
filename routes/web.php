@@ -642,10 +642,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             ->middleware('check.feature:ranking_access')->name('ranking');
 
         // Portal de Vagas (Admin/Empresa)
-        Route::resource('jobs', \App\Http\Controllers\Panel\Admin\JobController::class)->names('jobs');
+        Route::resource('jobs', \App\Http\Controllers\Admin\JobController::class);
 
         // Resgate de Pontos (Admin)
-        Route::resource('redemptions', \App\Http\Controllers\Panel\Admin\RedemptionController::class)->names('redemptions');
+        Route::post('redemptions/{redemption}/approve', [\App\Http\Controllers\Admin\RedemptionController::class, 'approve'])->name('redemptions.approve');
+        Route::post('redemptions/{redemption}/cancel', [\App\Http\Controllers\Admin\RedemptionController::class, 'cancel'])->name('redemptions.cancel');
+        Route::resource('redemptions', \App\Http\Controllers\Admin\RedemptionController::class);
 
 
         // FAILSAFE ROUTES (DO NOT REMOVE)
