@@ -6,11 +6,18 @@
 <div class="space-y-8">
     {{-- Header & Balance --}}
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div>
-            <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white transition-colors">
-                Troque seus Pontos
-            </h1>
-            <p class="text-slate-500 dark:text-slate-400 mt-1 font-medium transition-colors">Use seus pontos acumulados para resgatar prêmios, cursos e mentorias.</p>
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white transition-colors">
+                    Troque seus Pontos
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 font-medium transition-colors">Use seus pontos acumulados para resgatar prêmios, cursos e mentorias.</p>
+            </div>
+            <a href="{{ route('redemptions.history') }}" 
+               class="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-6 py-3 rounded-2xl font-bold transition-all active:scale-95 border border-slate-200 dark:border-slate-700 transition-colors shrink-0">
+                <i class="fas fa-history"></i>
+                Meus Resgates
+            </a>
         </div>
 
         <div class="bg-blue-600 rounded-3xl p-6 shadow-2xl shadow-blue-500/30 flex items-center gap-6 min-w-[280px]">

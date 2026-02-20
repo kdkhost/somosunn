@@ -26,6 +26,8 @@
         $logo = \App\Models\Setting::getUrl('logo_front') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg');
         $favicon = \App\Models\Setting::getUrl('favicon_image') ?: asset('favicon.ico');
         $pwaEnabled = (string) \App\Models\Setting::get('pwa_enabled', '1') === '1';
+        $pwaPromptEnabled = (string) \App\Models\Setting::get('pwa_prompt_enabled', '1') === '1';
+        $pwaPromptSnoozeDays = (int) \App\Models\Setting::get('pwa_prompt_snooze_days', '7');
         $pwaTheme = \App\Models\Setting::get('pwa_theme_color', '#1F5EDB');
 
         $seoDefaultTitle = \App\Models\Setting::get('seo_meta_title') ?: (\App\Models\Setting::get('app_name') ?: config('app.name', 'UNN'));
@@ -1666,9 +1668,28 @@
                 // Guarda o evento para acionar depois
                 deferredPrompt = e;
 
-                // Mostra o modal customizado
-                // Pequeno delay para garantir que a página carregou
+                // Só mostra se o prompt estiver ativado globalmente
+                const promptEnabled = @json($pwaPromptEnabled);
+                if (!promptEnabled) return;
+
+                // Verifica o snooze (adiamento)
+                const snoozeUntil = localStorage.getItem('pwa_install_snooze_until');
+                if (snoozeUntil && new Date().getTime() < parseInt(snoozeUntil)) {
+                    console.log('PWA: Prompt ignorado devido ao temporizador de adiamento.');
+                    return;
+                }
+
+                // Mostra o modal customizado com pequeno delay para garantir que a página carregou
                 setTimeout(showInstallModal, 2000);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (e.target.id === 'pwa-dismiss-btn') {
+                    const days = @json($pwaPromptSnoozeDays);
+                    const until = new Date().getTime() + (days * 24 * 60 * 60 * 1000);
+                    localStorage.setItem('pwa_install_snooze_until', until.toString());
+                    console.log(`PWA: Instalacão adiada por ${days} dias.`);
+                }
             });
         </script>
     @endif

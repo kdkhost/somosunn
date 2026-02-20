@@ -64,9 +64,14 @@ class NotificationHubController extends Controller
             $planExpiresSoon = $user->plan_expires_at->isFuture() && $user->plan_expires_at->diffInDays(now()) <= 7;
         }
 
+        // 6. New Job Vacancies (Unread database notifications)
+        $newJobsCount = $user->unreadNotifications()
+            ->where('type', 'App\Notifications\JobVacancyPublished')
+            ->count();
+
         // Consolidated response
         return response()->json([
-            'total' => $unreadMessagesCount + $pendingConnectionsCount + $newSalesCount + $upcomingEventsCount + ($planExpiresSoon ? 1 : 0),
+            'total' => $unreadMessagesCount + $pendingConnectionsCount + $newSalesCount + $upcomingEventsCount + ($planExpiresSoon ? 1 : 0) + $newJobsCount,
             'items' => [
                 [
                     'type' => 'messages',
@@ -112,6 +117,15 @@ class NotificationHubController extends Controller
                     'color' => 'text-red-500',
                     'bg' => 'bg-red-50',
                     'route' => route('premium')
+                ],
+                [
+                    'type' => 'jobs',
+                    'count' => $newJobsCount,
+                    'label' => 'novas vagas',
+                    'icon' => 'fas fa-briefcase',
+                    'color' => 'text-indigo-500',
+                    'bg' => 'bg-indigo-50',
+                    'route' => route('notifications.index', ['type' => 'JobVacancyPublished'])
                 ]
             ],
             'last_sync' => now()->toIso8601String()

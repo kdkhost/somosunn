@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\RedeemableItem;
 use App\Models\Redemption;
 use App\Models\PointsLog;
+use App\Notifications\RedemptionStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -75,6 +76,10 @@ class RedemptionController extends Controller
     {
         $this->authorizeAdmin();
         $redemption->update(['status' => 'completed']);
+
+        // Notify User
+        $redemption->user->notify(new RedemptionStatusUpdated($redemption));
+
         return back()->with('success', 'Resgate concluído!');
     }
 
@@ -86,6 +91,9 @@ class RedemptionController extends Controller
         $user->increment('points', $redemption->points_spent);
 
         $redemption->update(['status' => 'cancelled']);
+
+        // Notify User
+        $user->notify(new RedemptionStatusUpdated($redemption));
 
         // Log the return of points
         PointsLog::create([

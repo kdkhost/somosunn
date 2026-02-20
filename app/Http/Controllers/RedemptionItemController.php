@@ -17,6 +17,16 @@ class RedemptionItemController extends Controller
         return view('panel.redemptions.shop', compact('items'));
     }
 
+    public function history()
+    {
+        $redemptions = Redemption::with('item')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
+
+        return view('panel.redemptions.history', compact('redemptions'));
+    }
+
     public function redeem(Request $request, RedeemableItem $item)
     {
         if (!$item->is_active) {

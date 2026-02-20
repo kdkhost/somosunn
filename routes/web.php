@@ -457,8 +457,12 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::get('/vagas/{job}', [\App\Http\Controllers\Panel\JobController::class, 'show'])->name('jobs.show');
     Route::post('/vagas/{job}/candidatar', [\App\Http\Controllers\Panel\JobController::class, 'apply'])->name('jobs.apply');
 
+    // Gestão de Vagas da Empresa (Cadastro e Edição)
+    Route::resource('my-jobs', \App\Http\Controllers\Panel\MyJobController::class);
+
     // Loja de Pontos (Usuário)
     Route::get('/resgate', [\App\Http\Controllers\RedemptionItemController::class, 'index'])->name('redemptions.shop');
+    Route::get('/resgate/historico', [\App\Http\Controllers\RedemptionItemController::class, 'history'])->name('redemptions.history');
     Route::post('/resgate/{item}', [\App\Http\Controllers\RedemptionItemController::class, 'redeem'])->name('redemptions.redeem');
 
     // Wishlist

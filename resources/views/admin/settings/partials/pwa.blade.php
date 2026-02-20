@@ -4,13 +4,42 @@
         instalar o site direto da barra de endereço ou menu do navegador.
     </div>
 
-    <div class="form-group">
-        <div class="custom-control custom-switch custom-switch-lg">
-            <input type="checkbox" class="custom-control-input" id="pwa_enabled" name="pwa_enabled" value="1" {{ ($settings['pwa_enabled'] ?? 0) ? 'checked' : '' }}>
-            <label class="custom-control-label font-weight-bold" for="pwa_enabled">Ativar Progressive Web App
-                (PWA)</label>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <div class="custom-control custom-switch custom-switch-lg">
+                    <input type="checkbox" class="custom-control-input" id="pwa_enabled" name="pwa_enabled" value="1" {{ ($settings['pwa_enabled'] ?? 0) ? 'checked' : '' }}>
+                    <label class="custom-control-label font-weight-bold" for="pwa_enabled">Ativar Progressive Web App
+                        (PWA)</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <div class="custom-control custom-switch custom-switch-lg">
+                    <input type="checkbox" class="custom-control-input" id="pwa_prompt_enabled"
+                        name="pwa_prompt_enabled" value="1" {{ ($settings['pwa_prompt_enabled'] ?? 1) ? 'checked' : '' }}>
+                    <label class="custom-control-label font-weight-bold" for="pwa_prompt_enabled">Permitir Banner de
+                        Instalação</label>
+                </div>
+                <small class="form-text text-muted">Exibe um modal convidando o usuário a instalar o App.</small>
+            </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Dias para Reexibição (Snooze)</label>
+                <input type="number" name="pwa_prompt_snooze_days" class="form-control"
+                    value="{{ $settings['pwa_prompt_snooze_days'] ?? 7 }}" min="0">
+                <small class="form-text text-muted">Apos clicar em "Mais tarde", quanto tempo esperar para mostrar
+                    novamente.</small>
+            </div>
+        </div>
+    </div>
+
+    <hr>
 
     <div class="row">
         <div class="col-md-6">

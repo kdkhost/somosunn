@@ -241,7 +241,7 @@ class SettingController extends Controller
 
         // Mapeamento de booleanos por grupo para garantir que desativar (unchecked) funcione
         $groupBools = [
-            'pwa' => ['pwa_enabled'],
+            'pwa' => ['pwa_enabled', 'pwa_prompt_enabled'],
             'appearance' => ['preloader_enabled'],
             'player' => [
                 'video_player_enabled',

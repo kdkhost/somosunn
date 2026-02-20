@@ -25,6 +25,7 @@
                 ['label' => 'Eventos', 'href' => route('events.index'), 'setting_key' => 'feature_events'],
                 ['label' => 'Marketplace', 'href' => route('marketplace.index')],
                 ['label' => 'Membros', 'href' => route('membros')],
+                ['label' => 'Vagas Abertas', 'href' => route('jobs.public.index')],
             ],
         ],
         ['label' => 'Premium', 'href' => route('premium'), 'setting_key' => 'feature_premium'],
@@ -94,20 +95,20 @@
                 @auth
                     <!-- Notification Hub (Bell) -->
                     <div class="relative" x-data="{
-                                                                    open: false,
-                                                                    total: 0,
-                                                                    items: [],
-                                                                    loading: true,
-                                                                     async fetchNotifications() {
-                                                                         try {
-                                                                             const r = await fetch('{{ route('notifications.hub') }}');
-                                                                             if (!r.ok) return;
-                                                                             const data = await r.json();
-                                                                             this.total = data.total || 0;
-                                                                             this.items = (data.items || []).filter(i => i.count > 0);
-                                                                         } catch(e) { console.error('Notification hub failed:', e) } finally { this.loading = false }
-                                                                     }
-                                                                  }"
+                                                                        open: false,
+                                                                        total: 0,
+                                                                        items: [],
+                                                                        loading: true,
+                                                                         async fetchNotifications() {
+                                                                             try {
+                                                                                 const r = await fetch('{{ route('notifications.hub') }}');
+                                                                                 if (!r.ok) return;
+                                                                                 const data = await r.json();
+                                                                                 this.total = data.total || 0;
+                                                                                 this.items = (data.items || []).filter(i => i.count > 0);
+                                                                             } catch(e) { console.error('Notification hub failed:', e) } finally { this.loading = false }
+                                                                         }
+                                                                      }"
                         x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
 
                         <button @click="open = !open; fetchNotifications()"

@@ -80,6 +80,13 @@
             Vagas
         </a>
 
+        @if($user->canAccessFeature('vagas_create') || $isImpersonatingAdmin)
+            <a href="{{ route('panel.my-jobs.index') }}" class="{{ $navItemClass(request()->routeIs('panel.my-jobs.*')) }}">
+                <i class="fas fa-plus-circle w-5 opacity-80"></i>
+                Minhas Vagas
+            </a>
+        @endif
+
         <a href="{{ route('panel.redemptions.shop') }}"
             class="{{ $navItemClass(request()->routeIs('panel.redemptions.*')) }}">
             <i class="fas fa-gift w-5 opacity-80"></i>
