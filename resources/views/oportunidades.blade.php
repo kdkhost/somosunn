@@ -3,9 +3,23 @@
 @section('content')
 <div class="py-20 bg-slate-50">
     <div class="container mx-auto px-4">
+        <!-- Banner Premium -->
+        <div class="max-w-7xl mx-auto mb-12">
+            <div class="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-between px-8 py-10 md:py-16 gap-8 animate-fade-in">
+                <div class="flex-1 text-white">
+                    <h1 class="text-5xl font-black mb-4 drop-shadow-lg">Oportunidades de Carreira</h1>
+                    <p class="text-2xl mb-6 font-medium">Conecte-se com empresas parceiras e impulsione sua carreira na comunidade <span class="font-bold">SOMOS UNN</span>.</p>
+                    <a href="/cadastro-curriculo" class="inline-block bg-white text-blue-700 font-bold px-8 py-4 rounded-2xl shadow-lg hover:bg-blue-50 transition text-xl mt-2 animate-bounce">Cadastre seu currículo</a>
+                </div>
+                <div class="hidden md:block">
+                    <img src="/img/banner-career.svg" alt="Banner Oportunidades" class="w-80 h-auto animate-float" />
+                </div>
+            </div>
+        </div>
+        <!-- Fim Banner Premium -->
         <div class="max-w-4xl mx-auto text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-6">Oportunidades de Carreira</h1>
-            <p class="text-xl text-slate-600">Confira as vagas abertas em nossa rede de empresas parceiras e na comunidade <span class="font-semibold text-primary">SOMOS UNN</span>.</p>
+            <h2 class="text-3xl font-bold text-slate-900 mb-4">Vagas abertas</h2>
+            <p class="text-xl text-slate-600">Confira as vagas disponíveis e filtre por área, local ou empresa.</p>
         </div>
 
         <form method="GET" action="" class="mb-8 bg-white rounded-2xl shadow p-6 flex flex-wrap gap-4 justify-center border border-slate-100">
