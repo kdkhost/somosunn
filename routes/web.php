@@ -410,6 +410,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
                 Route::put('attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'renameAttachment'])->name('attachments.rename');
                 Route::delete('attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'deleteAttachment'])->name('attachments.destroy');
             });
+
+            // Preview de Certificado
+            Route::post('certificate/preview', [\App\Http\Controllers\Panel\Admin\CourseController::class, 'certificatePreview'])->name('certificate.preview');
         });
     });
 

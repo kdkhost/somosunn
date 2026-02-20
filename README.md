@@ -188,6 +188,8 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Conformidade SweetAlert2:**
   - Remoção definitiva de alertas `alert()` nativos nas configurações de Gateways.
   - Implementação de diálogos elegantes de sucesso/erro via **SweetAlert2** para uma experiência premium.
+- **Correção de Erros:**
+  - Solucionado Erro 500 no formulário de cursos ao acessar o preview de certificado (Rota faltante implementada).
 - **Refatoração de Controllers:**
   - Simplificação do `SettingController` delegando a resolução de URLs para o Model, aumentando a manutenibilidade.
 

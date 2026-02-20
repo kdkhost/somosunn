@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
@@ -288,5 +289,52 @@ class CourseController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Preview certificate with current form data (without saving).
+     */
+    public function certificatePreview(Request $request, Course $course)
+    {
+        $this->ensurePermission('courses.view');
+        $this->ensureCanManage($course);
+
+        // We use the same validation but relaxed for preview
+        $request->validate([
+            'certificate_settings' => 'nullable|json',
+            'author_name' => 'nullable|string|max:255',
+        ]);
+
+        // Temporarily override course data for rendering
+        if ($request->filled('certificate_settings')) {
+            $course->certificate_settings = $request->input('certificate_settings');
+        }
+        if ($request->filled('author_name')) {
+            $course->author_name = $request->input('author_name');
+        }
+
+        $user = Auth::user();
+        $type = 'course';
+        $certHash = 'PREVIEW-' . strtoupper(Str::random(8));
+        $workload = $course->total_hours ?? 0;
+
+        $settings = $course->certificate_settings;
+        if (is_string($settings)) {
+            $settings = json_decode($settings, true) ?: [];
+        }
+
+        $fontCss = app(\App\Services\Certificate\CertificateFontCssGenerator::class)
+            ->buildFontCss($settings ?: [], true);
+
+        return view('admin.certificates.template', [
+            'user' => $user,
+            'course' => $course,
+            'certHash' => $certHash,
+            'authorName' => $course->author_name ?: 'Instrutor',
+            'workload' => $workload,
+            'type' => $type,
+            'fontCss' => $fontCss,
+            'isPreview' => true
+        ]);
     }
 }
