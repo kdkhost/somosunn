@@ -1,4 +1,4 @@
-@extends('site.layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Mural de Vagas Abertas')
 

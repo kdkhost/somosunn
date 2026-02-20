@@ -1,4 +1,4 @@
-@extends('site.layouts.app')
+@extends('layouts.app')
 
 @section('title', $job->title)
 
@@ -30,7 +30,8 @@
                                 </span>
                                 <h1 class="text-3xl md:text-5xl font-black text-slate-900 mb-2">{{ $job->title }}</h1>
                                 <p class="text-xl text-blue-600 font-bold">
-                                    {{ $job->company_name ?? 'Empresa Confidencial' }}</p>
+                                    {{ $job->company_name ?? 'Empresa Confidencial' }}
+                                </p>
                             </div>
 
                             @if(Auth::check())
