@@ -71,7 +71,7 @@
                     <p class="text-slate-600 mb-8 line-clamp-3">
                         {{ $vaga->short_description ?? Str::limit(strip_tags($vaga->description), 150) }}
                     </p>
-                    <a href="{{ url('/vagas/' . $vaga->id) }}"
+                    <a href="{{ route('jobs.public.show', $vaga->id) }}"
                         class="mt-auto w-full py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-bold text-center transition-all">
                         Ver Detalhes da Vaga
                     </a>
