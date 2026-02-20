@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="bg-white min-h-screen py-12">
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-4xl font-bold text-center text-blue-800 mb-4">Oportunidades de Carreira</h1>
-        <p class="text-center text-lg text-gray-800 mb-8">Confira as vagas abertas em nossa rede de empresas parceiras e na comunidade SOMOS UNN.</p>
+<div class="min-h-screen py-12 bg-gradient-to-br from-blue-50 via-white to-blue-100">
+    <div class="max-w-4xl mx-auto bg-white/90 rounded-2xl shadow-xl p-8">
+        <h1 class="text-5xl font-extrabold text-center text-blue-900 mb-4 tracking-tight drop-shadow-lg">Oportunidades de Carreira</h1>
+        <p class="text-center text-xl text-gray-700 mb-10">Confira as vagas abertas em nossa rede de empresas parceiras e na comunidade <span class="font-semibold text-blue-700">SOMOS UNN</span>.</p>
 
-        <form method="GET" action="" class="mb-8 bg-white rounded-lg shadow p-6 flex flex-wrap gap-4 justify-center">
+        <form method="GET" action="" class="mb-10 bg-blue-50 rounded-xl shadow-md p-6 flex flex-wrap gap-4 justify-center border border-blue-100 animate-fade-in">
             <div>
                 <label for="area" class="block text-sm font-medium text-gray-700">Área</label>
                 <input type="text" name="area" id="area" value="{{ request('area') }}" class="mt-1 block w-40 rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -31,17 +31,17 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     @forelse($vagas as $vaga)
-                        <div class="bg-gray-100 shadow-lg rounded-lg p-6 border border-gray-300">
-                            <div class="flex items-center mb-2">
-                                <h2 class="text-2xl font-semibold text-blue-800 mr-2">{{ $vaga->title ?? 'Título da vaga' }}</h2>
+                        <div class="bg-white shadow-xl rounded-2xl p-8 border border-blue-100 transition-transform hover:-translate-y-1 hover:shadow-2xl duration-200">
+                            <div class="flex items-center mb-4">
+                                <h2 class="text-3xl font-bold text-blue-800 mr-2">{{ $vaga->title ?? 'Título da vaga' }}</h2>
                                 @if(isset($vaga->partner) && $vaga->partner)
-                                    <span class="bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full">Empresa Parceira</span>
+                                    <span class="bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full shadow-sm animate-pulse">Empresa Parceira</span>
                                 @endif
                             </div>
-                            <p class="text-gray-800 mb-2">Empresa: {{ $vaga->company_name ?? 'Empresa' }}</p>
-                            <p class="text-gray-800 mb-2">Local: {{ $vaga->location ?? 'Local' }}</p>
-                            <p class="text-gray-800 mb-4">Salário: {{ $vaga->salary_range ?? 'A combinar' }}</p>
-                            <ul class="list-disc ml-5 text-gray-900 mb-4">
+                            <p class="text-gray-700 mb-2 text-lg">Empresa: <span class="font-semibold">{{ $vaga->company_name ?? 'Empresa' }}</span></p>
+                            <p class="text-gray-700 mb-2 text-lg">Local: <span class="font-semibold">{{ $vaga->location ?? 'Local' }}</span></p>
+                            <p class="text-gray-700 mb-4 text-lg">Salário: <span class="font-semibold text-green-700">{{ $vaga->salary_range ?? 'A combinar' }}</span></p>
+                            <ul class="list-disc ml-5 text-gray-900 mb-6">
                                 @if(!empty($vaga->requirements))
                                     @foreach(explode("\n", $vaga->requirements) as $req)
                                         <li>{{ trim($req) }}</li>
@@ -50,18 +50,26 @@
                                     <li>Requisitos não informados</li>
                                 @endif
                             </ul>
-                            <div class="flex gap-2 mt-2">
-                                <a href="{{ route('jobs.show', $vaga->id) }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition" aria-label="Ver detalhes da vaga {{ $vaga->title }}">Ver detalhes</a>
+                            <div class="flex gap-2 mt-4">
+                                <a href="{{ route('jobs.show', $vaga->id) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-sm" aria-label="Ver detalhes da vaga {{ $vaga->title }}">Ver detalhes</a>
                                 <form method="POST" action="{{ route('jobs.apply', $vaga->id) }}">
                                     @csrf
-                                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition" aria-label="Candidatar-se rapidamente à vaga {{ $vaga->title }}">Candidatura rápida</button>
+                                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition shadow-sm" aria-label="Candidatar-se rapidamente à vaga {{ $vaga->title }}">Candidatura rápida</button>
                                 </form>
                             </div>
                         </div>
                     @empty
-                        <div class="col-span-2 text-center text-gray-500 py-12">
-                            <i class="fas fa-briefcase text-4xl mb-4"></i>
-                            <p>Nenhuma vaga aberta no momento. Volte em breve!</p>
+                        <div class="col-span-2 flex flex-col items-center justify-center py-16 bg-gradient-to-b from-blue-50 to-white rounded-lg shadow-md">
+                            <div class="mb-6">
+                                <svg width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg" class="animate-bounce">
+                                    <rect x="16" y="24" width="32" height="24" rx="6" fill="#2563eb"/>
+                                    <rect x="24" y="32" width="16" height="8" rx="2" fill="#fff"/>
+                                    <circle cx="32" cy="20" r="6" fill="#2563eb"/>
+                                </svg>
+                            </div>
+                            <h2 class="text-2xl font-bold text-blue-900 mb-2">Nenhuma vaga disponível</h2>
+                            <p class="text-lg text-gray-600 mb-4">No momento não há oportunidades abertas.<br>Fique atento, novas vagas serão publicadas em breve!</p>
+                            <span class="text-sm text-gray-400">Acompanhe a comunidade para novidades.</span>
                         </div>
                     @endforelse
         </div>
