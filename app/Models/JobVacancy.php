@@ -15,6 +15,7 @@ class JobVacancy extends Model
         'company_name',
         'location',
         'type',
+        'level',
         'short_description',
         'description',
         'requirements',

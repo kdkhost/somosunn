@@ -243,7 +243,8 @@
                                             <p
                                                 class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-tight mb-1">
                                                 Nível</p>
-                                            <p class="font-extrabold text-slate-900 leading-tight">Não Informado</p>
+                                            <p class="font-extrabold text-slate-900 leading-tight">
+                                                {{ $job->level ?? 'Não Informado' }}</p>
                                         </div>
                                     </div>
                                 </div>

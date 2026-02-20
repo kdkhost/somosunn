@@ -22,14 +22,14 @@
 
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="title">Título da Vaga <span class="text-danger">*</span></label>
                                     <input type="text" name="title" id="title" class="form-control"
                                         value="{{ old('title', $vacancy->title) }}" required>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="type">Tipo de Contrato <span class="text-danger">*</span></label>
                                     <select name="type" id="type" class="form-control custom-select">
@@ -38,6 +38,22 @@
                                         <option value="Freelance" @selected(old('type', $vacancy->type) == 'Freelance')>
                                             Freelance</option>
                                         <option value="Estágio" @selected(old('type', $vacancy->type) == 'Estágio')>Estágio
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="level">Nível <span class="text-danger">*</span></label>
+                                    <select name="level" id="level" class="form-control custom-select">
+                                        <option value="Junior" @selected(old('level', $vacancy->level) == 'Junior')>Junior
+                                        </option>
+                                        <option value="Pleno" @selected(old('level', $vacancy->level) == 'Pleno')>Pleno
+                                        </option>
+                                        <option value="Sênior" @selected(old('level', $vacancy->level) == 'Sênior')>Sênior
+                                        </option>
+                                        <option value="Especialista" @selected(old('level', $vacancy->level) == 'Especialista')>Especialista</option>
+                                        <option value="Estágio" @selected(old('level', $vacancy->level) == 'Estágio')>Estágio
                                         </option>
                                     </select>
                                 </div>

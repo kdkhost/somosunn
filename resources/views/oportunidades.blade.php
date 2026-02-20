@@ -237,7 +237,7 @@
                                         <div class="flex flex-col gap-2">
                                             <span
                                                 class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100 self-start">
-                                                {{ $vaga->type ?? 'Integral' }}
+                                                {{ $vaga->type ?? 'Integral' }} • {{ $vaga->level ?? 'Pleno' }}
                                             </span>
                                             @if($vaga->is_demo)
                                                 <span

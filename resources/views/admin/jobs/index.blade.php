@@ -29,34 +29,58 @@
                     @forelse($vacancies as $vacancy)
                         <tr>
                             <td>
-                                <a>{{ $vacancy->title }}</a>
-                                <br />
-                                <small>Publicado em {{ $vacancy->created_at->format('d/m/Y') }}</small>
+                                <div class="d-flex align-items-center">
+                                    @if($vacancy->image)
+                                        <img src="{{ asset($vacancy->image) }}" class="img-circle img-size-32 mr-2"
+                                            style="object-fit: contain; background: #f8f9fa; border: 1px solid #dee2e6;">
+                                    @else
+                                        <div class="img-circle img-size-32 mr-2 bg-light d-flex align-items-center justify-center text-muted"
+                                            style="border: 1px solid #dee2e6;">
+                                            <i class="fas fa-briefcase"></i>
+                                        </div>
+                                    @endif
+                                    <div>
+                                        <a href="{{ route('jobs.public.show', $vacancy->id) }}" target="_blank"
+                                            class="font-weight-bold">{{ $vacancy->title }}</a>
+                                        <br />
+                                        <small class="text-muted">Publicado em
+                                            {{ $vacancy->created_at->format('d/m/Y') }}</small>
+                                    </div>
+                                </div>
                             </td>
-                            <td>{{ $vacancy->company_name ?: 'Confidencial' }}</td>
-                            <td>{{ $vacancy->type }}</td>
                             <td>
-                                <span class="badge badge-info">{{ $vacancy->applications_count }} inscritos</span>
+                                {{ $vacancy->company_name ?: 'Confidencial' }}
+                                @if($vacancy->is_demo)
+                                    <br><span class="badge badge-warning" style="font-size: 10px;"><i
+                                            class="fas fa-flask mr-1"></i>DEMO</span>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="badge badge-light border">{{ $vacancy->level ?? 'N/A' }}</span>
+                                <br><small class="text-muted">{{ $vacancy->type }}</small>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-info">{{ $vacancy->applications_count }}</span>
                             </td>
                             <td class="project-state text-center">
                                 @if($vacancy->is_active)
-                                    <span class="badge badge-success">Ativa</span>
+                                    <span class="badge badge-success px-2">Ativa</span>
                                 @else
-                                    <span class="badge badge-secondary">Inativa</span>
+                                    <span class="badge badge-secondary px-2">Inativa</span>
                                 @endif
                                 @if($vacancy->expires_at && $vacancy->expires_at->isPast())
-                                    <span class="badge badge-danger">Expirada</span>
+                                    <br><span class="badge badge-danger px-2 mt-1">Expirada</span>
                                 @endif
                             </td>
                             <td class="project-actions text-right">
-                                <a class="btn btn-info btn-sm" href="{{ route('admin.jobs.edit', $vacancy) }}">
-                                    <i class="fas fa-pencil-alt"></i> Editar
+                                <a class="btn btn-info btn-sm" href="{{ route('admin.jobs.edit', $vacancy) }}" title="Editar">
+                                    <i class="fas fa-pencil-alt"></i>
                                 </a>
                                 <form action="{{ route('admin.jobs.destroy', $vacancy) }}" method="POST"
                                     style="display:inline-block">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm btn-delete" title="Excluir">
-                                        <i class="fas fa-trash"></i> Excluir
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
                             </td>
