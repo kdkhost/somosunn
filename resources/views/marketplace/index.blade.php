@@ -269,121 +269,126 @@
                         <div class="relative" data-marketplace-hero data-animation="{{ $marketplaceHeroAnimation }}"
                             data-autoplay="{{ $marketplaceHeroAutoplay ? 1 : 0 }}" data-interval="{{ $marketplaceHeroIntervalMs }}">
                             @if($marketplaceHeroAnimation === 'fade')
-                                <div class="relative min-h-[550px] md:min-h-[550px]">
+                                {{-- FADE MODE --}}
+                                <div class="relative" style="min-height: 480px;">
                                     @foreach($marketplaceHeroSlides as $idx => $slide)
                                         <div class="mp-hero-slide absolute inset-0 transition-opacity duration-700 ease-out {{ $idx === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }}"
-                                            aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
-                                            <div class="relative h-full w-full overflow-hidden">
-                                                @if(($slide['image'] ?? '') !== '' || ($slide['image_mobile'] ?? '') !== '')
-                                                    <div class="absolute inset-0 liquid-bg-animate">
-                                                        {{-- Environment Layer (Deep Blur) --}}
-                                                        <div class="absolute inset-0 bg-cover bg-center blur-[100px] opacity-40 scale-150" 
-                                                             style="background-image: url('{{ $slide['image'] }}')"></div>
-                                                        
-                                                        <div class="relative w-full h-full flex items-center justify-center p-6 md:p-12">
-                                                            <picture class="relative z-10 w-full h-full max-h-[70%] md:max-h-[85%] flex items-center justify-center float-animate">
-                                                                @if(($slide['image_mobile'] ?? '') !== '')
-                                                                    <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
-                                                                @endif
-                                                                <img src="{{ $slide['image'] }}" alt=""
-                                                                    class="max-w-full max-h-full object-contain filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                                                            </picture>
+                                            aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}"
+                                            style="min-height: 480px;">
+
+                                            {{-- Layer 0: Fundo liquid gradient --}}
+                                            @if(($slide['image'] ?? '') !== '')
+                                                <div class="absolute inset-0 liquid-bg-animate" style="z-index:0;">
+                                                    <div class="absolute inset-0" style="background-image: url('{{ $slide['image'] }}'); background-size:cover; background-position:center; filter:blur(80px); opacity:0.4; transform:scale(1.2);"></div>
+                                                </div>
+                                            @else
+                                                <div class="absolute inset-0" style="z-index:0; background: radial-gradient(900px circle at 20% 10%, rgba(31,94,219,0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23,127,214,0.16) 0%, transparent 55%);"></div>
+                                            @endif
+
+                                            {{-- Layer 1: Imagem central flutuante --}}
+                                            @if(($slide['image'] ?? '') !== '')
+                                                <div class="absolute inset-0 flex items-center justify-center p-8 md:p-16" style="z-index:1;">
+                                                    <picture class="float-animate flex items-center justify-center" style="max-height:85%; max-width:100%;">
+                                                        @if(($slide['image_mobile'] ?? '') !== '')
+                                                            <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
+                                                        @endif
+                                                        <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? '' }}"
+                                                            style="max-width:100%; max-height:380px; object-fit:contain; filter:drop-shadow(0 20px 50px rgba(0,0,0,0.55));">
+                                                    </picture>
+                                                </div>
+                                            @endif
+
+                                            {{-- Layer 2: Overlay escuro sutil --}}
+                                            <div class="absolute inset-0" style="z-index:2; background: rgba(15,23,42,0.1); pointer-events:none;"></div>
+
+                                            {{-- Layer 3: Glass Card de conteúdo --}}
+                                            <div class="absolute inset-0 flex items-center justify-center md:justify-start p-6 md:p-12" style="z-index:3;">
+                                                <div class="glass-card hero-content-card p-6 md:p-10 max-w-xl w-full text-center md:text-left"
+                                                     style="opacity:0; transform:translateY(20px); transition: opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s;">
+                                                    <div class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[10px] font-black text-white uppercase tracking-widest mb-4"
+                                                        style="background: linear-gradient(135deg, #3b82f6, #6366f1); border: 1px solid rgba(255,255,255,0.2);">
+                                                        <i class="fas fa-bolt text-amber-300"></i> Especial pra você
+                                                    </div>
+                                                    @if(($slide['title'] ?? '') !== '')
+                                                        <div class="text-3xl md:text-5xl font-black text-white leading-tight mb-4">
+                                                            {{ $slide['title'] }}
                                                         </div>
+                                                    @endif
+                                                    @if(($slide['subtitle'] ?? '') !== '')
+                                                        <div class="text-slate-200 text-sm md:text-base opacity-90 mb-8">
+                                                            {{ $slide['subtitle'] }}
+                                                        </div>
+                                                    @endif
+                                                    @if(($slide['button_text'] ?? '') !== '' && ($slide['button_url'] ?? '') !== '')
+                                                        <a href="{{ $slide['button_url'] }}"
+                                                            class="inline-flex items-center justify-center gap-3 bg-white text-blue-700 hover:bg-blue-50 px-8 py-3.5 rounded-xl font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group">
+                                                            {{ $slide['button_text'] }}
+                                                            <i class="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                {{-- SLIDE MODE --}}
+                                <div class="relative overflow-hidden" style="min-height: 480px;">
+                                    <div class="mp-hero-track flex transition-transform duration-700 ease-out will-change-transform" style="height: 480px;">
+                                        @foreach($marketplaceHeroSlides as $idx => $slide)
+                                            <div class="mp-hero-slide relative shrink-0" aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}"
+                                                 style="width:100%; height:480px;">
+
+                                                {{-- Layer 0: Fundo liquid gradient --}}
+                                                @if(($slide['image'] ?? '') !== '')
+                                                    <div class="absolute inset-0 liquid-bg-animate" style="z-index:0;">
+                                                        <div class="absolute inset-0" style="background-image: url('{{ $slide['image'] }}'); background-size:cover; background-position:center; filter:blur(80px); opacity:0.4; transform:scale(1.2);"></div>
                                                     </div>
                                                 @else
-                                                    <div class="absolute inset-0 opacity-60 pointer-events-none"
-                                                        style="background: radial-gradient(900px circle at 20% 10%, rgba(31, 94, 219, 0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23, 127, 214, 0.16) 0%, transparent 55%);">
+                                                    <div class="absolute inset-0" style="z-index:0; background: radial-gradient(900px circle at 20% 10%, rgba(31,94,219,0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23,127,214,0.16) 0%, transparent 55%);"></div>
+                                                @endif
+
+                                                {{-- Layer 1: Imagem central flutuante --}}
+                                                @if(($slide['image'] ?? '') !== '')
+                                                    <div class="absolute inset-0 flex items-center justify-center p-8 md:p-16" style="z-index:1;">
+                                                        <picture class="float-animate flex items-center justify-center" style="max-height:85%; max-width:100%;">
+                                                            @if(($slide['image_mobile'] ?? '') !== '')
+                                                                <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
+                                                            @endif
+                                                            <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? '' }}"
+                                                                style="max-width:100%; max-height:380px; object-fit:contain; filter:drop-shadow(0 20px 50px rgba(0,0,0,0.55));">
+                                                        </picture>
                                                     </div>
                                                 @endif
 
-                                                <div class="absolute inset-0 bg-slate-900/10 pointer-events-none"></div>
+                                                {{-- Layer 2: Overlay escuro sutil --}}
+                                                <div class="absolute inset-0" style="z-index:2; background: rgba(15,23,42,0.1); pointer-events:none;"></div>
 
-                                                <div class="absolute inset-0 p-6 md:p-12 flex items-center justify-center md:justify-start">
-                                                    <div class="glass-card p-6 md:p-10 max-w-xl text-center md:text-left translate-y-8 md:translate-y-0 opacity-0 transition-all duration-700 delay-300 hero-content-card">
+                                                {{-- Layer 3: Glass Card de conteúdo --}}
+                                                <div class="absolute inset-0 flex items-center justify-center md:justify-start p-6 md:p-12" style="z-index:3;">
+                                                    <div class="glass-card hero-content-card p-6 md:p-10 max-w-xl w-full text-center md:text-left"
+                                                         style="opacity:0; transform:translateY(20px); transition: opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s;">
                                                         <div class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[10px] font-black text-white uppercase tracking-widest mb-4"
                                                             style="background: linear-gradient(135deg, #3b82f6, #6366f1); border: 1px solid rgba(255,255,255,0.2);">
                                                             <i class="fas fa-bolt text-amber-300"></i> Especial pra você
                                                         </div>
-
                                                         @if(($slide['title'] ?? '') !== '')
-                                                            <div class="text-3xl md:text-5xl font-black text-white leading-tight mb-4 text-balance">
+                                                            <div class="text-3xl md:text-5xl font-black text-white leading-tight mb-4">
                                                                 {{ $slide['title'] }}
                                                             </div>
                                                         @endif
-
                                                         @if(($slide['subtitle'] ?? '') !== '')
-                                                            <div class="text-slate-200 text-sm md:text-base opacity-90 mb-8 line-clamp-2 md:line-clamp-none">
+                                                            <div class="text-slate-200 text-sm md:text-base opacity-90 mb-8">
                                                                 {{ $slide['subtitle'] }}
                                                             </div>
                                                         @endif
-
                                                         @if(($slide['button_text'] ?? '') !== '' && ($slide['button_url'] ?? '') !== '')
                                                             <a href="{{ $slide['button_url'] }}"
                                                                 class="inline-flex items-center justify-center gap-3 bg-white text-blue-700 hover:bg-blue-50 px-8 py-3.5 rounded-xl font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group">
                                                                 {{ $slide['button_text'] }}
-                                                                <i class="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i> 
+                                                                <i class="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
                                                             </a>
                                                         @endif
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                @endforeach
-                                </div>
-                            @else
-                                <div class="relative overflow-hidden min-h-[550px] md:min-h-[600px]">
-                                    <div class="mp-hero-track flex transition-transform duration-700 ease-out will-change-transform h-full">
-                                        @foreach($marketplaceHeroSlides as $idx => $slide)
-                                            <div class="mp-hero-slide w-full shrink-0" aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
-                                                <div class="relative h-full w-full overflow-hidden">
-                                                    @if(($slide['image'] ?? '') !== '' || ($slide['image_mobile'] ?? '') !== '')
-                                                        <div class="absolute inset-0 liquid-bg-animate">
-                                                            <div class="absolute inset-0 bg-cover bg-center blur-[100px] opacity-40 scale-150"
-                                                                 style="background-image: url('{{ $slide['image'] }}')"></div>
-                                                            <div class="relative w-full h-full flex items-center justify-center p-6 md:p-12">
-                                                                <picture class="relative z-10 w-full h-full max-h-[70%] md:max-h-[85%] flex items-center justify-center float-animate">
-                                                                    @if(($slide['image_mobile'] ?? '') !== '')
-                                                                        <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
-                                                                    @endif
-                                                                    <img src="{{ $slide['image'] }}" alt=""
-                                                                        class="max-w-full max-h-full object-contain filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                                                                </picture>
-                                                            </div>
-                                                        </div>
-                                                    @else
-                                                        <div class="absolute inset-0 opacity-60 pointer-events-none"
-                                                            style="background: radial-gradient(900px circle at 20% 10%, rgba(31, 94, 219, 0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23, 127, 214, 0.16) 0%, transparent 55%);"></div>
-                                                    @endif
-
-                                                    <div class="absolute inset-0 bg-slate-900/10 pointer-events-none"></div>
-
-                                                    <div class="absolute inset-0 p-6 md:p-12 flex items-center justify-center md:justify-start">
-                                                        <div class="glass-card p-6 md:p-10 max-w-xl text-center md:text-left hero-content-card" style="opacity:0; transform:translateY(20px); transition: opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s;">
-                                                            <div class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[10px] font-black text-white uppercase tracking-widest mb-4"
-                                                                style="background: linear-gradient(135deg, #3b82f6, #6366f1); border: 1px solid rgba(255,255,255,0.2);">
-                                                                <i class="fas fa-bolt text-amber-300"></i> Especial pra você
-                                                            </div>
-
-                                                            @if(($slide['title'] ?? '') !== '')
-                                                                <div class="text-3xl md:text-5xl font-black text-white leading-tight mb-4">
-                                                                    {{ $slide['title'] }}
-                                                                </div>
-                                                            @endif
-
-                                                            @if(($slide['subtitle'] ?? '') !== '')
-                                                                <div class="text-slate-200 text-sm md:text-base opacity-90 mb-8 line-clamp-2 md:line-clamp-none">
-                                                                    {{ $slide['subtitle'] }}
-                                                                </div>
-                                                            @endif
-
-                                                            @if(($slide['button_text'] ?? '') !== '' && ($slide['button_url'] ?? '') !== '')
-                                                                <a href="{{ $slide['button_url'] }}"
-                                                                    class="inline-flex items-center justify-center gap-3 bg-white text-blue-700 hover:bg-blue-50 px-8 py-3.5 rounded-xl font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group">
-                                                                    {{ $slide['button_text'] }}
-                                                                    <i class="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
-                                                                </a>
-                                                            @endif
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
