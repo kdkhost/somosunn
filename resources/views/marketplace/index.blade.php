@@ -285,17 +285,15 @@
                                                 <div class="absolute inset-0" style="z-index:0; background: radial-gradient(900px circle at 20% 10%, rgba(31,94,219,0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23,127,214,0.16) 0%, transparent 55%);"></div>
                                             @endif
 
-                                            {{-- Layer 1: Imagem central flutuante --}}
+                                            {{-- Layer 1: Imagem cobrindo todo o banner --}}
                                             @if(($slide['image'] ?? '') !== '')
-                                                <div class="absolute inset-0 flex items-center justify-center p-8 md:p-16" style="z-index:1;">
-                                                    <picture class="float-animate flex items-center justify-center" style="max-height:85%; max-width:100%;">
-                                                        @if(($slide['image_mobile'] ?? '') !== '')
-                                                            <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
-                                                        @endif
-                                                        <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? '' }}"
-                                                            style="max-width:100%; max-height:380px; object-fit:contain; filter:drop-shadow(0 20px 50px rgba(0,0,0,0.55));">
-                                                    </picture>
-                                                </div>
+                                                <picture class="absolute inset-0" style="z-index:1;">
+                                                    @if(($slide['image_mobile'] ?? '') !== '')
+                                                        <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
+                                                    @endif
+                                                    <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? '' }}"
+                                                        style="width:100%; height:100%; object-fit:cover; display:block;">
+                                                </picture>
                                             @endif
 
                                             {{-- Layer 2: Overlay escuro sutil --}}
@@ -348,17 +346,15 @@
                                                     <div class="absolute inset-0" style="z-index:0; background: radial-gradient(900px circle at 20% 10%, rgba(31,94,219,0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23,127,214,0.16) 0%, transparent 55%);"></div>
                                                 @endif
 
-                                                {{-- Layer 1: Imagem central flutuante --}}
+                                                {{-- Layer 1: Imagem cobrindo todo o banner --}}
                                                 @if(($slide['image'] ?? '') !== '')
-                                                    <div class="absolute inset-0 flex items-center justify-center p-8 md:p-16" style="z-index:1;">
-                                                        <picture class="float-animate flex items-center justify-center" style="max-height:85%; max-width:100%;">
-                                                            @if(($slide['image_mobile'] ?? '') !== '')
-                                                                <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
-                                                            @endif
-                                                            <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? '' }}"
-                                                                style="max-width:100%; max-height:380px; object-fit:contain; filter:drop-shadow(0 20px 50px rgba(0,0,0,0.55));">
-                                                        </picture>
-                                                    </div>
+                                                    <picture class="absolute inset-0" style="z-index:1;">
+                                                        @if(($slide['image_mobile'] ?? '') !== '')
+                                                            <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
+                                                        @endif
+                                                        <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? '' }}"
+                                                            style="width:100%; height:100%; object-fit:cover; display:block;">
+                                                    </picture>
                                                 @endif
 
                                                 {{-- Layer 2: Overlay escuro sutil --}}
