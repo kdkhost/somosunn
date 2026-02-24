@@ -245,6 +245,32 @@
                                 </div>
                             </div>
                         </div>
+
+                        {{-- Customer Health Gadget --}}
+                        <div class="card card-outline card-success mt-3">
+                            <div class="card-header border-0 py-2">
+                                <h3 class="card-title text-sm font-weight-bold text-success"><i
+                                        class="fas fa-heartbeat mr-2"></i>Saúde do Cliente</h3>
+                            </div>
+                            <div class="card-body p-3">
+                                <div class="row align-items-center">
+                                    <div class="col-6">
+                                        <canvas id="customerHealthChart" style="height: 100px; max-height: 100px;"></canvas>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-xs mb-1"><i class="fas fa-circle text-success mr-1"></i> Alta:
+                                            <strong>{{ $customerHealth['Alta'] }}</strong></div>
+                                        <div class="text-xs mb-1"><i class="fas fa-circle text-warning mr-1"></i> Média:
+                                            <strong>{{ $customerHealth['Média'] }}</strong></div>
+                                        <div class="text-xs"><i class="fas fa-circle text-danger mr-1"></i> Baixa:
+                                            <strong>{{ $customerHealth['Baixa'] }}</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer py-2 text-center">
+                                <small class="text-muted">Proporção de engajamento e planos</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -347,8 +373,8 @@
                 fetchMpBalance();
             @endif
 
-                // --- 1. Init FullCalendar ---
-                var calendarEl = document.getElementById('calendar');
+                    // --- 1. Init FullCalendar ---
+                    var calendarEl = document.getElementById('calendar');
             if (calendarEl) {
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
@@ -446,7 +472,31 @@
                         }
                     });
                 }
+
+                // Customer Health Chart
+                const healthCtx = document.getElementById('customerHealthChart');
+                if (healthCtx) {
+                    new Chart(healthCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Alta', 'Média', 'Baixa'],
+                            datasets: [{
+                                data: [{{ $customerHealth['Alta'] }}, {{ $customerHealth['Média'] }}, {{ $customerHealth['Baixa'] }}],
+                                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '70%',
+                            plugins: {
+                                legend: { display: false }
+                            }
+                        }
+                    });
+                }
             @endif
-                });
+                    });
     </script>
 @endpush

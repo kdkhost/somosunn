@@ -250,13 +250,19 @@
                                             aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
                                             <div class="relative h-full w-full overflow-hidden">
                                                 @if(($slide['image'] ?? '') !== '' || ($slide['image_mobile'] ?? '') !== '')
-                                                    <picture>
-                                                        @if(($slide['image_mobile'] ?? '') !== '')
-                                                            <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
-                                                        @endif
-                                                        <img src="{{ $slide['image'] }}" alt=""
-                                                            class="absolute inset-0 w-full h-full object-cover">
-                                                    </picture>
+                                                    <div class="absolute inset-0 bg-slate-900">
+                                                        {{-- Background blur for vertical space/gaps --}}
+                                                        <div class="absolute inset-0 bg-cover bg-center blur-3xl scale-110 opacity-30" 
+                                                             style="background-image: url('{{ $slide['image'] }}')"></div>
+                                                        
+                                                        <picture>
+                                                            @if(($slide['image_mobile'] ?? '') !== '')
+                                                                <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
+                                                            @endif
+                                                            <img src="{{ $slide['image'] }}" alt=""
+                                                                class="relative w-full h-full object-contain z-10 transition-transform duration-1000 group-hover:scale-105">
+                                                        </picture>
+                                                    </div>
                                                 @else
                                                     <div class="absolute inset-0 opacity-60 pointer-events-none"
                                                         style="background: radial-gradient(900px circle at 20% 10%, rgba(31, 94, 219, 0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23, 127, 214, 0.16) 0%, transparent 55%);">
@@ -304,13 +310,19 @@
                                             <div class="mp-hero-slide w-full shrink-0" aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
                                                 <div class="relative h-full w-full overflow-hidden">
                                                     @if(($slide['image'] ?? '') !== '' || ($slide['image_mobile'] ?? '') !== '')
-                                                        <picture>
-                                                            @if(($slide['image_mobile'] ?? '') !== '')
-                                                                <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
-                                                            @endif
-                                                            <img src="{{ $slide['image'] }}" alt=""
-                                                                class="absolute inset-0 w-full h-full object-cover">
-                                                        </picture>
+                                                        <div class="absolute inset-0 bg-slate-900">
+                                                            {{-- Background blur for vertical space/gaps --}}
+                                                            <div class="absolute inset-0 bg-cover bg-center blur-3xl scale-110 opacity-30" 
+                                                                 style="background-image: url('{{ $slide['image'] }}')"></div>
+
+                                                            <picture>
+                                                                @if(($slide['image_mobile'] ?? '') !== '')
+                                                                    <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
+                                                                @endif
+                                                                <img src="{{ $slide['image'] }}" alt=""
+                                                                    class="relative w-full h-full object-contain z-10 transition-transform duration-1000 group-hover:scale-105">
+                                                            </picture>
+                                                        </div>
                                                     @else
                                                         <div class="absolute inset-0 opacity-60 pointer-events-none"
                                                             style="background: radial-gradient(900px circle at 20% 10%, rgba(31, 94, 219, 0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23, 127, 214, 0.16) 0%, transparent 55%);">

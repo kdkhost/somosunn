@@ -35,6 +35,11 @@ class DashboardController extends Controller
         $certificatesByMonth = [];
         $contentDistribution = [];
         $jobsStatus = [];
+        $customerHealth = [
+            'Alta' => 0,
+            'Média' => 0,
+            'Baixa' => 0
+        ];
 
 
         try {
@@ -50,6 +55,21 @@ class DashboardController extends Controller
                 $certificatesCount = \App\Models\Certificate::count();
                 $pendingJobsCount = \DB::table('jobs')->count();
                 $logsCount = \App\Models\ActivityLog::count();
+
+                // Cálculo de Saúde do Cliente
+                $allUsers = \App\Models\User::all();
+                foreach ($allUsers as $u) {
+                    $hasPlan = $u->plan_id && (!$u->plan_expires_at || $u->plan_expires_at->isFuture());
+                    $isComplete = $u->isProfileComplete();
+
+                    if (!$hasPlan) {
+                        $customerHealth['Baixa']++;
+                    } elseif ($isComplete) {
+                        $customerHealth['Alta']++;
+                    } else {
+                        $customerHealth['Média']++;
+                    }
+                }
 
                 // Gráfico: Pedidos por status
                 $rawOrdersByStatus = \App\Models\Order::selectRaw('status, COUNT(*) as total')
@@ -198,6 +218,7 @@ class DashboardController extends Controller
             'certificatesByMonth',
             'contentDistribution',
             'jobsStatus',
+            'customerHealth',
         ));
     }
     public function getMpBalance()
