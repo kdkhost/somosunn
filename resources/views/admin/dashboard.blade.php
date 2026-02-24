@@ -246,29 +246,100 @@
                             </div>
                         </div>
 
-                        {{-- Customer Health Gadget --}}
-                        <div class="card card-outline card-success mt-3">
-                            <div class="card-header border-0 py-2">
-                                <h3 class="card-title text-sm font-weight-bold text-success"><i
-                                        class="fas fa-heartbeat mr-2"></i>Saúde do Cliente</h3>
+
+                        {{-- Business Vitality Index (Customer Health Gadget) --}}
+                        @php
+                            $totalHealth = ($customerHealth['Alta'] + $customerHealth['Média'] + $customerHealth['Baixa']);
+                            $altaPerc = $totalHealth > 0 ? round($customerHealth['Alta'] / $totalHealth * 100) : 0;
+                        @endphp
+                        <div class="mt-3 rounded-2xl overflow-hidden p-4 text-white position-relative"
+                            style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f2d4c 100%); border: 1px solid rgba(255,255,255,0.07);">
+                            {{-- Background orb --}}
+                            <div class="position-absolute"
+                                style="top:-20px; right:-20px; width:120px; height:120px; background: radial-gradient(circle, rgba(16,185,129,0.25), transparent 70%); pointer-events:none;">
                             </div>
-                            <div class="card-body p-3">
-                                <div class="row align-items-center">
-                                    <div class="col-6">
-                                        <canvas id="customerHealthChart" style="height: 100px; max-height: 100px;"></canvas>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <div class="text-xs font-weight-bold"
+                                        style="color: #94a3b8; letter-spacing: 0.08em; text-transform: uppercase;">Business
+                                        Vitality</div>
+                                    <div class="font-weight-black" style="font-size: 1.2rem; color: #fff;">Saúde do Cliente
                                     </div>
-                                    <div class="col-6">
-                                        <div class="text-xs mb-1"><i class="fas fa-circle text-success mr-1"></i> Alta:
-                                            <strong>{{ $customerHealth['Alta'] }}</strong></div>
-                                        <div class="text-xs mb-1"><i class="fas fa-circle text-warning mr-1"></i> Média:
-                                            <strong>{{ $customerHealth['Média'] }}</strong></div>
-                                        <div class="text-xs"><i class="fas fa-circle text-danger mr-1"></i> Baixa:
-                                            <strong>{{ $customerHealth['Baixa'] }}</strong></div>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center rounded-circle"
+                                    style="width:42px; height:42px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3);">
+                                    <i class="fas fa-heartbeat"
+                                        style="color: #10b981; {{ $altaPerc >= 60 ? 'animation: pulse-anim 1.5s ease-in-out infinite;' : '' }}"></i>
+                                </div>
+                            </div>
+
+                            {{-- Score Ring + Bars --}}
+                            <div class="d-flex gap-3 align-items-center">
+                                {{-- Canvas Donut --}}
+                                <div style="flex-shrink:0; width:90px; height:90px; position:relative;">
+                                    <canvas id="customerHealthChart" width="90" height="90"></canvas>
+                                    <div class="position-absolute d-flex flex-column align-items-center justify-content-center text-center"
+                                        style="inset:0;">
+                                        <div class="font-weight-black"
+                                            style="font-size:1.4rem; color:{{ $altaPerc >= 60 ? '#10b981' : ($altaPerc >= 30 ? '#f59e0b' : '#ef4444') }};">
+                                            {{ $altaPerc }}%
+                                        </div>
+                                        <div
+                                            style="font-size:0.55rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em;">
+                                            Engajados</div>
+                                    </div>
+                                </div>
+
+                                {{-- Stats --}}
+                                <div class="flex-fill">
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span style="font-size:0.7rem; color:#94a3b8;"><i class="fas fa-circle mr-1"
+                                                    style="color:#10b981;"></i>Alta</span>
+                                            <span class="font-weight-bold"
+                                                style="font-size:0.7rem; color:#10b981;">{{ $customerHealth['Alta'] }}</span>
+                                        </div>
+                                        <div class="rounded-pill" style="height:4px; background:rgba(255,255,255,0.08);">
+                                            <div class="rounded-pill"
+                                                style="height:4px; width:{{ $altaPerc }}%; background: linear-gradient(90deg, #10b981, #34d399);">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        @php $medPerc = $totalHealth > 0 ? round($customerHealth['Média'] / $totalHealth * 100) : 0; @endphp
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span style="font-size:0.7rem; color:#94a3b8;"><i class="fas fa-circle mr-1"
+                                                    style="color:#f59e0b;"></i>Média</span>
+                                            <span class="font-weight-bold"
+                                                style="font-size:0.7rem; color:#f59e0b;">{{ $customerHealth['Média'] }}</span>
+                                        </div>
+                                        <div class="rounded-pill" style="height:4px; background:rgba(255,255,255,0.08);">
+                                            <div class="rounded-pill"
+                                                style="height:4px; width:{{ $medPerc }}%; background: linear-gradient(90deg, #f59e0b, #fbbf24);">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        @php $lowPerc = $totalHealth > 0 ? round($customerHealth['Baixa'] / $totalHealth * 100) : 0; @endphp
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span style="font-size:0.7rem; color:#94a3b8;"><i class="fas fa-circle mr-1"
+                                                    style="color:#ef4444;"></i>Baixa</span>
+                                            <span class="font-weight-bold"
+                                                style="font-size:0.7rem; color:#ef4444;">{{ $customerHealth['Baixa'] }}</span>
+                                        </div>
+                                        <div class="rounded-pill" style="height:4px; background:rgba(255,255,255,0.08);">
+                                            <div class="rounded-pill"
+                                                style="height:4px; width:{{ $lowPerc }}%; background: linear-gradient(90deg, #ef4444, #f87171);">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-footer py-2 text-center">
-                                <small class="text-muted">Proporção de engajamento e planos</small>
+
+                            <div class="text-center mt-3 pt-2" style="border-top: 1px solid rgba(255,255,255,0.06);">
+                                <small style="color:#475569; font-size:0.65rem;">Atualizado em tempo real baseado em planos e
+                                    perfis</small>
                             </div>
                         </div>
                     </div>
@@ -373,8 +444,8 @@
                 fetchMpBalance();
             @endif
 
-                    // --- 1. Init FullCalendar ---
-                    var calendarEl = document.getElementById('calendar');
+                                // --- 1. Init FullCalendar ---
+                                var calendarEl = document.getElementById('calendar');
             if (calendarEl) {
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
@@ -473,7 +544,7 @@
                     });
                 }
 
-                // Customer Health Chart
+                // Customer Health Chart (Business Vitality Index)
                 const healthCtx = document.getElementById('customerHealthChart');
                 if (healthCtx) {
                     new Chart(healthCtx, {
@@ -482,21 +553,52 @@
                             labels: ['Alta', 'Média', 'Baixa'],
                             datasets: [{
                                 data: [{{ $customerHealth['Alta'] }}, {{ $customerHealth['Média'] }}, {{ $customerHealth['Baixa'] }}],
-                                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
-                                borderWidth: 0
+                                backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                                borderWidth: 2,
+                                borderColor: ['rgba(16,185,129,0.2)', 'rgba(245,158,11,0.2)', 'rgba(239,68,68,0.2)']
                             }]
                         },
                         options: {
-                            responsive: true,
+                            responsive: false,
                             maintainAspectRatio: false,
-                            cutout: '70%',
-                            plugins: {
-                                legend: { display: false }
-                            }
+                            cutout: '72%',
+                            plugins: { legend: { display: false }, tooltip: { enabled: true } }
                         }
                     });
                 }
             @endif
-                    });
+                                });
     </script>
+
+    <style>
+        @keyframes pulse-anim {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        .gap-3 {
+            gap: 0.75rem;
+        }
+
+        .flex-fill {
+            flex: 1 1 auto;
+        }
+
+        .rounded-2xl {
+            border-radius: 1rem !important;
+        }
+
+        .font-weight-black {
+            font-weight: 900 !important;
+        }
+    </style>
 @endpush

@@ -150,13 +150,38 @@
 
 @push('styles')
     <style>
-        .mp-hscroll::-webkit-scrollbar {
-            display: none;
+        .mp-hscroll::-webkit-scrollbar { display: none; }
+        .mp-hscroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Liquid Background Animation */
+        @keyframes liquid-bg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .liquid-bg-animate {
+            background: linear-gradient(-45deg, #0f172a, #1e293b, #1e40af, #0f172a);
+            background-size: 400% 400%;
+            animation: liquid-bg 15s ease infinite;
         }
 
-        .mp-hscroll {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+        }
+
+        /* Float Animation */
+        @keyframes float-img {
+            0% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-10px) scale(1.02); }
+            100% { transform: translateY(0px) scale(1); }
+        }
+        .float-animate {
+            animation: float-img 6s ease-in-out infinite;
         }
     </style>
 @endpush
@@ -250,18 +275,20 @@
                                             aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
                                             <div class="relative h-full w-full overflow-hidden">
                                                 @if(($slide['image'] ?? '') !== '' || ($slide['image_mobile'] ?? '') !== '')
-                                                    <div class="absolute inset-0 bg-slate-900">
-                                                        {{-- Background blur for vertical space/gaps --}}
-                                                        <div class="absolute inset-0 bg-cover bg-center blur-3xl scale-110 opacity-30" 
+                                                    <div class="absolute inset-0 liquid-bg-animate">
+                                                        {{-- Environment Layer (Deep Blur) --}}
+                                                        <div class="absolute inset-0 bg-cover bg-center blur-[100px] opacity-40 scale-150" 
                                                              style="background-image: url('{{ $slide['image'] }}')"></div>
                                                         
-                                                        <picture>
-                                                            @if(($slide['image_mobile'] ?? '') !== '')
-                                                                <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
-                                                            @endif
-                                                            <img src="{{ $slide['image'] }}" alt=""
-                                                                class="relative w-full h-full object-contain z-10 transition-transform duration-1000 group-hover:scale-105">
-                                                        </picture>
+                                                        <div class="relative w-full h-full flex items-center justify-center p-6 md:p-12">
+                                                            <picture class="relative z-10 w-full h-full max-h-[70%] md:max-h-[85%] flex items-center justify-center float-animate">
+                                                                @if(($slide['image_mobile'] ?? '') !== '')
+                                                                    <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
+                                                                @endif
+                                                                <img src="{{ $slide['image'] }}" alt=""
+                                                                    class="max-w-full max-h-full object-contain filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                                                            </picture>
+                                                        </div>
                                                     </div>
                                                 @else
                                                     <div class="absolute inset-0 opacity-60 pointer-events-none"
@@ -269,95 +296,94 @@
                                                     </div>
                                                 @endif
 
-                                                <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-900/90 via-slate-900/40 to-transparent"></div>
+                                                <div class="absolute inset-0 bg-slate-900/10 pointer-events-none"></div>
 
-                                                <div class="relative p-8 md:p-16 h-full flex flex-col justify-center items-center text-center md:items-start md:text-left">
-                                                    <div class="inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-black text-white shadow-lg mb-4"
-                                                        style="background: linear-gradient(135deg, #1e40af, #3b82f6); border: 1px solid rgba(255,255,255,0.1);">
-                                                        <i class="fas fa-bolt text-amber-400"></i> Destaque do Marketplace
-                                                    </div>
-
-                                                    @if(($slide['title'] ?? '') !== '')
-                                                        <div class="mt-4 text-4xl md:text-6xl font-black text-white max-w-3xl leading-tight tracking-tight drop-shadow-md">
-                                                            {{ $slide['title'] }}
+                                                <div class="absolute inset-0 p-6 md:p-12 flex items-center justify-center md:justify-start">
+                                                    <div class="glass-card p-6 md:p-10 max-w-xl text-center md:text-left translate-y-8 md:translate-y-0 opacity-0 transition-all duration-700 delay-300 hero-content-card">
+                                                        <div class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[10px] font-black text-white uppercase tracking-widest mb-4"
+                                                            style="background: linear-gradient(135deg, #3b82f6, #6366f1); border: 1px solid rgba(255,255,255,0.2);">
+                                                            <i class="fas fa-bolt text-amber-300"></i> Especial pra você
                                                         </div>
-                                                    @endif
 
-                                                    @if(($slide['subtitle'] ?? '') !== '')
-                                                        <div class="mt-4 text-slate-100 text-lg md:text-xl max-w-2xl leading-relaxed opacity-90">
-                                                            {{ $slide['subtitle'] }}
-                                                        </div>
-                                                    @endif
+                                                        @if(($slide['title'] ?? '') !== '')
+                                                            <div class="text-3xl md:text-5xl font-black text-white leading-tight mb-4 text-balance">
+                                                                {{ $slide['title'] }}
+                                                            </div>
+                                                        @endif
 
-                                                    @if(($slide['button_text'] ?? '') !== '' && ($slide['button_url'] ?? '') !== '')
-                                                        <div class="mt-8">
+                                                        @if(($slide['subtitle'] ?? '') !== '')
+                                                            <div class="text-slate-200 text-sm md:text-base opacity-90 mb-8 line-clamp-2 md:line-clamp-none">
+                                                                {{ $slide['subtitle'] }}
+                                                            </div>
+                                                        @endif
+
+                                                        @if(($slide['button_text'] ?? '') !== '' && ($slide['button_url'] ?? '') !== '')
                                                             <a href="{{ $slide['button_url'] }}"
-                                                                class="inline-flex items-center justify-center gap-3 bg-white text-slate-900 px-8 py-3.5 rounded-2xl font-black shadow-xl hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 active:scale-95 group">
-                                                                <i class="fas fa-shopping-bag text-blue-600 transition-transform group-hover:rotate-12"></i> 
+                                                                class="inline-flex items-center justify-center gap-3 bg-white text-blue-700 hover:bg-blue-50 px-8 py-3.5 rounded-xl font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group">
                                                                 {{ $slide['button_text'] }}
+                                                                <i class="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i> 
                                                             </a>
-                                                        </div>
-                                                    @endif
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
-                            @else
-                                <div class="relative overflow-hidden min-h-[550px] md:min-h-[550px]">
+                                <div class="relative overflow-hidden min-h-[550px] md:min-h-[600px]">
                                     <div class="mp-hero-track flex transition-transform duration-700 ease-out will-change-transform h-full">
                                         @foreach($marketplaceHeroSlides as $idx => $slide)
                                             <div class="mp-hero-slide w-full shrink-0" aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
                                                 <div class="relative h-full w-full overflow-hidden">
                                                     @if(($slide['image'] ?? '') !== '' || ($slide['image_mobile'] ?? '') !== '')
-                                                        <div class="absolute inset-0 bg-slate-900">
-                                                            {{-- Background blur for vertical space/gaps --}}
-                                                            <div class="absolute inset-0 bg-cover bg-center blur-3xl scale-110 opacity-30" 
+                                                        <div class="absolute inset-0 liquid-bg-animate">
+                                                            <div class="absolute inset-0 bg-cover bg-center blur-[100px] opacity-40 scale-150" 
                                                                  style="background-image: url('{{ $slide['image'] }}')"></div>
-
-                                                            <picture>
+                                                            <div class="relative w-full h-full flex items-center justify-center p-6 md:p-12">
+                                                                <picture class="relative z-10 w-full h-full max-h-[70%] md:max-h-[85%] flex items-center justify-center float-animate">
                                                                 @if(($slide['image_mobile'] ?? '') !== '')
                                                                     <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
                                                                 @endif
                                                                 <img src="{{ $slide['image'] }}" alt=""
                                                                     class="relative w-full h-full object-contain z-10 transition-transform duration-1000 group-hover:scale-105">
                                                             </picture>
+                                                                </picture>
+                                                            </div>
                                                         </div>
                                                     @else
                                                         <div class="absolute inset-0 opacity-60 pointer-events-none"
-                                                            style="background: radial-gradient(900px circle at 20% 10%, rgba(31, 94, 219, 0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23, 127, 214, 0.16) 0%, transparent 55%);">
-                                                        </div>
+                                                            style="background: radial-gradient(900px circle at 20% 10%, rgba(31, 94, 219, 0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23, 127, 214, 0.16) 0%, transparent 55%);"></div>
                                                     @endif
 
-                                                    <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-900/90 via-slate-900/40 to-transparent"></div>
+                                                    <div class="absolute inset-0 bg-slate-900/10 pointer-events-none"></div>
 
-                                                    <div class="relative p-8 md:p-16 h-full flex flex-col justify-center items-center text-center md:items-start md:text-left">
-                                                        <div class="inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-black text-white shadow-lg mb-4"
-                                                            style="background: linear-gradient(135deg, #1e40af, #3b82f6); border: 1px solid rgba(255,255,255,0.1);">
-                                                            <i class="fas fa-bolt text-amber-400"></i> Destaque do Marketplace
-                                                        </div>
-
-                                                        @if(($slide['title'] ?? '') !== '')
-                                                            <div class="mt-4 text-4xl md:text-6xl font-black text-white max-w-3xl leading-tight tracking-tight drop-shadow-md">
-                                                                {{ $slide['title'] }}
+                                                    <div class="absolute inset-0 p-6 md:p-12 flex items-center justify-center md:justify-start">
+                                                        <div class="glass-card p-6 md:p-10 max-w-xl text-center md:text-left translate-y-8 md:translate-y-0 opacity-0 transition-all duration-700 delay-300 hero-content-card">
+                                                            <div class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[10px] font-black text-white uppercase tracking-widest mb-4"
+                                                                style="background: linear-gradient(135deg, #3b82f6, #6366f1); border: 1px solid rgba(255,255,255,0.2);">
+                                                                <i class="fas fa-bolt text-amber-300"></i> Especial pra você
                                                             </div>
-                                                        @endif
 
-                                                        @if(($slide['subtitle'] ?? '') !== '')
-                                                            <div class="mt-4 text-slate-100 text-lg md:text-xl max-w-2xl leading-relaxed opacity-90">
-                                                                {{ $slide['subtitle'] }}
-                                                            </div>
-                                                        @endif
+                                                            @if(($slide['title'] ?? '') !== '')
+                                                                <div class="text-3xl md:text-5xl font-black text-white leading-tight mb-4">
+                                                                    {{ $slide['title'] }}
+                                                                </div>
+                                                            @endif
 
-                                                        @if(($slide['button_text'] ?? '') !== '' && ($slide['button_url'] ?? '') !== '')
-                                                            <div class="mt-8">
+                                                            @if(($slide['subtitle'] ?? '') !== '')
+                                                                <div class="text-slate-200 text-sm md:text-base opacity-90 mb-8 line-clamp-2 md:line-clamp-none">
+                                                                    {{ $slide['subtitle'] }}
+                                                                </div>
+                                                            @endif
+
+                                                            @if(($slide['button_text'] ?? '') !== '' && ($slide['button_url'] ?? '') !== '')
                                                                 <a href="{{ $slide['button_url'] }}"
-                                                                    class="inline-flex items-center justify-center gap-3 bg-white text-slate-900 px-8 py-3.5 rounded-2xl font-black shadow-xl hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 active:scale-95 group">
-                                                                    <i class="fas fa-shopping-bag text-blue-600 transition-transform group-hover:rotate-12"></i> 
+                                                                    class="inline-flex items-center justify-center gap-3 bg-white text-blue-700 hover:bg-blue-50 px-8 py-3.5 rounded-xl font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group">
                                                                     {{ $slide['button_text'] }}
+                                                                    <i class="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
                                                                 </a>
-                                                            </div>
-                                                        @endif
+                                                            @endif
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1257,6 +1283,24 @@
 
                 applyIndex(0);
                 start();
+
+                // Animate content cards on slide change
+                function animateHeroContentCards(container) {
+                    if (!container) return;
+                    const cards = container.querySelectorAll('.hero-content-card');
+                    cards.forEach(card => {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, 300);
+                    });
+                }
+
+                // Initial animation for active slide
+                const firstSlide = hero.querySelector('[data-hero-slide="0"], .mp-hero-slide, [aria-hidden="false"]');
+                if (firstSlide) animateHeroContentCards(firstSlide);
             }
 
             function initMarketplaceExitOffer() {
