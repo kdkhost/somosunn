@@ -40,7 +40,8 @@ class DashboardController extends Controller
             'Média' => 0,
             'Baixa' => 0
         ];
-
+        $myHealth = ['level' => 'Alta', 'color' => '#10b981', 'emoji' => '🟢', 'score' => 100];
+        $myHealthDetails = [];
 
         try {
             if ($isAdmin) {
@@ -141,6 +142,30 @@ class DashboardController extends Controller
                 $coursesCount = $user->courses()->count();
                 $mentorshipsCount = $user->mentorships()->count() ?? 0;
                 $eventsCount = $user->eventRegistrations()->count();
+
+                // Saúde individual do cliente
+                $hasPlan = $user->plan_id && (!$user->plan_expires_at || $user->plan_expires_at->isFuture());
+                $isProfileComplete = $user->isProfileComplete();
+
+                if (!$hasPlan) {
+                    $myHealth = ['level' => 'Baixa', 'color' => '#ef4444', 'emoji' => '🔴', 'score' => 30];
+                } elseif ($isProfileComplete) {
+                    $myHealth = ['level' => 'Alta', 'color' => '#10b981', 'emoji' => '🟢', 'score' => 100];
+                } else {
+                    $myHealth = ['level' => 'Média', 'color' => '#f59e0b', 'emoji' => '🟡', 'score' => 65];
+                }
+
+                // Detalhes do que falta completar
+                $myHealthDetails = [
+                    'plano_ativo' => $hasPlan,
+                    'perfil_completo' => $isProfileComplete,
+                    'telefone' => !blank($user->phone),
+                    'ocupacao' => !blank($user->occupation),
+                    'bio' => !blank($user->bio),
+                    'cidade_estado' => !blank($user->city) && !blank($user->state),
+                    'foto' => !blank($user->photo),
+                    'empresa' => !blank($user->company),
+                ];
             }
 
             // Eventos do Calendário (Unificado)
@@ -219,6 +244,8 @@ class DashboardController extends Controller
             'contentDistribution',
             'jobsStatus',
             'customerHealth',
+            'myHealth',
+            'myHealthDetails',
         ));
     }
     public function getMpBalance()

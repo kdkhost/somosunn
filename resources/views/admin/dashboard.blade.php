@@ -376,6 +376,108 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
+                        {{-- My Vitality Score (Saúde Individual do Cliente) --}}
+                        <div class="rounded-2xl overflow-hidden p-4 text-white position-relative mb-3"
+                             style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f2d4c 100%); border: 1px solid rgba(255,255,255,0.07);">
+                            {{-- BG Orb --}}
+                            <div class="position-absolute"
+                                 style="top:-15px; right:-15px; width:110px; height:110px;
+                                        background: radial-gradient(circle, {{ $myHealth['color'] }}40, transparent 70%);
+                                        pointer-events:none;"></div>
+
+                            {{-- Header --}}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <div style="font-size:0.65rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">
+                                        Minha Reputação
+                                    </div>
+                                    <div style="font-size:1.1rem; color:#fff; font-weight:900;">Vitality Score</div>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center rounded-circle"
+                                     style="width:42px; height:42px;
+                                            background: {{ $myHealth['color'] }}25;
+                                            border: 1px solid {{ $myHealth['color'] }}50;">
+                                    <i class="fas fa-heartbeat"
+                                       style="color: {{ $myHealth['color'] }};
+                                              {{ $myHealth['level'] === 'Alta' ? 'animation: pulse-anim 1.5s ease-in-out infinite;' : '' }}"></i>
+                                </div>
+                            </div>
+
+                            {{-- Score Ring --}}
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div style="flex-shrink:0; position:relative; width:80px; height:80px;">
+                                    <svg viewBox="0 0 36 36" style="width:80px; height:80px; transform:rotate(-90deg);">
+                                        <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3"/>
+                                        <circle cx="18" cy="18" r="15.9" fill="none"
+                                            stroke="{{ $myHealth['color'] }}" stroke-width="3"
+                                            stroke-dasharray="{{ $myHealth['score'] }}, 100"
+                                            stroke-linecap="round"
+                                            style="transition: stroke-dasharray 1s ease;"/>
+                                    </svg>
+                                    <div class="position-absolute d-flex flex-column align-items-center justify-content-center"
+                                         style="inset:0; line-height:1;">
+                                        <span style="font-size:1.2rem; font-weight:900; color:{{ $myHealth['color'] }};">
+                                            {{ $myHealth['score'] }}
+                                        </span>
+                                        <span style="font-size:0.5rem; color:#94a3b8; text-transform:uppercase;">pts</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="font-size:1rem; font-weight:900; color:{{ $myHealth['color'] }};">
+                                        {{ $myHealth['emoji'] }} {{ $myHealth['level'] }}
+                                    </div>
+                                    <div style="font-size:0.7rem; color:#94a3b8; margin-top:2px;">
+                                        @if($myHealth['level'] === 'Alta')
+                                            Perfil completo e plano ativo! 🎉
+                                        @elseif($myHealth['level'] === 'Média')
+                                            Complete seu perfil para subir!
+                                        @else
+                                            Ative um plano para começar.
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Checklist de critérios --}}
+                            @if(!empty($myHealthDetails))
+                            <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top:0.75rem;">
+                                @foreach([
+                                    'plano_ativo'     => ['label' => 'Plano ativo',       'icon' => 'fa-crown'],
+                                    'foto'            => ['label' => 'Foto de perfil',     'icon' => 'fa-user-circle'],
+                                    'bio'             => ['label' => 'Bio preenchida',     'icon' => 'fa-align-left'],
+                                    'telefone'        => ['label' => 'Telefone',           'icon' => 'fa-phone'],
+                                    'ocupacao'        => ['label' => 'Ocupação',           'icon' => 'fa-briefcase'],
+                                    'cidade_estado'   => ['label' => 'Cidade/Estado',      'icon' => 'fa-map-marker-alt'],
+                                    'empresa'         => ['label' => 'Empresa',            'icon' => 'fa-building'],
+                                ] as $key => $item)
+                                    @if(array_key_exists($key, $myHealthDetails))
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <span style="font-size:0.68rem; color:#94a3b8;">
+                                            <i class="fas {{ $item['icon'] }} mr-1" style="width:12px;"></i>
+                                            {{ $item['label'] }}
+                                        </span>
+                                        @if($myHealthDetails[$key])
+                                            <i class="fas fa-check-circle" style="color:#10b981; font-size:0.75rem;"></i>
+                                        @else
+                                            <i class="fas fa-times-circle" style="color:#ef4444; font-size:0.75rem;"></i>
+                                        @endif
+                                    </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                            @endif
+
+                            <a href="{{ route('panel.settings.index') }}"
+                               class="d-block text-center mt-3 py-2 rounded-xl"
+                               style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+                                      color: #94a3b8; font-size:0.7rem; text-decoration:none;
+                                      transition: background 0.2s;"
+                               onmouseover="this.style.background='rgba(255,255,255,0.12)'"
+                               onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                                <i class="fas fa-edit mr-1"></i> Completar meu perfil
+                            </a>
+                        </div>
+
                         <div class="card card-outline card-info shadow-sm">
                             <div class="card-header border-0">
                                 <h3 class="card-title"><i class="fas fa-bullhorn mr-2"></i>Novidades</h3>
@@ -386,6 +488,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         @endif
     </div>

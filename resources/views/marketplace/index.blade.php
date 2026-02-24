@@ -328,8 +328,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    @endforeach
+                                @endforeach
                                 </div>
+                            @else
                                 <div class="relative overflow-hidden min-h-[550px] md:min-h-[600px]">
                                     <div class="mp-hero-track flex transition-transform duration-700 ease-out will-change-transform h-full">
                                         @foreach($marketplaceHeroSlides as $idx => $slide)
@@ -337,16 +338,15 @@
                                                 <div class="relative h-full w-full overflow-hidden">
                                                     @if(($slide['image'] ?? '') !== '' || ($slide['image_mobile'] ?? '') !== '')
                                                         <div class="absolute inset-0 liquid-bg-animate">
-                                                            <div class="absolute inset-0 bg-cover bg-center blur-[100px] opacity-40 scale-150" 
+                                                            <div class="absolute inset-0 bg-cover bg-center blur-[100px] opacity-40 scale-150"
                                                                  style="background-image: url('{{ $slide['image'] }}')"></div>
                                                             <div class="relative w-full h-full flex items-center justify-center p-6 md:p-12">
                                                                 <picture class="relative z-10 w-full h-full max-h-[70%] md:max-h-[85%] flex items-center justify-center float-animate">
-                                                                @if(($slide['image_mobile'] ?? '') !== '')
-                                                                    <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
-                                                                @endif
-                                                                <img src="{{ $slide['image'] }}" alt=""
-                                                                    class="relative w-full h-full object-contain z-10 transition-transform duration-1000 group-hover:scale-105">
-                                                            </picture>
+                                                                    @if(($slide['image_mobile'] ?? '') !== '')
+                                                                        <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
+                                                                    @endif
+                                                                    <img src="{{ $slide['image'] }}" alt=""
+                                                                        class="max-w-full max-h-full object-contain filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
                                                                 </picture>
                                                             </div>
                                                         </div>
@@ -358,7 +358,7 @@
                                                     <div class="absolute inset-0 bg-slate-900/10 pointer-events-none"></div>
 
                                                     <div class="absolute inset-0 p-6 md:p-12 flex items-center justify-center md:justify-start">
-                                                        <div class="glass-card p-6 md:p-10 max-w-xl text-center md:text-left translate-y-8 md:translate-y-0 opacity-0 transition-all duration-700 delay-300 hero-content-card">
+                                                        <div class="glass-card p-6 md:p-10 max-w-xl text-center md:text-left hero-content-card" style="opacity:0; transform:translateY(20px); transition: opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s;">
                                                             <div class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[10px] font-black text-white uppercase tracking-widest mb-4"
                                                                 style="background: linear-gradient(135deg, #3b82f6, #6366f1); border: 1px solid rgba(255,255,255,0.2);">
                                                                 <i class="fas fa-bolt text-amber-300"></i> Especial pra você
@@ -391,6 +391,7 @@
                                     </div>
                                 </div>
                             @endif
+
 
                             @if(count($marketplaceHeroSlides) > 1)
                                 <button type="button" data-hero-prev
