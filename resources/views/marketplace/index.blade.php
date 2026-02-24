@@ -258,10 +258,10 @@
 
                                                 <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/45 to-transparent"></div>
 
-                                                <div class="relative p-6 md:p-10 min-h-[280px] md:min-h-[340px] flex flex-col justify-center">
-                                                    <div class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-black text-white"
-                                                        style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3));">
-                                                        <i class="fas fa-bolt"></i> Destaque do Marketplace
+                                                <div class="relative p-6 md:p-10 min-h-[280px] md:min-h-[340px] flex flex-col justify-center items-start">
+                                                    <div class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black text-white shadow-lg"
+                                                        style="background: linear-gradient(135deg, #1e40af, #3b82f6); border: 1px solid rgba(255,255,255,0.1);">
+                                                        <i class="fas fa-bolt text-amber-400"></i> Destaque do Marketplace
                                                     </div>
 
                                                     @if(($slide['title'] ?? '') !== '')
@@ -277,10 +277,11 @@
                                                     @endif
 
                                                     @if(($slide['button_text'] ?? '') !== '' && ($slide['button_url'] ?? '') !== '')
-                                                        <div class="mt-6">
+                                                        <div class="mt-8">
                                                             <a href="{{ $slide['button_url'] }}"
-                                                                class="btn-primary text-white px-6 py-3 rounded-2xl font-black inline-flex items-center justify-center gap-2 shadow-md">
-                                                                <i class="fas fa-shopping-bag"></i> {{ $slide['button_text'] }}
+                                                                class="inline-flex items-center justify-center gap-3 bg-white text-slate-900 px-8 py-3.5 rounded-2xl font-black shadow-xl hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 active:scale-95 group">
+                                                                <i class="fas fa-shopping-bag text-blue-600 transition-transform group-hover:rotate-12"></i> 
+                                                                {{ $slide['button_text'] }}
                                                             </a>
                                                         </div>
                                                     @endif
@@ -306,10 +307,10 @@
 
                                                     <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/45 to-transparent"></div>
 
-                                                    <div class="relative p-6 md:p-10 min-h-[280px] md:min-h-[340px] flex flex-col justify-center">
-                                                        <div class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-black text-white"
-                                                            style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3));">
-                                                            <i class="fas fa-bolt"></i> Destaque do Marketplace
+                                                    <div class="relative p-6 md:p-10 min-h-[280px] md:min-h-[340px] flex flex-col justify-center items-start">
+                                                        <div class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black text-white shadow-lg"
+                                                            style="background: linear-gradient(135deg, #1e40af, #3b82f6); border: 1px solid rgba(255,255,255,0.1);">
+                                                            <i class="fas fa-bolt text-amber-400"></i> Destaque do Marketplace
                                                         </div>
 
                                                         @if(($slide['title'] ?? '') !== '')
@@ -325,10 +326,11 @@
                                                         @endif
 
                                                         @if(($slide['button_text'] ?? '') !== '' && ($slide['button_url'] ?? '') !== '')
-                                                            <div class="mt-6">
+                                                            <div class="mt-8">
                                                                 <a href="{{ $slide['button_url'] }}"
-                                                                    class="btn-primary text-white px-6 py-3 rounded-2xl font-black inline-flex items-center justify-center gap-2 shadow-md">
-                                                                    <i class="fas fa-shopping-bag"></i> {{ $slide['button_text'] }}
+                                                                    class="inline-flex items-center justify-center gap-3 bg-white text-slate-900 px-8 py-3.5 rounded-2xl font-black shadow-xl hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 active:scale-95 group">
+                                                                    <i class="fas fa-shopping-bag text-blue-600 transition-transform group-hover:rotate-12"></i> 
+                                                                    {{ $slide['button_text'] }}
                                                                 </a>
                                                             </div>
                                                         @endif
@@ -342,12 +344,12 @@
 
                             @if(count($marketplaceHeroSlides) > 1)
                                 <button type="button" data-hero-prev
-                                    class="hidden sm:inline-flex absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full bg-white/90 border border-slate-200 text-slate-700 hover:bg-white shadow">
-                                    <i class="fas fa-chevron-left text-sm"></i>
+                                    class="hidden sm:inline-flex absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/40 shadow-2xl transition-all duration-300">
+                                    <i class="fas fa-chevron-left"></i>
                                 </button>
                                 <button type="button" data-hero-next
-                                    class="hidden sm:inline-flex absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full bg-white/90 border border-slate-200 text-slate-700 hover:bg-white shadow">
-                                    <i class="fas fa-chevron-right text-sm"></i>
+                                    class="hidden sm:inline-flex absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/40 shadow-2xl transition-all duration-300">
+                                    <i class="fas fa-chevron-right"></i>
                                 </button>
 
                                 <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full bg-black/30 px-3 py-2 backdrop-blur">
