@@ -236,17 +236,17 @@
             @endif
         </div>
 
-        <div class="mt-6">
-            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="mt-6 -mx-4 md:mx-0">
+            <div class="bg-white md:rounded-3xl md:border border-slate-100 shadow-sm overflow-hidden">
                     @if($marketplaceHeroEnabled)
                         <div class="relative" data-marketplace-hero data-animation="{{ $marketplaceHeroAnimation }}"
                             data-autoplay="{{ $marketplaceHeroAutoplay ? 1 : 0 }}" data-interval="{{ $marketplaceHeroIntervalMs }}">
                             @if($marketplaceHeroAnimation === 'fade')
                                 <div class="relative min-h-[480px] md:min-h-[550px]">
                                     @foreach($marketplaceHeroSlides as $idx => $slide)
-                                        <div class="mp-hero-slide absolute inset-0 transition-opacity duration-700 ease-out px-4 py-2 md:p-0 {{ $idx === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }}"
+                                        <div class="mp-hero-slide absolute inset-0 transition-opacity duration-700 ease-out {{ $idx === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }}"
                                             aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
-                                            <div class="relative h-full w-full rounded-[2rem] md:rounded-none overflow-hidden shadow-xl md:shadow-none">
+                                            <div class="relative h-full w-full overflow-hidden">
                                                 @if(($slide['image'] ?? '') !== '')
                                                     <img src="{{ $slide['image'] }}" alt=""
                                                         class="absolute inset-0 w-full h-full object-cover">
@@ -294,8 +294,8 @@
                                 <div class="relative overflow-hidden min-h-[480px] md:min-h-[550px]">
                                     <div class="mp-hero-track flex transition-transform duration-700 ease-out will-change-transform h-full">
                                         @foreach($marketplaceHeroSlides as $idx => $slide)
-                                            <div class="mp-hero-slide w-full shrink-0 px-4 py-2 md:p-0" aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
-                                                <div class="relative h-full w-full rounded-[2rem] md:rounded-none overflow-hidden shadow-xl md:shadow-none">
+                                            <div class="mp-hero-slide w-full shrink-0" aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
+                                                <div class="relative h-full w-full overflow-hidden">
                                                     @if(($slide['image'] ?? '') !== '')
                                                         <img src="{{ $slide['image'] }}" alt=""
                                                             class="absolute inset-0 w-full h-full object-cover">
