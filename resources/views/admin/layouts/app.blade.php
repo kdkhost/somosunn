@@ -151,10 +151,17 @@
                 padding-right: 0.75rem;
             }
         }
-    </style>
-    <style>
-        /* Small neutral utilities to restore layout helpers used across admin views
-           These are intentionally minimal and do NOT override AdminLTE theme colors. */
+        /* Failsafe para o preloader - garante que ele desapareça mesmo se o JS falhar */
+        @keyframes preloader-failsafe {
+            from { opacity: 1; pointer-events: auto; }
+            to { opacity: 0; pointer-events: none; visibility: hidden; }
+        }
+        .preloader {
+            animation: preloader-failsafe 0.5s forwards;
+            animation-delay: 5s; /* Desaparece automaticamente após 5s */
+        }
+
+        /* Small neutral utilities to restore layout helpers used across admin views */
         .bg-white {
             background-color: #ffffff !important;
         }
@@ -320,7 +327,11 @@
 
     @if($isSuperAdmin)
         <div class="wrapper">
-            {{-- Preloader removido para diagnostico --}}
+            @if($preloaderEnabled && (!auth()->check() || !auth()->user() || !auth()->user()->isAdmin()))
+                <div class="preloader flex-column justify-content-center align-items-center">
+                    <img class="animation__shake" src="{{ $preloaderImage }}" alt="UNN" height="80" width="80">
+                </div>
+            @endif
 
             @include('admin.partials.navbar')
             @include('admin.partials.sidebar')
@@ -441,9 +452,8 @@
         };
 
         $(function () {
-            // PJAX desativado para diagnostico
-            // const container = '#pjax-container';
-            // $(document).pjax('a[data-pjax="true"]', container, { timeout: 8000 });
+            const container = '#pjax-container';
+            $(document).pjax('a[data-pjax="true"]', container, { timeout: 8000 });
 
             function shouldDisablePjax(href) {
                 if (!href) return false;
