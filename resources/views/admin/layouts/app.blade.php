@@ -320,11 +320,7 @@
 
     @if($isSuperAdmin)
         <div class="wrapper">
-            @if($preloaderEnabled && (!auth()->check() || !auth()->user()->isAdmin()))
-                <div class="preloader flex-column justify-content-center align-items-center">
-                    <img class="animation__shake" src="{{ $preloaderImage }}" alt="UNN" height="80" width="80">
-                </div>
-            @endif
+            {{-- Preloader removido para diagnostico --}}
 
             @include('admin.partials.navbar')
             @include('admin.partials.sidebar')
@@ -445,8 +441,9 @@
         };
 
         $(function () {
-            const container = '#pjax-container';
-            $(document).pjax('a[data-pjax="true"]', container, { timeout: 8000 });
+            // PJAX desativado para diagnostico
+            // const container = '#pjax-container';
+            // $(document).pjax('a[data-pjax="true"]', container, { timeout: 8000 });
 
             function shouldDisablePjax(href) {
                 if (!href) return false;
