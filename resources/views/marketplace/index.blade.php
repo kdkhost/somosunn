@@ -242,11 +242,11 @@
                         <div class="relative" data-marketplace-hero data-animation="{{ $marketplaceHeroAnimation }}"
                             data-autoplay="{{ $marketplaceHeroAutoplay ? 1 : 0 }}" data-interval="{{ $marketplaceHeroIntervalMs }}">
                             @if($marketplaceHeroAnimation === 'fade')
-                                <div class="relative min-h-[280px] md:min-h-[340px]">
+                                <div class="relative min-h-[400px] md:min-h-[550px]">
                                     @foreach($marketplaceHeroSlides as $idx => $slide)
                                         <div class="mp-hero-slide absolute inset-0 transition-opacity duration-700 ease-out {{ $idx === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }}"
                                             aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
-                                            <div class="relative min-h-[280px] md:min-h-[340px]">
+                                            <div class="relative min-h-[400px] md:min-h-[550px]">
                                                 @if(($slide['image'] ?? '') !== '')
                                                     <img src="{{ $slide['image'] }}" alt=""
                                                         class="absolute inset-0 w-full h-full object-cover">
@@ -258,20 +258,20 @@
 
                                                 <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/45 to-transparent"></div>
 
-                                                <div class="relative p-6 md:p-10 min-h-[280px] md:min-h-[340px] flex flex-col justify-center items-start">
-                                                    <div class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black text-white shadow-lg"
+                                                <div class="relative p-8 md:p-16 min-h-[400px] md:min-h-[550px] flex flex-col justify-center items-start">
+                                                    <div class="inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-black text-white shadow-lg mb-4"
                                                         style="background: linear-gradient(135deg, #1e40af, #3b82f6); border: 1px solid rgba(255,255,255,0.1);">
                                                         <i class="fas fa-bolt text-amber-400"></i> Destaque do Marketplace
                                                     </div>
 
                                                     @if(($slide['title'] ?? '') !== '')
-                                                        <div class="mt-4 text-3xl sm:text-4xl font-black text-white max-w-2xl leading-tight">
+                                                        <div class="mt-4 text-4xl md:text-6xl font-black text-white max-w-3xl leading-tight tracking-tight drop-shadow-md">
                                                             {{ $slide['title'] }}
                                                         </div>
                                                     @endif
 
                                                     @if(($slide['subtitle'] ?? '') !== '')
-                                                        <div class="mt-3 text-slate-100 text-base sm:text-lg max-w-2xl">
+                                                        <div class="mt-4 text-slate-100 text-lg md:text-xl max-w-2xl leading-relaxed opacity-90">
                                                             {{ $slide['subtitle'] }}
                                                         </div>
                                                     @endif
@@ -295,7 +295,7 @@
                                     <div class="mp-hero-track flex transition-transform duration-700 ease-out will-change-transform">
                                         @foreach($marketplaceHeroSlides as $idx => $slide)
                                             <div class="mp-hero-slide w-full shrink-0" aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
-                                                <div class="relative min-h-[280px] md:min-h-[340px]">
+                                                <div class="relative min-h-[400px] md:min-h-[550px]">
                                                     @if(($slide['image'] ?? '') !== '')
                                                         <img src="{{ $slide['image'] }}" alt=""
                                                             class="absolute inset-0 w-full h-full object-cover">
@@ -307,20 +307,20 @@
 
                                                     <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/45 to-transparent"></div>
 
-                                                    <div class="relative p-6 md:p-10 min-h-[280px] md:min-h-[340px] flex flex-col justify-center items-start">
-                                                        <div class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black text-white shadow-lg"
+                                                    <div class="relative p-8 md:p-16 min-h-[400px] md:min-h-[550px] flex flex-col justify-center items-start">
+                                                        <div class="inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-black text-white shadow-lg mb-4"
                                                             style="background: linear-gradient(135deg, #1e40af, #3b82f6); border: 1px solid rgba(255,255,255,0.1);">
                                                             <i class="fas fa-bolt text-amber-400"></i> Destaque do Marketplace
                                                         </div>
 
                                                         @if(($slide['title'] ?? '') !== '')
-                                                            <div class="mt-4 text-3xl sm:text-4xl font-black text-white max-w-2xl leading-tight">
+                                                            <div class="mt-4 text-4xl md:text-6xl font-black text-white max-w-3xl leading-tight tracking-tight drop-shadow-md">
                                                                 {{ $slide['title'] }}
                                                             </div>
                                                         @endif
 
                                                         @if(($slide['subtitle'] ?? '') !== '')
-                                                            <div class="mt-3 text-slate-100 text-base sm:text-lg max-w-2xl">
+                                                            <div class="mt-4 text-slate-100 text-lg md:text-xl max-w-2xl leading-relaxed opacity-90">
                                                                 {{ $slide['subtitle'] }}
                                                             </div>
                                                         @endif
