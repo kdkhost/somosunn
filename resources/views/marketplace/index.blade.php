@@ -103,14 +103,16 @@
     $marketplaceHeroSlides = [];
     foreach ([1, 2, 3] as $i) {
         $image = $resolveAssetUrl(\App\Models\Setting::get("marketplace_hero_slide_{$i}_image"));
+        $imageMobile = $resolveAssetUrl(\App\Models\Setting::get("marketplace_hero_slide_{$i}_image_mobile"));
         $title = trim((string) (\App\Models\Setting::get("marketplace_hero_slide_{$i}_title") ?: ''));
         $subtitle = trim((string) (\App\Models\Setting::get("marketplace_hero_slide_{$i}_subtitle") ?: ''));
         $buttonText = trim((string) (\App\Models\Setting::get("marketplace_hero_slide_{$i}_button_text") ?: ''));
         $buttonUrl = $resolveLinkUrl(\App\Models\Setting::get("marketplace_hero_slide_{$i}_button_url"));
 
-        if ($image !== '' || $title !== '' || $subtitle !== '' || $buttonText !== '' || $buttonUrl !== '') {
+        if ($image !== '' || $imageMobile !== '' || $title !== '' || $subtitle !== '' || $buttonText !== '' || $buttonUrl !== '') {
             $marketplaceHeroSlides[] = [
                 'image' => $image,
+                'image_mobile' => $imageMobile,
                 'title' => $title,
                 'subtitle' => $subtitle,
                 'button_text' => $buttonText,
@@ -242,14 +244,19 @@
                         <div class="relative" data-marketplace-hero data-animation="{{ $marketplaceHeroAnimation }}"
                             data-autoplay="{{ $marketplaceHeroAutoplay ? 1 : 0 }}" data-interval="{{ $marketplaceHeroIntervalMs }}">
                             @if($marketplaceHeroAnimation === 'fade')
-                                <div class="relative min-h-[480px] md:min-h-[550px]">
+                                <div class="relative min-h-[550px] md:min-h-[550px]">
                                     @foreach($marketplaceHeroSlides as $idx => $slide)
                                         <div class="mp-hero-slide absolute inset-0 transition-opacity duration-700 ease-out {{ $idx === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }}"
                                             aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
                                             <div class="relative h-full w-full overflow-hidden">
-                                                @if(($slide['image'] ?? '') !== '')
-                                                    <img src="{{ $slide['image'] }}" alt=""
-                                                        class="absolute inset-0 w-full h-full object-cover">
+                                                @if(($slide['image'] ?? '') !== '' || ($slide['image_mobile'] ?? '') !== '')
+                                                    <picture>
+                                                        @if(($slide['image_mobile'] ?? '') !== '')
+                                                            <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
+                                                        @endif
+                                                        <img src="{{ $slide['image'] }}" alt=""
+                                                            class="absolute inset-0 w-full h-full object-cover">
+                                                    </picture>
                                                 @else
                                                     <div class="absolute inset-0 opacity-60 pointer-events-none"
                                                         style="background: radial-gradient(900px circle at 20% 10%, rgba(31, 94, 219, 0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23, 127, 214, 0.16) 0%, transparent 55%);">
@@ -291,14 +298,19 @@
                                     @endforeach
                                 </div>
                             @else
-                                <div class="relative overflow-hidden min-h-[480px] md:min-h-[550px]">
+                                <div class="relative overflow-hidden min-h-[550px] md:min-h-[550px]">
                                     <div class="mp-hero-track flex transition-transform duration-700 ease-out will-change-transform h-full">
                                         @foreach($marketplaceHeroSlides as $idx => $slide)
                                             <div class="mp-hero-slide w-full shrink-0" aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
                                                 <div class="relative h-full w-full overflow-hidden">
-                                                    @if(($slide['image'] ?? '') !== '')
-                                                        <img src="{{ $slide['image'] }}" alt=""
-                                                            class="absolute inset-0 w-full h-full object-cover">
+                                                    @if(($slide['image'] ?? '') !== '' || ($slide['image_mobile'] ?? '') !== '')
+                                                        <picture>
+                                                            @if(($slide['image_mobile'] ?? '') !== '')
+                                                                <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
+                                                            @endif
+                                                            <img src="{{ $slide['image'] }}" alt=""
+                                                                class="absolute inset-0 w-full h-full object-cover">
+                                                        </picture>
                                                     @else
                                                         <div class="absolute inset-0 opacity-60 pointer-events-none"
                                                             style="background: radial-gradient(900px circle at 20% 10%, rgba(31, 94, 219, 0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23, 127, 214, 0.16) 0%, transparent 55%);">

@@ -115,8 +115,11 @@ class SettingController extends Controller
             'marketplace_exit_banner_image',
             // Marketplace remove flags (tratados separadamente)
             'remove_marketplace_hero_slide_1_image',
+            'remove_marketplace_hero_slide_1_image_mobile',
             'remove_marketplace_hero_slide_2_image',
+            'remove_marketplace_hero_slide_2_image_mobile',
             'remove_marketplace_hero_slide_3_image',
+            'remove_marketplace_hero_slide_3_image_mobile',
             'remove_marketplace_exit_banner_image',
         ]);
 
@@ -229,11 +232,20 @@ class SettingController extends Controller
         if ($request->hasFile('marketplace_hero_slide_1_image')) {
             $this->replaceFile('marketplace_hero_slide_1_image', $this->storePublic($request->file('marketplace_hero_slide_1_image'), 'uploads/imagens/marketplace/hero'));
         }
+        if ($request->hasFile('marketplace_hero_slide_1_image_mobile')) {
+            $this->replaceFile('marketplace_hero_slide_1_image_mobile', $this->storePublic($request->file('marketplace_hero_slide_1_image_mobile'), 'uploads/imagens/marketplace/hero'));
+        }
         if ($request->hasFile('marketplace_hero_slide_2_image')) {
             $this->replaceFile('marketplace_hero_slide_2_image', $this->storePublic($request->file('marketplace_hero_slide_2_image'), 'uploads/imagens/marketplace/hero'));
         }
+        if ($request->hasFile('marketplace_hero_slide_2_image_mobile')) {
+            $this->replaceFile('marketplace_hero_slide_2_image_mobile', $this->storePublic($request->file('marketplace_hero_slide_2_image_mobile'), 'uploads/imagens/marketplace/hero'));
+        }
         if ($request->hasFile('marketplace_hero_slide_3_image')) {
             $this->replaceFile('marketplace_hero_slide_3_image', $this->storePublic($request->file('marketplace_hero_slide_3_image'), 'uploads/imagens/marketplace/hero'));
+        }
+        if ($request->hasFile('marketplace_hero_slide_3_image_mobile')) {
+            $this->replaceFile('marketplace_hero_slide_3_image_mobile', $this->storePublic($request->file('marketplace_hero_slide_3_image_mobile'), 'uploads/imagens/marketplace/hero'));
         }
         if ($request->hasFile('marketplace_exit_banner_image')) {
             $this->replaceFile('marketplace_exit_banner_image', $this->storePublic($request->file('marketplace_exit_banner_image'), 'uploads/imagens/marketplace/exit'));

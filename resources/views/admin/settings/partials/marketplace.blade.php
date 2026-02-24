@@ -53,8 +53,11 @@
 
     @php
         $slide1Image = isset($getUrl) ? $getUrl('marketplace_hero_slide_1_image') : '';
+        $slide1ImageMobile = isset($getUrl) ? $getUrl('marketplace_hero_slide_1_image_mobile') : '';
         $slide2Image = isset($getUrl) ? $getUrl('marketplace_hero_slide_2_image') : '';
+        $slide2ImageMobile = isset($getUrl) ? $getUrl('marketplace_hero_slide_2_image_mobile') : '';
         $slide3Image = isset($getUrl) ? $getUrl('marketplace_hero_slide_3_image') : '';
+        $slide3ImageMobile = isset($getUrl) ? $getUrl('marketplace_hero_slide_3_image_mobile') : '';
 
         $exitImage = isset($getUrl) ? $getUrl('marketplace_exit_banner_image') : '';
     @endphp
@@ -119,14 +122,27 @@
 
                     @include('components.forms.data-upload', [
                         'name' => 'marketplace_hero_slide_1_image',
-                        'label' => 'Imagem do Slide 1',
+                        'label' => 'Imagem Desktop (1920x600)',
                         'currentValue' => $slide1Image
                     ])
-                    
                     @if($slide1Image)
                         <div class="custom-control custom-switch mb-3">
                             <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_1_image" name="remove_marketplace_hero_slide_1_image" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_hero_slide_1_image">Remover imagem existente</label>
+                            <label class="custom-control-label" for="remove_marketplace_hero_slide_1_image">Remover desktop</label>
+                        </div>
+                    @endif
+
+                    <hr class="border-dashed my-3">
+
+                    @include('components.forms.data-upload', [
+                        'name' => 'marketplace_hero_slide_1_image_mobile',
+                        'label' => 'Imagem Mobile (800x1200)',
+                        'currentValue' => $slide1ImageMobile
+                    ])
+                    @if($slide1ImageMobile)
+                        <div class="custom-control custom-switch mb-3">
+                            <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_1_image_mobile" name="remove_marketplace_hero_slide_1_image_mobile" value="1">
+                            <label class="custom-control-label" for="remove_marketplace_hero_slide_1_image_mobile">Remover mobile</label>
                         </div>
                     @endif
 
@@ -162,14 +178,27 @@
                 <div class="card-body">
                     @include('components.forms.data-upload', [
                         'name' => 'marketplace_hero_slide_2_image',
-                        'label' => 'Imagem do Slide 2',
+                        'label' => 'Imagem Desktop (1920x600)',
                         'currentValue' => $slide2Image
                     ])
-
                     @if($slide2Image)
                         <div class="custom-control custom-switch mb-3">
                             <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_2_image" name="remove_marketplace_hero_slide_2_image" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_hero_slide_2_image">Remover imagem existente</label>
+                            <label class="custom-control-label" for="remove_marketplace_hero_slide_2_image">Remover desktop</label>
+                        </div>
+                    @endif
+
+                    <hr class="border-dashed my-3">
+
+                    @include('components.forms.data-upload', [
+                        'name' => 'marketplace_hero_slide_2_image_mobile',
+                        'label' => 'Imagem Mobile (800x1200)',
+                        'currentValue' => $slide2ImageMobile
+                    ])
+                    @if($slide2ImageMobile)
+                        <div class="custom-control custom-switch mb-3">
+                            <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_2_image_mobile" name="remove_marketplace_hero_slide_2_image_mobile" value="1">
+                            <label class="custom-control-label" for="remove_marketplace_hero_slide_2_image_mobile">Remover mobile</label>
                         </div>
                     @endif
 
@@ -205,14 +234,27 @@
                 <div class="card-body">
                     @include('components.forms.data-upload', [
                         'name' => 'marketplace_hero_slide_3_image',
-                        'label' => 'Imagem do Slide 3',
+                        'label' => 'Imagem Desktop (1920x600)',
                         'currentValue' => $slide3Image
                     ])
-
                     @if($slide3Image)
                         <div class="custom-control custom-switch mb-3">
                             <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_3_image" name="remove_marketplace_hero_slide_3_image" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_hero_slide_3_image">Remover imagem existente</label>
+                            <label class="custom-control-label" for="remove_marketplace_hero_slide_3_image">Remover desktop</label>
+                        </div>
+                    @endif
+
+                    <hr class="border-dashed my-3">
+
+                    @include('components.forms.data-upload', [
+                        'name' => 'marketplace_hero_slide_3_image_mobile',
+                        'label' => 'Imagem Mobile (800x1200)',
+                        'currentValue' => $slide3ImageMobile
+                    ])
+                    @if($slide3ImageMobile)
+                        <div class="custom-control custom-switch mb-3">
+                            <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_3_image_mobile" name="remove_marketplace_hero_slide_3_image_mobile" value="1">
+                            <label class="custom-control-label" for="remove_marketplace_hero_slide_3_image_mobile">Remover mobile</label>
                         </div>
                     @endif
 
