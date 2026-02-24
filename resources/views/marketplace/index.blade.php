@@ -300,17 +300,21 @@
                             data-interval="{{ $marketplaceHeroIntervalMs }}">
                             @if($marketplaceHeroAnimation === 'fade')
                                 {{-- FADE MODE --}}
-                                <div class="relative" style="min-height: 480px;">
+                                <div class="relative overflow-hidden">
+                                    {{-- Phantom spacer: dá a altura correta ao container por breakpoint --}}
+                                    <div aria-hidden="true" class="block md:hidden" style="height:360px;"></div>
+                                    <div aria-hidden="true" class="hidden md:block" style="height:480px;"></div>
+
                                     @foreach($marketplaceHeroSlides as $idx => $slide)
-                                        <div class="mp-hero-slide {{ $idx === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }} transition-opacity duration-700 ease-out"
+                                        <div class="mp-hero-slide absolute inset-0 transition-opacity duration-700 ease-out {{ $idx === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }}"
                                             aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
 
-                                            {{-- MOBILE: card vertical (imagem topo + conteúdo abaixo) --}}
-                                            <div class="block md:hidden">
+                                            {{-- MOBILE: card vertical (um por vez via opacity) --}}
+                                            <div class="block md:hidden h-full overflow-hidden p-2">
                                                 <div
-                                                    class="rounded-2xl overflow-hidden shadow-lg border border-slate-100 bg-white mx-2 my-2">
+                                                    class="rounded-2xl overflow-hidden shadow-lg border border-slate-100 bg-white h-full flex flex-col">
                                                     @if(($slide['image'] ?? '') !== '')
-                                                        <div style="height:220px; overflow:hidden; position:relative;">
+                                                        <div style="height:200px; flex-shrink:0; overflow:hidden;">
                                                             <picture>
                                                                 @if(($slide['image_mobile'] ?? '') !== '')
                                                                     <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
@@ -320,14 +324,14 @@
                                                             </picture>
                                                         </div>
                                                     @endif
-                                                    <div class="p-5">
+                                                    <div class="p-5 flex flex-col flex-1">
                                                         @if(($slide['title'] ?? '') !== '')
                                                             <div class="text-xl font-black text-slate-900 leading-tight mb-2">
                                                                 {{ $slide['title'] }}
                                                             </div>
                                                         @endif
                                                         @if(($slide['subtitle'] ?? '') !== '')
-                                                            <div class="text-slate-500 text-sm mb-4 leading-relaxed">
+                                                            <div class="text-slate-500 text-sm mb-4 leading-relaxed flex-1">
                                                                 {{ $slide['subtitle'] }}
                                                             </div>
                                                         @endif
@@ -342,8 +346,7 @@
                                             </div>
 
                                             {{-- DESKTOP: banner full-cover com glass card --}}
-                                            <div class="hidden md:block absolute inset-0" style="min-height:480px;">
-                                                {{-- Layer 0: Fundo liquid gradient --}}
+                                            <div class="hidden md:block absolute inset-0">
                                                 @if(($slide['image'] ?? '') !== '')
                                                     <div class="absolute inset-0 liquid-bg-animate" style="z-index:0;">
                                                         <div class="absolute inset-0"
@@ -355,17 +358,14 @@
                                                         style="z-index:0; background: radial-gradient(900px circle at 20% 10%, rgba(31,94,219,0.22) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23,127,214,0.16) 0%, transparent 55%);">
                                                     </div>
                                                 @endif
-                                                {{-- Layer 1: Imagem cobrindo todo o banner --}}
                                                 @if(($slide['image'] ?? '') !== '')
                                                     <picture class="absolute inset-0" style="z-index:1;">
                                                         <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? '' }}"
                                                             style="width:100%; height:100%; object-fit:cover; display:block;">
                                                     </picture>
                                                 @endif
-                                                {{-- Layer 2: Overlay escuro --}}
                                                 <div class="absolute inset-0"
-                                                    style="z-index:2; background: rgba(15,23,42,0.35); pointer-events:none;"></div>
-                                                {{-- Layer 3: Glass Card conteúdo --}}
+                                                    style="z-index:2; background:rgba(15,23,42,0.35); pointer-events:none;"></div>
                                                 <div class="absolute inset-0 flex items-center justify-start p-12" style="z-index:3;">
                                                     <div class="glass-card hero-content-card p-10 max-w-xl text-left"
                                                         style="opacity:0; transform:translateY(20px); transition: opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s;">
@@ -375,12 +375,10 @@
                                                         </div>
                                                         @if(($slide['title'] ?? '') !== '')
                                                             <div class="text-5xl font-black text-white leading-tight mb-4">
-                                                                {{ $slide['title'] }}
-                                                            </div>
+                                                                {{ $slide['title'] }}</div>
                                                         @endif
                                                         @if(($slide['subtitle'] ?? '') !== '')
-                                                            <div class="text-slate-200 text-base opacity-90 mb-8">
-                                                                {{ $slide['subtitle'] }}
+                                                            <div class="text-slate-200 text-base opacity-90 mb-8">{{ $slide['subtitle'] }}
                                                             </div>
                                                         @endif
                                                         @if(($slide['button_text'] ?? '') !== '' && ($slide['button_url'] ?? '') !== '')
@@ -399,19 +397,24 @@
                                 </div>
                             @else
                                 {{-- SLIDE MODE --}}
-                                <div class="relative overflow-hidden" style="min-height:480px;">
+                                <div class="relative overflow-hidden">
+                                    {{-- Phantom spacer: altura por breakpoint --}}
+                                    <div aria-hidden="true" class="block md:hidden" style="height:360px;"></div>
+                                    <div aria-hidden="true" class="hidden md:block" style="height:480px;"></div>
+
+                                    {{-- Track absoluto sobre o spacer --}}
                                     <div
-                                        class="mp-hero-track flex transition-transform duration-700 ease-out will-change-transform">
+                                        class="mp-hero-track absolute inset-0 flex transition-transform duration-700 ease-out will-change-transform">
                                         @foreach($marketplaceHeroSlides as $idx => $slide)
-                                            <div class="mp-hero-slide relative shrink-0"
+                                            <div class="mp-hero-slide relative shrink-0 h-full"
                                                 aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}" style="width:100%;">
 
                                                 {{-- MOBILE: card vertical --}}
-                                                <div class="block md:hidden">
+                                                <div class="block md:hidden h-full overflow-hidden p-2">
                                                     <div
-                                                        class="rounded-2xl overflow-hidden shadow-lg border border-slate-100 bg-white mx-2 my-2">
+                                                        class="rounded-2xl overflow-hidden shadow-lg border border-slate-100 bg-white h-full flex flex-col">
                                                         @if(($slide['image'] ?? '') !== '')
-                                                            <div style="height:220px; overflow:hidden;">
+                                                            <div style="height:200px; flex-shrink:0; overflow:hidden;">
                                                                 <picture>
                                                                     @if(($slide['image_mobile'] ?? '') !== '')
                                                                         <source media="(max-width: 767px)"
@@ -422,16 +425,14 @@
                                                                 </picture>
                                                             </div>
                                                         @endif
-                                                        <div class="p-5">
+                                                        <div class="p-5 flex flex-col flex-1">
                                                             @if(($slide['title'] ?? '') !== '')
                                                                 <div class="text-xl font-black text-slate-900 leading-tight mb-2">
-                                                                    {{ $slide['title'] }}
-                                                                </div>
+                                                                    {{ $slide['title'] }}</div>
                                                             @endif
                                                             @if(($slide['subtitle'] ?? '') !== '')
-                                                                <div class="text-slate-500 text-sm mb-4 leading-relaxed">
-                                                                    {{ $slide['subtitle'] }}
-                                                                </div>
+                                                                <div class="text-slate-500 text-sm mb-4 leading-relaxed flex-1">
+                                                                    {{ $slide['subtitle'] }}</div>
                                                             @endif
                                                             @if(($slide['button_text'] ?? '') !== '' && ($slide['button_url'] ?? '') !== '')
                                                                 <a href="{{ $slide['button_url'] }}"
@@ -444,8 +445,7 @@
                                                 </div>
 
                                                 {{-- DESKTOP: banner full-cover --}}
-                                                <div class="hidden md:block relative" style="height:480px;">
-                                                    {{-- Layer 0: Fundo blur --}}
+                                                <div class="hidden md:block absolute inset-0">
                                                     @if(($slide['image'] ?? '') !== '')
                                                         <div class="absolute inset-0 liquid-bg-animate" style="z-index:0;">
                                                             <div class="absolute inset-0"
@@ -457,17 +457,14 @@
                                                             style="z-index:0; background: radial-gradient(900px circle at 20% 10%, rgba(31,94,219,0.22) 0%, transparent 60%);">
                                                         </div>
                                                     @endif
-                                                    {{-- Layer 1: Imagem cover --}}
                                                     @if(($slide['image'] ?? '') !== '')
                                                         <picture class="absolute inset-0" style="z-index:1;">
                                                             <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? '' }}"
                                                                 style="width:100%; height:100%; object-fit:cover; display:block;">
                                                         </picture>
                                                     @endif
-                                                    {{-- Layer 2: Overlay --}}
                                                     <div class="absolute inset-0"
                                                         style="z-index:2; background:rgba(15,23,42,0.35); pointer-events:none;"></div>
-                                                    {{-- Layer 3: Conteúdo --}}
                                                     <div class="absolute inset-0 flex items-center justify-start p-12"
                                                         style="z-index:3;">
                                                         <div class="glass-card hero-content-card p-10 max-w-xl text-left"
@@ -478,13 +475,11 @@
                                                             </div>
                                                             @if(($slide['title'] ?? '') !== '')
                                                                 <div class="text-5xl font-black text-white leading-tight mb-4">
-                                                                    {{ $slide['title'] }}
-                                                                </div>
+                                                                    {{ $slide['title'] }}</div>
                                                             @endif
                                                             @if(($slide['subtitle'] ?? '') !== '')
                                                                 <div class="text-slate-200 text-base opacity-90 mb-8">
-                                                                    {{ $slide['subtitle'] }}
-                                                                </div>
+                                                                    {{ $slide['subtitle'] }}</div>
                                                             @endif
                                                             @if(($slide['button_text'] ?? '') !== '' && ($slide['button_url'] ?? '') !== '')
                                                                 <a href="{{ $slide['button_url'] }}"
@@ -502,6 +497,9 @@
                                     </div>
                                 </div>
                             @endif
+
+
+
 
 
                             @if(count($marketplaceHeroSlides) > 1)
@@ -589,7 +587,8 @@
                                             </div>
                                             <div class="min-w-0">
                                                 <div class="font-black text-slate-900 leading-tight truncate">
-                                                    {{ $cat['label'] }}</div>
+                                                    {{ $cat['label'] }}
+                                                </div>
                                                 <div class="text-sm text-slate-500">{{ $cat['count'] }} item(ns)</div>
                                             </div>
                                             <div class="ml-auto text-slate-300">
@@ -1721,14 +1720,14 @@
                         saveState(state);
 
                         const html = `
-                                <div class="flex gap-3 items-center">
-                                    ${image ? `<img src="${escapeHtml(image)}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:12px;border:1px solid rgba(148,163,184,.35)" />` : ''}
-                                    <div style="min-width:0">
-                                        <div style="font-weight:900;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">${title}</div>
-                                        ${date ? `<div style="margin-top:2px;font-size:12px;opacity:.85">Data: ${date}</div>` : ''}
-                                    </div>
-                                </div>
-                            `;
+                                        <div class="flex gap-3 items-center">
+                                            ${image ? `<img src="${escapeHtml(image)}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:12px;border:1px solid rgba(148,163,184,.35)" />` : ''}
+                                            <div style="min-width:0">
+                                                <div style="font-weight:900;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">${title}</div>
+                                                ${date ? `<div style="margin-top:2px;font-size:12px;opacity:.85">Data: ${date}</div>` : ''}
+                                            </div>
+                                        </div>
+                                    `;
 
                         toast.fire({
                             icon: 'info',
