@@ -242,11 +242,11 @@
                         <div class="relative" data-marketplace-hero data-animation="{{ $marketplaceHeroAnimation }}"
                             data-autoplay="{{ $marketplaceHeroAutoplay ? 1 : 0 }}" data-interval="{{ $marketplaceHeroIntervalMs }}">
                             @if($marketplaceHeroAnimation === 'fade')
-                                <div class="relative min-h-[400px] md:min-h-[550px]">
+                                <div class="relative min-h-[480px] md:min-h-[550px]">
                                     @foreach($marketplaceHeroSlides as $idx => $slide)
-                                        <div class="mp-hero-slide absolute inset-0 transition-opacity duration-700 ease-out {{ $idx === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }}"
+                                        <div class="mp-hero-slide absolute inset-0 transition-opacity duration-700 ease-out px-4 py-2 md:p-0 {{ $idx === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }}"
                                             aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
-                                            <div class="relative min-h-[400px] md:min-h-[550px]">
+                                            <div class="relative h-full w-full rounded-[2rem] md:rounded-none overflow-hidden shadow-xl md:shadow-none">
                                                 @if(($slide['image'] ?? '') !== '')
                                                     <img src="{{ $slide['image'] }}" alt=""
                                                         class="absolute inset-0 w-full h-full object-cover">
@@ -256,9 +256,9 @@
                                                     </div>
                                                 @endif
 
-                                                <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/45 to-transparent"></div>
+                                                <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-900/90 via-slate-900/40 to-transparent"></div>
 
-                                                <div class="relative p-8 md:p-16 min-h-[400px] md:min-h-[550px] flex flex-col justify-center items-start">
+                                                <div class="relative p-8 md:p-16 h-full flex flex-col justify-center items-center text-center md:items-start md:text-left">
                                                     <div class="inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-black text-white shadow-lg mb-4"
                                                         style="background: linear-gradient(135deg, #1e40af, #3b82f6); border: 1px solid rgba(255,255,255,0.1);">
                                                         <i class="fas fa-bolt text-amber-400"></i> Destaque do Marketplace
@@ -291,11 +291,11 @@
                                     @endforeach
                                 </div>
                             @else
-                                <div class="overflow-hidden">
-                                    <div class="mp-hero-track flex transition-transform duration-700 ease-out will-change-transform">
+                                <div class="relative overflow-hidden min-h-[480px] md:min-h-[550px]">
+                                    <div class="mp-hero-track flex transition-transform duration-700 ease-out will-change-transform h-full">
                                         @foreach($marketplaceHeroSlides as $idx => $slide)
-                                            <div class="mp-hero-slide w-full shrink-0" aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
-                                                <div class="relative min-h-[400px] md:min-h-[550px]">
+                                            <div class="mp-hero-slide w-full shrink-0 px-4 py-2 md:p-0" aria-hidden="{{ $idx === 0 ? 'false' : 'true' }}">
+                                                <div class="relative h-full w-full rounded-[2rem] md:rounded-none overflow-hidden shadow-xl md:shadow-none">
                                                     @if(($slide['image'] ?? '') !== '')
                                                         <img src="{{ $slide['image'] }}" alt=""
                                                             class="absolute inset-0 w-full h-full object-cover">
@@ -305,9 +305,9 @@
                                                         </div>
                                                     @endif
 
-                                                    <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/45 to-transparent"></div>
+                                                    <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-900/90 via-slate-900/40 to-transparent"></div>
 
-                                                    <div class="relative p-8 md:p-16 min-h-[400px] md:min-h-[550px] flex flex-col justify-center items-start">
+                                                    <div class="relative p-8 md:p-16 h-full flex flex-col justify-center items-center text-center md:items-start md:text-left">
                                                         <div class="inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-black text-white shadow-lg mb-4"
                                                             style="background: linear-gradient(135deg, #1e40af, #3b82f6); border: 1px solid rgba(255,255,255,0.1);">
                                                             <i class="fas fa-bolt text-amber-400"></i> Destaque do Marketplace
