@@ -20,3 +20,6 @@
 /public/css/*.map
 npm-debug.log
 composer.lock
+
+# Configurações locais de editor (contêm tokens sensíveis)
+.cursor/
