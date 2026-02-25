@@ -281,10 +281,8 @@
                             headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
                         }).then(r => r.json()).then(data => {
                             if (data.success) {
-                                Swal.fire({
-                                    toast: true, position: 'top-end', icon: 'success', title: data.message,
-                                    showConfirmButton: false, timer: 2500
-                                }).then(() => location.reload());
+                                toastr.success(data.message);
+                                setTimeout(() => location.reload(), 1500);
                             }
                         });
                     });
@@ -317,14 +315,12 @@
                 }).then(r => r.json()).then(data => {
                     if (data.success) {
                         document.getElementById('modal-cupom').classList.add('hidden');
-                        Swal.fire({
-                            toast: true, position: 'top-end', icon: 'success', title: data.message,
-                            showConfirmButton: false, timer: 2500
-                        }).then(() => location.reload());
+                        toastr.success(data.message);
+                        setTimeout(() => location.reload(), 1500);
                     } else {
-                        Swal.fire({ icon: 'error', title: 'Erro', text: data.message || 'Verifique os campos.' });
+                        toastr.error(data.message || 'Verifique os campos.');
                     }
-                }).catch(() => Swal.fire({ icon: 'error', title: 'Erro de rede', text: 'Tente novamente.' }));
+                }).catch(() => toastr.error('Tente novamente.'));
             });        </script>
     @endpush
 @endsection

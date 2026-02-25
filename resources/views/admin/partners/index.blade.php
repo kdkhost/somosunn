@@ -21,29 +21,9 @@
     <section class="content">
         <div class="container-fluid">
 
-            @if(session('success'))
-                @push('scripts')
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            Swal.fire({
-                                toast: true, position: 'top-end', icon: 'success',
-                                title: '{{ session('success') }}',
-                                showConfirmButton: false, timer: 3500, timerProgressBar: true
-                            });
-                        });
-                    </script>
-                @endpush
-            @endif
+            {{-- As notificações agora são handled globalmente pelo app.blade.php via toastr --}}
 
-            @if(session('error'))
-                @push('scripts')
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            Swal.fire({ icon: 'error', title: 'Erro', text: '{{ session('error') }}' });
-                        });
-                    </script>
-                @endpush
-            @endif
+            {{-- As notificações agora são handled globalmente pelo app.blade.php via toastr --}}
 
             <div class="card card-outline card-primary">
                 <div class="card-header">
@@ -156,11 +136,7 @@
                             body: JSON.stringify({ order })
                         }).then(r => r.json()).then(data => {
                             if (data.status === 'success') {
-                                Swal.fire({
-                                    toast: true, position: 'top-end', icon: 'success',
-                                    title: data.message || 'Ordem atualizada!',
-                                    showConfirmButton: false, timer: 1500
-                                });
+                                toastr.success(data.message || 'Ordem atualizada!');
                             }
                         });
                     }

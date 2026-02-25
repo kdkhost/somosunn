@@ -24,29 +24,7 @@
     <section class="content">
         <div class="container-fluid">
 
-            @if(session('success'))
-                @push('scripts')
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            Swal.fire({
-                                toast: true, position: 'top-end', icon: 'success',
-                                title: '{{ session('success') }}',
-                                showConfirmButton: false, timer: 3500, timerProgressBar: true
-                            });
-                        });
-                    </script>
-                @endpush
-            @endif
-
-            @if(session('error'))
-                @push('scripts')
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            Swal.fire({ icon: 'error', title: 'Erro', text: '{{ session('error') }}' });
-                        });
-                    </script>
-                @endpush
-            @endif
+            {{-- As notificações agora são handled globalmente pelo app.blade.php via toastr --}}
 
             <div class="row">
                 {{-- ── Card Principal ────────────────────────────────────────────── --}}
