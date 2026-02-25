@@ -18,6 +18,27 @@
         {{-- Vacancies Grid --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($vacancies as $vacancy)
+                @php
+                    $myApplication = $vacancy->applications->first();
+                    $status = $myApplication ? ($myApplication->status === 'reviewing' ? 'standby' : $myApplication->status) : null;
+                    if ($status === 'accepted') {
+                        $status = 'approved';
+                    }
+                    $statusClasses = match ($status) {
+                        'pending' => 'bg-amber-100 dark:bg-amber-900/20 text-amber-700',
+                        'standby' => 'bg-blue-100 dark:bg-blue-900/20 text-blue-700',
+                        'approved' => 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700',
+                        'rejected' => 'bg-red-100 dark:bg-red-900/20 text-red-700',
+                        default => 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400',
+                    };
+                    $statusLabel = match ($status) {
+                        'pending' => 'Pendente',
+                        'standby' => 'Standby',
+                        'approved' => 'Aprovado',
+                        'rejected' => 'Recusado',
+                        default => 'Nao enviado',
+                    };
+                @endphp
                 <div
                     class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col transition-all hover:shadow-xl hover:shadow-blue-500/5 group">
                     <div class="flex items-start justify-between mb-4">
@@ -52,15 +73,18 @@
 
                     <div
                         class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between transition-colors">
-                        @if($vacancy->salary_range)
-                            <div class="text-sm font-bold text-emerald-600">{{ $vacancy->salary_range }}</div>
-                        @else
-                            <div></div>
-                        @endif
+                        <div class="flex flex-col gap-1">
+                            @if($vacancy->salary_range)
+                                <div class="text-sm font-bold text-emerald-600">{{ $vacancy->salary_range }}</div>
+                            @endif
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-bold {{ $statusClasses }}">
+                                {{ $statusLabel }}
+                            </span>
+                        </div>
 
                         <a href="{{ route('panel.jobs.show', $vacancy) }}"
                             class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl hover:bg-blue-600 hover:text-white transition-all">
-                            Ver Detalhes
+                            Acompanhar
                         </a>
                     </div>
                 </div>

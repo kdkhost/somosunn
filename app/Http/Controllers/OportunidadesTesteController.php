@@ -10,7 +10,10 @@ class OportunidadesTesteController extends Controller
     {
         try {
             $query = JobVacancy::where('is_active', true)
-                ->where('visibility', 'public');
+                ->where(function ($q) {
+                    $q->whereNull('visibility')
+                        ->orWhereIn('visibility', ['public', 'external', 'both']);
+                });
 
             if ($request->filled('area')) {
                 $query->where('type', 'like', '%' . $request->area . '%');

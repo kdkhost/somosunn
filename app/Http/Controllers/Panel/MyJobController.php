@@ -39,19 +39,25 @@ class MyJobController extends Controller
             'benefits' => 'nullable|string',
             'salary_range' => 'nullable|string|max:255',
             'expires_at' => 'nullable|date',
-            'visibility' => 'required|in:internal,external,both',
+            'visibility' => 'required|in:public,private,internal,external,both',
         ]);
 
         $data['user_id'] = Auth::id();
         $data['is_active'] = true;
+        $data['visibility'] = $this->normalizeVisibility((string) $data['visibility']);
 
         $vacancy = JobVacancy::create($data);
 
-        // Notificar toda a comunidade
-        $users = User::all();
-        Notification::send($users, new JobVacancyPublished($vacancy));
+        if (($vacancy->visibility ?? 'public') === 'public') {
+            // Notificar toda a comunidade apenas para vagas publicas
+            $users = User::all();
+            Notification::send($users, new JobVacancyPublished($vacancy));
+            $message = 'Vaga publicada e comunidade notificada com sucesso!';
+        } else {
+            $message = 'Vaga publicada com sucesso!';
+        }
 
-        return redirect()->route('panel.my-jobs.index')->with('success', 'Vaga publicada e comunidade notificada com sucesso!');
+        return redirect()->route('panel.my-jobs.index')->with('success', $message);
     }
 
     public function edit(JobVacancy $my_job)
@@ -82,9 +88,10 @@ class MyJobController extends Controller
             'benefits' => 'nullable|string',
             'salary_range' => 'nullable|string|max:255',
             'expires_at' => 'nullable|date',
-            'visibility' => 'required|in:internal,external,both',
+            'visibility' => 'required|in:public,private,internal,external,both',
         ]);
 
+        $data['visibility'] = $this->normalizeVisibility((string) $data['visibility']);
         $my_job->update($data);
 
         return redirect()->route('panel.my-jobs.index')->with('success', 'Vaga atualizada com sucesso!');
@@ -104,7 +111,7 @@ class MyJobController extends Controller
     private function authorizeAccess()
     {
         if (!Auth::user()->canAccessFeature('vagas_create')) {
-            abort(403, 'Seu plano atual não permite publicar vagas.');
+            abort(403, 'Seu plano atual nao permite publicar vagas.');
         }
     }
 
@@ -121,7 +128,7 @@ class MyJobController extends Controller
             ->latest()
             ->get();
 
-        // Marca as notificações desta vaga como lidas
+        // Marca as notificacoes desta vaga como lidas
         Auth::user()->unreadNotifications()
             ->where('type', 'App\\Notifications\\JobApplicationReceived')
             ->whereJsonContains('data->action_url', route('panel.my-jobs.candidates', $my_job))
@@ -145,7 +152,7 @@ class MyJobController extends Controller
         $path = storage_path('app/public/' . $application->resume_path);
 
         if (!file_exists($path)) {
-            abort(404, 'Currículo não encontrado.');
+            abort(404, 'Curriculo nao encontrado.');
         }
 
         return response()->download($path, 'curriculo_' . ($application->user->name ?? 'candidato') . '.' . pathinfo($path, PATHINFO_EXTENSION));
@@ -159,14 +166,35 @@ class MyJobController extends Controller
             abort(403);
         }
 
-        $status = $request->input('status');
-        if (!in_array($status, ['pending', 'approved', 'rejected'])) {
-            return response()->json(['success' => false, 'message' => 'Status inválido.'], 422);
+        $status = (string) $request->input('status');
+        if ($status === 'reviewing') {
+            $status = 'standby';
+        }
+
+        if (!in_array($status, ['pending', 'standby', 'approved', 'rejected'], true)) {
+            return response()->json(['success' => false, 'message' => 'Status invalido.'], 422);
         }
 
         $application->update(['status' => $status]);
 
-        $labels = ['pending' => 'Pendente', 'approved' => 'Aprovado', 'rejected' => 'Recusado'];
+        $labels = [
+            'pending' => 'Pendente',
+            'standby' => 'Standby',
+            'approved' => 'Aprovado',
+            'rejected' => 'Recusado',
+        ];
+
         return response()->json(['success' => true, 'message' => 'Candidato marcado como ' . $labels[$status] . '!']);
+    }
+
+    private function normalizeVisibility(string $visibility): string
+    {
+        $visibility = strtolower(trim($visibility));
+
+        return match ($visibility) {
+            'internal' => 'private',
+            'external', 'both' => 'public',
+            default => in_array($visibility, ['public', 'private'], true) ? $visibility : 'public',
+        };
     }
 }

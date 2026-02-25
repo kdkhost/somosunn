@@ -13,6 +13,11 @@ class JobVacancyPublished extends Notification
 
     protected $vacancy;
 
+    private function vacancyUrl(): string
+    {
+        return route('jobs.public.show', $this->vacancy) . '#candidatura';
+    }
+
     /**
      * Create a new notification instance.
      */
@@ -43,7 +48,7 @@ class JobVacancyPublished extends Notification
             ->line('**Vaga:** ' . $this->vacancy->title)
             ->line('**Empresa:** ' . ($this->vacancy->company_name ?? 'Confidencial'))
             ->line('**Localização:** ' . ($this->vacancy->location ?? 'Não informado'))
-            ->action('Ver Detalhes da Vaga', route('panel.jobs.show', $this->vacancy))
+            ->action('Ver Detalhes da Vaga', $this->vacancyUrl())
             ->line('Aproveite esta oportunidade estratégica de networking e carreira!')
             ->salutation('Atenciosamente, Equipe SOMOS UNN');
     }
@@ -58,7 +63,7 @@ class JobVacancyPublished extends Notification
         return [
             'message' => 'Nova vaga publicada: ' . $this->vacancy->title,
             'type' => 'job_vacancy',
-            'action_url' => route('panel.jobs.show', $this->vacancy),
+            'action_url' => $this->vacancyUrl(),
             'action_label' => 'Candidatar-se',
             'company' => $this->vacancy->company_name,
         ];

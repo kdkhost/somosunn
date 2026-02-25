@@ -150,7 +150,7 @@
                                                 class="flex-1 px-8 py-4 rounded-2xl font-black btn-primary text-white shadow-xl shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3">
                                                 Ver Detalhes da Vaga <i class="fas fa-arrow-right text-sm"></i>
                                             </a>
-                                            <a href="/cadastro-curriculo"
+                                            <a href="{{ route('jobs.public.show', $featuredJob->id) }}#candidatura"
                                                 class="flex-1 px-8 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-600 hover:bg-slate-50 hover:border-slate-200 transition-all flex items-center justify-center">
                                                 Enviar Currículo
                                             </a>
@@ -323,7 +323,7 @@
                         </div>
                         <h3 class="text-xl font-black text-slate-900 mb-3">Cadastro de Perfil</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
-                            Mantenha seus dados e currículo atualizados no seu portal do membro para aumentar suas chances.
+                            Mantenha seus dados e currículo atualizados para agilizar as candidaturas enviadas no frontend.
                         </p>
                     </div>
 
@@ -368,9 +368,9 @@
                             notificado por empresas parceiras.
                         </p>
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <a href="/cadastro-curriculo"
+                            <a href="{{ route('jobs.public.index') }}#lista-vagas"
                                 class="px-10 py-5 rounded-2xl font-black bg-white text-blue-700 hover:bg-blue-50 shadow-2xl transition inline-flex items-center gap-3">
-                                <i class="fas fa-file-upload"></i> Cadastrar Currículo
+                                <i class="fas fa-file-upload"></i> Escolher Vaga e Candidatar
                             </a>
                             <a href="{{ route('premium') }}"
                                 class="px-10 py-5 rounded-2xl font-black border-2 border-white/20 hover:bg-white/10 transition inline-flex items-center gap-3">

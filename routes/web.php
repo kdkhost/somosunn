@@ -91,7 +91,10 @@ Route::get('/membros', [\App\Http\Controllers\MemberController::class, 'index'])
 // Vagas Públicas (Externas)
 Route::get('/vagas-abertas', [\App\Http\Controllers\OportunidadesTesteController::class, 'index'])->name('jobs.public.index');
 Route::get('/vagas-abertas/{job}', [\App\Http\Controllers\JobPublicController::class, 'show'])->name('jobs.public.show');
-Route::get('/cadastro-curriculo', fn() => redirect()->route('panel.profile.edit'))->name('curriculum.register');
+Route::post('/vagas-abertas/{job}/inscricao-vaga', [\App\Http\Controllers\JobPublicController::class, 'apply'])
+    ->middleware(['auth', 'check.plan'])
+    ->name('jobs.public.apply');
+Route::get('/cadastro-curriculo', fn() => redirect()->to(route('jobs.public.index') . '#lista-vagas'))->name('curriculum.register');
 
 // ── Parceiros ────────────────────────────────────────────────────────────────
 // Público: listagem e detalhe de cupons (detalhe exige login + plano ativo no controller)
@@ -487,8 +490,6 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     // Portal de Vagas (Usuário)
     Route::get('/vagas', [\App\Http\Controllers\Panel\JobController::class, 'index'])->name('jobs.index');
     Route::get('/vagas/{job}', [\App\Http\Controllers\Panel\JobController::class, 'show'])->name('jobs.show');
-    Route::post('/vagas/{job}/inscricao-vaga', [\App\Http\Controllers\Panel\JobController::class, 'apply'])->name('jobs.apply');
-    Route::post('/sj-submit/{job}', [\App\Http\Controllers\Panel\JobController::class, 'apply'])->name('jobs.apply.external');
 
     // Gestão de Vagas da Empresa (Cadastro e Edição)
     Route::get('my-jobs/{my_job}/candidates', [\App\Http\Controllers\Panel\MyJobController::class, 'candidates'])->name('my-jobs.candidates');

@@ -19,6 +19,37 @@
         }
     </style>
 
+    @php
+        $normalizedStatus = $application ? ($application->status === 'reviewing' ? 'standby' : $application->status) : null;
+        if ($normalizedStatus === 'accepted') {
+            $normalizedStatus = 'approved';
+        }
+
+        $statusMeta = [
+            'pending' => [
+                'label' => 'Pendente',
+                'badge' => 'bg-amber-100 text-amber-700 border-amber-200',
+                'text' => 'Sua candidatura foi recebida e esta aguardando analise inicial.',
+            ],
+            'standby' => [
+                'label' => 'Standby',
+                'badge' => 'bg-blue-100 text-blue-700 border-blue-200',
+                'text' => 'Sua candidatura esta em observacao para possiveis proximas etapas.',
+            ],
+            'approved' => [
+                'label' => 'Aprovado',
+                'badge' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                'text' => 'Parabens! Sua candidatura foi aprovada para avancar.',
+            ],
+            'rejected' => [
+                'label' => 'Recusado',
+                'badge' => 'bg-red-100 text-red-700 border-red-200',
+                'text' => 'A vaga seguiu com outro perfil neste momento.',
+            ],
+        ];
+        $currentStatusMeta = $normalizedStatus && isset($statusMeta[$normalizedStatus]) ? $statusMeta[$normalizedStatus] : null;
+    @endphp
+
     <div class="min-h-screen bg-slate-50">
         {{-- Hero Section --}}
         <section class="unn-jobs-hero pt-32 pb-20 border-b border-slate-100 overflow-hidden">
@@ -148,10 +179,17 @@
                                         </button>
 
                                         @if(Auth::check())
-                                            <a href="{{ route('panel.jobs.show', $job) }}"
-                                                class="px-8 py-4 btn-primary text-white rounded-2xl font-black shadow-xl shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
-                                                Candidatar-se Agora <i class="fas fa-arrow-right text-sm"></i>
-                                            </a>
+                                            @if($application)
+                                                <a href="{{ route('panel.jobs.show', $job) }}"
+                                                    class="px-8 py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-black shadow-xl shadow-slate-900/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
+                                                    Acompanhar Candidatura <i class="fas fa-arrow-right text-sm"></i>
+                                                </a>
+                                            @else
+                                                <a href="#candidatura"
+                                                    class="px-8 py-4 btn-primary text-white rounded-2xl font-black shadow-xl shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
+                                                    Enviar Curriculo <i class="fas fa-arrow-right text-sm"></i>
+                                                </a>
+                                            @endif
                                         @else
                                             <a href="{{ route('login') }}"
                                                 class="px-8 py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-black shadow-xl shadow-slate-900/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
@@ -160,6 +198,77 @@
                                         @endif
                                     </div>
                                 </div>
+                            </div>
+
+                            <div id="candidatura"
+                                class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.06)] border border-slate-100 scroll-mt-32">
+                                <div class="flex items-center gap-3 mb-8 pb-4 border-b border-slate-50">
+                                    <div class="w-2 h-10 bg-blue-600 rounded-full"></div>
+                                    <h2 class="text-2xl font-black text-slate-900 m-0">Candidatura</h2>
+                                </div>
+
+                                @if(Auth::check())
+                                    @if($application && $currentStatusMeta)
+                                        <div class="space-y-5">
+                                            <span
+                                                class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold border {{ $currentStatusMeta['badge'] }}">
+                                                {{ $currentStatusMeta['label'] }}
+                                            </span>
+                                            <p class="text-slate-600 font-semibold">{{ $currentStatusMeta['text'] }}</p>
+                                            <div class="rounded-2xl bg-slate-50 border border-slate-100 p-5 space-y-2">
+                                                <p class="text-xs font-black uppercase tracking-widest text-slate-400">Data de envio</p>
+                                                <p class="text-sm font-bold text-slate-700">{{ $application->created_at->format('d/m/Y H:i') }}</p>
+                                            </div>
+                                            <a href="{{ route('panel.jobs.show', $job) }}"
+                                                class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-slate-900 hover:bg-black text-white font-black transition-all">
+                                                Ver andamento no painel <i class="fas fa-arrow-right text-xs"></i>
+                                            </a>
+                                        </div>
+                                    @else
+                                        <p class="text-slate-600 font-semibold mb-6">
+                                            Envie seu curriculo por aqui. O responsavel pela vaga avaliara sua candidatura no painel administrativo dele.
+                                        </p>
+
+                                        <form id="frontend-apply-form" data-apply-url="{{ route('jobs.public.apply', $job) }}"
+                                            class="space-y-5">
+                                            <div>
+                                                <label for="resume_file"
+                                                    class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
+                                                    Curriculo (PDF, DOC ou DOCX - max 2MB)
+                                                </label>
+                                                <input id="resume_file" name="resume_file" type="file" accept=".pdf,.doc,.docx"
+                                                    required
+                                                    class="w-full rounded-2xl border-slate-200 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                            </div>
+
+                                            <div>
+                                                <label for="cover_letter"
+                                                    class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
+                                                    Carta de apresentacao (opcional)
+                                                </label>
+                                                <textarea id="cover_letter" name="cover_letter" rows="5" maxlength="2000"
+                                                    placeholder="Escreva uma breve apresentacao para o recrutador."
+                                                    class="w-full rounded-2xl border-slate-200 focus:ring-blue-500 focus:border-blue-500 text-sm"></textarea>
+                                            </div>
+
+                                            <div id="frontend-apply-feedback" class="hidden rounded-2xl px-4 py-3 text-sm font-bold">
+                                            </div>
+
+                                            <button id="frontend-apply-submit" type="submit"
+                                                class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl btn-primary text-white font-black shadow-xl shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-95">
+                                                Enviar Candidatura <i class="fas fa-paper-plane text-xs"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                @else
+                                    <p class="text-slate-600 font-semibold mb-6">
+                                        Faca login para enviar seu curriculo diretamente no frontend e acompanhar o andamento da candidatura.
+                                    </p>
+                                    <a href="{{ route('login') }}"
+                                        class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-slate-900 hover:bg-black text-white font-black transition-all">
+                                        Entrar para Candidatar <i class="fas fa-arrow-right text-sm"></i>
+                                    </a>
+                                @endif
                             </div>
 
                             {{-- Final CTA Area --}}
@@ -285,3 +394,106 @@
         </section>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        (function() {
+            const form = document.getElementById('frontend-apply-form');
+            if (!form) return;
+
+            const fileInput = document.getElementById('resume_file');
+            const coverLetterInput = document.getElementById('cover_letter');
+            const submitButton = document.getElementById('frontend-apply-submit');
+            const feedback = document.getElementById('frontend-apply-feedback');
+            const applyUrl = form.dataset.applyUrl;
+            const csrfToken = '{{ csrf_token() }}';
+            const allowed = ['pdf', 'doc', 'docx'];
+
+            function showFeedback(type, message) {
+                feedback.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'border', 'border-red-200', 'bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+                if (type === 'success') {
+                    feedback.classList.add('bg-emerald-50', 'text-emerald-700', 'border', 'border-emerald-200');
+                } else {
+                    feedback.classList.add('bg-red-50', 'text-red-700', 'border', 'border-red-200');
+                }
+                feedback.textContent = message;
+            }
+
+            function readFileAsDataURL(file) {
+                return new Promise(function(resolve, reject) {
+                    const reader = new FileReader();
+                    reader.onload = function() {
+                        resolve(reader.result);
+                    };
+                    reader.onerror = function() {
+                        reject(new Error('Falha ao ler o arquivo.'));
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const file = fileInput.files && fileInput.files.length ? fileInput.files[0] : null;
+                if (!file) {
+                    showFeedback('error', 'Selecione um curriculo antes de enviar.');
+                    return;
+                }
+
+                const extension = (file.name.split('.').pop() || '').toLowerCase();
+                if (!allowed.includes(extension)) {
+                    showFeedback('error', 'Formato invalido. Use PDF, DOC ou DOCX.');
+                    return;
+                }
+
+                if (file.size > (2 * 1024 * 1024)) {
+                    showFeedback('error', 'Arquivo muito grande. O limite e 2MB.');
+                    return;
+                }
+
+                submitButton.disabled = true;
+                submitButton.classList.add('opacity-70', 'cursor-not-allowed');
+                submitButton.innerHTML = 'Enviando...';
+
+                try {
+                    const fileData = await readFileAsDataURL(file);
+                    const response = await fetch(applyUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({
+                            file_data: fileData,
+                            file_name: file.name,
+                            cover_letter: coverLetterInput ? coverLetterInput.value : ''
+                        })
+                    });
+
+                    const contentType = response.headers.get('content-type') || '';
+                    const isJson = contentType.includes('application/json');
+                    const data = isJson ? await response.json() : null;
+
+                    if (response.ok && data && data.success) {
+                        showFeedback('success', data.message || 'Candidatura enviada com sucesso!');
+                        form.reset();
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1200);
+                        return;
+                    }
+
+                    showFeedback('error', (data && data.message) ? data.message : 'Nao foi possivel enviar a candidatura.');
+                } catch (error) {
+                    showFeedback('error', 'Erro de conexao. Tente novamente.');
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
+                    submitButton.innerHTML = 'Enviar Candidatura <i class="fas fa-paper-plane text-xs"></i>';
+                }
+            });
+        })();
+    </script>
+@endpush
