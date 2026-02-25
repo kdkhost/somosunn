@@ -236,7 +236,23 @@
 
             /* Em modo Debug/Simulação, campos fake bonitões */
             .simulation-field {
-                @apply block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-3 px-4 text-sm mt-1;
+                display: block;
+                width: 100%;
+                border-radius: 0.75rem;
+                border: 1px solid #d1d5db;
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+                color: #4b5563;
+                background-color: #f9fafb;
+                outline: none;
+                transition: border-color 0.15s;
+            }
+
+            .simulation-field:focus {
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
             }
         </style>
         @if((($paymentConfigured ?? false) || config('app.debug')) && ($plan->price ?? 0) > 0)
@@ -261,11 +277,11 @@
                         if (e.target.value === 'pix') {
                             cardForm.classList.add('hidden');
                             pixInfo.classList.remove('hidden');
-                            submitBtn.innerText = 'Gerar QR Code Pix';
+                            submitBtn.innerHTML = '<i class="fas fa-qrcode"></i> Gerar QR Code Pix';
                         } else {
                             cardForm.classList.remove('hidden');
                             pixInfo.classList.add('hidden');
-                            submitBtn.innerText = 'Finalizar Pagamento';
+                            submitBtn.innerHTML = '<i class="fas fa-lock"></i> Finalizar Pagamento';
                         }
                     });
                 });
@@ -301,7 +317,7 @@
                                 onReady: () => {
                                     // Se o brick carregou e estamos no modo cartão, esconder botão geral
                                     const selected = document.querySelector('input[name="payment_method"]:checked').value;
-                                    if(selected === 'credit_card') {
+                                    if (selected === 'credit_card') {
                                         submitBtn.classList.add('hidden');
                                     }
                                 },
@@ -333,43 +349,43 @@
                 } else if ("{{ config('app.debug') }}") {
                     console.log("Modo Simulação Ativo: SDK do MercadoPago suprimido.");
                     document.getElementById('cardPaymentBrick_container').innerHTML = `
-                        <div class="p-8 border border-amber-200 rounded-3xl bg-amber-50/30 space-y-4">
-                            <div class="flex items-center gap-3 text-amber-700 mb-4">
-                                <i class="fas fa-flask text-2xl"></i>
-                                <h4 class="font-black italic">MODO SIMULADOR</h4>
-                            </div>
-                            
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Número do Cartão (Simulado)</label>
-                                    <input type="text" class="simulation-field" value="4444 4444 4444 4444" disabled>
-                                </div>
+                                    <div class="p-8 border border-amber-200 rounded-3xl bg-amber-50/30 space-y-4">
+                                        <div class="flex items-center gap-3 text-amber-700 mb-4">
+                                            <i class="fas fa-flask text-2xl"></i>
+                                            <h4 class="font-black italic">MODO SIMULADOR</h4>
+                                        </div>
 
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Validade</label>
-                                        <input type="text" class="simulation-field" value="12/28" disabled>
-                                    </div>
-                                    <div>
-                                        <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">CVV</label>
-                                        <input type="text" class="simulation-field" value="123" disabled>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Nome do Titular</label>
-                                    <input type="text" class="simulation-field" value="{{ Auth::check() ? strtoupper(Auth::user()->name) : 'CLIENTE TESTE' }}" disabled>
-                                </div>
-                            </div>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Número do Cartão (Simulado)</label>
+                                                <input type="text" class="simulation-field" value="4444 4444 4444 4444" disabled>
+                                            </div>
 
-                            <div class="p-4 bg-white/50 rounded-2xl border border-amber-100 mt-4">
-                                <p class="text-[11px] text-amber-700 leading-relaxed font-medium">
-                                    <i class="fas fa-info-circle mr-1"></i> As chaves do MercadoPago não foram configuradas. 
-                                    Como o <strong>Debug</strong> está ativo, este formulário fake permite testar o fluxo de adesão.
-                                </p>
-                            </div>
-                        </div>
-                    `;
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Validade</label>
+                                                    <input type="text" class="simulation-field" value="12/28" disabled>
+                                                </div>
+                                                <div>
+                                                    <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">CVV</label>
+                                                    <input type="text" class="simulation-field" value="123" disabled>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Nome do Titular</label>
+                                                <input type="text" class="simulation-field" value="{{ Auth::check() ? strtoupper(Auth::user()->name) : 'CLIENTE TESTE' }}" disabled>
+                                            </div>
+                                        </div>
+
+                                        <div class="p-4 bg-white/50 rounded-2xl border border-amber-100 mt-4">
+                                            <p class="text-[11px] text-amber-700 leading-relaxed font-medium">
+                                                <i class="fas fa-info-circle mr-1"></i> As chaves do MercadoPago não foram configuradas. 
+                                                Como o <strong>Debug</strong> está ativo, este formulário fake permite testar o fluxo de adesão.
+                                            </p>
+                                        </div>
+                                    </div>
+                                `;
                 }
 
                 // Sincronizar visibilidade do botão de submit externo
@@ -377,7 +393,7 @@
                     radio.addEventListener('change', (e) => {
                         const isPix = e.target.value === 'pix';
                         const isSimulation = !window.cardPaymentBrickController;
-                        
+
                         // Mostra o botão azul apenas se for Pix OU se estivermos em Simulação
                         if (isPix || isSimulation) {
                             submitBtn.classList.remove('hidden');
