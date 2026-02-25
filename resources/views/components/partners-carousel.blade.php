@@ -60,11 +60,14 @@
         }
 
         .partners-track-wrapper {
-            overflow: hidden;
+            overflow: visible;
+            /* ← Permite que tooltips (position:absolute) apareçam acima */
             position: relative;
             width: 100%;
-            mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+            padding-top: 60px;
+            /* ← espaço acima para o tooltip não ser cortado */
+            margin-top: -60px;
+            /* ← compensar o espaço extra sem quebrar o layout */
             cursor: grab;
             user-select: none;
         }

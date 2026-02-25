@@ -6,15 +6,15 @@
 @push('styles')
     <style>
         /*
-             * CONTAINER DO BRICK DO MERCADOPAGO
-             * ─────────────────────────────────
-             * NÃO adicionar regras em `iframe` ou `*` dentro deste container:
-             * o Brick gerencia seu CSS via Shadow DOM e JS interno.
-             * Qualquer reset externo (font-family, line-height, height) destrói
-             * o sistema de labels flutuantes e a renderização dos campos PCI.
-             * A única correção necessária foi remover `iframe { height:auto }`
-             * do CSS global do app.blade.php (já feito).
-            */
+                 * CONTAINER DO BRICK DO MERCADOPAGO
+                 * ─────────────────────────────────
+                 * NÃO adicionar regras em `iframe` ou `*` dentro deste container:
+                 * o Brick gerencia seu CSS via Shadow DOM e JS interno.
+                 * Qualquer reset externo (font-family, line-height, height) destrói
+                 * o sistema de labels flutuantes e a renderização dos campos PCI.
+                 * A única correção necessária foi remover `iframe { height:auto }`
+                 * do CSS global do app.blade.php (já feito).
+                */
 
         #cardPaymentBrick_container {
             min-height: 340px;
@@ -402,40 +402,60 @@
                 } else if ("{{ config('app.debug') }}") {
                     console.log("Modo Simulação Ativo.");
                     document.getElementById('cardPaymentBrick_container').innerHTML = `
-                                    <div style="padding:24px;border:2px dashed #fcd34d;border-radius:16px;background:#fffbeb;">
-                                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-                                            <i class="fas fa-flask" style="font-size:1.4rem;color:#b45309;"></i>
-                                            <span style="font-weight:900;color:#92400e;font-size:0.95rem;letter-spacing:.05em;">MODO SIMULAÇÃO — Dados fictícios para teste</span>
-                                        </div>
-                                        <div style="display:grid;gap:14px;">
-                                            <div>
-                                                <label class="sim-label">Número do Cartão</label>
-                                                <input class="sim-input" type="text" value="5031 4332 1540 6351" disabled>
-                                            </div>
-                                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                                                <div>
-                                                    <label class="sim-label">Validade</label>
-                                                    <input class="sim-input" type="text" value="11/30" disabled>
+                                                <div style="padding:24px;border:2px dashed #fcd34d;border-radius:16px;background:#fffbeb;">
+                                                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+                                                        <i class="fas fa-flask" style="font-size:1.4rem;color:#b45309;"></i>
+                                                        <span style="font-weight:900;color:#92400e;font-size:0.95rem;letter-spacing:.05em;">MODO SIMULAÇÃO — Dados fictícios para teste</span>
+                                                    </div>
+                                                    <div style="display:grid;gap:14px;">
+                                                        <div>
+                                                            <label class="sim-label">Número do Cartão</label>
+                                                            <input class="sim-input" type="text" value="5031 4332 1540 6351" disabled>
+                                                        </div>
+                                                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                                            <div>
+                                                                <label class="sim-label">Validade</label>
+                                                                <input class="sim-input" type="text" value="11/30" disabled>
+                                                            </div>
+                                                            <div>
+                                                                <label class="sim-label">CVV</label>
+                                                                <input class="sim-input" type="text" value="123" disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label class="sim-label">Nome do titular</label>
+                                                            <input class="sim-input" type="text" value="{{ Auth::check() ? strtoupper(Auth::user()->name) : 'CLIENTE TESTE' }}" disabled>
+                                                        </div>
+                                                    </div>
+                                                    <p style="margin-top:16px;font-size:0.75rem;color:#92400e;line-height:1.5;">
+                                                        <i class="fas fa-info-circle"></i>
+                                                        MercadoPago não configurado. Como o <strong>Debug</strong> está ativo, clique em "Finalizar Pagamento" para simular a aprovação.
+                                                    </p>
                                                 </div>
-                                                <div>
-                                                    <label class="sim-label">CVV</label>
-                                                    <input class="sim-input" type="text" value="123" disabled>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label class="sim-label">Nome do titular</label>
-                                                <input class="sim-input" type="text" value="{{ Auth::check() ? strtoupper(Auth::user()->name) : 'CLIENTE TESTE' }}" disabled>
-                                            </div>
-                                        </div>
-                                        <p style="margin-top:16px;font-size:0.75rem;color:#92400e;line-height:1.5;">
-                                            <i class="fas fa-info-circle"></i>
-                                            MercadoPago não configurado. Como o <strong>Debug</strong> está ativo, clique em "Finalizar Pagamento" para simular a aprovação.
-                                        </p>
-                                    </div>
-                                `;
+                                            `;
                 }
 
+                // ─── SUBMIT: Pix bypassa o Brick ────────────────────────────────────
+                // O Brick DO intercepta o event 'submit' do formulário.
+                // Para Pix, precisamos capturar ANTES do Brick, desmontá-lo e submeter.
+                const paymentForm = document.getElementById('paymentForm');
+                paymentForm.addEventListener('submit', function (e) {
+                    const method = document.getElementById('payment_method_hidden').value;
+                    if (method === 'pix') {
+                        e.preventDefault();
+                        e.stopImmediatePropagation(); // Impede que o Brick processe o submit
+                        // Desmontar o Brick para liberar o form
+                        if (window.cardPaymentBrickController) {
+                            try { window.cardPaymentBrickController.unmount(); } catch (_) { }
+                        }
+                        // Submeter o formulário sem o Brick
+                        paymentForm.submit();
+                    }
+                    // Se for credit_card, o Brick gerencia via onSubmit callback
+                }, true); // 'true' = capture phase (antes do Brick que usa bubble phase)
+
                 // Nota: a sincronização do botão é gerenciada integralmente por syncPaymentMethod().
+
             </script>
         @endif
     @endpush
