@@ -62,9 +62,14 @@ class ConfigureMcpServer extends Command
         $path = $dir . '/mcp.json';
         file_put_contents($path, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
 
+        $integratorId = Setting::get('mercadopago_integrator_id', '');
+
         $this->info("✅ .cursor/mcp.json gerado com sucesso!");
         $this->line("   Ambiente : <fg=yellow>{$env}</> ({$label})");
         $this->line("   Token    : <fg=yellow>" . substr($token, 0, 12) . '…</> (ocultado para segurança)');
+        if ($integratorId) {
+            $this->line("   Integrador: <fg=yellow>{$integratorId}</>");
+        }
         $this->line("   Arquivo  : <fg=cyan>{$path}</>");
         $this->newLine();
         $this->comment('Reinicie o Cursor para o servidor MCP ser ativado.');

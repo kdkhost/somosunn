@@ -112,6 +112,27 @@
                 </div>
             </div>
 
+            <div class="p-3 bg-light rounded border mb-3">
+                <h6 class="text-dark mb-3"><i class="fas fa-fingerprint mr-1"></i> Identificação da plataforma
+                    (Opcional)</h6>
+                <p class="text-sm text-muted mb-3">Configure os IDs de identificação para o MercadoPago (Rastreamento de
+                    qualidade).</p>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Integrator ID</label>
+                        <input type="text" name="mercadopago_integrator_id" class="form-control"
+                            value="{{ $settings['mercadopago_integrator_id'] ?? '' }}" placeholder="ex: dev_1234567890">
+                        <small class="text-muted">Identificador do integrador (opcional).</small>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Platform ID</label>
+                        <input type="text" name="mercadopago_platform_id" class="form-control"
+                            value="{{ $settings['mercadopago_platform_id'] ?? '' }}" placeholder="ex: plat_1234567890">
+                        <small class="text-muted">Identificador da plataforma (opcional).</small>
+                    </div>
+                </div>
+            </div>
+
             <div class="p-3 bg-white rounded border mb-3">
                 <h6 class="text-dark mb-3"><i class="fas fa-list-check mr-1"></i> Meios de Pagamento Aceitos
                     (Plataforma)</h6>

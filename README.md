@@ -210,5 +210,15 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
   - Padronização definitiva de retornos AJAX e sessões via **Toastr**.
   - Remoção de SweetAlert2 Toasts redundantes para uma interface mais limpa e focada.
 
+### 25/02/2026 (Tarde) — Refinamento Técnico MercadoPago (MCP)
+- **Configuração Dinâmica:**
+  - MercadoPago agora lê credenciais e configurações diretamente do banco de dados, ignorando cache estático em modo CLI.
+  - Implementação essencial para correta execução de **Tarefas Agendadas (Cron)** e do **Servidor MCP**.
+- **Identificação da Plataforma:**
+  - Adicionados campos para **Integrator ID** e **Platform ID** na interface administrativa do Gateway.
+  - Injeção automática de headers de identificação em transações via cartão de crédito para rastreamento de qualidade.
+- **MCP Server:**
+  - Comando `php artisan mcp:configure` aprimorado para exibir status completo da integração.
+
 ---
 © 2026 UNN Networking. Todos os direitos reservados.
