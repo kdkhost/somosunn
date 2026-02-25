@@ -41,7 +41,13 @@ class PartnerController extends Controller
 
         $data['active'] = $request->boolean('active');
         $data['slug'] = $data['slug'] ?: Str::slug($data['name']);
-        $data['order'] = $data['order'] ?? 0;
+
+        if ($request->filled('order')) {
+            $data['order'] = (int) $request->order;
+        } else {
+            // Ordem automática (última posição)
+            $data['order'] = (Partner::max('order') ?? 0) + 1;
+        }
 
         if ($request->hasFile('logo')) {
             $data['logo'] = $request->file('logo')->store('partners/logos', 'public');
@@ -77,7 +83,10 @@ class PartnerController extends Controller
 
         $data['active'] = $request->boolean('active');
         $data['slug'] = $data['slug'] ?: Str::slug($data['name']);
-        $data['order'] = $data['order'] ?? 0;
+
+        if ($request->filled('order')) {
+            $data['order'] = (int) $request->order;
+        }
 
         if ($request->boolean('remove_logo') && $partner->logo) {
             Storage::disk('public')->delete($partner->logo);
@@ -115,7 +124,7 @@ class PartnerController extends Controller
         foreach ($request->order as $position => $id) {
             Partner::where('id', $id)->update(['order' => $position]);
         }
-        return response()->json(['status' => 'success']);
+        return response()->json(['status' => 'success', 'message' => 'Ordem de exibição atualizada!']);
     }
 
     protected function ensureAdmin(): void

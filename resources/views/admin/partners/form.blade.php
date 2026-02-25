@@ -151,7 +151,8 @@
                                             <label>Ordem de exibição</label>
                                             <input type="number" name="order" class="form-control"
                                                 value="{{ old('order', $partner->order ?? 0) }}" min="0">
-                                            <small class="text-muted">Menor número = exibido primeiro</small>
+                                            <small class="text-muted">Menor número = exibido primeiro. Deixe vazio para
+                                                preencher automaticamente.</small>
                                         </div>
                                     </div>
                                     <div class="col-md-6">

@@ -154,6 +154,14 @@
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                             body: JSON.stringify({ order })
+                        }).then(r => r.json()).then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    toast: true, position: 'top-end', icon: 'success',
+                                    title: data.message || 'Ordem atualizada!',
+                                    showConfirmButton: false, timer: 1500
+                                });
+                            }
                         });
                     }
                 });
