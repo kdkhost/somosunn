@@ -134,14 +134,6 @@
                             </div>
                         @endif
 
-                        @if(session('success'))
-                            <div
-                                class="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mb-6 flex items-start gap-3">
-                                <i class="fas fa-circle-check mt-0.5 text-green-500"></i>
-                                <span>{{ session('success') }}</span>
-                            </div>
-                        @endif
-
                         @if(($plan->price ?? 0) > 0 && !($paymentConfigured ?? false))
                             @if(config('app.debug'))
                                 <div

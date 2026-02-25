@@ -75,17 +75,6 @@
                     </div>
                 @endif
 
-                <!-- Success Message -->
-                @if(session('success'))
-                    <div
-                        class="mb-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded-2xl p-4">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check-circle text-green-500"></i>
-                            <span class="text-green-800 dark:text-green-300 text-sm font-medium">{{ session('success') }}</span>
-                        </div>
-                    </div>
-                @endif
-
                 @include('panel.admin.settings.partials.' . $group, ['settings' => $settings, 'getUrl' => $getUrl])
 
                 <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">

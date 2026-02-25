@@ -79,11 +79,6 @@
                         <i class="fas fa-triangle-exclamation mr-2"></i>{{ session('error') }}
                     </div>
                 @endif
-                @if(session('success'))
-                    <div class="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mb-6">
-                        <i class="fas fa-circle-check mr-2"></i>{{ session('success') }}
-                    </div>
-                @endif
 
                 @if($alreadyConfirmed)
                     <div class="bg-white rounded-2xl shadow-lg p-8">
