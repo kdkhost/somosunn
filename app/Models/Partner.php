@@ -12,6 +12,7 @@ class Partner extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'name',
         'slug',
         'logo',
@@ -27,6 +28,12 @@ class Partner extends Model
     ];
 
     // ── Relações ────────────────────────────────────────────────────────────────
+    /** Usuário membro responsável pelo parceiro */
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function coupons()
     {
         return $this->hasMany(PartnerCoupon::class)->orderBy('active', 'desc')->orderBy('expires_at');

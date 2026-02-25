@@ -21,13 +21,15 @@ class PartnerController extends Controller
     public function create()
     {
         $this->ensureAdmin();
-        return view('admin.partners.form', ['partner' => new Partner]);
+        $users = \App\Models\User::orderBy('name')->get(['id', 'name', 'email']);
+        return view('admin.partners.form', ['partner' => new Partner, 'users' => $users]);
     }
 
     public function store(Request $request)
     {
         $this->ensureAdmin();
         $data = $request->validate([
+            'user_id' => 'nullable|exists:users,id',
             'name' => 'required|string|max:150',
             'slug' => 'nullable|string|max:150|unique:partners,slug',
             'website_url' => 'nullable|url|max:500',
@@ -53,14 +55,16 @@ class PartnerController extends Controller
     public function edit(Partner $partner)
     {
         $this->ensureAdmin();
+        $users = \App\Models\User::orderBy('name')->get(['id', 'name', 'email']);
         $coupons = $partner->coupons()->orderBy('active', 'desc')->orderBy('created_at', 'desc')->get();
-        return view('admin.partners.form', compact('partner', 'coupons'));
+        return view('admin.partners.form', compact('partner', 'coupons', 'users'));
     }
 
     public function update(Request $request, Partner $partner)
     {
         $this->ensureAdmin();
         $data = $request->validate([
+            'user_id' => 'nullable|exists:users,id',
             'name' => 'required|string|max:150',
             'slug' => 'nullable|string|max:150|unique:partners,slug,' . $partner->id,
             'website_url' => 'nullable|url|max:500',

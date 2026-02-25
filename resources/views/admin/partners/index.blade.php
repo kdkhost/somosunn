@@ -22,10 +22,27 @@
         <div class="container-fluid">
 
             @if(session('success'))
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    {{ session('success') }}
-                </div>
+                @push('scripts')
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            Swal.fire({
+                                toast: true, position: 'top-end', icon: 'success',
+                                title: '{{ session('success') }}',
+                                showConfirmButton: false, timer: 3500, timerProgressBar: true
+                            });
+                        });
+                    </script>
+                @endpush
+            @endif
+
+            @if(session('error'))
+                @push('scripts')
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            Swal.fire({ icon: 'error', title: 'Erro', text: '{{ session('error') }}' });
+                        });
+                    </script>
+                @endpush
             @endif
 
             <div class="card card-outline card-primary">
@@ -103,10 +120,10 @@
                                                 <i class="fas fa-edit"></i> Editar
                                             </a>
                                             <form method="POST" action="{{ route('admin.partners.destroy', $partner) }}"
-                                                class="d-inline"
-                                                onsubmit="return confirm('Remover este parceiro e todos os cupons?')">
+                                                class="d-inline partner-delete-form">
                                                 @csrf @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <button type="button" class="btn btn-sm btn-outline-danger btn-delete-partner"
+                                                    data-nome="{{ $partner->name }}">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
@@ -125,6 +142,7 @@
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
         <script>
+            // Drag-to-reorder
             const tbody = document.getElementById('partners-sortable');
             if (tbody) {
                 Sortable.create(tbody, {
@@ -140,6 +158,24 @@
                     }
                 });
             }
+
+            // Confirmação de exclusão via SweetAlert2
+            document.querySelectorAll('.btn-delete-partner').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const nome = this.dataset.nome;
+                    const form = this.closest('form');
+                    Swal.fire({
+                        title: 'Remover parceiro?',
+                        html: `Isso removerá <strong>${nome}</strong> e todos os cupons vinculados.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#e3342f',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '<i class="fas fa-trash mr-1"></i> Remover',
+                        cancelButtonText: 'Cancelar'
+                    }).then(result => { if (result.isConfirmed) form.submit(); });
+                });
+            });
         </script>
     @endpush
 @endsection

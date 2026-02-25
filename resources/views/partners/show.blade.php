@@ -17,12 +17,12 @@
                 <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
                     {{-- Logo --}}
                     <div class="flex-shrink-0"
-                        style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:1rem;backdrop-filter:blur(10px);min-width:140px;min-height:80px;display:flex;align-items:center;justify-content:center;">
+                        style="background:#ffffff;border:2px solid rgba(255,255,255,0.3);border-radius:20px;padding:1rem;min-width:140px;min-height:80px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.2);">
                         @if($partner->logo_url)
                             <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}"
-                                style="max-width:120px;max-height:64px;object-fit:contain;filter:brightness(0) invert(1);">
+                                style="max-width:120px;max-height:64px;object-fit:contain;">
                         @else
-                            <i class="fas fa-building text-white text-3xl"></i>
+                            <i class="fas fa-building text-slate-400 text-3xl"></i>
                         @endif
                     </div>
                     {{-- Info --}}

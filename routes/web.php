@@ -112,6 +112,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin/partners')->name('admin.part
     Route::put('/{partner}/coupons/{coupon}', [\App\Http\Controllers\Admin\PartnerCouponController::class, 'update'])->name('coupons.update');
     Route::delete('/{partner}/coupons/{coupon}', [\App\Http\Controllers\Admin\PartnerCouponController::class, 'destroy'])->name('coupons.destroy');
 });
+
+// Área do Membro-Parceiro: gerenciamento dos próprios cupons
+Route::middleware(['auth'])->prefix('meu-parceiro')->name('member.partner.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\MemberPartnerController::class, 'index'])->name('index');
+    Route::post('/cupons', [\App\Http\Controllers\MemberPartnerController::class, 'store'])->name('coupons.store');
+    Route::put('/cupons/{coupon}', [\App\Http\Controllers\MemberPartnerController::class, 'update'])->name('coupons.update');
+    Route::delete('/cupons/{coupon}', [\App\Http\Controllers\MemberPartnerController::class, 'destroy'])->name('coupons.destroy');
+});
 // ─────────────────────────────────────────────────────────────────────────────
 
 

@@ -25,10 +25,27 @@
         <div class="container-fluid">
 
             @if(session('success'))
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    {{ session('success') }}
-                </div>
+                @push('scripts')
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            Swal.fire({
+                                toast: true, position: 'top-end', icon: 'success',
+                                title: '{{ session('success') }}',
+                                showConfirmButton: false, timer: 3500, timerProgressBar: true
+                            });
+                        });
+                    </script>
+                @endpush
+            @endif
+
+            @if(session('error'))
+                @push('scripts')
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            Swal.fire({ icon: 'error', title: 'Erro', text: '{{ session('error') }}' });
+                        });
+                    </script>
+                @endpush
             @endif
 
             <div class="row">
@@ -82,6 +99,22 @@
                                     <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                                         value="{{ old('name', $partner->name ?? '') }}" required>
                                     @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Usuário Responsável (Membro Parceiro)</label>
+                                    <select name="user_id"
+                                        class="form-control select2 @error('user_id') is-invalid @enderror">
+                                        <option value="">-- Sem usuário vinculado --</option>
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}" {{ old('user_id', $partner->user_id ?? '') == $user->id ? 'selected' : '' }}>
+                                                {{ $user->name }} ({{ $user->email }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <small class="text-muted">Usuário que poderá gerenciar os cupons na área de
+                                        membros.</small>
+                                    @error('user_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
 
                                 <div class="form-group">
