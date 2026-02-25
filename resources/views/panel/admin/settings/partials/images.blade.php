@@ -77,8 +77,9 @@
 
                 <div class="flex gap-3">
                     <button type="button" onclick="document.getElementById('input_{{ $name }}').click()" 
-                            class="flex-1 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                        Selecionar Imagem
+                            class="flex-1 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-bold text-slate-700 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800 transition inline-flex items-center justify-center gap-2">
+                        <i class="fas fa-upload text-blue-500"></i>
+                        <span id="btn_text_{{ $name }}">Selecionar Imagem</span>
                     </button>
                     <input type="file" id="input_{{ $name }}" name="{{ $name }}" class="hidden" accept="image/*" onchange="previewImage(this, 'preview_{{ $name }}')">
                     
@@ -88,6 +89,9 @@
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
+                <p id="file_label_{{ $name }}" class="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">
+                    {{ $getUrl($name) ? 'Imagem atual definida' : 'Nenhuma imagem selecionada' }}
+                </p>
             </div>
             @endforeach
         </div>
@@ -116,6 +120,16 @@
                 // Reset remove hidden input
                 const name = previewId.replace('preview_', '');
                 document.getElementById('remove_' + name).value = '0';
+
+                const fileLabel = document.getElementById('file_label_' + name);
+                if (fileLabel) {
+                    fileLabel.textContent = file.name;
+                }
+
+                const btnText = document.getElementById('btn_text_' + name);
+                if (btnText) {
+                    btnText.textContent = 'Alterar Imagem';
+                }
             }
             reader.readAsDataURL(file);
         }
@@ -133,5 +147,15 @@
             </div>`;
         }
         document.getElementById('input_' + name).value = '';
+
+        const fileLabel = document.getElementById('file_label_' + name);
+        if (fileLabel) {
+            fileLabel.textContent = 'Imagem removida';
+        }
+
+        const btnText = document.getElementById('btn_text_' + name);
+        if (btnText) {
+            btnText.textContent = 'Selecionar Imagem';
+        }
     }
 </script>
