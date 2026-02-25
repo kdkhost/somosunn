@@ -85,14 +85,18 @@
                     @else
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6 transition-colors">Candidatar-se</h3>
 
-                        <form action="{{ route('panel.jobs.apply.external', $job) }}" method="POST"
-                            enctype="multipart/form-data" class="space-y-4">
+                        {{-- Formulário sem multipart: arquivo convertido para Base64 via JS --}}
+                        <form id="applyForm" action="{{ route('panel.jobs.apply.external', $job) }}" method="POST"
+                            class="space-y-4">
                             @csrf
+                            <input type="hidden" name="file_data" id="file_data">
+                            <input type="hidden" name="file_name" id="file_name">
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Seu Currículo
                                     (PDF/DOC)</label>
-                                <input type="file" name="cv_file" required
+                                <input type="file" id="cv_file_picker" accept=".pdf,.doc,.docx" required
                                     class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all cursor-pointer">
+                                <p id="file_status" class="text-xs text-slate-400 mt-1"></p>
                             </div>
 
                             <div>
@@ -103,11 +107,54 @@
                                     placeholder="Conte um pouco sobre você..."></textarea>
                             </div>
 
-                            <button type="submit"
+                            <button type="submit" id="applyBtn"
                                 class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-500/30 transition-all transform hover:-translate-y-1">
                                 Enviar Candidatura
                             </button>
                         </form>
+
+                        <script>
+                            (function () {
+                                var picker = document.getElementById('cv_file_picker');
+                                var status = document.getElementById('file_status');
+                                var fileData = document.getElementById('file_data');
+                                var fileName = document.getElementById('file_name');
+                                var form = document.getElementById('applyForm');
+                                var btn = document.getElementById('applyBtn');
+
+                                picker.addEventListener('change', function () {
+                                    var file = this.files[0];
+                                    if (!file) return;
+                                    var maxMB = 2;
+                                    if (file.size > maxMB * 1024 * 1024) {
+                                        Swal.fire('Arquivo muito grande', 'O currículo deve ter no máximo 2MB.', 'warning');
+                                        this.value = '';
+                                        return;
+                                    }
+                                    status.textContent = 'Lendo arquivo...';
+                                    var reader = new FileReader();
+                                    reader.onload = function (e) {
+                                        fileData.value = e.target.result; // base64 data URL
+                                        fileName.value = file.name;
+                                        status.textContent = '✅ ' + file.name + ' pronto para envio.';
+                                    };
+                                    reader.onerror = function () {
+                                        status.textContent = '❌ Erro ao ler o arquivo.';
+                                    };
+                                    reader.readAsDataURL(file);
+                                });
+
+                                form.addEventListener('submit', function (e) {
+                                    if (!fileData.value) {
+                                        e.preventDefault();
+                                        Swal.fire('Atenção', 'Selecione o arquivo do currículo.', 'warning');
+                                        return;
+                                    }
+                                    btn.disabled = true;
+                                    btn.textContent = 'Enviando...';
+                                });
+                            })();
+                        </script>
                     @endif
 
                     <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4 transition-colors">

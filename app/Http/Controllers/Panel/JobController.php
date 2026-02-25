@@ -40,7 +40,8 @@ class JobController extends Controller
     {
         $request->validate([
             'cover_letter' => 'nullable|string',
-            'cv_file' => 'required|file|mimes:pdf,doc,docx|max:2048',
+            'file_data' => 'required|string',
+            'file_name' => 'required|string|max:255',
         ]);
 
         $exists = JobApplication::where('job_vacancy_id', $job->id)
@@ -51,12 +52,33 @@ class JobController extends Controller
             return back()->with('error', 'Você já se candidatou para esta vaga.');
         }
 
-        $resumePath = $request->file('cv_file')->store('resumes', 'public');
+        // Decodifica o Base64 e salva o arquivo
+        $fileData = $request->input('file_data');
+        $fileName = $request->input('file_name');
+
+        // Valida extensão
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        if (!in_array($ext, ['pdf', 'doc', 'docx'])) {
+            return back()->with('error', 'Formato de arquivo inválido. Use PDF, DOC ou DOCX.');
+        }
+
+        // Remove o header do data URL (data:application/pdf;base64,)
+        if (str_contains($fileData, ';base64,')) {
+            $fileData = substr($fileData, strpos($fileData, ';base64,') + 8);
+        }
+
+        $decoded = base64_decode($fileData);
+        if (!$decoded || strlen($decoded) > 2 * 1024 * 1024) {
+            return back()->with('error', 'Arquivo inválido ou muito grande (máx 2MB).');
+        }
+
+        $uniqueName = 'resumes/' . \Str::uuid() . '.' . $ext;
+        \Storage::disk('public')->put($uniqueName, $decoded);
 
         JobApplication::create([
             'job_vacancy_id' => $job->id,
             'user_id' => Auth::id(),
-            'resume_path' => $resumePath,
+            'resume_path' => $uniqueName,
             'cover_letter' => $request->cover_letter,
             'status' => 'pending'
         ]);
