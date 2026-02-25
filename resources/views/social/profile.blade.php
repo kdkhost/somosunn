@@ -320,7 +320,7 @@
                         return;
                     }
 
-                    window.location.href = '{{ route('chat.start', $user->id) }}';
+                    window.location.href = '/chat/start/' + userId;
                 }
 
                 function acceptConnection(userId) {
