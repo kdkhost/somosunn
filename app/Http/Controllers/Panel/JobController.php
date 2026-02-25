@@ -38,9 +38,6 @@ class JobController extends Controller
 
     public function apply(Request $request, JobVacancy $job)
     {
-        // DEBUG: Verificar se a requisição chega aqui
-        // dd('Chegou no apply', $request->all(), $job);
-
         $request->validate([
             'cover_letter' => 'nullable|string',
             'resume' => 'required|file|mimes:pdf,doc,docx|max:2048',
