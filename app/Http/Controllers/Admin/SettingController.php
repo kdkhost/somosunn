@@ -110,8 +110,11 @@ class SettingController extends Controller
             'smtp_test_email', // Não salvar e-mail de teste
             // Marketplace hero/exit (arquivos tratados separadamente)
             'marketplace_hero_slide_1_image',
+            'marketplace_hero_slide_1_image_mobile',
             'marketplace_hero_slide_2_image',
+            'marketplace_hero_slide_2_image_mobile',
             'marketplace_hero_slide_3_image',
+            'marketplace_hero_slide_3_image_mobile',
             'marketplace_exit_banner_image',
             // Marketplace remove flags (tratados separadamente)
             'remove_marketplace_hero_slide_1_image',
@@ -616,8 +619,11 @@ class SettingController extends Controller
             'seo_og_image' => ['uploads/imagens/seo', 'uploads/imagens'],
             'seo_twitter_image' => ['uploads/imagens/seo', 'uploads/imagens'],
             'marketplace_hero_slide_1_image' => ['uploads/imagens/marketplace/hero', 'uploads/imagens/marketplace', 'uploads/imagens/frontend', 'uploads/imagens'],
+            'marketplace_hero_slide_1_image_mobile' => ['uploads/imagens/marketplace/hero', 'uploads/imagens/marketplace', 'uploads/imagens'],
             'marketplace_hero_slide_2_image' => ['uploads/imagens/marketplace/hero', 'uploads/imagens/marketplace', 'uploads/imagens/frontend', 'uploads/imagens'],
+            'marketplace_hero_slide_2_image_mobile' => ['uploads/imagens/marketplace/hero', 'uploads/imagens/marketplace', 'uploads/imagens'],
             'marketplace_hero_slide_3_image' => ['uploads/imagens/marketplace/hero', 'uploads/imagens/marketplace', 'uploads/imagens/frontend', 'uploads/imagens'],
+            'marketplace_hero_slide_3_image_mobile' => ['uploads/imagens/marketplace/hero', 'uploads/imagens/marketplace', 'uploads/imagens'],
             'marketplace_exit_banner_image' => ['uploads/imagens/marketplace/exit', 'uploads/imagens/marketplace', 'uploads/imagens/frontend', 'uploads/imagens'],
         ];
 
