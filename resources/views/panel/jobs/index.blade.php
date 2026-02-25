@@ -58,7 +58,7 @@
                             <div></div>
                         @endif
 
-                        <a href="{{ route('jobs.show', $vacancy) }}"
+                        <a href="{{ route('panel.jobs.show', $vacancy) }}"
                             class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl hover:bg-blue-600 hover:text-white transition-all">
                             Ver Detalhes
                         </a>

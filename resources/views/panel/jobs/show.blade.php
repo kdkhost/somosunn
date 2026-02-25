@@ -77,7 +77,7 @@
                             </h3>
                             <p class="text-sm text-slate-500 dark:text-slate-400 transition-colors">Você já se candidatou para
                                 esta vaga. Boa sorte!</p>
-                            <a href="{{ route('jobs.index') }}"
+                            <a href="{{ route('panel.jobs.index') }}"
                                 class="block w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-2xl hover:bg-slate-200 transition-all text-sm">
                                 Voltar para Vagas
                             </a>
@@ -85,7 +85,7 @@
                     @else
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6 transition-colors">Candidatar-se</h3>
 
-                        <form action="{{ route('jobs.apply', $job) }}" method="POST" enctype="multipart/form-data"
+                        <form action="{{ route('panel.jobs.apply', $job) }}" method="POST" enctype="multipart/form-data"
                             class="space-y-4">
                             @csrf
                             <div>

@@ -227,52 +227,16 @@
 
     @push('scripts')
         <style>
-            /* Reset agressivo para isolar o Brick do MercadoPago dos estilos globais (Tailwind/Bootstrap) */
+            /* Isolar o Brick do MercadoPago e garantir que ele tenha espaço */
             #cardPaymentBrick_container {
-                font-family: 'Inter', sans-serif;
-                line-height: normal !important;
-                text-align: left;
+                min-height: 300px;
                 width: 100%;
+                margin-bottom: 2rem;
             }
 
-            #cardPaymentBrick_container * {
-                box-sizing: border-box !important;
-            }
-
-            #cardPaymentBrick_container form {
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-
-            /* Resets específicos para inputs e labels */
-            #cardPaymentBrick_container label {
-                display: block !important;
-                margin-bottom: 4px !important;
-                font-weight: normal !important;
-                width: auto !important;
-                position: static !important;
-                float: none !important;
-            }
-
-            #cardPaymentBrick_container input,
-            #cardPaymentBrick_container select,
-            #cardPaymentBrick_container textarea {
-                height: 48px !important;
-                /* Altura padrão para inputs do MP */
-                min-height: 48px !important;
-                padding: 10px 12px !important;
-                font-size: 16px !important;
-                /* Evita zoom no iOS */
-                line-height: normal !important;
-                margin: 0 !important;
-                border-radius: 6px !important;
-                box-shadow: none !important;
-            }
-
-            /* Corrigir placeholders e inputs que parecem desalinhados */
-            #cardPaymentBrick_container .input-container {
-                position: relative !important;
-                margin-bottom: 16px !important;
+            /* Em modo Debug/Simulação, campos fake bonitões */
+            .simulation-field {
+                @apply block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-3 px-4 text-sm mt-1;
             }
         </style>
         @if((($paymentConfigured ?? false) || config('app.debug')) && ($plan->price ?? 0) > 0)
@@ -334,7 +298,13 @@
                                 },
                             },
                             callbacks: {
-                                onReady: () => {},
+                                onReady: () => {
+                                    // Se o brick carregou e estamos no modo cartão, esconder botão geral
+                                    const selected = document.querySelector('input[name="payment_method"]:checked').value;
+                                    if(selected === 'credit_card') {
+                                        submitBtn.classList.add('hidden');
+                                    }
+                                },
                                 onSubmit: ({ selectedPaymentMethod, formData }) => {
                                     document.getElementById('token').value = formData.token;
                                     document.getElementById('issuer_id').value = formData.issuer_id;
@@ -348,6 +318,7 @@
                                 },
                                 onError: (error) => {
                                     console.error(error);
+                                    Swal.fire('Erro', 'Verifique os dados do cartão e tente novamente.', 'error');
                                 },
                             },
                         };
@@ -362,17 +333,59 @@
                 } else if ("{{ config('app.debug') }}") {
                     console.log("Modo Simulação Ativo: SDK do MercadoPago suprimido.");
                     document.getElementById('cardPaymentBrick_container').innerHTML = `
-                        <div class="p-8 border-2 border-dashed border-amber-200 rounded-2xl bg-amber-50 text-amber-700 text-center">
-                            <i class="fas fa-vial mb-3 text-4xl opacity-50"></i>
-                            <h4 class="font-bold text-lg mb-1">Pagamento Simulado</h4>
-                            <p class="text-sm opacity-80 mb-4">Ambiente de Teste Detectado</p>
-                            <div class="bg-white p-4 rounded-xl border border-amber-100 text-left text-xs mb-4">
-                                <p class="mb-1"><strong>Checkout sem chaves API:</strong></p>
-                                <p>Este formulário simula o comportamento do MercadoPago para validar a lógica de assinatura.</p>
+                        <div class="p-8 border border-amber-200 rounded-3xl bg-amber-50/30 space-y-4">
+                            <div class="flex items-center gap-3 text-amber-700 mb-4">
+                                <i class="fas fa-flask text-2xl"></i>
+                                <h4 class="font-black italic">MODO SIMULADOR</h4>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Número do Cartão (Simulado)</label>
+                                    <input type="text" class="simulation-field" value="4444 4444 4444 4444" disabled>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Validade</label>
+                                        <input type="text" class="simulation-field" value="12/28" disabled>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">CVV</label>
+                                        <input type="text" class="simulation-field" value="123" disabled>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Nome do Titular</label>
+                                    <input type="text" class="simulation-field" value="{{ Auth::check() ? strtoupper(Auth::user()->name) : 'CLIENTE TESTE' }}" disabled>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-white/50 rounded-2xl border border-amber-100 mt-4">
+                                <p class="text-[11px] text-amber-700 leading-relaxed font-medium">
+                                    <i class="fas fa-info-circle mr-1"></i> As chaves do MercadoPago não foram configuradas. 
+                                    Como o <strong>Debug</strong> está ativo, este formulário fake permite testar o fluxo de adesão.
+                                </p>
                             </div>
                         </div>
                     `;
                 }
+
+                // Sincronizar visibilidade do botão de submit externo
+                radios.forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const isPix = e.target.value === 'pix';
+                        const isSimulation = !window.cardPaymentBrickController;
+                        
+                        // Mostra o botão azul apenas se for Pix OU se estivermos em Simulação
+                        if (isPix || isSimulation) {
+                            submitBtn.classList.remove('hidden');
+                        } else {
+                            submitBtn.classList.add('hidden');
+                        }
+                    });
+                });
             </script>
         @endif
     @endpush
