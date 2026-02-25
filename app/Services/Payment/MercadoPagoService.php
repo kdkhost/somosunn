@@ -135,7 +135,6 @@ class MercadoPagoService
             'description' => $this->orderDescription($order),
             'installments' => (int) $data['installments'],
             'payment_method_id' => $data['payment_method_id'],
-            'issuer_id' => $data['issuer_id'],
             'payer' => [
                 'email' => $data['email'] ?? $order->user->email,
                 'identification' => [
@@ -147,20 +146,33 @@ class MercadoPagoService
             'notification_url' => $this->notificationUrl(),
         ];
 
+        // issuer_id é opcional — string vazia causa erro 400 na API
+        if (!empty($data['issuer_id'])) {
+            $paymentData['issuer_id'] = (int) $data['issuer_id'];
+        }
+
         if (!$config['is_platform'] && $calc['application_fee'] > 0) {
             $paymentData['application_fee'] = $calc['application_fee'];
         }
 
         $response = Http::withToken($token)
-            ->withHeaders(['X-Idempotency-Key' => 'cc-' . $order->id . '-' . time()])
+            ->withHeaders([
+                'X-Idempotency-Key' => 'cc-' . $order->id . '-' . time(),
+                'X-Integrator-Id' => config('payments.mercadopago.integrator_id', ''),
+                'X-Platform-Id' => config('payments.mercadopago.platform_id', ''),
+            ])
             ->post("{$this->baseUrl}/v1/payments", $paymentData);
 
         if ($response->failed()) {
-            \Log::error('MercadoPago Credit Card Error: ' . $response->body(), [
+            \Log::error('MercadoPago Credit Card Error', [
                 'order_id' => $order->id,
-                'status' => $response->status()
+                'http_status' => $response->status(),
+                'mp_message' => $response->json('message'),
+                'mp_cause' => $response->json('cause'),
+                'body' => $response->body(),
             ]);
-            throw new Exception('Falha ao processar cartão: ' . $response->body());
+            $msg = $response->json('message') ?? $response->body();
+            throw new Exception('Falha ao processar cartão: ' . $msg);
         }
 
         $body = (array) $response->json();
