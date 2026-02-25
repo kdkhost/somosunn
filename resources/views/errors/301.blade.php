@@ -1,13 +1,10 @@
-@extends('layouts.app')
+@extends('errors.layout')
 
-@section('title','301 — Movido permanentemente')
+@section('error_code', '301')
+@section('error_heading', 'Conteudo movido permanentemente')
+@section('error_message', 'Este endereco foi atualizado e agora aponta para uma nova localizacao.')
+@section('error_hint', 'Atualize seus favoritos para evitar redirecionamentos desnecessarios.')
+@section('error_primary_label', 'Ir para a pagina inicial')
+@section('error_accent', '#0EA5E9')
+@section('error_accent_soft', '#14B8A6')
 
-@section('content')
-<div class="min-h-screen flex items-center justify-center">
-    <div class="text-center">
-        <h1 class="text-6xl font-bold">301</h1>
-        <p class="text-xl mt-4">Conteúdo movido permanentemente.</p>
-        <a href="{{ route('home') }}" class="btn-primary text-white px-4 py-2 rounded mt-6 inline-block">Ir para o site</a>
-    </div>
-</div>
-@endsection

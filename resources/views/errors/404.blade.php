@@ -1,13 +1,10 @@
-@extends('layouts.app')
+@extends('errors.layout')
 
-@section('title','404 — Página não encontrada')
+@section('error_code', '404')
+@section('error_heading', 'Pagina nao encontrada')
+@section('error_message', 'A rota que voce tentou acessar nao existe ou foi removida.')
+@section('error_hint', 'Confira o endereco digitado ou use os atalhos abaixo para continuar navegando.')
+@section('error_primary_label', 'Explorar o site')
+@section('error_accent', '#2563EB')
+@section('error_accent_soft', '#06B6D4')
 
-@section('content')
-<div class="min-h-screen flex items-center justify-center">
-    <div class="text-center">
-        <h1 class="text-6xl font-bold">404</h1>
-        <p class="text-xl mt-4">Ops — Página não encontrada.</p>
-        <a href="{{ route('home') }}" class="btn-primary text-white px-4 py-2 rounded mt-6 inline-block">Voltar ao site</a>
-    </div>
-</div>
-@endsection

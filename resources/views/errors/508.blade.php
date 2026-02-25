@@ -1,13 +1,10 @@
-@extends('layouts.app')
+@extends('errors.layout')
 
-@section('title','508 — Loop detectado')
+@section('error_code', '508')
+@section('error_heading', 'Loop detectado no servidor')
+@section('error_message', 'Foi identificado um ciclo de processamento que impediu a conclusao da resposta.')
+@section('error_hint', 'Tente novamente e, se persistir, contate o suporte com o horario deste erro.')
+@section('error_primary_label', 'Voltar para a home')
+@section('error_accent', '#1D4ED8')
+@section('error_accent_soft', '#14B8A6')
 
-@section('content')
-<div class="min-h-screen flex items-center justify-center">
-    <div class="text-center">
-        <h1 class="text-6xl font-bold">508</h1>
-        <p class="text-xl mt-4">Loop detectado no servidor.</p>
-        <a href="{{ route('home') }}" class="btn-primary text-white px-4 py-2 rounded mt-6 inline-block">Voltar ao site</a>
-    </div>
-</div>
-@endsection

@@ -813,7 +813,10 @@
         </div>
     @endif
 
-    @php $showNavigation = $showNavigation ?? true; @endphp
+    @php
+        $showNavigation = $showNavigation ?? true;
+        $showFooter = $showFooter ?? true;
+    @endphp
     @if($showNavigation)
         @include('partials.header')
     @endif
@@ -840,7 +843,7 @@
         </div>
     @endif
 
-    @includeWhen(true, 'partials.footer')
+    @includeWhen($showFooter, 'partials.footer')
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/inputmask.min.js"></script>

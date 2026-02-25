@@ -1,13 +1,10 @@
-@extends('layouts.app')
+@extends('errors.layout')
 
-@section('title','503 — Serviço indisponível')
+@section('error_code', '503')
+@section('error_heading', 'Servico temporariamente indisponivel')
+@section('error_message', 'Estamos em manutencao ou com alta carga no momento.')
+@section('error_hint', 'Tente novamente em breve. Obrigado pela paciencia.')
+@section('error_primary_label', 'Voltar para a home')
+@section('error_accent', '#0F766E')
+@section('error_accent_soft', '#06B6D4')
 
-@section('content')
-<div class="min-h-screen flex items-center justify-center">
-    <div class="text-center">
-        <h1 class="text-6xl font-bold">503</h1>
-        <p class="text-xl mt-4">Serviço temporariamente indisponível. Volte mais tarde.</p>
-        <a href="{{ route('home') }}" class="btn-primary text-white px-4 py-2 rounded mt-6 inline-block">Voltar ao site</a>
-    </div>
-</div>
-@endsection

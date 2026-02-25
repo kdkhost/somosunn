@@ -1,13 +1,10 @@
-@extends('layouts.app')
+@extends('errors.layout')
 
-@section('title','500 — Erro interno')
+@section('error_code', '500')
+@section('error_heading', 'Erro interno do servidor')
+@section('error_message', 'Encontramos uma falha inesperada ao processar sua solicitacao.')
+@section('error_hint', 'Nossa equipe ja pode ter sido notificada. Tente novamente em alguns minutos.')
+@section('error_primary_label', 'Voltar para a home')
+@section('error_accent', '#DC2626')
+@section('error_accent_soft', '#F97316')
 
-@section('content')
-<div class="min-h-screen flex items-center justify-center">
-    <div class="text-center">
-        <h1 class="text-6xl font-bold">500</h1>
-        <p class="text-xl mt-4">Erro interno do servidor.</p>
-        <a href="{{ route('home') }}" class="btn-primary text-white px-4 py-2 rounded mt-6 inline-block">Voltar ao site</a>
-    </div>
-</div>
-@endsection

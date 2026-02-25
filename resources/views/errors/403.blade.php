@@ -1,13 +1,10 @@
-@extends('layouts.app')
+@extends('errors.layout')
 
-@section('title','403 — Acesso negado')
+@section('error_code', '403')
+@section('error_heading', 'Acesso negado')
+@section('error_message', 'Voce nao tem permissao para visualizar este conteudo.')
+@section('error_hint', 'Se voce acredita que isso e um engano, fale com um administrador.')
+@section('error_primary_label', 'Voltar para a home')
+@section('error_accent', '#F97316')
+@section('error_accent_soft', '#FB7185')
 
-@section('content')
-<div class="min-h-screen flex items-center justify-center">
-    <div class="text-center">
-        <h1 class="text-6xl font-bold">403</h1>
-        <p class="text-xl mt-4">Acesso negado.</p>
-        <a href="{{ route('home') }}" class="btn-primary text-white px-4 py-2 rounded mt-6 inline-block">Voltar ao site</a>
-    </div>
-</div>
-@endsection
