@@ -824,10 +824,15 @@
 
     @php
         $hidePartnersCarousel = request()->routeIs('courses.lessons.show');
+        $isBackendArea = request()->routeIs('panel.*')
+            || request()->routeIs('admin.*')
+            || request()->is('painel/*')
+            || request()->is('admin/*');
+        $showPartnersCarousel = $showNavigation && !$hidePartnersCarousel && !$isBackendArea;
     @endphp
 
     {{-- Parceiros Globais --}}
-    @if($showNavigation && !$hidePartnersCarousel)
+    @if($showPartnersCarousel)
         <div class="bg-white py-10">
             <div class="max-w-7xl mx-auto px-4 md:px-6">
                 @include('components.partners-carousel')
