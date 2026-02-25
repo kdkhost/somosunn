@@ -6,7 +6,7 @@
     <div class="max-w-5xl mx-auto space-y-6">
         {{-- Header & Breadcrumb --}}
         <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
-            <a href="{{ route('jobs.index') }}" class="hover:text-blue-600 transition-colors">Vagas</a>
+            <a href="{{ route('panel.jobs.index') }}" class="hover:text-blue-600 transition-colors">Vagas</a>
             <i class="fas fa-chevron-right text-[8px]"></i>
             <span class="text-slate-900 dark:text-white">{{ $job->title }}</span>
         </div>

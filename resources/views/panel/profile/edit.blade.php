@@ -11,6 +11,20 @@
                 <p class="text-slate-600 dark:text-slate-400 mt-1">Mantenha seus dados atualizados para melhor experiência
                     na plataforma.</p>
             </div>
+
+            @if(request()->routeIs('curriculum.register') || request()->has('ref_curriculum'))
+                <div
+                    class="flex-1 max-w-md bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 p-4 rounded-2xl flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-blue-900 dark:text-blue-100 italic">Banco de Talentos</h4>
+                        <p class="text-xs text-blue-700 dark:text-blue-300">Complete seu perfil abaixo para que empresas
+                            parceiras possam te encontrar!</p>
+                    </div>
+                </div>
+            @endif
             <a href="{{ route('panel.dashboard') }}"
                 class="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                 data-tooltip="Voltar para o painel principal" style="position:relative;">
@@ -446,21 +460,21 @@
 
                     function updateDocMask() {
                         if (!docInput || !personTypeSelect) return;
-                        
+
                         const isJuridica = personTypeSelect.value === 'J';
                         const mask = isJuridica ? '99.999.999/9999-99' : '999.999.999-99';
                         const placeholder = isJuridica ? '00.000.000/0000-00' : '000.000.000-00';
                         const label = isJuridica ? 'Documento (CNPJ)' : 'Documento (CPF)';
-                        
+
                         if (docInput.inputmask) docInput.inputmask.remove();
                         Inputmask({ mask: mask, keepStatic: true }).mask(docInput);
-                        
+
                         docInput.placeholder = placeholder;
-                        if(docLabel) docLabel.textContent = label;
+                        if (docLabel) docLabel.textContent = label;
                     }
 
                     if (personTypeSelect) {
-                        personTypeSelect.addEventListener('change', function() {
+                        personTypeSelect.addEventListener('change', function () {
                             docInput.value = ''; // Clear on change to avoid mask conflict
                             updateDocMask();
                         });
@@ -468,7 +482,7 @@
                         updateDocMask();
                     } else {
                         // Fallback if no select
-                         Inputmask({ mask: ['999.999.999-99', '99.999.999/9999-99'], keepStatic: true }).mask(docInput);
+                        Inputmask({ mask: ['999.999.999-99', '99.999.999/9999-99'], keepStatic: true }).mask(docInput);
                     }
 
                     // CEP

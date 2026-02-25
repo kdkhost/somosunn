@@ -91,6 +91,7 @@ Route::get('/membros', [\App\Http\Controllers\MemberController::class, 'index'])
 // Vagas Públicas (Externas)
 Route::get('/vagas-abertas', [\App\Http\Controllers\OportunidadesTesteController::class, 'index'])->name('jobs.public.index');
 Route::get('/vagas-abertas/{job}', [\App\Http\Controllers\JobPublicController::class, 'show'])->name('jobs.public.show');
+Route::get('/cadastro-curriculo', fn() => redirect()->route('panel.profile.edit'))->name('curriculum.register');
 
 // ── Parceiros ────────────────────────────────────────────────────────────────
 // Público: listagem e detalhe de cupons (detalhe exige login + plano ativo no controller)
