@@ -85,74 +85,98 @@
                     @else
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6 transition-colors">Candidatar-se</h3>
 
-                        {{-- Formulário sem multipart: arquivo convertido para Base64 via JS --}}
-                        <form id="applyForm" action="{{ route('panel.jobs.apply.external', $job) }}" method="POST"
-                            class="space-y-4">
-                            @csrf
-                            <input type="hidden" name="file_data" id="file_data">
-                            <input type="hidden" name="file_name" id="file_name">
+                        {{-- Envio via fetch() JSON para bypassar ModSecurity (sem multipart/form-data) --}}
+                        <div id="applyFormWrap" class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Seu Currículo
                                     (PDF/DOC)</label>
-                                <input type="file" id="cv_file_picker" accept=".pdf,.doc,.docx" required
+                                <input type="file" id="cv_file_picker" accept=".pdf,.doc,.docx"
                                     class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all cursor-pointer">
                                 <p id="file_status" class="text-xs text-slate-400 mt-1"></p>
                             </div>
-
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-widest">Carta de
                                     Apresentação</label>
-                                <textarea name="cover_letter" rows="4"
+                                <textarea id="cover_letter_field" rows="4"
                                     class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-slate-900 dark:text-white font-medium"
                                     placeholder="Conte um pouco sobre você..."></textarea>
                             </div>
-
-                            <button type="submit" id="applyBtn"
+                            <button id="applyBtn" onclick="submitApplication()"
                                 class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-500/30 transition-all transform hover:-translate-y-1">
                                 Enviar Candidatura
                             </button>
-                        </form>
+                        </div>
 
                         <script>
                             (function () {
                                 var picker = document.getElementById('cv_file_picker');
                                 var status = document.getElementById('file_status');
-                                var fileData = document.getElementById('file_data');
-                                var fileName = document.getElementById('file_name');
-                                var form = document.getElementById('applyForm');
-                                var btn = document.getElementById('applyBtn');
+                                var fileDataB64 = null;
+                                var fileNameVal = null;
 
                                 picker.addEventListener('change', function () {
                                     var file = this.files[0];
                                     if (!file) return;
-                                    var maxMB = 2;
-                                    if (file.size > maxMB * 1024 * 1024) {
-                                        Swal.fire('Arquivo muito grande', 'O currículo deve ter no máximo 2MB.', 'warning');
+                                    if (file.size > 2 * 1024 * 1024) {
+                                        Swal.fire('Arquivo grande demais', 'Máx 2MB.', 'warning');
                                         this.value = '';
                                         return;
                                     }
-                                    status.textContent = 'Lendo arquivo...';
+                                    status.textContent = 'Lendo...';
                                     var reader = new FileReader();
                                     reader.onload = function (e) {
-                                        fileData.value = e.target.result; // base64 data URL
-                                        fileName.value = file.name;
-                                        status.textContent = '✅ ' + file.name + ' pronto para envio.';
+                                        fileDataB64 = e.target.result;
+                                        fileNameVal = file.name;
+                                        status.textContent = '✅ ' + file.name;
                                     };
-                                    reader.onerror = function () {
-                                        status.textContent = '❌ Erro ao ler o arquivo.';
-                                    };
+                                    reader.onerror = function () { status.textContent = '❌ Erro ao ler.'; };
                                     reader.readAsDataURL(file);
                                 });
 
-                                form.addEventListener('submit', function (e) {
-                                    if (!fileData.value) {
-                                        e.preventDefault();
-                                        Swal.fire('Atenção', 'Selecione o arquivo do currículo.', 'warning');
+                                window.submitApplication = function () {
+                                    if (!fileDataB64) {
+                                        Swal.fire('Atenção', 'Selecione o currículo antes de enviar.', 'warning');
                                         return;
                                     }
+                                    var btn = document.getElementById('applyBtn');
                                     btn.disabled = true;
                                     btn.textContent = 'Enviando...';
-                                });
+
+                                    fetch('{{ route('panel.jobs.apply.external', $job) }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'Accept': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        },
+                                        body: JSON.stringify({
+                                            file_data: fileDataB64,
+                                            file_name: fileNameVal,
+                                            cover_letter: document.getElementById('cover_letter_field').value
+                                        })
+                                    })
+                                        .then(function (r) { return r.json(); })
+                                        .then(function (data) {
+                                            if (data.success) {
+                                                Swal.fire({
+                                                    icon: 'success',
+                                                    title: 'Candidatura enviada!',
+                                                    text: 'Boa sorte!',
+                                                    timer: 2500,
+                                                    showConfirmButton: false
+                                                }).then(function () { window.location.reload(); });
+                                            } else {
+                                                btn.disabled = false;
+                                                btn.textContent = 'Enviar Candidatura';
+                                                Swal.fire('Erro', data.message || 'Não foi possível enviar.', 'error');
+                                            }
+                                        })
+                                        .catch(function (err) {
+                                            btn.disabled = false;
+                                            btn.textContent = 'Enviar Candidatura';
+                                            Swal.fire('Erro de conexão', 'Verifique sua internet e tente novamente.', 'error');
+                                        });
+                                };
                             })();
                         </script>
                     @endif

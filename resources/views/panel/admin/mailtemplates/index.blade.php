@@ -448,7 +448,10 @@
 
         document.getElementById('sendPreviewBtn').addEventListener('click', function () {
             const email = document.getElementById('previewEmail').value;
-            if (!email) return toastr.warning('Digite um e-mail');
+            if (!email) {
+                Swal.fire('Atenção', 'Digite um e-mail de destino.', 'warning');
+                return;
+            }
 
             const btn = this;
             btn.disabled = true;
@@ -460,8 +463,14 @@
                 body: JSON.stringify({ email: email })
             })
                 .then(r => r.json())
-                .then(d => toastr.success(d.message || 'Enviado!'))
-                .catch(() => toastr.error('Erro'))
+                .then(d => {
+                    if (d.success) {
+                        Swal.fire({ icon: 'success', title: 'Enviado!', text: d.message || 'E-mail de teste enviado com sucesso!', timer: 3000, showConfirmButton: false });
+                    } else {
+                        Swal.fire('Erro ao enviar', d.error || 'Falha ao disparar o e-mail. Verifique as configurações SMTP.', 'error');
+                    }
+                })
+                .catch(() => Swal.fire('Erro de conexão', 'Não foi possível comunicar com o servidor.', 'error'))
                 .finally(() => { btn.disabled = false; btn.innerText = 'Enviar'; });
         });
     </script>

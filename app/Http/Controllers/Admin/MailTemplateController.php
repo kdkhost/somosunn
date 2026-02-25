@@ -139,8 +139,17 @@ class MailTemplateController extends Controller
         $data = $this->sampleData($request->input('email'));
         $html = $this->renderVariables($mailtemplate->body, $data);
 
-        $mt = new MailTestController();
-        return $mt->sendRaw($request->input('email'), $mailtemplate->subject, $html);
+        try {
+            \Mail::html($html, function ($message) use ($request, $mailtemplate) {
+                $message->to($request->input('email'))
+                    ->subject($mailtemplate->subject);
+            });
+
+            return response()->json(['success' => true, 'message' => 'E-mail de teste enviado com sucesso!']);
+        } catch (\Throwable $e) {
+            \Log::error('sendPreview error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'error' => 'Falha ao enviar: ' . $e->getMessage()], 500);
+        }
     }
 
     protected function sampleData($email = 'preview@example.com')

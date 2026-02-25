@@ -129,5 +129,7 @@
 
         <!-- Summernote Lite JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+        <!-- Summernote PT-BR lang pack -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-pt-BR.min.js"></script>
     @endpush
 @endsection
