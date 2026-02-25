@@ -67,11 +67,23 @@
                         @endif
 
                         @if(($plan->price ?? 0) > 0 && !($paymentConfigured ?? false))
-                            <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6">
-                                <i class="fas fa-triangle-exclamation mr-2"></i>
-                                Pagamento indisponível no momento. Configure as credenciais do MercadoPago no painel para
-                                habilitar assinaturas.
-                            </div>
+                            @if(config('app.debug'))
+                                <div
+                                    class="bg-amber-50 border border-amber-200 text-amber-700 p-4 rounded-xl mb-6 flex items-center gap-3">
+                                    <i class="fas fa-flask-vial text-xl text-amber-500"></i>
+                                    <div>
+                                        <p class="font-bold">Modo de Simulação (Debug)</p>
+                                        <p class="text-sm">As credenciais do MercadoPago não foram detectadas. Como o site está em
+                                            modo de testes, você pode finalizar a compra para validar o fluxo.</p>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6">
+                                    <i class="fas fa-triangle-exclamation mr-2"></i>
+                                    Pagamento indisponível no momento. Configure as credenciais do MercadoPago no painel para
+                                    habilitar assinaturas.
+                                </div>
+                            @endif
                         @endif
 
                         @guest
@@ -203,7 +215,7 @@
 
                             <button type="submit"
                                 class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg mt-8 shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                                {{ (($plan->price ?? 0) > 0 && !($paymentConfigured ?? false)) ? 'disabled' : '' }}>
+                                {{ (($plan->price ?? 0) > 0 && !($paymentConfigured ?? false) && !config('app.debug')) ? 'disabled' : '' }}>
                                 <i class="fas fa-lock"></i> Finalizar Pagamento
                             </button>
                         </div>
@@ -263,16 +275,17 @@
                 margin-bottom: 16px !important;
             }
         </style>
-        @if(($paymentConfigured ?? false) && ($plan->price ?? 0) > 0)
+        @if((($paymentConfigured ?? false) || config('app.debug')) && ($plan->price ?? 0) > 0)
             @php
                 $theme = \App\Models\Setting::get('gateway_checkout_theme', 'default');
                 $primaryColor = \App\Models\Setting::get('gateway_checkout_primary_color', '#1F5EDB');
             @endphp
 
-            <script src="https://sdk.mercadopago.com/js/v2"></script>
-            <script>
-                const mp = new MercadoPago("{{ $publicKey }}");
+            @if($paymentConfigured ?? false)
+                <script src="https://sdk.mercadopago.com/js/v2"></script>
+            @endif
 
+            <script>
                 // Toggle Payment Methods
                 const radios = document.querySelectorAll('input[name="payment_method"]');
                 const cardForm = document.getElementById('creditCardForm');
@@ -293,62 +306,73 @@
                     });
                 });
 
-                // Initialize Card Payment Brick
-                const bricksBuilder = mp.bricks();
-                const renderCardPaymentBrick = async (bricksBuilder) => {
-                    const settings = {
-                        initialization: {
-                            amount: {{ $plan->price }},
-                            payer: {
-                                email: "{{ Auth::check() ? Auth::user()->email : 'test@test.com' }}", // Pre-fill if logged in
-                            },
-                        },
-                        customization: {
-                            visual: {
-                                style: {
-                                    theme: '{{ $theme }}',
-                                    customVariables: {
-                                        baseColor: '{{ $primaryColor }}',
-                                        formBackgroundColor: '#ffffff',
-                                        borderRadius: '12px',
-                                    }
+                if (typeof MercadoPago !== 'undefined' && "{{ $publicKey ?? '' }}") {
+                    const mp = new MercadoPago("{{ $publicKey }}");
+                    const bricksBuilder = mp.bricks();
+
+                    const renderCardPaymentBrick = async (bricksBuilder) => {
+                        const settings = {
+                            initialization: {
+                                amount: {{ $plan->price }},
+                                payer: {
+                                    email: "{{ Auth::check() ? Auth::user()->email : 'test@test.com' }}",
                                 },
                             },
-                            paymentMethods: {
-                                maxInstallments: 12,
+                            customization: {
+                                visual: {
+                                    style: {
+                                        theme: '{{ $theme }}',
+                                        customVariables: {
+                                            baseColor: '{{ $primaryColor }}',
+                                            formBackgroundColor: '#ffffff',
+                                            borderRadius: '12px',
+                                        }
+                                    },
+                                },
+                                paymentMethods: {
+                                    maxInstallments: 12,
+                                },
                             },
-                        },
-                        callbacks: {
-                            onReady: () => {
-                                // Brick is ready
-                            },
-                            onSubmit: ({ selectedPaymentMethod, formData }) => {
-                                // Populate hidden inputs
-                                document.getElementById('token').value = formData.token;
-                                document.getElementById('issuer_id').value = formData.issuer_id;
-                                document.getElementById('payment_method_id').value = formData.payment_method_id;
-                                document.getElementById('installments').value = formData.installments;
+                            callbacks: {
+                                onReady: () => {},
+                                onSubmit: ({ selectedPaymentMethod, formData }) => {
+                                    document.getElementById('token').value = formData.token;
+                                    document.getElementById('issuer_id').value = formData.issuer_id;
+                                    document.getElementById('payment_method_id').value = formData.payment_method_id;
+                                    document.getElementById('installments').value = formData.installments;
 
-                                // Submit form
-                                return new Promise((resolve, reject) => {
-                                    document.getElementById('paymentForm').submit();
-                                    resolve();
-                                });
+                                    return new Promise((resolve) => {
+                                        document.getElementById('paymentForm').submit();
+                                        resolve();
+                                    });
+                                },
+                                onError: (error) => {
+                                    console.error(error);
+                                },
                             },
-                            onError: (error) => {
-                                console.error(error);
-                            },
-                        },
+                        };
+                        window.cardPaymentBrickController = await bricksBuilder.create(
+                            'cardPayment',
+                            'cardPaymentBrick_container',
+                            settings
+                        );
                     };
-                    window.cardPaymentBrickController = await bricksBuilder.create(
-                        'cardPayment',
-                        'cardPaymentBrick_container',
-                        settings
-                    );
-                };
 
-                // Only render brick if card is selected (default)
-                renderCardPaymentBrick(bricksBuilder);
+                    renderCardPaymentBrick(bricksBuilder);
+                } else if ("{{ config('app.debug') }}") {
+                    console.log("Modo Simulação Ativo: SDK do MercadoPago suprimido.");
+                    document.getElementById('cardPaymentBrick_container').innerHTML = `
+                        <div class="p-8 border-2 border-dashed border-amber-200 rounded-2xl bg-amber-50 text-amber-700 text-center">
+                            <i class="fas fa-vial mb-3 text-4xl opacity-50"></i>
+                            <h4 class="font-bold text-lg mb-1">Pagamento Simulado</h4>
+                            <p class="text-sm opacity-80 mb-4">Ambiente de Teste Detectado</p>
+                            <div class="bg-white p-4 rounded-xl border border-amber-100 text-left text-xs mb-4">
+                                <p class="mb-1"><strong>Checkout sem chaves API:</strong></p>
+                                <p>Este formulário simula o comportamento do MercadoPago para validar a lógica de assinatura.</p>
+                            </div>
+                        </div>
+                    `;
+                }
             </script>
         @endif
     @endpush

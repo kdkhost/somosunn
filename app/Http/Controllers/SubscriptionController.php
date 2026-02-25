@@ -101,8 +101,9 @@ class SubscriptionController extends Controller
             $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
             $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
             $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+            $isSimulation = !$paymentsConfigured && config('app.debug');
 
-            if (!$paymentsConfigured) {
+            if (!$paymentsConfigured && !$isSimulation) {
                 throw new \RuntimeException('MercadoPago não configurado para assinaturas.');
             }
 
@@ -137,7 +138,13 @@ class SubscriptionController extends Controller
             ]);
 
             // Charge via MercadoPago
-            if ($plan->is_recurring && !empty($plan->mp_plan_id)) {
+            if ($isSimulation) {
+                $paymentResult = [
+                    'status' => 'approved',
+                    'id' => 'sim_' . Str::random(10),
+                    'status_detail' => 'accreditation_simulation',
+                ];
+            } else if ($plan->is_recurring && !empty($plan->mp_plan_id)) {
                 $paymentResult = $this->mpService->subscribeUser($plan->mp_plan_id, [
                     'email' => $user->email,
                     'card_token' => $request->token,

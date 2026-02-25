@@ -105,6 +105,10 @@ class MercadoPagoService
             ->post("{$this->baseUrl}/v1/payments", $paymentData);
 
         if ($response->failed()) {
+            \Log::error('MercadoPago Pix Error: ' . $response->body(), [
+                'order_id' => $order->id,
+                'status' => $response->status()
+            ]);
             throw new Exception('Falha ao criar Pix: ' . $response->body());
         }
 
@@ -152,6 +156,10 @@ class MercadoPagoService
             ->post("{$this->baseUrl}/v1/payments", $paymentData);
 
         if ($response->failed()) {
+            \Log::error('MercadoPago Credit Card Error: ' . $response->body(), [
+                'order_id' => $order->id,
+                'status' => $response->status()
+            ]);
             throw new Exception('Falha ao processar cartão: ' . $response->body());
         }
 
