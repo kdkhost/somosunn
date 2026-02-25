@@ -76,6 +76,16 @@
                                 <td class="px-6 py-4 text-right">
                                     <div
                                         class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {{-- Ver Candidatos --}}
+                                        <a href="{{ route('panel.my-jobs.candidates', $vacancy) }}" title="Ver Candidatos"
+                                            class="relative p-2 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all">
+                                            <i class="fas fa-users"></i>
+                                            @php $cnt = $vacancy->applications()->count(); @endphp
+                                            @if($cnt > 0)
+                                                <span
+                                                    class="absolute -top-1 -right-1 min-w-[16px] h-4 text-[10px] font-black bg-blue-600 text-white rounded-full flex items-center justify-center px-0.5">{{ $cnt }}</span>
+                                            @endif
+                                        </a>
                                         <a href="{{ route('panel.my-jobs.edit', $vacancy) }}"
                                             class="p-2 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all">
                                             <i class="fas fa-edit"></i>

@@ -491,6 +491,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::post('/sj-submit/{job}', [\App\Http\Controllers\Panel\JobController::class, 'apply'])->name('jobs.apply.external');
 
     // Gestão de Vagas da Empresa (Cadastro e Edição)
+    Route::get('my-jobs/{my_job}/candidates', [\App\Http\Controllers\Panel\MyJobController::class, 'candidates'])->name('my-jobs.candidates');
+    Route::get('my-jobs/{my_job}/candidates/{application}/download', [\App\Http\Controllers\Panel\MyJobController::class, 'downloadResume'])->name('my-jobs.candidates.download');
+    Route::post('my-jobs/applications/{application}/status', [\App\Http\Controllers\Panel\MyJobController::class, 'updateApplicationStatus'])->name('my-jobs.application.status');
     Route::resource('my-jobs', \App\Http\Controllers\Panel\MyJobController::class);
 
     // Loja de Pontos (Usuário)

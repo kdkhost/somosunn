@@ -107,4 +107,66 @@ class MyJobController extends Controller
             abort(403, 'Seu plano atual não permite publicar vagas.');
         }
     }
+
+    public function candidates(JobVacancy $my_job)
+    {
+        $this->authorizeAccess();
+
+        if ($my_job->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $applications = $my_job->applications()
+            ->with('user')
+            ->latest()
+            ->get();
+
+        // Marca as notificações desta vaga como lidas
+        Auth::user()->unreadNotifications()
+            ->where('type', 'App\\Notifications\\JobApplicationReceived')
+            ->whereJsonContains('data->action_url', route('panel.my-jobs.candidates', $my_job))
+            ->update(['read_at' => now()]);
+
+        return view('panel.my-jobs.candidates', compact('my_job', 'applications'));
+    }
+
+    public function downloadResume(JobVacancy $my_job, \App\Models\JobApplication $application)
+    {
+        $this->authorizeAccess();
+
+        if ($my_job->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($application->job_vacancy_id !== $my_job->id) {
+            abort(404);
+        }
+
+        $path = storage_path('app/public/' . $application->resume_path);
+
+        if (!file_exists($path)) {
+            abort(404, 'Currículo não encontrado.');
+        }
+
+        return response()->download($path, 'curriculo_' . ($application->user->name ?? 'candidato') . '.' . pathinfo($path, PATHINFO_EXTENSION));
+    }
+
+    public function updateApplicationStatus(\App\Models\JobApplication $application, Request $request)
+    {
+        $this->authorizeAccess();
+
+        if ($application->vacancy->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $status = $request->input('status');
+        if (!in_array($status, ['pending', 'approved', 'rejected'])) {
+            return response()->json(['success' => false, 'message' => 'Status inválido.'], 422);
+        }
+
+        $application->update(['status' => $status]);
+
+        $labels = ['pending' => 'Pendente', 'approved' => 'Aprovado', 'rejected' => 'Recusado'];
+        return response()->json(['success' => true, 'message' => 'Candidato marcado como ' . $labels[$status] . '!']);
+    }
 }
