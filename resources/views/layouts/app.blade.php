@@ -67,7 +67,7 @@
 
         $videoPlyrSettingsRaw = (string) (\App\Models\Setting::get('video_plyr_settings') ?: 'captions,quality,speed,loop');
         $videoPlyrSettings = preg_split('/[\s,]+/', $videoPlyrSettingsRaw, -1, PREG_SPLIT_NO_EMPTY);
-        
+
         $videoPlyrSpeedOptionsRaw = (string) (\App\Models\Setting::get('video_plyr_speed_options') ?: '0.5,0.75,1,1.25,1.5,2');
         $videoPlyrSpeedOptions = array_values(array_filter(array_map(function ($value) {
             $value = trim((string) $value);
@@ -258,7 +258,7 @@
     {{-- Google AdSense Script --}}
     @if($adsEnabled && $adsensePublisherId !== '')
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $adsensePublisherId }}"
-             crossorigin="anonymous"></script>
+            crossorigin="anonymous"></script>
     @endif
 
     <link rel="icon" href="{{ $favicon }}" type="image/x-icon">
@@ -293,15 +293,15 @@
         }
     </script>
     <script>
-        // Set theme immediately to avoid flash
-        (function() {
-            const theme = @json(auth()->user()?->theme_pref ?? 'light');
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        })();
+            // Set theme immediately to avoid flash
+            (function () {
+                const theme = @json(auth()->user()?->theme_pref ?? 'light');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            })();
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @if($videoPlayerEnabled)
@@ -334,16 +334,30 @@
             --unn-card: #ffffff;
             --unn-text: #0f172a;
             @if($videoPlayerEnabled)
-                --plyr-color-main: {{ $videoPlyrColor }};
-                --plyr-range-fill-background: {{ $videoPlyrColor }};
-                --plyr-video-control-background-hover: {{ $videoPlyrColor }};
-                --plyr-audio-control-background-hover: {{ $videoPlyrColor }};
-                --plyr-control-toggle-checked-background: {{ $videoPlyrColor }};
-                --plyr-focus-visible-color: {{ $videoPlyrColor }};
+                --plyr-color-main:
+                    {{ $videoPlyrColor }}
+                ;
+                --plyr-range-fill-background:
+                    {{ $videoPlyrColor }}
+                ;
+                --plyr-video-control-background-hover:
+                    {{ $videoPlyrColor }}
+                ;
+                --plyr-audio-control-background-hover:
+                    {{ $videoPlyrColor }}
+                ;
+                --plyr-control-toggle-checked-background:
+                    {{ $videoPlyrColor }}
+                ;
+                --plyr-focus-visible-color:
+                    {{ $videoPlyrColor }}
+                ;
                 --plyr-font-family: 'Inter', sans-serif;
                 --plyr-menu-background: rgba(15, 23, 42, 0.92);
                 --plyr-menu-color: #ffffff;
-                --plyr-tooltip-background: {{ $videoPlyrColor }};
+                --plyr-tooltip-background:
+                    {{ $videoPlyrColor }}
+                ;
                 --plyr-tooltip-color: #ffffff;
             @endif
         }
@@ -427,20 +441,21 @@
                     try {
                         list($r, $g, $b) = sscanf($bgStart, "#%02x%02x%02x");
                         $rgbaColor = "rgba($r, $g, $b, " . ($bgOpacity / 100) . ")";
-                    } catch (\Throwable $e) { }
+                    } catch (\Throwable $e) {
+                    }
                 }
             @endphp
 
             @if($bgImage)
-                background: linear-gradient({{ $rgbaColor }}, {{ $rgbaColor }}), url('{{ asset($bgImage) }}');
+                background: linear-gradient({{ $rgbaColor }},
+                        {{ $rgbaColor }}
+                    ), url('{{ asset($bgImage) }}');
                 background-attachment: fixed;
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
-            @else
-                background: linear-gradient(180deg, #f8fbff 0%, #ffffff 40%);
-            @endif
-            color: var(--unn-text);
+            @else background: linear-gradient(180deg, #f8fbff 0%, #ffffff 40%);
+            @endif color: var(--unn-text);
         }
 
         /* Responsive fixes */
@@ -460,6 +475,7 @@
         }
 
         @media (max-width: 640px) {
+
             /* Typography scale for small screens */
             .text-3xl {
                 font-size: 1.5rem;
@@ -551,6 +567,7 @@
         }
 
         @media (max-width: 1024px) {
+
             a.btn-primary,
             button.btn-primary {
                 font-size: 0.95rem;
@@ -600,20 +617,28 @@
 
             /* Apply custom color to Plyr elements */
             .plyr--full-ui input[type=range] {
-                color: var(--plyr-color-main, {{ $videoPlyrColor }});
+                color: var(--plyr-color-main,
+                        {{ $videoPlyrColor }}
+                    );
             }
 
             .plyr__control--overlaid {
-                background: var(--plyr-color-main, {{ $videoPlyrColor }});
+                background: var(--plyr-color-main,
+                        {{ $videoPlyrColor }}
+                    );
             }
 
             .plyr__control:hover,
             .plyr__control[aria-expanded=true] {
-                background: var(--plyr-color-main, {{ $videoPlyrColor }});
+                background: var(--plyr-color-main,
+                        {{ $videoPlyrColor }}
+                    );
             }
 
             .plyr__menu__container .plyr__control[role=menuitemradio][aria-checked=true]:before {
-                background: var(--plyr-color-main, {{ $videoPlyrColor }});
+                background: var(--plyr-color-main,
+                        {{ $videoPlyrColor }}
+                    );
             }
 
             .unn-video-float-placeholder {
@@ -733,9 +758,11 @@
                 0% {
                     transform: translate(0, 0) rotate(var(--unn-wm-rotate, 0deg));
                 }
+
                 50% {
                     transform: translate(-8px, 8px) rotate(var(--unn-wm-rotate, 0deg));
                 }
+
                 100% {
                     transform: translate(0, 0) rotate(var(--unn-wm-rotate, 0deg));
                 }
@@ -747,9 +774,12 @@
 
             /* Adjustments for Floating Player */
             .unn-video-float .unn-video-watermark {
-                min-width: 40px; /* Allow smaller watermark in mini player */
-                --unn-wm-margin: 8px !important; /* Smaller margin */
+                min-width: 40px;
+                /* Allow smaller watermark in mini player */
+                --unn-wm-margin: 8px !important;
+                /* Smaller margin */
             }
+
         @endif
     </style>
     <!-- Toastr CSS -->
@@ -770,7 +800,7 @@
                 class="bg-yellow-900 text-yellow-100 px-2 py-1 rounded hover:bg-yellow-800 transition whitespace-nowrap">
                 Sair
             </a>
-            <button onclick="document.getElementById('impersonation-badge').style.display='none'" 
+            <button onclick="document.getElementById('impersonation-badge').style.display='none'"
                 class="text-yellow-900 hover:text-yellow-700 ml-1" title="Minimizar">
                 <i class="fas fa-times"></i>
             </button>
@@ -785,6 +815,15 @@
     <main class="{{ $showNavigation ? 'pt-20 lg:pt-24' : 'pt-0' }} min-h-[calc(100vh-80px)]">
         @yield('content')
     </main>
+
+    {{-- Parceiros Globais --}}
+    @if($showNavigation)
+        <div class="bg-white py-10">
+            <div class="max-w-7xl mx-auto px-4 md:px-6">
+                @include('components.partners-carousel')
+            </div>
+        </div>
+    @endif
 
     @includeWhen(true, 'partials.footer')
 
@@ -878,7 +917,7 @@
                     mobileOverlay.classList.add('opacity-0');
                     mobileOverlay.classList.remove('opacity-100');
                     mobilePanel.classList.add('-translate-x-full');
-                    
+
                     mobileOverlay.classList.remove('pointer-events-auto');
                     mobileOverlay.classList.add('pointer-events-none');
 
@@ -969,8 +1008,8 @@
                     };
 
                     // Use configured controls or default
-                    let controls = Array.isArray(plyr.controls) && plyr.controls.length 
-                        ? [...plyr.controls] 
+                    let controls = Array.isArray(plyr.controls) && plyr.controls.length
+                        ? [...plyr.controls]
                         : [...defaultControls];
 
                     // Replace native 'pip' with custom 'toggle-floating' to support watermark
@@ -995,10 +1034,10 @@
                     // Filter based on enabled settings
                     // Trust the 'controls' list from backend configuration COMPLETELY.
                     // We remove all manual filters that were based on hidden boolean flags.
-                    
+
                     // Robust "Self-Healing": If the string list is missing absolute essentials that are implicitly wanted.
                     // However, we predominantly trust the list from Admin.
-                    
+
                     // If the list is empty, use defaults.
                     if (!controls.length) {
                         controls = [...defaultControls];
@@ -1006,18 +1045,18 @@
 
                     // Always ensure play-large for usability if not explicitly removed
                     if (!controls.includes('play-large') && controls.includes('play')) {
-                         controls.unshift('play-large');
+                        controls.unshift('play-large');
                     }
-                    
+
                     // Ensure 'toggle-floating' is used instead of 'pip' (handled above)
                     // We remove 'toggle-floating' from the array passed to Plyr to avoid "unknown control" issues,
                     // but we keep track of it to inject manually in initOne.
                     const needsFloating = controls.includes('toggle-floating');
                     const cleanControls = controls.filter(c => c !== 'toggle-floating');
-                    
+
                     base.controls = cleanControls;
                     base.unnCustomFloating = needsFloating;
-                    
+
                     if (Array.isArray(plyr.settings) && plyr.settings.length) {
                         base.settings = plyr.settings;
                     }
@@ -1031,7 +1070,7 @@
                             options: plyr.speedOptions.map(n => Number(n)).filter(n => Number.isFinite(n))
                         };
                     }
-                    
+
                     // Add listeners for custom controls in initOne (Plyr setup) to bind 'toggle-floating'
                     base.listeners = base.listeners || {};
 
@@ -1353,39 +1392,39 @@
 
                         // Inject custom button if configured in controls
                         if (options.unnCustomFloating) {
-                             const controls = player.elements.controls;
-                             if (controls) {
-                                 // Create button
-                                 const btn = document.createElement('button');
-                                 btn.type = 'button';
-                                 btn.className = 'plyr__controls__item plyr__control';
-                                 btn.setAttribute('data-plyr', 'toggle-floating');
-                                 btn.setAttribute('aria-label', 'Mini Player');
-                                 // Icon (PiP icon)
-                                 btn.innerHTML = `
-                                    <svg aria-hidden="true" focusable="false" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" class="plyr__icon">
-                                        <path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z"></path>
-                                    </svg>
-                                    <span class="plyr__sr-only">Mini Player</span>
-                                 `;
-                                 
-                                 // Insert in correct position
-                                 // Ideally we find where 'toggle-floating' is in options.controls and place it accordingly relative to others
-                                 // But simplistically, we can append it or try to insert before fullscreen
-                                 
-                                 const fsBtn = controls.querySelector('[data-plyr="fullscreen"]');
-                                 if (fsBtn) {
-                                     controls.insertBefore(btn, fsBtn);
-                                 } else {
-                                     controls.appendChild(btn);
-                                 }
+                            const controls = player.elements.controls;
+                            if (controls) {
+                                // Create button
+                                const btn = document.createElement('button');
+                                btn.type = 'button';
+                                btn.className = 'plyr__controls__item plyr__control';
+                                btn.setAttribute('data-plyr', 'toggle-floating');
+                                btn.setAttribute('aria-label', 'Mini Player');
+                                // Icon (PiP icon)
+                                btn.innerHTML = `
+                                        <svg aria-hidden="true" focusable="false" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" class="plyr__icon">
+                                            <path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z"></path>
+                                        </svg>
+                                        <span class="plyr__sr-only">Mini Player</span>
+                                     `;
 
-                                 btn.addEventListener('click', function() {
-                                     if (host.toggleFloating) {
-                                         host.toggleFloating();
-                                     }
-                                 });
-                             }
+                                // Insert in correct position
+                                // Ideally we find where 'toggle-floating' is in options.controls and place it accordingly relative to others
+                                // But simplistically, we can append it or try to insert before fullscreen
+
+                                const fsBtn = controls.querySelector('[data-plyr="fullscreen"]');
+                                if (fsBtn) {
+                                    controls.insertBefore(btn, fsBtn);
+                                } else {
+                                    controls.appendChild(btn);
+                                }
+
+                                btn.addEventListener('click', function () {
+                                    if (host.toggleFloating) {
+                                        host.toggleFloating();
+                                    }
+                                });
+                            }
                         }
                     }
                 }
@@ -1417,7 +1456,7 @@
                     if (host.parentNode) {
                         try {
                             host.parentNode.insertBefore(placeholder, host);
-                        } catch(e) {}
+                        } catch (e) { }
                     }
 
                     // In-page Close button (only visible when floating in-page)
@@ -1460,16 +1499,16 @@
                                     pipWindow.document.head.appendChild(link);
                                 }
                             });
-                            
+
                             // Specific adjustments for PiP window
-                             const style = document.createElement('style');
-                             style.textContent = `
-                                body { margin: 0; display: flex; justify-content: center; align-items: center; background: #000; height: 100vh; overflow: hidden; }
-                                .unn-video-player { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; }
-                                .unn-video-float-close { display: none !important; } /* Hide close button in window */
-                                .unn-video-watermark { --unn-wm-margin: 8px !important; min-width: 40px; }
-                             `;
-                             pipWindow.document.head.appendChild(style);
+                            const style = document.createElement('style');
+                            style.textContent = `
+                                    body { margin: 0; display: flex; justify-content: center; align-items: center; background: #000; height: 100vh; overflow: hidden; }
+                                    .unn-video-player { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; }
+                                    .unn-video-float-close { display: none !important; } /* Hide close button in window */
+                                    .unn-video-watermark { --unn-wm-margin: 8px !important; min-width: 40px; }
+                                 `;
+                            pipWindow.document.head.appendChild(style);
 
                             // Move player to PiP window
                             pipWindow.document.body.append(host);
@@ -1484,13 +1523,13 @@
                                 }
                                 pipWindow = null;
                                 manualToggle = false;
-                                
+
                                 // Clean up checks
                                 if (player && typeof player.resize === 'function') {
-                                     setTimeout(() => player.resize(), 50);
+                                    setTimeout(() => player.resize(), 50);
                                 }
                             });
-                            
+
                             return true;
                         } catch (err) {
                             console.error('Failed to open Document PiP:', err);
@@ -1540,18 +1579,18 @@
 
                     // Expose toggle capability to the wrapper for external buttons
                     // ALWAYS attach to the host we are passed, because that is what the button uses.
-                    host.toggleFloating = function() {
-                         console.log('UNN Video: toggleFloating called');
-                         // If we are in PiP window, toggle means close it
-                         if (pipWindow) {
-                             manualToggle = false;
-                             disabled = false;
-                             setFloating(false);
-                         } else {
-                             manualToggle = !host.classList.contains('unn-video-float');
-                             disabled = !manualToggle;
-                             setFloating(manualToggle);
-                         }
+                    host.toggleFloating = function () {
+                        console.log('UNN Video: toggleFloating called');
+                        // If we are in PiP window, toggle means close it
+                        if (pipWindow) {
+                            manualToggle = false;
+                            disabled = false;
+                            setFloating(false);
+                        } else {
+                            manualToggle = !host.classList.contains('unn-video-float');
+                            disabled = !manualToggle;
+                            setFloating(manualToggle);
+                        }
                     };
 
                     // For backward compatibility or if something else looks for it on the wrapper
@@ -1567,7 +1606,7 @@
                             for (const entry of entries) {
                                 // Auto-float (In-Page) only if not manually disabled and not in PiP window
                                 if (!manualToggle && !pipWindow) {
-                                     setFloating(!entry.isIntersecting);
+                                    setFloating(!entry.isIntersecting);
                                 }
                             }
                         }, { threshold: 0.15 });
@@ -1624,7 +1663,7 @@
 
     @if ($pwaEnabled)
         <script>
-                    if ('serviceWorker' in navigator) {
+                        if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(function () { console.log('Service Worker registrado'); })
                     .catch(function (err) { console.error('SW erro:', err); });
@@ -1640,26 +1679,26 @@
                 modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-fade-in';
 
                 modal.innerHTML = `
-                                <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center relative transform transition-all scale-100">
-                                    <div class="flex justify-center mb-6">
-                                        <img src="{{ $logo }}" alt="Logo" class="h-16 object-contain">
-                                    </div>
+                                    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center relative transform transition-all scale-100">
+                                        <div class="flex justify-center mb-6">
+                                            <img src="{{ $logo }}" alt="Logo" class="h-16 object-contain">
+                                        </div>
 
-                                    <h3 class="text-xl font-bold text-slate-900 mb-3">Instale nosso aplicativo!</h3>
-                                    <p class="text-slate-600 text-sm mb-8 leading-relaxed">
-                                        Tenha acesso mais rápido e use mesmo offline! Instale nosso app diretamente na sua tela inicial.
-                                    </p>
+                                        <h3 class="text-xl font-bold text-slate-900 mb-3">Instale nosso aplicativo!</h3>
+                                        <p class="text-slate-600 text-sm mb-8 leading-relaxed">
+                                            Tenha acesso mais rápido e use mesmo offline! Instale nosso app diretamente na sua tela inicial.
+                                        </p>
 
-                                    <div class="flex flex-col gap-3">
-                                        <button id="pwa-install-btn" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all">
-                                            Instalar Agora
-                                        </button>
-                                        <button id="pwa-dismiss-btn" class="w-full py-3 px-4 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-colors">
-                                            Mais tarde
-                                        </button>
+                                        <div class="flex flex-col gap-3">
+                                            <button id="pwa-install-btn" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all">
+                                                Instalar Agora
+                                            </button>
+                                            <button id="pwa-dismiss-btn" class="w-full py-3 px-4 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-colors">
+                                                Mais tarde
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            `;
+                                `;
 
                 document.body.appendChild(modal);
 

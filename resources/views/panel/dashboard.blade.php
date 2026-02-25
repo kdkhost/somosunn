@@ -64,6 +64,71 @@
         </div>
     </div>
 
+    <!-- Section: Minha Saúde na UNN -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 animate-fade-in-up" style="animation-delay: 100ms;">
+        <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 p-8 flex flex-col items-center text-center group/card transition-all">
+            <div class="relative w-32 h-32 mb-6">
+                <svg class="w-full h-full transform -rotate-90">
+                    <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" class="text-slate-100 dark:text-slate-800" />
+                    <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" 
+                        stroke-dasharray="{{ (2 * pi() * 58) * (($myHealth['score'] ?? 0) / 100) }} {{ (2 * pi() * 58) }}"
+                        class="transition-all duration-1000" style="color: {{ $myHealth['color'] ?? '#1F5EDB' }}" />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span class="text-3xl font-black text-slate-900 dark:text-white">{{ $myHealth['score'] ?? 0 }}%</span>
+                    <span class="text-[10px] uppercase font-bold text-slate-400">Saúde</span>
+                </div>
+            </div>
+            <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Sua Saúde na UNN {{ $myHealth['emoji'] ?? '' }}</h4>
+            <div class="px-4 py-1.5 rounded-full text-xs font-bold mb-4" style="background-color: {{ ($myHealth['color'] ?? '#1F5EDB') }}20; color: {{ $myHealth['color'] ?? '#1F5EDB' }}">
+                Status: {{ $myHealth['level'] ?? 'Iniciante' }}
+            </div>
+            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed px-4">
+                {{ ($myHealth['score'] ?? 0) < 100 ? 'Complete seu perfil para aumentar sua autoridade na rede.' : 'Parabéns! Seu perfil está otimizado para o máximo de visibilidade.' }}
+            </p>
+        </div>
+
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 p-8 flex flex-col">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h4 class="text-xl font-bold text-slate-900 dark:text-white">Checklist de Visibilidade</h4>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Aumente suas chances de networking completando seu cadastro.</p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+                    <i class="fas fa-list-check text-xl"></i>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                @php
+                    $checkItems = [
+                        ['key' => 'plano_ativo', 'label' => 'Plano Ativo', 'icon' => 'fa-gem'],
+                        ['key' => 'perfil_completo', 'label' => 'Cadastro Completo', 'icon' => 'fa-user-check'],
+                        ['key' => 'foto', 'label' => 'Foto Profissional', 'icon' => 'fa-camera'],
+                        ['key' => 'bio', 'label' => 'Biografia/Bio', 'icon' => 'fa-paragraph'],
+                        ['key' => 'telefone', 'label' => 'WhatsApp Contato', 'icon' => 'fa-phone-flip'],
+                        ['key' => 'ocupacao', 'label' => 'Cargo/Ocupação', 'icon' => 'fa-briefcase'],
+                    ];
+                @endphp
+
+                @foreach($checkItems as $item)
+                    @php $isDone = $myHealthDetails[$item['key']] ?? false; @endphp
+                    <div class="flex items-center gap-3 p-4 rounded-2xl {{ $isDone ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100/50 dark:border-emerald-800/20' : 'bg-slate-50 dark:bg-slate-800/30 border-slate-100 dark:border-slate-800' }} border transition-all hover:scale-[1.02] duration-300">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center {{ $isDone ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-200 dark:bg-slate-700 text-slate-400' }}">
+                            <i class="fas {{ $isDone ? 'fa-check' : $item['icon'] }}"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold {{ $isDone ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400' }}">{{ $item['label'] }}</span>
+                            <span class="text-[10px] font-medium {{ $isDone ? 'text-emerald-600/70 dark:text-emerald-500/60' : 'text-slate-400' }}">
+                                {{ $isDone ? 'Concluido' : 'Pendente' }}
+                            </span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
     <!-- Section: Visão Geral -->
     <div class="mb-12 animate-fade-in-up">
         <div class="flex items-center justify-between mb-6 px-1">

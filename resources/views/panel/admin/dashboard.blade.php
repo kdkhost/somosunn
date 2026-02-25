@@ -38,6 +38,7 @@
                         ['route' => 'panel.admin.plans.index', 'icon' => 'fa-gem', 'color' => 'indigo', 'title' => 'Planos', 'desc' => 'Pacotes e preços'],
                         ['route' => 'panel.admin.orders.index', 'icon' => 'fa-shopping-basket', 'color' => 'emerald', 'title' => 'Vendas', 'desc' => 'Pedidos realizados'],
                         ['route' => 'panel.admin.invoices.index', 'icon' => 'fa-file-invoice-dollar', 'color' => 'amber', 'title' => 'Faturas', 'desc' => 'Gestão de faturamento'],
+                        ['route' => 'admin.partners.index', 'icon' => 'fa-handshake', 'color' => 'sky', 'title' => 'Parceiros', 'desc' => 'Empresas e benefícios'],
                     ];
                 @endphp
 
@@ -52,6 +53,77 @@
                         <p class="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">{{ $item['desc'] }}</p>
                     </a>
                 @endforeach
+            </div>
+        </div>
+
+        {{-- Section: Saúde da Comunidade --}}
+        @php
+            $totalU = array_sum($customerHealth ?? []);
+            $altaP = $totalU > 0 ? (($customerHealth['Alta'] ?? 0) / $totalU) * 100 : 0;
+        @endphp
+        <div>
+            <div class="flex items-center gap-3 mb-6 px-2">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <i class="fas fa-heartbeat text-sm"></i>
+                </div>
+                <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Saúde da Comunidade</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {{-- Card: Saúde Geral --}}
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col items-center text-center">
+                    <div class="relative w-32 h-32 mb-6">
+                        <svg class="w-full h-full transform -rotate-90">
+                            <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" class="text-slate-100 dark:text-slate-800" />
+                            <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" 
+                                stroke-dasharray="{{ (2 * pi() * 58) * ($altaP / 100) }} {{ (2 * pi() * 58) }}"
+                                class="text-emerald-500 transition-all duration-1000" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span class="text-3xl font-black text-slate-900 dark:text-white">{{ round($altaP) }}%</span>
+                            <span class="text-[10px] uppercase font-bold text-slate-400">Engajamento</span>
+                        </div>
+                    </div>
+                    <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Saúde Global</h4>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Percentual de membros com plano ativo e perfil completo.</p>
+                </div>
+
+                {{-- Card: Detalhamento --}}
+                <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200/60 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <h4 class="text-xl font-bold text-slate-900 dark:text-white">Status dos Membros</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Distribuição baseada em atividade e perfil.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                            <span class="text-xs font-bold text-slate-500">Total: {{ $totalU }}</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        @foreach(['Alta' => ['color' => 'emerald', 'label' => 'Alta (Ótima)', 'icon' => 'fa-check-circle'], 
+                                  'Média' => ['color' => 'amber', 'label' => 'Média (Regular)', 'icon' => 'fa-exclamation-circle'], 
+                                  'Baixa' => ['color' => 'rose', 'label' => 'Baixa (Crítica)', 'icon' => 'fa-times-circle']] as $key => $meta)
+                            @php 
+                                $count = $customerHealth[$key] ?? 0;
+                                $percent = $totalU > 0 ? ($count / $totalU) * 100 : 0;
+                            @endphp
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas {{ $meta['icon'] }} text-{{ $meta['color'] }}-500"></i>
+                                        <span class="font-bold text-slate-700 dark:text-slate-300">{{ $meta['label'] }}</span>
+                                    </div>
+                                    <span class="text-sm font-black text-slate-900 dark:text-white">{{ $count }} membros ({{ round($percent) }}%)</span>
+                                </div>
+                                <div class="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-{{ $meta['color'] }}-500 transition-all duration-1000" style="width: {{ $percent }}%"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
 

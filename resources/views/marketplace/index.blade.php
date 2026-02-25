@@ -674,8 +674,6 @@
                 </div>
             </section>
 
-            {{-- Carrossel de Empresas Parceiras --}}
-            @include('components.partners-carousel')
 
             {{-- Promoções relâmpago --}}
             @php
@@ -1744,14 +1742,14 @@
                         saveState(state);
 
                         const html = `
-                                                                                    <div class="flex gap-3 items-center">
-                                                                                        ${image ? `<img src="${escapeHtml(image)}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:12px;border:1px solid rgba(148,163,184,.35)" />` : ''}
-                                                                                        <div style="min-width:0">
-                                                                                            <div style="font-weight:900;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">${title}</div>
-                                                                                            ${date ? `<div style="margin-top:2px;font-size:12px;opacity:.85">Data: ${date}</div>` : ''}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                `;
+                                                                                            <div class="flex gap-3 items-center">
+                                                                                                ${image ? `<img src="${escapeHtml(image)}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:12px;border:1px solid rgba(148,163,184,.35)" />` : ''}
+                                                                                                <div style="min-width:0">
+                                                                                                    <div style="font-weight:900;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">${title}</div>
+                                                                                                    ${date ? `<div style="margin-top:2px;font-size:12px;opacity:.85">Data: ${date}</div>` : ''}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        `;
 
                         toast.fire({
                             icon: 'info',

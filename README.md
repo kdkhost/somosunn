@@ -194,9 +194,13 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Refatoração de Controllers:**
   - Simplificação do `SettingController` delegando a resolução de URLs para o Model, aumentando a manutenibilidade.
 
-### 25/02/2026 — Padronização de UX e Sistema de Parceiros
-- **Sistema de Parceiros 1.0:**
-  - Lançamento do ecossistema de parcerias com carrossel interativo no Marketplace.
+### 25/02/2026 — Padronização de UX, Sistema de Parceiros e Expansão
+- **Monitoramento de Saúde (Dashboards):**
+  - **Saúde da Comunidade (Admin):** Integração de seção visual no novo painel administrativo com indicadores de engajamento do ecossistema.
+  - **Saúde do Membro (Pessoal):** Widget interativo introduzido no dashboard do membro, apresentando checklist de visibilidade e score de perfil.
+- **Sistema de Parceiros 1.0 (Expansão):**
+  - **Injeção Global:** O carrossel de parceiros agora é exibido automaticamente em todas as páginas públicas do frontend.
+  - **Integração no Painel:** Atalho direto para gestão de parcerias adicionado ao novo dashboard administrativo moderno.
   - Área de cupons para membros com Clipboard API e restrição de acesso por plano.
   - Painel de autogestão corporativa para parceiros autorizados regatarem e gerenciarem seus próprios benefícios.
 - **Tooltips Premium:**

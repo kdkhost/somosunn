@@ -220,7 +220,10 @@ class DashboardController extends Controller
                 'usersByMonth',
                 'certificatesByMonth',
                 'contentDistribution',
-                'jobsStatus'
+                'jobsStatus',
+                'customerHealth',
+                'myHealth',
+                'myHealthDetails'
             ));
         }
 
