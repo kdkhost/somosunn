@@ -1,4 +1,4 @@
-﻿curl.exe : Note: Unnecessary use of 
+curl.exe : Note: Unnecessary use of 
 -X or --request, POST is already 
 inferred.
 No linha:1 caractere:1

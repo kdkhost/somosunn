@@ -286,8 +286,16 @@
                     });
                 }
 
-                function openChat(userId, userName) {
-                    window.location.href = `/panel/chat?user=${userId}`;
+                const chatStartBaseUrl = @json(url('/chat/start'));
+
+                function openChat(userId) {
+                    const targetId = parseInt(userId, 10);
+                    if (!Number.isInteger(targetId) || targetId <= 0) {
+                        toastr.error('Usuário inválido para iniciar o chat.');
+                        return;
+                    }
+
+                    window.location.href = `${chatStartBaseUrl}/${targetId}`;
                 }
             </script>
         @endpush
