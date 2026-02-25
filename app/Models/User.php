@@ -158,7 +158,12 @@ class User extends Authenticatable
         'show_email_public',
         'show_phone_public',
         'show_address_public',
-        'hide_profile'
+        'hide_profile',
+        // IDs Sociais
+        'google_id',
+        'facebook_id',
+        'linkedin_id',
+        'avatar'
     ];
 
     protected $hidden = ['password', 'remember_token'];

@@ -42,7 +42,7 @@
     @endphp
     
     <div class="relative z-10 flex flex-col items-center w-full">
-        <img src="{{ $logoAuthSrc }}" class="h-16 mb-6 drop-shadow-lg {{ $animClass }}" alt="Logo"
+        <img src="{{ $logoAuthSrc }}" class="h-28 max-w-full mb-8 drop-shadow-2xl object-contain {{ $animClass }}" alt="Logo"
             onerror="this.style.display='none';">
         
         <h2 class="text-3xl font-bold mb-3 text-center drop-shadow-md {{ $animClass }}"

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SocialAuthController extends Controller
 {
-    protected $providers = ['google','facebook','linkedin'];
+    protected $providers = ['google', 'facebook', 'linkedin'];
 
     public function redirect($provider)
     {
@@ -88,8 +88,12 @@ class SocialAuthController extends Controller
 
         Auth::login($user, true);
 
-        $defaultRedirect = $user->isAdmin() ? route('admin.dashboard') : route('panel.dashboard');
-        return redirect()->intended($defaultRedirect);
+        // Redireciona para o novo painel administrativo ou do membro
+        if ($user->isAdmin()) {
+            return redirect()->route('panel.admin.dashboard');
+        }
+
+        return redirect()->intended(route('panel.dashboard'));
     }
 
     private function resolveDefaultPlan(): ?Plan
