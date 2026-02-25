@@ -139,6 +139,19 @@ class SubscriptionController extends Controller
 
             // Charge via MercadoPago
             if ($isSimulation) {
+                // Simular pagamento sem chamar a API (modo debug sem chaves MP)
+                if ($request->payment_method === 'pix') {
+                    // Pix simulado: gera QR Code fictício para demonstração do fluxo
+                    $fakePixCode = 'SIM.' . strtoupper(Str::random(20)) . '.' . number_format((float) $plan->price, 2, '', '');
+                    // QR Code 1x1 pixel PNG transparente em base64 (placeholder seguro)
+                    $fakeQrBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+                    DB::commit();
+                    return view('site.subscription.pix', [
+                        'order' => $order,
+                        'qr_code' => $fakePixCode,
+                        'qr_code_base64' => $fakeQrBase64,
+                    ]);
+                }
                 $paymentResult = [
                     'status' => 'approved',
                     'id' => 'sim_' . Str::random(10),

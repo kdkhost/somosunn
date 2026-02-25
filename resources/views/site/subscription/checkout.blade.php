@@ -55,6 +55,8 @@
                 <div class="lg:col-span-2">
                     <form action="{{ route('subscription.process', $plan->id) }}" method="POST" id="paymentForm">
                         @csrf
+                        {{-- Campo sincronizado com os radios via JS --}}
+                        <input type="hidden" name="payment_method" id="payment_method_hidden" value="credit_card">
 
                         @if ($errors->any())
                             <div class="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl mb-6">
@@ -158,6 +160,24 @@
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
                         @endguest
 
+                        {{-- CPF para usuários logados que não preencheram ainda --}}
+                        @auth
+                            @if(!Auth::user()->doc)
+                                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-8">
+                                    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+                                        <span
+                                            class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm"><i
+                                                class="fas fa-id-card text-xs"></i></span>
+                                        Documento (CPF)
+                                    </h2>
+                                    <p class="text-sm text-gray-500 mb-4">Necessário para processamento do pagamento.</p>
+                                    <input type="text" name="cpf" value="{{ old('cpf') }}"
+                                        class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="000.000.000-00" required>
+                                </div>
+                            @endif
+                        @endauth
+
                         <!-- Passo 2: Pagamento -->
                         <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
                             <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
@@ -167,22 +187,21 @@
                             </h2>
 
                             <div class="grid grid-cols-2 gap-4 mb-8">
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="payment_method" value="credit_card" class="peer sr-only"
-                                        checked>
+                                <label class="cursor-pointer" id="label-credit-card">
+                                    <input type="radio" name="payment_method_radio" value="credit_card"
+                                        id="radio-credit-card" class="peer sr-only" checked>
                                     <div
                                         class="p-4 border-2 border-gray-200 rounded-xl peer-checked:border-blue-600 peer-checked:bg-blue-50 transition text-center hover:border-blue-300">
-                                        <i
-                                            class="fas fa-credit-card text-2xl mb-2 text-gray-600 peer-checked:text-blue-600"></i>
+                                        <i class="fas fa-credit-card text-2xl mb-2 text-gray-600"></i>
                                         <p class="font-bold text-gray-900">Cartão de Crédito</p>
                                     </div>
                                 </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="payment_method" value="pix" class="peer sr-only">
+                                <label class="cursor-pointer" id="label-pix">
+                                    <input type="radio" name="payment_method_radio" value="pix" id="radio-pix"
+                                        class="peer sr-only">
                                     <div
                                         class="p-4 border-2 border-gray-200 rounded-xl peer-checked:border-blue-600 peer-checked:bg-blue-50 transition text-center hover:border-blue-300">
-                                        <i
-                                            class="fa-brands fa-pix text-2xl mb-2 text-gray-600 peer-checked:text-blue-600"></i>
+                                        <i class="fa-brands fa-pix text-2xl mb-2 text-gray-600"></i>
                                         <p class="font-bold text-gray-900">Pix Automático</p>
                                     </div>
                                 </label>
@@ -227,11 +246,19 @@
 
     @push('scripts')
         <style>
-            /* Isolar o Brick do MercadoPago e garantir que ele tenha espaço */
+            /* ─── Isolar Brick do MercadoPago ─── */
+            /* O CSS global tem: iframe { height: auto } que destrói o Brick.
+               height: unset reverte para o comportamento padrão do iframe. */
+            #cardPaymentBrick_container iframe {
+                height: unset !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
             #cardPaymentBrick_container {
-                min-height: 300px;
+                min-height: 320px;
                 width: 100%;
                 margin-bottom: 2rem;
+                box-sizing: border-box;
             }
 
             /* Em modo Debug/Simulação, campos fake bonitões */
@@ -266,24 +293,29 @@
             @endif
 
             <script>
-                // Toggle Payment Methods
-                const radios = document.querySelectorAll('input[name="payment_method"]');
+                // Toggle Payment Methods — sincroniza o hidden que vai no POST
+                const radios = document.querySelectorAll('input[name="payment_method_radio"]');
+                const hiddenMethod = document.getElementById('payment_method_hidden');
                 const cardForm = document.getElementById('creditCardForm');
                 const pixInfo = document.getElementById('pixInfo');
                 const submitBtn = document.querySelector('button[type="submit"]');
 
+                function syncPaymentMethod(value) {
+                    hiddenMethod.value = value;
+                    if (value === 'pix') {
+                        cardForm.classList.add('hidden');
+                        pixInfo.classList.remove('hidden');
+                        submitBtn.classList.remove('hidden');
+                        submitBtn.innerHTML = '<i class="fas fa-qrcode mr-2"></i> Gerar QR Code Pix';
+                    } else {
+                        cardForm.classList.remove('hidden');
+                        pixInfo.classList.add('hidden');
+                        submitBtn.innerHTML = '<i class="fas fa-lock mr-2"></i> Finalizar Pagamento';
+                    }
+                }
+
                 radios.forEach(radio => {
-                    radio.addEventListener('change', (e) => {
-                        if (e.target.value === 'pix') {
-                            cardForm.classList.add('hidden');
-                            pixInfo.classList.remove('hidden');
-                            submitBtn.innerHTML = '<i class="fas fa-qrcode"></i> Gerar QR Code Pix';
-                        } else {
-                            cardForm.classList.remove('hidden');
-                            pixInfo.classList.add('hidden');
-                            submitBtn.innerHTML = '<i class="fas fa-lock"></i> Finalizar Pagamento';
-                        }
-                    });
+                    radio.addEventListener('change', (e) => syncPaymentMethod(e.target.value));
                 });
 
                 if (typeof MercadoPago !== 'undefined' && "{{ $publicKey ?? '' }}") {
@@ -315,9 +347,9 @@
                             },
                             callbacks: {
                                 onReady: () => {
-                                    // Se o brick carregou e estamos no modo cartão, esconder botão geral
-                                    const selected = document.querySelector('input[name="payment_method"]:checked').value;
-                                    if (selected === 'credit_card') {
+                                    // Se brick carregou e payment_method é cartão, esconder botão externo
+                                    const selected = document.querySelector('input[name="payment_method_radio"]:checked');
+                                    if (!selected || selected.value === 'credit_card') {
                                         submitBtn.classList.add('hidden');
                                     }
                                 },
@@ -349,59 +381,46 @@
                 } else if ("{{ config('app.debug') }}") {
                     console.log("Modo Simulação Ativo: SDK do MercadoPago suprimido.");
                     document.getElementById('cardPaymentBrick_container').innerHTML = `
-                                    <div class="p-8 border border-amber-200 rounded-3xl bg-amber-50/30 space-y-4">
-                                        <div class="flex items-center gap-3 text-amber-700 mb-4">
-                                            <i class="fas fa-flask text-2xl"></i>
-                                            <h4 class="font-black italic">MODO SIMULADOR</h4>
-                                        </div>
+                                                <div class="p-8 border border-amber-200 rounded-3xl bg-amber-50/30 space-y-4">
+                                                    <div class="flex items-center gap-3 text-amber-700 mb-4">
+                                                        <i class="fas fa-flask text-2xl"></i>
+                                                        <h4 class="font-black italic">MODO SIMULADOR</h4>
+                                                    </div>
 
-                                        <div class="space-y-3">
-                                            <div>
-                                                <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Número do Cartão (Simulado)</label>
-                                                <input type="text" class="simulation-field" value="4444 4444 4444 4444" disabled>
-                                            </div>
+                                                    <div class="space-y-3">
+                                                        <div>
+                                                            <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Número do Cartão (Simulado)</label>
+                                                            <input type="text" class="simulation-field" value="4444 4444 4444 4444" disabled>
+                                                        </div>
 
-                                            <div class="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Validade</label>
-                                                    <input type="text" class="simulation-field" value="12/28" disabled>
+                                                        <div class="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Validade</label>
+                                                                <input type="text" class="simulation-field" value="12/28" disabled>
+                                                            </div>
+                                                            <div>
+                                                                <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">CVV</label>
+                                                                <input type="text" class="simulation-field" value="123" disabled>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Nome do Titular</label>
+                                                            <input type="text" class="simulation-field" value="{{ Auth::check() ? strtoupper(Auth::user()->name) : 'CLIENTE TESTE' }}" disabled>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="p-4 bg-white/50 rounded-2xl border border-amber-100 mt-4">
+                                                        <p class="text-[11px] text-amber-700 leading-relaxed font-medium">
+                                                            <i class="fas fa-info-circle mr-1"></i> As chaves do MercadoPago não foram configuradas. 
+                                                            Como o <strong>Debug</strong> está ativo, este formulário fake permite testar o fluxo de adesão.
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">CVV</label>
-                                                    <input type="text" class="simulation-field" value="123" disabled>
-                                                </div>
-                                            </div>
-
-                                            <div>
-                                                <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Nome do Titular</label>
-                                                <input type="text" class="simulation-field" value="{{ Auth::check() ? strtoupper(Auth::user()->name) : 'CLIENTE TESTE' }}" disabled>
-                                            </div>
-                                        </div>
-
-                                        <div class="p-4 bg-white/50 rounded-2xl border border-amber-100 mt-4">
-                                            <p class="text-[11px] text-amber-700 leading-relaxed font-medium">
-                                                <i class="fas fa-info-circle mr-1"></i> As chaves do MercadoPago não foram configuradas. 
-                                                Como o <strong>Debug</strong> está ativo, este formulário fake permite testar o fluxo de adesão.
-                                            </p>
-                                        </div>
-                                    </div>
-                                `;
+                                            `;
                 }
 
-                // Sincronizar visibilidade do botão de submit externo
-                radios.forEach(radio => {
-                    radio.addEventListener('change', (e) => {
-                        const isPix = e.target.value === 'pix';
-                        const isSimulation = !window.cardPaymentBrickController;
-
-                        // Mostra o botão azul apenas se for Pix OU se estivermos em Simulação
-                        if (isPix || isSimulation) {
-                            submitBtn.classList.remove('hidden');
-                        } else {
-                            submitBtn.classList.add('hidden');
-                        }
-                    });
-                });
+                // Nota: a sincronização do botão é gerenciada integralmente por syncPaymentMethod().
             </script>
         @endif
     @endpush
