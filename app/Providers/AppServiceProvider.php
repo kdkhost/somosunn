@@ -267,6 +267,9 @@ class AppServiceProvider extends ServiceProvider
                     // Generic Overrides (Marketplace Sync)
                     'mercadopago_public_key',
                     'mercadopago_access_token',
+                    // Rastreamento de qualidade / integrador
+                    'mercadopago_integrator_id',
+                    'mercadopago_platform_id',
                     // PagSeguro
                     'pagseguro_email',
                     'pagseguro_token',
@@ -301,7 +304,15 @@ class AppServiceProvider extends ServiceProvider
                     }
                 }
 
-                // 3. PagSeguro Platform
+                // 3. Integrador / Rastreamento de qualidade
+                if (!empty($paymentSettings['mercadopago_integrator_id'])) {
+                    config(['payments.mercadopago.integrator_id' => $paymentSettings['mercadopago_integrator_id']]);
+                }
+                if (!empty($paymentSettings['mercadopago_platform_id'])) {
+                    config(['payments.mercadopago.platform_id' => $paymentSettings['mercadopago_platform_id']]);
+                }
+
+                // 4. PagSeguro Platform
                 if (!empty($paymentSettings['pagseguro_email'])) {
                     config(['payments.pagseguro.email' => $paymentSettings['pagseguro_email']]);
                 }

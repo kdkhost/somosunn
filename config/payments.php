@@ -26,6 +26,19 @@ return [
          * URL para onde o vendedor é redirecionado após autorizar o aplicativo.
          */
         'redirect_uri' => env('MERCADOPAGO_REDIRECT_URI', env('APP_URL') . '/gateway/mercadopago/callback'),
+
+        /**
+         * Identificador do integrador para rastreamento de qualidade no painel do MP.
+         * Configurável pelo admin em: Configurações > Pagamentos > MercadoPago.
+         * Sobrescrito pelo AppServiceProvider com o valor do banco de dados.
+         */
+        'integrator_id' => env('MERCADOPAGO_INTEGRATOR_ID', ''),
+
+        /**
+         * Identificador da plataforma para rastreamento no painel do MP.
+         * Configurável pelo admin em: Configurações > Pagamentos > MercadoPago.
+         */
+        'platform_id' => env('MERCADOPAGO_PLATFORM_ID', ''),
     ],
 
     'pagseguro' => [
