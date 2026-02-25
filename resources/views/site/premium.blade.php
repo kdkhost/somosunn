@@ -113,6 +113,30 @@
             </div>
         </section>
 
+        @if(!empty($requiredFeature))
+            <section class="px-6 md:px-12 lg:px-24 pb-4">
+                <div class="max-w-7xl mx-auto">
+                    <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 md:p-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                            <div>
+                                <p class="text-xs font-black uppercase tracking-wider text-blue-600 mb-1">Upgrade sugerido</p>
+                                <h3 class="text-lg md:text-xl font-black text-slate-900">
+                                    Recurso bloqueado: {{ $requiredFeatureLabel ?: 'Acesso premium' }}
+                                </h3>
+                                <p class="text-sm text-slate-600 mt-1">
+                                    Selecione um plano recomendado abaixo para liberar este acesso.
+                                </p>
+                            </div>
+                            <a href="#planos" class="btn-primary text-white px-5 py-3 rounded-xl font-bold text-sm inline-flex items-center gap-2 w-fit">
+                                <i class="fas fa-crown"></i>
+                                Ver planos recomendados
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        @endif
+
         <!-- Pricing Section -->
         <section class="py-16 px-6 md:px-12 lg:px-24" id="planos">
             <div class="max-w-7xl mx-auto">
@@ -122,15 +146,30 @@
                         plano, mais recursos exclusivos.</p>
                 </div>
 
+                @php
+                    $recommendedPlanIds = ($recommendedPlans ?? collect())->pluck('id')->all();
+                @endphp
+
                 <div class="grid md:grid-cols-{{ min(3, $plans->count() ?: 1) }} gap-8">
                     @forelse($plans as $plan)
-                        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg {{ $plan->highlight ? 'shadow-2xl ring-2 relative' : '' }}"
+                        @php
+                            $isRecommendedForFeature = in_array($plan->id, $recommendedPlanIds, true);
+                        @endphp
+
+                        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg {{ $plan->highlight ? 'shadow-2xl ring-2' : '' }} {{ ($plan->highlight || $isRecommendedForFeature) ? 'relative' : '' }}"
                             style="{{ $plan->highlight ? '--tw-ring-color: var(--unn-azul-1)' : '' }}">
 
                             @if($plan->highlight)
                                 <span
                                     class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 btn-primary text-white text-sm font-bold rounded-full">
                                     MAIS POPULAR
+                                </span>
+                            @endif
+
+                            @if($isRecommendedForFeature)
+                                <span
+                                    class="absolute -top-4 {{ $plan->highlight ? 'right-4' : 'left-1/2 -translate-x-1/2' }} px-4 py-1 bg-emerald-500 text-white text-xs font-black rounded-full shadow-lg">
+                                    RECOMENDADO PARA ESTE ACESSO
                                 </span>
                             @endif
 

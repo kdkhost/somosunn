@@ -107,6 +107,25 @@ class HomeController extends Controller
             ->orderBy('price')
             ->get();
 
+        $requiredFeature = trim((string) request()->query('feature', ''));
+        $requiredFeatureLabel = $requiredFeature !== '' ? $this->featureLabel($requiredFeature) : '';
+
+        $recommendedPlans = collect();
+        if ($requiredFeature !== '') {
+            $recommendedPlans = $plans
+                ->filter(function ($plan) use ($requiredFeature) {
+                    return method_exists($plan, 'hasFeature') ? (bool) $plan->hasFeature($requiredFeature) : false;
+                })
+                ->values();
+
+            if ($recommendedPlans->isNotEmpty()) {
+                $recommendedIds = $recommendedPlans->pluck('id')->all();
+                $plans = $recommendedPlans
+                    ->concat($plans->reject(fn($plan) => in_array($plan->id, $recommendedIds, true)))
+                    ->values();
+            }
+        }
+
         $testimonials = collect();
         if (view()->shared('unnDbAvailable')) {
             try {
@@ -120,7 +139,13 @@ class HomeController extends Controller
             }
         }
 
-        return view('site.premium', compact('plans', 'testimonials'));
+        return view('site.premium', compact(
+            'plans',
+            'testimonials',
+            'requiredFeature',
+            'requiredFeatureLabel',
+            'recommendedPlans'
+        ));
     }
 
     // Webhook placeholders
@@ -181,5 +206,20 @@ class HomeController extends Controller
         }
 
         return ['levelSummary' => $levels->toArray(), 'leaderboard' => $leaderboard];
+    }
+
+    private function featureLabel(string $feature): string
+    {
+        $feature = trim($feature);
+
+        return match ($feature) {
+            'courses_access', 'courses', 'courses_lessons_access' => 'Acesso a cursos e aulas',
+            'mentorships_access', 'mentorships' => 'Acesso a mentorias',
+            'events_access', 'events' => 'Acesso a eventos',
+            'chat', 'chat_access' => 'Acesso ao chat',
+            'community', 'community_access' => 'Acesso a comunidade',
+            'marketplace.buy', 'marketplace' => 'Acesso ao marketplace',
+            default => 'Acesso a recurso premium',
+        };
     }
 }

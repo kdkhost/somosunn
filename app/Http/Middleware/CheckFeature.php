@@ -12,12 +12,9 @@ use Illuminate\Support\Facades\Schema;
 class CheckFeature
 {
     /**
-     * Handle an incoming request.
-     *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  string  $feature
-     * @return mixed
      */
     public function handle(Request $request, Closure $next, $feature)
     {
@@ -27,20 +24,24 @@ class CheckFeature
             return redirect()->guest(route('login'));
         }
 
-        // Impersonação (admin/superadmin): liberar acesso total durante suporte/diagnóstico
+        // Impersonation: admin/superadmin bypasses feature checks.
         if (session()->has('impersonator_id') && session()->get('impersonator_is_admin')) {
             return $next($request);
         }
 
-        if (!$user->canAccessFeature($feature) && !$this->hasEntitlementOverride($request, $user, (string) $feature)) {
-            // Se for AJAX, retorna JSON
+        $feature = trim((string) $feature);
+
+        if (!$user->canAccessFeature($feature) && !$this->hasEntitlementOverride($request, $user, $feature)) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Funcionalidade não incluída no seu plano.'], 403);
+                return response()->json([
+                    'message' => 'Funcionalidade nao incluida no seu plano.',
+                    'required_feature' => $feature,
+                ], 403);
             }
 
-            // Se for normal, redireciona com mensagem ou aborta
-            // Redirecionar para 'upgrade' ou 'planos' seria ideal
-            return redirect()->route('portal')->with('error', 'Esta funcionalidade não está disponível no seu plano atual. Faça um upgrade!');
+            return redirect()
+                ->route('premium', ['feature' => $feature])
+                ->with('warning', 'Seu plano atual nao inclui este recurso. Veja os planos recomendados para liberar o acesso.');
         }
 
         return $next($request);
@@ -58,7 +59,7 @@ class CheckFeature
             if (in_array($feature, $courseAccessFeatures, true)) {
                 $courseParam = $request->route('course');
 
-                // /courses (index) não tem {course}; libera somente se já comprou/enrolou em algum curso.
+                // /courses (index) has no {course}; allow only if already purchased/enrolled in any course.
                 if ($courseParam === null) {
                     return method_exists($user, 'hasPurchasedCourses') ? (bool) $user->hasPurchasedCourses() : false;
                 }
@@ -167,3 +168,4 @@ class CheckFeature
         return null;
     }
 }
+
