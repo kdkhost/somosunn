@@ -210,6 +210,7 @@
                             'admin.fonts.*',
                             'admin.faqs.*',
                             'admin.jobs.*',
+                            'admin.partners.*',
                             'admin.redemptions.*',
                             'admin.settings*',
                         ];
@@ -273,6 +274,13 @@
                                     class="nav-link {{ $is('admin.redemptions.*') }}">
                                     <i class="fas fa-gift nav-icon"></i>
                                     <p>Resgates</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.partners.index') }}"
+                                    class="nav-link {{ $is('admin.partners.*') }}">
+                                    <i class="fas fa-handshake nav-icon"></i>
+                                    <p>Parceiros</p>
                                 </a>
                             </li>
                             <li class="nav-item">

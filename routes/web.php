@@ -92,6 +92,28 @@ Route::get('/membros', [\App\Http\Controllers\MemberController::class, 'index'])
 Route::get('/vagas-abertas', [\App\Http\Controllers\OportunidadesTesteController::class, 'index'])->name('jobs.public.index');
 Route::get('/vagas-abertas/{job}', [\App\Http\Controllers\JobPublicController::class, 'show'])->name('jobs.public.show');
 
+// ── Parceiros ────────────────────────────────────────────────────────────────
+// Público: listagem e detalhe de cupons (detalhe exige login + plano ativo no controller)
+Route::get('/parceiros', [\App\Http\Controllers\PublicPartnerController::class, 'index'])->name('partners.index');
+Route::get('/parceiros/{partner:slug}', [\App\Http\Controllers\PublicPartnerController::class, 'show'])->name('partners.show');
+
+// Admin: CRUD de parceiros
+Route::middleware(['auth', 'admin'])->prefix('admin/partners')->name('admin.partners.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\PartnerController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\Admin\PartnerController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\Admin\PartnerController::class, 'store'])->name('store');
+    Route::get('/{partner}/edit', [\App\Http\Controllers\Admin\PartnerController::class, 'edit'])->name('edit');
+    Route::put('/{partner}', [\App\Http\Controllers\Admin\PartnerController::class, 'update'])->name('update');
+    Route::delete('/{partner}', [\App\Http\Controllers\Admin\PartnerController::class, 'destroy'])->name('destroy');
+    Route::post('/order', [\App\Http\Controllers\Admin\PartnerController::class, 'updateOrder'])->name('order');
+
+    // Cupons aninhados
+    Route::post('/{partner}/coupons', [\App\Http\Controllers\Admin\PartnerCouponController::class, 'store'])->name('coupons.store');
+    Route::put('/{partner}/coupons/{coupon}', [\App\Http\Controllers\Admin\PartnerCouponController::class, 'update'])->name('coupons.update');
+    Route::delete('/{partner}/coupons/{coupon}', [\App\Http\Controllers\Admin\PartnerCouponController::class, 'destroy'])->name('coupons.destroy');
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 
 // Eventos (público: vitrine/SEO; compra/reserva controla acesso por pedido/inscrição)
 Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
