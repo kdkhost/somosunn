@@ -831,7 +831,7 @@
             || request()->routeIs('admin.*')
             || request()->is('painel/*')
             || request()->is('admin/*');
-        $showPartnersCarousel = $showNavigation && !$hidePartnersCarousel && !$isBackendArea;
+        $showPartnersCarousel = $showPartnersCarousel ?? ($showNavigation && !$hidePartnersCarousel && !$isBackendArea);
     @endphp
 
     {{-- Parceiros Globais --}}
