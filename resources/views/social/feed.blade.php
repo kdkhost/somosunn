@@ -569,9 +569,9 @@
                                         </button>
                                         <div id="conversation-menu-main"
                                             class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1">
-                                            <button type="button"
+                                            <button type="button" onclick="toggleConversationMute()"
                                                 class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
-                                                <i class="fas fa-bell-slash"></i> Silenciar
+                                                <i class="fas fa-bell-slash"></i> <span id="conversation-menu-mute-label">Silenciar</span>
                                             </button>
                                             <button type="button"
                                                 class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600">
@@ -734,41 +734,62 @@
                                 <p class="text-xs text-gray-500" id="conversation-info-status">Online recentemente</p>
                             </div>
                             <div class="grid grid-cols-3 gap-2 text-center text-xs text-gray-500 mb-4">
-                                <button type="button" class="py-2 rounded-lg hover:bg-gray-100">
+                                <button type="button" id="conversation-info-open-profile"
+                                    class="py-2 rounded-lg hover:bg-gray-100">
                                     <i class="fas fa-user text-gray-400"></i>
                                     <span class="block mt-1">Perfil</span>
                                 </button>
-                                <button type="button" class="py-2 rounded-lg hover:bg-gray-100">
-                                    <i class="fas fa-bell text-gray-400"></i>
-                                    <span class="block mt-1">Silenciar</span>
+                                <button type="button" id="conversation-info-toggle-mute"
+                                    class="py-2 rounded-lg hover:bg-gray-100">
+                                    <i id="conversation-info-mute-icon" class="fas fa-bell text-gray-400"></i>
+                                    <span id="conversation-info-mute-label" class="block mt-1">Silenciar</span>
                                 </button>
-                                <button type="button" class="py-2 rounded-lg hover:bg-gray-100">
+                                <button type="button" id="conversation-info-search-message"
+                                    class="py-2 rounded-lg hover:bg-gray-100">
                                     <i class="fas fa-search text-gray-400"></i>
                                     <span class="block mt-1">Pesquisar</span>
                                 </button>
                             </div>
                             <div class="border-t border-gray-100 pt-3">
-                                <button type="button"
+                                <button type="button" data-accordion-toggle data-accordion-target="conversation-about-panel"
                                     class="w-full text-left text-sm font-semibold text-gray-700 flex items-center justify-between">
                                     Informacoes da conversa
-                                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                                    <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform" data-accordion-icon></i>
                                 </button>
+                                <div id="conversation-about-panel" class="mt-3 space-y-1 text-xs text-gray-500 hidden">
+                                    <p id="conversation-about-type">Tipo: --</p>
+                                    <p id="conversation-about-members">Participantes: --</p>
+                                    <p id="conversation-about-created">Iniciada em: --</p>
+                                </div>
                             </div>
                             <div class="border-t border-gray-100 pt-3">
-                                <button type="button"
+                                <button type="button" data-accordion-toggle data-accordion-target="conversation-customize-panel"
                                     class="w-full text-left text-sm font-semibold text-gray-700 flex items-center justify-between">
                                     Personalizar conversa
-                                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                                    <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform" data-accordion-icon></i>
                                 </button>
+                                <div id="conversation-customize-panel" class="mt-3 space-y-2 hidden">
+                                    <button type="button" id="conversation-customize-mute"
+                                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-50">
+                                        Silenciar conversa
+                                    </button>
+                                    <button type="button" id="conversation-customize-close"
+                                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-50">
+                                        Fechar conversa ativa
+                                    </button>
+                                </div>
                             </div>
                             <div class="border-t border-gray-100 pt-3">
-                                <button type="button"
+                                <button type="button" data-accordion-toggle data-accordion-target="conversation-media-panel"
                                     class="w-full text-left text-sm font-semibold text-gray-700 flex items-center justify-between">
                                     Midia e arquivos
-                                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                                    <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform rotate-180"
+                                        data-accordion-icon></i>
                                 </button>
-                                <div id="conversation-shared" class="mt-3 space-y-2 text-xs text-gray-500">
-                                    <p>Sem itens compartilhados.</p>
+                                <div id="conversation-media-panel" class="mt-3">
+                                    <div id="conversation-shared" class="space-y-2 text-xs text-gray-500">
+                                        <p>Sem itens compartilhados.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -886,6 +907,18 @@
         const conversationInfoAvatar = document.getElementById('conversation-info-avatar');
         const conversationInfoName = document.getElementById('conversation-info-name');
         const conversationInfoStatus = document.getElementById('conversation-info-status');
+        const conversationInfoOpenProfile = document.getElementById('conversation-info-open-profile');
+        const conversationInfoToggleMute = document.getElementById('conversation-info-toggle-mute');
+        const conversationInfoMuteLabel = document.getElementById('conversation-info-mute-label');
+        const conversationInfoMuteIcon = document.getElementById('conversation-info-mute-icon');
+        const conversationInfoSearchMessage = document.getElementById('conversation-info-search-message');
+        const conversationMenuMuteLabel = document.getElementById('conversation-menu-mute-label');
+        const conversationCustomizeMute = document.getElementById('conversation-customize-mute');
+        const conversationCustomizeClose = document.getElementById('conversation-customize-close');
+        const conversationAboutType = document.getElementById('conversation-about-type');
+        const conversationAboutMembers = document.getElementById('conversation-about-members');
+        const conversationAboutCreated = document.getElementById('conversation-about-created');
+        const conversationAccordionButtons = document.querySelectorAll('[data-accordion-toggle]');
         const feedPanel = document.getElementById('feed-panel');
         const chatPanel = document.getElementById('chat-panel');
         const sidebarButtons = document.querySelectorAll('nav [data-panel]');
@@ -902,9 +935,352 @@
         const maxVisibleChats = 5;
         let chatPollTimer = null;
         let activeConversationUserId = null;
+        let activeConversationData = null;
+        let activeConversationSearchTerm = '';
         let conversationPollTimer = null;
         const notifiedUsers = new Set();
+        const mutedConversationUsers = new Set();
+        const mutedConversationStorageKey = 'social_feed_muted_conversations';
+        const profileBaseUrl = @json(url('/profile'));
         let hasActiveConversation = false;
+
+        const normalizeUserId = (value) => {
+            const parsed = parseInt(value, 10);
+            return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+        };
+
+        const escapeHtmlSafe = (value) => String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
+        const escapeRegexSafe = (value) => String(value ?? '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        const highlightWithTerm = (text, term, markClass) => {
+            const raw = String(text ?? '');
+            const cleanTerm = String(term ?? '').trim();
+            if (!cleanTerm) {
+                return escapeHtmlSafe(raw);
+            }
+
+            const regex = new RegExp(`(${escapeRegexSafe(cleanTerm)})`, 'gi');
+            return escapeHtmlSafe(raw).replace(regex, `<mark class="${markClass}">$1</mark>`);
+        };
+
+        const notifyInfo = (message) => {
+            if (typeof toastr !== 'undefined') {
+                toastr.info(message);
+            }
+        };
+
+        const notifySuccess = (message) => {
+            if (typeof toastr !== 'undefined') {
+                toastr.success(message);
+            }
+        };
+
+        const loadMutedConversationUsers = () => {
+            try {
+                const raw = localStorage.getItem(mutedConversationStorageKey);
+                const parsed = JSON.parse(raw || '[]');
+                if (Array.isArray(parsed)) {
+                    parsed.forEach((id) => {
+                        const normalized = normalizeUserId(id);
+                        if (normalized) {
+                            mutedConversationUsers.add(normalized);
+                        }
+                    });
+                }
+            } catch (e) {
+                // Ignore storage failures (private mode, blocked storage, etc.)
+            }
+        };
+
+        const persistMutedConversationUsers = () => {
+            try {
+                localStorage.setItem(mutedConversationStorageKey, JSON.stringify(Array.from(mutedConversationUsers.values())));
+            } catch (e) {
+                // Ignore storage failures (private mode, blocked storage, etc.)
+            }
+        };
+
+        const isConversationMuted = (userId) => {
+            const normalized = normalizeUserId(userId);
+            if (!normalized) {
+                return false;
+            }
+            return mutedConversationUsers.has(normalized);
+        };
+
+        const formatConversationDate = (value) => {
+            if (!value) {
+                return '--';
+            }
+
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) {
+                return '--';
+            }
+
+            return date.toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        };
+
+        const updateConversationDetails = (payload) => {
+            activeConversationData = payload && payload.conversation ? payload.conversation : null;
+
+            const typeRaw = String(activeConversationData?.type || '').toLowerCase();
+            let typeLabel = '--';
+            if (typeRaw === 'group') {
+                typeLabel = 'Grupo';
+            } else if (typeRaw === 'private' || typeRaw === 'direct') {
+                typeLabel = 'Privada';
+            } else if (typeRaw) {
+                typeLabel = typeRaw;
+            }
+
+            const participants = Array.isArray(activeConversationData?.users)
+                ? activeConversationData.users.length
+                : (typeRaw === 'group' ? '--' : (activeConversationUserId ? '2' : '--'));
+
+            if (conversationAboutType) {
+                conversationAboutType.textContent = `Tipo: ${typeLabel}`;
+            }
+            if (conversationAboutMembers) {
+                conversationAboutMembers.textContent = `Participantes: ${participants}`;
+            }
+            if (conversationAboutCreated) {
+                conversationAboutCreated.textContent = `Iniciada em: ${formatConversationDate(activeConversationData?.created_at)}`;
+            }
+        };
+
+        const updateConversationMuteUi = () => {
+            const muted = isConversationMuted(activeConversationUserId);
+            const hasConversation = !!normalizeUserId(activeConversationUserId);
+            const muteLabel = muted ? 'Ativar som' : 'Silenciar';
+
+            if (conversationInfoToggleMute) {
+                conversationInfoToggleMute.classList.toggle('text-blue-600', muted);
+                conversationInfoToggleMute.classList.toggle('bg-blue-50', muted);
+                conversationInfoToggleMute.disabled = !hasConversation;
+            }
+            if (conversationInfoOpenProfile) {
+                conversationInfoOpenProfile.disabled = !hasConversation;
+            }
+            if (conversationInfoSearchMessage) {
+                conversationInfoSearchMessage.disabled = !hasConversation;
+            }
+            if (conversationInfoMuteLabel) {
+                conversationInfoMuteLabel.textContent = muteLabel;
+            }
+            if (conversationInfoMuteIcon) {
+                conversationInfoMuteIcon.classList.toggle('fa-bell', !muted);
+                conversationInfoMuteIcon.classList.toggle('fa-bell-slash', muted);
+                conversationInfoMuteIcon.classList.toggle('text-blue-600', muted);
+                conversationInfoMuteIcon.classList.toggle('text-gray-400', !muted);
+            }
+            if (conversationMenuMuteLabel) {
+                conversationMenuMuteLabel.textContent = muteLabel;
+            }
+            if (conversationCustomizeMute) {
+                conversationCustomizeMute.textContent = muted ? 'Ativar notificações' : 'Silenciar conversa';
+                conversationCustomizeMute.disabled = !hasConversation;
+            }
+            if (conversationInfoStatus) {
+                if (!hasConversation) {
+                    conversationInfoStatus.textContent = 'Sem conversa ativa';
+                } else {
+                    conversationInfoStatus.textContent = muted ? 'Notificações silenciadas' : 'Online recentemente';
+                }
+            }
+        };
+
+        const applyConversationMessageSearch = () => {
+            if (!conversationMessages) {
+                return 0;
+            }
+
+            const nodes = conversationMessages.querySelectorAll('.conversation-message-text');
+            if (!nodes.length) {
+                return 0;
+            }
+
+            const term = (activeConversationSearchTerm || '').trim();
+            let totalMatches = 0;
+            let firstMatchNode = null;
+
+            nodes.forEach((node) => {
+                const rawText = node.dataset.rawText || '';
+
+                if (!term) {
+                    node.textContent = rawText;
+                    return;
+                }
+
+                const lowered = rawText.toLowerCase();
+                const hasMatch = lowered.includes(term.toLowerCase());
+                if (hasMatch) {
+                    totalMatches++;
+                    node.innerHTML = highlightWithTerm(rawText, term, 'bg-yellow-200 text-gray-900 px-0.5 rounded');
+                    if (!firstMatchNode) {
+                        firstMatchNode = node;
+                    }
+                } else {
+                    node.textContent = rawText;
+                }
+            });
+
+            if (firstMatchNode) {
+                firstMatchNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            return totalMatches;
+        };
+
+        const searchInActiveConversation = async () => {
+            if (!normalizeUserId(activeConversationUserId)) {
+                notifyInfo('Selecione uma conversa primeiro.');
+                return;
+            }
+
+            let term = '';
+            if (typeof Swal !== 'undefined') {
+                const result = await Swal.fire({
+                    title: 'Pesquisar na conversa',
+                    input: 'text',
+                    inputLabel: 'Digite um termo para localizar mensagens',
+                    inputValue: activeConversationSearchTerm || '',
+                    inputPlaceholder: 'Ex.: orçamento, contrato, reunião',
+                    showCancelButton: true,
+                    confirmButtonText: 'Pesquisar',
+                    cancelButtonText: 'Cancelar'
+                });
+
+                if (!result.isConfirmed) {
+                    return;
+                }
+                term = String(result.value || '').trim();
+            } else {
+                const typed = window.prompt('Pesquisar na conversa:', activeConversationSearchTerm || '');
+                if (typed === null) {
+                    return;
+                }
+                term = String(typed).trim();
+            }
+
+            activeConversationSearchTerm = term;
+            const matches = applyConversationMessageSearch();
+
+            if (!term) {
+                notifyInfo('Busca limpa.');
+                return;
+            }
+
+            if (matches === 0) {
+                notifyInfo('Nenhuma mensagem encontrada para esse termo.');
+            } else {
+                notifySuccess(`${matches} resultado(s) encontrado(s).`);
+            }
+        };
+
+        const toggleConversationMute = () => {
+            const targetId = normalizeUserId(activeConversationUserId);
+            if (!targetId) {
+                notifyInfo('Selecione uma conversa primeiro.');
+                return;
+            }
+
+            if (mutedConversationUsers.has(targetId)) {
+                mutedConversationUsers.delete(targetId);
+                notifySuccess('Conversa com notificações ativadas.');
+            } else {
+                mutedConversationUsers.add(targetId);
+                notifyInfo('Conversa silenciada.');
+            }
+
+            persistMutedConversationUsers();
+            updateConversationMuteUi();
+        };
+
+        const openActiveConversationProfile = () => {
+            const targetId = normalizeUserId(activeConversationUserId);
+            if (!targetId) {
+                notifyInfo('Selecione uma conversa primeiro.');
+                return;
+            }
+
+            window.location.href = `${profileBaseUrl}/${targetId}`;
+        };
+
+        const closeActiveConversation = () => {
+            activeConversationUserId = null;
+            activeConversationData = null;
+            activeConversationSearchTerm = '';
+            hasActiveConversation = false;
+
+            setConversationHeader('', '');
+            updateConversationDetails(null);
+            updateConversationMuteUi();
+            renderSharedItems([]);
+
+            if (conversationMessages) {
+                conversationMessages.innerHTML = '<p class="text-sm text-gray-500">Selecione um membro para ver a conversa.</p>';
+            }
+
+            setActivePanel('chat');
+            loadConversations();
+        };
+
+        const initConversationAccordions = () => {
+            conversationAccordionButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const targetId = button.getAttribute('data-accordion-target');
+                    if (!targetId) {
+                        return;
+                    }
+
+                    const panel = document.getElementById(targetId);
+                    if (!panel) {
+                        return;
+                    }
+
+                    panel.classList.toggle('hidden');
+                    const icon = button.querySelector('[data-accordion-icon]');
+                    if (icon) {
+                        icon.classList.toggle('rotate-180', !panel.classList.contains('hidden'));
+                    }
+                });
+            });
+        };
+
+        if (conversationInfoOpenProfile) {
+            conversationInfoOpenProfile.addEventListener('click', openActiveConversationProfile);
+        }
+        if (conversationInfoToggleMute) {
+            conversationInfoToggleMute.addEventListener('click', toggleConversationMute);
+        }
+        if (conversationInfoSearchMessage) {
+            conversationInfoSearchMessage.addEventListener('click', searchInActiveConversation);
+        }
+        if (conversationCustomizeMute) {
+            conversationCustomizeMute.addEventListener('click', toggleConversationMute);
+        }
+        if (conversationCustomizeClose) {
+            conversationCustomizeClose.addEventListener('click', closeActiveConversation);
+        }
+
+        loadMutedConversationUsers();
+        initConversationAccordions();
+        updateConversationMuteUi();
+        updateConversationDetails(null);
+        window.toggleConversationMute = toggleConversationMute;
 
         const startConversationPolling = () => {
             if (conversationPollTimer) {
@@ -1023,12 +1399,15 @@
                 }
 
                 const text = document.createElement('div');
+                text.className = 'conversation-message-text';
+                text.dataset.rawText = msg.content || '';
                 text.textContent = msg.content || '';
                 bubble.appendChild(text);
                 wrap.appendChild(bubble);
                 conversationMessages.appendChild(wrap);
             });
             conversationMessages.scrollTop = conversationMessages.scrollHeight;
+            applyConversationMessageSearch();
         };
 
         const renderSharedItems = (messages) => {
@@ -1081,6 +1460,8 @@
                 .then((data) => {
                     renderConversationMessages(data.messages || []);
                     renderSharedItems(data.messages || []);
+                    updateConversationDetails(data);
+                    updateConversationMuteUi();
                 })
                 .catch(() => {
                     return;
@@ -1088,19 +1469,26 @@
         };
 
         const openConversation = (userId, userName, userPhoto) => {
-            if (!userId) {
+            const normalizedUserId = normalizeUserId(userId);
+            if (!normalizedUserId) {
                 return;
             }
 
-            activeConversationUserId = userId;
+            if (normalizeUserId(activeConversationUserId) !== normalizedUserId) {
+                activeConversationSearchTerm = '';
+            }
+
+            activeConversationUserId = normalizedUserId;
             hasActiveConversation = true;
+            updateConversationDetails(null);
             setConversationHeader(userName, userPhoto);
+            updateConversationMuteUi();
             setActivePanel('chat');
             if (conversationMessages) {
                 conversationMessages.innerHTML = '<p class="text-sm text-gray-500">Carregando mensagens...</p>';
             }
 
-            fetch(`/chat/with/${userId}`, {
+            fetch(`/chat/with/${normalizedUserId}`, {
                 headers: {
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
@@ -1113,6 +1501,8 @@
                 .then((data) => {
                     renderConversationMessages(data.messages || []);
                     renderSharedItems(data.messages || []);
+                    updateConversationDetails(data);
+                    updateConversationMuteUi();
                 })
                 .catch(() => {
                     if (conversationMessages) {
@@ -1181,6 +1571,7 @@
             const applyConversationFilter = () => {
                 const term = conversationSearch.value.trim().toLowerCase();
                 const activeFilter = document.querySelector('#conversation-filters .filter-btn.bg-blue-50')?.getAttribute('data-filter') || 'all';
+                let visibleRows = 0;
 
                 document.querySelectorAll('[data-conversation-row]').forEach((row) => {
                     const rawName = row.getAttribute('data-name') || '';
@@ -1201,6 +1592,9 @@
 
                     const matches = matchesSearch && matchesFilter;
                     row.classList.toggle('hidden', !matches);
+                    if (matches) {
+                        visibleRows++;
+                    }
 
                     const nameNode = row.querySelector('[data-role="conversation-name"]');
                     const messageNode = row.querySelector('[data-role="conversation-message"]');
@@ -1211,6 +1605,20 @@
                         messageNode.innerHTML = highlightText(rawMessage, term);
                     }
                 });
+
+                const emptyId = 'conversation-filter-empty';
+                const emptyNode = document.getElementById(emptyId);
+                if (visibleRows === 0 && conversationList && conversationList.querySelector('[data-conversation-row]')) {
+                    if (!emptyNode) {
+                        const msg = document.createElement('p');
+                        msg.id = emptyId;
+                        msg.className = 'text-xs text-gray-500 p-2';
+                        msg.textContent = 'Nenhuma conversa encontrada para este filtro.';
+                        conversationList.appendChild(msg);
+                    }
+                } else if (emptyNode) {
+                    emptyNode.remove();
+                }
             };
 
             // Filter buttons logic
@@ -1273,6 +1681,12 @@
                         conversationList.innerHTML = '<p class="text-xs text-gray-500">Nenhuma conversa iniciada.</p>';
                         return;
                     }
+
+                    Array.from(conversationList.children).forEach((child) => {
+                        if (!child.hasAttribute('data-conversation-row')) {
+                            child.remove();
+                        }
+                    });
 
                     // Patching DOM to avoid flickering
                     const currentRows = Array.from(conversationList.querySelectorAll('[data-conversation-row]'));
@@ -1344,7 +1758,7 @@
                             notifiedUsers.delete(otherUser.id);
                         }
 
-                        if ((conv.unread_count || 0) > 0 && userIdStr !== activeUserIdString && !openChats.has(otherUser.id) && !notifiedUsers.has(otherUser.id)) {
+                        if ((conv.unread_count || 0) > 0 && userIdStr !== activeUserIdString && !openChats.has(otherUser.id) && !notifiedUsers.has(otherUser.id) && !isConversationMuted(otherUser.id)) {
                             notifiedUsers.add(otherUser.id);
                             openMultiChat(otherUser.id, otherUser.name, avatar);
                         }
@@ -1354,7 +1768,7 @@
                         openConversation(firstUser.id, firstUser.name, firstUser.avatar);
                     }
 
-                    if (window.applyConversationFilter && conversationSearch && conversationSearch.value.trim() !== '') {
+                    if (window.applyConversationFilter) {
                         window.applyConversationFilter();
                     }
                 })
