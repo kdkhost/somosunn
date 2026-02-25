@@ -2,7 +2,13 @@
 
 @section('title', ($coupon->id ? 'Editar' : 'Novo') . ' Cupom')
 
-@section('content')
+@section('panel_breadcrumb')
+    <a href="{{ route('panel.admin.coupons.index') }}" class="hover:underline">Cupons</a>
+    <span class="mx-2 text-slate-300 dark:text-slate-700 transition-colors">/</span>
+    <span class="text-slate-500 dark:text-slate-400 transition-colors">{{ $coupon->id ? 'Editar' : 'Novo' }}</span>
+@endsection
+
+@section('panel_content')
     <div class="max-w-4xl mx-auto space-y-6">
         {{-- Header --}}
         <div class="flex items-center justify-between">
