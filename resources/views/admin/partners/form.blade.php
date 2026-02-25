@@ -13,7 +13,8 @@
                     </h1>
                 </div>
                 <div class="col-auto">
-                    <a href="{{ route('admin.partners.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('admin.partners.index') }}" class="btn btn-outline-secondary"
+                        title="Voltar para a listagem">
                         <i class="fas fa-arrow-left mr-1"></i> Voltar
                     </a>
                 </div>
@@ -151,7 +152,8 @@
 
                             </div>
                             <div class="card-footer text-right">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary"
+                                    title="{{ isset($partner->id) ? 'Salvar alterações do parceiro' : 'Salvar e cadastrar parceiro' }}">
                                     <i class="fas fa-save mr-1"></i>
                                     {{ isset($partner->id) ? 'Salvar Alterações' : 'Criar Parceiro' }}
                                 </button>
@@ -167,8 +169,8 @@
                             <div class="card-header">
                                 <h3 class="card-title"><i class="fas fa-ticket-alt mr-1"></i> Cupons de Desconto</h3>
                                 <div class="card-tools">
-                                    <button class="btn btn-sm btn-success" data-toggle="collapse"
-                                        data-target="#new-coupon-form">
+                                    <button class="btn btn-sm btn-success" data-toggle="collapse" data-target="#new-coupon-form"
+                                        title="Abrir formulário de novo cupom">
                                         <i class="fas fa-plus"></i> Novo Cupom
                                     </button>
                                 </div>
@@ -241,7 +243,8 @@
                                                     <label class="custom-control-label small"
                                                         for="new_coupon_active">Ativo</label>
                                                 </div>
-                                                <button type="submit" class="btn btn-sm btn-success float-right">
+                                                <button type="submit" class="btn btn-sm btn-success float-right"
+                                                    title="Confirmar e adicionar cupom">
                                                     <i class="fas fa-plus mr-1"></i> Adicionar Cupom
                                                 </button>
                                             </div>
@@ -278,15 +281,18 @@
                                                     </div>
                                                     <div class="d-flex gap-1">
                                                         <button class="btn btn-xs btn-outline-secondary"
-                                                            onclick="editCoupon({{ $coupon->id }}, {{ $coupon->toJson() }})">
+                                                            onclick="editCoupon({{ $coupon->id }}, {{ $coupon->toJson() }})"
+                                                            title="Editar Cupom">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
                                                         <form method="POST"
                                                             action="{{ route('admin.partners.coupons.destroy', [$partner, $coupon]) }}"
                                                             onsubmit="return confirm('Remover este cupom?')" class="d-inline">
                                                             @csrf @method('DELETE')
-                                                            <button type="submit" class="btn btn-xs btn-outline-danger"><i
-                                                                    class="fas fa-trash"></i></button>
+                                                            <button type="submit" class="btn btn-xs btn-outline-danger"
+                                                                title="Excluir Cupom">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
                                                         </form>
                                                     </div>
                                                 </div>

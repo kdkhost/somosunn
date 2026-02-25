@@ -58,7 +58,8 @@
                             <tbody id="partners-sortable">
                                 @foreach($partners as $partner)
                                     <tr data-id="{{ $partner->id }}">
-                                        <td class="align-middle text-center text-muted" style="cursor:grab;">
+                                        <td class="align-middle text-center text-muted" style="cursor:grab;"
+                                            title="Arraste para reordenar">
                                             <i class="fas fa-grip-vertical"></i>
                                         </td>
                                         <td class="align-middle">
@@ -96,14 +97,14 @@
                                         </td>
                                         <td class="align-middle text-right">
                                             <a href="{{ route('admin.partners.edit', $partner) }}"
-                                                class="btn btn-sm btn-outline-primary">
+                                                class="btn btn-sm btn-outline-primary" title="Editar Parceiro">
                                                 <i class="fas fa-edit"></i> Editar
                                             </a>
                                             <form method="POST" action="{{ route('admin.partners.destroy', $partner) }}"
                                                 class="d-inline partner-delete-form">
                                                 @csrf @method('DELETE')
                                                 <button type="button" class="btn btn-sm btn-outline-danger btn-delete-partner"
-                                                    data-nome="{{ $partner->name }}">
+                                                    data-nome="{{ $partner->name }}" title="Excluir Parceiro">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>

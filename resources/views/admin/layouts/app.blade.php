@@ -99,6 +99,58 @@
         /* Layout helpers only — do not override AdminLTE colors here */
         :root {
             --main-header-height: 3.5rem;
+            --unn-azul-1: #1F5EDB;
+            --unn-azul-2: #177FD6;
+            --unn-azul-3: #1D3FC4;
+        }
+
+        /* Tooltip customizada (Premium) */
+        .ui-tooltip {
+            position: relative;
+        }
+
+        .ui-tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 10px);
+            transform: translateX(-50%);
+            background: var(--unn-azul-1, #1F5EDB);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1060;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .ui-tooltip::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 4px);
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: var(--unn-azul-1, #1F5EDB) transparent transparent transparent;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            z-index: 1060;
+        }
+
+        .ui-tooltip:hover::after,
+        .ui-tooltip:focus-visible::after,
+        .ui-tooltip:hover::before,
+        .ui-tooltip:focus-visible::before {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-2px);
         }
 
         .content-wrapper {
@@ -151,14 +203,25 @@
                 padding-right: 0.75rem;
             }
         }
+
         /* Failsafe para o preloader - garante que ele desapareça mesmo se o JS falhar */
         @keyframes preloader-failsafe {
-            from { opacity: 1; pointer-events: auto; }
-            to { opacity: 0; pointer-events: none; visibility: hidden; }
+            from {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            to {
+                opacity: 0;
+                pointer-events: none;
+                visibility: hidden;
+            }
         }
+
         .preloader {
             animation: preloader-failsafe 0.5s forwards;
-            animation-delay: 5s; /* Desaparece automaticamente após 5s */
+            animation-delay: 5s;
+            /* Desaparece automaticamente após 5s */
         }
 
         /* Small neutral utilities to restore layout helpers used across admin views */
@@ -487,6 +550,7 @@
                 initColorPickers();
                 initDateTimePickers();
                 initCouponFormEnhancements();
+                initTooltips();
             });
             $('.summernote').summernote({ height: 180 });
             initUploadWidgets();
@@ -494,588 +558,10 @@
             initColorPickers();
             initDateTimePickers();
             initCouponFormEnhancements();
+            initTooltips();
+        });
 
-            toastr.options = { positionClass: 'toast-top-right', timeOut: 3500, progressBar: true };
-
-            $(document).on('submit', '.ajax-form', function (e) {
-                e.preventDefault();
-                const form = $(this);
-                $.ajax({
-                    url: form.attr('action'),
-                    method: form.attr('method') || 'POST',
-                    data: new FormData(this),
-                    processData: false,
-                    contentType: false,
-                    success: function (resp) {
-                        const msg = (resp && resp.message) ? resp.message : 'Salvo com sucesso';
-                        showSuccess(msg);
-                        if (resp && resp.redirect) { $.pjax({ url: resp.redirect, container: container }); }
-                    },
-                    error: function (xhr) {
-                        let msg = 'Erro ao salvar';
-                        if (xhr && xhr.status === 419) { msg = 'Sessão expirada. Recarregue a página e tente novamente.'; }
-                        else if (xhr && xhr.status === 413) { msg = 'Arquivo muito grande para enviar.'; }
-                        else if (xhr && xhr.responseJSON) {
-                            if (xhr.responseJSON.message) { msg = xhr.responseJSON.message; }
-                            const errors = xhr.responseJSON.errors || null;
-                            if (errors && typeof errors === 'object') {
-                                const firstKey = Object.keys(errors)[0];
-                                const firstVal = firstKey ? errors[firstKey] : null;
-                                if (Array.isArray(firstVal) && firstVal[0]) { msg = firstVal[0]; }
-                            }
-                        }
-                        showError(msg);
-                    }
-                });
-            });
-
-            $(document).on('click', '.btn-delete, [data-confirm-delete]', function (e) {
-                e.preventDefault();
-
-                const $btn = $(this);
-                const url = $btn.data('action') || $btn.attr('href');
-                const redirect = $btn.data('redirect') || null;
-                const $form = $btn.closest('form');
-
-                showConfirm('Confirme para continuar.', function () {
-                    // Prefer form submission quando explicitamente solicitado
-                    if ($btn.is('[data-confirm-delete]') || (!url && $form.length)) {
-                        if ($form.length) {
-                            if ($form.hasClass('ajax-form')) {
-                                $form.trigger('submit');
-                            } else {
-                                $form.get(0).submit();
-                            }
-                            return;
-                        }
-                    }
-
-                    if (!url) {
-                        showError('Ação inválida: URL não encontrada.');
-                        return;
-                    }
-
-                    $.post(url, { _method: 'DELETE', _token: '{{ csrf_token() }}' })
-                        .done(function (resp) {
-                            showSuccess('Excluído');
-
-                            if (redirect) {
-                                window.location.href = redirect;
-                                return;
-                            }
-
-                            if (resp && typeof resp === 'object' && resp.redirect) {
-                                $.pjax({ url: resp.redirect, container: container });
-                                return;
-                            }
-
-                            $.pjax.reload(container);
-                        })
-                        .fail(function (xhr) {
-                            let msg = 'Erro ao excluir';
-                            if (xhr && xhr.status === 419) { msg = 'Sessão expirada. Recarregue a página e tente novamente.'; }
-                            else if (xhr && xhr.responseJSON && xhr.responseJSON.message) { msg = xhr.responseJSON.message; }
-                            showError(msg);
-                        });
-                });
-            });
-
-            window.confirmAction = function (event, title, text, onConfirm) {
-                if (event && typeof event.preventDefault === 'function') {
-                    event.preventDefault();
-                }
-
-                return Swal.fire({
-                    title: title || 'Confirmar acao',
-                    text: text || 'Confirme para continuar.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Confirmar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (!result.isConfirmed) {
-                        return false;
-                    }
-
-                    if (typeof onConfirm === 'function') {
-                        onConfirm();
-                        return true;
-                    }
-
-                    if (event) {
-                        const target = event.currentTarget || event.target;
-                        const form = target && target.closest ? target.closest('form') : null;
-
-                        if (form) {
-                            form.submit();
-                            return true;
-                        }
-
-                        const link = target && target.getAttribute ? target.getAttribute('href') : null;
-                        if (link && link !== '#') {
-                            window.location.href = link;
-                            return true;
-                        }
-                    }
-
-                    return true;
-                });
-            };
-
-            $('#themeToggleBtn').on('click', function () {
-                const input = $('#site_theme_input');
-                input.val(input.val() === 'dark' ? 'light' : 'dark');
-                $('#themeToggleForm').submit();
-            });
-
-            const logo = $('.brand-logo-img');
-            const favicon = $('.brand-favicon-img');
-            $(document).on('collapsed.lte.pushmenu', function () { logo.addClass('d-none'); favicon.removeClass('d-none'); });
-            $(document).on('expanded.lte.pushmenu', function () { favicon.addClass('d-none'); logo.removeClass('d-none'); });
-
-            // Persistência de aba ativa (nav-tabs)
-            const tabKey = 'admin-active-tab-' + (location.pathname || 'root');
-
-            // Use delegation to support PJAX/dynamic content
-            $(document).on('shown.bs.tab', 'a[data-toggle="pill"], a[data-toggle="tab"]', function (e) {
-                localStorage.setItem(tabKey, $(e.target).attr('href'));
-            });
-
-            function restoreActiveTab() {
-                const savedTab = localStorage.getItem(tabKey);
-                if (savedTab) {
-                    const $tab = $('a[href="' + savedTab + '"]');
-                    if ($tab.length) {
-                        // Use bootstrap tab show
-                        $tab.tab('show');
-                    }
-                }
-            }
-
-            // Restore on load
-            restoreActiveTab();
-
-            // Restore on PJAX end
-            $(document).on('pjax:end', function () {
-                restoreActiveTab();
-            });
-
-            function initColorPickers() {
-                $('.colorpicker-element').colorpicker();
-            }
-
-            function initMasks() {
-                function lookupCep($input) {
-                    const cep = $input.val().replace(/\D/g, '');
-                    if (cep.length !== 8) return;
-                    if ($input.data('lastCep') === cep) return;
-                    $input.data('lastCep', cep);
-                    const targetNumber = $input.data('target-number');
-                    const targetComplement = $input.data('target-complement');
-                    const targetDistrict = $input.data('target-district');
-                    toastr.info('Buscando CEP...');
-                    fetch('https://viacep.com.br/ws/' + cep + '/json/')
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.erro) { toastr.error('CEP não encontrado'); return; }
-                            $('[name="company_address"]').val(data.logradouro || '');
-                            if (targetDistrict) { $(targetDistrict).val(data.bairro || ''); } else { $('[name="company_district"]').val(data.bairro || ''); }
-                            $('[name="company_city"]').val(data.localidade || '');
-                            $('[name="company_state"]').val(data.uf || '');
-                            toastr.success('Endereço preenchido pelo CEP');
-                            if (targetNumber) { $(targetNumber).focus(); }
-                            else if (targetComplement) { $(targetComplement).focus(); }
-                        })
-                        .catch(() => { toastr.error('Falha ao buscar CEP'); });
-                }
-
-                // CEP com viacep + feedback
-                $('.mask-cep').inputmask('99999-999', {
-                    oncomplete: function () {
-                        lookupCep($(this));
-                    }
-                });
-                $('.mask-cep').off('input.cep').on('input.cep', function () {
-                    const $input = $(this);
-                    const cep = $input.val().replace(/\D/g, '');
-                    if (cep.length === 8) {
-                        clearTimeout($input.data('cepTimer'));
-                        $input.data('cepTimer', setTimeout(() => lookupCep($input), 250));
-                    }
-                });
-                $('.mask-cep').off('blur.cep').on('blur.cep', function () {
-                    lookupCep($(this));
-                });
-                $('.mask-cpf').inputmask('999.999.999-99');
-                $('.mask-cnpj').inputmask('99.999.999/9999-99');
-                $('.mask-date').inputmask('99/99/9999');
-                $('.mask-datetime').inputmask('99/99/9999 99:99');
-                $('.mask-time').inputmask('99:99');
-                $('.mask-phone').inputmask({ 'mask': ['(99) 9999-9999', '(99) 9 9999-9999'], keepStatic: true });
-                $('.mask-money').inputmask('currency', {
-                    prefix: 'R$ ',
-                    radixPoint: ',',
-                    groupSeparator: '.',
-                    autoGroup: true,
-                    digits: 2,
-                    rightAlign: false,
-                    substituteRadixPoint: true,
-                    onBeforeMask: function (value) {
-                        if (value === null || value === undefined) return value;
-                        value = String(value);
-                        // Eloquent decimal casts usually return "97.00" (dot decimal). Inputmask here expects comma.
-                        if (value.includes(',') || !value.includes('.')) return value;
-                        if (/^\\d+\\.\\d{1,2}$/.test(value)) return value.replace('.', ',');
-                        return value;
-                    }
-                });
-                $('.mask-cpf-cnpj').inputmask({ mask: ['999.999.999-99', '99.999.999/9999-99'], keepStatic: true, placeholder: '_' });
-            }
-
-            function initDateTimePickers() {
-                if (typeof flatpickr === 'undefined') return;
-
-                try {
-                    if (flatpickr.l10ns && flatpickr.l10ns.pt) {
-                        flatpickr.localize(flatpickr.l10ns.pt);
-                    }
-                } catch (e) { /* ignore */ }
-
-                $('[data-datetime-picker]').each(function () {
-                    if (this._flatpickr) return;
-                    flatpickr(this, {
-                        enableTime: true,
-                        time_24hr: true,
-                        allowInput: true,
-                        dateFormat: 'Y-m-d H:i'
-                    });
-                });
-            }
-
-            function initCouponFormEnhancements() {
-                const form = $('form.ajax-form').filter(function () {
-                    return String($(this).attr('action') || '').includes('/admin/coupons');
-                }).first();
-
-                if (!form.length) return;
-
-                // Gerar código (fallback global para PJAX)
-                const btnGen = document.getElementById('btnGenCode');
-                if (btnGen && !btnGen.dataset.bound) {
-                    btnGen.dataset.bound = '1';
-                    btnGen.addEventListener('click', function () {
-                        const input = form.find('input[name="code"]').get(0);
-                        if (!input) return;
-                        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-                        let out = '';
-                        for (let i = 0; i < 12; i++) out += chars[Math.floor(Math.random() * chars.length)];
-                        input.value = out;
-                    });
-                }
-
-                const scopeSelect = form.find('select[name="applies_to"]');
-                const itemWrap = form.find('[data-coupon-item-wrap]');
-                const itemSelect = form.find('select[name="applies_to_id"]');
-                const itemHelp = form.find('[data-coupon-item-help]');
-
-                if (!scopeSelect.length || !itemSelect.length) return;
-
-                if (form.data('couponUiInit')) return;
-                form.data('couponUiInit', true);
-
-                function filterItemOptions(scope) {
-                    itemSelect.find('option').each(function () {
-                        const optScope = $(this).data('scope');
-                        if (!optScope) {
-                            $(this).prop('hidden', false);
-                            return;
-                        }
-                        $(this).prop('hidden', optScope !== scope);
-                    });
-                }
-
-                function applyScope() {
-                    const scope = String(scopeSelect.val() || 'all');
-
-                    if (scope === 'all') {
-                        itemSelect.val('');
-                        itemSelect.prop('disabled', true);
-                        itemWrap.addClass('d-none');
-                        return;
-                    }
-
-                    itemWrap.removeClass('d-none');
-                    itemSelect.prop('disabled', false);
-                    filterItemOptions(scope);
-
-                    const selected = itemSelect.find('option:selected');
-                    if (selected.length && selected.prop('hidden')) {
-                        itemSelect.val('');
-                    }
-
-                    if (itemHelp.length) {
-                        const label = scope === 'event' ? 'evento' : (scope === 'course' ? 'curso' : 'mentoria');
-                        itemHelp.text('Selecione o ' + label + ' para criar uma promoção direcionada (opcional).');
-                    }
-                }
-
-                scopeSelect.on('change.couponui', applyScope);
-                applyScope();
-            }
-
-            function initUploadWidgets() {
-                $('.upload-box').each(function () {
-                    const box = $(this);
-                    if (box.data('uploadInit')) return;
-                    box.data('uploadInit', true);
-                    box.attr('tabindex', '0');
-
-                    const input = box.find('input[type=file]');
-                    const preview = box.find('.upload-preview');
-                    const meta = box.find('.upload-meta');
-                    const help = box.find('.upload-help');
-                    const removeBtn = box.find('.upload-remove');
-                    const progress = box.find('.upload-progress');
-                    const bar = progress.find('.progress-bar');
-                    const maxSize = parseInt(box.data('max-size') || (5 * 1024 * 1024));
-                    const crop = box.data('crop') === 1 || box.data('crop') === '1';
-                    const existingUrl = box.data('existing-url');
-                    const removeInputSelector = box.data('remove-input');
-                    const accept = (input.attr('accept') || 'image/*').replace(/\./g, '');
-                    const acceptLower = String(input.attr('accept') || '').toLowerCase();
-                    const sizeMb = (maxSize / 1024 / 1024).toFixed(2) + ' MB';
-
-                    // Custom preview constraints
-                    const previewMaxHeight = box.data('preview-max-height');
-                    const previewMaxWidth = box.data('preview-max-width');
-                    const previewStyle = (previewMaxHeight ? 'max-height:' + previewMaxHeight + 'px;' : '') +
-                        (previewMaxWidth ? 'max-width:' + previewMaxWidth + 'px;' : '');
-
-                    if (help.length) {
-                        help.text('Aceita: ' + accept + ' • Até ' + sizeMb + (crop ? ' • Possível recorte' : ''));
-                    }
-
-                    function kindFromAccept() {
-                        if (acceptLower.includes('video/')) return 'video';
-                        if (acceptLower.includes('audio/')) return 'audio';
-                        if (acceptLower.includes('image/')) return 'image';
-                        if (acceptLower.trim() === '') return 'image';
-                        return 'file';
-                    }
-
-                    const defaultKind = kindFromAccept();
-
-                    function kindFromUrl(url) {
-                        const clean = String(url || '').split('?')[0].split('#')[0].toLowerCase();
-                        if (/\.(png|jpe?g|gif|webp|svg)$/.test(clean)) return 'image';
-                        if (/\.(mp4|webm|ogg|mov|m4v)$/.test(clean)) return 'video';
-                        if (/\.(mp3|wav|ogg|m4a|aac|flac)$/.test(clean)) return 'audio';
-                        return defaultKind;
-                    }
-
-                    function previewHtml(kind, url, label) {
-                        const safeLabel = String(label || 'arquivo');
-
-                        if (kind === 'video') {
-                            return '<video src="' + url + '" controls style="width:100%; max-height: 240px; border-radius: 10px;"></video>' +
-                                '<div class="text-muted small mt-2">' + safeLabel + '</div>';
-                        }
-
-                        if (kind === 'audio') {
-                            return '<audio src="' + url + '" controls style="width:100%;"></audio>' +
-                                '<div class="text-muted small mt-2">' + safeLabel + '</div>';
-                        }
-
-                        if (kind === 'file') {
-                            return '<i class="upload-icon fas fa-file-alt"></i>' +
-                                '<div class="text-muted small">Arquivo selecionado</div>' +
-                                '<div class="font-weight-bold small mt-1" style="word-break: break-word;">' + safeLabel + '</div>' +
-                                (url ? '<div class="mt-2"><a href="' + url + '" target="_blank" rel="noopener" class="btn btn-xs btn-outline-primary">Abrir</a></div>' : '');
-                        }
-
-                        return '<img src="' + url + '" alt="preview" class="img-fluid">';
-                    }
-
-                    function renderEmpty() {
-                        preview.html('<i class="upload-icon fas fa-cloud-upload-alt"></i><div class="text-muted small">Clique ou arraste para enviar</div>');
-                        meta.text('');
-                        removeBtn.addClass('d-none');
-                    }
-
-                    function renderExisting(url) {
-                        const kind = kindFromUrl(url);
-                        preview.html(previewHtml(kind, url, 'Arquivo atual'));
-                        meta.text('Arquivo atual');
-                        removeBtn.removeClass('d-none');
-                    }
-
-                    renderEmpty();
-                    if (existingUrl) {
-                        renderExisting(existingUrl);
-                    }
-
-                    function setPreview(blobOrFile, name, url) {
-                        const sizeMB = (blobOrFile.size / 1024 / 1024).toFixed(2);
-                        const type = String(blobOrFile.type || '').toLowerCase();
-                        const kind = type.startsWith('image/') ? 'image' : (type.startsWith('video/') ? 'video' : (type.startsWith('audio/') ? 'audio' : defaultKind));
-                        preview.html(previewHtml(kind, url, name || 'arquivo'));
-                        meta.text((name || 'arquivo') + ' • ' + sizeMB + ' MB • ' + (blobOrFile.type || ''));
-                        removeBtn.removeClass('d-none');
-                    }
-
-                    function bindFileToInput(file) {
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(file);
-                        input.off('change.upload');
-                        input[0].files = dataTransfer.files;
-                        input.on('change.upload', onInputChange);
-                    }
-
-                    function handleFile(file) {
-                        if (!file) return;
-                        if (file.size > maxSize) { toastr.error('Arquivo excede o limite'); return; }
-                        const reader = new FileReader();
-                        bar.css('width', '0%');
-                        progress.removeClass('d-none');
-                        const start = Date.now();
-
-                        reader.onprogress = function (e) {
-                            if (e.lengthComputable) {
-                                const pct = (e.loaded / e.total) * 100;
-                                bar.css('width', pct + '%');
-                            }
-                        };
-                        reader.onload = function (e) {
-                            bar.css('width', '100%');
-                            setTimeout(() => progress.addClass('d-none'), 400);
-                            const url = e.target.result;
-                            const elapsed = (Date.now() - start) / 1000;
-                            const speed = file.size / Math.max(elapsed, 0.1);
-                            const eta = speed > 0 ? Math.max((file.size - speed * elapsed) / speed, 0) : 0;
-                            const extra = ' • ' + (file.size / 1024 / 1024).toFixed(2) + ' MB • ' + (file.type || 'tipo desconhecido') + ' • ~' + eta.toFixed(1) + 's';
-                            if (crop) {
-                                openCropper(url, { outputType: 'image/jpeg', quality: 0.92, maxSize: maxSize }, function (croppedBlob, croppedUrl) {
-                                    const fileExt = (croppedBlob.type && croppedBlob.type.split('/')[1]) ? croppedBlob.type.split('/')[1] : 'png';
-                                    const normalizedExt = fileExt === 'jpeg' ? 'jpg' : fileExt;
-                                    const croppedFile = new File([croppedBlob], file.name.replace(/\.[^/.]+$/, '') + '.' + normalizedExt, { type: croppedBlob.type });
-                                    bindFileToInput(croppedFile);
-                                    setPreview(croppedFile, croppedFile.name + extra, croppedUrl);
-                                });
-                            } else {
-                                setPreview(file, file.name + extra, url);
-                            }
-                        };
-                        reader.readAsDataURL(file);
-                    }
-
-                    function openFileDialog() {
-                        if (box.data('opening')) return;
-                        box.data('opening', true);
-                        const reset = () => {
-                            box.data('opening', false);
-                            $(window).off('focus.upload', reset);
-                        };
-                        $(window).one('focus.upload', reset);
-                        input.trigger('click');
-                    }
-
-                    function onInputChange() {
-                        const file = this.files && this.files[0] ? this.files[0] : null;
-                        if (removeInputSelector) { $(removeInputSelector).val('0'); }
-                        handleFile(file);
-                    }
-
-                    box.off('.upload');
-                    input.off('.upload');
-                    removeBtn.off('.upload');
-                    box.find('.upload-btn').off('.upload');
-
-                    box.on('click.upload', function (e) {
-                        if ($(e.target).closest('.upload-btn, .upload-remove, input').length) return;
-                        openFileDialog();
-                    });
-                    box.on('keydown.upload', function (e) {
-                        if (!['Enter', ' '].includes(e.key)) return;
-                        e.preventDefault();
-                        openFileDialog();
-                    });
-                    box.on('dragover.upload', function (e) { e.preventDefault(); box.addClass('dragover'); });
-                    box.on('dragleave.upload drop.upload', function (e) { e.preventDefault(); box.removeClass('dragover'); });
-                    box.on('drop.upload', function (e) { e.preventDefault(); const f = e.originalEvent.dataTransfer.files[0]; handleFile(f); });
-
-                    box.find('.upload-btn').on('click.upload', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        openFileDialog();
-                    });
-                    input.on('click.upload', function (e) { e.stopPropagation(); });
-                    input.on('change.upload', onInputChange);
-
-                    removeBtn.on('click.upload', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        input.val('');
-                        renderEmpty();
-                        if (removeInputSelector) { $(removeInputSelector).val('1'); }
-                    });
-                });
-            }
-            function openCropper(imageUrl, options, callback) {
-                if (typeof options === 'function') {
-                    callback = options;
-                    options = {};
-                }
-                options = options || {};
-                const outputType = options.outputType || 'image/jpeg';
-                const quality = typeof options.quality === 'number' ? options.quality : 0.92;
-                const maxSize = options.maxSize || null;
-
-                const modalId = 'cropperModal';
-                let modal = $('#' + modalId);
-                if (!modal.length) {
-                    $('body').append(
-                        '<div class="modal fade" id="' + modalId + '" tabindex="-1">' +
-                        '<div class="modal-dialog modal-lg"><div class="modal-content">' +
-                        '<div class="modal-header"><h5 class="modal-title">Cortar imagem</h5>' +
-                        '<button type="button" class="close" data-dismiss="modal">&times;</button></div>' +
-                        '<div class="modal-body"><div style="max-height:500px;">' +
-                        '<img id="' + modalId + '-img" style="max-width:100%;"></div></div>' +
-                        '<div class="modal-footer">' +
-                        '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>' +
-                        '<button type="button" class="btn btn-primary" id="' + modalId + '-apply">Aplicar</button>' +
-                        '</div></div></div></div>'
-                    );
-                    modal = $('#' + modalId);
-                }
-                const img = $('#' + modalId + '-img');
-                let cropper;
-                modal.on('shown.bs.modal', function () {
-                    img.attr('src', imageUrl);
-                    cropper = new Cropper(img[0], { aspectRatio: NaN, viewMode: 1 });
-                }).on('hidden.bs.modal', function () {
-                    cropper && cropper.destroy();
-                    cropper = null;
-                });
-                $('#' + modalId + '-apply').off('click').on('click', function () {
-                    if (!cropper) return;
-                    cropper.getCroppedCanvas({ fillColor: '#fff' }).toBlob(function (blob) {
-                        if (!blob) {
-                            toastr.error('Falha ao gerar a imagem recortada.');
-                            return;
-                        }
-                        if (maxSize && blob.size > maxSize) {
-                            const mb = (maxSize / 1024 / 1024).toFixed(2);
-                            toastr.error('A imagem recortada excede o limite de ' + mb + ' MB.');
-                            return;
-                        }
-                        const url = URL.createObjectURL(blob);
-                        callback(blob, url);
-                        modal.modal('hide');
-                    }, outputType, quality);
-                });
-                modal.modal('show');
-            }
-
+        function initTooltips() {
             $('[title]').each(function () {
                 var $el = $(this);
                 var text = $el.attr('title');
@@ -1084,6 +570,590 @@
                 $el.addClass('ui-tooltip');
                 $el.removeAttr('title');
             });
+        }
+
+        toastr.options = { positionClass: 'toast-top-right', timeOut: 3500, progressBar: true };
+
+        $(document).on('submit', '.ajax-form', function (e) {
+            e.preventDefault();
+            const form = $(this);
+            $.ajax({
+                url: form.attr('action'),
+                method: form.attr('method') || 'POST',
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                success: function (resp) {
+                    const msg = (resp && resp.message) ? resp.message : 'Salvo com sucesso';
+                    showSuccess(msg);
+                    if (resp && resp.redirect) { $.pjax({ url: resp.redirect, container: container }); }
+                },
+                error: function (xhr) {
+                    let msg = 'Erro ao salvar';
+                    if (xhr && xhr.status === 419) { msg = 'Sessão expirada. Recarregue a página e tente novamente.'; }
+                    else if (xhr && xhr.status === 413) { msg = 'Arquivo muito grande para enviar.'; }
+                    else if (xhr && xhr.responseJSON) {
+                        if (xhr.responseJSON.message) { msg = xhr.responseJSON.message; }
+                        const errors = xhr.responseJSON.errors || null;
+                        if (errors && typeof errors === 'object') {
+                            const firstKey = Object.keys(errors)[0];
+                            const firstVal = firstKey ? errors[firstKey] : null;
+                            if (Array.isArray(firstVal) && firstVal[0]) { msg = firstVal[0]; }
+                        }
+                    }
+                    showError(msg);
+                }
+            });
+        });
+
+        $(document).on('click', '.btn-delete, [data-confirm-delete]', function (e) {
+            e.preventDefault();
+
+            const $btn = $(this);
+            const url = $btn.data('action') || $btn.attr('href');
+            const redirect = $btn.data('redirect') || null;
+            const $form = $btn.closest('form');
+
+            showConfirm('Confirme para continuar.', function () {
+                // Prefer form submission quando explicitamente solicitado
+                if ($btn.is('[data-confirm-delete]') || (!url && $form.length)) {
+                    if ($form.length) {
+                        if ($form.hasClass('ajax-form')) {
+                            $form.trigger('submit');
+                        } else {
+                            $form.get(0).submit();
+                        }
+                        return;
+                    }
+                }
+
+                if (!url) {
+                    showError('Ação inválida: URL não encontrada.');
+                    return;
+                }
+
+                $.post(url, { _method: 'DELETE', _token: '{{ csrf_token() }}' })
+                    .done(function (resp) {
+                        showSuccess('Excluído');
+
+                        if (redirect) {
+                            window.location.href = redirect;
+                            return;
+                        }
+
+                        if (resp && typeof resp === 'object' && resp.redirect) {
+                            $.pjax({ url: resp.redirect, container: container });
+                            return;
+                        }
+
+                        $.pjax.reload(container);
+                    })
+                    .fail(function (xhr) {
+                        let msg = 'Erro ao excluir';
+                        if (xhr && xhr.status === 419) { msg = 'Sessão expirada. Recarregue a página e tente novamente.'; }
+                        else if (xhr && xhr.responseJSON && xhr.responseJSON.message) { msg = xhr.responseJSON.message; }
+                        showError(msg);
+                    });
+            });
+        });
+
+        window.confirmAction = function (event, title, text, onConfirm) {
+            if (event && typeof event.preventDefault === 'function') {
+                event.preventDefault();
+            }
+
+            return Swal.fire({
+                title: title || 'Confirmar acao',
+                text: text || 'Confirme para continuar.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    return false;
+                }
+
+                if (typeof onConfirm === 'function') {
+                    onConfirm();
+                    return true;
+                }
+
+                if (event) {
+                    const target = event.currentTarget || event.target;
+                    const form = target && target.closest ? target.closest('form') : null;
+
+                    if (form) {
+                        form.submit();
+                        return true;
+                    }
+
+                    const link = target && target.getAttribute ? target.getAttribute('href') : null;
+                    if (link && link !== '#') {
+                        window.location.href = link;
+                        return true;
+                    }
+                }
+
+                return true;
+            });
+        };
+
+        $('#themeToggleBtn').on('click', function () {
+            const input = $('#site_theme_input');
+            input.val(input.val() === 'dark' ? 'light' : 'dark');
+            $('#themeToggleForm').submit();
+        });
+
+        const logo = $('.brand-logo-img');
+        const favicon = $('.brand-favicon-img');
+        $(document).on('collapsed.lte.pushmenu', function () { logo.addClass('d-none'); favicon.removeClass('d-none'); });
+        $(document).on('expanded.lte.pushmenu', function () { favicon.addClass('d-none'); logo.removeClass('d-none'); });
+
+        // Persistência de aba ativa (nav-tabs)
+        const tabKey = 'admin-active-tab-' + (location.pathname || 'root');
+
+        // Use delegation to support PJAX/dynamic content
+        $(document).on('shown.bs.tab', 'a[data-toggle="pill"], a[data-toggle="tab"]', function (e) {
+            localStorage.setItem(tabKey, $(e.target).attr('href'));
+        });
+
+        function restoreActiveTab() {
+            const savedTab = localStorage.getItem(tabKey);
+            if (savedTab) {
+                const $tab = $('a[href="' + savedTab + '"]');
+                if ($tab.length) {
+                    // Use bootstrap tab show
+                    $tab.tab('show');
+                }
+            }
+        }
+
+        // Restore on load
+        restoreActiveTab();
+
+        // Restore on PJAX end
+        $(document).on('pjax:end', function () {
+            restoreActiveTab();
+        });
+
+        function initColorPickers() {
+            $('.colorpicker-element').colorpicker();
+        }
+
+        function initMasks() {
+            function lookupCep($input) {
+                const cep = $input.val().replace(/\D/g, '');
+                if (cep.length !== 8) return;
+                if ($input.data('lastCep') === cep) return;
+                $input.data('lastCep', cep);
+                const targetNumber = $input.data('target-number');
+                const targetComplement = $input.data('target-complement');
+                const targetDistrict = $input.data('target-district');
+                toastr.info('Buscando CEP...');
+                fetch('https://viacep.com.br/ws/' + cep + '/json/')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.erro) { toastr.error('CEP não encontrado'); return; }
+                        $('[name="company_address"]').val(data.logradouro || '');
+                        if (targetDistrict) { $(targetDistrict).val(data.bairro || ''); } else { $('[name="company_district"]').val(data.bairro || ''); }
+                        $('[name="company_city"]').val(data.localidade || '');
+                        $('[name="company_state"]').val(data.uf || '');
+                        toastr.success('Endereço preenchido pelo CEP');
+                        if (targetNumber) { $(targetNumber).focus(); }
+                        else if (targetComplement) { $(targetComplement).focus(); }
+                    })
+                    .catch(() => { toastr.error('Falha ao buscar CEP'); });
+            }
+
+            // CEP com viacep + feedback
+            $('.mask-cep').inputmask('99999-999', {
+                oncomplete: function () {
+                    lookupCep($(this));
+                }
+            });
+            $('.mask-cep').off('input.cep').on('input.cep', function () {
+                const $input = $(this);
+                const cep = $input.val().replace(/\D/g, '');
+                if (cep.length === 8) {
+                    clearTimeout($input.data('cepTimer'));
+                    $input.data('cepTimer', setTimeout(() => lookupCep($input), 250));
+                }
+            });
+            $('.mask-cep').off('blur.cep').on('blur.cep', function () {
+                lookupCep($(this));
+            });
+            $('.mask-cpf').inputmask('999.999.999-99');
+            $('.mask-cnpj').inputmask('99.999.999/9999-99');
+            $('.mask-date').inputmask('99/99/9999');
+            $('.mask-datetime').inputmask('99/99/9999 99:99');
+            $('.mask-time').inputmask('99:99');
+            $('.mask-phone').inputmask({ 'mask': ['(99) 9999-9999', '(99) 9 9999-9999'], keepStatic: true });
+            $('.mask-money').inputmask('currency', {
+                prefix: 'R$ ',
+                radixPoint: ',',
+                groupSeparator: '.',
+                autoGroup: true,
+                digits: 2,
+                rightAlign: false,
+                substituteRadixPoint: true,
+                onBeforeMask: function (value) {
+                    if (value === null || value === undefined) return value;
+                    value = String(value);
+                    // Eloquent decimal casts usually return "97.00" (dot decimal). Inputmask here expects comma.
+                    if (value.includes(',') || !value.includes('.')) return value;
+                    if (/^\\d+\\.\\d{1,2}$/.test(value)) return value.replace('.', ',');
+                    return value;
+                }
+            });
+            $('.mask-cpf-cnpj').inputmask({ mask: ['999.999.999-99', '99.999.999/9999-99'], keepStatic: true, placeholder: '_' });
+        }
+
+        function initDateTimePickers() {
+            if (typeof flatpickr === 'undefined') return;
+
+            try {
+                if (flatpickr.l10ns && flatpickr.l10ns.pt) {
+                    flatpickr.localize(flatpickr.l10ns.pt);
+                }
+            } catch (e) { /* ignore */ }
+
+            $('[data-datetime-picker]').each(function () {
+                if (this._flatpickr) return;
+                flatpickr(this, {
+                    enableTime: true,
+                    time_24hr: true,
+                    allowInput: true,
+                    dateFormat: 'Y-m-d H:i'
+                });
+            });
+        }
+
+        function initCouponFormEnhancements() {
+            const form = $('form.ajax-form').filter(function () {
+                return String($(this).attr('action') || '').includes('/admin/coupons');
+            }).first();
+
+            if (!form.length) return;
+
+            // Gerar código (fallback global para PJAX)
+            const btnGen = document.getElementById('btnGenCode');
+            if (btnGen && !btnGen.dataset.bound) {
+                btnGen.dataset.bound = '1';
+                btnGen.addEventListener('click', function () {
+                    const input = form.find('input[name="code"]').get(0);
+                    if (!input) return;
+                    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                    let out = '';
+                    for (let i = 0; i < 12; i++) out += chars[Math.floor(Math.random() * chars.length)];
+                    input.value = out;
+                });
+            }
+
+            const scopeSelect = form.find('select[name="applies_to"]');
+            const itemWrap = form.find('[data-coupon-item-wrap]');
+            const itemSelect = form.find('select[name="applies_to_id"]');
+            const itemHelp = form.find('[data-coupon-item-help]');
+
+            if (!scopeSelect.length || !itemSelect.length) return;
+
+            if (form.data('couponUiInit')) return;
+            form.data('couponUiInit', true);
+
+            function filterItemOptions(scope) {
+                itemSelect.find('option').each(function () {
+                    const optScope = $(this).data('scope');
+                    if (!optScope) {
+                        $(this).prop('hidden', false);
+                        return;
+                    }
+                    $(this).prop('hidden', optScope !== scope);
+                });
+            }
+
+            function applyScope() {
+                const scope = String(scopeSelect.val() || 'all');
+
+                if (scope === 'all') {
+                    itemSelect.val('');
+                    itemSelect.prop('disabled', true);
+                    itemWrap.addClass('d-none');
+                    return;
+                }
+
+                itemWrap.removeClass('d-none');
+                itemSelect.prop('disabled', false);
+                filterItemOptions(scope);
+
+                const selected = itemSelect.find('option:selected');
+                if (selected.length && selected.prop('hidden')) {
+                    itemSelect.val('');
+                }
+
+                if (itemHelp.length) {
+                    const label = scope === 'event' ? 'evento' : (scope === 'course' ? 'curso' : 'mentoria');
+                    itemHelp.text('Selecione o ' + label + ' para criar uma promoção direcionada (opcional).');
+                }
+            }
+
+            scopeSelect.on('change.couponui', applyScope);
+            applyScope();
+        }
+
+        function initUploadWidgets() {
+            $('.upload-box').each(function () {
+                const box = $(this);
+                if (box.data('uploadInit')) return;
+                box.data('uploadInit', true);
+                box.attr('tabindex', '0');
+
+                const input = box.find('input[type=file]');
+                const preview = box.find('.upload-preview');
+                const meta = box.find('.upload-meta');
+                const help = box.find('.upload-help');
+                const removeBtn = box.find('.upload-remove');
+                const progress = box.find('.upload-progress');
+                const bar = progress.find('.progress-bar');
+                const maxSize = parseInt(box.data('max-size') || (5 * 1024 * 1024));
+                const crop = box.data('crop') === 1 || box.data('crop') === '1';
+                const existingUrl = box.data('existing-url');
+                const removeInputSelector = box.data('remove-input');
+                const accept = (input.attr('accept') || 'image/*').replace(/\./g, '');
+                const acceptLower = String(input.attr('accept') || '').toLowerCase();
+                const sizeMb = (maxSize / 1024 / 1024).toFixed(2) + ' MB';
+
+                // Custom preview constraints
+                const previewMaxHeight = box.data('preview-max-height');
+                const previewMaxWidth = box.data('preview-max-width');
+                const previewStyle = (previewMaxHeight ? 'max-height:' + previewMaxHeight + 'px;' : '') +
+                    (previewMaxWidth ? 'max-width:' + previewMaxWidth + 'px;' : '');
+
+                if (help.length) {
+                    help.text('Aceita: ' + accept + ' • Até ' + sizeMb + (crop ? ' • Possível recorte' : ''));
+                }
+
+                function kindFromAccept() {
+                    if (acceptLower.includes('video/')) return 'video';
+                    if (acceptLower.includes('audio/')) return 'audio';
+                    if (acceptLower.includes('image/')) return 'image';
+                    if (acceptLower.trim() === '') return 'image';
+                    return 'file';
+                }
+
+                const defaultKind = kindFromAccept();
+
+                function kindFromUrl(url) {
+                    const clean = String(url || '').split('?')[0].split('#')[0].toLowerCase();
+                    if (/\.(png|jpe?g|gif|webp|svg)$/.test(clean)) return 'image';
+                    if (/\.(mp4|webm|ogg|mov|m4v)$/.test(clean)) return 'video';
+                    if (/\.(mp3|wav|ogg|m4a|aac|flac)$/.test(clean)) return 'audio';
+                    return defaultKind;
+                }
+
+                function previewHtml(kind, url, label) {
+                    const safeLabel = String(label || 'arquivo');
+
+                    if (kind === 'video') {
+                        return '<video src="' + url + '" controls style="width:100%; max-height: 240px; border-radius: 10px;"></video>' +
+                            '<div class="text-muted small mt-2">' + safeLabel + '</div>';
+                    }
+
+                    if (kind === 'audio') {
+                        return '<audio src="' + url + '" controls style="width:100%;"></audio>' +
+                            '<div class="text-muted small mt-2">' + safeLabel + '</div>';
+                    }
+
+                    if (kind === 'file') {
+                        return '<i class="upload-icon fas fa-file-alt"></i>' +
+                            '<div class="text-muted small">Arquivo selecionado</div>' +
+                            '<div class="font-weight-bold small mt-1" style="word-break: break-word;">' + safeLabel + '</div>' +
+                            (url ? '<div class="mt-2"><a href="' + url + '" target="_blank" rel="noopener" class="btn btn-xs btn-outline-primary">Abrir</a></div>' : '');
+                    }
+
+                    return '<img src="' + url + '" alt="preview" class="img-fluid">';
+                }
+
+                function renderEmpty() {
+                    preview.html('<i class="upload-icon fas fa-cloud-upload-alt"></i><div class="text-muted small">Clique ou arraste para enviar</div>');
+                    meta.text('');
+                    removeBtn.addClass('d-none');
+                }
+
+                function renderExisting(url) {
+                    const kind = kindFromUrl(url);
+                    preview.html(previewHtml(kind, url, 'Arquivo atual'));
+                    meta.text('Arquivo atual');
+                    removeBtn.removeClass('d-none');
+                }
+
+                renderEmpty();
+                if (existingUrl) {
+                    renderExisting(existingUrl);
+                }
+
+                function setPreview(blobOrFile, name, url) {
+                    const sizeMB = (blobOrFile.size / 1024 / 1024).toFixed(2);
+                    const type = String(blobOrFile.type || '').toLowerCase();
+                    const kind = type.startsWith('image/') ? 'image' : (type.startsWith('video/') ? 'video' : (type.startsWith('audio/') ? 'audio' : defaultKind));
+                    preview.html(previewHtml(kind, url, name || 'arquivo'));
+                    meta.text((name || 'arquivo') + ' • ' + sizeMB + ' MB • ' + (blobOrFile.type || ''));
+                    removeBtn.removeClass('d-none');
+                }
+
+                function bindFileToInput(file) {
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    input.off('change.upload');
+                    input[0].files = dataTransfer.files;
+                    input.on('change.upload', onInputChange);
+                }
+
+                function handleFile(file) {
+                    if (!file) return;
+                    if (file.size > maxSize) { toastr.error('Arquivo excede o limite'); return; }
+                    const reader = new FileReader();
+                    bar.css('width', '0%');
+                    progress.removeClass('d-none');
+                    const start = Date.now();
+
+                    reader.onprogress = function (e) {
+                        if (e.lengthComputable) {
+                            const pct = (e.loaded / e.total) * 100;
+                            bar.css('width', pct + '%');
+                        }
+                    };
+                    reader.onload = function (e) {
+                        bar.css('width', '100%');
+                        setTimeout(() => progress.addClass('d-none'), 400);
+                        const url = e.target.result;
+                        const elapsed = (Date.now() - start) / 1000;
+                        const speed = file.size / Math.max(elapsed, 0.1);
+                        const eta = speed > 0 ? Math.max((file.size - speed * elapsed) / speed, 0) : 0;
+                        const extra = ' • ' + (file.size / 1024 / 1024).toFixed(2) + ' MB • ' + (file.type || 'tipo desconhecido') + ' • ~' + eta.toFixed(1) + 's';
+                        if (crop) {
+                            openCropper(url, { outputType: 'image/jpeg', quality: 0.92, maxSize: maxSize }, function (croppedBlob, croppedUrl) {
+                                const fileExt = (croppedBlob.type && croppedBlob.type.split('/')[1]) ? croppedBlob.type.split('/')[1] : 'png';
+                                const normalizedExt = fileExt === 'jpeg' ? 'jpg' : fileExt;
+                                const croppedFile = new File([croppedBlob], file.name.replace(/\.[^/.]+$/, '') + '.' + normalizedExt, { type: croppedBlob.type });
+                                bindFileToInput(croppedFile);
+                                setPreview(croppedFile, croppedFile.name + extra, croppedUrl);
+                            });
+                        } else {
+                            setPreview(file, file.name + extra, url);
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+
+                function openFileDialog() {
+                    if (box.data('opening')) return;
+                    box.data('opening', true);
+                    const reset = () => {
+                        box.data('opening', false);
+                        $(window).off('focus.upload', reset);
+                    };
+                    $(window).one('focus.upload', reset);
+                    input.trigger('click');
+                }
+
+                function onInputChange() {
+                    const file = this.files && this.files[0] ? this.files[0] : null;
+                    if (removeInputSelector) { $(removeInputSelector).val('0'); }
+                    handleFile(file);
+                }
+
+                box.off('.upload');
+                input.off('.upload');
+                removeBtn.off('.upload');
+                box.find('.upload-btn').off('.upload');
+
+                box.on('click.upload', function (e) {
+                    if ($(e.target).closest('.upload-btn, .upload-remove, input').length) return;
+                    openFileDialog();
+                });
+                box.on('keydown.upload', function (e) {
+                    if (!['Enter', ' '].includes(e.key)) return;
+                    e.preventDefault();
+                    openFileDialog();
+                });
+                box.on('dragover.upload', function (e) { e.preventDefault(); box.addClass('dragover'); });
+                box.on('dragleave.upload drop.upload', function (e) { e.preventDefault(); box.removeClass('dragover'); });
+                box.on('drop.upload', function (e) { e.preventDefault(); const f = e.originalEvent.dataTransfer.files[0]; handleFile(f); });
+
+                box.find('.upload-btn').on('click.upload', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openFileDialog();
+                });
+                input.on('click.upload', function (e) { e.stopPropagation(); });
+                input.on('change.upload', onInputChange);
+
+                removeBtn.on('click.upload', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    input.val('');
+                    renderEmpty();
+                    if (removeInputSelector) { $(removeInputSelector).val('1'); }
+                });
+            });
+        }
+        function openCropper(imageUrl, options, callback) {
+            if (typeof options === 'function') {
+                callback = options;
+                options = {};
+            }
+            options = options || {};
+            const outputType = options.outputType || 'image/jpeg';
+            const quality = typeof options.quality === 'number' ? options.quality : 0.92;
+            const maxSize = options.maxSize || null;
+
+            const modalId = 'cropperModal';
+            let modal = $('#' + modalId);
+            if (!modal.length) {
+                $('body').append(
+                    '<div class="modal fade" id="' + modalId + '" tabindex="-1">' +
+                    '<div class="modal-dialog modal-lg"><div class="modal-content">' +
+                    '<div class="modal-header"><h5 class="modal-title">Cortar imagem</h5>' +
+                    '<button type="button" class="close" data-dismiss="modal">&times;</button></div>' +
+                    '<div class="modal-body"><div style="max-height:500px;">' +
+                    '<img id="' + modalId + '-img" style="max-width:100%;"></div></div>' +
+                    '<div class="modal-footer">' +
+                    '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>' +
+                    '<button type="button" class="btn btn-primary" id="' + modalId + '-apply">Aplicar</button>' +
+                    '</div></div></div></div>'
+                );
+                modal = $('#' + modalId);
+            }
+            const img = $('#' + modalId + '-img');
+            let cropper;
+            modal.on('shown.bs.modal', function () {
+                img.attr('src', imageUrl);
+                cropper = new Cropper(img[0], { aspectRatio: NaN, viewMode: 1 });
+            }).on('hidden.bs.modal', function () {
+                cropper && cropper.destroy();
+                cropper = null;
+            });
+            $('#' + modalId + '-apply').off('click').on('click', function () {
+                if (!cropper) return;
+                cropper.getCroppedCanvas({ fillColor: '#fff' }).toBlob(function (blob) {
+                    if (!blob) {
+                        toastr.error('Falha ao gerar a imagem recortada.');
+                        return;
+                    }
+                    if (maxSize && blob.size > maxSize) {
+                        const mb = (maxSize / 1024 / 1024).toFixed(2);
+                        toastr.error('A imagem recortada excede o limite de ' + mb + ' MB.');
+                        return;
+                    }
+                    const url = URL.createObjectURL(blob);
+                    callback(blob, url);
+                    modal.modal('hide');
+                }, outputType, quality);
+            });
+            modal.modal('show');
+        }
+
+        initTooltips();
         });
     </script>
 </body>

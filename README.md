@@ -194,5 +194,17 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Refatoração de Controllers:**
   - Simplificação do `SettingController` delegando a resolução de URLs para o Model, aumentando a manutenibilidade.
 
+### 25/02/2026 — Padronização de UX e Sistema de Parceiros
+- **Sistema de Parceiros 1.0:**
+  - Lançamento do ecossistema de parcerias com carrossel interativo no Marketplace.
+  - Área de cupons para membros com Clipboard API e restrição de acesso por plano.
+  - Painel de autogestão corporativa para parceiros autorizados regatarem e gerenciarem seus próprios benefícios.
+- **Tooltips Premium:**
+  - Injeção global de tooltips personalizadas (Azul UNN) em todos os botões das áreas Admin, Member e Superadmin.
+  - Motor reativo para suporte a navegação PJAX (reinicialização automática de tooltips).
+- **Notificações Toastr:**
+  - Padronização definitiva de retornos AJAX e sessões via **Toastr**.
+  - Remoção de SweetAlert2 Toasts redundantes para uma interface mais limpa e focada.
+
 ---
 © 2026 UNN Networking. Todos os direitos reservados.

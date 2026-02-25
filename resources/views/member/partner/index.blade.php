@@ -84,7 +84,7 @@
                         <p class="text-slate-400">Nenhum cupom cadastrado ainda.</p>
                         <button id="btn-novo-cupom-2"
                             class="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white text-sm"
-                            style="background:linear-gradient(135deg,#1f5edb,#177fd6);">
+                            style="background:linear-gradient(135deg,#1f5edb,#177fd6);" title="Criar novo cupom de desconto">
                             <i class="fas fa-plus"></i> Criar primeiro cupom
                         </button>
                     </div>
@@ -122,11 +122,12 @@
                                 <div class="flex gap-2 flex-shrink-0">
                                     <button class="btn-editar-cupom px-3 py-1.5 rounded-lg text-sm font-semibold text-white"
                                         style="background:linear-gradient(135deg,#1f5edb,#177fd6);"
-                                        data-cupom="{{ json_encode($coupon) }}">
+                                        data-cupom="{{ json_encode($coupon) }}" title="Editar Cupom">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button class="btn-remover-cupom px-3 py-1.5 rounded-lg text-sm font-semibold text-white"
-                                        style="background:#ef4444;" data-id="{{ $coupon->id }}" data-titulo="{{ $coupon->title }}">
+                                        style="background:#ef4444;" data-id="{{ $coupon->id }}" data-titulo="{{ $coupon->title }}"
+                                        title="Excluir Cupom">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
