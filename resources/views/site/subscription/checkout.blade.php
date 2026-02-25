@@ -2,6 +2,79 @@
 
 @section('title', 'Assinar Plano ' . $plan->name)
 
+{{-- CSS do Brick no HEAD (antes do SDK renderizar) --}}
+@push('styles')
+    <style>
+        /* ========================================
+           ISOLAÇÃO DO BRICK DO MERCADOPAGO
+           O app.blade.php global tem regras que
+           quebram o Brick. Neutralizamos aqui,
+           no HEAD, antes do Brick começar a renderizar.
+        ======================================== */
+
+        /* O Brick usa iframes para campos PCI.
+           NUNCA deixe height:auto em iframes de pagamento. */
+        #cardPaymentBrick_container iframe,
+        #cardPaymentBrick_container [id*="iframe"],
+        .mercadopago-checkout-bricks__payment [iframe] {
+            height: unset !important;
+            min-height: 0 !important;
+            max-width: 100% !important;
+        }
+
+        /* Reset agressivo: o Brick somente funciona
+           se os inputs internos não herdarem resets
+           do Tailwind preflight / fontes globais */
+        #cardPaymentBrick_container * {
+            font-family: inherit !important;
+            box-sizing: border-box !important;
+            line-height: normal !important;
+        }
+
+        #cardPaymentBrick_container {
+            min-height: 340px;
+            width: 100%;
+            margin-bottom: 2rem;
+            box-sizing: border-box;
+        }
+
+        /* Campos do modo Simulação */
+        .sim-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #92400e;
+            margin-bottom: 4px;
+        }
+
+        .sim-input {
+            display: block;
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #fcd34d;
+            border-radius: 10px;
+            font-size: 0.925rem;
+            color: #1f2937;
+            background: #fffbeb;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.15s;
+        }
+
+        .sim-input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+
+        .sim-input[disabled] {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="min-h-screen bg-slate-50 pt-32 pb-20 px-4">
         <div class="max-w-6xl mx-auto">
@@ -245,43 +318,6 @@
     </div>
 
     @push('scripts')
-        <style>
-            /* ─── Isolar Brick do MercadoPago ─── */
-            /* O CSS global tem: iframe { height: auto } que destrói o Brick.
-               height: unset reverte para o comportamento padrão do iframe. */
-            #cardPaymentBrick_container iframe {
-                height: unset !important;
-                max-width: 100% !important;
-                box-sizing: border-box !important;
-            }
-            #cardPaymentBrick_container {
-                min-height: 320px;
-                width: 100%;
-                margin-bottom: 2rem;
-                box-sizing: border-box;
-            }
-
-            /* Em modo Debug/Simulação, campos fake bonitões */
-            .simulation-field {
-                display: block;
-                width: 100%;
-                border-radius: 0.75rem;
-                border: 1px solid #d1d5db;
-                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-                padding: 0.75rem 1rem;
-                font-size: 0.875rem;
-                margin-top: 0.25rem;
-                color: #4b5563;
-                background-color: #f9fafb;
-                outline: none;
-                transition: border-color 0.15s;
-            }
-
-            .simulation-field:focus {
-                border-color: #3b82f6;
-                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-            }
-        </style>
         @if((($paymentConfigured ?? false) || config('app.debug')) && ($plan->price ?? 0) > 0)
             @php
                 $theme = \App\Models\Setting::get('gateway_checkout_theme', 'default');
@@ -379,45 +415,39 @@
 
                     renderCardPaymentBrick(bricksBuilder);
                 } else if ("{{ config('app.debug') }}") {
-                    console.log("Modo Simulação Ativo: SDK do MercadoPago suprimido.");
+                    console.log("Modo Simulação Ativo.");
                     document.getElementById('cardPaymentBrick_container').innerHTML = `
-                                                <div class="p-8 border border-amber-200 rounded-3xl bg-amber-50/30 space-y-4">
-                                                    <div class="flex items-center gap-3 text-amber-700 mb-4">
-                                                        <i class="fas fa-flask text-2xl"></i>
-                                                        <h4 class="font-black italic">MODO SIMULADOR</h4>
-                                                    </div>
-
-                                                    <div class="space-y-3">
-                                                        <div>
-                                                            <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Número do Cartão (Simulado)</label>
-                                                            <input type="text" class="simulation-field" value="4444 4444 4444 4444" disabled>
-                                                        </div>
-
-                                                        <div class="grid grid-cols-2 gap-4">
-                                                            <div>
-                                                                <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Validade</label>
-                                                                <input type="text" class="simulation-field" value="12/28" disabled>
-                                                            </div>
-                                                            <div>
-                                                                <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">CVV</label>
-                                                                <input type="text" class="simulation-field" value="123" disabled>
-                                                            </div>
-                                                        </div>
-
-                                                        <div>
-                                                            <label class="text-[10px] font-black text-amber-900 uppercase tracking-widest">Nome do Titular</label>
-                                                            <input type="text" class="simulation-field" value="{{ Auth::check() ? strtoupper(Auth::user()->name) : 'CLIENTE TESTE' }}" disabled>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="p-4 bg-white/50 rounded-2xl border border-amber-100 mt-4">
-                                                        <p class="text-[11px] text-amber-700 leading-relaxed font-medium">
-                                                            <i class="fas fa-info-circle mr-1"></i> As chaves do MercadoPago não foram configuradas. 
-                                                            Como o <strong>Debug</strong> está ativo, este formulário fake permite testar o fluxo de adesão.
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            `;
+                        <div style="padding:24px;border:2px dashed #fcd34d;border-radius:16px;background:#fffbeb;">
+                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+                                <i class="fas fa-flask" style="font-size:1.4rem;color:#b45309;"></i>
+                                <span style="font-weight:900;color:#92400e;font-size:0.95rem;letter-spacing:.05em;">MODO SIMULAÇÃO — Dados fictícios para teste</span>
+                            </div>
+                            <div style="display:grid;gap:14px;">
+                                <div>
+                                    <label class="sim-label">Número do Cartão</label>
+                                    <input class="sim-input" type="text" value="5031 4332 1540 6351" disabled>
+                                </div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                    <div>
+                                        <label class="sim-label">Validade</label>
+                                        <input class="sim-input" type="text" value="11/30" disabled>
+                                    </div>
+                                    <div>
+                                        <label class="sim-label">CVV</label>
+                                        <input class="sim-input" type="text" value="123" disabled>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="sim-label">Nome do titular</label>
+                                    <input class="sim-input" type="text" value="{{ Auth::check() ? strtoupper(Auth::user()->name) : 'CLIENTE TESTE' }}" disabled>
+                                </div>
+                            </div>
+                            <p style="margin-top:16px;font-size:0.75rem;color:#92400e;line-height:1.5;">
+                                <i class="fas fa-info-circle"></i>
+                                MercadoPago não configurado. Como o <strong>Debug</strong> está ativo, clique em "Finalizar Pagamento" para simular a aprovação.
+                            </p>
+                        </div>
+                    `;
                 }
 
                 // Nota: a sincronização do botão é gerenciada integralmente por syncPaymentMethod().
