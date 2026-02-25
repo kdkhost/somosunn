@@ -17,8 +17,7 @@
                 {{-- Duplicamos para loop infinito --}}
                 @foreach([$carouselPartners, $carouselPartners] as $set)
                     @foreach($set as $p)
-                        <a href="{{ route('partners.show', $p->slug) }}" class="partner-logo-card" title="{{ $p->name }}"
-                            aria-label="{{ $p->name }}">
+                        <a href="{{ route('partners.show', $p->slug) }}" class="partner-logo-card" aria-label="{{ $p->name }}">
                             <div class="partner-logo-inner">
                                 @if($p->logo_url)
                                     <img src="{{ $p->logo_url }}" alt="{{ $p->name }}" loading="lazy">
