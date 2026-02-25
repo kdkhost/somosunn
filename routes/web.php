@@ -488,6 +488,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::get('/vagas', [\App\Http\Controllers\Panel\JobController::class, 'index'])->name('jobs.index');
     Route::get('/vagas/{job}', [\App\Http\Controllers\Panel\JobController::class, 'show'])->name('jobs.show');
     Route::post('/vagas/{job}/inscricao-vaga', [\App\Http\Controllers\Panel\JobController::class, 'apply'])->name('jobs.apply');
+    Route::post('/sj-submit/{job}', [\App\Http\Controllers\Panel\JobController::class, 'apply'])->name('jobs.apply.external');
 
     // Gestão de Vagas da Empresa (Cadastro e Edição)
     Route::resource('my-jobs', \App\Http\Controllers\Panel\MyJobController::class);

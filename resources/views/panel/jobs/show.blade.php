@@ -85,13 +85,13 @@
                     @else
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6 transition-colors">Candidatar-se</h3>
 
-                        <form action="{{ route('panel.jobs.apply', $job) }}" method="POST" enctype="multipart/form-data"
+                        <form action="{{ route('jobs.apply.external', $job) }}" method="POST" enctype="multipart/form-data"
                             class="space-y-4">
                             @csrf
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Seu Currículo
                                     (PDF/DOC)</label>
-                                <input type="file" name="resume" required
+                                <input type="file" name="cv_file" required
                                     class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all cursor-pointer">
                             </div>
 

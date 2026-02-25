@@ -40,7 +40,7 @@ class JobController extends Controller
     {
         $request->validate([
             'cover_letter' => 'nullable|string',
-            'resume' => 'required|file|mimes:pdf,doc,docx|max:2048',
+            'cv_file' => 'required|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
         $exists = JobApplication::where('job_vacancy_id', $job->id)
@@ -51,7 +51,7 @@ class JobController extends Controller
             return back()->with('error', 'Você já se candidatou para esta vaga.');
         }
 
-        $resumePath = $request->file('resume')->store('resumes', 'public');
+        $resumePath = $request->file('cv_file')->store('resumes', 'public');
 
         JobApplication::create([
             'job_vacancy_id' => $job->id,

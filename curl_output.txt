@@ -1,0 +1,2042 @@
+﻿curl.exe : Note: Unnecessary use of 
+-X or --request, POST is already 
+inferred.
+No linha:1 caractere:1
++ curl.exe -X POST 
+https://somosunn.com.br/test-post.php 
+-d "test=hello ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpec 
+   ified: (Note: Unnecessa...ready i  
+  nferred.:String) [], RemoteExcept   
+ ion
+    + FullyQualifiedErrorId : NativeC 
+   ommandError
+ 
+  % Total    % Received % Xferd  
+Average Speed   Time    Time     Time 
+ Current
+                                 
+Dload  Upload   Total   Spent    Left 
+ Speed
+
+  0     0    0     0    0     0      
+0      0 --:--:-- --:--:-- --:--:--   
+  0* Host somosunn.com.br:443 was 
+resolved.
+* IPv6: (none)
+* IPv4: 15.235.57.3
+*   Trying 15.235.57.3:443...
+* schannel: disabled automatic use of 
+client certificate
+* ALPN: curl offers http/1.1
+* ALPN: server accepted http/1.1
+* Established connection to 
+somosunn.com.br (15.235.57.3 port 
+443) from 192.168.1.240 port 59163 
+* using HTTP/1.x
+> POST /test-post.php HTTP/1.1
+
+> Host: somosunn.com.br
+
+> User-Agent: curl/8.16.0
+
+> Accept: */*
+
+> Content-Length: 10
+
+> Content-Type: 
+application/x-www-form-urlencoded
+
+> 
+
+} [10 bytes data]
+* upload completely sent off: 10 bytes
+< HTTP/1.1 404 Not Found
+
+< Connection: Keep-Alive
+
+< Keep-Alive: timeout=5, max=100
+
+< x-powered-by: PHP/8.4.15
+
+< cache-control: max-age=0, private, 
+no-cache, no-store, must-revalidate
+
+< content-type: text/html; 
+charset=UTF-8
+
+< content-length: 94116
+
+< date: Wed, 25 Feb 2026 04:22:46 GMT
+
+< referrer-policy: 
+strict-origin-when-cross-origin
+
+< x-content-type-options: nosniff
+
+< x-frame-options: DENY
+
+< alt-svc: h3=":443"; ma=2592000, 
+h3-29=":443"; ma=2592000, 
+h3-Q050=":443"; ma=2592000, 
+h3-Q046=":443"; ma=2592000, 
+h3-Q043=":443"; ma=2592000, 
+quic=":443"; ma=2592000; v="43,46"
+
+< 
+
+{ [804 bytes data]
+
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>404 ÔÇö P├ígina n├úo encontrada</title>
+    
+            <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://somosunn.com.br/test-post.php">
+
+    
+    <meta property="og:title" content="404 ÔÇö P├ígina n├úo encontrada">
+        <meta property="og:type" content="website">
+    <meta property="og:url" content="https://somosunn.com.br/test-post.php">
+    <meta property="og:site_name" content="Comunidade UNN">
+    
+    
+    <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="404 ÔÇö P├ígina n├úo encontrada">
+        
+    
+    
+    
+    
+    <link rel="icon" href="https://somosunn.com.br/uploads/imagens/geral/6985e570aec231.39376161.png" type="image/x-icon">
+    <link rel="apple-touch-icon" href="https://somosunn.com.br/uploads/imagens/frontend/69823308659c82.02961438.png">
+            <link rel="manifest" href="https://somosunn.com.br/manifest.webmanifest">
+        <meta name="theme-color" content="#0C6BF7">
+
+    <!-- Fonts & Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        unn: {
+                            azul: {
+                                1: '#1F5EDB',
+                                2: '#177FD6',
+                                3: '#1D3FC4',
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script>
+            // Set theme immediately to avoid flash
+            (function () {
+                const theme = "light";
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            })();
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+            <link rel="stylesheet" href="https://somosunn.com.br/vendor/plyr/plyr.css">
+    
+    
+    <style>
+        /* Ajuste para ├¡cones de input date no Dark Mode */
+        .dark input[type="date"]::-webkit-calendar-picker-indicator,
+        .dark input[type="time"]::-webkit-calendar-picker-indicator,
+        .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) brightness(100%) contrast(100%);
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --unn-azul-1: #1F5EDB;
+            /* principal */
+            --unn-azul-2: #177FD6;
+            /* secund├írio */
+            --unn-azul-3: #1D3FC4;
+            /* escuro */
+            --unn-card: #ffffff;
+            --unn-text: #0f172a;
+                            --plyr-color-main:
+                    #009EFF
+                ;
+                --plyr-range-fill-background:
+                    #009EFF
+                ;
+                --plyr-video-control-background-hover:
+                    #009EFF
+                ;
+                --plyr-audio-control-background-hover:
+                    #009EFF
+                ;
+                --plyr-control-toggle-checked-background:
+                    #009EFF
+                ;
+                --plyr-focus-visible-color:
+                    #009EFF
+                ;
+                --plyr-font-family: 'Inter', sans-serif;
+                --plyr-menu-background: rgba(15, 23, 42, 0.92);
+                --plyr-menu-color: #ffffff;
+                --plyr-tooltip-background:
+                    #009EFF
+                ;
+                --plyr-tooltip-color: #ffffff;
+                    }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--unn-azul-1) 0%, var(--unn-azul-2) 50%, var(--unn-azul-3) 100%);
+            color: #fff;
+            border: none;
+        }
+
+        /* Garantir que bot├Áes e links n├úo quebrem texto */
+        a.inline-flex,
+        button.inline-flex,
+        a[class*="btn-"],
+        button[class*="btn-"],
+        a[class*="rounded-xl"],
+        button[class*="rounded-xl"],
+        a[class*="rounded-full"],
+        button[class*="rounded-full"] {
+            white-space: nowrap;
+        }
+
+        .ui-tooltip {
+            position: relative;
+        }
+
+        .ui-tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 10px);
+            transform: translateX(-50%);
+            background: var(--unn-azul-1, #1F5EDB);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+            z-index: 20;
+        }
+
+        .ui-tooltip::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 4px);
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: var(--unn-azul-1, #1F5EDB) transparent transparent transparent;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            z-index: 20;
+        }
+
+        .ui-tooltip:hover::after,
+        .ui-tooltip:focus-visible::after,
+        .ui-tooltip:hover::before,
+        .ui-tooltip:focus-visible::before {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        html,
+        body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        body {
+            
+                            background: linear-gradient(rgba(0, 0, 0, 0.3),
+                        rgba(0, 0, 0, 0.3)
+                    ), url('https://somosunn.com.br/uploads/imagens/frontend/69894c8354ee62.21381934.jpeg');
+                background-attachment: fixed;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+             color: var(--unn-text);
+        }
+
+        /* Responsive fixes */
+        img,
+        video,
+        iframe {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .max-w-7xl,
+        .max-w-6xl,
+        .max-w-5xl,
+        .max-w-4xl {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        @media (max-width: 640px) {
+
+            /* Typography scale for small screens */
+            .text-3xl {
+                font-size: 1.5rem;
+                line-height: 1.25;
+            }
+
+            .text-2xl {
+                font-size: 1.25rem;
+                line-height: 1.25;
+            }
+
+            .text-xl {
+                font-size: 1.125rem;
+                line-height: 1.35;
+            }
+
+            .text-lg {
+                font-size: 1rem;
+                line-height: 1.5;
+            }
+
+            .text-5xl {
+                font-size: 2rem;
+                line-height: 1.2;
+            }
+
+            .text-6xl {
+                font-size: 2.25rem;
+                line-height: 1.2;
+            }
+
+            .text-4xl {
+                font-size: 1.75rem;
+                line-height: 1.3;
+            }
+
+            /* Common spacing utilities used in CTAs */
+            .px-10 {
+                padding-left: 1.25rem;
+                padding-right: 1.25rem;
+            }
+
+            .px-8 {
+                padding-left: 1.25rem;
+                padding-right: 1.25rem;
+            }
+
+            .px-6 {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            /* Normalize button paddings without collapsing layout blocks */
+            a.py-4,
+            button.py-4,
+            [role="button"].py-4 {
+                padding-top: 0.75rem;
+                padding-bottom: 0.75rem;
+            }
+
+            a.py-3,
+            button.py-3,
+            [role="button"].py-3 {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .text-6xl {
+                font-size: clamp(2.2rem, 6vw, 3.1rem);
+                line-height: 1.15;
+            }
+
+            .text-5xl {
+                font-size: clamp(1.95rem, 5vw, 2.7rem);
+                line-height: 1.2;
+            }
+
+            .text-4xl {
+                font-size: clamp(1.65rem, 4vw, 2.2rem);
+                line-height: 1.25;
+            }
+        }
+
+        @media (max-width: 1024px) {
+
+            a.btn-primary,
+            button.btn-primary {
+                font-size: 0.95rem;
+                line-height: 1.25rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            a.rounded-full,
+            button.rounded-full {
+                max-width: 100%;
+            }
+        }
+
+                    .unn-video-player {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            .unn-video-player .plyr,
+            .unn-video-player .plyr--video {
+                width: 100% !important;
+                height: 100% !important;
+                border-radius: 0.75rem;
+            }
+
+            .unn-video-player .plyr__video-wrapper {
+                height: 100%;
+            }
+
+            .unn-video-player video {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+
+            /* Ensure controls are always visible initially */
+            .unn-video-player .plyr__controls {
+                opacity: 1;
+            }
+
+            /* Apply custom color to Plyr elements */
+            .plyr--full-ui input[type=range] {
+                color: var(--plyr-color-main,
+                        #009EFF
+                    );
+            }
+
+            .plyr__control--overlaid {
+                background: var(--plyr-color-main,
+                        #009EFF
+                    );
+            }
+
+            .plyr__control:hover,
+            .plyr__control[aria-expanded=true] {
+                background: var(--plyr-color-main,
+                        #009EFF
+                    );
+            }
+
+            .plyr__menu__container .plyr__control[role=menuitemradio][aria-checked=true]:before {
+                background: var(--plyr-color-main,
+                        #009EFF
+                    );
+            }
+
+            .unn-video-float-placeholder {
+                display: none;
+            }
+
+            .unn-video-float {
+                position: fixed !important;
+                width: var(--unn-float-width, 420px) !important;
+                height: var(--unn-float-height, 236px) !important;
+                right: 24px;
+                bottom: 92px;
+                z-index: 9999;
+                margin: 0 !important;
+                border-radius: 16px;
+                overflow: hidden;
+                background: #000;
+                box-shadow: 0 18px 55px rgba(0, 0, 0, 0.35);
+            }
+
+            .unn-video-float .unn-video-float-close {
+                display: inline-flex;
+            }
+
+            .unn-video-float-close {
+                display: none;
+                position: absolute;
+                z-index: 10;
+                top: 10px;
+                right: 10px;
+                width: 34px;
+                height: 34px;
+                border-radius: 999px;
+                align-items: center;
+                justify-content: center;
+                background: rgba(15, 23, 42, 0.65);
+                border: 1px solid rgba(255, 255, 255, 0.25);
+                color: #fff;
+                cursor: pointer;
+                backdrop-filter: blur(6px);
+            }
+
+            .unn-video-float-close:hover {
+                background: rgba(15, 23, 42, 0.85);
+            }
+
+            @media (max-width: 768px) {
+                .unn-video-float {
+                    right: 12px;
+                    bottom: 12px;
+                    width: min(92vw, var(--unn-float-width, 420px)) !important;
+                    height: min(52vw, var(--unn-float-height, 236px)) !important;
+                }
+            }
+
+            .unn-video-watermark {
+                position: absolute;
+                z-index: 6;
+                pointer-events: none;
+                user-select: none;
+                opacity: var(--unn-wm-opacity, 0.15);
+                width: var(--unn-wm-size, 18%);
+                max-width: 280px;
+                min-width: 96px;
+                mix-blend-mode: var(--unn-wm-blend, normal);
+            }
+
+            .unn-video-watermark-inner {
+                width: 100%;
+                transform: rotate(var(--unn-wm-rotate, 0deg));
+            }
+
+            .unn-video-watermark img {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+
+            .unn-video-watermark-text {
+                margin-top: 6px;
+                font-size: 12px;
+                font-weight: 800;
+                letter-spacing: 0.02em;
+                color: rgba(255, 255, 255, 0.92);
+                text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+                line-height: 1.1;
+                word-break: break-word;
+            }
+
+            .unn-video-watermark--top-left {
+                top: var(--unn-wm-margin, 16px);
+                left: var(--unn-wm-margin, 16px);
+            }
+
+            .unn-video-watermark--top-right {
+                top: var(--unn-wm-margin, 16px);
+                right: var(--unn-wm-margin, 16px);
+            }
+
+            .unn-video-watermark--bottom-left {
+                bottom: var(--unn-wm-margin, 16px);
+                left: var(--unn-wm-margin, 16px);
+            }
+
+            .unn-video-watermark--bottom-right {
+                bottom: var(--unn-wm-margin, 16px);
+                right: var(--unn-wm-margin, 16px);
+            }
+
+            .unn-video-watermark--center {
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            @keyframes unnWatermarkDrift {
+                0% {
+                    transform: translate(0, 0) rotate(var(--unn-wm-rotate, 0deg));
+                }
+
+                50% {
+                    transform: translate(-8px, 8px) rotate(var(--unn-wm-rotate, 0deg));
+                }
+
+                100% {
+                    transform: translate(0, 0) rotate(var(--unn-wm-rotate, 0deg));
+                }
+            }
+
+            .unn-video-watermark--animate .unn-video-watermark-inner {
+                animation: unnWatermarkDrift 11s ease-in-out infinite;
+            }
+
+            /* Adjustments for Floating Player */
+            .unn-video-float .unn-video-watermark {
+                min-width: 40px;
+                /* Allow smaller watermark in mini player */
+                --unn-wm-margin: 8px !important;
+                /* Smaller margin */
+            }
+
+            </style>
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
+</head>
+
+<body class="bg-slate-50 min-h-screen">
+        
+    
+                <nav class="fixed inset-x-0 top-0 z-50 bg-white shadow-xl border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-4 flex items-center justify-between gap-4">
+        <!-- Logo -->
+        <a href="https://somosunn.com.br" class="flex items-center gap-3 shrink-0">
+            <div class="inline-flex h-12 md:h-16 w-auto items-center justify-center overflow-hidden">
+                <img src="https://somosunn.com.br/uploads/imagens/frontend/69823308659c82.02961438.png" alt="UNN" class="h-full w-auto object-contain"
+                    onerror="this.style.display='none';">
+            </div>
+        </a>
+
+        <!-- Menu + Actions (aligned right) -->
+        <div class="flex items-center gap-6">
+            <!-- Desktop Menu -->
+            <div class="hidden lg:flex items-center gap-4 text-sm font-semibold text-gray-800">
+                                                                                                            <div class="relative group">
+                                <a href="https://somosunn.com.br/sobre"
+                                    class="inline-flex items-center gap-1 hover:text-[#1F5EDB] transition-colors py-2">
+                                    Institucional
+                                    <i class="fas fa-chevron-down text-xs ml-0.5 opacity-70"></i>
+                                </a>
+                                <div class="absolute right-0 top-full pt-2 hidden group-hover:block z-40">
+                                    <div
+                                        class="rounded-2xl bg-white shadow-xl border border-slate-100 min-w-[220px] py-2 overflow-hidden">
+                                                                                                                                                                                <a href="https://somosunn.com.br/sobre"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Sobre a UNN
+                                                </a>
+                                                                                                                                                                                                                            <a href="https://somosunn.com.br/manifesto"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Manifesto
+                                                </a>
+                                                                                                                                                                                                                            <a href="https://somosunn.com.br/quem-somos"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Quem somos
+                                                </a>
+                                                                                                                                                                                                                            <a href="https://somosunn.com.br/como-funciona"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Como funciona
+                                                </a>
+                                                                                                                                                                                                                            <a href="https://somosunn.com.br/valores"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Valores
+                                                </a>
+                                                                                                                                                                                                                            <a href="https://somosunn.com.br/contato"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Contato
+                                                </a>
+                                                                                                                        </div>
+                                </div>
+                            </div>
+                                                                                                                                                        <div class="relative group">
+                                <a href="https://somosunn.com.br/portal"
+                                    class="inline-flex items-center gap-1 hover:text-[#1F5EDB] transition-colors py-2">
+                                    Comunidade
+                                    <i class="fas fa-chevron-down text-xs ml-0.5 opacity-70"></i>
+                                </a>
+                                <div class="absolute right-0 top-full pt-2 hidden group-hover:block z-40">
+                                    <div
+                                        class="rounded-2xl bg-white shadow-xl border border-slate-100 min-w-[220px] py-2 overflow-hidden">
+                                                                                                                                                                                <a href="https://somosunn.com.br/portal"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Portal
+                                                </a>
+                                                                                                                                                                                                                            <a href="https://somosunn.com.br/feed"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Feed Social
+                                                </a>
+                                                                                                                                                                                                                            <a href="https://somosunn.com.br/courses"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Cursos
+                                                </a>
+                                                                                                                                                                                                                            <a href="https://somosunn.com.br/eventos"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Eventos
+                                                </a>
+                                                                                                                                                                                                                            <a href="https://somosunn.com.br/marketplace"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Marketplace
+                                                </a>
+                                                                                                                                                                                                                            <a href="https://somosunn.com.br/membros"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Membros
+                                                </a>
+                                                                                                                                                                                                                            <a href="https://somosunn.com.br/vagas-abertas"
+                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                    Vagas Abertas
+                                                </a>
+                                                                                                                        </div>
+                                </div>
+                            </div>
+                                                                                                                                                        <a href="https://somosunn.com.br/premium" class="hover:text-[#1F5EDB] transition-colors">Premium</a>
+                                                                        </div>
+
+            <!-- Notification Hub & Mobile Toggle Combined -->
+            <div class="flex items-center gap-2 sm:gap-4">
+                
+                <!-- Mobile Toggle -->
+                <button id="mobile-menu-toggle" type="button"
+                    class="lg:hidden inline-flex items-center justify-center rounded-full border-0 p-2 min-w-[44px] min-h-[44px] text-[#1F5EDB] hover:bg-[#1F5EDB]/10 relative z-[60] active:scale-95 transition-transform touch-manipulation">
+                    <span class="sr-only">Abrir menu</span>
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="hidden lg:flex items-center gap-3">
+                                    <a href="https://somosunn.com.br/login"
+                        class="inline-flex items-center gap-2 rounded-full border border-[#1F5EDB] px-6 py-2 text-sm font-bold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition-all whitespace-nowrap">
+                        Entrar
+                    </a>
+                
+                                    <a href="https://somosunn.com.br/register"
+                        class="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-[#1F5EDB] via-[#177FD6] to-[#1D3FC4] text-white shadow-[0_15px_30px_-10px_rgba(29,63,196,0.45)] px-7 py-3 text-sm font-bold whitespace-nowrap">
+                        Fazer parte
+                    </a>
+                            </div>
+        </div>
+    </div>
+</nav>
+
+<div id="mobile-menu" class="fixed inset-0 z-[100] hidden" aria-hidden="true">
+    <div id="mobile-menu-overlay"
+        class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+    <div id="mobile-menu-panel"
+        class="relative z-10 w-4/5 max-w-sm h-full bg-white border-r border-white/80 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out overflow-y-auto pointer-events-auto">
+        <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+            <div class="flex items-center gap-3">
+                <div class="inline-flex h-10 w-auto items-center justify-center overflow-hidden">
+                    <img src="https://somosunn.com.br/uploads/imagens/frontend/69823308659c82.02961438.png" alt="UNN" class="h-full w-auto object-contain"
+                        onerror="this.style.display='none';">
+                </div>
+            </div>
+            <button id="mobile-menu-close"
+                class="text-gray-500 hover:text-gray-900 text-2xl leading-none px-3">&times;</button>
+        </div>
+
+        
+        <nav class="px-4 py-4 flex flex-col gap-1 text-gray-700">
+                            <a href="https://somosunn.com.br/sobre"
+                    class="block rounded-xl px-4 py-2.5 font-semibold hover:bg-slate-100 transition-colors">
+                    Institucional
+                </a>
+                            <a href="https://somosunn.com.br/portal"
+                    class="block rounded-xl px-4 py-2.5 font-semibold hover:bg-slate-100 transition-colors">
+                    Comunidade
+                </a>
+                            <a href="https://somosunn.com.br/premium"
+                    class="block rounded-xl px-4 py-2.5 font-semibold hover:bg-slate-100 transition-colors">
+                    Premium
+                </a>
+            
+                    </nav>
+
+        <div class="px-4 pb-6 space-y-2">
+                            <a href="https://somosunn.com.br/login"
+                    class="inline-flex w-full items-center justify-center rounded-full border border-[#1F5EDB] px-6 py-2.5 text-sm font-semibold text-[#1F5EDB] hover:bg-[#1F5EDB]/10 transition">
+                    Entrar
+                </a>
+                <a href="https://somosunn.com.br/register"
+                    class="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-br from-[#1F5EDB] via-[#177FD6] to-[#1D3FC4] text-white shadow-[0_15px_30px_-10px_rgba(29,63,196,0.45)] px-6 py-2.5 text-sm font-bold text-white transition">
+                    Fazer parte
+                </a>
+                    </div>
+    </div>
+</div>    
+    <main class="pt-20 lg:pt-24 min-h-[calc(100vh-80px)]">
+        <div class="min-h-screen flex items-center justify-center">
+    <div class="text-center">
+        <h1 class="text-6xl font-bold">404</h1>
+        <p class="text-xl mt-4">Ops ÔÇö P├ígina n├úo encontrada.</p>
+        <a href="https://somosunn.com.br" class="btn-primary text-white px-4 py-2 rounded mt-6 inline-block">Voltar ao site</a>
+    </div>
+</div>
+    </main>
+
+    
+            <div class="bg-white py-10">
+            <div class="max-w-7xl mx-auto px-4 md:px-6">
+                <section class="partners-carousel-section py-8" aria-label="Empresas Parceiras">
+        <div class="partners-carousel-header text-center mb-6">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold mb-2"
+                style="background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1d4ed8;">
+                <i class="fas fa-handshake"></i> Nossos Parceiros
+            </div>
+            <p class="text-slate-500 text-sm mt-1">Benef├¡cios exclusivos para membros da plataforma</p>
+        </div>
+
+        <div class="partners-track-wrapper" id="partnersTrack">
+            <div class="partners-track" id="partnersInner">
+                
+                                                            <a href="https://somosunn.com.br/parceiros/balas-galo-doce" class="partner-logo-card" title="Balas Galo Doce"
+                            aria-label="Balas Galo Doce">
+                            <div class="partner-logo-inner">
+                                                                    <img src="https://somosunn.com.br/storage/partners/logos/0m8QIuuvSWi5W2k03CjcSRXq4cxMBdBeRmeTcDgu.png" alt="Balas Galo Doce" loading="lazy">
+                                                            </div>
+                            <div class="partner-logo-tooltip">
+                                <span>Balas Galo Doce</span>
+                                                                                            </div>
+                        </a>
+                                            <a href="https://somosunn.com.br/parceiros/eth-estrategias" class="partner-logo-card" title="Eth Estrat├®gias"
+                            aria-label="Eth Estrat├®gias">
+                            <div class="partner-logo-inner">
+                                                                    <img src="https://somosunn.com.br/storage/partners/logos/RIsMJq4bQ5dcg6Km0quZqqXZ8iKum3Tg8ENXivq3.png" alt="Eth Estrat├®gias" loading="lazy">
+                                                            </div>
+                            <div class="partner-logo-tooltip">
+                                <span>Eth Estrat├®gias</span>
+                                                                                            </div>
+                        </a>
+                                            <a href="https://somosunn.com.br/parceiros/prime-rio-mc" class="partner-logo-card" title="Prime Rio Mc"
+                            aria-label="Prime Rio Mc">
+                            <div class="partner-logo-inner">
+                                                                    <img src="https://somosunn.com.br/storage/partners/logos/j4JG5Ti1gkv13PFHWsum6Y6UnrxRdcrZYJsQ3WeO.png" alt="Prime Rio Mc" loading="lazy">
+                                                            </div>
+                            <div class="partner-logo-tooltip">
+                                <span>Prime Rio Mc</span>
+                                                                                            </div>
+                        </a>
+                                            <a href="https://somosunn.com.br/parceiros/kdkhost-solucoes" class="partner-logo-card" title="KdkHost Solu├º├Áes"
+                            aria-label="KdkHost Solu├º├Áes">
+                            <div class="partner-logo-inner">
+                                                                    <img src="https://somosunn.com.br/storage/partners/logos/VvdU4q001UzUO9faaxJKrlJUzIPmZ7ThLqhRW9lL.png" alt="KdkHost Solu├º├Áes" loading="lazy">
+                                                            </div>
+                            <div class="partner-logo-tooltip">
+                                <span>KdkHost Solu├º├Áes</span>
+                                                                                                    <span class="partner-coupon-badge">
+                                        <i class="fas fa-ticket-alt"></i> 1 cupom(s)
+                                    </span>
+                                                            </div>
+                        </a>
+                                                                                <a href="https://somosunn.com.br/parceiros/balas-galo-doce" class="partner-logo-card" title="Balas Galo Doce"
+                            aria-label="Balas Galo Doce">
+                            <div class="partner-logo-inner">
+                                                                    <img src="https://somosunn.com.br/storage/partners/logos/0m8QIuuvSWi5W2k03CjcSRXq4cxMBdBeRmeTcDgu.png" alt="Balas Galo Doce" loading="lazy">
+                                                            </div>
+                            <div class="partner-logo-tooltip">
+                                <span>Balas Galo Doce</span>
+                                                                                            </div>
+                        </a>
+                                            <a href="https://somosunn.com.br/parceiros/eth-estrategias" class="partner-logo-card" title="Eth Estrat├®gias"
+                            aria-label="Eth Estrat├®gias">
+                            <div class="partner-logo-inner">
+                                                                    <img src="https://somosunn.com.br/storage/partners/logos/RIsMJq4bQ5dcg6Km0quZqqXZ8iKum3Tg8ENXivq3.png" alt="Eth Estrat├®gias" loading="lazy">
+                                                            </div>
+                            <div class="partner-logo-tooltip">
+                                <span>Eth Estrat├®gias</span>
+                                                                                            </div>
+                        </a>
+                                            <a href="https://somosunn.com.br/parceiros/prime-rio-mc" class="partner-logo-card" title="Prime Rio Mc"
+                            aria-label="Prime Rio Mc">
+                            <div class="partner-logo-inner">
+                                                                    <img src="https://somosunn.com.br/storage/partners/logos/j4JG5Ti1gkv13PFHWsum6Y6UnrxRdcrZYJsQ3WeO.png" alt="Prime Rio Mc" loading="lazy">
+                                                            </div>
+                            <div class="partner-logo-tooltip">
+                                <span>Prime Rio Mc</span>
+                                                                                            </div>
+                        </a>
+                                            <a href="https://somosunn.com.br/parceiros/kdkhost-solucoes" class="partner-logo-card" title="KdkHost Solu├º├Áes"
+                            aria-label="KdkHost Solu├º├Áes">
+                            <div class="partner-logo-inner">
+                                                                    <img src="https://somosunn.com.br/storage/partners/logos/VvdU4q001UzUO9faaxJKrlJUzIPmZ7ThLqhRW9lL.png" alt="KdkHost Solu├º├Áes" loading="lazy">
+                                                            </div>
+                            <div class="partner-logo-tooltip">
+                                <span>KdkHost Solu├º├Áes</span>
+                                                                                                    <span class="partner-coupon-badge">
+                                        <i class="fas fa-ticket-alt"></i> 1 cupom(s)
+                                    </span>
+                                                            </div>
+                        </a>
+                                                </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="https://somosunn.com.br/parceiros"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-105"
+                style="background: linear-gradient(135deg, #1f5edb, #177fd6); color: #fff; box-shadow: 0 4px 15px rgba(31,94,219,0.3);">
+                <i class="fas fa-handshake"></i> Ver todos os parceiros
+            </a>
+        </div>
+    </section>
+
+    <style>
+        /* ÔöÇÔöÇ Partners Carousel ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ */
+        .partners-carousel-section {
+            padding: 2rem 0;
+        }
+
+        .partners-track-wrapper {
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+            cursor: grab;
+            user-select: none;
+        }
+
+        .partners-track-wrapper:active {
+            cursor: grabbing;
+        }
+
+        .partners-track {
+            display: flex;
+            gap: 1.25rem;
+            width: max-content;
+            animation: partners-scroll 28s linear infinite;
+            padding: 0.75rem 0;
+        }
+
+        .partners-track.paused {
+            animation-play-state: paused;
+        }
+
+        @keyframes partners-scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .partner-logo-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none !important;
+            flex-shrink: 0;
+        }
+
+        .partner-logo-inner {
+            width: 160px;
+            height: 80px;
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 10px 14px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .partner-logo-card:hover .partner-logo-inner {
+            transform: scale(1.07);
+            box-shadow: 0 6px 20px rgba(31, 94, 219, 0.18);
+            border-color: #93c5fd;
+        }
+
+        .partner-logo-inner img {
+            max-width: 136px;
+            max-height: 60px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            filter: grayscale(20%);
+            transition: filter 0.25s ease;
+        }
+
+        .partner-logo-card:hover .partner-logo-inner img {
+            filter: grayscale(0%);
+        }
+
+        .partner-logo-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            gap: 4px;
+            text-align: center;
+        }
+
+        .partner-logo-placeholder i {
+            font-size: 1.4rem;
+        }
+
+        /* Tooltip */
+        .partner-logo-tooltip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(6px);
+            background: #1e293b;
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 8px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            z-index: 10;
+        }
+
+        .partner-logo-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #1e293b;
+        }
+
+        .partner-logo-card:hover .partner-logo-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .partner-coupon-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: linear-gradient(135deg, #1f5edb, #177fd6);
+            border-radius: 20px;
+            padding: 1px 8px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #fff;
+        }
+    </style>
+
+    <script>
+        (function () {
+            const wrapper = document.getElementById('partnersTrack');
+            const track = document.getElementById('partnersInner');
+            if (!wrapper || !track) return;
+
+            // Pause on hover
+            wrapper.addEventListener('mouseenter', () => track.classList.add('paused'));
+            wrapper.addEventListener('mouseleave', () => {
+                if (!isDragging) track.classList.remove('paused');
+            });
+
+            // Drag to scroll
+            let isDragging = false, startX = 0, scrollLeft = 0;
+
+            function onDown(e) {
+                isDragging = true;
+                track.classList.add('paused');
+                startX = (e.touches ? e.touches[0].clientX : e.clientX) - wrapper.getBoundingClientRect().left;
+                scrollLeft = wrapper.scrollLeft;
+                wrapper.style.cursor = 'grabbing';
+            }
+            function onMove(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                const x = (e.touches ? e.touches[0].clientX : e.clientX) - wrapper.getBoundingClientRect().left;
+                wrapper.scrollLeft = scrollLeft - (x - startX);
+            }
+            function onUp() {
+                isDragging = false;
+                wrapper.style.cursor = 'grab';
+                track.classList.remove('paused');
+            }
+
+            wrapper.addEventListener('mousedown', onDown);
+            wrapper.addEventListener('mousemove', onMove);
+            wrapper.addEventListener('mouseup', onUp);
+            wrapper.addEventListener('mouseleave', onUp);
+            wrapper.addEventListener('touchstart', onDown, { passive: true });
+            wrapper.addEventListener('touchmove', onMove, { passive: false });
+            wrapper.addEventListener('touchend', onUp);
+        })();
+    </script>
+            </div>
+        </div>
+    
+    <footer class="bg-white border-t border-gray-100 mt-auto">
+    <div class="max-w-7xl mx-auto px-6 py-6 grid grid-cols-1 sm:grid-cols-2 gap-2 items-center text-gray-500">
+        <div
+            class="text-xs sm:text-sm text-center sm:text-left flex items-center justify-center sm:justify-start gap-4">
+            <span>┬® 2026 UNN.</span>
+            <a href="https://somosunn.com.br/vagas-abertas" class="hover:text-[#1F5EDB] transition-colors font-medium">Vagas
+                Abertas</a>
+        </div>
+        <div class="text-xs text-center sm:text-right hidden md:block">
+            Desenvolvido por:
+            <a href="https://kdkhost.com.br" target="_blank" rel="noopener" class="font-semibold hover:underline"
+                style="color: var(--unn-azul-1)">
+                Marcelo Brad RJ
+            </a>
+            ┬À site kdkhost.com.br
+        </div>
+    </div>
+</footer>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/inputmask.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Input masks
+            try {
+                if (typeof Inputmask === 'function') {
+                    var imasks = document.querySelectorAll('input[data-mask]');
+                    imasks.forEach(function (el) {
+                        var m = el.getAttribute('data-mask');
+                        if (m) {
+                            Inputmask(m).mask(el);
+                        }
+                    });
+                }
+            } catch (e) {
+                // Se algum CDN estiver bloqueado, n├úo quebra o restante do site
+            }
+
+            // CEP auto-complete on any input with id=cep
+            var cep = document.getElementById('cep');
+            if (cep) {
+                cep.addEventListener('input', function (e) {
+                    var v = e.target.value.replace(/\D/g, '');
+                    if (v.length === 8) {
+                        fetch(`https://viacep.com.br/ws/${v}/json/`).then(r => r.json()).then(data => {
+                            if (!data.erro) {
+                                var address = document.getElementById('address');
+                                if (address) {
+                                    address.value = `${data.logradouro} - ${data.bairro} - ${data.localidade}/${data.uf}`;
+                                    var campos = Array.prototype.slice.call(document.querySelectorAll('input,select,textarea'));
+                                    var idx = campos.indexOf(address);
+                                    if (idx > -1 && campos[idx + 1]) {
+                                        campos[idx + 1].focus();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Password strength indicator
+            var pwd = document.getElementById('password');
+            var strengthWrap = document.getElementById('pw-strength');
+            var strength = strengthWrap ? strengthWrap.querySelector('span') : null;
+            if (pwd && strength) {
+                pwd.addEventListener('input', function () {
+                    var score = (typeof zxcvbn === 'function') ? zxcvbn(pwd.value).score : 0;
+                    var texts = ['Muito fraca', 'Fraca', 'OK', 'Boa', 'Forte'];
+                    strength.textContent = texts[score];
+                });
+            }
+
+            // Mobile menu toggle (sidebar do front-end)
+            var initMobileMenu = function () {
+                var mobileToggle = document.getElementById('mobile-menu-toggle');
+                var mobileMenu = document.getElementById('mobile-menu');
+                var mobilePanel = document.getElementById('mobile-menu-panel');
+                var mobileOverlay = document.getElementById('mobile-menu-overlay');
+                var mobileClose = document.getElementById('mobile-menu-close');
+
+                if (!mobileToggle || !mobileMenu || !mobilePanel || !mobileOverlay || !mobileClose) {
+                    return;
+                }
+
+                if (mobileToggle.dataset.mobileMenuBound === '1') {
+                    return;
+                }
+                mobileToggle.dataset.mobileMenuBound = '1';
+
+                var openMenu = function () {
+                    mobileMenu.classList.remove('hidden');
+                    mobileMenu.setAttribute('aria-hidden', 'false');
+
+                    mobileOverlay.classList.remove('pointer-events-none');
+                    mobileOverlay.classList.add('pointer-events-auto');
+                    mobileOverlay.classList.remove('opacity-0');
+                    mobileOverlay.classList.add('opacity-100');
+
+                    mobilePanel.classList.remove('-translate-x-full');
+                };
+
+                var closeMenu = function () {
+                    mobileOverlay.classList.add('opacity-0');
+                    mobileOverlay.classList.remove('opacity-100');
+                    mobilePanel.classList.add('-translate-x-full');
+
+                    mobileOverlay.classList.remove('pointer-events-auto');
+                    mobileOverlay.classList.add('pointer-events-none');
+
+                    setTimeout(function () {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenu.setAttribute('aria-hidden', 'true');
+                    }, 320);
+                };
+
+                mobileToggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    openMenu();
+                });
+
+                mobileClose.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    closeMenu();
+                });
+
+                mobileOverlay.addEventListener('click', closeMenu);
+
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
+                        closeMenu();
+                    }
+                });
+            };
+
+            initMobileMenu();
+
+            document.querySelectorAll('button[title], a[title]').forEach(function (el) {
+                var tooltipText = el.getAttribute('title');
+                if (!tooltipText) {
+                    return;
+                }
+
+                el.setAttribute('data-tooltip', tooltipText);
+                el.classList.add('ui-tooltip');
+                el.removeAttribute('title');
+            });
+        });
+
+        // Global Notifications Polling moved to NotificationHub component in navbar.blade.php
+    </script>
+
+            <script>
+            window.UNN = window.UNN || {};
+            window.UNN.videoPlayer = {"enabled":true,"plyr":{"autoplay":false,"muted":false,"clickToPlay":true,"disableContextMenu":true,"rewindEnabled":false,"fastForwardEnabled":false,"volumeEnabled":false,"seekTime":10,"volume":0.8,"controls":["play","progress","current-time","duration","mute","volume","captions","settings","pip","airplay","fullscreen"],"settings":["captions","quality","speed","loop"],"speedOptions":[0.5,0.75,1,1.25,1.5,2],"speedSelected":1,"customOptions":null},"watermark":{"enabled":true,"imageUrl":"https://somosunn.com.br/uploads/imagens/watermark/6985e570af9774.34966437.png","text":"","opacity":0.5,"sizePercent":9,"position":"bottom-right","margin":24,"rotate":0,"blend":"overlay","animate":false}};
+        </script>
+        <script src="https://somosunn.com.br/vendor/plyr/plyr.polyfilled.js"></script>
+        <script>
+            (function () {
+                const config = (window.UNN && window.UNN.videoPlayer) ? window.UNN.videoPlayer : null;
+                if (!config || !config.enabled) return;
+                const canUsePlyr = () => typeof Plyr !== 'undefined';
+
+                function deepMerge(target, source) {
+                    if (!source || typeof source !== 'object') return target;
+
+                    for (const key of Object.keys(source)) {
+                        const value = source[key];
+                        if (value && typeof value === 'object' && !Array.isArray(value)) {
+                            if (!target[key] || typeof target[key] !== 'object' || Array.isArray(target[key])) {
+                                target[key] = {};
+                            }
+                            deepMerge(target[key], value);
+                            continue;
+                        }
+                        target[key] = value;
+                    }
+                    return target;
+                }
+
+                function buildPlyrOptions() {
+                    const plyr = (config && config.plyr) ? config.plyr : {};
+
+                    // Default controls if not specified
+                    const defaultControls = ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'];
+
+                    const base = {
+                        autoplay: !!plyr.autoplay,
+                        muted: !!plyr.muted,
+                        clickToPlay: plyr.clickToPlay !== false,
+                        disableContextMenu: plyr.disableContextMenu !== false,
+                        seekTime: Number.isFinite(plyr.seekTime) ? plyr.seekTime : 10,
+                        fullscreen: { enabled: true, fallback: true, iosNative: true },
+                    };
+
+                    // Use configured controls or default
+                    let controls = Array.isArray(plyr.controls) && plyr.controls.length
+                        ? [...plyr.controls]
+                        : [...defaultControls];
+
+                    // Replace native 'pip' with custom 'toggle-floating' to support watermark
+                    if (controls.includes('pip')) {
+                        const pipIdx = controls.indexOf('pip');
+                        controls[pipIdx] = 'toggle-floating';
+                    } else if (config.floatingEnabled !== false && !controls.includes('toggle-floating') && !controls.includes('pip')) {
+                        // If not present but floating enabled, add it near fullscreen or settings
+                        const fsIdx = controls.indexOf('fullscreen');
+                        if (fsIdx >= 0) {
+                            controls.splice(fsIdx, 0, 'toggle-floating');
+                        } else {
+                            controls.push('toggle-floating');
+                        }
+                    }
+
+                    // Ensure play-large (big play button) is always present
+                    if (!controls.includes('play-large')) {
+                        controls.unshift('play-large');
+                    }
+
+                    // Filter based on enabled settings
+                    // Trust the 'controls' list from backend configuration COMPLETELY.
+                    // We remove all manual filters that were based on hidden boolean flags.
+
+                    // Robust "Self-Healing": If the string list is missing absolute essentials that are implicitly wanted.
+                    // However, we predominantly trust the list from Admin.
+
+                    // If the list is empty, use defaults.
+                    if (!controls.length) {
+                        controls = [...defaultControls];
+                    }
+
+                    // Always ensure play-large for usability if not explicitly removed
+                    if (!controls.includes('play-large') && controls.includes('play')) {
+                        controls.unshift('play-large');
+                    }
+
+                    // Ensure 'toggle-floating' is used instead of 'pip' (handled above)
+                    // We remove 'toggle-floating' from the array passed to Plyr to avoid "unknown control" issues,
+                    // but we keep track of it to inject manually in initOne.
+                    const needsFloating = controls.includes('toggle-floating');
+                    const cleanControls = controls.filter(c => c !== 'toggle-floating');
+
+                    base.controls = cleanControls;
+                    base.unnCustomFloating = needsFloating;
+
+                    if (Array.isArray(plyr.settings) && plyr.settings.length) {
+                        base.settings = plyr.settings;
+                    }
+                    if (Number.isFinite(plyr.volume) && true) { // Always apply volume setting
+                        base.volume = Math.max(0, Math.min(1, Number(plyr.volume)));
+                    }
+                    if (Array.isArray(plyr.speedOptions) && plyr.speedOptions.length) {
+                        const selected = Number.isFinite(plyr.speedSelected) ? Number(plyr.speedSelected) : 1;
+                        base.speed = {
+                            selected: selected,
+                            options: plyr.speedOptions.map(n => Number(n)).filter(n => Number.isFinite(n))
+                        };
+                    }
+
+                    // Add listeners for custom controls in initOne (Plyr setup) to bind 'toggle-floating'
+                    base.listeners = base.listeners || {};
+
+                    const custom = plyr.customOptions && typeof plyr.customOptions === 'object'
+                        ? plyr.customOptions
+                        : null;
+
+                    return deepMerge(base, custom || {});
+                }
+
+                function extractYouTubeId(url) {
+                    if (!url) return null;
+                    const patterns = [
+                        /youtu\.be\/([^?&#/]+)/i,
+                        /youtube\.com\/watch\?v=([^?&#/]+)/i,
+                        /youtube\.com\/embed\/([^?&#/]+)/i,
+                        /youtube\.com\/shorts\/([^?&#/]+)/i,
+                    ];
+                    for (const pattern of patterns) {
+                        const match = String(url).match(pattern);
+                        if (match && match[1]) return match[1];
+                    }
+
+                    try {
+                        const parsed = new URL(String(url));
+                        const v = parsed.searchParams.get('v');
+                        if (v) return v;
+                    } catch (e) { /* ignore */ }
+
+                    return null;
+                }
+
+                function extractVimeoId(url) {
+                    if (!url) return null;
+                    const patterns = [
+                        /vimeo\.com\/(\d+)/i,
+                        /player\.vimeo\.com\/video\/(\d+)/i,
+                    ];
+                    for (const pattern of patterns) {
+                        const match = String(url).match(pattern);
+                        if (match && match[1]) return match[1];
+                    }
+                    return null;
+                }
+
+                function normalizeVideoUrl(value) {
+                    let url = (value == null) ? '' : String(value);
+                    url = url.trim();
+                    if (!url) return '';
+
+                    if (/^https?:\/\//i.test(url)) {
+                        try {
+                            const parsed = new URL(url);
+                            const sameHost = parsed.host === window.location.host;
+                            if (!sameHost) {
+                                return url;
+                            }
+
+                            let path = String(parsed.pathname || '').replace(/^\/+/, '');
+                            if (path.startsWith('public/storage/app/public/')) {
+                                return '/storage/' + path.replace(/^public\/storage\/app\/public\//, '');
+                            }
+                            if (path.startsWith('storage/app/public/')) {
+                                return '/storage/' + path.replace(/^storage\/app\/public\//, '');
+                            }
+                            if (path.startsWith('public/')) {
+                                path = path.replace(/^public\//, '');
+                            }
+                            if (/^(course-videos|course-materials)\//i.test(path)) {
+                                return '/storage/' + path;
+                            }
+                            if (path.startsWith('storage/')) {
+                                return '/' + path;
+                            }
+                        } catch (e) { /* ignore */ }
+                        return url;
+                    }
+                    if (url.startsWith('//')) return (window.location.protocol || 'https:') + url;
+
+                    if (url.startsWith('/storage/app/public/')) {
+                        return '/storage/' + url.replace(/^\/storage\/app\/public\//, '');
+                    }
+                    if (url.startsWith('storage/app/public/')) {
+                        return '/storage/' + url.replace(/^storage\/app\/public\//, '');
+                    }
+                    if (url.startsWith('public/')) {
+                        url = url.replace(/^public\//, '');
+                    }
+                    if (/^(course-videos|course-materials)\//i.test(url)) {
+                        return '/storage/' + url;
+                    }
+
+                    if (url.startsWith('/')) return url;
+
+                    // Allow common providers without protocol.
+                    if (/^(www\.)?(youtube\.com|youtu\.be|vimeo\.com|player\.vimeo\.com)\//i.test(url)) {
+                        url = url.replace(/^www\./i, '');
+                        return 'https://' + url;
+                    }
+
+                    // Most stored paths are relative to the public root (ex: storage/... or uploads/...).
+                    return '/' + url;
+                }
+
+                function isDirectVideo(url) {
+                    if (!url) return false;
+                    const cleaned = String(url).split('#')[0].split('?')[0].toLowerCase();
+                    return (
+                        cleaned.endsWith('.mp4') ||
+                        cleaned.endsWith('.webm') ||
+                        cleaned.endsWith('.ogg') ||
+                        cleaned.endsWith('.m4v')
+                    );
+                }
+
+                function guessMimeType(url) {
+                    const cleaned = String(url).split('#')[0].split('?')[0].toLowerCase();
+                    if (cleaned.endsWith('.webm')) return 'video/webm';
+                    if (cleaned.endsWith('.ogg')) return 'video/ogg';
+                    return 'video/mp4';
+                }
+
+                function applyWatermark(container) {
+                    const wm = config.watermark || {};
+                    if (!wm.enabled) return;
+                    if (!wm.imageUrl && !wm.text) return;
+
+                    if (!container) return;
+                    if (container.querySelector('.unn-video-watermark')) return;
+
+                    const outer = document.createElement('div');
+                    const position = wm.position || 'top-right';
+                    outer.className = [
+                        'unn-video-watermark',
+                        'unn-video-watermark--' + position,
+                        wm.animate ? 'unn-video-watermark--animate' : '',
+                    ].filter(Boolean).join(' ');
+
+                    outer.style.setProperty('--unn-wm-opacity', Number.isFinite(wm.opacity) ? String(wm.opacity) : '0.15');
+                    outer.style.setProperty('--unn-wm-size', (Number.isFinite(wm.sizePercent) ? wm.sizePercent : 18) + '%');
+                    outer.style.setProperty('--unn-wm-margin', (Number.isFinite(wm.margin) ? wm.margin : 16) + 'px');
+                    outer.style.setProperty('--unn-wm-rotate', (Number.isFinite(wm.rotate) ? wm.rotate : 0) + 'deg');
+                    outer.style.setProperty('--unn-wm-blend', wm.blend || 'normal');
+
+                    const inner = document.createElement('div');
+                    inner.className = 'unn-video-watermark-inner';
+
+                    if (wm.imageUrl) {
+                        const img = document.createElement('img');
+                        img.src = wm.imageUrl;
+                        img.alt = "Marca d'agua";
+                        img.loading = 'lazy';
+                        inner.appendChild(img);
+                    }
+
+                    if (wm.text) {
+                        const text = document.createElement('div');
+                        text.className = 'unn-video-watermark-text';
+                        text.textContent = String(wm.text);
+                        inner.appendChild(text);
+                    }
+
+                    outer.appendChild(inner);
+                    container.appendChild(outer);
+                }
+
+                function bindPlaybackProtections(target, disableContextMenu, blockDownload) {
+                    if (!target) return;
+
+                    if (disableContextMenu) {
+                        target.addEventListener('contextmenu', function (event) {
+                            event.preventDefault();
+                        }, true);
+                        target.setAttribute('oncontextmenu', 'return false;');
+                    }
+
+                    if (!blockDownload) {
+                        return;
+                    }
+
+                    // Keyboard protections
+                    target.addEventListener('keydown', function (e) {
+                        // Prevent Ctrl+S, Ctrl+U, Ctrl+Shift+I, F12
+                        if ((e.ctrlKey && (e.key === 's' || e.key === 'u' || e.key === 'S' || e.key === 'U')) ||
+                            (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'I' || e.key === 'c' || e.key === 'C' || e.key === 'j' || e.key === 'J')) ||
+                            (e.key === 'F12')) {
+                            e.preventDefault();
+                            return false;
+                        }
+                    }, true);
+
+                    target.addEventListener('dragstart', function (event) {
+                        event.preventDefault();
+                    }, true);
+
+                    if (target.tagName === 'VIDEO') {
+                        target.setAttribute('controlsList', 'nodownload noplaybackrate noremoteplayback');
+                        // target.setAttribute('disablePictureInPicture', ''); // Allow PiP even if download is blocked
+                        target.setAttribute('disableRemotePlayback', '');
+                        // Prevent standard "Save Video As" in some older browsers
+                        target.addEventListener('mousedown', function (e) {
+                            if (e.button === 2) { e.preventDefault(); return false; }
+                        }, true);
+                    }
+                }
+
+                function initOne(wrapper) {
+                    if (!wrapper || wrapper.dataset.unnVideoPlayerInit === '1') return;
+                    wrapper.dataset.unnVideoPlayerInit = '1';
+
+                    const rawUrl = wrapper.dataset.videoUrl || wrapper.getAttribute('data-video-url') || '';
+                    const url = normalizeVideoUrl(rawUrl);
+                    if (!url) return;
+
+                    const youtubeId = extractYouTubeId(url);
+                    const vimeoId = youtubeId ? null : extractVimeoId(url);
+                    const options = buildPlyrOptions();
+
+                    const blockDownload = (wrapper.dataset.blockDownload === '1') || (wrapper.getAttribute('data-block-download') === '1');
+                    const floatingEnabled = (wrapper.dataset.floatingEnabled === '1') || (wrapper.getAttribute('data-floating-enabled') === '1');
+                    const floatingWidth = parseInt(wrapper.dataset.floatingWidth || wrapper.getAttribute('data-floating-width') || '', 10);
+                    const floatingHeight = parseInt(wrapper.dataset.floatingHeight || wrapper.getAttribute('data-floating-height') || '', 10);
+                    const plyrAvailable = canUsePlyr();
+                    const disableContextMenu = blockDownload || options.disableContextMenu !== false;
+
+                    options.disableContextMenu = disableContextMenu;
+                    if (blockDownload && Array.isArray(options.controls) && options.controls.length) {
+                        options.controls = options.controls.filter(c => c !== 'download');
+                    }
+
+                    wrapper.classList.add('unn-video-player');
+                    wrapper.innerHTML = '';
+                    bindPlaybackProtections(wrapper, disableContextMenu, blockDownload);
+
+                    // Decide host early, but if plyr initializes, it might wrap it.
+                    // We will re-evaluate 'host' after Plyr init if needed.
+                    let host = wrapper.closest('[data-unn-video-host]') || wrapper;
+
+                    let target;
+                    if (youtubeId) {
+                        if (plyrAvailable) {
+                            target = document.createElement('div');
+                            target.setAttribute('data-plyr-provider', 'youtube');
+                            target.setAttribute('data-plyr-embed-id', youtubeId);
+                            wrapper.appendChild(target);
+                        } else {
+                            target = document.createElement('iframe');
+                            target.src = 'https://www.youtube.com/embed/' + encodeURIComponent(youtubeId);
+                            target.setAttribute('allowfullscreen', '');
+                            target.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                            target.className = 'w-full h-full min-h-[400px]';
+                            wrapper.appendChild(target);
+                        }
+                    } else if (vimeoId) {
+                        if (plyrAvailable) {
+                            target = document.createElement('div');
+                            target.setAttribute('data-plyr-provider', 'vimeo');
+                            target.setAttribute('data-plyr-embed-id', vimeoId);
+                            wrapper.appendChild(target);
+                        } else {
+                            target = document.createElement('iframe');
+                            target.src = 'https://player.vimeo.com/video/' + encodeURIComponent(vimeoId);
+                            target.setAttribute('allowfullscreen', '');
+                            target.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+                            target.className = 'w-full h-full min-h-[400px]';
+                            wrapper.appendChild(target);
+                        }
+                    } else {
+                        target = document.createElement('video');
+                        target.setAttribute('playsinline', '');
+                        target.setAttribute('controls', '');
+
+                        const source = document.createElement('source');
+                        source.src = String(url);
+                        source.type = guessMimeType(url);
+                        target.appendChild(source);
+
+                        wrapper.appendChild(target);
+                    }
+                    bindPlaybackProtections(target, disableContextMenu, blockDownload);
+
+                    if (!plyrAvailable) {
+                        wrapper.__unnVideoApi = {
+                            player: null,
+                            media: target && target.tagName === 'VIDEO' ? target : null,
+                            wrapper: wrapper,
+                        };
+                        wrapper.dispatchEvent(new CustomEvent('unn:video-ready', { detail: wrapper.__unnVideoApi }));
+                        applyWatermark(wrapper);
+                        if (floatingEnabled) {
+                            const width = Number.isFinite(floatingWidth) ? floatingWidth : 420;
+                            const height = Number.isFinite(floatingHeight) ? floatingHeight : Math.round(width * 9 / 16);
+                            setupFloatingPlayer(host, null, { width, height });
+                        }
+                        return;
+                    }
+
+                    const player = new Plyr(target, options);
+                    const media = (player && player.media) ? player.media : null;
+                    if (media) {
+                        bindPlaybackProtections(media, disableContextMenu, blockDownload);
+                    }
+                    const container = (player && player.elements) ? player.elements.container : wrapper;
+                    if (container) {
+                        bindPlaybackProtections(container, disableContextMenu, blockDownload);
+                    }
+                    wrapper.__unnVideoApi = {
+                        player: player,
+                        media: media,
+                        wrapper: wrapper,
+                    };
+                    wrapper.dispatchEvent(new CustomEvent('unn:video-ready', { detail: wrapper.__unnVideoApi }));
+                    applyWatermark(container);
+
+                    if (floatingEnabled) {
+                        const width = Number.isFinite(floatingWidth) ? floatingWidth : 420;
+                        const height = Number.isFinite(floatingHeight) ? floatingHeight : Math.round(width * 9 / 16);
+                        setupFloatingPlayer(host, player, { width, height });
+
+                        // Inject custom button if configured in controls
+                        if (options.unnCustomFloating) {
+                            const controls = player.elements.controls;
+                            if (controls) {
+                                // Create button
+                                const btn = document.createElement('button');
+                                btn.type = 'button';
+                                btn.className = 'plyr__controls__item plyr__control';
+                                btn.setAttribute('data-plyr', 'toggle-floating');
+                                btn.setAttribute('aria-label', 'Mini Player');
+                                // Icon (PiP icon)
+                                btn.innerHTML = `
+                                        <svg aria-hidden="true" focusable="false" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" class="plyr__icon">
+                                            <path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z"></path>
+                                        </svg>
+                                        <span class="plyr__sr-only">Mini Player</span>
+                                     `;
+
+                                // Insert in correct position
+                                // Ideally we find where 'toggle-floating' is in options.controls and place it accordingly relative to others
+                                // But simplistically, we can append it or try to insert before fullscreen
+
+                                const fsBtn = controls.querySelector('[data-plyr="fullscreen"]');
+                                if (fsBtn) {
+                                    controls.insertBefore(btn, fsBtn);
+                                } else {
+                                    controls.appendChild(btn);
+                                }
+
+                                btn.addEventListener('click', function () {
+                                    if (host.toggleFloating) {
+                                        host.toggleFloating();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+
+                function setupFloatingPlayer(host, player, cfg) {
+                    if (!host || host.dataset.unnVideoFloatingInit === '1') return;
+                    host.dataset.unnVideoFloatingInit = '1';
+
+                    let disabled = false;
+                    let manualToggle = false; // Track manual toggle state
+                    let pipWindow = null; // Store reference to PiP window
+
+                    const clampInt = function (value, fallback, min, max) {
+                        const parsed = parseInt(String(value || ''), 10);
+                        const n = Number.isFinite(parsed) ? parsed : fallback;
+                        return Math.max(min, Math.min(max, n));
+                    };
+
+                    const width = clampInt(cfg && cfg.width, 420, 260, 960);
+                    const height = clampInt(cfg && cfg.height, Math.round(width * 9 / 16), 160, 720);
+
+                    host.style.setProperty('--unn-float-width', width + 'px');
+                    host.style.setProperty('--unn-float-height', height + 'px');
+
+                    // Placeholder to keep space in the original document
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'unn-video-float-placeholder';
+                    placeholder.style.display = 'none';
+                    if (host.parentNode) {
+                        try {
+                            host.parentNode.insertBefore(placeholder, host);
+                        } catch (e) { }
+                    }
+
+                    // In-page Close button (only visible when floating in-page)
+                    const closeBtn = document.createElement('button');
+                    closeBtn.type = 'button';
+                    closeBtn.className = 'unn-video-float-close';
+                    closeBtn.setAttribute('aria-label', 'Fechar mini player');
+                    closeBtn.innerHTML = '&times;';
+                    closeBtn.addEventListener('click', function () {
+                        disabled = true;
+                        manualToggle = false;
+                        setFloating(false);
+                    });
+                    host.appendChild(closeBtn);
+
+                    async function enterDocumentPiP() {
+                        if (!('documentPictureInPicture' in window)) {
+                            return false;
+                        }
+
+                        try {
+                            pipWindow = await window.documentPictureInPicture.requestWindow({
+                                width: host.clientWidth || width,
+                                height: host.clientHeight || height,
+                            });
+
+                            // Copy style sheets
+                            [...document.styleSheets].forEach((styleSheet) => {
+                                try {
+                                    const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
+                                    const style = document.createElement('style');
+                                    style.textContent = cssRules;
+                                    pipWindow.document.head.appendChild(style);
+                                } catch (e) {
+                                    const link = document.createElement('link');
+                                    link.rel = 'stylesheet';
+                                    link.type = styleSheet.type;
+                                    link.media = styleSheet.media;
+                                    link.href = styleSheet.href;
+                                    pipWindow.document.head.appendChild(link);
+                                }
+                            });
+
+                            // Specific adjustments for PiP window
+                            const style = document.createElement('style');
+                            style.textContent = `
+                                    body { margin: 0; display: flex; justify-content: center; align-items: center; background: #000; height: 100vh; overflow: hidden; }
+                                    .unn-video-player { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; }
+                                    .unn-video-float-close { display: none !important; } /* Hide close button in window */
+                                    .unn-video-watermark { --unn-wm-margin: 8px !important; min-width: 40px; }
+                                 `;
+                            pipWindow.document.head.appendChild(style);
+
+                            // Move player to PiP window
+                            pipWindow.document.body.append(host);
+                            placeholder.style.height = (height) + 'px'; // Approximate height or keep original rect
+                            placeholder.style.display = 'block';
+
+                            pipWindow.addEventListener('pagehide', (event) => {
+                                // Restore when window closes
+                                if (placeholder && placeholder.parentNode) {
+                                    placeholder.parentNode.insertBefore(host, placeholder);
+                                    placeholder.style.display = 'none';
+                                }
+                                pipWindow = null;
+                                manualToggle = false;
+
+                                // Clean up checks
+                                if (player && typeof player.resize === 'function') {
+                                    setTimeout(() => player.resize(), 50);
+                                }
+  0 94126    0   804  100    10   
+1435     17  0:01:05 --:--:--  
+0:01:05  1458
+100 94126  100 94116  100    10    
+99k     10  0:00:01 --:--:--  0:00:01 
+ 100k
+* Connection #0 to host 
+somosunn.com.br:443 left intact
+                            });
+
+                            return true;
+                        } catch (err) {
+                            console.error('Failed to open Document PiP:', err);
+                            return false;
+                        }
+                    }
+
+                    async function setFloating(on) {
+                        if (disabled && !manualToggle) on = false;
+
+                        if (on) {
+                            // Priority 1: Document PiP (New Window + Watermark)
+                            // Only triggered via manual toggle
+                            if (manualToggle && 'documentPictureInPicture' in window) {
+                                if (!pipWindow) {
+                                    const success = await enterDocumentPiP();
+                                    if (success) return;
+                                } else {
+                                    return; // Already open
+                                }
+                            }
+
+                            // Fallback: In-Page Float (Classic)
+                            // Used if Document PiP fails OR if it is an auto-scroll trigger
+                            if (!pipWindow && !host.classList.contains('unn-video-float')) {
+                                const rect = host.getBoundingClientRect();
+                                placeholder.style.height = rect.height + 'px';
+                                placeholder.style.display = 'block';
+                                host.classList.add('unn-video-float');
+                            }
+                        } else {
+                            // Turn Off
+                            if (pipWindow) {
+                                pipWindow.close(); // This triggers pagehide which restores elements
+                            } else if (host.classList.contains('unn-video-float')) {
+                                host.classList.remove('unn-video-float');
+                                placeholder.style.display = 'none';
+                            }
+                        }
+
+                        try {
+                            if (player && typeof player.resize === 'function') {
+                                player.resize();
+                            }
+                        } catch (e) { /* ignore */ }
+                    }
+
+                    // Expose toggle capability to the wrapper for external buttons
+                    // ALWAYS attach to the host we are passed, because that is what the button uses.
+                    host.toggleFloating = function () {
+                        console.log('UNN Video: toggleFloating called');
+                        // If we are in PiP window, toggle means close it
+                        if (pipWindow) {
+                            manualToggle = false;
+                            disabled = false;
+                            setFloating(false);
+                        } else {
+                            manualToggle = !host.classList.contains('unn-video-float');
+                            disabled = !manualToggle;
+                            setFloating(manualToggle);
+                        }
+                    };
+
+                    // For backward compatibility or if something else looks for it on the wrapper
+                    if (host !== host.querySelector('[data-unn-video-player]')) {
+                        const wrapper = host.querySelector('[data-unn-video-player]');
+                        if (wrapper) {
+                            wrapper.toggleFloating = host.toggleFloating;
+                        }
+                    }
+
+                    if ('IntersectionObserver' in window) {
+                        const observer = new IntersectionObserver(function (entries) {
+                            for (const entry of entries) {
+                                // Auto-float (In-Page) only if not manually disabled and not in PiP window
+                                if (!manualToggle && !pipWindow) {
+                                    setFloating(!entry.isIntersecting);
+                                }
+                            }
+                        }, { threshold: 0.15 });
+                        observer.observe(host);
+                    } else {
+                        const onScroll = function () {
+                            if (manualToggle || pipWindow) return;
+                            const rect = host.getBoundingClientRect();
+                            const inView = rect.bottom > 100 && rect.top < (window.innerHeight - 100);
+                            setFloating(!inView);
+                        };
+                        window.addEventListener('scroll', onScroll, { passive: true });
+                        onScroll();
+                    }
+                }
+
+                function initAll() {
+                    document.querySelectorAll('[data-unn-video-player]').forEach(initOne);
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initAll);
+                } else {
+                    initAll();
+                }
+            })();
+        </script>
+    
+    <!-- jQuery (necess├írio para Toastr e plugins do painel) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Toastr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
+    <script>
+        toastr.options = { positionClass: 'toast-top-right', timeOut: 4000, progressBar: true };
+                                            </script>
+
+    
+            <script>
+                        if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(function () { console.log('Service Worker registrado'); })
+                    .catch(function (err) { console.error('SW erro:', err); });
+            }
+
+            let deferredPrompt;
+
+            const showInstallModal = () => {
+                if (document.getElementById('pwa-install-modal')) return;
+
+                const modal = document.createElement('div');
+                modal.id = 'pwa-install-modal';
+                modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-fade-in';
+
+                modal.innerHTML = `
+                                    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center relative transform transition-all scale-100">
+                                        <div class="flex justify-center mb-6">
+                                            <img src="https://somosunn.com.br/uploads/imagens/frontend/69823308659c82.02961438.png" alt="Logo" class="h-16 object-contain">
+                                        </div>
+
+                                        <h3 class="text-xl font-bold text-slate-900 mb-3">Instale nosso aplicativo!</h3>
+                                        <p class="text-slate-600 text-sm mb-8 leading-relaxed">
+                                            Tenha acesso mais r├ípido e use mesmo offline! Instale nosso app diretamente na sua tela inicial.
+                                        </p>
+
+                                        <div class="flex flex-col gap-3">
+                                            <button id="pwa-install-btn" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all">
+                                                Instalar Agora
+                                            </button>
+                                            <button id="pwa-dismiss-btn" class="w-full py-3 px-4 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-colors">
+                                                Mais tarde
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+
+                document.body.appendChild(modal);
+
+                // Anima├º├úo de entrada
+                requestAnimationFrame(() => {
+                    modal.querySelector('div').classList.add('scale-100');
+                    modal.querySelector('div').classList.remove('scale-95');
+                });
+
+                document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+                    if (!deferredPrompt) return;
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log('User response to the install prompt: ' + outcome);
+                    deferredPrompt = null;
+                    removeModal();
+                });
+
+                document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
+                    removeModal();
+                    // Opcional: Salvar em cookie/localStorage para n├úo mostrar novamente por X dias
+                });
+
+                function removeModal() {
+                    modal.classList.add('opacity-0');
+                    setTimeout(() => modal.remove(), 300);
+                }
+            };
+
+            window.showInstallModal = showInstallModal;
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Impede que o Chrome mostre o prompt nativo automaticamente (para mobile principalmente)
+                e.preventDefault();
+                // Guarda o evento para acionar depois
+                deferredPrompt = e;
+
+                // S├│ mostra se o prompt estiver ativado globalmente
+                const promptEnabled = true;
+                if (!promptEnabled) return;
+
+                // Verifica o snooze (adiamento)
+                const snoozeUntil = localStorage.getItem('pwa_install_snooze_until');
+                if (snoozeUntil && new Date().getTime() < parseInt(snoozeUntil)) {
+                    console.log('PWA: Prompt ignorado devido ao temporizador de adiamento.');
+                    return;
+                }
+
+                // Mostra o modal customizado com pequeno delay para garantir que a p├ígina carregou
+                setTimeout(showInstallModal, 2000);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (e.target.id === 'pwa-dismiss-btn') {
+                    const days = 3;
+                    const until = new Date().getTime() + (days * 24 * 60 * 60 * 1000);
+                    localStorage.setItem('pwa_install_snooze_until', until.toString());
+                    console.log(`PWA: Instalac├úo adiada por ${days} dias.`);
+                }
+            });
+        </script>
+        
+    </body>
+
+</html>
