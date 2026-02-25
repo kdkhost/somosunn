@@ -14,7 +14,7 @@
                     pedidos de prêmios.</p>
             </div>
 
-            <a href="{{ route('redemptions.shop') }}"
+            <a href="{{ route('panel.redemptions.shop') }}"
                 class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95">
                 <i class="fas fa-store"></i>
                 Voltar para a Loja
@@ -109,7 +109,7 @@
                                         não realizou nenhum resgate.</p>
                                     <p class="text-slate-400 dark:text-slate-600 text-sm mt-1 transition-colors">Comece a
                                         acumular pontos para ganhar prêmios!</p>
-                                    <a href="{{ route('redemptions.shop') }}"
+                                    <a href="{{ route('panel.redemptions.shop') }}"
                                         class="inline-flex mt-6 text-blue-600 dark:text-blue-400 font-black hover:underline transition-all">Ver
                                         Itens Disponíveis</a>
                                 </td>

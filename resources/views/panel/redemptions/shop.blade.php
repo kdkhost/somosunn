@@ -13,7 +13,7 @@
                 </h1>
                 <p class="text-slate-500 dark:text-slate-400 mt-1 font-medium transition-colors">Use seus pontos acumulados para resgatar prêmios, cursos e mentorias.</p>
             </div>
-            <a href="{{ route('redemptions.history') }}" 
+            <a href="{{ route('panel.redemptions.history') }}" 
                class="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-6 py-3 rounded-2xl font-bold transition-all active:scale-95 border border-slate-200 dark:border-slate-700 transition-colors shrink-0">
                 <i class="fas fa-history"></i>
                 Meus Resgates
@@ -65,7 +65,7 @@
                         </span>
                     </div>
 
-                    <form action="{{ route('redemptions.redeem', $item) }}" method="POST" class="redeem-form">
+                    <form action="{{ route('panel.redemptions.redeem', $item) }}" method="POST" class="redeem-form">
                         @csrf
                         <button type="button" 
                                 class="w-full py-4 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2 btn-redeem
