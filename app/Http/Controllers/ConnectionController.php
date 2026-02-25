@@ -80,11 +80,27 @@ class ConnectionController extends Controller
             'responded_at' => now()
         ]);
 
+        // Cria conversa privada se não existir
+        $me = Auth::user();
+        $conversation = $me->conversations()->whereHas('users', function ($q) use ($user) {
+            $q->where('users.id', $user->id);
+        })->get()->filter(function ($c) {
+            return $c->users()->count() == 2;
+        })->first();
+
+        if (!$conversation) {
+            $conversation = \App\Models\Conversation::create([
+                'type' => 'private',
+                'title' => $user->name
+            ]);
+            $conversation->users()->attach([$me->id, $user->id]);
+        }
+
         // Notificar quem solicitou que foi aceito
         $user->notify(new \App\Notifications\AppNotification([
-            'message' => Auth::user()->name . ' aceitou seu pedido de conexão!',
+            'message' => $me->name . ' aceitou seu pedido de conexão!',
             'type' => 'ConnectionAccepted',
-            'action_url' => route('chat.index'),
+            'action_url' => route('chat.show', $conversation->id),
             'action_label' => 'Conversar agora'
         ]));
 
