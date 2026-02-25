@@ -465,12 +465,11 @@
             height: auto;
         }
 
-        /* Iframes de conteúdo (YouTube, Vimeo etc) ficam responsivos,
-           mas iframes de SDKs de pagamento NÃO devem ter height:auto
-           pois isso quebra o layout interno (MercadoPago Brick, etc.) */
-        iframe:not([id*="mercadopago"]):not([id*="paymentBrick"]):not([name*="mp"]):not([src*="mercadopago"]) {
+        /* Iframes NAO devem ter height:auto — iframes nao se redimensionam
+           automaticamente como imagens, e height:auto resulta em 0px para
+           iframes cross-origin (como o MercadoPago Brick), quebrando o layout. */
+        iframe {
             max-width: 100%;
-            height: auto;
         }
 
         .max-w-7xl,
@@ -1409,11 +1408,11 @@
                                 btn.setAttribute('aria-label', 'Mini Player');
                                 // Icon (PiP icon)
                                 btn.innerHTML = `
-                                                <svg aria-hidden="true" focusable="false" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" class="plyr__icon">
-                                                    <path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z"></path>
-                                                </svg>
-                                                <span class="plyr__sr-only">Mini Player</span>
-                                             `;
+                                                    <svg aria-hidden="true" focusable="false" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" class="plyr__icon">
+                                                        <path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z"></path>
+                                                    </svg>
+                                                    <span class="plyr__sr-only">Mini Player</span>
+                                                 `;
 
                                 // Insert in correct position
                                 // Ideally we find where 'toggle-floating' is in options.controls and place it accordingly relative to others
@@ -1510,11 +1509,11 @@
                             // Specific adjustments for PiP window
                             const style = document.createElement('style');
                             style.textContent = `
-                                            body { margin: 0; display: flex; justify-content: center; align-items: center; background: #000; height: 100vh; overflow: hidden; }
-                                            .unn-video-player { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; }
-                                            .unn-video-float-close { display: none !important; } /* Hide close button in window */
-                                            .unn-video-watermark { --unn-wm-margin: 8px !important; min-width: 40px; }
-                                         `;
+                                                body { margin: 0; display: flex; justify-content: center; align-items: center; background: #000; height: 100vh; overflow: hidden; }
+                                                .unn-video-player { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; }
+                                                .unn-video-float-close { display: none !important; } /* Hide close button in window */
+                                                .unn-video-watermark { --unn-wm-margin: 8px !important; min-width: 40px; }
+                                             `;
                             pipWindow.document.head.appendChild(style);
 
                             // Move player to PiP window
@@ -1670,7 +1669,7 @@
 
     @if ($pwaEnabled)
         <script>
-                                if ('serviceWorker' in navigator) {
+                                    if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(function () { console.log('Service Worker registrado'); })
                     .catch(function (err) { console.error('SW erro:', err); });
@@ -1686,26 +1685,26 @@
                 modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-fade-in';
 
                 modal.innerHTML = `
-                                            <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center relative transform transition-all scale-100">
-                                                <div class="flex justify-center mb-6">
-                                                    <img src="{{ $logo }}" alt="Logo" class="h-16 object-contain">
-                                                </div>
+                                                <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center relative transform transition-all scale-100">
+                                                    <div class="flex justify-center mb-6">
+                                                        <img src="{{ $logo }}" alt="Logo" class="h-16 object-contain">
+                                                    </div>
 
-                                                <h3 class="text-xl font-bold text-slate-900 mb-3">Instale nosso aplicativo!</h3>
-                                                <p class="text-slate-600 text-sm mb-8 leading-relaxed">
-                                                    Tenha acesso mais rápido e use mesmo offline! Instale nosso app diretamente na sua tela inicial.
-                                                </p>
+                                                    <h3 class="text-xl font-bold text-slate-900 mb-3">Instale nosso aplicativo!</h3>
+                                                    <p class="text-slate-600 text-sm mb-8 leading-relaxed">
+                                                        Tenha acesso mais rápido e use mesmo offline! Instale nosso app diretamente na sua tela inicial.
+                                                    </p>
 
-                                                <div class="flex flex-col gap-3">
-                                                    <button id="pwa-install-btn" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all">
-                                                        Instalar Agora
-                                                    </button>
-                                                    <button id="pwa-dismiss-btn" class="w-full py-3 px-4 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-colors">
-                                                        Mais tarde
-                                                    </button>
+                                                    <div class="flex flex-col gap-3">
+                                                        <button id="pwa-install-btn" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all">
+                                                            Instalar Agora
+                                                        </button>
+                                                        <button id="pwa-dismiss-btn" class="w-full py-3 px-4 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-colors">
+                                                            Mais tarde
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        `;
+                                            `;
 
                 document.body.appendChild(modal);
 
