@@ -43,7 +43,7 @@ class EnsureConnectionIsAccepted
                 if ($request->expectsJson() || $request->ajax()) {
                     return response()->json(['message' => 'Você precisa de uma conexão aceita para conversar com este membro.'], 403);
                 }
-                return redirect()->route('portal')->with('error', 'Você precisa de uma conexão aceita para conversar com este membro.');
+                return redirect()->route('chat.index')->with('error', 'Você precisa de uma conexão aceita para conversar com este membro.');
             }
         }
 
@@ -61,7 +61,7 @@ class EnsureConnectionIsAccepted
                 if ($request->expectsJson() || $request->ajax()) {
                     return response()->json(['message' => 'Solicite uma conexão primeiro.'], 403);
                 }
-                return redirect()->route('portal')->with('error', 'Solicite uma conexão primeiro.');
+                return redirect()->route('chat.index')->with('error', 'Solicite uma conexão primeiro.');
             }
         }
 
