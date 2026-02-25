@@ -68,7 +68,7 @@ class Setting extends Model
      */
     public static function getUrl(string $key, ?string $default = ''): string
     {
-        $val = static::get($key);
+        $val = (string) static::get($key, '');
         if (!$val) {
             return (string) $default;
         }
@@ -77,18 +77,33 @@ class Setting extends Model
             return $val;
         }
 
+        $val = str_replace('\\', '/', trim($val));
+        if (str_starts_with($val, 'public/')) {
+            $val = ltrim(substr($val, strlen('public/')), '/');
+        }
+
         // Se o valor já começar com 'storage/', usa direto no asset
         if (str_starts_with($val, 'storage/')) {
+            if (!file_exists(public_path($val))) {
+                return (string) $default;
+            }
             return asset($val);
         }
 
         // Se começar com 'uploads/', é provável que esteja na raiz pública (legacy ou custom)
         if (str_starts_with($val, 'uploads/')) {
+            if (!file_exists(public_path($val))) {
+                return (string) $default;
+            }
             return asset($val);
         }
 
         // Fallback genérico para storage (padrão Laravel)
-        return asset('storage/' . $val);
+        $storagePath = 'storage/' . ltrim($val, '/');
+        if (!file_exists(public_path($storagePath))) {
+            return (string) $default;
+        }
+        return asset($storagePath);
     }
 
     public static function flushRuntimeCache(): void

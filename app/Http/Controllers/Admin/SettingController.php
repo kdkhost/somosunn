@@ -571,14 +571,17 @@ class SettingController extends Controller
 
     private function replaceFile($key, $newPath)
     {
-        $this->removeFile($key);
+        $this->removeFile($key, false);
         Setting::updateOrCreate(['key' => $key], ['value' => $newPath]);
     }
 
-    private function removeFile($key)
+    private function removeFile($key, bool $clearSetting = true)
     {
         $old = Setting::where('key', $key)->value('value');
         if (!$old) {
+            if ($clearSetting) {
+                Setting::updateOrCreate(['key' => $key], ['value' => '']);
+            }
             return;
         }
         $paths = [
@@ -589,6 +592,9 @@ class SettingController extends Controller
             if ($path && file_exists($path)) {
                 @unlink($path);
             }
+        }
+        if ($clearSetting) {
+            Setting::updateOrCreate(['key' => $key], ['value' => '']);
         }
     }
 
@@ -1013,13 +1019,16 @@ class SettingController extends Controller
             $file = $request->file('file');
             $key = $request->input('key');
 
-            // Define allowed directories based on key prefix or mapping
+            // Define destination folder by setting key
             $directory = 'uploads/imagens/geral';
+            if (in_array($key, ['hero_image', 'site_bg_image', 'logo_front'], true)) {
+                $directory = 'uploads/imagens/frontend';
+            }
             if (str_contains($key, 'marketplace'))
                 $directory = 'uploads/imagens/marketplace';
-            if (str_contains($key, 'hero'))
+            if (str_contains($key, 'marketplace_hero'))
                 $directory = 'uploads/imagens/marketplace/hero';
-            if (str_contains($key, 'exit'))
+            if (str_contains($key, 'marketplace_exit'))
                 $directory = 'uploads/imagens/marketplace/exit';
             if (str_contains($key, 'pwa'))
                 $directory = 'uploads/imagens/pwa';
@@ -1030,7 +1039,7 @@ class SettingController extends Controller
             $path = $this->storePublic($file, $directory);
 
             // Remove old file if exists
-            $this->removeFile($key);
+            $this->removeFile($key, false);
 
             // Update Database
             Setting::updateOrCreate(['key' => $key], ['value' => $path]);
