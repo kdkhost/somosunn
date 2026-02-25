@@ -85,8 +85,8 @@
                     @else
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6 transition-colors">Candidatar-se</h3>
 
-                        <form action="{{ route('jobs.apply.external', $job) }}" method="POST" enctype="multipart/form-data"
-                            class="space-y-4">
+                        <form action="{{ route('panel.jobs.apply.external', $job) }}" method="POST"
+                            enctype="multipart/form-data" class="space-y-4">
                             @csrf
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Seu Currículo
