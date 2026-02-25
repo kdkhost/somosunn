@@ -161,10 +161,18 @@
                         <input type="text" name="marketplace_hero_slide_1_button_text" class="form-control"
                             value="{{ $settings['marketplace_hero_slide_1_button_text'] ?? '' }}">
                     </div>
-                    <div class="form-group mb-0">
+                    <div class="form-group">
                         <label>Botão (URL)</label>
                         <input type="text" name="marketplace_hero_slide_1_button_url" class="form-control"
                             value="{{ $settings['marketplace_hero_slide_1_button_url'] ?? '' }}" placeholder="/marketplace">
+                    </div>
+                    <div class="form-group mb-0">
+                        <label>Abrir link</label>
+                        @php $t1 = $settings['marketplace_hero_slide_1_button_target'] ?? '_self'; @endphp
+                        <select name="marketplace_hero_slide_1_button_target" class="form-control">
+                            <option value="_self"  {{ $t1 === '_self'  ? 'selected' : '' }}>Mesma aba</option>
+                            <option value="_blank" {{ $t1 === '_blank' ? 'selected' : '' }}>Nova guia</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -217,10 +225,18 @@
                         <input type="text" name="marketplace_hero_slide_2_button_text" class="form-control"
                             value="{{ $settings['marketplace_hero_slide_2_button_text'] ?? '' }}">
                     </div>
-                    <div class="form-group mb-0">
+                    <div class="form-group">
                         <label>Botão (URL)</label>
                         <input type="text" name="marketplace_hero_slide_2_button_url" class="form-control"
                             value="{{ $settings['marketplace_hero_slide_2_button_url'] ?? '' }}" placeholder="/marketplace">
+                    </div>
+                    <div class="form-group mb-0">
+                        <label>Abrir link</label>
+                        @php $t2 = $settings['marketplace_hero_slide_2_button_target'] ?? '_self'; @endphp
+                        <select name="marketplace_hero_slide_2_button_target" class="form-control">
+                            <option value="_self"  {{ $t2 === '_self'  ? 'selected' : '' }}>Mesma aba</option>
+                            <option value="_blank" {{ $t2 === '_blank' ? 'selected' : '' }}>Nova guia</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -273,10 +289,18 @@
                         <input type="text" name="marketplace_hero_slide_3_button_text" class="form-control"
                             value="{{ $settings['marketplace_hero_slide_3_button_text'] ?? '' }}">
                     </div>
-                    <div class="form-group mb-0">
+                    <div class="form-group">
                         <label>Botão (URL)</label>
                         <input type="text" name="marketplace_hero_slide_3_button_url" class="form-control"
                             value="{{ $settings['marketplace_hero_slide_3_button_url'] ?? '' }}" placeholder="/marketplace">
+                    </div>
+                    <div class="form-group mb-0">
+                        <label>Abrir link</label>
+                        @php $t3 = $settings['marketplace_hero_slide_3_button_target'] ?? '_self'; @endphp
+                        <select name="marketplace_hero_slide_3_button_target" class="form-control">
+                            <option value="_self"  {{ $t3 === '_self'  ? 'selected' : '' }}>Mesma aba</option>
+                            <option value="_blank" {{ $t3 === '_blank' ? 'selected' : '' }}>Nova guia</option>
+                        </select>
                     </div>
                 </div>
             </div>
