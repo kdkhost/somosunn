@@ -24,6 +24,8 @@ class EnsureUserHasActivePlan
             return $next($request);
         }
 
+        \Log::info('CheckPlan: user ' . $user->id . ' accessing ' . $request->path());
+
         // 2. Admin Bypass
         if ($user->isAdmin()) {
             return $next($request);
