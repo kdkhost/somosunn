@@ -158,13 +158,8 @@
                                         .then(function (r) { return r.json(); })
                                         .then(function (data) {
                                             if (data.success) {
-                                                Swal.fire({
-                                                    icon: 'success',
-                                                    title: 'Candidatura enviada!',
-                                                    text: 'Boa sorte!',
-                                                    timer: 2500,
-                                                    showConfirmButton: false
-                                                }).then(function () { window.location.reload(); });
+                                                toastr.success(data.message || 'Candidatura enviada! Boa sorte!');
+                                                setTimeout(function () { window.location.reload(); }, 2000);
                                             } else {
                                                 btn.disabled = false;
                                                 btn.textContent = 'Enviar Candidatura';
