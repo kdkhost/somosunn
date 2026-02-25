@@ -822,8 +822,12 @@
         @yield('content')
     </main>
 
+    @php
+        $hidePartnersCarousel = request()->routeIs('courses.lessons.show');
+    @endphp
+
     {{-- Parceiros Globais --}}
-    @if($showNavigation)
+    @if($showNavigation && !$hidePartnersCarousel)
         <div class="bg-white py-10">
             <div class="max-w-7xl mx-auto px-4 md:px-6">
                 @include('components.partners-carousel')
