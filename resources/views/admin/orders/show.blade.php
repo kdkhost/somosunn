@@ -103,8 +103,7 @@
                                 gateway.</small>
                         </form>
                     @elseif($order->status === 'pending')
-                        @if($order->status !== 'paid' && $order->status !== 'refunded')
-                            <form action="{{ route('admin.orders.approve_manually', $order->id) }}" method="POST" class="inline-block" id="form-approve-{{ $order->id }}">
+                            <form action="{{ route('admin.orders.approve', $order->id) }}" method="POST" class="inline-block" id="form-approve-{{ $order->id }}">
                                 @csrf
                                 <button type="button" onclick="confirmApprove('{{ $order->id }}')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                                     <i class="fas fa-check mr-1"></i> Aprovar Manualmente (Permuta)
@@ -118,7 +117,6 @@
                                     <i class="fas fa-times mr-1"></i> Cancelar Pedido
                                 </button>
                             </form>
-                        </div>
                     @endif
                     @if($order->status === 'cancelled')
                         <div class="alert alert-warning text-center">
