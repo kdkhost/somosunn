@@ -461,6 +461,8 @@
         (function() {
             const form = document.getElementById('frontend-apply-form');
             if (!form) return;
+            if (form.dataset.uploadInit === '1') return;
+            form.dataset.uploadInit = '1';
 
             const fileInput = document.getElementById('resume_file');
             const dropzone = document.getElementById('resume-dropzone');
@@ -475,6 +477,13 @@
             const csrfToken = '{{ csrf_token() }}';
             const allowed = ['pdf', 'doc', 'docx'];
             let stagedFile = null;
+
+            function openFilePicker() {
+                if (!fileInput) {
+                    return;
+                }
+                fileInput.click();
+            }
 
             function clearFeedback() {
                 feedback.classList.add('hidden');
@@ -589,16 +598,17 @@
 
             if (dropzone && fileInput) {
                 dropzone.addEventListener('click', function(event) {
+                    event.preventDefault();
                     if (event.target.closest('#resume-select-trigger')) {
                         return;
                     }
-                    fileInput.click();
+                    openFilePicker();
                 });
 
                 dropzone.addEventListener('keydown', function(event) {
                     if (event.key === 'Enter' || event.key === ' ') {
                         event.preventDefault();
-                        fileInput.click();
+                        openFilePicker();
                     }
                 });
 
@@ -637,7 +647,8 @@
             if (selectTrigger && fileInput) {
                 selectTrigger.addEventListener('click', function(event) {
                     event.preventDefault();
-                    fileInput.click();
+                    event.stopPropagation();
+                    openFilePicker();
                 });
             }
 
