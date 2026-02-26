@@ -129,7 +129,7 @@
         <input type="checkbox" class="custom-control-input" id="email_queue_schedule_enabled"
             name="email_queue_schedule_enabled" value="1" {{ ($settings['email_queue_schedule_enabled'] ?? 1) ? 'checked' : '' }}>
         <label class="custom-control-label" for="email_queue_schedule_enabled">Ativar processamento automático da fila (scheduler)</label>
-        <small class="form-text text-muted">Requer cron rodando <code>php artisan schedule:run</code>.</small>
+        <small class="form-text text-muted">Funciona com cron do servidor ou com o cron interno do sistema (quando houver tráfego).</small>
     </div>
 
     <hr class="my-4">

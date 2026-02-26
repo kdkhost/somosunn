@@ -193,8 +193,8 @@
                 <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Ativar processamento automático da
                     fila (scheduler)</span>
             </label>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Requer cron rodando `php artisan schedule:run`
-                no servidor.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Funciona com cron do servidor ou com o cron
+                interno do sistema (quando houver tráfego).</p>
         </div>
     </div>
 

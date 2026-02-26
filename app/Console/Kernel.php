@@ -19,7 +19,12 @@ class Kernel extends ConsoleKernel
 
         // Processamento de fila de e-mails (configurável no painel SMTP)
         try {
-            if (\Schema::hasTable('settings') && EmailQueueSettings::shouldQueue() && EmailQueueSettings::scheduleEnabled()) {
+            if (
+                \Schema::hasTable('settings')
+                && EmailQueueSettings::shouldQueue()
+                && EmailQueueSettings::scheduleEnabled()
+                && config('internal_cron.run_queue_worker', true)
+            ) {
                 $connection = EmailQueueSettings::connection();
                 $queue = EmailQueueSettings::queueName();
                 $tries = EmailQueueSettings::tries();
