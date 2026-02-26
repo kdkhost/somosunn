@@ -225,20 +225,80 @@
                                             </a>
                                         </div>
                                     @else
-                                        <p class="text-slate-600 font-semibold mb-6">
-                                            Envie seu curriculo por aqui. O responsavel pela vaga avaliara sua candidatura no painel administrativo dele.
+                                        <p class="text-slate-600 font-semibold mb-8 leading-relaxed">
+                                            Envie seu curriculo por aqui. O responsavel pela vaga avaliara sua candidatura
+                                            no painel administrativo dele.
                                         </p>
 
                                         <form id="frontend-apply-form" data-apply-url="{{ route('jobs.public.apply', $job) }}"
-                                            class="space-y-5">
-                                            <div>
-                                                <label for="resume_file"
-                                                    class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
-                                                    Curriculo (PDF, DOC ou DOCX - max 2MB)
-                                                </label>
-                                                <input id="resume_file" name="resume_file" type="file" accept=".pdf,.doc,.docx"
-                                                    required
-                                                    class="w-full rounded-2xl border-slate-200 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                            class="space-y-6">
+                                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                                <div class="lg:col-span-2">
+                                                    <label for="resume_file"
+                                                        class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-3">
+                                                        Curriculo (PDF, DOC ou DOCX - max 2MB)
+                                                    </label>
+                                                    <input id="resume_file" name="resume_file" type="file" accept=".pdf,.doc,.docx"
+                                                        required class="sr-only">
+
+                                                    <div id="resume-dropzone" tabindex="0" role="button"
+                                                        aria-controls="resume_file"
+                                                        class="group relative rounded-[2rem] border-2 border-dashed border-slate-300 bg-slate-50/80 px-6 py-8 md:px-8 md:py-10 transition-all duration-200 cursor-pointer hover:border-blue-400 hover:bg-blue-50/60 focus:outline-none focus:ring-4 focus:ring-blue-200">
+                                                        <div class="flex flex-col items-center text-center">
+                                                            <div
+                                                                class="w-16 h-16 rounded-2xl bg-blue-600/10 text-blue-600 flex items-center justify-center mb-4">
+                                                                <i class="fas fa-cloud-upload-alt text-2xl"></i>
+                                                            </div>
+                                                            <p class="text-base md:text-lg font-black text-slate-900 mb-1">
+                                                                Arraste e solte seu curriculo aqui
+                                                            </p>
+                                                            <p class="text-sm font-semibold text-slate-500 mb-4">
+                                                                ou selecione o arquivo manualmente
+                                                            </p>
+                                                            <button id="resume-select-trigger" type="button"
+                                                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-sm font-black transition-all">
+                                                                <i class="fas fa-folder-open text-xs"></i> Escolher arquivo
+                                                            </button>
+                                                            <p class="mt-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                                                Formatos aceitos: PDF, DOC e DOCX
+                                                            </p>
+                                                        </div>
+
+                                                        <div id="resume-file-selected"
+                                                            class="hidden mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-left">
+                                                            <div class="flex items-start gap-3">
+                                                                <i class="fas fa-file-alt text-emerald-600 mt-0.5"></i>
+                                                                <div class="min-w-0">
+                                                                    <p id="resume-file-name"
+                                                                        class="text-sm font-black text-emerald-700 truncate"></p>
+                                                                    <p id="resume-file-meta"
+                                                                        class="text-xs font-semibold text-emerald-600 mt-0.5"></p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div
+                                                    class="rounded-[2rem] border border-slate-200 bg-slate-50 p-5 space-y-4">
+                                                    <p class="text-xs font-black uppercase tracking-widest text-slate-500">
+                                                        Dicas para se destacar
+                                                    </p>
+                                                    <ul class="space-y-2 text-sm text-slate-600 font-semibold">
+                                                        <li class="flex items-center gap-2">
+                                                            <i class="fas fa-check-circle text-emerald-500"></i>
+                                                            Arquivo legivel e atualizado.
+                                                        </li>
+                                                        <li class="flex items-center gap-2">
+                                                            <i class="fas fa-check-circle text-emerald-500"></i>
+                                                            Objetivo alinhado com a vaga.
+                                                        </li>
+                                                        <li class="flex items-center gap-2">
+                                                            <i class="fas fa-check-circle text-emerald-500"></i>
+                                                            Carta curta e objetiva.
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
 
                                             <div>
@@ -246,16 +306,17 @@
                                                     class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
                                                     Carta de apresentacao (opcional)
                                                 </label>
-                                                <textarea id="cover_letter" name="cover_letter" rows="5" maxlength="2000"
+                                                <textarea id="cover_letter" name="cover_letter" rows="6" maxlength="2000"
                                                     placeholder="Escreva uma breve apresentacao para o recrutador."
-                                                    class="w-full rounded-2xl border-slate-200 focus:ring-blue-500 focus:border-blue-500 text-sm"></textarea>
+                                                    class="w-full rounded-2xl border-slate-200 bg-slate-50 focus:ring-blue-500 focus:border-blue-500 text-sm leading-relaxed"></textarea>
                                             </div>
 
-                                            <div id="frontend-apply-feedback" class="hidden rounded-2xl px-4 py-3 text-sm font-bold">
+                                            <div id="frontend-apply-feedback"
+                                                class="hidden rounded-2xl px-4 py-3 text-sm font-bold">
                                             </div>
 
                                             <button id="frontend-apply-submit" type="submit"
-                                                class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl btn-primary text-white font-black shadow-xl shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-95">
+                                                class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-2xl btn-primary text-white font-black shadow-xl shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-95">
                                                 Enviar Candidatura <i class="fas fa-paper-plane text-xs"></i>
                                             </button>
                                         </form>
@@ -402,21 +463,115 @@
             if (!form) return;
 
             const fileInput = document.getElementById('resume_file');
+            const dropzone = document.getElementById('resume-dropzone');
+            const selectTrigger = document.getElementById('resume-select-trigger');
+            const selectedFileBox = document.getElementById('resume-file-selected');
+            const selectedFileName = document.getElementById('resume-file-name');
+            const selectedFileMeta = document.getElementById('resume-file-meta');
             const coverLetterInput = document.getElementById('cover_letter');
             const submitButton = document.getElementById('frontend-apply-submit');
             const feedback = document.getElementById('frontend-apply-feedback');
             const applyUrl = form.dataset.applyUrl;
             const csrfToken = '{{ csrf_token() }}';
             const allowed = ['pdf', 'doc', 'docx'];
+            let stagedFile = null;
+
+            function clearFeedback() {
+                feedback.classList.add('hidden');
+                feedback.textContent = '';
+            }
 
             function showFeedback(type, message) {
-                feedback.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'border', 'border-red-200', 'bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+                feedback.classList.remove(
+                    'hidden',
+                    'bg-red-50',
+                    'text-red-700',
+                    'border',
+                    'border-red-200',
+                    'bg-emerald-50',
+                    'text-emerald-700',
+                    'border-emerald-200'
+                );
                 if (type === 'success') {
                     feedback.classList.add('bg-emerald-50', 'text-emerald-700', 'border', 'border-emerald-200');
                 } else {
                     feedback.classList.add('bg-red-50', 'text-red-700', 'border', 'border-red-200');
                 }
                 feedback.textContent = message;
+            }
+
+            function formatFileSize(size) {
+                if (!Number.isFinite(size) || size <= 0) {
+                    return '0 KB';
+                }
+                if (size < 1024) {
+                    return size + ' B';
+                }
+                if (size < 1024 * 1024) {
+                    return (size / 1024).toFixed(1) + ' KB';
+                }
+                return (size / (1024 * 1024)).toFixed(2) + ' MB';
+            }
+
+            function validateFile(file) {
+                if (!file) {
+                    return 'Selecione um curriculo antes de enviar.';
+                }
+
+                const extension = (file.name.split('.').pop() || '').toLowerCase();
+                if (!allowed.includes(extension)) {
+                    return 'Formato invalido. Use PDF, DOC ou DOCX.';
+                }
+
+                if (file.size > (2 * 1024 * 1024)) {
+                    return 'Arquivo muito grande. O limite e 2MB.';
+                }
+
+                return null;
+            }
+
+            function renderSelectedFile(file) {
+                if (!selectedFileBox || !selectedFileName || !selectedFileMeta) {
+                    return;
+                }
+
+                if (!file) {
+                    selectedFileBox.classList.add('hidden');
+                    selectedFileName.textContent = '';
+                    selectedFileMeta.textContent = '';
+                    return;
+                }
+
+                const ext = (file.name.split('.').pop() || '').toUpperCase();
+                selectedFileName.textContent = file.name;
+                selectedFileMeta.textContent = ext + ' - ' + formatFileSize(file.size);
+                selectedFileBox.classList.remove('hidden');
+            }
+
+            function setDropzoneDragging(isDragging) {
+                if (!dropzone) {
+                    return;
+                }
+
+                if (isDragging) {
+                    dropzone.classList.add('border-blue-500', 'bg-blue-50');
+                } else {
+                    dropzone.classList.remove('border-blue-500', 'bg-blue-50');
+                }
+            }
+
+            function assignFileToInput(file) {
+                if (!fileInput || !file) {
+                    return;
+                }
+
+                stagedFile = file;
+                if (typeof DataTransfer !== 'undefined') {
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    fileInput.files = dt.files;
+                }
+                renderSelectedFile(file);
             }
 
             function readFileAsDataURL(file) {
@@ -432,23 +587,87 @@
                 });
             }
 
+            if (dropzone && fileInput) {
+                dropzone.addEventListener('click', function(event) {
+                    if (event.target.closest('#resume-select-trigger')) {
+                        return;
+                    }
+                    fileInput.click();
+                });
+
+                dropzone.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        fileInput.click();
+                    }
+                });
+
+                ['dragenter', 'dragover'].forEach(function(eventName) {
+                    dropzone.addEventListener(eventName, function(event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setDropzoneDragging(true);
+                    });
+                });
+
+                ['dragleave', 'dragend'].forEach(function(eventName) {
+                    dropzone.addEventListener(eventName, function(event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setDropzoneDragging(false);
+                    });
+                });
+
+                dropzone.addEventListener('drop', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setDropzoneDragging(false);
+
+                    const droppedFiles = event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null;
+                    if (!droppedFiles || !droppedFiles.length) {
+                        return;
+                    }
+
+                    const file = droppedFiles[0];
+                    assignFileToInput(file);
+                    clearFeedback();
+                });
+            }
+
+            if (selectTrigger && fileInput) {
+                selectTrigger.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    fileInput.click();
+                });
+            }
+
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    const file = fileInput.files && fileInput.files.length ? fileInput.files[0] : null;
+                    stagedFile = file;
+                    renderSelectedFile(file);
+
+                    if (!file) {
+                        return;
+                    }
+
+                    const validationError = validateFile(file);
+                    if (validationError) {
+                        showFeedback('error', validationError);
+                        return;
+                    }
+
+                    clearFeedback();
+                });
+            }
+
             form.addEventListener('submit', async function(event) {
                 event.preventDefault();
 
-                const file = fileInput.files && fileInput.files.length ? fileInput.files[0] : null;
-                if (!file) {
-                    showFeedback('error', 'Selecione um curriculo antes de enviar.');
-                    return;
-                }
-
-                const extension = (file.name.split('.').pop() || '').toLowerCase();
-                if (!allowed.includes(extension)) {
-                    showFeedback('error', 'Formato invalido. Use PDF, DOC ou DOCX.');
-                    return;
-                }
-
-                if (file.size > (2 * 1024 * 1024)) {
-                    showFeedback('error', 'Arquivo muito grande. O limite e 2MB.');
+                const file = (fileInput.files && fileInput.files.length ? fileInput.files[0] : null) || stagedFile;
+                const validationError = validateFile(file);
+                if (validationError) {
+                    showFeedback('error', validationError);
                     return;
                 }
 
@@ -479,6 +698,8 @@
                     if (response.ok && data && data.success) {
                         showFeedback('success', data.message || 'Candidatura enviada com sucesso!');
                         form.reset();
+                        stagedFile = null;
+                        renderSelectedFile(null);
                         setTimeout(function() {
                             window.location.reload();
                         }, 1200);
