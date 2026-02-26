@@ -256,6 +256,62 @@
                 return y + '-' + mm + '-' + dd + ' ' + hh + ':' + ii;
             }
 
+            function dateToCanonical(date) {
+                if (!(date instanceof Date)) return '';
+                const y = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, '0');
+                const dd = String(date.getDate()).padStart(2, '0');
+                const hh = String(date.getHours()).padStart(2, '0');
+                const ii = String(date.getMinutes()).padStart(2, '0');
+                return y + '-' + mm + '-' + dd + ' ' + hh + ':' + ii;
+            }
+
+            function initBrDatePicker(input, hidden) {
+                if (!(window.flatpickr && input && hidden)) return;
+
+                flatpickr(input, {
+                    enableTime: true,
+                    time_24hr: true,
+                    allowInput: true,
+                    minuteIncrement: 1,
+                    dateFormat: 'd/m/Y H:i',
+                    locale: (window.flatpickr && flatpickr.l10ns && flatpickr.l10ns.pt) ? flatpickr.l10ns.pt : 'default',
+                    onReady: function (_, __, instance) {
+                        const canonical = String(hidden.value || '').trim();
+                        if (!canonical) return;
+                        const parsed = instance.parseDate(canonical, 'Y-m-d H:i');
+                        if (parsed) {
+                            instance.setDate(parsed, true, 'Y-m-d H:i');
+                            hidden.value = dateToCanonical(parsed);
+                        }
+                    },
+                    onChange: function (selectedDates) {
+                        hidden.value = selectedDates[0] ? dateToCanonical(selectedDates[0]) : '';
+                    },
+                    onClose: function (selectedDates, dateStr, instance) {
+                        if (selectedDates[0]) {
+                            hidden.value = dateToCanonical(selectedDates[0]);
+                            return;
+                        }
+
+                        const typed = String(dateStr || '').trim();
+                        if (typed === '') {
+                            hidden.value = '';
+                            return;
+                        }
+
+                        const parsed = instance.parseDate(typed, 'd/m/Y H:i');
+                        if (!parsed) {
+                            showUiError('Data/hora invalida. Use o formato DD/MM/AAAA HH:MM.');
+                            return;
+                        }
+
+                        instance.setDate(parsed, true);
+                        hidden.value = dateToCanonical(parsed);
+                    }
+                });
+            }
+
             function setupDateTimeFields() {
                 const issuedHidden = document.getElementById('issued_at');
                 const dueHidden = document.getElementById('due_at');
@@ -268,6 +324,9 @@
 
                 issuedDisplay.value = canonicalToBr(issuedHidden.value);
                 dueDisplay.value = canonicalToBr(dueHidden.value);
+
+                initBrDatePicker(issuedDisplay, issuedHidden);
+                initBrDatePicker(dueDisplay, dueHidden);
 
                 [issuedDisplay, dueDisplay].forEach(function (field) {
                     field.setAttribute('inputmode', 'numeric');
