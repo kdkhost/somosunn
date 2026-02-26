@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Mail\InvoiceMail;
 use App\Models\Invoice;
 use App\Services\InvoiceService;
+use App\Support\EmailQueueSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -25,6 +26,12 @@ class SendInvoiceEmailJob implements ShouldQueue
     {
         $this->invoiceId = $invoiceId;
         $this->force = $force;
+        $this->onConnection(EmailQueueSettings::connection());
+        $this->onQueue(EmailQueueSettings::queueName());
+
+        if (EmailQueueSettings::shouldQueue() && EmailQueueSettings::delaySeconds() > 0) {
+            $this->delay(now()->addSeconds(EmailQueueSettings::delaySeconds()));
+        }
     }
 
     public function middleware()
@@ -60,4 +67,3 @@ class SendInvoiceEmailJob implements ShouldQueue
         }
     }
 }
-

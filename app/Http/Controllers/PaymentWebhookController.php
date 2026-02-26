@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\Plan;
 use App\Services\CouponService;
 use App\Services\InvoiceService;
+use App\Support\EmailQueueSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -131,7 +132,7 @@ class PaymentWebhookController extends Controller
         app(InvoiceService::class)->issueAndQueueForOrder($order);
 
         if (!$wasPaid || !data_get($order->metadata, 'emails.marketplace_paid_sent_at')) {
-            SendMarketplaceOrderPaidEmailsJob::dispatch((int) $order->id);
+            EmailQueueSettings::dispatch(new SendMarketplaceOrderPaidEmailsJob((int) $order->id));
 
             // Notificar Vendedor (se houver seller_id e não for a plataforma)
             if ($order->seller_id && $order->seller_id !== 'platform') {
@@ -198,7 +199,7 @@ class PaymentWebhookController extends Controller
             app(InvoiceService::class)->issueAndQueueForOrder($order);
 
             if (!$wasPaid || !data_get($order->metadata, 'emails.marketplace_paid_sent_at')) {
-                SendMarketplaceOrderPaidEmailsJob::dispatch((int) $order->id);
+                EmailQueueSettings::dispatch(new SendMarketplaceOrderPaidEmailsJob((int) $order->id));
             }
             break;
         }

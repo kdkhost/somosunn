@@ -2,15 +2,16 @@
 
 namespace App\Services;
 
+use App\Jobs\SendInvoiceEmailJob;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Order;
 use App\Models\Setting;
+use App\Support\EmailQueueSettings;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class InvoiceService
 {
@@ -143,14 +144,15 @@ class InvoiceService
         $invoice->email_queued_at = now();
         $invoice->save();
 
-        if ($sync) {
+        if ($sync || !EmailQueueSettings::shouldQueue()) {
             // Immediate processing (no queue)
-            \App\Jobs\SendInvoiceEmailJob::dispatchSync((int) $invoice->id, $force);
+            SendInvoiceEmailJob::dispatchSync((int) $invoice->id, $force);
             return;
         }
 
         $dispatch = function () use ($invoice, $force) {
-            \App\Jobs\SendInvoiceEmailJob::dispatch((int) $invoice->id, $force);
+            $job = new SendInvoiceEmailJob((int) $invoice->id, $force);
+            dispatch(EmailQueueSettings::applyToQueueable($job));
         };
 
         try {

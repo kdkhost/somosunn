@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\User;
+use App\Support\EmailQueueSettings;
 use App\Services\Mail\SystemMailLayoutData;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,6 +19,12 @@ class WelcomeMail extends Mailable implements ShouldQueue
     public function __construct(User $user)
     {
         $this->user = $user;
+        $this->onConnection(EmailQueueSettings::connection());
+        $this->onQueue(EmailQueueSettings::queueName());
+
+        if (EmailQueueSettings::shouldQueue() && EmailQueueSettings::delaySeconds() > 0) {
+            $this->delay(now()->addSeconds(EmailQueueSettings::delaySeconds()));
+        }
     }
 
     public function build()

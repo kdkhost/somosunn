@@ -8,6 +8,7 @@ use App\Models\MailTemplate;
 use App\Models\Mentorship;
 use App\Models\Order;
 use App\Services\Mail\SystemMailLayoutData;
+use App\Support\EmailQueueSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,6 +29,12 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
     public function __construct(int $orderId)
     {
         $this->orderId = $orderId;
+        $this->onConnection(EmailQueueSettings::connection());
+        $this->onQueue(EmailQueueSettings::queueName());
+
+        if (EmailQueueSettings::shouldQueue() && EmailQueueSettings::delaySeconds() > 0) {
+            $this->delay(now()->addSeconds(EmailQueueSettings::delaySeconds()));
+        }
     }
 
     public function middleware()

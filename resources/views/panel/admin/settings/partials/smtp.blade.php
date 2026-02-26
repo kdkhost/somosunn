@@ -113,6 +113,91 @@
         </div>
     </div>
 
+    <!-- Email Queue Rules -->
+    <div
+        class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 transition-colors">
+        <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2 mb-6">
+            <i class="fas fa-tasks text-blue-500"></i> Regras da Fila de E-mails
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="md:col-span-2">
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Modo
+                    de disparo</label>
+                <select name="email_dispatch_mode"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                    <option value="sync" {{ ($settings['email_dispatch_mode'] ?? 'sync') === 'sync' ? 'selected' : '' }}>Imediato (recomendado)</option>
+                    <option value="queue" {{ ($settings['email_dispatch_mode'] ?? '') === 'queue' ? 'selected' : '' }}>Enfileirado</option>
+                </select>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Imediato evita e-mails presos quando não há
+                    worker ativo.</p>
+            </div>
+            <div>
+                <label
+                    class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Conexão</label>
+                <select name="email_queue_connection"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                    @php($queueConnection = $settings['email_queue_connection'] ?? 'database')
+                    <option value="database" {{ $queueConnection === 'database' ? 'selected' : '' }}>database</option>
+                    <option value="redis" {{ $queueConnection === 'redis' ? 'selected' : '' }}>redis</option>
+                    <option value="sqs" {{ $queueConnection === 'sqs' ? 'selected' : '' }}>sqs</option>
+                    <option value="beanstalkd" {{ $queueConnection === 'beanstalkd' ? 'selected' : '' }}>beanstalkd</option>
+                    <option value="sync" {{ $queueConnection === 'sync' ? 'selected' : '' }}>sync</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Fila
+                    (nome)</label>
+                <input type="text" name="email_queue_name" value="{{ $settings['email_queue_name'] ?? 'emails' }}"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Delay
+                    (seg.)</label>
+                <input type="number" min="0" max="3600" name="email_queue_delay_seconds"
+                    value="{{ $settings['email_queue_delay_seconds'] ?? '0' }}"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+            </div>
+            <div>
+                <label
+                    class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Tentativas</label>
+                <input type="number" min="1" max="10" name="email_queue_tries"
+                    value="{{ $settings['email_queue_tries'] ?? '3' }}"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Timeout
+                    (seg.)</label>
+                <input type="number" min="30" max="900" name="email_queue_timeout"
+                    value="{{ $settings['email_queue_timeout'] ?? '120' }}"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Sleep
+                    (seg.)</label>
+                <input type="number" min="1" max="10" name="email_queue_sleep"
+                    value="{{ $settings['email_queue_sleep'] ?? '1' }}"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <label class="inline-flex items-center gap-3 cursor-pointer">
+                <input type="hidden" name="email_queue_schedule_enabled" value="0">
+                <input type="checkbox" name="email_queue_schedule_enabled" value="1"
+                    {{ ($settings['email_queue_schedule_enabled'] ?? 1) ? 'checked' : '' }}
+                    class="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 dark:bg-slate-900">
+                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Ativar processamento automático da
+                    fila (scheduler)</span>
+            </label>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Requer cron rodando `php artisan schedule:run`
+                no servidor.</p>
+        </div>
+    </div>
+
     <!-- Test Connection -->
     <div
         class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 transition-colors">

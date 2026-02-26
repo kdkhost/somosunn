@@ -287,6 +287,9 @@ class SettingController extends Controller
                 'social_twitter_enabled',
                 'social_linkedin_enabled',
             ],
+            'smtp' => [
+                'email_queue_schedule_enabled',
+            ],
             'system' => ['s3_path_style'],
         ];
 
@@ -434,11 +437,57 @@ class SettingController extends Controller
             's3_bucket',
             's3_url',
             's3_endpoint',
+            'smtp_host',
+            'smtp_port',
+            'smtp_username',
+            'smtp_password',
+            'smtp_encryption',
+            'smtp_from_email',
+            'smtp_from_name',
+            'smtp_cc',
+            'smtp_bcc',
         ] as $key) {
             if (!array_key_exists($key, $data)) {
                 continue;
             }
             $data[$key] = trim((string) $data[$key]);
+        }
+
+        if (array_key_exists('email_dispatch_mode', $data)) {
+            $mode = trim((string) $data['email_dispatch_mode']);
+            $data['email_dispatch_mode'] = in_array($mode, ['sync', 'queue'], true) ? $mode : 'sync';
+        }
+
+        if (array_key_exists('email_queue_connection', $data)) {
+            $connection = trim((string) $data['email_queue_connection']);
+            $allowedConnections = array_keys((array) config('queue.connections', []));
+            $data['email_queue_connection'] = in_array($connection, $allowedConnections, true) ? $connection : 'database';
+        }
+
+        if (array_key_exists('email_queue_name', $data)) {
+            $queueName = preg_replace('/[^a-zA-Z0-9_\-]/', '', trim((string) $data['email_queue_name'])) ?: '';
+            $data['email_queue_name'] = $queueName !== '' ? $queueName : 'emails';
+        }
+
+        foreach ([
+            'email_queue_delay_seconds' => ['min' => 0, 'max' => 3600],
+            'email_queue_tries' => ['min' => 1, 'max' => 10],
+            'email_queue_timeout' => ['min' => 30, 'max' => 900],
+            'email_queue_sleep' => ['min' => 1, 'max' => 10],
+        ] as $key => $limits) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+
+            $raw = trim((string) $data[$key]);
+            if ($raw === '') {
+                $data[$key] = (string) $limits['min'];
+                continue;
+            }
+
+            $value = (int) $raw;
+            $value = max((int) $limits['min'], min((int) $limits['max'], $value));
+            $data[$key] = (string) $value;
         }
 
         if (array_key_exists('recaptcha_v3_min_score', $data)) {

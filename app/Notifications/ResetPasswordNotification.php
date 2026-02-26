@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\MailTemplate;
+use App\Support\EmailQueueSettings;
 use App\Services\Mail\SystemMailLayoutData;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -24,6 +25,12 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
     public function __construct($token)
     {
         $this->token = $token;
+        $this->onConnection(EmailQueueSettings::connection());
+        $this->onQueue(EmailQueueSettings::queueName());
+
+        if (EmailQueueSettings::shouldQueue() && EmailQueueSettings::delaySeconds() > 0) {
+            $this->delay(now()->addSeconds(EmailQueueSettings::delaySeconds()));
+        }
     }
 
     /**
@@ -120,4 +127,3 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
         return [];
     }
 }
-

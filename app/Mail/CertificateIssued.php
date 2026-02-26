@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Certificate;
+use App\Support\EmailQueueSettings;
 use App\Services\Mail\SystemMailLayoutData;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -36,6 +37,12 @@ class CertificateIssued extends Mailable implements ShouldQueue
             : ($certificate->mentorship_id ? 'a mentoria' : ($certificate->event_id ? 'o evento' : 'o conteúdo'));
         $this->itemTitle = (string) ($this->product->title ?? 'UNN');
         $this->url = asset('storage/' . $certificate->pdf_path);
+        $this->onConnection(EmailQueueSettings::connection());
+        $this->onQueue(EmailQueueSettings::queueName());
+
+        if (EmailQueueSettings::shouldQueue() && EmailQueueSettings::delaySeconds() > 0) {
+            $this->delay(now()->addSeconds(EmailQueueSettings::delaySeconds()));
+        }
     }
 
     /**

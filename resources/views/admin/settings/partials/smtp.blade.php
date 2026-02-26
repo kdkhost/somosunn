@@ -73,6 +73,67 @@
 
     <hr class="my-4">
 
+    <h5 class="text-primary mb-3"><i class="fas fa-tasks mr-2"></i> Regras da Fila de E-mails</h5>
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label>Modo de disparo</label>
+            <select name="email_dispatch_mode" class="form-control">
+                <option value="sync" {{ ($settings['email_dispatch_mode'] ?? 'sync') === 'sync' ? 'selected' : '' }}>Imediato (recomendado)</option>
+                <option value="queue" {{ ($settings['email_dispatch_mode'] ?? '') === 'queue' ? 'selected' : '' }}>Enfileirado</option>
+            </select>
+            <small class="form-text text-muted">Imediato evita e-mails presos quando não há worker ativo.</small>
+        </div>
+        <div class="col-md-3 form-group">
+            <label>Conexão</label>
+            @php($queueConnection = $settings['email_queue_connection'] ?? 'database')
+            <select name="email_queue_connection" class="form-control">
+                <option value="database" {{ $queueConnection === 'database' ? 'selected' : '' }}>database</option>
+                <option value="redis" {{ $queueConnection === 'redis' ? 'selected' : '' }}>redis</option>
+                <option value="sqs" {{ $queueConnection === 'sqs' ? 'selected' : '' }}>sqs</option>
+                <option value="beanstalkd" {{ $queueConnection === 'beanstalkd' ? 'selected' : '' }}>beanstalkd</option>
+                <option value="sync" {{ $queueConnection === 'sync' ? 'selected' : '' }}>sync</option>
+            </select>
+        </div>
+        <div class="col-md-3 form-group">
+            <label>Fila (nome)</label>
+            <input type="text" name="email_queue_name" class="form-control"
+                value="{{ $settings['email_queue_name'] ?? 'emails' }}">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 form-group">
+            <label>Delay (seg.)</label>
+            <input type="number" min="0" max="3600" name="email_queue_delay_seconds" class="form-control"
+                value="{{ $settings['email_queue_delay_seconds'] ?? '0' }}">
+        </div>
+        <div class="col-md-3 form-group">
+            <label>Tentativas</label>
+            <input type="number" min="1" max="10" name="email_queue_tries" class="form-control"
+                value="{{ $settings['email_queue_tries'] ?? '3' }}">
+        </div>
+        <div class="col-md-3 form-group">
+            <label>Timeout (seg.)</label>
+            <input type="number" min="30" max="900" name="email_queue_timeout" class="form-control"
+                value="{{ $settings['email_queue_timeout'] ?? '120' }}">
+        </div>
+        <div class="col-md-3 form-group">
+            <label>Sleep (seg.)</label>
+            <input type="number" min="1" max="10" name="email_queue_sleep" class="form-control"
+                value="{{ $settings['email_queue_sleep'] ?? '1' }}">
+        </div>
+    </div>
+
+    <div class="custom-control custom-switch mb-3">
+        <input type="hidden" name="email_queue_schedule_enabled" value="0">
+        <input type="checkbox" class="custom-control-input" id="email_queue_schedule_enabled"
+            name="email_queue_schedule_enabled" value="1" {{ ($settings['email_queue_schedule_enabled'] ?? 1) ? 'checked' : '' }}>
+        <label class="custom-control-label" for="email_queue_schedule_enabled">Ativar processamento automático da fila (scheduler)</label>
+        <small class="form-text text-muted">Requer cron rodando <code>php artisan schedule:run</code>.</small>
+    </div>
+
+    <hr class="my-4">
+
     <h5 class="text-primary mb-3"><i class="fas fa-paper-plane mr-2"></i> Teste de Envio</h5>
     <div class="form-group" style="max-width: 500px;">
         <label>Enviar e-mail de teste para:</label>

@@ -167,7 +167,11 @@ class InvoiceController extends Controller
         $force = $request->boolean('force', true);
         $service->queueInvoiceEmail($invoice, $force);
 
-        return back()->with('success', 'Envio de fatura enfileirado.');
+        $message = \App\Support\EmailQueueSettings::shouldQueue()
+            ? 'Envio de fatura enfileirado.'
+            : 'Fatura enviada com sucesso.';
+
+        return back()->with('success', $message);
     }
 
     public function pdf(Invoice $invoice, InvoiceService $service)

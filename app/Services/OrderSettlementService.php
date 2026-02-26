@@ -10,6 +10,7 @@ use App\Models\EventRegistration;
 use App\Models\Mentorship;
 use App\Models\Order;
 use App\Models\Plan;
+use App\Support\EmailQueueSettings;
 use App\Notifications\AppNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -90,7 +91,7 @@ class OrderSettlementService
         }
 
         if ($sendNotifications && (!$wasPaid || !data_get($order->metadata, 'emails.marketplace_paid_sent_at'))) {
-            SendMarketplaceOrderPaidEmailsJob::dispatch((int) $order->id);
+            EmailQueueSettings::dispatch(new SendMarketplaceOrderPaidEmailsJob((int) $order->id));
             $this->notifyUsers($order);
         }
 

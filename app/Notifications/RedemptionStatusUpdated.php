@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Redemption;
+use App\Support\EmailQueueSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -17,6 +18,12 @@ class RedemptionStatusUpdated extends Notification implements ShouldQueue
     public function __construct(Redemption $redemption)
     {
         $this->redemption = $redemption;
+        $this->onConnection(EmailQueueSettings::connection());
+        $this->onQueue(EmailQueueSettings::queueName());
+
+        if (EmailQueueSettings::shouldQueue() && EmailQueueSettings::delaySeconds() > 0) {
+            $this->delay(now()->addSeconds(EmailQueueSettings::delaySeconds()));
+        }
     }
 
     public function via($notifiable): array

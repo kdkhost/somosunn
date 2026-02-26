@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\MailTemplate;
 use App\Models\Order;
 use App\Models\Setting;
+use App\Support\EmailQueueSettings;
 use App\Services\Mail\SystemMailLayoutData;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,6 +24,12 @@ class OrderAbandonedCart extends Mailable implements ShouldQueue
     public function __construct(Order $order)
     {
         $this->order = $order;
+        $this->onConnection(EmailQueueSettings::connection());
+        $this->onQueue(EmailQueueSettings::queueName());
+
+        if (EmailQueueSettings::shouldQueue() && EmailQueueSettings::delaySeconds() > 0) {
+            $this->delay(now()->addSeconds(EmailQueueSettings::delaySeconds()));
+        }
     }
 
     public function build()
