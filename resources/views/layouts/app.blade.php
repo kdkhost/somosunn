@@ -1677,8 +1677,6 @@
         @endif
     </script>
 
-    @stack('scripts')
-
     @if ($pwaEnabled)
         <script>
                                     if ('serviceWorker' in navigator) {

@@ -269,84 +269,108 @@
             }
 
             document.addEventListener('DOMContentLoaded', function () {
+                if (window.__notificationsPageInit) {
+                    return;
+                }
+                window.__notificationsPageInit = true;
+
                 const container = document.getElementById('notifications-container');
                 const loadMoreBtn = document.getElementById('load-more');
                 const markAllReadBtn = document.getElementById('mark-all-read');
 
                 // Marcar todas como lidas
                 if (markAllReadBtn) {
-                    markAllReadBtn.addEventListener('click', function () {
+                    markAllReadBtn.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        markAllReadBtn.disabled = true;
+
                         fetch('{{ route('notifications.markRead') }}', {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json'
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
                             }
                         })
-                            .then(r => r.json())
+                            .then(r => r.ok ? r.json() : Promise.reject(r))
                             .then(data => {
                                 if (data.success) {
                                     document.querySelectorAll('.is-new-notification').forEach(el => {
                                         el.classList.remove('is-new-notification', 'bg-blue-50/50', 'border-blue-100');
+                                        el.setAttribute('data-read', 'true');
                                         el.querySelector('.unread-dot')?.remove();
                                     });
-                                    toastr.success('Todas as notificações marcadas como lidas');
+                                    toastr.success('Todas as notificacoes marcadas como lidas');
+                                } else {
+                                    toastr.error('Nao foi possivel marcar as notificacoes.');
                                 }
+                            })
+                            .catch(() => {
+                                toastr.error('Nao foi possivel marcar as notificacoes como lidas.');
+                            })
+                            .finally(() => {
+                                markAllReadBtn.disabled = false;
                             });
                     });
                 }
 
                 // Marcar uma como lida
-                container.addEventListener('click', function (e) {
-                    const row = e.target.closest('[data-notification-id]');
-                    if (!row) return;
+                if (container) {
+                    container.addEventListener('click', function (e) {
+                        const row = e.target.closest('[data-notification-id]');
+                        if (!row) return;
 
-                    const id = row.getAttribute('data-notification-id');
-                    const isRead = row.getAttribute('data-read') === 'true';
+                        const id = row.getAttribute('data-notification-id');
+                        const isRead = row.getAttribute('data-read') === 'true';
 
-                    if (!isRead && !e.target.closest('button')) {
-                        fetch(`/notificacoes/read/${id}`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json'
-                            }
-                        });
-                        row.setAttribute('data-read', 'true');
-                        row.classList.remove('is-new-notification', 'bg-blue-50/50', 'border-blue-100');
-                        row.querySelector('.unread-dot')?.remove();
-                    }
-                });
-
-                // Excluir notificação
-                container.addEventListener('click', function (e) {
-                    const deleteBtn = e.target.closest('.delete-notification');
-                    if (!deleteBtn) return;
-
-                    const id = deleteBtn.getAttribute('data-id');
-                    const row = document.querySelector(`[data-notification-id="${id}"]`);
-
-                    if (confirm('Deseja remover esta notificação?')) {
-                        fetch(`/notificacoes/${id}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json'
-                            }
-                        })
-                            .then(r => r.json())
-                            .then(data => {
-                                if (data.success) {
-                                    row.style.opacity = '0';
-                                    row.style.transform = 'translateX(20px)';
-                                    setTimeout(() => row.remove(), 300);
+                        if (!isRead && !e.target.closest('button')) {
+                            fetch(`/notificacoes/read/${id}`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
                                 }
                             });
-                    }
-                });
+                            row.setAttribute('data-read', 'true');
+                            row.classList.remove('is-new-notification', 'bg-blue-50/50', 'border-blue-100');
+                            row.querySelector('.unread-dot')?.remove();
+                        }
+                    });
+                }
+
+                // Excluir notificação
+                if (container) {
+                    container.addEventListener('click', function (e) {
+                        const deleteBtn = e.target.closest('.delete-notification');
+                        if (!deleteBtn) return;
+
+                        const id = deleteBtn.getAttribute('data-id');
+                        const row = document.querySelector(`[data-notification-id="${id}"]`);
+
+                        if (confirm('Deseja remover esta notificacao?')) {
+                            fetch(`/notificacoes/${id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            })
+                                .then(r => r.json())
+                                .then(data => {
+                                    if (data.success && row) {
+                                        row.style.opacity = '0';
+                                        row.style.transform = 'translateX(20px)';
+                                        setTimeout(() => row.remove(), 300);
+                                    }
+                                });
+                        }
+                    });
+                }
 
                 // Paginação AJAX
-                if (loadMoreBtn) {
+                if (loadMoreBtn && container) {
                     loadMoreBtn.addEventListener('click', function () {
                         const page = this.getAttribute('data-page');
                         const url = new URL(window.location.href);
@@ -364,10 +388,15 @@
                                     loadMoreBtn.remove();
                                 } else {
                                     container.insertAdjacentHTML('beforeend', html);
-                                    this.setAttribute('data-page', parseInt(page) + 1);
+                                    this.setAttribute('data-page', parseInt(page, 10) + 1);
                                     this.disabled = false;
-                                    this.textContent = 'Carregando mais...';
+                                    this.textContent = 'Carregar mais';
                                 }
+                            })
+                            .catch(() => {
+                                this.disabled = false;
+                                this.textContent = 'Carregar mais';
+                                toastr.error('Nao foi possivel carregar mais notificacoes.');
                             });
                     });
                 }
