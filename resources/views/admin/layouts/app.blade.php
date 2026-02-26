@@ -488,6 +488,75 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
     @include('admin.partials.notifications')
     @include('admin.partials.chat-widget')
+
+    <style>
+        .admin-back-to-top {
+            position: fixed;
+            right: 1rem;
+            bottom: 6.3rem;
+            width: 44px;
+            height: 44px;
+            border: 0;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            z-index: 1055;
+            opacity: 0;
+            transform: translateY(8px);
+            pointer-events: none;
+            transition: opacity .2s ease, transform .2s ease, box-shadow .2s ease;
+            background: linear-gradient(135deg, #1F5EDB, #177FD6, #1D3FC4);
+            box-shadow: 0 12px 26px rgba(31, 94, 219, .32);
+        }
+
+        .admin-back-to-top:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 30px rgba(31, 94, 219, .38);
+        }
+
+        .admin-back-to-top.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px) {
+            .admin-back-to-top {
+                right: .85rem;
+                bottom: 5.8rem;
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+    <button type="button" id="adminBackToTop" class="admin-back-to-top" aria-label="Voltar ao topo" title="Voltar ao topo">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+    <script>
+        (function () {
+            const button = document.getElementById('adminBackToTop');
+            if (!button) return;
+
+            const onScroll = function () {
+                if (window.scrollY > 420) {
+                    button.classList.add('is-visible');
+                } else {
+                    button.classList.remove('is-visible');
+                }
+            };
+
+            button.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
+    </script>
+
     @stack('scripts')
     <script>
         window.showSuccess = function (msg) {

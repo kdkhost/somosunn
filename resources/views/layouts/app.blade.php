@@ -1780,6 +1780,74 @@
     {{-- Floating Chat Component (persiste entre páginas) --}}
     @include('partials.floating-chat')
 
+    <style>
+        .site-back-to-top {
+            position: fixed;
+            right: 1rem;
+            bottom: 6rem;
+            width: 46px;
+            height: 46px;
+            border: 0;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            z-index: 1040;
+            opacity: 0;
+            transform: translateY(8px);
+            pointer-events: none;
+            transition: opacity .2s ease, transform .2s ease, box-shadow .2s ease;
+            background: linear-gradient(135deg, var(--unn-azul-1, #1F5EDB), var(--unn-azul-2, #177FD6), var(--unn-azul-3, #1D3FC4));
+            box-shadow: 0 12px 24px rgba(31, 94, 219, .35);
+        }
+
+        .site-back-to-top:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 30px rgba(31, 94, 219, .4);
+        }
+
+        .site-back-to-top.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px) {
+            .site-back-to-top {
+                right: .85rem;
+                bottom: 5.5rem;
+                width: 42px;
+                height: 42px;
+            }
+        }
+    </style>
+    <button type="button" id="siteBackToTop" class="site-back-to-top" aria-label="Voltar ao topo" title="Voltar ao topo">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+    <script>
+        (function () {
+            const button = document.getElementById('siteBackToTop');
+            if (!button) return;
+
+            const onScroll = function () {
+                if (window.scrollY > 420) {
+                    button.classList.add('is-visible');
+                } else {
+                    button.classList.remove('is-visible');
+                }
+            };
+
+            button.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
+    </script>
+
     {{-- scripts empilhados pelas views individuais via @push('scripts') --}}
     @stack('scripts')
 </body>

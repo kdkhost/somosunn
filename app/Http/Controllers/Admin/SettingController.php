@@ -290,7 +290,11 @@ class SettingController extends Controller
             'smtp' => [
                 'email_queue_schedule_enabled',
             ],
-            'system' => ['s3_path_style'],
+            'system' => [
+                's3_path_style',
+                'maintenance_enabled',
+                'maintenance_auto_enabled',
+            ],
         ];
 
         $currentGroup = $request->input('current_group', 'general');
@@ -546,6 +550,45 @@ class SettingController extends Controller
                 $data['uploads_storage_disk'] = '';
             } else {
                 $data['uploads_storage_disk'] = in_array($raw, ['public', 's3'], true) ? $raw : 'public';
+            }
+        }
+
+        foreach ([
+            'maintenance_title',
+            'maintenance_subtitle',
+            'maintenance_message',
+            'maintenance_button_label',
+            'maintenance_button_url',
+            'maintenance_contact_email',
+        ] as $key) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+
+            $data[$key] = trim((string) $data[$key]);
+        }
+
+        if (array_key_exists('maintenance_contact_email', $data)) {
+            if ($data['maintenance_contact_email'] !== '' && !filter_var($data['maintenance_contact_email'], FILTER_VALIDATE_EMAIL)) {
+                $data['maintenance_contact_email'] = '';
+            }
+        }
+
+        foreach (['maintenance_start_at', 'maintenance_end_at'] as $key) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+
+            $raw = trim((string) $data[$key]);
+            if ($raw === '') {
+                $data[$key] = '';
+                continue;
+            }
+
+            try {
+                $data[$key] = \Carbon\Carbon::parse($raw)->format('Y-m-d H:i:s');
+            } catch (\Throwable $e) {
+                $data[$key] = '';
             }
         }
 
