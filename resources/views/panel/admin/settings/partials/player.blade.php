@@ -28,12 +28,27 @@
 
             <div>
                 <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Cor Principal</label>
+                @php
+                    $videoPlyrColorRaw = (string) ($settings['video_plyr_color'] ?? ($settings['site_color_primary'] ?? '#1F5EDB'));
+                    $videoPlyrColor = preg_match('/^#[0-9A-Fa-f]{6}$/', $videoPlyrColorRaw) ? strtoupper($videoPlyrColorRaw) : '#1F5EDB';
+                @endphp
                 <div class="flex gap-2">
                     <div class="relative flex-1">
-                        <input type="text" name="video_plyr_color" value="{{ $settings['video_plyr_color'] ?? ($settings['site_color_primary'] ?? '#1F5EDB') }}"
-                               class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white colorpicker-input">
+                        <input type="text" id="video_plyr_color_input" name="video_plyr_color" value="{{ $videoPlyrColor }}"
+                               class="w-full px-4 py-3 pr-14 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white colorpicker-input uppercase tracking-wide"
+                               autocomplete="off" spellcheck="false">
+                        <span id="video_plyr_color_swatch"
+                              class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 inline-flex h-7 w-7 rounded-lg border border-slate-200 dark:border-slate-700 shadow-inner"
+                              style="background-color: {{ $videoPlyrColor }};"></span>
                     </div>
+                    <label for="video_plyr_color_picker"
+                           class="relative inline-flex items-center justify-center w-12 h-12 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer">
+                        <input type="color" id="video_plyr_color_picker" value="{{ $videoPlyrColor }}"
+                               class="absolute inset-0 opacity-0 cursor-pointer">
+                        <i class="fas fa-eye-dropper text-slate-500 dark:text-slate-400"></i>
+                    </label>
                 </div>
+                <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Use o color pick para selecionar a cor.</p>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
@@ -185,6 +200,52 @@
 </div>
 
 <script>
+    (function initColorPick() {
+        const textInput = document.getElementById('video_plyr_color_input');
+        const pickerInput = document.getElementById('video_plyr_color_picker');
+        const swatch = document.getElementById('video_plyr_color_swatch');
+        const fallback = '#1F5EDB';
+
+        if (!textInput || !pickerInput) {
+            return;
+        }
+
+        const normalizeHexColor = (value) => {
+            const cleaned = String(value || '').trim().toUpperCase();
+            const withHash = cleaned.startsWith('#') ? cleaned : `#${cleaned}`;
+            return /^#[0-9A-F]{6}$/.test(withHash) ? withHash : null;
+        };
+
+        const applyColor = (value) => {
+            const valid = normalizeHexColor(value) || fallback;
+            textInput.value = valid;
+            pickerInput.value = valid;
+            if (swatch) {
+                swatch.style.backgroundColor = valid;
+            }
+        };
+
+        applyColor(textInput.value);
+
+        pickerInput.addEventListener('input', function () {
+            applyColor(this.value);
+        });
+
+        textInput.addEventListener('input', function () {
+            const partial = normalizeHexColor(this.value);
+            if (partial) {
+                pickerInput.value = partial;
+                if (swatch) {
+                    swatch.style.backgroundColor = partial;
+                }
+            }
+        });
+
+        textInput.addEventListener('blur', function () {
+            applyColor(this.value);
+        });
+    })();
+
     function previewImage(input, previewId) {
         const file = input.files[0];
         if (file) {
