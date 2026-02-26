@@ -65,11 +65,28 @@
         .dark .note-dropdown-item:hover {
             background-color: #1e293b !important;
         }
+
+        /* Panel New: ensure form readability in dark mode when color utilities are missing */
+        .dark .panel-theme-shell input[class*='dark:bg-slate-']:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']):not([type='file']):not([class*='dark:text-']),
+        .dark .panel-theme-shell textarea[class*='dark:bg-slate-']:not([class*='dark:text-']),
+        .dark .panel-theme-shell select[class*='dark:bg-slate-']:not([class*='dark:text-']) {
+            color: #f8fafc;
+        }
+
+        .dark .panel-theme-shell input[class*='dark:bg-slate-']:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']):not([type='file'])::placeholder,
+        .dark .panel-theme-shell textarea[class*='dark:bg-slate-']::placeholder {
+            color: #64748b;
+            opacity: 1;
+        }
+
+        .dark .panel-theme-shell button[class*='dark:bg-slate-']:not([class*='dark:text-']) {
+            color: #e2e8f0;
+        }
     </style>
 @endprepend
 
 @section('content')
-    <div class="bg-slate-50 dark:bg-slate-950 min-h-screen pb-10 transition-colors duration-300">
+    <div class="panel-theme-shell bg-slate-50 dark:bg-slate-950 min-h-screen pb-10 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16">
 
             {{-- Breadcrumb (Top Navigation) --}}
