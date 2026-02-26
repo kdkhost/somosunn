@@ -113,13 +113,19 @@
                                 gateway.</small>
                         </form>
                     @elseif($order->status === 'pending')
-                            <form action="{{ route('admin.orders.approve', $order->id) }}" method="POST" class="inline-block"
-                                onsubmit="return confirmAction(event, 'Aprovar manualmente?', 'A compra sera aprovada sem pagamento em gateway, com baixa da fatura e envio de e-mails.');">
-                                @csrf
-                                <button type="submit" class="btn btn-success btn-block font-weight-bold">
-                                    <i class="fas fa-check mr-1"></i> Aprovar Manualmente (Permuta)
+                            @if($canManualApprove ?? false)
+                                <form action="{{ route('admin.orders.approve', $order->id) }}" method="POST" class="inline-block"
+                                    onsubmit="return confirmAction(event, 'Aprovar manualmente?', 'A compra sera aprovada sem pagamento em gateway, com baixa da fatura e envio de e-mails.');">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success btn-block font-weight-bold">
+                                        <i class="fas fa-check mr-1"></i> Aprovar Manualmente (Permuta)
+                                    </button>
+                                </form>
+                            @else
+                                <button type="button" class="btn btn-secondary btn-block font-weight-bold" disabled>
+                                    <i class="fas fa-lock mr-1"></i> Aprovacao manual desabilitada
                                 </button>
-                            </form>
+                            @endif
                             <form action="{{ route('admin.orders.cancel', $order->id) }}" method="POST" class="mt-2"
                                 id="form-cancel-{{ $order->id }}"
                                 onsubmit="return confirmAction(event, 'Cancelar pedido?', 'Deseja realmente cancelar este pedido?');">

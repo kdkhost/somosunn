@@ -41,7 +41,7 @@
                 <div class="custom-control custom-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
                     <input type="hidden" name="marketplace_manual_approval_enabled" value="0">
                     <input type="checkbox" class="custom-control-input" id="marketplace_manual_approval_enabled"
-                        name="marketplace_manual_approval_enabled" value="1" {{ ($settings['marketplace_manual_approval_enabled'] ?? 0) ? 'checked' : '' }}>
+                        name="marketplace_manual_approval_enabled" value="1" {{ ($settings['marketplace_manual_approval_enabled'] ?? 1) ? 'checked' : '' }}>
                     <label class="custom-control-label font-weight-bold" for="marketplace_manual_approval_enabled">Habilitar Aprovação Manual (Permuta)</label>
                 </div>
                 <small class="text-muted">Permite admins aprovarem pedidos sem pagamento financeiro (ex: negociação direta/permuta).</small>

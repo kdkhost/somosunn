@@ -65,7 +65,9 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $order->load(['user', 'items', 'invoice', 'manualApprover']);
-        return view('admin.orders.show', compact('order'));
+        $canManualApprove = $this->canCurrentUserApproveManually();
+
+        return view('admin.orders.show', compact('order', 'canManualApprove'));
     }
 
     public function refund(Order $order)
@@ -102,8 +104,7 @@ class OrderController extends Controller
             return back()->with('error', 'Pedido ja esta pago.');
         }
 
-        $manualEnabled = \App\Models\Setting::get('marketplace_manual_approval_enabled', 0);
-        if (!$manualEnabled && !auth()->user()->isSuperAdmin()) {
+        if (!$this->canCurrentUserApproveManually()) {
             return back()->with('error', 'Aprovacao manual desabilitada.');
         }
 
@@ -128,6 +129,16 @@ class OrderController extends Controller
         }
 
         return back()->with('success', 'Pedido aprovado manualmente, fatura baixada e e-mails enviados.');
+    }
+
+    private function canCurrentUserApproveManually(): bool
+    {
+        $manualEnabled = (bool) \App\Models\Setting::get('marketplace_manual_approval_enabled', 1);
+        if ($manualEnabled) {
+            return true;
+        }
+
+        return auth()->check() && auth()->user()->isSuperAdmin();
     }
 
     public function cancel(Order $order)
