@@ -395,6 +395,18 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::get('/mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('mailtemplates.preview');
         Route::post('/mailtemplates/{mailtemplate}/send-preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
 
+        // Internal Cron (new panel)
+        Route::prefix('cron')->name('cron.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Panel\Admin\CronController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Panel\Admin\CronController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Panel\Admin\CronController::class, 'store'])->name('store');
+            Route::get('/{task}/edit', [\App\Http\Controllers\Panel\Admin\CronController::class, 'edit'])->name('edit');
+            Route::put('/{task}', [\App\Http\Controllers\Panel\Admin\CronController::class, 'update'])->name('update');
+            Route::delete('/{task}', [\App\Http\Controllers\Panel\Admin\CronController::class, 'destroy'])->name('destroy');
+            Route::get('/{task}/logs', [\App\Http\Controllers\Panel\Admin\CronController::class, 'logs'])->name('logs');
+            Route::post('/{task}/run', [\App\Http\Controllers\Panel\Admin\CronController::class, 'run'])->name('run');
+        });
+
         // Users Management
         Route::resource('users', \App\Http\Controllers\Panel\Admin\UserController::class);
 

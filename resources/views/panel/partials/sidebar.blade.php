@@ -334,8 +334,8 @@
                     <i class="fas fa-at w-5 opacity-80"></i>
                     E-mails
                 </a>
-                <a href="{{ route('admin.cron.index') }}"
-                    class="{{ $navItemClass(request()->routeIs('admin.cron.*')) }}">
+                <a href="{{ route('panel.admin.cron.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.cron.*')) }}">
                     <i class="fas fa-clock w-5 opacity-80"></i>
                     Cron interno
                 </a>
