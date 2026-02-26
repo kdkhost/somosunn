@@ -6,13 +6,33 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class CourseController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
-        $courses = Course::where('user_id', $user->id)->latest()->get();
+        $courses = Course::query()
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+
+                if (Schema::hasColumn('courses', 'created_by')) {
+                    $query->orWhere('created_by', $user->id);
+                }
+
+                if (trim((string) ($user->name ?? '')) !== '') {
+                    $query->orWhere(function ($fallbackQuery) use ($user) {
+                        $fallbackQuery->where(function ($courseOwnerQuery) {
+                            $courseOwnerQuery->whereNull('user_id')
+                                ->orWhere('user_id', 1);
+                        })
+                            ->where('author_name', trim((string) ($user->name ?? '')));
+                    });
+                }
+            })
+            ->latest()
+            ->get();
         return view('panel.courses.index', compact('courses'));
     }
 
@@ -48,6 +68,9 @@ class CourseController extends Controller
         }
 
         $data['user_id'] = Auth::id();
+        if (Schema::hasColumn('courses', 'created_by')) {
+            $data['created_by'] = Auth::id();
+        }
         Course::create($data);
 
         return redirect()->route('panel.courses.index')->with('success', 'Curso criado com sucesso!');
@@ -83,6 +106,10 @@ class CourseController extends Controller
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/course-thumbs'), $fileName);
             $data['thumbnail'] = 'uploads/course-thumbs/' . $fileName;
+        }
+
+        if (Schema::hasColumn('courses', 'created_by') && empty($course->created_by)) {
+            $data['created_by'] = Auth::id();
         }
 
         $course->update($data);

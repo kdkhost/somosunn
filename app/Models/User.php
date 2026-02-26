@@ -68,6 +68,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Traits\HasRoles;
 use App\Services\ProfilePhotoService;
+use Illuminate\Support\Facades\Schema;
 
 class User extends Authenticatable
 {
@@ -203,7 +204,20 @@ class User extends Authenticatable
 
     public function courses()
     {
+        try {
+            if (Schema::hasColumn((new Course())->getTable(), 'user_id')) {
+                return $this->hasMany(Course::class, 'user_id');
+            }
+        } catch (\Throwable $e) {
+            // Fallback to legacy column below.
+        }
+
         return $this->hasMany(Course::class, 'created_by');
+    }
+
+    public function createdCourses()
+    {
+        return $this->courses();
     }
 
     public function enrollments()

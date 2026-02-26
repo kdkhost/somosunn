@@ -27,7 +27,7 @@ class CourseController extends Controller
 
         // If not superadmin, only show courses created by the user
         if (!Auth::user()->isAdmin()) {
-            $query->where('user_id', Auth::id());
+            $this->applyOwnerFilter($query);
         }
 
         // Search
@@ -79,6 +79,9 @@ class CourseController extends Controller
         // Legacy support
         $data['published'] = ($data['status'] === 'published');
         $data['user_id'] = Auth::id();
+        if (Schema::hasColumn('courses', 'created_by')) {
+            $data['created_by'] = Auth::id();
+        }
 
         // Handle Thumbnail
         if ($request->hasFile('thumbnail')) {
@@ -130,6 +133,9 @@ class CourseController extends Controller
 
         // Legacy support
         $data['published'] = ($data['status'] === 'published');
+        if (Schema::hasColumn('courses', 'created_by') && empty($course->created_by)) {
+            $data['created_by'] = Auth::id();
+        }
 
         // Handle Thumbnail
         if ($request->hasFile('thumbnail')) {
@@ -269,9 +275,48 @@ class CourseController extends Controller
             return;
         }
 
-        if ((int) $course->user_id !== (int) Auth::id()) {
+        $authUserId = (int) Auth::id();
+        $authUserName = trim((string) (Auth::user()->name ?? ''));
+
+        $ownsByUserId = (int) $course->user_id === $authUserId;
+        $ownsByLegacyCreatedBy = false;
+        $ownsByAuthorFallback = false;
+
+        if (Schema::hasColumn('courses', 'created_by')) {
+            $ownsByLegacyCreatedBy = (int) ($course->created_by ?? 0) === $authUserId;
+        }
+
+        if ((empty($course->user_id) || (int) $course->user_id === 1) && $authUserName !== '') {
+            $ownsByAuthorFallback = trim((string) ($course->author_name ?? '')) === $authUserName;
+        }
+
+        if (!$ownsByUserId && !$ownsByLegacyCreatedBy && !$ownsByAuthorFallback) {
             abort(403, 'Você não tem permissão para gerenciar este curso.');
         }
+    }
+
+    protected function applyOwnerFilter($query): void
+    {
+        $authUserId = (int) Auth::id();
+        $authUserName = trim((string) (Auth::user()->name ?? ''));
+
+        $query->where(function ($ownerQuery) use ($authUserId, $authUserName) {
+            $ownerQuery->where('user_id', $authUserId);
+
+            if (Schema::hasColumn('courses', 'created_by')) {
+                $ownerQuery->orWhere('created_by', $authUserId);
+            }
+
+            if ($authUserName !== '') {
+                $ownerQuery->orWhere(function ($fallbackQuery) use ($authUserName) {
+                    $fallbackQuery->where(function ($courseOwnerQuery) {
+                        $courseOwnerQuery->whereNull('user_id')
+                            ->orWhere('user_id', 1);
+                    })
+                        ->where('author_name', $authUserName);
+                });
+            }
+        });
     }
 
     public function reorderLessons(Request $request, Course $course)
