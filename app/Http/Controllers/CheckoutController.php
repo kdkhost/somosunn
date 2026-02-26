@@ -347,9 +347,25 @@ class CheckoutController extends Controller
                 }
             }
 
-        } catch (\Exception $e) {
-            \Log::error('Erro Checkout: ' . $e->getMessage());
-            return response()->json(['error' => 'Erro ao processar: ' . $e->getMessage()], 500);
+        } catch (\Throwable $e) {
+            \Log::error('Erro Checkout', [
+                'message' => $e->getMessage(),
+                'order_id' => $order->id ?? null,
+                'user_id' => Auth::id(),
+                'gateway' => $gateway ?? null,
+            ]);
+
+            $message = trim((string) $e->getMessage());
+            if ($message !== '' && function_exists('iconv')) {
+                $converted = @iconv('UTF-8', 'UTF-8//IGNORE', $message);
+                if (is_string($converted) && $converted !== '') {
+                    $message = $converted;
+                }
+            }
+
+            return response()->json([
+                'error' => $message !== '' ? $message : 'Não foi possível processar o pagamento no momento.'
+            ], 500);
         }
     }
 }

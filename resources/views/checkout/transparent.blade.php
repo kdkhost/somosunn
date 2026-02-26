@@ -251,6 +251,7 @@
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
                                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                 },
                                 body: JSON.stringify({
@@ -258,7 +259,22 @@
                                     formData: formData
                                 })
                             })
-                            .then(response => response.json())
+                            .then(async response => {
+                                const raw = await response.text();
+                                let data = {};
+
+                                try {
+                                    data = raw ? JSON.parse(raw) : {};
+                                } catch (e) {
+                                    throw new Error(`Resposta inválida do servidor (HTTP ${response.status}).`);
+                                }
+
+                                if (!response.ok) {
+                                    throw new Error(data.error || `Erro HTTP ${response.status}`);
+                                }
+
+                                return data;
+                            })
                             .then(data => {
                                 showLoading(false);
                                 if (data.success) {
@@ -280,7 +296,7 @@
                             .catch(error => {
                                 showLoading(false);
                                 console.error('Checkout Error:', error);
-                                toastr.error('Erro de conexão. Tente novamente.');
+                                toastr.error(error.message || 'Erro de conexão. Tente novamente.');
                                 reject();
                             });
                         });

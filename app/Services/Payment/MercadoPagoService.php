@@ -79,19 +79,37 @@ class MercadoPagoService
 
         $calc = $this->calculateTotalAndFee($order, $config);
 
+        $payerEmail = trim((string) ($data['email'] ?? $order->user->email ?? ''));
+        if ($payerEmail === '') {
+            throw new Exception('E-mail do pagador não informado.');
+        }
+
+        $rawName = trim((string) ($data['name'] ?? $order->user->name ?? ''));
+        if ($rawName === '') {
+            $rawName = 'Cliente';
+        }
+        $nameParts = preg_split('/\s+/', $rawName) ?: ['Cliente'];
+        $firstName = $nameParts[0] ?? 'Cliente';
+        $lastName = count($nameParts) > 1 ? implode(' ', array_slice($nameParts, 1)) : 'Cliente';
+
+        $cpf = preg_replace('/\D/', '', (string) ($data['cpf'] ?? $order->user->doc ?? ''));
+        $payer = [
+            'email' => $payerEmail,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+        ];
+        if ($cpf !== '') {
+            $payer['identification'] = [
+                'type' => 'CPF',
+                'number' => $cpf,
+            ];
+        }
+
         $paymentData = [
             'transaction_amount' => $calc['transaction_amount'],
             'description' => $this->orderDescription($order),
             'payment_method_id' => 'pix',
-            'payer' => [
-                'email' => $data['email'] ?? $order->user->email,
-                'first_name' => explode(' ', $data['name'] ?? $order->user->name)[0],
-                'last_name' => collect(explode(' ', $data['name'] ?? $order->user->name))->slice(1)->join(' ') ?: 'User',
-                'identification' => [
-                    'type' => 'CPF',
-                    'number' => preg_replace('/\D/', '', $data['cpf'] ?? $order->user->doc)
-                ]
-            ],
+            'payer' => $payer,
             'external_reference' => (string) $order->id,
             'notification_url' => $this->notificationUrl(),
         ];
@@ -129,19 +147,29 @@ class MercadoPagoService
 
         $calc = $this->calculateTotalAndFee($order, $config);
 
+        $payerEmail = trim((string) ($data['email'] ?? $order->user->email ?? ''));
+        if ($payerEmail === '') {
+            throw new Exception('E-mail do pagador não informado.');
+        }
+
+        $cpf = preg_replace('/\D/', '', (string) ($data['cpf'] ?? $order->user->doc ?? ''));
+        $payer = [
+            'email' => $payerEmail,
+        ];
+        if ($cpf !== '') {
+            $payer['identification'] = [
+                'type' => 'CPF',
+                'number' => $cpf,
+            ];
+        }
+
         $paymentData = [
             'transaction_amount' => $calc['transaction_amount'],
             'token' => $data['token'],
             'description' => $this->orderDescription($order),
             'installments' => (int) $data['installments'],
             'payment_method_id' => $data['payment_method_id'],
-            'payer' => [
-                'email' => $data['email'] ?? $order->user->email,
-                'identification' => [
-                    'type' => 'CPF',
-                    'number' => preg_replace('/\D/', '', $data['cpf'] ?? $order->user->doc)
-                ]
-            ],
+            'payer' => $payer,
             'external_reference' => (string) $order->id,
             'notification_url' => $this->notificationUrl(),
         ];
