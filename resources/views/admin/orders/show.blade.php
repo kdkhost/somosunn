@@ -105,7 +105,7 @@
                     @elseif($order->status === 'pending')
                             <form action="{{ route('admin.orders.approve', $order->id) }}" method="POST" class="inline-block" id="form-approve-{{ $order->id }}">
                                 @csrf
-                                <button type="button" onclick="confirmApprove('{{ $order->id }}')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                                <button type="button" onclick="confirmApprove('{{ $order->id }}')" class="btn btn-success btn-block font-weight-bold">
                                     <i class="fas fa-check mr-1"></i> Aprovar Manualmente (Permuta)
                                 </button>
                             </form>
