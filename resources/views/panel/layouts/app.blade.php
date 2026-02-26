@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@push('styles')
+@prepend('styles')
     <!-- FilePond CSS (local) -->
     <link href="{{ asset('vendor/filepond/filepond.css') }}?v=3" rel="stylesheet">
     <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-image-preview.css') }}?v=3" rel="stylesheet">
@@ -66,7 +66,7 @@
             background-color: #1e293b !important;
         }
     </style>
-@endpush
+@endprepend
 
 @section('content')
     <div class="bg-slate-50 dark:bg-slate-950 min-h-screen pb-10 transition-colors duration-300">
@@ -117,7 +117,7 @@
         </div>
     </div>
 
-    @push('scripts')
+    @prepend('scripts')
         <!-- FilePond JS (local) -->
         <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-image-preview.js') }}?v=3"></script>
         <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-size.js') }}?v=3"></script>
@@ -131,5 +131,5 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
         <!-- Summernote PT-BR lang pack -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-pt-BR.min.js"></script>
-    @endpush
+    @endprepend
 @endsection

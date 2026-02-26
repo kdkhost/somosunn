@@ -816,8 +816,33 @@
                 ]
             };
 
-            $('#fullDescription').summernote(summernoteConfig);
-            $('#lessonContent').summernote(summernoteConfig);
+            const initSummernoteEditors = () => {
+                if (!(window.jQuery && $.fn && $.fn.summernote)) {
+                    return false;
+                }
+
+                ['#fullDescription', '#lessonContent'].forEach((selector) => {
+                    const $field = $(selector);
+                    if (!$field.length || $field.next('.note-editor').length) {
+                        return;
+                    }
+
+                    $field.summernote(summernoteConfig);
+                });
+
+                return true;
+            };
+
+            if (!initSummernoteEditors()) {
+                let attempts = 0;
+                const maxAttempts = 30;
+                const timer = setInterval(() => {
+                    attempts += 1;
+                    if (initSummernoteEditors() || attempts >= maxAttempts) {
+                        clearInterval(timer);
+                    }
+                }, 200);
+            }
 
             // Certificate Editor Logic
             $(document).ready(function () {
