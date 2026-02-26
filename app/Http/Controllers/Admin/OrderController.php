@@ -35,7 +35,7 @@ class OrderController extends Controller
 
         $this->applyPaymentScopeFilter($ordersQuery, $paymentScope);
 
-        $orders = $ordersQuery->paginate(20)->withQueryString();
+        $orders = $ordersQuery->get();
 
         $summaryBaseQuery = Order::query()->where('status', 'paid');
         $this->applySearchFilter($summaryBaseQuery, $search);

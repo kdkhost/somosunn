@@ -145,8 +145,8 @@
         <div class="card-header">
             <h3 class="card-title">Listagem de pedidos</h3>
         </div>
-        <div class="card-body table-responsive p-0">
-            <table class="table table-hover text-nowrap table-striped">
+        <div class="card-body p-0">
+            <table id="orders-table" class="table table-hover table-striped mb-0">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -169,7 +169,7 @@
                             $financialDate = $order->paid_at ?? $order->manual_approved_at ?? $order->created_at;
                         @endphp
                         <tr>
-                            <td>#{{ $order->id }}</td>
+                            <td data-order="{{ (int) $order->id }}">#{{ $order->id }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <img src="{{ $avatarUrl }}" class="img-circle elevation-1 mr-2"
@@ -181,7 +181,9 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="font-weight-bold">R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</td>
+                            <td class="font-weight-bold" data-order="{{ (float) $order->total_amount }}">R$
+                                {{ number_format((float) $order->total_amount, 2, ',', '.') }}
+                            </td>
                             <td>
                                 <span class="badge badge-info mb-1">{{ ucfirst($order->gateway ?: 'manual') }}</span><br>
                                 <small class="text-muted">{{ $order->payment_method ?: 'nao informado' }}</small>
@@ -206,7 +208,9 @@
                                     <span class="badge badge-pill badge-secondary">{{ $order->status }}</span>
                                 @endif
                             </td>
-                            <td>{{ $financialDate ? $financialDate->format('d/m/Y H:i') : '-' }}</td>
+                            <td data-order="{{ $financialDate ? $financialDate->timestamp : 0 }}">
+                                {{ $financialDate ? $financialDate->format('d/m/Y H:i') : '-' }}
+                            </td>
                             <td class="text-right">
                                 <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-primary"
                                     title="Ver Detalhes">
@@ -225,8 +229,51 @@
                 </tbody>
             </table>
         </div>
-        <div class="card-footer clearfix">
-            {{ $orders->links('pagination::bootstrap-4') }}
-        </div>
     </div>
 @endsection
+
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+    <style>
+        #orders-table_wrapper .dataTables_paginate {
+            margin: 0.75rem 0.75rem 0 0;
+        }
+
+        #orders-table_wrapper .dataTables_info {
+            margin: 0.95rem 0 0 0.75rem;
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+
+        #orders-table_wrapper .pagination {
+            margin: 0;
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(function() {
+            $('#orders-table').DataTable({
+                paging: true,
+                ordering: true,
+                info: true,
+                searching: false,
+                lengthChange: false,
+                pageLength: 10,
+                autoWidth: false,
+                order: [
+                    [0, 'desc']
+                ],
+                columnDefs: [
+                    { targets: 7, orderable: false, searchable: false }
+                ],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json'
+                }
+            });
+        });
+    </script>
+@endpush
