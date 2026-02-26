@@ -215,6 +215,29 @@
         <script>
             const csrfToken = '{{ csrf_token() }}';
 
+            async function confirmAction(options = {}) {
+                if (typeof Swal === 'undefined') {
+                    if (window.toastr && typeof window.toastr.warning === 'function') {
+                        window.toastr.warning('Confirmação indisponível no momento.');
+                    } else {
+                        console.warn('SweetAlert2 não disponível para confirmação.');
+                    }
+                    return false;
+                }
+
+                const result = await Swal.fire({
+                    icon: options.icon || 'question',
+                    title: options.title || 'Confirmar',
+                    text: options.text || 'Deseja continuar?',
+                    showCancelButton: true,
+                    confirmButtonText: options.confirmButtonText || 'Confirmar',
+                    cancelButtonText: options.cancelButtonText || 'Cancelar',
+                    reverseButtons: true
+                });
+
+                return !!result.isConfirmed;
+            }
+
             // Sidebar Functions (same as feed)
             function requestInvite(userId) {
                 fetch(`/connect/${userId}`, {
@@ -230,8 +253,14 @@
                 });
             }
 
-            function cancelInvite(userId) {
-                if (!confirm('Cancelar solicitação?')) return;
+            async function cancelInvite(userId) {
+                const confirmed = await confirmAction({
+                    title: 'Cancelar solicitação',
+                    text: 'Cancelar solicitação?',
+                    confirmButtonText: 'Cancelar solicitação'
+                });
+                if (!confirmed) return;
+
                 fetch(`/connection/remove/${userId}`, {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': csrfToken, 'Content-Type': 'application/json' }
@@ -255,8 +284,14 @@
                 });
             }
 
-            function refuseInvite(userId) {
-                if (!confirm('Recusar solicitação?')) return;
+            async function refuseInvite(userId) {
+                const confirmed = await confirmAction({
+                    title: 'Recusar solicitação',
+                    text: 'Recusar solicitação?',
+                    confirmButtonText: 'Recusar'
+                });
+                if (!confirmed) return;
+
                 fetch(`/connection/remove/${userId}`, {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': csrfToken, 'Content-Type': 'application/json' }
@@ -341,31 +376,37 @@
 
                 // Excluir notificação
                 if (container) {
-                    container.addEventListener('click', function (e) {
+                    container.addEventListener('click', async function (e) {
                         const deleteBtn = e.target.closest('.delete-notification');
                         if (!deleteBtn) return;
 
                         const id = deleteBtn.getAttribute('data-id');
                         const row = document.querySelector(`[data-notification-id="${id}"]`);
 
-                        if (confirm('Deseja remover esta notificacao?')) {
-                            fetch(`/notificacoes/${id}`, {
-                                method: 'DELETE',
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                    'Accept': 'application/json',
-                                    'X-Requested-With': 'XMLHttpRequest'
+                        const confirmed = await confirmAction({
+                            title: 'Remover notificação',
+                            text: 'Deseja remover esta notificação?',
+                            confirmButtonText: 'Remover',
+                            icon: 'warning'
+                        });
+                        if (!confirmed) return;
+
+                        fetch(`/notificacoes/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.success && row) {
+                                    row.style.opacity = '0';
+                                    row.style.transform = 'translateX(20px)';
+                                    setTimeout(() => row.remove(), 300);
                                 }
-                            })
-                                .then(r => r.json())
-                                .then(data => {
-                                    if (data.success && row) {
-                                        row.style.opacity = '0';
-                                        row.style.transform = 'translateX(20px)';
-                                        setTimeout(() => row.remove(), 300);
-                                    }
-                                });
-                        }
+                            });
                     });
                 }
 

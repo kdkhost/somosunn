@@ -101,7 +101,9 @@
                                 <td class="px-4 py-3">
                                     <div class="flex items-center justify-end gap-2">
                                         <form method="POST" action="{{ route('panel.admin.cron.run', $task) }}"
-                                            onsubmit="return confirm('Executar esta tarefa agora?');">
+                                            class="js-confirm-action" data-confirm-title="Executar tarefa"
+                                            data-confirm-text="Executar esta tarefa agora?"
+                                            data-confirm-button="Executar">
                                             @csrf
                                             <button type="submit"
                                                 class="inline-flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-2 text-emerald-700 transition hover:bg-emerald-100 dark:border-emerald-800/50 dark:bg-emerald-900/20 dark:text-emerald-300 dark:hover:bg-emerald-900/30"
@@ -123,7 +125,8 @@
                                         </a>
 
                                         <form method="POST" action="{{ route('panel.admin.cron.destroy', $task) }}"
-                                            onsubmit="return confirm('Excluir esta tarefa?');">
+                                            class="js-confirm-action" data-confirm-title="Excluir tarefa"
+                                            data-confirm-text="Excluir esta tarefa?" data-confirm-button="Excluir">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
@@ -148,3 +151,37 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.js-confirm-action').forEach((form) => {
+                if (form.dataset.bound === '1') return;
+                form.dataset.bound = '1';
+
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    if (typeof Swal === 'undefined') {
+                        form.submit();
+                        return;
+                    }
+
+                    Swal.fire({
+                        icon: 'question',
+                        title: form.dataset.confirmTitle || 'Confirmar acao',
+                        text: form.dataset.confirmText || 'Deseja continuar?',
+                        showCancelButton: true,
+                        confirmButtonText: form.dataset.confirmButton || 'Confirmar',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+@endpush

@@ -1168,11 +1168,8 @@
                 }
                 term = String(result.value || '').trim();
             } else {
-                const typed = window.prompt('Pesquisar na conversa:', activeConversationSearchTerm || '');
-                if (typed === null) {
-                    return;
-                }
-                term = String(typed).trim();
+                notifyInfo('Pesquisa indisponivel no momento. Atualize a pagina e tente novamente.');
+                return;
             }
 
             activeConversationSearchTerm = term;

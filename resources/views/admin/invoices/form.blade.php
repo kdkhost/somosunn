@@ -174,7 +174,15 @@
                     window.toastr.error(message);
                     return;
                 }
-                alert(message);
+                if (typeof window.Swal !== 'undefined') {
+                    window.Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: message
+                    });
+                    return;
+                }
+                console.error(message);
             }
 
             function applyMoneyMask(scope) {

@@ -287,7 +287,10 @@
                                                         </button>
                                                         <form method="POST"
                                                             action="{{ route('admin.partners.coupons.destroy', [$partner, $coupon]) }}"
-                                                            onsubmit="return confirm('Remover este cupom?')" class="d-inline">
+                                                            class="d-inline js-swal-confirm"
+                                                            data-confirm-title="Remover cupom"
+                                                            data-confirm-text="Remover este cupom?"
+                                                            data-confirm-button="Remover">
                                                             @csrf @method('DELETE')
                                                             <button type="submit" class="btn btn-xs btn-outline-danger"
                                                                 title="Excluir Cupom">
@@ -428,6 +431,38 @@
                 document.getElementById('edit_active').checked = !!coupon.active;
                 $('#editCouponModal').modal('show');
             }
+        
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.js-swal-confirm').forEach(function (form) {
+                    if (form.dataset.bound === '1') {
+                        return;
+                    }
+                    form.dataset.bound = '1';
+
+                    form.addEventListener('submit', function (event) {
+                        event.preventDefault();
+
+                        if (typeof Swal === 'undefined') {
+                            form.submit();
+                            return;
+                        }
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: form.dataset.confirmTitle || 'Confirmar ação',
+                            text: form.dataset.confirmText || 'Deseja continuar?',
+                            showCancelButton: true,
+                            confirmButtonText: form.dataset.confirmButton || 'Confirmar',
+                            cancelButtonText: 'Cancelar',
+                            reverseButtons: true
+                        }).then(function (result) {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
+                    });
+                });
+            });
         </script>
     @endpush
 @endsection

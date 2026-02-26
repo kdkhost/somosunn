@@ -114,11 +114,17 @@
                         }
                     } catch (err) {
                         console.error('Erro ao remover', err);
-                        // Use toaster if available or alert
+                        // Use toaster/SweetAlert when available (no native alert)
                         if (typeof toastr !== 'undefined') {
                             toastr.error('Erro ao processar solicitação.');
+                        } else if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro',
+                                text: 'Erro ao processar solicitação.'
+                            });
                         } else {
-                            alert('Erro ao processar solicitação.');
+                            console.error('Erro ao processar solicitação.');
                         }
                     }
                 });
