@@ -52,14 +52,14 @@
                             </p>
                         </div>
                     </div>
-                    <div class="relative inline-flex items-center cursor-pointer">
+                    <label for="marketplace_manual_approval_enabled" class="relative inline-flex items-center cursor-pointer">
                         <input type="hidden" name="marketplace_manual_approval_enabled" value="0">
                         <input type="checkbox" name="marketplace_manual_approval_enabled"
                             id="marketplace_manual_approval_enabled" value="1" class="sr-only peer" {{ ($settings['marketplace_manual_approval_enabled'] ?? 1) ? 'checked' : '' }}>
                         <div
                             class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
                         </div>
-                    </div>
+                    </label>
                 </div>
             </div>
         </div>
@@ -79,27 +79,27 @@
                     <p class="text-xs text-slate-500 dark:text-slate-400">Configure os slides da vitrine.</p>
                 </div>
             </div>
-            <div class="relative inline-flex items-center cursor-pointer">
+            <label for="marketplace_hero_enabled" class="relative inline-flex items-center cursor-pointer">
                 <input type="hidden" name="marketplace_hero_enabled" value="0">
                 <input type="checkbox" name="marketplace_hero_enabled" id="marketplace_hero_enabled" value="1"
                     class="sr-only peer" {{ ($settings['marketplace_hero_enabled'] ?? 1) ? 'checked' : '' }}>
                 <div
                     class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
                 </div>
-            </div>
+            </label>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div
                 class="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
-                <div class="relative inline-flex items-center cursor-pointer scale-90">
+                <label for="marketplace_hero_autoplay" class="relative inline-flex items-center cursor-pointer scale-90">
                     <input type="hidden" name="marketplace_hero_autoplay" value="0">
                     <input type="checkbox" name="marketplace_hero_autoplay" id="marketplace_hero_autoplay" value="1"
                         class="sr-only peer" {{ ($settings['marketplace_hero_autoplay'] ?? 1) ? 'checked' : '' }}>
                     <div
                         class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
                     </div>
-                </div>
+                </label>
                 <label class="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer"
                     for="marketplace_hero_autoplay">Autoplay</label>
             </div>
@@ -144,7 +144,7 @@
 
                     <div class="flex gap-2">
                         <button type="button" onclick="document.getElementById('input_{{ $imgKey }}').click()"
-                            class="flex-1 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-[10px] font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                            class="flex-1 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-[10px] font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                             Alterar
                         </button>
                         <input type="file" id="input_{{ $imgKey }}" name="{{ $imgKey }}" class="hidden" accept="image/*"
@@ -160,20 +160,20 @@
                         <input type="text" name="marketplace_hero_slide_{{ $slide }}_title"
                             value="{{ $settings["marketplace_hero_slide_{$slide}_title"] ?? '' }}"
                             placeholder="Título do Slide"
-                            class="w-full px-4 py-2 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 outline-none transition-all text-sm font-bold">
+                            class="w-full px-4 py-2 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 outline-none transition-all text-sm font-bold text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500">
                         <input type="text" name="marketplace_hero_slide_{{ $slide }}_subtitle"
                             value="{{ $settings["marketplace_hero_slide_{$slide}_subtitle"] ?? '' }}"
                             placeholder="Subtítulo/Texto"
-                            class="w-full px-4 py-2 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 outline-none transition-all text-xs font-medium">
+                            class="w-full px-4 py-2 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 outline-none transition-all text-xs font-medium text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500">
                         <div class="grid grid-cols-2 gap-2">
                             <input type="text" name="marketplace_hero_slide_{{ $slide }}_button_text"
                                 value="{{ $settings["marketplace_hero_slide_{$slide}_button_text"] ?? '' }}"
                                 placeholder="Botão"
-                                class="px-3 py-2 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 outline-none transition-all text-[10px] font-bold">
+                                class="px-3 py-2 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 outline-none transition-all text-[10px] font-bold text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500">
                             <input type="text" name="marketplace_hero_slide_{{ $slide }}_button_url"
                                 value="{{ $settings["marketplace_hero_slide_{$slide}_button_url"] ?? '' }}"
                                 placeholder="URL (ex: /shop)"
-                                class="px-3 py-2 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 outline-none transition-all text-[10px] font-medium">
+                                class="px-3 py-2 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 outline-none transition-all text-[10px] font-medium text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500">
                         </div>
                     </div>
                 </div>
@@ -196,14 +196,14 @@
                         saia.</p>
                 </div>
             </div>
-            <div class="relative inline-flex items-center cursor-pointer">
+            <label for="marketplace_exit_enabled" class="relative inline-flex items-center cursor-pointer">
                 <input type="hidden" name="marketplace_exit_enabled" value="0">
                 <input type="checkbox" name="marketplace_exit_enabled" id="marketplace_exit_enabled" value="1"
                     class="sr-only peer" {{ ($settings['marketplace_exit_enabled'] ?? 0) ? 'checked' : '' }}>
                 <div
                     class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
                 </div>
-            </div>
+            </label>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
@@ -213,13 +213,13 @@
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Delay (Segundos)</label>
                         <input type="number" name="marketplace_exit_delay_seconds"
                             value="{{ $settings['marketplace_exit_delay_seconds'] ?? '15' }}" min="0" max="120"
-                            class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 outline-none transition-all text-sm font-medium">
+                            class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 outline-none transition-all text-sm font-medium text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Código Cupom</label>
                         <input type="text" name="marketplace_exit_coupon_code"
                             value="{{ $settings['marketplace_exit_coupon_code'] ?? '' }}" placeholder="EX: SAVE10"
-                            class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 outline-none transition-all text-sm font-bold text-blue-600 uppercase text-center">
+                            class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 outline-none transition-all text-sm font-bold text-blue-600 dark:text-blue-300 uppercase text-center placeholder:text-blue-300 dark:placeholder:text-blue-500">
                     </div>
                 </div>
                 <div>
@@ -227,23 +227,23 @@
                         Popup</label>
                     <input type="text" name="marketplace_exit_title"
                         value="{{ $settings['marketplace_exit_title'] ?? 'Espere! Temos uma oferta pra você' }}"
-                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 outline-none transition-all font-bold">
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 outline-none transition-all font-bold text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Texto da
                         Mensagem</label>
                     <textarea name="marketplace_exit_text" rows="3"
-                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 outline-none transition-all text-sm">{{ $settings['marketplace_exit_text'] ?? 'Use um cupom e ganhe desconto agora mesmo.' }}</textarea>
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 outline-none transition-all text-sm text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500">{{ $settings['marketplace_exit_text'] ?? 'Use um cupom e ganhe desconto agora mesmo.' }}</textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <input type="text" name="marketplace_exit_button_text"
                         value="{{ $settings['marketplace_exit_button_text'] ?? 'Ver ofertas' }}"
                         placeholder="Texto Botão"
-                        class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 outline-none transition-all text-xs font-bold">
+                        class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 outline-none transition-all text-xs font-bold text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500">
                     <input type="text" name="marketplace_exit_button_url"
                         value="{{ $settings['marketplace_exit_button_url'] ?? '/marketplace' }}"
                         placeholder="Link Botão"
-                        class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 outline-none transition-all text-xs">
+                        class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 outline-none transition-all text-xs text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500">
                 </div>
             </div>
 
@@ -262,7 +262,7 @@
                 <div class="flex gap-2">
                     <button type="button"
                         onclick="document.getElementById('input_marketplace_exit_banner_image').click()"
-                        class="flex-1 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        class="flex-1 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                         Escolher Imagem
                     </button>
                     <input type="file" id="input_marketplace_exit_banner_image" name="marketplace_exit_banner_image"
@@ -295,14 +295,14 @@
                     </p>
                 </div>
             </div>
-            <div class="relative inline-flex items-center cursor-pointer">
+            <label for="marketplace_events_popup_enabled" class="relative inline-flex items-center cursor-pointer">
                 <input type="hidden" name="marketplace_events_popup_enabled" value="0">
                 <input type="checkbox" name="marketplace_events_popup_enabled" id="marketplace_events_popup_enabled"
                     value="1" class="sr-only peer" {{ ($settings['marketplace_events_popup_enabled'] ?? 1) ? 'checked' : '' }}>
                 <div
                     class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
                 </div>
-            </div>
+            </label>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">

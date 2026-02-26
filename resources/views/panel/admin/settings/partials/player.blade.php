@@ -10,10 +10,10 @@
                 <p class="text-xs text-slate-500 dark:text-slate-400 text-sm">Ative ou desative o player personalizado para as aulas.</p>
             </div>
         </div>
-        <div class="relative inline-flex items-center cursor-pointer">
+        <label for="video_player_enabled" class="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" name="video_player_enabled" id="video_player_enabled" value="1" class="sr-only peer" {{ ($settings['video_player_enabled'] ?? 1) ? 'checked' : '' }}>
             <div class="w-12 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-        </div>
+        </label>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -72,11 +72,11 @@
                     'video_plyr_disable_context_menu' => 'Bloquear Menu'
                 ] as $name => $label)
                 <div class="flex items-center gap-3">
-                    <div class="relative inline-flex items-center cursor-pointer scale-90">
+                    <label for="{{ $name }}" class="relative inline-flex items-center cursor-pointer scale-90">
                         <input type="hidden" name="{{ $name }}" value="0">
                         <input type="checkbox" name="{{ $name }}" id="{{ $name }}" value="1" class="sr-only peer" {{ ($settings[$name] ?? 0) ? 'checked' : '' }}>
                         <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </div>
+                    </label>
                     <label class="text-xs font-bold text-slate-600 dark:text-slate-400 cursor-pointer" for="{{ $name }}">{{ $label }}</label>
                 </div>
                 @endforeach
@@ -127,11 +127,11 @@
             <div class="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
                 <div class="flex justify-between items-center">
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Marca D'água (Imagem)</label>
-                    <div class="relative inline-flex items-center cursor-pointer scale-75">
+                    <label for="video_watermark_enabled" class="relative inline-flex items-center cursor-pointer scale-75">
                         <input type="hidden" name="video_watermark_enabled" value="0">
                         <input type="checkbox" name="video_watermark_enabled" id="video_watermark_enabled" value="1" class="sr-only peer" {{ ($settings['video_watermark_enabled'] ?? 0) ? 'checked' : '' }}>
                         <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </div>
+                    </label>
                 </div>
 
                 <div class="flex flex-col items-center gap-4">
@@ -159,37 +159,48 @@
             </div>
 
             <!-- Dynamic Text -->
+            @php
+                $watermarkTemplate = trim((string) ($settings['video_watermark_text_template'] ?? ''));
+                $watermarkTemplate = $watermarkTemplate !== '' ? $watermarkTemplate : '{name} - {email}';
+
+                $watermarkOpacity = trim((string) ($settings['video_watermark_opacity'] ?? ''));
+                $watermarkOpacity = $watermarkOpacity !== '' ? $watermarkOpacity : '0.5';
+
+                $watermarkPositionRaw = trim((string) ($settings['video_watermark_position'] ?? ''));
+                $allowedWatermarkPositions = ['top-right', 'top-left', 'bottom-right', 'bottom-left'];
+                $watermarkPosition = in_array($watermarkPositionRaw, $allowedWatermarkPositions, true) ? $watermarkPositionRaw : 'top-right';
+            @endphp
             <div class="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
                 <div class="flex justify-between items-center">
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Marca D'água Dinâmica</label>
-                    <div class="relative inline-flex items-center cursor-pointer scale-75">
+                    <label for="video_watermark_text_enabled" class="relative inline-flex items-center cursor-pointer scale-75">
                         <input type="hidden" name="video_watermark_text_enabled" value="0">
                         <input type="checkbox" name="video_watermark_text_enabled" id="video_watermark_text_enabled" value="1" class="sr-only peer" {{ ($settings['video_watermark_text_enabled'] ?? 0) ? 'checked' : '' }}>
                         <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </div>
+                    </label>
                 </div>
 
                 <div class="space-y-3">
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Template</label>
-                        <input type="text" name="video_watermark_text_template" value="{{ $settings['video_watermark_text_template'] ?? '{name} - {email}' }}"
-                               class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm font-medium">
+                        <input type="text" name="video_watermark_text_template" value="{{ $watermarkTemplate }}"
+                               class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm font-medium text-slate-800 dark:text-white">
                         <p class="text-[10px] text-slate-400 mt-1">Tags: {name}, {email}, {cpf}, {id}</p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Opacidade</label>
-                            <input type="number" step="0.1" name="video_watermark_opacity" value="{{ $settings['video_watermark_opacity'] ?? '0.5' }}"
-                                   class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm font-medium">
+                            <input type="number" step="0.1" name="video_watermark_opacity" value="{{ $watermarkOpacity }}"
+                                   class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm font-medium text-slate-800 dark:text-white">
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Posição</label>
-                            <select name="video_watermark_position" class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm font-medium">
-                                <option value="top-right" {{ ($settings['video_watermark_position'] ?? 'top-right') === 'top-right' ? 'selected' : '' }}>Topo Dir</option>
-                                <option value="top-left" {{ ($settings['video_watermark_position'] ?? '') === 'top-left' ? 'selected' : '' }}>Topo Esq</option>
-                                <option value="bottom-right" {{ ($settings['video_watermark_position'] ?? '') === 'bottom-right' ? 'selected' : '' }}>Inf Dir</option>
-                                <option value="bottom-left" {{ ($settings['video_watermark_position'] ?? '') === 'bottom-left' ? 'selected' : '' }}>Inf Esq</option>
+                            <select name="video_watermark_position" class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm font-medium text-slate-800 dark:text-white">
+                                <option value="top-right" {{ $watermarkPosition === 'top-right' ? 'selected' : '' }}>Topo Dir</option>
+                                <option value="top-left" {{ $watermarkPosition === 'top-left' ? 'selected' : '' }}>Topo Esq</option>
+                                <option value="bottom-right" {{ $watermarkPosition === 'bottom-right' ? 'selected' : '' }}>Inf Dir</option>
+                                <option value="bottom-left" {{ $watermarkPosition === 'bottom-left' ? 'selected' : '' }}>Inf Esq</option>
                             </select>
                         </div>
                     </div>

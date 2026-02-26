@@ -119,11 +119,11 @@
                         </div>
                         <h4 class="font-bold text-slate-800 dark:text-white">{{ $provider['label'] }}</h4>
                     </div>
-                    <div class="relative inline-flex items-center cursor-pointer">
+                    <label for="social_{{ $key }}_enabled" class="relative inline-flex items-center cursor-pointer">
                         <input type="hidden" name="social_{{ $key }}_enabled" value="0">
                         <input type="checkbox" name="social_{{ $key }}_enabled" id="social_{{ $key }}_enabled" value="1" class="sr-only peer" {{ ($settings['social_'.$key.'_enabled'] ?? 0) ? 'checked' : '' }}>
                         <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </div>
+                    </label>
                 </div>
                 <div class="p-6 space-y-4">
                     <div>
