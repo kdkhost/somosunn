@@ -650,10 +650,16 @@
         <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <script>
+            const isExistingCourse = @json($course->exists);
+            const lessonReorderUrl = @json($course->exists ? route('panel.admin.courses.lessons.reorder', $course) : null);
+            const lessonStoreUrl = @json($course->exists ? route('panel.admin.courses.lessons.store', $course) : null);
+            const lessonBaseUrl = @json($course->exists ? url('/admin/courses/' . $course->id . '/lessons') : null);
+            const certificatePreviewUrl = @json($course->exists ? route('panel.admin.courses.certificate.preview', $course) : null);
+
             document.addEventListener('DOMContentLoaded', function () {
                 // Sortable logic for lessons
                 const el = document.getElementById('lessons-list');
-                if (el) {
+                if (el && lessonReorderUrl) {
                     Sortable.create(el, {
                         animation: 150,
                         handle: '.cursor-move',
@@ -664,7 +670,7 @@
                                 order: index + 1
                             }));
 
-                            $.post('{{ route("panel.admin.courses.lessons.reorder", $course) }}', {
+                            $.post(lessonReorderUrl, {
                                 _token: '{{ csrf_token() }}',
                                 lessons: orders
                             }).done(() => {
@@ -700,7 +706,8 @@
             }
 
             function editLesson(id) {
-                $.get('/admin/courses/{{ $course->id }}/lessons/' + id + '/details', function (lesson) {
+                if (!lessonBaseUrl) return;
+                $.get(lessonBaseUrl + '/' + id + '/details', function (lesson) {
                     $('#lessonId').val(id);
                     $('#lessonTitle').val(lesson.title);
                     $('#lessonOrder').val(lesson.order);
@@ -732,8 +739,9 @@
             }
 
             $('#btnSaveLesson').on('click', function () {
+                if (!lessonStoreUrl || !lessonBaseUrl) return;
                 const id = $('#lessonId').val();
-                const url = id ? `/admin/courses/{{ $course->id }}/lessons/${id}` : `{{ route('panel.admin.courses.lessons.store', $course) }}`;
+                const url = id ? `${lessonBaseUrl}/${id}` : lessonStoreUrl;
                 const formData = new FormData(document.getElementById('lessonForm'));
                 if (id) formData.append('_method', 'PUT');
 
@@ -754,6 +762,7 @@
             });
 
             function deleteAttachment(lessonId, attId) {
+                if (!lessonBaseUrl) return;
                 Swal.fire({
                     title: 'Excluir anexo?',
                     text: "Esta ação não pode ser desfeita.",
@@ -772,7 +781,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/admin/courses/{{ $course->id }}/lessons/${lessonId}/attachments/${attId}`,
+                            url: `${lessonBaseUrl}/${lessonId}/attachments/${attId}`,
                             type: 'DELETE',
                             data: { _token: '{{ csrf_token() }}' },
                             success: function () {
@@ -812,7 +821,7 @@
 
             // Certificate Editor Logic
             $(document).ready(function () {
-                if ('{{ $course->exists }}' == '') return;
+                if (!isExistingCourse || !certificatePreviewUrl) return;
 
                 let rawCertSettings = {!! $course->certificate_settings ? json_encode($course->certificate_settings) : '{}' !!};
                 let certDoc = (rawCertSettings && rawCertSettings.schemaVersion === 2) ? rawCertSettings : { schemaVersion: 2, meta: {}, elements: {} };
@@ -914,7 +923,7 @@
                     const originalAction = form.action;
                     const originalTarget = form.target;
 
-                    form.action = "{{ route('panel.admin.courses.certificate.preview', $course) }}";
+                    form.action = certificatePreviewUrl;
                     form.target = "_blank";
                     form.submit();
 
