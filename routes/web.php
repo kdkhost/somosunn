@@ -730,6 +730,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             ->name('orders.approve');
         Route::post('orders/{order}/cancel', [\App\Http\Controllers\Admin\OrderController::class, 'cancel'])
             ->name('orders.cancel');
+        Route::get('orders/report/export/{format}', [\App\Http\Controllers\Admin\OrderController::class, 'exportReport'])
+            ->middleware('check.feature:orders_access')->name('orders.report.export');
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)
             ->middleware('check.feature:orders_access')->only(['index', 'show'])->names('orders');
 

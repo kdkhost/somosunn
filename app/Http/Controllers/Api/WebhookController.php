@@ -177,6 +177,9 @@ class WebhookController extends Controller
 
         $order->status = $internalStatus;
         $order->transaction_id = $transactionId;
+        if ($internalStatus === 'paid' && !$order->paid_at) {
+            $order->paid_at = now();
+        }
         $order->save();
 
         // Register/Update Payment Record

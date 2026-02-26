@@ -14,10 +14,10 @@ class MarketplaceController extends Controller
     {
         $userId = (int) Auth::id();
 
-        $paidTotal = (float) Order::where('seller_id', $userId)->where('status', 'paid')->sum('total_amount');
-        $platformFeeTotal = (float) Order::where('seller_id', $userId)->where('status', 'paid')->sum('platform_fee_amount');
+        $paidTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('total_amount');
+        $platformFeeTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('platform_fee_amount');
         $netTotal = (float) max(0, $paidTotal - $platformFeeTotal);
-        $paidCount = (int) Order::where('seller_id', $userId)->where('status', 'paid')->count();
+        $paidCount = (int) Order::where('seller_id', $userId)->financialPaid()->count();
         $pendingCount = (int) Order::where('seller_id', $userId)->where('status', 'pending')->count();
         $platformFeePercent = MarketplaceFee::percent();
 
@@ -49,10 +49,10 @@ class MarketplaceController extends Controller
             ->latest('id')
             ->paginate(20);
 
-        $paidTotal = (float) Order::where('seller_id', $userId)->where('status', 'paid')->sum('total_amount');
-        $platformFeeTotal = (float) Order::where('seller_id', $userId)->where('status', 'paid')->sum('platform_fee_amount');
+        $paidTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('total_amount');
+        $platformFeeTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('platform_fee_amount');
         $netTotal = (float) max(0, $paidTotal - $platformFeeTotal);
-        $paidCount = (int) Order::where('seller_id', $userId)->where('status', 'paid')->count();
+        $paidCount = (int) Order::where('seller_id', $userId)->financialPaid()->count();
 
         return view('admin.marketplace.sales', compact('orders', 'paidTotal', 'platformFeeTotal', 'netTotal', 'paidCount'));
     }

@@ -202,6 +202,7 @@ class SubscriptionController extends Controller
             if (($paymentResult['status'] ?? '') === 'approved') {
                 $order->update([
                     'status' => 'paid',
+                    'paid_at' => now(),
                     'transaction_id' => (string) ($paymentResult['id'] ?? null),
                 ]);
                 // Ativar plano no usuário

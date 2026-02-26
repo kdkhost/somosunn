@@ -45,7 +45,7 @@ class DashboardController extends Controller
 
         try {
             if ($isAdmin) {
-                $totalRevenue = \App\Models\Order::where('status', 'paid')->sum('total_amount');
+                $totalRevenue = \App\Models\Order::financialPaid()->sum('total_amount');
                 $refundedAmount = \App\Models\Order::where('status', 'refunded')->sum('total_amount');
                 $totalOrders = \App\Models\Order::count();
                 $totalUsers = \App\Models\User::count();
@@ -100,7 +100,7 @@ class DashboardController extends Controller
                     $date = now()->subMonths($i);
                     $label = $date->format('M/Y');
                     $months[] = $label;
-                    $salesChartData[] = \App\Models\Order::where('status', 'paid')
+                    $salesChartData[] = \App\Models\Order::financialPaid()
                         ->whereMonth('created_at', $date->month)
                         ->whereYear('created_at', $date->year)
                         ->sum('total_amount');

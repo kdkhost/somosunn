@@ -112,6 +112,7 @@ class PaymentWebhookController extends Controller
         if (!$wasPaid) {
             $order->update([
                 'status' => 'paid',
+                'paid_at' => now(),
                 'transaction_id' => (string) $transactionId,
                 'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
             ]);
@@ -137,7 +138,7 @@ class PaymentWebhookController extends Controller
                 $seller = \App\Models\User::find($order->seller_id);
                 if ($seller) {
                     $seller->notify(new \App\Notifications\AppNotification([
-                        'message' => 'Parabéns! Você realizou uma nova venda no valor de R$ ' . number_format($order->total, 2, ',', '.') . '.',
+                        'message' => 'Parabéns! Você realizou uma nova venda no valor de R$ ' . number_format((float) $order->total_amount, 2, ',', '.') . '.',
                         'type' => 'SaleConfirmed',
                         'action_url' => route('panel.marketplace.sales'),
                         'action_label' => 'Ver vendas'
@@ -183,6 +184,7 @@ class PaymentWebhookController extends Controller
             if ((string) $order->status !== 'paid') {
                 $order->update([
                     'status' => 'paid',
+                    'paid_at' => now(),
                     'transaction_id' => $charge['id'] ?? null,
                     'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $request->all()]),
                 ]);

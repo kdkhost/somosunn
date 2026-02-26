@@ -44,6 +44,16 @@
                         <li class="list-group-item">
                             <b>Gateway</b> <a class="float-right">{{ ucfirst($order->gateway) }}</a>
                         </li>
+                        @if($order->is_manual_approval)
+                            <li class="list-group-item">
+                                <b>Origem</b> <a class="float-right text-warning font-weight-bold">Aprovacao manual</a>
+                            </li>
+                            @if($order->manualApprover)
+                                <li class="list-group-item">
+                                    <b>Aprovado por</b> <a class="float-right">{{ $order->manualApprover->name }}</a>
+                                </li>
+                            @endif
+                        @endif
                         @if($order->transaction_id)
                             <li class="list-group-item">
                                 <b>Transação ID</b> <a
@@ -92,28 +102,29 @@
                         @endif
                     </div>
 
-                    @if($order->status === 'paid')
-                        <form action="{{ route('admin.orders.refund', $order->id) }}" method="POST" class="d-grid gap-2" id="form-refund-{{ $order->id }}">
+                        @if($order->status === 'paid')
+                        <form action="{{ route('admin.orders.refund', $order->id) }}" method="POST" class="d-grid gap-2"
+                            onsubmit="return confirmAction(event, 'Reembolsar pedido?', 'Esta acao vai estornar o pagamento no gateway. Deseja continuar?');">
                             @csrf
-                            <button type="button" class="btn btn-danger btn-block btn-delete"
-                                onclick="confirmRefund('{{ $order->id }}')">
+                            <button type="submit" class="btn btn-danger btn-block btn-delete">
                                 <i class="fas fa-undo mr-1"></i> Reembolsar Pedido
                             </button>
                             <small class="text-muted text-center mt-2 d-block">Esta ação estornará o pagamento no
                                 gateway.</small>
                         </form>
                     @elseif($order->status === 'pending')
-                            <form action="{{ route('admin.orders.approve', $order->id) }}" method="POST" class="inline-block" id="form-approve-{{ $order->id }}">
+                            <form action="{{ route('admin.orders.approve', $order->id) }}" method="POST" class="inline-block"
+                                onsubmit="return confirmAction(event, 'Aprovar manualmente?', 'A compra sera aprovada sem pagamento em gateway, com baixa da fatura e envio de e-mails.');">
                                 @csrf
-                                <button type="button" onclick="confirmApprove('{{ $order->id }}')" class="btn btn-success btn-block font-weight-bold">
+                                <button type="submit" class="btn btn-success btn-block font-weight-bold">
                                     <i class="fas fa-check mr-1"></i> Aprovar Manualmente (Permuta)
                                 </button>
                             </form>
                             <form action="{{ route('admin.orders.cancel', $order->id) }}" method="POST" class="mt-2"
-                                id="form-cancel-{{ $order->id }}">
+                                id="form-cancel-{{ $order->id }}"
+                                onsubmit="return confirmAction(event, 'Cancelar pedido?', 'Deseja realmente cancelar este pedido?');">
                                 @csrf
-                                <button type="button" class="btn btn-warning btn-block"
-                                    onclick="confirmCancel('{{ $order->id }}');">
+                                <button type="submit" class="btn btn-warning btn-block">
                                     <i class="fas fa-times mr-1"></i> Cancelar Pedido
                                 </button>
                             </form>

@@ -107,8 +107,8 @@ class MarketplaceController extends Controller
             ->latest('id')
             ->paginate(20);
 
-        $paidTotal = (float) Order::where('seller_id', $userId)->where('status', 'paid')->sum('total_amount');
-        $paidCount = (int) Order::where('seller_id', $userId)->where('status', 'paid')->count();
+        $paidTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('total_amount');
+        $paidCount = (int) Order::where('seller_id', $userId)->financialPaid()->count();
 
         return view('marketplace.sales', compact('orders', 'paidTotal', 'paidCount'));
     }
