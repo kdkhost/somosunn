@@ -3,6 +3,15 @@
     $plan = $user ? $user->activePlan() : null;
     $isImpersonatingAdmin = session()->has('impersonator_id') && session()->get('impersonator_is_admin');
     $currentTheme = $user->theme_pref ?? 'light';
+    $canAccessInstructorArea = (method_exists($user, 'canAccessInstructorArea') && $user->canAccessInstructorArea()) || $isImpersonatingAdmin;
+    $hasPartnerProfile = false;
+    if ($canAccessInstructorArea) {
+        try {
+            $hasPartnerProfile = \App\Models\Partner::where('user_id', $user->id)->exists();
+        } catch (\Throwable $e) {
+            $hasPartnerProfile = false;
+        }
+    }
 
     $navItemClass = function (bool $active = false) {
         $base = 'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200';
@@ -113,6 +122,67 @@
                     <i class="fas fa-receipt w-5 opacity-80"></i>
                     Minhas vendas
                 </a>
+            </div>
+        @endif
+
+        @if($canAccessInstructorArea)
+            <div class="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
+                <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 px-4">
+                    Instrutor
+                </div>
+                <a href="{{ route('panel.instructor.dashboard') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.instructor.*')) }}">
+                    <i class="fas fa-chalkboard-teacher w-5 opacity-80"></i>
+                    Central do instrutor
+                </a>
+
+                @if($user->hasPermission('courses.view') || $user->canAccessFeature('courses_access') || $isImpersonatingAdmin)
+                    <a href="{{ route('panel.admin.courses.index') }}"
+                        class="{{ $navItemClass(request()->routeIs('panel.admin.courses.*')) }}">
+                        <i class="fas fa-graduation-cap w-5 opacity-80"></i>
+                        Meus cursos
+                    </a>
+                @endif
+
+                @if($user->hasPermission('mentorships.view') || $user->canAccessFeature('mentorships_access') || $isImpersonatingAdmin)
+                    <a href="{{ route('panel.admin.mentorships.index') }}"
+                        class="{{ $navItemClass(request()->routeIs('panel.admin.mentorships.*')) }}">
+                        <i class="fas fa-user-tie w-5 opacity-80"></i>
+                        Minhas mentorias
+                    </a>
+                @endif
+
+                @if($user->hasPermission('events.view') || $user->canAccessFeature('events_access') || $isImpersonatingAdmin)
+                    <a href="{{ route('panel.admin.events.index') }}"
+                        class="{{ $navItemClass(request()->routeIs('panel.admin.events.*')) }}">
+                        <i class="fas fa-calendar-alt w-5 opacity-80"></i>
+                        Meus eventos
+                    </a>
+                @endif
+
+                @if($user->hasPermission('certificates.view') || $user->canAccessFeature('certificates_access') || $isImpersonatingAdmin)
+                    <a href="{{ route('panel.admin.certificates.index') }}"
+                        class="{{ $navItemClass(request()->routeIs('panel.admin.certificates.*')) }}">
+                        <i class="fas fa-certificate w-5 opacity-80"></i>
+                        Certificados
+                    </a>
+                @endif
+
+                @if($hasPartnerProfile)
+                    <a href="{{ route('member.partner.index') }}"
+                        class="{{ $navItemClass(request()->routeIs('member.partner.*')) }}">
+                        <i class="fas fa-ticket-alt w-5 opacity-80"></i>
+                        Cupons de parceiros
+                    </a>
+                @endif
+
+                @if($user->canAccessFeature('vagas_create') || $isImpersonatingAdmin)
+                    <a href="{{ route('panel.my-jobs.index') }}"
+                        class="{{ $navItemClass(request()->routeIs('panel.my-jobs.*')) }}">
+                        <i class="fas fa-briefcase w-5 opacity-80"></i>
+                        Minhas vagas
+                    </a>
+                @endif
             </div>
         @endif
 

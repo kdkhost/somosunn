@@ -366,6 +366,14 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::get('/', [\App\Http\Controllers\Panel\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/stats', [\App\Http\Controllers\Panel\DashboardController::class, 'stats'])->name('dashboard.stats');
 
+    // Instructor Area within member panel
+    Route::prefix('instrutor')
+        ->name('instructor.')
+        ->middleware([\App\Http\Middleware\EnsureInstructorAccess::class])
+        ->group(function () {
+            Route::get('/', [\App\Http\Controllers\Panel\InstructorController::class, 'index'])->name('dashboard');
+        });
+
     // Admin Routes within Panel (Tailwind)
     // PROTECTED: Only Admins can access these routes
     Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\EnsureUserIsAdmin::class])->group(function () {

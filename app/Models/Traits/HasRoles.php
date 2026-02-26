@@ -33,8 +33,54 @@ trait HasRoles
         if ($this->isAdmin()) {
             return true;
         }
+
         $perm = $perm instanceof Permission ? $perm->name : $perm;
-        return $this->roles()->whereHas('permissions', function ($q) use ($perm) {
-            $q->where('name', $perm); })->exists();
+        $hasRolePermission = $this->roles()->whereHas('permissions', function ($q) use ($perm) {
+            $q->where('name', $perm);
+        })->exists();
+
+        if ($hasRolePermission) {
+            return true;
+        }
+
+        if (!method_exists($this, 'canAccessFeature')) {
+            return false;
+        }
+
+        $perm = trim((string) $perm);
+        if ($perm === '') {
+            return false;
+        }
+
+        $featureCandidates = [$perm, str_replace('.', '_', $perm)];
+
+        if (preg_match('/^([a-z_]+)\.(view|access|create|edit|delete)$/', $perm, $matches)) {
+            $base = $matches[1];
+            $action = $matches[2];
+
+            $featureCandidates[] = $base;
+            $featureCandidates[] = $base . '_access';
+
+            if (!in_array($action, ['view', 'access'], true)) {
+                $featureCandidates[] = $base . '_' . $action;
+            }
+        }
+
+        if (str_starts_with($perm, 'certificates.')) {
+            $featureCandidates[] = 'courses.certificates';
+            $featureCandidates[] = 'certificates_access';
+        }
+
+        foreach (array_values(array_unique($featureCandidates)) as $feature) {
+            if (!is_string($feature) || trim($feature) === '') {
+                continue;
+            }
+
+            if ($this->canAccessFeature($feature)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

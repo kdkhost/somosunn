@@ -91,6 +91,19 @@ class User extends Authenticatable
             || $this->canAccessFeature('mentorships.create');
     }
 
+    public function canAccessInstructorArea(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return $this->canSellOnMarketplace()
+            || $this->canAccessFeature('courses_access')
+            || $this->canAccessFeature('mentorships_access')
+            || $this->canAccessFeature('events_access')
+            || $this->canAccessFeature('certificates_access');
+    }
+
     public function hasPurchasedCourses(): bool
     {
         try {
