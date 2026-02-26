@@ -219,6 +219,7 @@
                             'admin.partners.*',
                             'admin.redemptions.*',
                             'admin.settings*',
+                            'admin.cron.*',
                         ];
                     @endphp
 
