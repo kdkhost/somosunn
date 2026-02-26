@@ -284,7 +284,8 @@ class SettingController extends Controller
                 'social_login_enabled',
                 'social_google_enabled',
                 'social_facebook_enabled',
-                'social_twitter_enabled'
+                'social_twitter_enabled',
+                'social_linkedin_enabled',
             ],
             'system' => ['s3_path_style'],
         ];
@@ -302,6 +303,23 @@ class SettingController extends Controller
                     $data[$b] = 0;
                 }
             }
+        }
+
+        // Mantem compatibilidade entre chaves antigas (app_*) e novas (client_*) do Facebook.
+        $facebookClientId = trim((string) ($data['social_facebook_client_id'] ?? ''));
+        $facebookAppId = trim((string) ($data['social_facebook_app_id'] ?? ''));
+        if (array_key_exists('social_facebook_client_id', $data) || array_key_exists('social_facebook_app_id', $data)) {
+            $resolvedFacebookClientId = $facebookClientId !== '' ? $facebookClientId : $facebookAppId;
+            $data['social_facebook_client_id'] = $resolvedFacebookClientId;
+            $data['social_facebook_app_id'] = $resolvedFacebookClientId;
+        }
+
+        $facebookClientSecret = trim((string) ($data['social_facebook_client_secret'] ?? ''));
+        $facebookAppSecret = trim((string) ($data['social_facebook_app_secret'] ?? ''));
+        if (array_key_exists('social_facebook_client_secret', $data) || array_key_exists('social_facebook_app_secret', $data)) {
+            $resolvedFacebookClientSecret = $facebookClientSecret !== '' ? $facebookClientSecret : $facebookAppSecret;
+            $data['social_facebook_client_secret'] = $resolvedFacebookClientSecret;
+            $data['social_facebook_app_secret'] = $resolvedFacebookClientSecret;
         }
 
         $data['video_plyr_options_json'] = $plyrOptionsJson;

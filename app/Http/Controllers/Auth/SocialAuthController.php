@@ -4,41 +4,113 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
+use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Two\InvalidStateException;
 
 class SocialAuthController extends Controller
 {
-    protected $providers = ['google', 'facebook', 'linkedin'];
+    private array $providers = ['google', 'facebook', 'linkedin'];
 
-    public function redirect($provider)
+    public function redirect(string $provider)
     {
-        if (!in_array($provider, $this->providers, true)) {
+        if (!$this->isSupportedProvider($provider)) {
             abort(404);
         }
-        return Socialite::driver($provider)->redirect();
-    }
 
-    public function callback(Request $request, $provider)
-    {
-        if (!in_array($provider, $this->providers, true)) {
-            abort(404);
+        if (!$this->isProviderEnabled($provider)) {
+            return $this->socialUnavailable($provider, 'Login social desativado para este provedor.');
+        }
+
+        $this->applyProviderRuntimeConfig($provider);
+
+        if (!$this->hasProviderCredentials($provider)) {
+            Log::warning('Social provider missing credentials on redirect.', ['provider' => $provider]);
+
+            return $this->socialUnavailable($provider, 'Login social indisponivel no momento. Tente novamente em instantes.');
         }
 
         try {
-            $socialUser = Socialite::driver($provider)->stateless()->user();
+            $driver = Socialite::driver($provider);
+            if ($provider === 'facebook') {
+                $driver = $driver->scopes(['email']);
+            }
+
+            return $driver->redirect();
         } catch (\Throwable $e) {
-            Log::warning('Social login callback failed: ' . $e->getMessage());
-            return redirect()->route('login')->with('error', 'Não foi possível autenticar com o provedor informado. Tente novamente.');
+            Log::warning('Social redirect failed.', [
+                'provider' => $provider,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->socialUnavailable($provider, 'Nao foi possivel iniciar o login social agora.');
+        }
+    }
+
+    public function callback(Request $request, string $provider)
+    {
+        if (!$this->isSupportedProvider($provider)) {
+            abort(404);
         }
 
-        $email = $socialUser->getEmail();
-        if (!$email) {
-            return redirect()->route('login')->with('error', 'Seu provedor não informou um e-mail válido. Use outro método de login.');
+        if (!$this->isProviderEnabled($provider)) {
+            return $this->socialUnavailable($provider, 'Login social desativado para este provedor.');
+        }
+
+        $this->applyProviderRuntimeConfig($provider);
+
+        if (!$this->hasProviderCredentials($provider)) {
+            Log::warning('Social provider missing credentials on callback.', ['provider' => $provider]);
+
+            return $this->socialUnavailable($provider, 'Login social indisponivel no momento. Tente novamente em instantes.');
+        }
+
+        if ($request->filled('error')) {
+            Log::warning('Social provider returned an OAuth error.', [
+                'provider' => $provider,
+                'error' => (string) $request->query('error'),
+                'error_description' => (string) $request->query('error_description', ''),
+            ]);
+
+            return redirect()->route('login')->with('warning', 'Nao foi possivel concluir o login social. Tente novamente.');
+        }
+
+        try {
+            $driver = Socialite::driver($provider);
+            if ($provider === 'facebook') {
+                $driver = $driver->scopes(['email']);
+            }
+
+            try {
+                $socialUser = $driver->user();
+            } catch (InvalidStateException $e) {
+                Log::info('Social callback state mismatch. Retrying stateless mode.', ['provider' => $provider]);
+
+                $fallbackDriver = Socialite::driver($provider);
+                if ($provider === 'facebook') {
+                    $fallbackDriver = $fallbackDriver->scopes(['email']);
+                }
+                $socialUser = $fallbackDriver->stateless()->user();
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Social login callback failed.', [
+                'provider' => $provider,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->route('login')->with('warning', 'Nao foi possivel autenticar com o provedor informado. Tente novamente.');
+        }
+
+        $email = trim((string) $socialUser->getEmail());
+        if ($email === '') {
+            return redirect()->route('login')->with('warning', 'Seu provedor nao informou um e-mail valido. Use outro metodo de login.');
         }
 
         $providerIdField = $provider . '_id';
@@ -52,7 +124,7 @@ class SocialAuthController extends Controller
 
         if (!$user) {
             $user = new User();
-            $user->name = $socialUser->getName() ?? $socialUser->getNickname() ?? 'Usuário';
+            $user->name = $socialUser->getName() ?? $socialUser->getNickname() ?? 'Usuario';
             $user->email = $email;
             $user->email_verified_at = now();
             $user->password = bcrypt(bin2hex(random_bytes(16)));
@@ -62,9 +134,8 @@ class SocialAuthController extends Controller
             $user->{$providerIdField} = $providerId;
         }
 
-        // Preenche dados automaticamente (sem sobrescrever customizações do usuário)
         if (!$user->name) {
-            $user->name = $socialUser->getName() ?? $socialUser->getNickname() ?? 'Usuário';
+            $user->name = $socialUser->getName() ?? $socialUser->getNickname() ?? 'Usuario';
         }
 
         if (!$user->email_verified_at) {
@@ -73,7 +144,6 @@ class SocialAuthController extends Controller
 
         $user->save();
 
-        // Vincula pacote inicial (se ainda não tiver plano ativo)
         if (!$user->activePlan()) {
             $defaultPlan = $this->resolveDefaultPlan();
             if ($defaultPlan) {
@@ -83,17 +153,13 @@ class SocialAuthController extends Controller
             }
         }
 
-        // Avatar do provedor (salva apenas se ainda não tiver foto definida)
         $this->trySaveSocialAvatar($user, $socialUser->getAvatar());
 
         Auth::login($user, true);
 
-        // Redireciona para o novo painel administrativo ou do membro
-        if ($user->isAdmin()) {
-            return redirect()->route('panel.admin.dashboard');
-        }
+        $redirectRoute = $user->isAdmin() ? 'panel.admin.dashboard' : 'panel.dashboard';
 
-        return redirect()->intended(route('panel.dashboard'));
+        return redirect()->intended(route($redirectRoute));
     }
 
     private function resolveDefaultPlan(): ?Plan
@@ -155,8 +221,86 @@ class SocialAuthController extends Controller
                 $user->save();
             }
         } catch (\Throwable $e) {
-            // best-effort: não quebra login se avatar falhar
             return;
         }
+    }
+
+    private function isSupportedProvider(string $provider): bool
+    {
+        return in_array($provider, $this->providers, true);
+    }
+
+    private function isProviderEnabled(string $provider): bool
+    {
+        $socialLoginEnabled = $this->isEnabled(Setting::get('social_login_enabled', '1'));
+        if (!$socialLoginEnabled) {
+            return false;
+        }
+
+        return match ($provider) {
+            'google' => $this->isEnabled(Setting::get('social_google_enabled', Setting::get('social_google_active', '0'))),
+            'facebook' => $this->isEnabled(Setting::get('social_facebook_enabled', Setting::get('social_facebook_active', '0'))),
+            'linkedin' => $this->isEnabled(Setting::get('social_linkedin_enabled', Setting::get('social_linkedin_active', '0'))),
+            default => false,
+        };
+    }
+
+    private function isEnabled(mixed $value): bool
+    {
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    private function applyProviderRuntimeConfig(string $provider): void
+    {
+        $prefix = 'social_' . $provider . '_';
+        $redirect = trim((string) Setting::get($prefix . 'redirect', ''));
+
+        $clientId = trim((string) Setting::get($prefix . 'client_id', ''));
+        $clientSecret = trim((string) Setting::get($prefix . 'client_secret', ''));
+
+        if ($provider === 'facebook') {
+            if ($clientId === '') {
+                $clientId = trim((string) Setting::get('social_facebook_app_id', ''));
+            }
+            if ($clientSecret === '') {
+                $clientSecret = trim((string) Setting::get('social_facebook_app_secret', ''));
+            }
+        }
+
+        if ($clientId !== '') {
+            Config::set("services.{$provider}.client_id", $clientId);
+        }
+        if ($clientSecret !== '') {
+            Config::set("services.{$provider}.client_secret", $clientSecret);
+        }
+
+        if ($redirect !== '') {
+            Config::set("services.{$provider}.redirect", $redirect);
+        }
+    }
+
+    private function hasProviderCredentials(string $provider): bool
+    {
+        $serviceConfig = (array) Config::get("services.{$provider}", []);
+
+        $clientId = trim((string) Arr::get($serviceConfig, 'client_id', ''));
+        $clientSecret = trim((string) Arr::get($serviceConfig, 'client_secret', ''));
+        $redirect = trim((string) Arr::get($serviceConfig, 'redirect', ''));
+
+        return $clientId !== '' && $clientSecret !== '' && $redirect !== '';
+    }
+
+    private function socialUnavailable(string $provider, string $message)
+    {
+        $providerLabel = match ($provider) {
+            'google' => 'Google',
+            'facebook' => 'Facebook',
+            'linkedin' => 'LinkedIn',
+            default => ucfirst($provider),
+        };
+
+        return redirect()
+            ->route('login')
+            ->with('warning', "{$providerLabel}: {$message}");
     }
 }

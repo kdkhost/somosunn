@@ -35,7 +35,7 @@
     <div class="space-y-1">
         <a href="{{ route('panel.dashboard') }}" class="{{ $navItemClass(request()->routeIs('panel.dashboard')) }}">
             <i class="fas fa-th-large w-5 opacity-80"></i>
-            Visão geral
+            Visao geral
         </a>
 
         <a href="{{ route('panel.profile.edit') }}" class="{{ $navItemClass(request()->routeIs('panel.profile.*')) }}">
@@ -119,7 +119,7 @@
         @if($user->isAdmin())
             <div class="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
                 <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 px-4">
-                    Administração
+                    Administracao
                 </div>
 
                 <a href="{{ route('panel.admin.dashboard') }}"
@@ -128,19 +128,18 @@
                     Painel administrativo
                 </a>
 
-                {{-- Gestão --}}
-                <div
-                    class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
-                    Gestão</div>
+                <div class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                    Gestao
+                </div>
                 <a href="{{ route('panel.admin.users.index') }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.users.*')) }}">
                     <i class="fas fa-users-cog w-5 opacity-80"></i>
-                    Usuários
+                    Usuarios
                 </a>
                 <a href="{{ route('panel.admin.plans.index') }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.plans.*')) }}">
                     <i class="fas fa-gem w-5 opacity-80"></i>
-                    Planos / Pacotes
+                    Planos e pacotes
                 </a>
                 <a href="{{ route('panel.admin.orders.index') }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.orders.*')) }}">
@@ -157,6 +156,16 @@
                     <i class="fas fa-ticket-alt w-5 opacity-80"></i>
                     Cupons
                 </a>
+                <a href="{{ route('panel.admin.points-rules.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.points-rules.*')) }}">
+                    <i class="fas fa-star w-5 opacity-80"></i>
+                    Regras de pontos
+                </a>
+                <a href="{{ route('panel.admin.ranking.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.ranking.*')) }}">
+                    <i class="fas fa-trophy w-5 opacity-80"></i>
+                    Ranking
+                </a>
                 <a href="{{ route('panel.admin.jobs.index') }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.jobs.*')) }}">
                     <i class="fas fa-id-card w-5 opacity-80"></i>
@@ -167,11 +176,15 @@
                     <i class="fas fa-exchange-alt w-5 opacity-80"></i>
                     Resgates
                 </a>
+                <a href="{{ route('panel.admin.logs.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.logs.*')) }}">
+                    <i class="fas fa-history w-5 opacity-80"></i>
+                    Logs de atividade
+                </a>
 
-                {{-- Conteúdo --}}
-                <div
-                    class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
-                    Conteúdo</div>
+                <div class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                    Conteudo
+                </div>
                 <a href="{{ route('panel.admin.courses.index') }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.courses.*')) }}">
                     <i class="fas fa-graduation-cap w-5 opacity-80"></i>
@@ -192,11 +205,25 @@
                     <i class="fas fa-certificate w-5 opacity-80"></i>
                     Certificados
                 </a>
+                <a href="{{ route('panel.admin.faqs.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.faqs.*')) }}">
+                    <i class="fas fa-question-circle w-5 opacity-80"></i>
+                    FAQ
+                </a>
+                <a href="{{ route('panel.admin.testimonials.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.testimonials.*')) }}">
+                    <i class="fas fa-quote-left w-5 opacity-80"></i>
+                    Depoimentos
+                </a>
+                <a href="{{ route('panel.admin.cms.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.cms.*')) }}">
+                    <i class="fas fa-pencil-ruler w-5 opacity-80"></i>
+                    CMS e paginas
+                </a>
 
-                {{-- Configurações --}}
-                <div
-                    class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
-                    Ajustes</div>
+                <div class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                    Ajustes
+                </div>
                 <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'general') }}">
                     <i class="fas fa-cogs w-5 opacity-80"></i>
@@ -212,6 +239,26 @@
                     <i class="fas fa-envelope w-5 opacity-80"></i>
                     SMTP
                 </a>
+                <a href="{{ route('panel.admin.settings', ['group' => 'appearance']) }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'appearance') }}">
+                    <i class="fas fa-palette w-5 opacity-80"></i>
+                    Aparencia
+                </a>
+                <a href="{{ route('panel.admin.settings', ['group' => 'images']) }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'images') }}">
+                    <i class="fas fa-images w-5 opacity-80"></i>
+                    Imagens
+                </a>
+                <a href="{{ route('panel.admin.settings', ['group' => 'social']) }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'social') }}">
+                    <i class="fas fa-share-alt w-5 opacity-80"></i>
+                    Login social
+                </a>
+                <a href="{{ route('panel.admin.settings', ['group' => 'seo']) }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.admin.settings') && request('group') == 'seo') }}">
+                    <i class="fas fa-search w-5 opacity-80"></i>
+                    SEO
+                </a>
                 <a href="{{ route('panel.admin.mailtemplates.index') }}"
                     class="{{ $navItemClass(request()->routeIs('panel.admin.mailtemplates.*')) }}">
                     <i class="fas fa-at w-5 opacity-80"></i>
@@ -220,7 +267,6 @@
             </div>
         @endif
 
-        {{-- Theme Toggle --}}
         <div class="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
             <button onclick="toggleTheme()"
                 class="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 group">
@@ -243,14 +289,12 @@
     function toggleTheme() {
         const theme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
 
-        // UI Update
         if (theme === 'dark') {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
 
-        // Save Preference
         fetch('{{ route("panel.theme.toggle") }}', {
             method: 'POST',
             headers: {
@@ -258,8 +302,7 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({ theme: theme })
-        }).then(r => r.json()).then(data => {
-            // Optional: reload to apply all server-side classes correctly if needed
+        }).then(r => r.json()).then(() => {
             window.location.reload();
         });
     }

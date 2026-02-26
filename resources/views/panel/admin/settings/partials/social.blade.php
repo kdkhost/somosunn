@@ -35,8 +35,8 @@
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                         {{ $key === 'facebook' ? 'App ID' : ($key === 'twitter' ? 'Client ID (API Key)' : 'Client ID') }}
                     </label>
-                    <input type="text" name="social_{{ $key }}_{{ ($key === 'facebook' ? 'app_id' : 'client_id') }}" 
-                           value="{{ $settings['social_'.$key.'_'.($key === 'facebook' ? 'app_id' : 'client_id')] ?? '' }}"
+                    <input type="text" name="social_{{ $key }}_client_id" 
+                           value="{{ $settings['social_'.$key.'_client_id'] ?? ($key === 'facebook' ? ($settings['social_facebook_app_id'] ?? '') : '') }}"
                            class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm font-medium text-slate-800 dark:text-white">
                 </div>
                 <div>
@@ -47,8 +47,8 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                             <i class="fas fa-key text-[10px]"></i>
                         </div>
-                        <input type="password" name="social_{{ $key }}_{{ ($key === 'facebook' ? 'app_secret' : 'client_secret') }}" 
-                               value="{{ $settings['social_'.$key.'_'.($key === 'facebook' ? 'app_secret' : 'client_secret')] ?? '' }}"
+                        <input type="password" name="social_{{ $key }}_client_secret" 
+                               value="{{ $settings['social_'.$key.'_client_secret'] ?? ($key === 'facebook' ? ($settings['social_facebook_app_secret'] ?? '') : '') }}"
                                class="w-full pl-9 pr-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm font-medium text-slate-800 dark:text-white">
                     </div>
                 </div>

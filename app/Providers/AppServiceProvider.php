@@ -46,39 +46,75 @@ class AppServiceProvider extends ServiceProvider
             // Carregar configurações sociais se existirem (sobrescreve .env)
             try {
                 $socialSettings = DB::table('settings')->whereIn('key', [
+                    'social_login_enabled',
                     'social_google_client_id',
                     'social_google_client_secret',
                     'social_google_redirect',
                     'social_facebook_client_id',
                     'social_facebook_client_secret',
+                    'social_facebook_app_id',
+                    'social_facebook_app_secret',
                     'social_facebook_redirect',
                     'social_linkedin_client_id',
                     'social_linkedin_client_secret',
                     'social_linkedin_redirect'
                 ])->pluck('value', 'key')->toArray();
 
-                if (isset($socialSettings['social_google_client_id']) && $socialSettings['social_google_client_id']) {
-                    config(['services.google.client_id' => $socialSettings['social_google_client_id']]);
-                    if (isset($socialSettings['social_google_client_secret']))
-                        config(['services.google.client_secret' => $socialSettings['social_google_client_secret']]);
-                    if (isset($socialSettings['social_google_redirect']))
-                        config(['services.google.redirect' => $socialSettings['social_google_redirect']]);
+                $resolveSetting = static function (array $settings, array $keys, string $default = ''): string {
+                    foreach ($keys as $key) {
+                        if (!array_key_exists($key, $settings)) {
+                            continue;
+                        }
+
+                        $value = trim((string) $settings[$key]);
+                        if ($value !== '') {
+                            return $value;
+                        }
+                    }
+
+                    return $default;
+                };
+
+                $googleClientId = $resolveSetting($socialSettings, ['social_google_client_id']);
+                $googleClientSecret = $resolveSetting($socialSettings, ['social_google_client_secret']);
+                $googleRedirect = $resolveSetting($socialSettings, ['social_google_redirect']);
+
+                if ($googleClientId !== '') {
+                    config(['services.google.client_id' => $googleClientId]);
+                }
+                if ($googleClientSecret !== '') {
+                    config(['services.google.client_secret' => $googleClientSecret]);
+                }
+                if ($googleRedirect !== '') {
+                    config(['services.google.redirect' => $googleRedirect]);
                 }
 
-                if (isset($socialSettings['social_facebook_client_id']) && $socialSettings['social_facebook_client_id']) {
-                    config(['services.facebook.client_id' => $socialSettings['social_facebook_client_id']]);
-                    if (isset($socialSettings['social_facebook_client_secret']))
-                        config(['services.facebook.client_secret' => $socialSettings['social_facebook_client_secret']]);
-                    if (isset($socialSettings['social_facebook_redirect']))
-                        config(['services.facebook.redirect' => $socialSettings['social_facebook_redirect']]);
+                $facebookClientId = $resolveSetting($socialSettings, ['social_facebook_client_id', 'social_facebook_app_id']);
+                $facebookClientSecret = $resolveSetting($socialSettings, ['social_facebook_client_secret', 'social_facebook_app_secret']);
+                $facebookRedirect = $resolveSetting($socialSettings, ['social_facebook_redirect']);
+
+                if ($facebookClientId !== '') {
+                    config(['services.facebook.client_id' => $facebookClientId]);
+                }
+                if ($facebookClientSecret !== '') {
+                    config(['services.facebook.client_secret' => $facebookClientSecret]);
+                }
+                if ($facebookRedirect !== '') {
+                    config(['services.facebook.redirect' => $facebookRedirect]);
                 }
 
-                if (isset($socialSettings['social_linkedin_client_id']) && $socialSettings['social_linkedin_client_id']) {
-                    config(['services.linkedin.client_id' => $socialSettings['social_linkedin_client_id']]);
-                    if (isset($socialSettings['social_linkedin_client_secret']))
-                        config(['services.linkedin.client_secret' => $socialSettings['social_linkedin_client_secret']]);
-                    if (isset($socialSettings['social_linkedin_redirect']))
-                        config(['services.linkedin.redirect' => $socialSettings['social_linkedin_redirect']]);
+                $linkedinClientId = $resolveSetting($socialSettings, ['social_linkedin_client_id']);
+                $linkedinClientSecret = $resolveSetting($socialSettings, ['social_linkedin_client_secret']);
+                $linkedinRedirect = $resolveSetting($socialSettings, ['social_linkedin_redirect']);
+
+                if ($linkedinClientId !== '') {
+                    config(['services.linkedin.client_id' => $linkedinClientId]);
+                }
+                if ($linkedinClientSecret !== '') {
+                    config(['services.linkedin.client_secret' => $linkedinClientSecret]);
+                }
+                if ($linkedinRedirect !== '') {
+                    config(['services.linkedin.redirect' => $linkedinRedirect]);
                 }
             } catch (\Throwable $e) {
                 // Silently fail if table doesnt exist yet

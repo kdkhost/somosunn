@@ -17,9 +17,43 @@
     $animClass = $shouldAnimate ? 'animate-fade-in-up' : '';
     $pulseClass = $shouldAnimate ? 'animate-pulse' : '';
 
-    $googleEnabled = (string) \App\Models\Setting::get('social_google_enabled', \App\Models\Setting::get('social_google_active', '0')) === '1';
-    $facebookEnabled = (string) \App\Models\Setting::get('social_facebook_enabled', \App\Models\Setting::get('social_facebook_active', '0')) === '1';
-    $linkedinEnabled = (string) \App\Models\Setting::get('social_linkedin_enabled', \App\Models\Setting::get('social_linkedin_active', '0')) === '1';
+    $socialLoginEnabled = (string) \App\Models\Setting::get('social_login_enabled', '1') === '1';
+
+    $providerReady = function (string $provider): bool {
+        $prefix = 'social_' . $provider . '_';
+        $clientId = trim((string) \App\Models\Setting::get($prefix . 'client_id', ''));
+        $clientSecret = trim((string) \App\Models\Setting::get($prefix . 'client_secret', ''));
+
+        if ($provider === 'facebook') {
+            if ($clientId === '') {
+                $clientId = trim((string) \App\Models\Setting::get('social_facebook_app_id', ''));
+            }
+            if ($clientSecret === '') {
+                $clientSecret = trim((string) \App\Models\Setting::get('social_facebook_app_secret', ''));
+            }
+        }
+
+        if ($clientId === '') {
+            $clientId = trim((string) config('services.' . $provider . '.client_id', ''));
+        }
+        if ($clientSecret === '') {
+            $clientSecret = trim((string) config('services.' . $provider . '.client_secret', ''));
+        }
+
+        return $clientId !== '' && $clientSecret !== '';
+    };
+
+    $googleEnabled = $socialLoginEnabled
+        && (string) \App\Models\Setting::get('social_google_enabled', \App\Models\Setting::get('social_google_active', '0')) === '1'
+        && $providerReady('google');
+
+    $facebookEnabled = $socialLoginEnabled
+        && (string) \App\Models\Setting::get('social_facebook_enabled', \App\Models\Setting::get('social_facebook_active', '0')) === '1'
+        && $providerReady('facebook');
+
+    $linkedinEnabled = $socialLoginEnabled
+        && (string) \App\Models\Setting::get('social_linkedin_enabled', \App\Models\Setting::get('social_linkedin_active', '0')) === '1'
+        && $providerReady('linkedin');
 @endphp
 
 <div class="hidden md:flex flex-col items-center justify-center gap-6 p-12 bg-gradient-to-br from-[#7a5af8] via-[#6a40e6] to-[#4cc3ff] text-white relative overflow-hidden h-full min-h-[500px]"

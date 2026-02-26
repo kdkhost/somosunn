@@ -68,6 +68,12 @@
                         <p>Dashboard</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('panel.admin.dashboard') }}" class="nav-link">
+                        <i class="nav-icon fas fa-rocket"></i>
+                        <p>Painel Novo</p>
+                    </a>
+                </li>
 
                 @php
                     $canMarketplaceSeller = auth()->user()->canSellOnMarketplace();
