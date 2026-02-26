@@ -153,7 +153,9 @@
                                 </div>
                             </div>
                             <div class="custom-control custom-switch">
+                                <input type="hidden" name="mercadopago_method_credit_card" value="0">
                                 <input type="checkbox" class="custom-control-input" id="method_credit_card"
+                                    name="mercadopago_method_credit_card" value="1"
                                     onchange="toggleSetting('mercadopago_method_credit_card', this.checked)" {{ ($settings['mercadopago_method_credit_card'] ?? 1) ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="method_credit_card"></label>
                             </div>
@@ -173,7 +175,9 @@
                                 </div>
                             </div>
                             <div class="custom-control custom-switch">
+                                <input type="hidden" name="mercadopago_method_debit_card" value="0">
                                 <input type="checkbox" class="custom-control-input" id="method_debit_card"
+                                    name="mercadopago_method_debit_card" value="1"
                                     onchange="toggleSetting('mercadopago_method_debit_card', this.checked)" {{ ($settings['mercadopago_method_debit_card'] ?? 0) ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="method_debit_card"></label>
                             </div>
@@ -193,7 +197,9 @@
                                 </div>
                             </div>
                             <div class="custom-control custom-switch">
+                                <input type="hidden" name="mercadopago_method_pix" value="0">
                                 <input type="checkbox" class="custom-control-input" id="method_pix"
+                                    name="mercadopago_method_pix" value="1"
                                     onchange="toggleSetting('mercadopago_method_pix', this.checked)" {{ ($settings['mercadopago_method_pix'] ?? 1) ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="method_pix"></label>
                             </div>
@@ -213,7 +219,9 @@
                                 </div>
                             </div>
                             <div class="custom-control custom-switch">
+                                <input type="hidden" name="mercadopago_method_ticket" value="0">
                                 <input type="checkbox" class="custom-control-input" id="method_ticket"
+                                    name="mercadopago_method_ticket" value="1"
                                     onchange="toggleSetting('mercadopago_method_ticket', this.checked)" {{ ($settings['mercadopago_method_ticket'] ?? 0) ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="method_ticket"></label>
                             </div>
@@ -233,7 +241,9 @@
                                 </div>
                             </div>
                             <div class="custom-control custom-switch">
+                                <input type="hidden" name="mercadopago_method_mercadopago" value="0">
                                 <input type="checkbox" class="custom-control-input" id="method_mercadopago"
+                                    name="mercadopago_method_mercadopago" value="1"
                                     onchange="toggleSetting('mercadopago_method_mercadopago', this.checked)" {{ ($settings['mercadopago_method_mercadopago'] ?? 0) ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="method_mercadopago"></label>
                             </div>
