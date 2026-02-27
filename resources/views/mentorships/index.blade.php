@@ -135,7 +135,7 @@
                             Mentorias Premium UNN
                         </h1>
                         <p class="mt-3 text-white/80 text-base sm:text-lg">
-                            ConteÃºdo gravado + acompanhamento de mentores
+                            Conteúdo gravado + acompanhamento de mentores
                         </p>
                     </div>
                 </div>
@@ -146,9 +146,9 @@
             <div class="max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
                     <div>
-                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900">Mentorias disponÃ­veis</h2>
+                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900">Mentorias disponíveis</h2>
                         <p class="text-gray-600 mt-2 max-w-2xl">
-                            Escolha uma mentoria e acelere seu crescimento com orientaÃ§Ã£o prÃ¡tica.
+                            Escolha uma mentoria e acelere seu crescimento com orientação prática.
                         </p>
                     </div>
                     <span class="text-sm font-bold text-slate-500 uppercase tracking-wider">
@@ -250,8 +250,8 @@
                     <div class="max-w-3xl mx-auto">
                         <div class="bg-white rounded-[32px] shadow-2xl p-10 text-center">
                             <div class="text-slate-400 mb-4"><i class="fas fa-chalkboard-teacher text-5xl"></i></div>
-                            <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Nenhuma mentoria disponÃ­vel</h2>
-                            <p class="mt-2 text-slate-600">No momento nÃ£o temos mentorias abertas. Volte em breve.</p>
+                            <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Nenhuma mentoria disponível</h2>
+                            <p class="mt-2 text-slate-600">No momento não temos mentorias abertas. Volte em breve.</p>
 
                             <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
                                 <a href="{{ route('premium') }}"
@@ -260,7 +260,7 @@
                                 </a>
                                 <a href="{{ route('home') }}"
                                     class="px-8 py-4 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center">
-                                    Voltar ao inÃ­cio
+                                    Voltar ao início
                                 </a>
                             </div>
                         </div>

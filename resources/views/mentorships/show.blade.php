@@ -122,7 +122,7 @@
         $description = trim((string) ($mentorship->description ?? ''));
         $heroExcerpt = $description !== ''
             ? Str::limit(strip_tags($description), 160)
-            : 'Acompanhamento com orientaÃƒÂ§ÃƒÂ£o prÃƒÂ¡tica para acelerar resultados em networking e negÃƒÂ³cios.';
+            : 'Acompanhamento com orientação prática para acelerar resultados em networking e negócios.';
         $currentUser = Auth::user();
         $hasFullAccess = $currentUser ? $currentUser->hasMentorshipAccess($mentorship) : false;
         $canAccessByPlan = $currentUser ? $currentUser->canAccessFeature('mentorships_access') : false;
@@ -199,7 +199,7 @@
                         class="absolute inset-0 w-full h-full object-cover scale-110 saturate-[1.1] brightness-[0.85]"
                         style="filter: blur({{ $heroBlurPx }}px); opacity: 0.7;" aria-hidden="true">
 
-                    <!-- PelÃ­cula transparente em cor degradÃª -->
+                    <!-- Película transparente em cor degradê -->
                     <div class="absolute inset-0" style="background: linear-gradient(135deg, 
                                 {{ $hexToRgba($sitePrimary, 0.8 * $heroFilmScale) }} 0%, 
                                 {{ $hexToRgba($siteSecondary, 0.7 * $heroFilmScale) }} 50%, 
@@ -293,7 +293,7 @@
                                 {!! \App\Support\RichText::toHtml($description) !!}
                             </div>
                         @else
-                            <p class="mt-5 text-slate-600 leading-relaxed">Sem descriÃ§Ã£o.</p>
+                            <p class="mt-5 text-slate-600 leading-relaxed">Sem descrição.</p>
                         @endif
                     </div>
 
@@ -320,7 +320,7 @@
 
                         @if($flashActive && $mentorship->flash_sale_ends_at)
                             <div class="mt-4 inline-flex items-center gap-2 rounded-full bg-rose-50 border border-rose-200 px-3 py-1 text-xs font-black text-rose-800">
-                                <i class="fas fa-bolt"></i> PromoÃ§Ã£o relÃ¢mpago termina {{ $mentorship->flash_sale_ends_at->diffForHumans() }}
+                                <i class="fas fa-bolt"></i> Promoção relâmpago termina {{ $mentorship->flash_sale_ends_at->diffForHumans() }}
                             </div>
                         @endif
 
@@ -386,7 +386,7 @@
                         </div>
 
                         <p class="mt-8 text-xs text-slate-400 text-center leading-relaxed">
-                            Acesso exclusivo para membros. VocÃª pode comprar esta mentoria (quando disponÃ­vel) ou acessar via planos Premium (conforme regras do seu plano).
+                            Acesso exclusivo para membros. Você pode comprar esta mentoria (quando disponível) ou acessar via planos Premium (conforme regras do seu plano).
                         </p>
                     </aside>
                 </div>
@@ -394,20 +394,20 @@
                 <div class="mentorship-card p-8 md:p-10 mt-6">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                         <div>
-                            <h2 class="text-2xl sm:text-3xl font-black text-slate-900">AvaliaÃ§Ãµes</h2>
-                            <p class="text-sm text-slate-500">ComentÃ¡rios dos membros sobre esta mentoria.</p>
+                            <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Avaliações</h2>
+                            <p class="text-sm text-slate-500">Comentários dos membros sobre esta mentoria.</p>
                         </div>
                         @if($reviewsCount > 0)
                             <div
                                 class="inline-flex items-center gap-2 rounded-full bg-amber-50 text-amber-700 px-4 py-2 text-sm font-semibold">
                                 <i class="fas fa-star"></i>
                                 {{ number_format((float) $reviewsAvg, 1, ',', '.') }}/5 ({{ $reviewsCount }}
-                                {{ $reviewsCount === 1 ? 'avaliaÃ§Ã£o' : 'avaliaÃ§Ãµes' }})
+                                {{ $reviewsCount === 1 ? 'avaliação' : 'avaliações' }})
                             </div>
                         @endif
                     </div>
 
-                    @include('reviews.list', ['reviews' => $reviews, 'emptyMessage' => 'Esta mentoria ainda nÃ£o possui avaliaÃ§Ãµes aprovadas.'])
+                    @include('reviews.list', ['reviews' => $reviews, 'emptyMessage' => 'Esta mentoria ainda não possui avaliações aprovadas.'])
 
                     @include('reviews.form', [
                         'action' => route('mentorships.reviews.store', $mentorship->id),

@@ -92,7 +92,7 @@ class LessonController extends Controller
         if (!$this->canViewLesson($course, $lesson)) {
             if (request()->expectsJson()) {
                 return response()->json([
-                    'message' => 'VocÃª precisa comprar este curso para ver esta aula.',
+                    'message' => 'Você precisa comprar este curso para ver esta aula.',
                 ], 403);
             }
 
@@ -105,7 +105,7 @@ class LessonController extends Controller
                     'course_id' => (int) $course->id,
                     'lesson_id' => (int) $lesson->id,
                 ])
-                ->with('warning', 'ConteÃºdo bloqueado. Escolha como deseja liberar o acesso.');
+                ->with('warning', 'Conteúdo bloqueado. Escolha como deseja liberar o acesso.');
         }
 
         $previewLimitSeconds = 0;
@@ -308,7 +308,7 @@ class LessonController extends Controller
         if (!$this->canViewLesson($course, $lesson)) {
             if (request()->expectsJson()) {
                 return response()->json([
-                    'message' => 'VocÃª precisa comprar este curso para ver esta aula.',
+                    'message' => 'Você precisa comprar este curso para ver esta aula.',
                 ], 403);
             }
 
@@ -321,7 +321,7 @@ class LessonController extends Controller
                     'course_id' => (int) $course->id,
                     'lesson_id' => (int) $lesson->id,
                 ])
-                ->with('warning', 'ConteÃºdo bloqueado. Escolha como deseja liberar o acesso.');
+                ->with('warning', 'Conteúdo bloqueado. Escolha como deseja liberar o acesso.');
         }
 
         if (!Storage::disk('public')->exists($attachment->file_path)) {
@@ -419,7 +419,7 @@ class LessonController extends Controller
         if (!$this->canViewLesson($course, $lesson)) {
             if (request()->expectsJson()) {
                 return response()->json([
-                    'message' => 'VocÃª precisa comprar este curso para ver esta aula.',
+                    'message' => 'Você precisa comprar este curso para ver esta aula.',
                 ], 403);
             }
 
@@ -432,7 +432,7 @@ class LessonController extends Controller
                     'course_id' => (int) $course->id,
                     'lesson_id' => (int) $lesson->id,
                 ])
-                ->with('warning', 'ConteÃºdo bloqueado. Escolha como deseja liberar o acesso.');
+                ->with('warning', 'Conteúdo bloqueado. Escolha como deseja liberar o acesso.');
         }
 
         if (!Auth::check()) {
@@ -544,7 +544,7 @@ class LessonController extends Controller
         if (!$this->canViewLesson($course, $lesson)) {
             if (request()->expectsJson()) {
                 return response()->json([
-                    'message' => 'VocÃª precisa comprar este curso para ver esta aula.',
+                    'message' => 'Você precisa comprar este curso para ver esta aula.',
                 ], 403);
             }
 
@@ -557,7 +557,7 @@ class LessonController extends Controller
                     'course_id' => (int) $course->id,
                     'lesson_id' => (int) $lesson->id,
                 ])
-                ->with('warning', 'ConteÃºdo bloqueado. Escolha como deseja liberar o acesso.');
+                ->with('warning', 'Conteúdo bloqueado. Escolha como deseja liberar o acesso.');
         }
 
         if (!Auth::check()) {
@@ -599,7 +599,7 @@ class LessonController extends Controller
         if (!$this->canViewLesson($course, $lesson)) {
             if (request()->expectsJson()) {
                 return response()->json([
-                    'message' => 'VocÃª precisa comprar este curso para ver esta aula.',
+                    'message' => 'Você precisa comprar este curso para ver esta aula.',
                 ], 403);
             }
 
@@ -612,7 +612,7 @@ class LessonController extends Controller
                     'course_id' => (int) $course->id,
                     'lesson_id' => (int) $lesson->id,
                 ])
-                ->with('warning', 'ConteÃºdo bloqueado. Escolha como deseja liberar o acesso.');
+                ->with('warning', 'Conteúdo bloqueado. Escolha como deseja liberar o acesso.');
         }
 
         if (!Auth::check()) {
