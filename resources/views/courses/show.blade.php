@@ -222,7 +222,7 @@
                             Desbloqueie {{ $course->title }}
                         </h3>
                     </div>
-                    <button type="button" class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:text-slate-700"
+                    <button type="button" class="w-10 h-10 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 flex items-center justify-center transition-all border-none"
                         data-access-modal-close>
                         <i class="fas fa-times"></i>
                     </button>

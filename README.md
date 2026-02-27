@@ -211,6 +211,7 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Interface e Navegação:**
   - Injeção dinâmica de links de extrato nos menus laterais de ambos os sistemas.
   - Correção de bugs de sintaxe e visibilidade no formulário de perfil do novo painel.
+  - **Refinamento de UI**: Ajuste do botão de fechar nos modais de conteúdo premium (Cursos e Mentorias) para garantir um círculo perfeito e geometria simétrica, removendo bordas/fundos estáticos indesejados.
 
 ### 25/02/2026 — Padronização de UX, Sistema de Parceiros e Expansão
 - **Monitoramento de Saúde (Dashboards):**
