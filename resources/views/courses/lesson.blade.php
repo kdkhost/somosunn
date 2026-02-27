@@ -81,6 +81,12 @@
         <div class="flex-1 p-6 md:p-10 overflow-y-auto">
             <div class="max-w-4xl mx-auto">
                 <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ $lesson->title }}</h1>
+                @if(($previewLimitSeconds ?? 0) > 0 && !($hasFullAccess ?? false))
+                    <div class="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 text-sm font-semibold">
+                        <i class="fas fa-clock"></i>
+                        Prévia gratuita: {{ $formatSeconds($previewLimitSeconds) }}
+                    </div>
+                @endif
 
                 <div class="relative w-full overflow-hidden shadow-2xl mb-8 bg-black rounded-xl" style="aspect-ratio: 16/9;"
                     data-unn-video-host>
@@ -151,7 +157,10 @@
                                 data-floating-height="{{ (int) ($course->video_floating_height ?? 236) }}"
                                 data-wm-enabled="{{ $wmEnabled ? '1' : '0' }}" data-wm-image="{{ $wmImage }}"
                                 data-wm-text-enabled="{{ $wmTextEnabled ? '1' : '0' }}" data-wm-text="{{ $wmText }}"
-                                data-wm-opacity="{{ $wmOpacity }}" data-wm-position="{{ $wmPosition }}">
+                                data-wm-opacity="{{ $wmOpacity }}" data-wm-position="{{ $wmPosition }}"
+                                data-has-full-access="{{ !empty($hasFullAccess) ? '1' : '0' }}"
+                                data-preview-limit-seconds="{{ (int) ($previewLimitSeconds ?? 0) }}"
+                                data-checkout-url="{{ route('checkout.show', $course->id) }}">
                                 <video class="w-full h-full object-contain" controls playsinline preload="metadata">
                                     <source src="{{ $normalizedVideoUrl }}">
                                 </video>
@@ -302,6 +311,83 @@
 @endsection
 
 @push('scripts')
+    <script>
+        (function () {
+            const wrapper = document.querySelector('[data-unn-video-player]');
+            if (!wrapper) return;
+
+            const hasFullAccess = (wrapper.dataset.hasFullAccess || '0') === '1';
+            const previewLimitSeconds = Number.parseInt(wrapper.dataset.previewLimitSeconds || '0', 10) || 0;
+            const checkoutUrl = wrapper.dataset.checkoutUrl || '';
+
+            if (hasFullAccess || previewLimitSeconds <= 0) {
+                return;
+            }
+
+            let media = null;
+            let lockShown = false;
+
+            const showPreviewLockModal = () => {
+                if (lockShown) return;
+                lockShown = true;
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Prévia encerrada',
+                        text: 'Você atingiu o limite da aula gratuita. Desbloqueie o curso para assistir completo.',
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Desbloquear agora',
+                        cancelButtonText: 'Continuar navegando'
+                    }).then((result) => {
+                        if (result.isConfirmed && checkoutUrl) {
+                            window.location.href = checkoutUrl;
+                        }
+                    });
+                    return;
+                }
+
+                if (checkoutUrl) {
+                    window.location.href = checkoutUrl;
+                }
+            };
+
+            const enforcePreviewLimit = () => {
+                if (!media) return;
+
+                const currentTime = Number(media.currentTime || 0);
+                if (currentTime < previewLimitSeconds) {
+                    return;
+                }
+
+                media.pause();
+                const safeTime = Math.max(0, previewLimitSeconds - 0.25);
+                if (Math.abs(currentTime - safeTime) > 0.35) {
+                    media.currentTime = safeTime;
+                }
+                showPreviewLockModal();
+            };
+
+            const bindPreviewLimit = (api) => {
+                media = (api && api.media) ? api.media : wrapper.querySelector('video');
+                if (!media) return;
+
+                media.addEventListener('timeupdate', enforcePreviewLimit);
+                media.addEventListener('seeking', enforcePreviewLimit);
+                media.addEventListener('play', enforcePreviewLimit);
+            };
+
+            const existingApi = wrapper.__unnVideoApi || null;
+            if (existingApi) {
+                bindPreviewLimit(existingApi);
+            } else {
+                wrapper.addEventListener('unn:video-ready', (event) => {
+                    bindPreviewLimit((event && event.detail) ? event.detail : null);
+                }, { once: true });
+            }
+        })();
+    </script>
+
     @auth
         <script>
             (function () {

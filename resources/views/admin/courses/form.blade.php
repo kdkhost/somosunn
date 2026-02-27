@@ -550,8 +550,15 @@
                                                     <div class="mt-1">
                                                         <span
                                                             class="badge badge-light border">{{ gmdate("H:i:s", $lesson->duration) }}</span>
-                                                        @if($lesson->is_free_preview) <span class="badge badge-info">Preview
-                                                        Grátis</span> @endif
+                                                        @if($lesson->is_free_preview)
+                                                            <span class="badge badge-info">
+                                                                @if(($lesson->free_preview_mode ?? 'full') === 'time' && (int) ($lesson->free_preview_seconds ?? 0) > 0)
+                                                                    Preview {{ gmdate('i:s', (int) $lesson->free_preview_seconds) }}
+                                                                @else
+                                                                    Preview Grátis
+                                                                @endif
+                                                            </span>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
@@ -1089,6 +1096,26 @@
                             <label class="form-check-label" for="lessonPreview">Aula Gratuita (Preview)</label>
                         </div>
 
+                        <div class="row" id="lessonPreviewConfig" style="display:none;">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Tipo de Gratuidade</label>
+                                    <select name="free_preview_mode" id="lessonPreviewMode" class="form-control">
+                                        <option value="full">Aula inteira gratuita</option>
+                                        <option value="time">Tempo limitado (prévia parcial)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6" id="lessonPreviewSecondsGroup" style="display:none;">
+                                <div class="form-group">
+                                    <label>Tempo gratuito (segundos)</label>
+                                    <input type="number" name="free_preview_seconds" id="lessonPreviewSeconds"
+                                        class="form-control" min="1" step="1" placeholder="Ex: 180">
+                                    <small class="text-muted">Defina quantos segundos ficarão liberados nesta aula.</small>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="progress mt-3" id="uploadProgressWrapper" style="display:none;">
                             <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
                                 role="progressbar" id="uploadProgressBar" style="width: 0%">0%</div>
@@ -1167,10 +1194,22 @@
             }
         }
 
+        function toggleLessonPreviewConfig() {
+            const isPreview = $('#lessonPreview').is(':checked');
+            const mode = $('#lessonPreviewMode').val() || 'full';
+            const isTimeMode = isPreview && mode === 'time';
+
+            $('#lessonPreviewConfig').toggle(isPreview);
+            $('#lessonPreviewSecondsGroup').toggle(isTimeMode);
+            $('#lessonPreviewSeconds').prop('required', isTimeMode);
+        }
+
         $(document).ready(function () {
             $('#video_floating_enabled').on('change', function () {
                 $('#video_floating_size_group').toggle(this.checked);
             });
+            $('#lessonPreview, #lessonPreviewMode').on('change', toggleLessonPreviewConfig);
+            toggleLessonPreviewConfig();
             initCourseSummernoteEditors();
         });
 
@@ -1196,6 +1235,11 @@
             } else {
                 $('#lessonContent').val('');
             }
+
+            $('#lessonPreview').prop('checked', false);
+            $('#lessonPreviewMode').val('full');
+            $('#lessonPreviewSeconds').val('');
+            toggleLessonPreviewConfig();
 
             if (lesson) {
                 // Edit Mode
@@ -1234,7 +1278,10 @@
                 }
 
                 $('#lessonDuration').val(lesson.duration);
-                if (lesson.is_free_preview) $('#lessonPreview').prop('checked', true);
+                $('#lessonPreview').prop('checked', !!lesson.is_free_preview);
+                $('#lessonPreviewMode').val(lesson.free_preview_mode || 'full');
+                $('#lessonPreviewSeconds').val(lesson.free_preview_seconds || '');
+                toggleLessonPreviewConfig();
 
                 // Fetch details (attachments)
                 fetchLessonDetails(lesson.id);

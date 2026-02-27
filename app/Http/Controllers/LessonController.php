@@ -33,6 +33,8 @@ class LessonController extends Controller
             'content' => 'nullable|string',
             'is_free_preview' => 'nullable|boolean',
             'duration' => 'nullable|integer',
+            'free_preview_mode' => 'exclude_unless:is_free_preview,1|nullable|string|in:full,time',
+            'free_preview_seconds' => 'exclude_unless:is_free_preview,1|nullable|integer|min:1|required_if:free_preview_mode,time',
         ]);
 
         $videoUrl = $validated['video_url'] ?? null;
@@ -42,14 +44,15 @@ class LessonController extends Controller
             $videoUrl = Storage::disk('public')->url($path);
         }
 
+        $previewData = $this->buildPreviewData($request, (int) ($validated['duration'] ?? 0));
+
         $lesson = $course->lessons()->create([
             'title' => $validated['title'],
             'order' => $validated['order'],
             'video_url' => $videoUrl,
             'content' => $validated['content'],
-            'is_free_preview' => $request->has('is_free_preview'),
             'duration' => $request->duration ?? 0,
-        ]);
+        ] + $previewData);
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -68,8 +71,24 @@ class LessonController extends Controller
             abort(404);
         }
 
+        $hasFullAccess = $this->hasFullCourseAccess($course);
+
         if (!$this->canViewLesson($course, $lesson)) {
             abort(403, 'Você precisa comprar este curso para ver esta aula.');
+        }
+
+        $previewLimitSeconds = 0;
+        if (
+            !$hasFullAccess
+            && (bool) $lesson->is_free_preview
+            && (string) ($lesson->free_preview_mode ?? 'full') === 'time'
+        ) {
+            $previewLimitSeconds = max(0, (int) ($lesson->free_preview_seconds ?? 0));
+
+            $lessonDuration = max(0, (int) ($lesson->duration ?? 0));
+            if ($lessonDuration > 0 && $previewLimitSeconds > 0) {
+                $previewLimitSeconds = min($previewLimitSeconds, $lessonDuration);
+            }
         }
 
         $previous = $course->lessons()->where('order', '<', $lesson->order)->orderBy('order', 'desc')->first();
@@ -106,7 +125,10 @@ class LessonController extends Controller
             }
         }
 
-        return view('courses.lesson', compact('course', 'lesson', 'previous', 'next', 'resumeAt', 'bookmarks'));
+        return view(
+            'courses.lesson',
+            compact('course', 'lesson', 'previous', 'next', 'resumeAt', 'bookmarks', 'hasFullAccess', 'previewLimitSeconds')
+        );
     }
 
     public function update(Request $request, Course $course, Lesson $lesson)
@@ -120,9 +142,16 @@ class LessonController extends Controller
             'content' => 'nullable|string',
             'duration' => 'nullable|integer',
             'is_free_preview' => 'nullable|boolean',
+            'free_preview_mode' => 'exclude_unless:is_free_preview,1|nullable|string|in:full,time',
+            'free_preview_seconds' => 'exclude_unless:is_free_preview,1|nullable|integer|min:1|required_if:free_preview_mode,time',
         ]);
 
-        $lesson->update($validated + ['is_free_preview' => $request->has('is_free_preview')]);
+        $duration = array_key_exists('duration', $validated)
+            ? (int) $validated['duration']
+            : (int) ($lesson->duration ?? 0);
+        $previewData = $this->buildPreviewData($request, $duration);
+
+        $lesson->update(array_merge($validated, $previewData));
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -428,10 +457,19 @@ class LessonController extends Controller
 
     private function canViewLesson(Course $course, Lesson $lesson): bool
     {
+        if ($this->hasFullCourseAccess($course)) {
+            return true;
+        }
+
         if ($lesson->is_free_preview) {
             return true;
         }
 
+        return false;
+    }
+
+    private function hasFullCourseAccess(Course $course): bool
+    {
         if (!Auth::check()) {
             return false;
         }
@@ -441,5 +479,40 @@ class LessonController extends Controller
         }
 
         return $course->enrollments()->where('user_id', Auth::id())->exists();
+    }
+
+    private function buildPreviewData(Request $request, int $durationSeconds = 0): array
+    {
+        $isFreePreview = $request->boolean('is_free_preview');
+
+        if (!$isFreePreview) {
+            return [
+                'is_free_preview' => false,
+                'free_preview_mode' => 'full',
+                'free_preview_seconds' => null,
+            ];
+        }
+
+        $modeInput = (string) $request->input('free_preview_mode', 'full');
+        $mode = in_array($modeInput, ['full', 'time'], true) ? $modeInput : 'full';
+
+        if ($mode !== 'time') {
+            return [
+                'is_free_preview' => true,
+                'free_preview_mode' => 'full',
+                'free_preview_seconds' => null,
+            ];
+        }
+
+        $seconds = max(1, (int) $request->input('free_preview_seconds', 0));
+        if ($durationSeconds > 0) {
+            $seconds = min($seconds, $durationSeconds);
+        }
+
+        return [
+            'is_free_preview' => true,
+            'free_preview_mode' => 'time',
+            'free_preview_seconds' => $seconds,
+        ];
     }
 }

@@ -15,8 +15,16 @@ class Lesson extends Model
         'order',
         'video_url',
         'is_free_preview',
+        'free_preview_mode',
+        'free_preview_seconds',
         'content',
         'duration', // Seconds
+    ];
+
+    protected $casts = [
+        'is_free_preview' => 'boolean',
+        'free_preview_seconds' => 'integer',
+        'duration' => 'integer',
     ];
 
     public function course()

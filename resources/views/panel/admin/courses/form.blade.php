@@ -415,7 +415,7 @@
                             <p class="text-sm text-slate-500 dark:text-slate-400 font-medium italic">Organize os módulos e aulas
                                 do seu treinamento.</p>
                         </div>
-                        <button type="button" @click="openModal('lesson-modal')"
+                        <button type="button" @click="openNewLessonModal()"
                             class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl shadow-blue-500/20 transition transform hover:scale-[1.05] active:scale-[0.95]">
                             <i class="fas fa-plus"></i>
                             <span>Nova Aula</span>
@@ -451,7 +451,7 @@
                                             <span
                                                 class="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded-lg border border-emerald-100 dark:border-emerald-800/50 transition-colors">
                                                 <i class="fas fa-check-circle"></i>
-                                                Preview Grátis
+                                                {{ (($lesson->free_preview_mode ?? 'full') === 'time' && (int) ($lesson->free_preview_seconds ?? 0) > 0) ? ('Preview ' . gmdate('i:s', (int) $lesson->free_preview_seconds)) : 'Preview Grátis' }}
                                             </span>
                                         @endif
                                     </div>
@@ -705,6 +705,35 @@
                 document.getElementById(id).classList.remove('flex');
             }
 
+            function updateLessonPreviewConfig() {
+                const isPreview = $('#lessonPreview').is(':checked');
+                const mode = $('#lessonPreviewMode').val() || 'full';
+                const isTimeMode = isPreview && mode === 'time';
+
+                $('#lessonPreviewConfig').toggleClass('hidden', !isPreview);
+                $('#lessonPreviewSecondsGroup').toggleClass('hidden', !isTimeMode);
+                $('#lessonPreviewSeconds').prop('required', isTimeMode);
+            }
+
+            function openNewLessonModal() {
+                const form = document.getElementById('lessonForm');
+                if (form) {
+                    form.reset();
+                }
+
+                $('#lessonId').val('');
+                const nextOrder = Math.max(1, document.querySelectorAll('#lessons-list [data-id]').length + 1);
+                $('#lessonOrder').val(nextOrder);
+                $('#lessonPreview').prop('checked', false);
+                $('#lessonPreviewMode').val('full');
+                $('#lessonPreviewSeconds').val('');
+                $('#lessonVideo').val('');
+                $('#lessonContent').val('');
+                $('#attachmentList').empty();
+                updateLessonPreviewConfig();
+                openModal('lesson-modal');
+            }
+
             function editLesson(id) {
                 if (!lessonBaseUrl) return;
                 $.get(lessonBaseUrl + '/' + id + '/details', function (lesson) {
@@ -713,8 +742,11 @@
                     $('#lessonOrder').val(lesson.order);
                     $('#lessonDuration').val(lesson.duration);
                     $('#lessonPreview').prop('checked', !!lesson.is_free_preview);
+                    $('#lessonPreviewMode').val(lesson.free_preview_mode || 'full');
+                    $('#lessonPreviewSeconds').val(lesson.free_preview_seconds || '');
                     $('#lessonVideo').val(lesson.video_url || '');
                     $('#lessonContent').val(lesson.content || '');
+                    updateLessonPreviewConfig();
 
                     // Attachments
                     const $list = $('#attachmentList').empty();
@@ -737,6 +769,9 @@
                     openModal('lesson-modal');
                 });
             }
+
+            $(document).on('change', '#lessonPreview, #lessonPreviewMode', updateLessonPreviewConfig);
+            updateLessonPreviewConfig();
 
             $('#btnSaveLesson').on('click', function () {
                 if (!lessonStoreUrl || !lessonBaseUrl) return;
@@ -1038,6 +1073,35 @@
                                 <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Marcar como aula gratuita
                                     de preview</span>
                             </label>
+                        </div>
+
+                        <div id="lessonPreviewConfig" class="md:col-span-2 hidden">
+                            <div
+                                class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label
+                                            class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Tipo
+                                            de Gratuidade</label>
+                                        <select id="lessonPreviewMode" name="free_preview_mode"
+                                            class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                                            <option value="full">Aula inteira gratuita</option>
+                                            <option value="time">Tempo limitado (prévia parcial)</option>
+                                        </select>
+                                    </div>
+                                    <div id="lessonPreviewSecondsGroup" class="hidden">
+                                        <label
+                                            class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Tempo
+                                            Gratuito (segundos)</label>
+                                        <input type="number" id="lessonPreviewSeconds" name="free_preview_seconds" min="1"
+                                            step="1"
+                                            class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-400"
+                                            placeholder="Ex: 180">
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Defina quantos segundos
+                                            ficarão liberados para não assinantes.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="md:col-span-2">
