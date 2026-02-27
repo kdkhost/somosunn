@@ -99,7 +99,7 @@ class LessonController extends Controller
             $routeParam = !empty($course->slug) ? $course->slug : $course->id;
 
             return redirect()
-                ->route('courses.show', $routeParam)
+                ->route('courses.show', ['course' => $routeParam, 'locked' => 1])
                 ->with('access_blocked', [
                     'type' => 'course',
                     'course_id' => (int) $course->id,
@@ -315,7 +315,7 @@ class LessonController extends Controller
             $routeParam = !empty($course->slug) ? $course->slug : $course->id;
 
             return redirect()
-                ->route('courses.show', $routeParam)
+                ->route('courses.show', ['course' => $routeParam, 'locked' => 1])
                 ->with('access_blocked', [
                     'type' => 'course',
                     'course_id' => (int) $course->id,
@@ -426,7 +426,7 @@ class LessonController extends Controller
             $routeParam = !empty($course->slug) ? $course->slug : $course->id;
 
             return redirect()
-                ->route('courses.show', $routeParam)
+                ->route('courses.show', ['course' => $routeParam, 'locked' => 1])
                 ->with('access_blocked', [
                     'type' => 'course',
                     'course_id' => (int) $course->id,
@@ -551,7 +551,7 @@ class LessonController extends Controller
             $routeParam = !empty($course->slug) ? $course->slug : $course->id;
 
             return redirect()
-                ->route('courses.show', $routeParam)
+                ->route('courses.show', ['course' => $routeParam, 'locked' => 1])
                 ->with('access_blocked', [
                     'type' => 'course',
                     'course_id' => (int) $course->id,
@@ -606,7 +606,7 @@ class LessonController extends Controller
             $routeParam = !empty($course->slug) ? $course->slug : $course->id;
 
             return redirect()
-                ->route('courses.show', $routeParam)
+                ->route('courses.show', ['course' => $routeParam, 'locked' => 1])
                 ->with('access_blocked', [
                     'type' => 'course',
                     'course_id' => (int) $course->id,

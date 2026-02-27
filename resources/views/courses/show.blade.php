@@ -241,7 +241,7 @@
                         class="flex-1 px-6 py-3 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 text-center">
                         Fazer upgrade
                     </a>
-                    <a href="{{ route('checkout.show', $course->slug ?: $course->id) }}"
+                    <a href="{{ route('checkout.show', $course->id) }}"
                         class="flex-1 px-6 py-3 rounded-xl font-bold text-white text-center"
                         style="background: linear-gradient(135deg, #1f5edb, #2f7df6);">
                         Comprar curso

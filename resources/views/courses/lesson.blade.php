@@ -51,11 +51,20 @@
             </div>
             <div class="py-2">
                 @foreach($course->lessons()->orderBy('order')->get() as $l)
-                    <a href="{{ route('courses.lessons.show', [$course->id, $l->id]) }}"
+                    @php
+                        $canOpenLesson = (bool) ($hasFullAccess ?? false) || (bool) $l->is_free_preview;
+                        $courseRouteParam = !empty($course->slug) ? $course->slug : $course->id;
+                        $targetHref = $canOpenLesson
+                            ? route('courses.lessons.show', [$course->id, $l->id])
+                            : route('courses.show', ['course' => $courseRouteParam, 'locked' => 1]);
+                    @endphp
+                    <a href="{{ $targetHref }}"
                         class="flex items-center p-4 hover:bg-gray-50 transition border-l-4 {{ $l->id == $lesson->id ? 'border-[#1F5EDB] bg-blue-50' : 'border-transparent' }}">
                         <div class="mr-3">
                             @if(isset($lessonProgressMap[$l->id]) && $lessonProgressMap[$l->id])
                                 <i class="fas fa-check-circle text-green-500"></i>
+                            @elseif(!$canOpenLesson)
+                                <i class="fas fa-lock text-gray-400"></i>
                             @elseif($l->id == $lesson->id)
                                 <i class="fas fa-play text-[#1F5EDB]"></i>
                             @else

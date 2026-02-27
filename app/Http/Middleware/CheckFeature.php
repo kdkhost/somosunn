@@ -66,7 +66,10 @@ class CheckFeature
                     $routeParam = !empty($course->slug) ? $course->slug : $course->id;
 
                     return redirect()
-                        ->route('courses.show', $routeParam)
+                        ->route('courses.show', [
+                            'course' => $routeParam,
+                            'locked' => 1,
+                        ])
                         ->with('access_blocked', [
                             'type' => 'course',
                             'course_id' => (int) $course->id,
@@ -83,7 +86,10 @@ class CheckFeature
                 $mentorship = Mentorship::query()->find($mentorshipId);
                 if ($mentorship) {
                     return redirect()
-                        ->route('mentorships.show', $mentorship)
+                        ->route('mentorships.show', [
+                            'mentorship' => $mentorship,
+                            'locked' => 1,
+                        ])
                         ->with('access_blocked', [
                             'type' => 'mentorship',
                             'mentorship_id' => (int) $mentorship->id,
