@@ -23,6 +23,85 @@
             pointer-events: none;
         }
 
+        .mentorship-hero-glow {
+            background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.2), transparent 55%),
+                radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.14), transparent 55%),
+                linear-gradient(135deg, rgba(8, 24, 58, 0.9), rgba(15, 23, 42, 0.8));
+        }
+
+        .mentorship-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 999px;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            backdrop-filter: blur(10px);
+        }
+
+        .mentorship-card {
+            position: relative;
+            background: #ffffff;
+            border-radius: 1.75rem;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 20px 45px -30px rgba(15, 23, 42, 0.35);
+        }
+
+        .mentorship-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(14, 165, 233, 0.1), rgba(99, 102, 241, 0.25));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .mentorship-price {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(14, 165, 233, 0.08));
+            border: 1px solid rgba(59, 130, 246, 0.15);
+        }
+
+        .mentorship-cta {
+            background: linear-gradient(135deg, #1f5edb, #2f7df6);
+            box-shadow: 0 18px 35px -18px rgba(37, 99, 235, 0.55);
+        }
+
+        .mentorship-avatar-ring {
+            background: conic-gradient(from 180deg, rgba(255, 255, 255, 0.2), rgba(59, 130, 246, 0.65), rgba(14, 165, 233, 0.4), rgba(255, 255, 255, 0.2));
+            padding: 2px;
+            border-radius: 999px;
+        }
+
+        .mentorship-float {
+            animation: mentorshipFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes mentorshipFloat {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mentorship-float {
+                animation: none;
+            }
+        }
+
         /* Rating styles managed in partials/reviews/form.blade.php */
     </style>
 @endpush
@@ -36,6 +115,9 @@
         $slots = $mentorship->slots;
         $slotsLabel = is_null($slots) ? 'A confirmar' : (string) $slots;
         $description = trim((string) ($mentorship->description ?? ''));
+        $heroExcerpt = $description !== ''
+            ? Str::limit(strip_tags($description), 160)
+            : 'Acompanhamento com orientaÃ§Ã£o prÃ¡tica para acelerar resultados em networking e negÃ³cios.';
 
         $selectedRating = old('rating', optional($myReview)->rating);
         $selectedRating = is_numeric($selectedRating) ? max(1, min(5, (int) $selectedRating)) : null;
@@ -54,6 +136,14 @@
         };
 
         $mentorshipImageUrl = $resolveImageUrl($mentorship->image ?? null);
+        $mentorAvatarRaw = optional($mentorship->mentor)->profile_photo_url ?? optional($mentorship->mentor)->photo ?? null;
+        $mentorAvatarUrl = $resolveImageUrl($mentorAvatarRaw);
+
+        $typeLabel = match ($mentorship->type ?? '') {
+            \App\Models\Mentorship::TYPE_ONLINE => 'Online',
+            \App\Models\Mentorship::TYPE_PRESENCIAL => 'Presencial',
+            default => null,
+        };
 
         $sitePrimary = \App\Models\Setting::get('site_color_primary') ?: '#1F5EDB';
         $siteSecondary = \App\Models\Setting::get('site_color_secondary') ?: '#1D3FC4';
@@ -89,7 +179,7 @@
     @endphp
 
     <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <section class="unn-mentorship-show-hero relative overflow-hidden">
+        <section class="unn-mentorship-show-hero mentorship-hero-glow relative overflow-hidden">
             @if($mentorshipImageUrl)
                 <div class="absolute inset-0 pointer-events-none overflow-hidden">
                     <img src="{{ $mentorshipImageUrl }}" alt=""
@@ -124,8 +214,27 @@
                             {{ $mentorship->title ?? 'Mentoria' }}
                         </h1>
                         <p class="mt-4 text-white/90 text-base sm:text-lg max-w-3xl font-medium drop-shadow-md">
-                            Acompanhamento com orientação prática para acelerar resultados em networking e negócios.
+                            {{ $heroExcerpt }}
                         </p>
+                        <div class="mt-6 flex flex-wrap items-center gap-3">
+                            <span class="mentorship-chip">
+                                <i class="fas fa-crown text-[0.7rem]"></i> Premium
+                            </span>
+                            @if($typeLabel)
+                                <span class="mentorship-chip">
+                                    <i class="fas fa-satellite-dish text-[0.7rem]"></i> {{ $typeLabel }}
+                                </span>
+                            @endif
+                            <span class="mentorship-chip">
+                                <i class="fas fa-users text-[0.7rem]"></i> Vagas: {{ $slotsLabel }}
+                            </span>
+                            @if($reviewsCount > 0)
+                                <span class="mentorship-chip">
+                                    <i class="fas fa-star text-[0.7rem]"></i>
+                                    {{ number_format((float) $reviewsAvg, 1, ',', '.') }}/5
+                                </span>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -134,8 +243,37 @@
         <section class="px-4 md:px-12 lg:px-24 -mt-10 pb-14 md:pb-20">
             <div class="max-w-6xl mx-auto">
                 <div class="grid lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-xl border border-slate-100 p-8 md:p-10">
+                    <div class="lg:col-span-2 mentorship-card p-8 md:p-10">
                         <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Sobre a mentoria</h2>
+
+                        <div class="mt-6 grid sm:grid-cols-2 gap-4">
+                            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+                                <div class="mentorship-avatar-ring">
+                                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center overflow-hidden">
+                                        @if($mentorAvatarUrl)
+                                            <img src="{{ $mentorAvatarUrl }}" alt="{{ $mentorName }}" class="w-full h-full object-cover">
+                                        @else
+                                            <span class="text-sm font-black text-slate-600">
+                                                {{ mb_substr($mentorName, 0, 1) }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mentor</p>
+                                    <p class="text-base font-black text-slate-900">{{ $mentorName }}</p>
+                                </div>
+                            </div>
+                            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Formato</p>
+                                    <p class="text-base font-black text-slate-900">{{ $typeLabel ?? 'Mentoria Premium' }}</p>
+                                </div>
+                            </div>
+                        </div>
 
                         @if($description !== '')
                             <div class="mt-5 text-slate-600 leading-relaxed">
@@ -146,7 +284,7 @@
                         @endif
                     </div>
 
-                    <aside class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 md:p-10">
+                    <aside class="mentorship-card lg:sticky lg:top-8 p-8 md:p-10">
                         <div class="flex items-center justify-between gap-3">
                             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Investimento</p>
                             <span
@@ -154,23 +292,25 @@
                                 Premium
                             </span>
                         </div>
-
-                        <div class="mt-3 flex items-end gap-3">
-                            <p class="text-4xl font-black text-slate-900">
-                                {{ $price > 0 ? 'R$ ' . number_format($price, 2, ',', '.') : 'Gratuito' }}
-                            </p>
-                            @if($flashActive && $regularPrice > 0 && $price < $regularPrice)
-                                <p class="text-sm text-slate-400 line-through mb-1">
-                                    {{ 'R$ ' . number_format($regularPrice, 2, ',', '.') }}
+                        <div class="mt-5 mentorship-price rounded-2xl p-5">
+                            <div class="flex items-end justify-between gap-3">
+                                <p class="text-4xl font-black text-slate-900">
+                                    {{ $price > 0 ? 'R$ ' . number_format($price, 2, ',', '.') : 'Gratuito' }}
                                 </p>
-                            @endif
+                                @if($flashActive && $regularPrice > 0 && $price < $regularPrice)
+                                    <p class="text-sm text-slate-400 line-through mb-1">
+                                        {{ 'R$ ' . number_format($regularPrice, 2, ',', '.') }}
+                                    </p>
+                                @endif
+                            </div>
                         </div>
 
                         @if($flashActive && $mentorship->flash_sale_ends_at)
-                            <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-rose-50 border border-rose-200 px-3 py-1 text-xs font-black text-rose-800">
-                                <i class="fas fa-bolt"></i> Promoção relâmpago ativa
+                            <div class="mt-4 inline-flex items-center gap-2 rounded-full bg-rose-50 border border-rose-200 px-3 py-1 text-xs font-black text-rose-800">
+                                <i class="fas fa-bolt"></i> Promoção relâmpago termina {{ $mentorship->flash_sale_ends_at->diffForHumans() }}
                             </div>
                         @endif
+
 
                         <div class="mt-8 space-y-4">
                             <div class="flex items-start gap-4">
@@ -197,7 +337,7 @@
                         <div class="mt-10 flex flex-col gap-4">
                             @if($price > 0)
                                 <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
-                                    class="btn-primary text-white px-8 py-4 rounded-2xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_15px_30px_-10px_rgba(31,94,219,0.4)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
+                                    class="mentorship-cta text-white px-8 py-4 rounded-2xl font-bold inline-flex items-center justify-center gap-3 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap mentorship-float">
                                     Comprar mentoria <i class="fas fa-lock"></i>
                                 </a>
                             @endif
@@ -219,7 +359,7 @@
                     </aside>
                 </div>
 
-                <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 md:p-10 mt-6">
+                <div class="mentorship-card p-8 md:p-10 mt-6">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                         <div>
                             <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Avaliações</h2>
