@@ -59,6 +59,10 @@ class CertificateController extends Controller
         $issuedCertificates->appends(request()->all());
 
         $pendingEnrollments = $queryPending->get()->filter(function ($enrollment) {
+            if (!$enrollment->user || !$enrollment->enrollable) {
+                return false;
+            }
+
             $query = Certificate::where('user_id', $enrollment->user_id);
             if ($enrollment->enrollable_type === Course::class)
                 $query->where('course_id', $enrollment->enrollable_id);

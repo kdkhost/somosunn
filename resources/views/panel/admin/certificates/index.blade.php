@@ -76,17 +76,17 @@
                                     <div class="flex items-center gap-3">
                                         <div
                                             class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
-                                            @if($cert->user->profile_photo_url && !str_contains($cert->user->profile_photo_url, 'default-user.svg'))
-                                                <img src="{{ $cert->user->profile_photo_url }}" alt="" class="w-full h-full object-cover">
+                                            @if(optional($cert->user)->profile_photo_url && !str_contains((string) optional($cert->user)->profile_photo_url, 'default-user.svg'))
+                                                <img src="{{ optional($cert->user)->profile_photo_url }}" alt="" class="w-full h-full object-cover">
                                             @else
                                                 <i class="fas fa-user text-slate-400 dark:text-slate-500"></i>
                                             @endif
                                         </div>
                                         <div>
                                             <p class="text-sm font-bold text-slate-900 dark:text-white transition-colors">
-                                                {{ $cert->user->name }}</p>
+                                                {{ optional($cert->user)->name ?? 'Usuario removido' }}</p>
                                             <p class="text-xs text-slate-400 dark:text-slate-500 transition-colors">
-                                                {{ $cert->user->email }}</p>
+                                                {{ optional($cert->user)->email ?? '-' }}</p>
                                         </div>
                                     </div>
                                 </td>
@@ -176,17 +176,17 @@
                                     <div class="flex items-center gap-3">
                                         <div
                                             class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
-                                            @if($enrollment->user->profile_photo_url && !str_contains($enrollment->user->profile_photo_url, 'default-user.svg'))
-                                                <img src="{{ $enrollment->user->profile_photo_url }}" alt="" class="w-full h-full object-cover">
+                                            @if(optional($enrollment->user)->profile_photo_url && !str_contains((string) optional($enrollment->user)->profile_photo_url, 'default-user.svg'))
+                                                <img src="{{ optional($enrollment->user)->profile_photo_url }}" alt="" class="w-full h-full object-cover">
                                             @else
                                                 <i class="fas fa-user text-slate-400 dark:text-slate-500"></i>
                                             @endif
                                         </div>
                                         <div>
                                             <p class="text-sm font-bold text-slate-900 dark:text-white transition-colors">
-                                                {{ $enrollment->user->name }}</p>
+                                                {{ optional($enrollment->user)->name ?? 'Usuario removido' }}</p>
                                             <p class="text-xs text-slate-400 dark:text-slate-500 transition-colors">
-                                                {{ $enrollment->user->email }}</p>
+                                                {{ optional($enrollment->user)->email ?? '-' }}</p>
                                         </div>
                                     </div>
                                 </td>
@@ -196,7 +196,7 @@
                                         {{ $enrollment->enrollable_type === 'App\Models\Course' ? 'Curso' : ($enrollment->enrollable_type === 'App\Models\Mentorship' ? 'Mentoria' : 'Evento') }}
                                     </span>
                                     <span class="text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
-                                        {{ $enrollment->enrollable->title ?? 'N/A' }}
+                                        {{ optional($enrollment->enrollable)->title ?? 'Conteudo removido' }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 transition-colors">

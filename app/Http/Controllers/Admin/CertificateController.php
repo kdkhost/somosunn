@@ -60,6 +60,10 @@ class CertificateController extends Controller
 
         // Better Pending Logic: filter out those who already have a certificate for that specific enrollment
         $pendingEnrollments = $queryPending->get()->filter(function ($enrollment) {
+            if (!$enrollment->user || !$enrollment->enrollable) {
+                return false;
+            }
+
             $query = Certificate::where('user_id', $enrollment->user_id);
 
             if ($enrollment->enrollable_type === Course::class) {

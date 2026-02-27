@@ -51,9 +51,9 @@
                                     <td data-sort="{{ $cert->issued_at->format('YmdHis') }}">
                                         {{ $cert->issued_at->format('d/m/Y H:i') }}
                                     </td>
-                                    <td>{{ $cert->user->name }}</td>
+                                    <td>{{ optional($cert->user)->name ?? 'Usuario removido' }}</td>
                                     <td><span class="badge badge-info">{{ $type }}</span></td>
-                                    <td>{{ $product->title ?? 'N/A' }}</td>
+                                    <td>{{ optional($product)->title ?? 'Conteudo removido' }}</td>
                                     <td><small>{{ $cert->cert_hash }}</small></td>
                                     </td>
                                     <td>
@@ -79,7 +79,7 @@
                                             class="d-inline form-send-email">
                                             @csrf
                                             <button type="button" class="btn btn-xs btn-primary btn-send-email"
-                                                data-email="{{ $cert->user->email }}" title="Enviar por Email">
+                                                data-email="{{ optional($cert->user)->email ?? '-' }}" title="Enviar por Email">
                                                 <i class="fas fa-envelope"></i>
                                             </button>
                                         </form>
@@ -127,9 +127,9 @@
                                     @endphp
                                     <tr>
                                         <td>{{ $enrollment->completed_at ? $enrollment->completed_at->format('d/m/Y') : '-' }}</td>
-                                        <td>{{ $enrollment->user->name }}</td>
+                                        <td>{{ optional($enrollment->user)->name ?? 'Usuario removido' }}</td>
                                         <td><span class="badge badge-secondary">{{ $typeLabel }}</span></td>
-                                        <td>{{ $enrollment->enrollable->title }}</td>
+                                        <td>{{ optional($enrollment->enrollable)->title ?? 'Conteudo removido' }}</td>
                                         <td>
                                             <form action="{{ route('admin.certificates.generate') }}" method="POST"
                                                 class="d-inline">
