@@ -195,6 +195,19 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Refatoração de Controllers:**
   - Simplificação do `SettingController` delegando a resolução de URLs para o Model, aumentando a manutenibilidade.
 
+### 27/02/2026 — Split de Pagamento Marketplace
+- **Divisão Automatizada de Vendas:**
+  - Implementação de sistema de rateio (Split) para vendas de membros.
+  - Divisão configurável entre: **Vendedor, Plataforma, Tráfego Pago e Superadmin**.
+  - Validação de integridade: a soma das porcentagens é validada no admin para garantir exatamente 100%.
+- **Gestão Financeira e Transparência:**
+  - Nova tabela `order_splits` para auditoria e rastreamento de cada centavo distribuído.
+  - Campo **Chave PIX** adicionado ao perfil do usuário (Membro e Admin) para destinação automática de recebimentos.
+- **Webhook Inteligente:**
+  - O processamento de pagamentos agora dispara automaticamente o cálculo do split no momento da aprovação da ordem.
+- **MercadoPago & MCP:**
+  - Sistema preparado para suportar splits via API ou transferências diretas via PIX baseado nas ordens liquidadas.
+
 ### 25/02/2026 — Padronização de UX, Sistema de Parceiros e Expansão
 - **Monitoramento de Saúde (Dashboards):**
   - **Saúde da Comunidade (Admin):** Integração de seção visual no novo painel administrativo com indicadores de engajamento do ecossistema.

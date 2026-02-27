@@ -57,6 +57,15 @@
                     <input id="profile_complement" name="complement" value="{{ old('complement', $user->complement) }}"
                         class="mt-1 w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
                 </div>
+                <div class="md:col-span-4">
+                    <label class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 block transition-colors">Chave
+                        PIX (Para recebimento de Split)</label>
+                    <input id="profile_pix_key" name="pix_key" value="{{ old('pix_key', $user->pix_key) }}"
+                        placeholder="E-mail, CPF, Celular ou Chave Aleatória"
+                        class="mt-1 w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                    <small class="text-slate-500 dark:text-slate-400 mt-1 block">Esta chave será usada para o repasse
+                        automático de comissões e splits de vendas.</small>
+                </div>
                 <div class="md:col-span-2">
                     <label
                         class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 block transition-colors">Cidade</label>

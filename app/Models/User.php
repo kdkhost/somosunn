@@ -33,7 +33,7 @@
  *
  * -----------------------------------------------------------------------------
  * LICENÇA DE USO:
- * Este sistema é licenciado, não vendido.
+ * Este sistema é licensed, não vendido.
  * O uso é restrito ao cliente contratante conforme contrato firmado.
  * É vedado o compartilhamento, revenda ou distribuição a terceiros
  * sem autorização prévia e documentada.
@@ -177,7 +177,8 @@ class User extends Authenticatable
         'google_id',
         'facebook_id',
         'linkedin_id',
-        'avatar'
+        'avatar',
+        'pix_key'
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -230,110 +231,19 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class);
     }
 
-    public function interactions()
+    public function notifications()
     {
-        return $this->hasMany(Interaction::class, 'user_from_id');
+        return $this->morphMany(Notification::class, 'notifiable')->latest();
     }
 
-    // Relacionamentos de Conexão
-    public function sentConnections()
+    public function unreadNotifications()
     {
-        return $this->hasMany(Connection::class, 'requester_id');
+        return $this->morphMany(Notification::class, 'notifiable')->whereNull('read_at')->latest();
     }
 
-    public function receivedConnections()
+    public function readNotifications()
     {
-        return $this->hasMany(Connection::class, 'requested_id');
-    }
-
-    // Verifica se já são conectados (aceito)
-    public function isConnectedWith($userId)
-    {
-        return Connection::where(function ($q) use ($userId) {
-            $q->where('requester_id', $this->id)->where('requested_id', $userId);
-        })->orWhere(function ($q) use ($userId) {
-            $q->where('requester_id', $userId)->where('requested_id', $this->id);
-        })->where('status', 'accepted')->exists();
-    }
-
-    /**
-     * Verifica se o usuário atual pode enviar mensagem para outro usuário
-     * 
-     * Regras:
-     * - Admin/Superadmin podem mensagear qualquer um
-     * - Membros só podem mensagear admin/superadmin se tiverem conexão com eles
-     * - Membros podem responder se admin/superadmin mandou primeiro
-     * - Membro para membro: obrigatória conexão ativa
-     */
-    public function canMessageUser($otherUser)
-    {
-        // Se o usuário logado é admin ou superadmin, pode mensagear qualquer um
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        // Se o outro usuário é admin/superadmin
-        if ($otherUser->isAdmin()) {
-            // Verifica se tem conexão
-            if ($this->isConnectedWith($otherUser->id)) {
-                return true;
-            }
-
-            // Verifica se o admin já iniciou conversa (enviou mensagem primeiro)
-            $hasReceivedFromAdmin = \App\Models\Message::where('sender_id', $otherUser->id)
-                ->where('receiver_id', $this->id)
-                ->exists();
-
-            return $hasReceivedFromAdmin;
-        }
-
-        // Membro para membro: obrigatória conexão ativa
-        return $this->isConnectedWith($otherUser->id);
-    }
-
-    // Verifica se tem solicitação pendente (enviada ou recebida)
-    public function hasPendingConnectionWith($userId)
-    {
-        return Connection::where(function ($q) use ($userId) {
-            $q->where('requester_id', $this->id)->where('requested_id', $userId);
-        })->orWhere(function ($q) use ($userId) {
-            $q->where('requester_id', $userId)->where('requested_id', $this->id);
-        })->where('status', 'pending')->first();
-    }
-
-    public function conversations()
-    {
-        return $this->belongsToMany(Conversation::class, 'conversation_user')->withPivot('role', 'joined_at');
-    }
-
-    public function receivedInteractions()
-    {
-        return $this->hasMany(Interaction::class, 'user_to_id');
-    }
-
-    public function ranking()
-    {
-        return $this->hasOne(Ranking::class);
-    }
-
-    public function subscriptions()
-    {
-        return $this->hasMany(Subscription::class);
-    }
-
-    public function posts()
-    {
-        return $this->hasMany(Post::class);
-    }
-
-    public function itemReviews()
-    {
-        return $this->hasMany(ItemReview::class);
-    }
-
-    public function certificates()
-    {
-        return $this->hasMany(Certificate::class);
+        return $this->morphMany(Notification::class, 'notifiable')->whereNotNull('read_at')->latest();
     }
 
     public function isProfileComplete(): bool
@@ -373,29 +283,5 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new \App\Notifications\ResetPasswordNotification($token));
-    }
-
-    /**
-     * Get the entity's notifications.
-     */
-    public function notifications()
-    {
-        return $this->morphMany(Notification::class, 'notifiable')->latest();
-    }
-
-    /**
-     * Get the entity's unread notifications.
-     */
-    public function unreadNotifications()
-    {
-        return $this->morphMany(Notification::class, 'notifiable')->whereNull('read_at')->latest();
-    }
-
-    /**
-     * Get the entity's read notifications.
-     */
-    public function readNotifications()
-    {
-        return $this->morphMany(Notification::class, 'notifiable')->whereNotNull('read_at')->latest();
     }
 }

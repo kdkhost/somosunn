@@ -142,6 +142,17 @@ class SettingController extends Controller
             }
         }
 
+        if ($currentGroup === 'marketplace') {
+            $seller = (float) ($data['marketplace_split_seller_percent'] ?? 0);
+            $platform = (float) ($data['marketplace_split_platform_percent'] ?? 0);
+            $traffic = (float) ($data['marketplace_split_traffic_percent'] ?? 0);
+            $superadmin = (float) ($data['marketplace_split_superadmin_percent'] ?? 0);
+
+            if (round($seller + $platform + $traffic + $superadmin, 2) !== 100.00) {
+                return redirect()->back()->withInput()->with('error', 'A soma dos percentuais de split (Vendedor + Plataforma + Tráfego + Superadmin) deve ser exatamente 100%.');
+            }
+        }
+
         $dirs = [
             'uploads/imagens',
             'uploads/imagens/administrativo',

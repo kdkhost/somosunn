@@ -10,6 +10,9 @@ use App\Models\EventRegistration;
 use App\Models\Mentorship;
 use App\Models\Order;
 use App\Models\Plan;
+use App\Models\Setting;
+use App\Models\User;
+use App\Models\OrderSplit;
 use App\Services\CouponService;
 use App\Services\InvoiceService;
 use App\Support\EmailQueueSettings;
@@ -118,6 +121,9 @@ class PaymentWebhookController extends Controller
                 'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
             ]);
             Log::info("Order #{$order->id} marked as PAID via Webhook");
+
+            // Calcular Split de Pagamento
+            $this->calculateAndSaveSplits($order);
         } else {
             $order->update([
                 'transaction_id' => $order->transaction_id ?: (string) $transactionId,
@@ -205,6 +211,68 @@ class PaymentWebhookController extends Controller
         }
 
         return response('OK', 200);
+    }
+
+    private function calculateAndSaveSplits(Order $order)
+    {
+        $total = (float) $order->total_amount;
+        if ($total <= 0)
+            return;
+
+        // Limpar splits existentes se houver
+        OrderSplit::where('order_id', $order->id)->delete();
+
+        // Pegar porcentagens das configurações
+        $sellerPercent = (float) Setting::get('marketplace_split_seller_percent', 70);
+        $platformPercent = (float) Setting::get('marketplace_split_platform_percent', 10);
+        $trafficPercent = (float) Setting::get('marketplace_split_traffic_percent', 10);
+        $superadminPercent = (float) Setting::get('marketplace_split_superadmin_percent', 10);
+
+        // Achar SuperAdmin (para a chave PIX)
+        $superadmin = User::where('role', 'superadmin')
+            ->orWhere('level', 'superadmin')
+            ->first();
+
+        $splits = [
+            [
+                'type' => 'seller',
+                'percent' => $sellerPercent,
+                'user_id' => ($order->seller_id && $order->seller_id !== 'platform') ? $order->seller_id : null,
+            ],
+            [
+                'type' => 'platform',
+                'percent' => $platformPercent,
+                'user_id' => null,
+            ],
+            [
+                'type' => 'traffic',
+                'percent' => $trafficPercent,
+                'user_id' => null,
+            ],
+            [
+                'type' => 'superadmin',
+                'percent' => $superadminPercent,
+                'user_id' => $superadmin ? $superadmin->id : null,
+            ],
+        ];
+
+        foreach ($splits as $split) {
+            if ($split['percent'] <= 0)
+                continue;
+
+            $amount = round(($total * $split['percent']) / 100, 2);
+            $receiver = $split['user_id'] ? User::find($split['user_id']) : null;
+
+            OrderSplit::create([
+                'order_id' => $order->id,
+                'receiver_type' => $split['type'],
+                'receiver_id' => $split['user_id'],
+                'amount' => $amount,
+                'percentage' => $split['percent'],
+                'status' => 'pending',
+                'pix_key' => $receiver ? $receiver->pix_key : null,
+            ]);
+        }
     }
 
     private function confirmEventRegistrationsForOrder(Order $order): void

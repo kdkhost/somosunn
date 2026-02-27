@@ -50,6 +50,77 @@
     </div>
 
     <hr class="my-4">
+    
+    <h5 class="text-primary mb-3"><i class="fas fa-divide mr-2"></i> Divisão de Vendas (Split)</h5>
+    <div class="alert alert-warning mb-4">
+        <i class="fas fa-exclamation-triangle mr-2"></i> A soma das porcentagens deve ser exatamente <strong>100%</strong>.
+    </div>
+
+    <div class="row" id="split-settings-container">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Vendedor (%)</label>
+                <input type="number" name="marketplace_split_seller_percent" class="form-control split-input"
+                    value="{{ $settings['marketplace_split_seller_percent'] ?? '70' }}" min="0" max="100" step="0.01">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Plataforma (%)</label>
+                <input type="number" name="marketplace_split_platform_percent" class="form-control split-input"
+                    value="{{ $settings['marketplace_split_platform_percent'] ?? '10' }}" min="0" max="100" step="0.01">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Tráfego Pago (%)</label>
+                <input type="number" name="marketplace_split_traffic_percent" class="form-control split-input"
+                    value="{{ $settings['marketplace_split_traffic_percent'] ?? '10' }}" min="0" max="100" step="0.01">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Superadmin (%)</label>
+                <input type="number" name="marketplace_split_superadmin_percent" class="form-control split-input"
+                    value="{{ $settings['marketplace_split_superadmin_percent'] ?? '10' }}" min="0" max="100" step="0.01">
+            </div>
+        </div>
+    </div>
+    <div id="split-total-warning" class="mt-2 text-danger font-weight-bold" style="display: none;">
+        <i class="fas fa-times-circle mr-1"></i> A soma atual é <span id="split-total-value">0</span>%. Ajuste para 100%.
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('.split-input');
+            const warning = document.getElementById('split-total-warning');
+            const totalSpan = document.getElementById('split-total-value');
+
+            function calculateTotal() {
+                let total = 0;
+                inputs.forEach(input => {
+                    total += parseFloat(input.value || 0);
+                });
+                
+                total = Math.round(total * 100) / 100;
+                totalSpan.textContent = total;
+
+                if (total !== 100) {
+                    warning.style.display = 'block';
+                } else {
+                    warning.style.display = 'none';
+                }
+            }
+
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateTotal);
+            });
+
+            calculateTotal();
+        });
+    </script>
+
+    <hr class="my-4">
 
     @php
         $slide1Image = isset($getUrl) ? $getUrl('marketplace_hero_slide_1_image') : '';

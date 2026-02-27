@@ -59,6 +59,8 @@ class ProfileController extends Controller
             'linkedin' => 'nullable|url|max:255',
             'youtube' => 'nullable|url|max:255',
 
+            'pix_key' => 'nullable|string|max:255',
+
             'theme_pref' => 'nullable|string|in:light,dark',
         ]);
 

@@ -24,7 +24,7 @@ class ProfileController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:120',
-            'email' => 'required|email|unique:users,email,'.$user->id,
+            'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6|confirmed',
             'phone' => 'nullable|string|max:20',
             'doc' => 'nullable|string|max:20',
@@ -35,7 +35,7 @@ class ProfileController extends Controller
             'bio' => 'nullable|string|max:500',
             'photo' => 'nullable|image|max:2048',
             'cover_photo' => 'nullable|image|max:4096', // Capa pode ser maior (4MB)
-            
+
             // Endereço
             'cep' => 'nullable|string|max:9',
             'street' => 'nullable|string|max:255',
@@ -44,7 +44,7 @@ class ProfileController extends Controller
             'neighborhood' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:2',
-            
+
             // Redes Sociais
             'website' => 'nullable|url|max:255',
             'facebook' => 'nullable|string|max:255',
@@ -52,7 +52,9 @@ class ProfileController extends Controller
             'twitter' => 'nullable|string|max:255',
             'linkedin' => 'nullable|url|max:255',
             'youtube' => 'nullable|url|max:255',
-            
+
+            'pix_key' => 'nullable|string|max:255',
+
             // Privacidade - SEM validação boolean (checkboxes não enviam quando desmarcados)
         ]);
 
@@ -66,22 +68,22 @@ class ProfileController extends Controller
         $uploadedPhotoPath = null;
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
             \Log::info('Upload de foto iniciado para user ' . $user->id);
-            
+
             if ($user->photo && file_exists(public_path($user->photo))) {
                 unlink(public_path($user->photo));
             }
-            
+
             $file = $request->file('photo');
             $filename = 'avatar_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
             $directory = public_path('uploads/imagens/avatars');
-            
+
             if (!file_exists($directory)) {
                 mkdir($directory, 0755, true);
             }
-            
+
             $path = 'uploads/imagens/avatars/' . $filename;
             $file->move($directory, $filename);
-            
+
             if (file_exists(public_path($path))) {
                 $uploadedPhotoPath = $path;
                 $data['photo'] = $path;
@@ -91,22 +93,22 @@ class ProfileController extends Controller
         // Upload de foto de capa
         if ($request->hasFile('cover_photo') && $request->file('cover_photo')->isValid()) {
             \Log::info('Upload de capa iniciado para user ' . $user->id);
-            
+
             if ($user->cover_photo && file_exists(public_path($user->cover_photo))) {
                 unlink(public_path($user->cover_photo));
             }
-            
+
             $file = $request->file('cover_photo');
             $filename = 'cover_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
             $directory = public_path('uploads/imagens/covers');
-            
+
             if (!file_exists($directory)) {
                 mkdir($directory, 0755, true);
             }
-            
+
             $path = 'uploads/imagens/covers/' . $filename;
             $file->move($directory, $filename);
-            
+
             if (file_exists(public_path($path))) {
                 $data['cover_photo'] = $path;
             }
@@ -121,7 +123,7 @@ class ProfileController extends Controller
         // Salva os dados
         $user->fill($data);
         $saved = $user->save();
-        
+
         // Força refresh do modelo
         $user->refresh();
 
