@@ -557,6 +557,8 @@
         })();
     </script>
 
+    @include('partials.global-placeholder-fix')
+
     @stack('scripts')
     <script>
         window.showSuccess = function (msg) {

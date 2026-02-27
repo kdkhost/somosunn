@@ -70,6 +70,7 @@
         &copy; {{ date('Y') }} Grupo UNN. Todos os direitos reservados.
     </footer>
     @stack('scripts')
+    @include('partials.global-placeholder-fix')
     <script>
         // Menu mobile responsivo aprimorado
         document.addEventListener('DOMContentLoaded', function () {
