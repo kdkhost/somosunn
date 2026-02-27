@@ -233,30 +233,12 @@ class CertificateController extends Controller
     public function view($hash)
     {
         $cert = Certificate::where('cert_hash', $hash)->firstOrFail();
-
-        $pdfPath = $cert->pdf_path;
-
-        // Try multiple path resolution strategies
-        $possiblePaths = [
-            storage_path('app/public/' . $pdfPath),
-            public_path('storage/' . $pdfPath),
-            storage_path('app/' . $pdfPath),
-            public_path($pdfPath)
-        ];
-
-        $path = null;
-        foreach ($possiblePaths as $testPath) {
-            if (file_exists($testPath)) {
-                $path = $testPath;
-                break;
-            }
-        }
+        $type = null;
+        $id = null;
+        $path = $this->resolverCaminhoPdfCertificado($cert->pdf_path);
 
         // If PDF doesn't exist OR regeneration is forced
         if (!$path || request()->has('regenerate')) {
-            $type = null;
-            $id = null;
-
             if ($cert->course_id) {
                 $type = 'course';
                 $id = $cert->course_id;
@@ -293,13 +275,13 @@ class CertificateController extends Controller
                     $newPath = "certificates/{$cert->cert_hash}.pdf";
                     \Storage::disk('public')->put($newPath, $output);
                     $cert->update(['pdf_path' => $newPath]);
-                    $path = storage_path('app/public/' . $newPath);
+                    $path = $this->resolverCaminhoPdfCertificado($newPath);
                 }
             }
         }
 
 
-        if (!$path || !file_exists($path)) {
+        if (!$path || !is_file($path)) {
             \Log::error('Certificate PDF not found or regeneration failed', [
                 'cert_id' => $cert->id,
                 'cert_hash' => $cert->cert_hash,
@@ -324,6 +306,45 @@ class CertificateController extends Controller
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="certificado.pdf"'
         ]);
+    }
+
+    private function resolverCaminhoPdfCertificado(?string $pdfPath): ?string
+    {
+        $pdfPath = trim((string) ($pdfPath ?? ''));
+        if ($pdfPath === '' || $pdfPath === '/' || $pdfPath === '\\') {
+            return null;
+        }
+
+        $normalizado = str_replace('\\', '/', $pdfPath);
+        $normalizado = ltrim($normalizado, '/');
+        foreach (['storage/', 'public/', 'app/public/'] as $prefixo) {
+            if (str_starts_with($normalizado, $prefixo)) {
+                $normalizado = substr($normalizado, strlen($prefixo));
+                break;
+            }
+        }
+
+        $candidatos = [];
+        try {
+            if (Storage::disk('public')->exists($normalizado)) {
+                $candidatos[] = Storage::disk('public')->path($normalizado);
+            }
+        } catch (\Throwable $e) {
+            // Continua com fallback de caminhos locais
+        }
+
+        $candidatos[] = storage_path('app/public/' . $normalizado);
+        $candidatos[] = public_path('storage/' . $normalizado);
+        $candidatos[] = storage_path('app/' . $normalizado);
+        $candidatos[] = public_path($normalizado);
+
+        foreach ($candidatos as $caminho) {
+            if (is_string($caminho) && $caminho !== '' && is_file($caminho)) {
+                return $caminho;
+            }
+        }
+
+        return null;
     }
 
     public function previewHtml($hash)
