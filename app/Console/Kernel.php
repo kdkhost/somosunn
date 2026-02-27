@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
             \Illuminate\Support\Facades\Cache::put('cron_heartbeat', now(), 120);
         })->everyMinute();
 
-        // Processamento de fila de e-mails (configurável no painel SMTP)
+        // Processamento de fila de e-mails (configuravel no painel SMTP)
         try {
             if (
                 \Schema::hasTable('settings')
@@ -48,7 +48,21 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar worker de fila de e-mails: ' . $e->getMessage());
         }
 
-        // Carregar tarefas dinâmicas do banco
+        // Processamento interno de conversao de videos de aulas (HLS)
+        try {
+            if ((bool) config('uploads.video_hls_enabled', true)) {
+                $limite = max(1, (int) config('uploads.video_hls_scheduler_limit', 2));
+
+                $schedule->command('lessons:process-pending-videos --limit=' . $limite)
+                    ->everyMinute()
+                    ->withoutOverlapping()
+                    ->name('lessons-video-worker');
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar worker de videos de aulas: ' . $e->getMessage());
+        }
+
+        // Carregar tarefas dinamicas do banco
         try {
             if (\Schema::hasTable('scheduled_tasks')) {
                 $tasks = \App\Models\ScheduledTask::where('active', true)->get();
@@ -60,7 +74,7 @@ class Kernel extends ConsoleKernel
                 }
             }
         } catch (\Exception $e) {
-            \Log::error("Erro ao carregar scheduler do banco: " . $e->getMessage());
+            \Log::error('Erro ao carregar scheduler do banco: ' . $e->getMessage());
         }
     }
 

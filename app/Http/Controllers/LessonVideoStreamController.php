@@ -27,12 +27,12 @@ class LessonVideoStreamController extends Controller
         if ($path === 'source' || $path === 'source.mp4') {
             $caminhoFonte = $this->normalizarPath((string) ($lesson->video_storage_path ?? ''));
             if ($caminhoFonte !== '' && $storage->exists($caminhoFonte)) {
-                return $this->responderArquivo($storage->path($caminhoFonte), 'video/mp4');
+                return $this->responderArquivo($storage->path($caminhoFonte), $this->mimePorExtensao($caminhoFonte));
             }
 
             $pathLegado = $this->resolverPathLegadoPublico((string) ($lesson->video_url ?? ''));
             if ($pathLegado !== null && Storage::disk('public')->exists($pathLegado)) {
-                return $this->responderArquivo(Storage::disk('public')->path($pathLegado), 'video/mp4');
+                return $this->responderArquivo(Storage::disk('public')->path($pathLegado), $this->mimePorExtensao($pathLegado));
             }
 
             abort(404);
