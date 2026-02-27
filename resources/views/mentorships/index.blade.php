@@ -27,50 +27,47 @@
         .mentorship-card {
             position: relative;
             overflow: hidden;
-            border-radius: 1.75rem;
-            background: #fff;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            box-shadow: 0 18px 45px -32px rgba(15, 23, 42, 0.45);
+            border-radius: 24px;
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 20px 50px -40px rgba(15, 23, 42, 0.55);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
         }
 
-        .mentorship-card::after {
+        .mentorship-card::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.02), rgba(99, 102, 241, 0.08));
-            opacity: 0;
-            transition: opacity .35s ease;
+            border-top: 4px solid rgba(31, 94, 219, 0.75);
             pointer-events: none;
         }
 
-        .mentorship-card:hover::after {
-            opacity: 1;
+        .mentorship-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 28px 64px -44px rgba(15, 23, 42, 0.65);
+            border-color: rgba(59, 130, 246, 0.35);
         }
 
-        .mentorship-media {
-            position: relative;
-            height: 180px;
+        .mentorship-title {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            background: linear-gradient(135deg, rgba(30, 64, 175, 0.25), rgba(14, 116, 144, 0.25));
         }
 
-        .mentorship-media::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.0), rgba(15, 23, 42, 0.35));
+        .mentorship-excerpt {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        .mentorship-media img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scale(1.02);
-            transition: transform .4s ease;
-        }
-
-        .mentorship-card:hover .mentorship-media img {
-            transform: scale(1.06);
+        .mentorship-price {
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.01em;
+            font-size: clamp(1.05rem, 2vw, 1.3rem);
+            color: var(--unn-azul-1);
         }
 
         .mentorship-chip {
@@ -83,16 +80,16 @@
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            background: rgba(248, 250, 252, 0.9);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            color: #334155;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
         }
 
-        .mentorship-excerpt {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        .mentorship-stat {
+            border-radius: 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 0.9rem;
         }
     </style>
 @endpush
