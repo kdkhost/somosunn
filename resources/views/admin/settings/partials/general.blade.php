@@ -9,14 +9,14 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label>Nome do Site (App Name)</label>
-                <input type="text" name="app_name" class="form-control form-control-lg"
+                <input type="text" name="app_name" class="form-control"
                     value="{{ $settings['app_name'] ?? config('app.name') }}">
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label>Razão Social / Nome da Empresa</label>
-                <input type="text" name="company_name" class="form-control form-control-lg"
+                <input type="text" name="company_name" class="form-control"
                     value="{{ $settings['company_name'] ?? '' }}">
             </div>
         </div>
