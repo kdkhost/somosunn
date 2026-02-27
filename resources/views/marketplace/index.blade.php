@@ -212,6 +212,68 @@
             .float-animate {
                 animation: float-img 6s ease-in-out infinite;
             }
+
+            .swal2-popup.mp-event-popup {
+                width: min(540px, 92vw) !important;
+                border-radius: 18px !important;
+                padding: 1.25rem 1.25rem 1rem !important;
+            }
+
+            .swal2-popup.mp-event-popup .swal2-title {
+                margin: 0 0 .5rem !important;
+                text-align: left !important;
+                font-size: 1.8rem !important;
+                line-height: 1.2 !important;
+            }
+
+            .swal2-popup.mp-event-popup .swal2-html-container {
+                margin: 0 !important;
+                overflow: visible !important;
+                max-height: none !important;
+            }
+
+            .swal2-popup.mp-event-popup .swal2-actions {
+                margin-top: .9rem !important;
+                justify-content: flex-start !important;
+            }
+
+            .swal2-popup.mp-event-popup .swal2-confirm {
+                border-radius: 12px !important;
+                font-weight: 800 !important;
+                letter-spacing: .02em !important;
+            }
+
+            .mp-event-card {
+                display: flex;
+                align-items: center;
+                gap: .75rem;
+                text-align: left;
+            }
+
+            .mp-event-card img {
+                width: 56px;
+                height: 56px;
+                object-fit: cover;
+                border-radius: 12px;
+                border: 1px solid rgba(148, 163, 184, .35);
+                flex-shrink: 0;
+            }
+
+            .mp-event-card-title {
+                margin: 0;
+                font-size: 1.1rem;
+                font-weight: 800;
+                line-height: 1.2;
+                color: #1f2937;
+                word-break: break-word;
+            }
+
+            .mp-event-card-date {
+                margin: .2rem 0 0;
+                font-size: .92rem;
+                color: #475569;
+                line-height: 1.2;
+            }
         </style>
     @endpush
 
@@ -1690,11 +1752,17 @@
                         }
                     }
 
-                    const toast = window.Swal.mixin({
-                        toast: true,
-                        position: 'bottom-end',
+                    const popupEvento = window.Swal.mixin({
+                        toast: false,
+                        position: 'center',
+                        width: 540,
+                        heightAuto: false,
+                        customClass: {
+                            popup: 'mp-event-popup',
+                        },
                         showConfirmButton: true,
-                        confirmButtonText: 'Ver',
+                        confirmButtonText: 'APROVEITAR',
+                        confirmButtonColor: '#2563eb',
                         showCloseButton: true,
                         timer: 12000,
                         timerProgressBar: true,
@@ -1742,16 +1810,16 @@
                         saveState(state);
 
                         const html = `
-                                                                                            <div class="flex gap-3 items-center">
-                                                                                                ${image ? `<img src="${escapeHtml(image)}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:12px;border:1px solid rgba(148,163,184,.35)" />` : ''}
-                                                                                                <div style="min-width:0">
-                                                                                                    <div style="font-weight:900;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">${title}</div>
-                                                                                                    ${date ? `<div style="margin-top:2px;font-size:12px;opacity:.85">Data: ${date}</div>` : ''}
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        `;
+                            <div class="mp-event-card">
+                                ${image ? `<img src="${escapeHtml(image)}" alt="" />` : ''}
+                                <div style="min-width:0">
+                                    <p class="mp-event-card-title">${title}</p>
+                                    ${date ? `<p class="mp-event-card-date">Data: ${date}</p>` : ''}
+                                </div>
+                            </div>
+                        `;
 
-                        toast.fire({
+                        popupEvento.fire({
                             icon: 'info',
                             title: 'Novo evento na comunidade',
                             html,
