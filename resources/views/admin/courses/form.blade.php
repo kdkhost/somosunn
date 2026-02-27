@@ -1697,6 +1697,15 @@
             $('#lessonVideoFile').change(function (e) {
                 var file = e.target.files[0];
                 if (file) {
+                    const limiteMb = {{ (int) config('uploads.video_max_mb', 1024) }};
+                    const limiteBytes = limiteMb * 1024 * 1024;
+                    if (file.size > limiteBytes) {
+                        toastr.error('O video excede o limite permitido de ' + limiteMb + 'MB.');
+                        e.target.value = '';
+                        $('#lessonVideoFileLabel').text('Escolher video...');
+                        return;
+                    }
+
                     $('#lessonVideoFileLabel').text(file.name);
                     var video = document.createElement('video');
                     video.preload = 'metadata';
@@ -1724,7 +1733,12 @@
                 if (id) url += '/' + id;
 
                 // Sync Summernote content manually to ensure it's captured
-                var content = $('#lessonContent').summernote('code');
+                var content = '';
+                if (window.jQuery && $.fn && $.fn.summernote && $('#lessonContent').next('.note-editor').length) {
+                    content = $('#lessonContent').summernote('code');
+                } else {
+                    content = $('#lessonContent').val() || '';
+                }
 
                 var formData = new FormData($('#lessonForm')[0]);
                 formData.set('content', content); // Force override with summernote data
@@ -1741,6 +1755,11 @@
                     processData: false,
                     contentType: false,
                     dataType: 'json', // Expect JSON
+                    timeout: 900000,
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
                     xhr: function () {
                         var xhr = new window.XMLHttpRequest();
                         xhr.upload.addEventListener("progress", function (evt) {
@@ -1753,9 +1772,12 @@
                         return xhr;
                     },
                     success: function (response) {
-                        $('#uploadProgressWrapper').hide();
-                        $btn.prop('disabled', false).text(originalText);
-                        toastr.success('Aula salva com sucesso!');
+                        if (response && response.success === false) {
+                            toastr.error(response.message || 'Falha ao salvar a aula.');
+                            return;
+                        }
+
+                        toastr.success((response && response.message) ? response.message : 'Aula salva com sucesso!');
 
                         // Close modal and reload page immediately usually creates a jarring effect
                         // Better interaction: Close modal, then reload.
@@ -1765,6 +1787,11 @@
                         }, 500); // 0.5s delay to see success
                     },
                     error: function (xhr) {
+                        if (xhr && xhr.statusText === 'timeout') {
+                            toastr.error('Tempo limite excedido no upload. Tente um arquivo menor.');
+                            return;
+                        }
+
                         $('#uploadProgressWrapper').hide();
                         $btn.prop('disabled', false).text(originalText);
 
@@ -1780,6 +1807,10 @@
                             toastr.error('Erro ao salvar.');
                             console.error(xhr);
                         }
+                    },
+                    complete: function () {
+                        $('#uploadProgressWrapper').hide();
+                        $btn.prop('disabled', false).text(originalText);
                     }
                 });
             });

@@ -135,10 +135,20 @@ class LessonController extends Controller
     {
         $this->authorize('update', $course);
 
+        set_time_limit(0);
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 0);
+
+        $videoMaxMb = (int) config('uploads.video_max_mb', 1024);
+        $videoMaxKb = max(1, $videoMaxMb) * 1024;
+        $allowedVideoExt = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_video_formats', [])));
+        $allowedVideoRule = !empty($allowedVideoExt) ? ('|mimes:' . implode(',', $allowedVideoExt)) : '';
+
         $validated = $request->validate([
             'title' => 'required|string',
             'order' => 'integer',
             'video_url' => 'nullable|url',
+            'video_file' => 'nullable|file|max:' . $videoMaxKb . $allowedVideoRule,
             'content' => 'nullable|string',
             'duration' => 'nullable|integer',
             'is_free_preview' => 'nullable|boolean',
@@ -146,12 +156,20 @@ class LessonController extends Controller
             'free_preview_seconds' => 'exclude_unless:is_free_preview,1|nullable|integer|min:1|required_if:free_preview_mode,time',
         ]);
 
+        $videoUrl = $validated['video_url'] ?? $lesson->video_url;
+        if ($request->hasFile('video_file')) {
+            $path = $request->file('video_file')->store('course-videos', 'public');
+            $videoUrl = Storage::disk('public')->url($path);
+        }
+
         $duration = array_key_exists('duration', $validated)
             ? (int) $validated['duration']
             : (int) ($lesson->duration ?? 0);
         $previewData = $this->buildPreviewData($request, $duration);
 
-        $lesson->update(array_merge($validated, $previewData));
+        $lesson->update(array_merge($validated, $previewData, [
+            'video_url' => $videoUrl,
+        ]));
 
         if ($request->wantsJson()) {
             return response()->json([

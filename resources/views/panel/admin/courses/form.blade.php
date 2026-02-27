@@ -728,6 +728,8 @@
                 $('#lessonPreviewMode').val('full');
                 $('#lessonPreviewSeconds').val('');
                 $('#lessonVideo').val('');
+                $('#lessonVideoFile').val('');
+                $('#lessonVideoFileLabel').html('<i class="fas fa-cloud-upload-alt text-lg"></i><span>Selecionar video para envio</span>');
                 $('#lessonContent').val('');
                 $('#attachmentList').empty();
                 updateLessonPreviewConfig();
@@ -745,6 +747,8 @@
                     $('#lessonPreviewMode').val(lesson.free_preview_mode || 'full');
                     $('#lessonPreviewSeconds').val(lesson.free_preview_seconds || '');
                     $('#lessonVideo').val(lesson.video_url || '');
+                    $('#lessonVideoFile').val('');
+                    $('#lessonVideoFileLabel').html('<i class="fas fa-cloud-upload-alt text-lg"></i><span>Selecionar video para envio</span>');
                     $('#lessonContent').val(lesson.content || '');
                     updateLessonPreviewConfig();
                     if (!lesson.duration || Number(lesson.duration) <= 0) {
@@ -977,6 +981,34 @@
                 agendarDeteccaoDuracaoUrl(false);
             });
 
+            $(document).on('change', '#lessonVideoFile', function (e) {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+
+                const limiteMb = {{ (int) config('uploads.video_max_mb', 1024) }};
+                const limiteBytes = limiteMb * 1024 * 1024;
+                if (file.size > limiteBytes) {
+                    toastr.error('O video excede o limite permitido de ' + limiteMb + 'MB.');
+                    e.target.value = '';
+                    $('#lessonVideoFileLabel').html('<i class="fas fa-cloud-upload-alt text-lg"></i><span>Selecionar video para envio</span>');
+                    return;
+                }
+
+                $('#lessonVideoFileLabel').html('<i class="fas fa-file-video text-lg"></i><span>' + file.name + '</span>');
+
+                const video = document.createElement('video');
+                video.preload = 'metadata';
+                video.onloadedmetadata = function () {
+                    window.URL.revokeObjectURL(video.src);
+                    const duracao = Math.floor(Number(video.duration) || 0);
+                    if (duracao > 0) {
+                        $('#lessonDuration').val(duracao);
+                        toastr.info('Duração detectada: ' + duracao + 's');
+                    }
+                };
+                video.src = URL.createObjectURL(file);
+            });
+
             $(document).on('change', '#lessonPreview, #lessonPreviewMode', updateLessonPreviewConfig);
             updateLessonPreviewConfig();
 
@@ -987,18 +1019,51 @@
                 const formData = new FormData(document.getElementById('lessonForm'));
                 if (id) formData.append('_method', 'PUT');
 
+                const $btn = $(this);
+                const textoOriginal = $btn.html();
+                $btn.prop('disabled', true).html('Salvando...');
+
                 $.ajax({
                     url: url,
                     type: 'POST',
                     data: formData,
                     processData: false,
                     contentType: false,
-                    success: function () {
-                        toastr.success('Aula salva!');
+                    timeout: 900000,
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    success: function (response) {
+                        if (response && response.success === false) {
+                            toastr.error(response.message || 'Falha ao salvar a aula.');
+                            return;
+                        }
+                        toastr.success((response && response.message) ? response.message : 'Aula salva!');
                         location.reload();
                     },
                     error: function (xhr) {
+                        if (xhr && xhr.statusText === 'timeout') {
+                            toastr.error('Tempo limite excedido no upload. Tente um arquivo menor.');
+                            return;
+                        }
+
+                        if (xhr && xhr.responseJSON && xhr.responseJSON.errors) {
+                            let msg = '';
+                            $.each(xhr.responseJSON.errors, function (k, v) { msg += v[0] + '<br>'; });
+                            toastr.error(msg || 'Erro ao salvar aula.');
+                            return;
+                        }
+
+                        if (xhr && xhr.status === 413) {
+                            toastr.error('Arquivo muito grande para o servidor.');
+                            return;
+                        }
+
                         toastr.error('Erro ao salvar aula.');
+                    },
+                    complete: function () {
+                        $btn.prop('disabled', false).html(textoOriginal);
                     }
                 });
             });
@@ -1270,6 +1335,22 @@
                                     class="w-full pl-12 pr-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-300"
                                     placeholder="https://...">
                             </div>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label
+                                class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Arquivo
+                                de VÃ­deo (Upload)</label>
+                            <div class="relative group">
+                                <input type="file" id="lessonVideoFile" name="video_file" accept="video/*,video/mp4,video/webm"
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                <div id="lessonVideoFileLabel"
+                                    class="w-full px-5 py-4 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 group-hover:border-blue-400 group-hover:bg-blue-50/10 transition-all">
+                                    <i class="fas fa-cloud-upload-alt text-lg"></i>
+                                    <span>Selecionar video para envio</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Se enviar arquivo, ele terá prioridade sobre a URL.</p>
                         </div>
 
                         <div class="md:col-span-2">
