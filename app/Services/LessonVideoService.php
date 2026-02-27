@@ -338,6 +338,10 @@ class LessonVideoService
         }
 
         $filtroVideo = 'scale=w=min(1280\\,iw):h=-2';
+        $textoMarca = $this->resolverTextoMarcaDaguaTranscode();
+        if ($textoMarca !== null) {
+            $filtroVideo .= ',drawtext=text=\'' . $this->escaparTextoFfmpeg($textoMarca) . '\':fontcolor=white@0.22:fontsize=24:x=w-tw-24:y=h-th-24:box=1:boxcolor=black@0.25:boxborderw=8';
+        }
         $comentarioProtecao = $this->textoProtecaoMetadado();
 
         $comandoBase = [
@@ -550,6 +554,49 @@ class LessonVideoService
         }
 
         return 'Conteudo protegido - anti-pirataria - ' . $nomeSite;
+    }
+
+    private function resolverTextoMarcaDaguaTranscode(): ?string
+    {
+        $ativo = (string) Setting::get('video_watermark_text_enabled', '0') === '1';
+        if (!$ativo) {
+            return null;
+        }
+
+        $template = trim((string) (Setting::get('video_watermark_text_template') ?: '{name} - {email}'));
+        $nomeSite = trim((string) (Setting::get('app_name') ?: config('app.name', 'UNN')));
+        if ($nomeSite === '') {
+            $nomeSite = 'UNN';
+        }
+
+        $texto = str_replace(
+            ['{name}', '{email}', '{cpf}', '{id}', '{site}'],
+            ['USUARIO', 'usuario@protegido', '***', '0', $nomeSite],
+            $template
+        );
+
+        $texto = trim(preg_replace('/\s+/u', ' ', $texto) ?: $texto);
+        if ($texto === '') {
+            $texto = 'Conteudo protegido - ' . $nomeSite;
+        }
+
+        if (function_exists('mb_substr')) {
+            $texto = mb_substr($texto, 0, 100);
+        } else {
+            $texto = substr($texto, 0, 100);
+        }
+
+        return $texto;
+    }
+
+    private function escaparTextoFfmpeg(string $texto): string
+    {
+        $texto = str_replace(["\r", "\n", "\t"], ' ', $texto);
+        $texto = str_replace('\\', '\\\\', $texto);
+        $texto = str_replace(':', '\\:', $texto);
+        $texto = str_replace("'", "\\'", $texto);
+        $texto = str_replace('%', '\\%', $texto);
+        return trim($texto);
     }
 
     private function removerPastaRecursiva($storage, string $pasta): void

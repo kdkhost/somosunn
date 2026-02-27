@@ -184,7 +184,11 @@
                         @endif
                     @else
                         <div class="flex items-center justify-center h-full text-white">
-                            <p>Nenhum vídeo disponível para esta aula.</p>
+                            @if(!empty($videoProcessando))
+                                <p>Vídeo em processamento seguro. Aguarde alguns instantes e atualize a página.</p>
+                            @else
+                                <p>Nenhum vídeo disponível para esta aula.</p>
+                            @endif
                         </div>
                     @endif
                 </div>

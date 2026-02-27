@@ -565,7 +565,7 @@
                                             <div class="d-flex align-items-center flex-nowrap" style="gap: 5px;">
                                                 <button type="button" class="btn btn-sm btn-outline-primary btn-edit-lesson"
                                                     data-id="{{ $lesson->id }}" title="Editar"><i class="fas fa-edit"></i></button>
-                                                <form action="{{ route('courses.lessons.destroy', [$course, $lesson]) }}"
+                                                <form action="{{ route('admin.courses.lessons.destroy', [$course, $lesson]) }}"
                                                     method="POST" class="d-inline ajax-delete">
                                                     @csrf @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir"><i
@@ -1158,6 +1158,42 @@
     <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
     <script>
         Dropzone.autoDiscover = false;
+        const aulaStoreUrlAdmin = @json($course->exists ? route('admin.courses.lessons.store', $course) : null);
+        const aulaBaseUrlAdmin = aulaStoreUrlAdmin;
+        const aulaImagemConteudoUrlAdmin = @json($course->exists ? route('admin.courses.lessons.content-image', $course) : null);
+
+        function enviarImagemConteudoAula(file, $editor) {
+            if (!aulaImagemConteudoUrlAdmin) {
+                toastr.warning('Salve o curso primeiro para enviar imagens no conteúdo.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('_token', '{{ csrf_token() }}');
+            formData.append('image', file);
+
+            $.ajax({
+                url: aulaImagemConteudoUrlAdmin,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).done(function (response) {
+                if (response && response.url) {
+                    $editor.summernote('insertImage', response.url);
+                    return;
+                }
+
+                toastr.error('Nao foi possivel inserir a imagem no conteúdo.');
+            }).fail(function (xhr) {
+                const mensagem = xhr?.responseJSON?.message || 'Falha ao enviar imagem do conteúdo.';
+                toastr.error(mensagem);
+            });
+        }
 
         function initCourseSummernoteEditors(tryCount = 0) {
             if (!(window.jQuery && $.fn && $.fn.summernote)) {
@@ -1174,7 +1210,13 @@
                 fullDescription.summernote({
                     height: 260,
                     lang: 'pt-BR',
-                    placeholder: 'Detalhe o conteúdo do curso...'
+                    placeholder: 'Detalhe o conteudo do curso...',
+                    callbacks: {
+                        onImageUpload: function (files) {
+                            if (!files || !files.length) return;
+                            Array.from(files).forEach((file) => enviarImagemConteudoAula(file, fullDescription));
+                        }
+                    }
                 });
             }
 
@@ -1189,7 +1231,13 @@
                         ['para', ['ul', 'ol', 'paragraph']],
                         ['insert', ['link', 'picture', 'video']],
                         ['view', ['fullscreen', 'codeview']]
-                    ]
+                    ],
+                    callbacks: {
+                        onImageUpload: function (files) {
+                            if (!files || !files.length) return;
+                            Array.from(files).forEach((file) => enviarImagemConteudoAula(file, lessonContent));
+                        }
+                    }
                 });
             }
         }
@@ -1211,6 +1259,45 @@
             $('#lessonPreview, #lessonPreviewMode').on('change', toggleLessonPreviewConfig);
             toggleLessonPreviewConfig();
             initCourseSummernoteEditors();
+
+            const $lessonList = $('#lessons-list');
+            @if($course->exists)
+            if ($lessonList.length && $.fn.sortable) {
+                $lessonList.sortable({
+                    items: '.lesson-item',
+                    handle: '.fa-grip-vertical',
+                    axis: 'y',
+                    tolerance: 'pointer',
+                    update: function () {
+                        const lessons = [];
+                        $lessonList.find('.lesson-item').each(function (index) {
+                            const id = Number($(this).data('id') || 0);
+                            if (!id) return;
+                            lessons.push({
+                                id: id,
+                                order: index + 1
+                            });
+                            $(this).find('.text-muted.mr-1').first().text('#' + (index + 1));
+                        });
+
+                        if (!lessons.length) return;
+
+                        $.ajax({
+                            url: '{{ route('admin.courses.lessons.reorder', $course) }}',
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                lessons: lessons
+                            }
+                        }).done(function () {
+                            toastr.success('Ordem das aulas atualizada.');
+                        }).fail(function (xhr) {
+                            toastr.error(xhr?.responseJSON?.message || 'Falha ao atualizar a ordem das aulas.');
+                        });
+                    }
+                });
+            }
+            @endif
         });
 
         // Helper functions
@@ -1269,10 +1356,10 @@
                     $('#pills-url-tab').tab('show');
                 }
 
-                // Lock Video Editing
-                $('#lessonVideo').prop('disabled', true);
-                $('#lessonVideoFile').prop('disabled', true);
-                $('#video-source-tab a').addClass('disabled'); // Disable tab switching
+                // Permite ajuste da fonte de video mesmo na edicao da aula
+                $('#lessonVideo').prop('disabled', false);
+                $('#lessonVideoFile').prop('disabled', false);
+                $('#video-source-tab a').removeClass('disabled');
 
                 // Set Content
                 if (window.jQuery && $.fn && $.fn.summernote && $('#lessonContent').next('.note-editor').length) {
@@ -1309,13 +1396,17 @@
         }
 
         function updateDropzoneUrl(lessonId) {
-            if (myDropzone) {
-                myDropzone.options.url = '/courses/{{ $course->id }}/lessons/' + lessonId + '/attachments';
+            if (myDropzone && aulaBaseUrlAdmin) {
+                myDropzone.options.url = aulaBaseUrlAdmin + '/' + lessonId + '/attachments';
             }
         }
 
         function fetchLessonDetails(lessonId) {
-            $.get('/courses/{{ $course->id }}/lessons/' + lessonId + '/details', function (data) {
+            if (!aulaBaseUrlAdmin) {
+                return;
+            }
+
+            $.get(aulaBaseUrlAdmin + '/' + lessonId + '/details', function (data) {
                 renderAttachments(data.attachments, lessonId);
             });
         }
@@ -1355,7 +1446,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/courses/{{ $course->id }}/lessons/' + lessonId + '/attachments/' + attId,
+                        url: aulaBaseUrlAdmin + '/' + lessonId + '/attachments/' + attId,
                         type: 'PUT',
                         data: { name: result.value, _token: '{{ csrf_token() }}' },
                         success: function () { fetchLessonDetails(lessonId); toastr.success('Renomeado'); }
@@ -1373,7 +1464,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/courses/{{ $course->id }}/lessons/' + lessonId + '/attachments/' + attId,
+                        url: aulaBaseUrlAdmin + '/' + lessonId + '/attachments/' + attId,
                         type: 'DELETE',
                         data: { _token: '{{ csrf_token() }}' },
                         success: function () { fetchLessonDetails(lessonId); toastr.success('Removido'); }
@@ -1468,9 +1559,9 @@
             // Edit Lesson Click
             window.abrirEdicaoAula = function (id) {
                 const lessonId = Number(id || 0);
-                if (!lessonId) return;
+                if (!lessonId || !aulaBaseUrlAdmin) return;
 
-                $.get('/courses/{{ $course->id }}/lessons/' + lessonId + '/details', function (data) {
+                $.get(aulaBaseUrlAdmin + '/' + lessonId + '/details', function (data) {
                     openLessonModal(data);
                 }).fail(function (xhr) {
                     let mensagem = 'Não foi possível carregar os dados da aula para edição.';
@@ -1594,7 +1685,7 @@
                         }
                     };
 
-                    const timeout = setTimeout(() => finalizar(0, new Error('Tempo esgotado ao detectar duração do YouTube.')), 12000);
+                    const timeout = setTimeout(() => finalizar(0, new Error('Tempo esgotado ao detectar duracao do YouTube.')), 18000);
 
                     player = new window.YT.Player(probeId, {
                         videoId: videoId,
@@ -1603,15 +1694,29 @@
                         playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1, playsinline: 1 },
                         events: {
                             onReady: function (event) {
-                                setTimeout(() => {
-                                    clearTimeout(timeout);
+                                const inicio = Date.now();
+                                const tentar = function () {
                                     const duracao = Math.floor(Number(event.target.getDuration()) || 0);
-                                    finalizar(duracao);
-                                }, 700);
+                                    if (duracao > 0) {
+                                        clearTimeout(timeout);
+                                        finalizar(duracao);
+                                        return;
+                                    }
+
+                                    if ((Date.now() - inicio) >= 15000) {
+                                        clearTimeout(timeout);
+                                        finalizar(0, new Error('Nao foi possivel detectar a duracao do YouTube.'));
+                                        return;
+                                    }
+
+                                    setTimeout(tentar, 400);
+                                };
+
+                                tentar();
                             },
                             onError: function () {
                                 clearTimeout(timeout);
-                                finalizar(0, new Error('Vídeo do YouTube indisponível para prévia.'));
+                                finalizar(0, new Error('Video do YouTube indisponivel para previa.'));
                             }
                         }
                     });
@@ -1733,7 +1838,12 @@
                 $btn.prop('disabled', true).text('Salvando...');
 
                 const id = $('#lessonId').val();
-                let url = '/courses/{{ $course->id }}/lessons';
+                let url = aulaStoreUrlAdmin;
+                if (!url) {
+                    toastr.error('Salve o curso primeiro para cadastrar aulas.');
+                    $btn.prop('disabled', false).text(originalText);
+                    return;
+                }
                 if (id) url += '/' + id;
 
                 // Sync Summernote content manually to ensure it's captured

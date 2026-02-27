@@ -312,6 +312,26 @@ class CourseController extends Controller
         }
     }
 
+    public function reorderLessons(Request $request, Course $course)
+    {
+        $this->ensurePermission('courses.edit');
+        $this->ensureCanManage($course);
+
+        $dados = $request->validate([
+            'lessons' => 'required|array|min:1',
+            'lessons.*.id' => 'required|integer|exists:lessons,id',
+            'lessons.*.order' => 'required|integer|min:1',
+        ]);
+
+        foreach ((array) $dados['lessons'] as $item) {
+            $course->lessons()
+                ->where('id', (int) $item['id'])
+                ->update(['order' => (int) $item['order']]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
     public function destroy(Course $course)
     {
         $this->ensurePermission('courses.delete');

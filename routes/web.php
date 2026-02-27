@@ -475,6 +475,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
 
         Route::prefix('courses/{course}')->name('courses.')->group(function () {
             Route::post('lessons', [\App\Http\Controllers\LessonController::class, 'store'])->name('lessons.store');
+            Route::post('lessons/content-image', [\App\Http\Controllers\LessonController::class, 'uploadContentImage'])->name('lessons.content-image');
             Route::prefix('lessons/{lesson}')->name('lessons.')->group(function () {
                 Route::put('/', [\App\Http\Controllers\LessonController::class, 'update'])->name('update');
                 Route::delete('/', [\App\Http\Controllers\LessonController::class, 'destroy'])->name('destroy');
@@ -673,6 +674,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         // Courses CRUD
         Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class)
             ->middleware('check.feature:courses_access')->names('courses');
+        Route::post('courses/{course}/lessons/reorder', [\App\Http\Controllers\Admin\CourseController::class, 'reorderLessons'])
+            ->middleware('check.feature:courses_edit')->name('courses.lessons.reorder');
+        Route::prefix('courses/{course}')->name('courses.')->middleware('check.feature:courses_edit')->group(function () {
+            Route::post('lessons', [\App\Http\Controllers\LessonController::class, 'store'])->name('lessons.store');
+            Route::post('lessons/content-image', [\App\Http\Controllers\LessonController::class, 'uploadContentImage'])->name('lessons.content-image');
+            Route::prefix('lessons/{lesson}')->name('lessons.')->group(function () {
+                Route::put('/', [\App\Http\Controllers\LessonController::class, 'update'])->name('update');
+                Route::delete('/', [\App\Http\Controllers\LessonController::class, 'destroy'])->name('destroy');
+                Route::get('details', [\App\Http\Controllers\LessonController::class, 'getDetails'])->name('details');
+                Route::post('attachments', [\App\Http\Controllers\LessonController::class, 'uploadAttachment'])->name('attachments.store');
+                Route::put('attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'renameAttachment'])->name('attachments.rename');
+                Route::delete('attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'deleteAttachment'])->name('attachments.destroy');
+            });
+        });
 
         // Custom Fonts
         Route::get('/fonts', [\App\Http\Controllers\Admin\CustomFontController::class, 'index'])

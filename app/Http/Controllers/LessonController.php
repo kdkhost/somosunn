@@ -11,6 +11,7 @@ use App\Services\LessonVideoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class LessonController extends Controller
 {
@@ -141,16 +142,20 @@ class LessonController extends Controller
         }
 
         $playbackUrl = $this->resolverUrlPlayback($course, $lesson);
+        $videoProcessando = $lesson->possuiVideoInterno()
+            && !$lesson->hlsPronto()
+            && (bool) ($course->video_block_download ?? false);
 
         return view(
             'courses.lesson',
-            compact('course', 'lesson', 'previous', 'next', 'resumeAt', 'bookmarks', 'hasFullAccess', 'previewLimitSeconds', 'playbackUrl')
+            compact('course', 'lesson', 'previous', 'next', 'resumeAt', 'bookmarks', 'hasFullAccess', 'previewLimitSeconds', 'playbackUrl', 'videoProcessando')
         );
     }
 
     public function update(Request $request, Course $course, Lesson $lesson)
     {
         $this->authorize('update', $course);
+        $this->validarAulaDoCurso($course, $lesson);
 
         set_time_limit(0);
         ini_set('memory_limit', '-1');
@@ -217,6 +222,7 @@ class LessonController extends Controller
     public function destroy(Course $course, Lesson $lesson)
     {
         $this->authorize('update', $course);
+        $this->validarAulaDoCurso($course, $lesson);
         $this->lessonVideoService->limparArquivosVideo($lesson);
         $lesson->delete();
         return back()->with('success', 'Aula removida.');
@@ -225,6 +231,7 @@ class LessonController extends Controller
     public function uploadAttachment(Request $request, Course $course, Lesson $lesson)
     {
         $this->authorize('update', $course);
+        $this->validarAulaDoCurso($course, $lesson);
         set_time_limit(0);
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', 0);
@@ -236,14 +243,19 @@ class LessonController extends Controller
 
         $request->validate([
             'file' => 'required|file|max:' . $docMaxKb . $allowedDocRule,
+            'name' => 'nullable|string|max:255',
         ]);
 
         $file = $request->file('file');
         $path = $file->store('course-materials', 'public');
+        $nomeExibicao = $this->normalizarNomeAnexo(
+            $request->input('name'),
+            (string) $file->getClientOriginalName()
+        );
 
         $attachment = $lesson->attachments()->create([
             'file_path' => $path,
-            'file_name' => $request->input('name', $file->getClientOriginalName()),
+            'file_name' => $nomeExibicao,
             'file_type' => $file->getClientOriginalExtension(),
             'file_size' => $file->getSize(),
         ]);
@@ -251,6 +263,24 @@ class LessonController extends Controller
         return response()->json([
             'success' => true,
             'attachment' => $attachment,
+        ]);
+    }
+
+    public function uploadContentImage(Request $request, Course $course)
+    {
+        $this->authorize('update', $course);
+
+        $request->validate([
+            'image' => 'required|file|image|max:5120|mimes:jpg,jpeg,png,webp,gif',
+        ]);
+
+        $file = $request->file('image');
+        $path = $file->store('course-content-images', 'public');
+
+        return response()->json([
+            'success' => true,
+            'url' => Storage::disk('public')->url($path),
+            'path' => $path,
         ]);
     }
 
@@ -301,6 +331,8 @@ class LessonController extends Controller
     public function deleteAttachment(Course $course, Lesson $lesson, LessonAttachment $attachment)
     {
         $this->authorize('update', $course);
+        $this->validarAulaDoCurso($course, $lesson);
+        $this->validarAnexoDaAula($lesson, $attachment);
 
         if (Storage::disk('public')->exists($attachment->file_path)) {
             Storage::disk('public')->delete($attachment->file_path);
@@ -314,9 +346,13 @@ class LessonController extends Controller
     public function renameAttachment(Request $request, Course $course, Lesson $lesson, LessonAttachment $attachment)
     {
         $this->authorize('update', $course);
+        $this->validarAulaDoCurso($course, $lesson);
+        $this->validarAnexoDaAula($lesson, $attachment);
         $request->validate(['name' => 'required|string|max:255']);
 
-        $attachment->update(['file_name' => $request->name]);
+        $attachment->update([
+            'file_name' => $this->normalizarNomeAnexo($request->name, (string) $attachment->file_name),
+        ]);
 
         return response()->json(['success' => true]);
     }
@@ -324,6 +360,7 @@ class LessonController extends Controller
     public function getDetails(Course $course, Lesson $lesson)
     {
         $this->authorize('update', $course);
+        $this->validarAulaDoCurso($course, $lesson);
 
         $lesson->load('attachments');
 
@@ -555,6 +592,10 @@ class LessonController extends Controller
                 return route('courses.lessons.stream', [$course, $lesson, 'master.m3u8']);
             }
 
+            if ((bool) ($course->video_block_download ?? false)) {
+                return null;
+            }
+
             return route('courses.lessons.stream', [$course, $lesson, 'source']);
         }
 
@@ -626,6 +667,55 @@ class LessonController extends Controller
         }
 
         return Storage::disk('public')->exists($valor) ? $valor : null;
+    }
+
+    private function validarAulaDoCurso(Course $course, Lesson $lesson): void
+    {
+        if ((int) $lesson->course_id !== (int) $course->id) {
+            abort(404);
+        }
+    }
+
+    private function validarAnexoDaAula(Lesson $lesson, LessonAttachment $attachment): void
+    {
+        if ((int) $attachment->lesson_id !== (int) $lesson->id) {
+            abort(404);
+        }
+    }
+
+    private function normalizarNomeAnexo(?string $nomeInformado, string $fallback = 'arquivo'): string
+    {
+        $nome = trim((string) ($nomeInformado ?? ''));
+        if ($nome === '') {
+            $nome = trim((string) $fallback);
+        }
+
+        $nome = str_replace(["\r", "\n", "\t"], ' ', $nome);
+        $nome = preg_replace('/\s+/u', ' ', $nome) ?? $nome;
+        $nome = basename(str_replace('\\', '/', $nome));
+        $nome = trim($nome, " .\t\n\r\0\x0B");
+
+        if ($nome === '') {
+            $nome = 'arquivo';
+        }
+
+        if (function_exists('mb_check_encoding') && !mb_check_encoding($nome, 'UTF-8')) {
+            $normalizado = @iconv('UTF-8', 'UTF-8//IGNORE', $nome);
+            if (is_string($normalizado) && trim($normalizado) !== '') {
+                $nome = trim($normalizado);
+            } else {
+                $nome = Str::ascii($nome);
+            }
+        }
+
+        if (function_exists('mb_substr')) {
+            $nome = mb_substr($nome, 0, 180);
+        } else {
+            $nome = substr($nome, 0, 180);
+        }
+
+        $nome = trim($nome);
+        return $nome !== '' ? $nome : 'arquivo';
     }
 
     private function buildPreviewData(Request $request, int $durationSeconds = 0): array

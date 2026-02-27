@@ -25,6 +25,10 @@ class LessonVideoStreamController extends Controller
 
         // Fonte original protegida (fallback quando HLS nao estiver pronto).
         if ($path === 'source' || $path === 'source.mp4') {
+            if ((bool) ($course->video_block_download ?? false)) {
+                abort(403, 'A fonte original do video esta bloqueada para download.');
+            }
+
             $caminhoFonte = $this->normalizarPath((string) ($lesson->video_storage_path ?? ''));
             if ($caminhoFonte !== '' && $storage->exists($caminhoFonte)) {
                 return $this->responderArquivo($storage->path($caminhoFonte), $this->mimePorExtensao($caminhoFonte));

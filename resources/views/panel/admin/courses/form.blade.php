@@ -653,7 +653,8 @@
             const isExistingCourse = @json($course->exists);
             const lessonReorderUrl = @json($course->exists ? route('panel.admin.courses.lessons.reorder', $course) : null);
             const lessonStoreUrl = @json($course->exists ? route('panel.admin.courses.lessons.store', $course) : null);
-            const lessonBaseUrl = @json($course->exists ? url('/admin/courses/' . $course->id . '/lessons') : null);
+            const lessonBaseUrl = lessonStoreUrl;
+            const lessonContentImageUploadUrl = @json($course->exists ? route('panel.admin.courses.lessons.content-image', $course) : null);
             const certificatePreviewUrl = @json($course->exists ? route('panel.admin.courses.certificate.preview', $course) : null);
 
             document.addEventListener('DOMContentLoaded', function () {
@@ -665,18 +666,24 @@
                         handle: '.cursor-move',
                         ghostClass: 'bg-blue-50',
                         onEnd: function () {
-                            const orders = Array.from(el.children).map((item, index) => ({
-                                id: item.dataset.id,
-                                order: index + 1
-                            }));
+                            const orders = Array.from(el.querySelectorAll('[data-id]'))
+                                .map((item, index) => ({
+                                    id: Number(item.dataset.id || 0),
+                                    order: index + 1
+                                }))
+                                .filter((item) => item.id > 0);
+
+                            if (!orders.length) {
+                                return;
+                            }
 
                             $.post(lessonReorderUrl, {
                                 _token: '{{ csrf_token() }}',
                                 lessons: orders
                             }).done(() => {
                                 toastr.success('Ordem atualizada!');
-                            }).fail(() => {
-                                toastr.error('Erro ao reordenar.');
+                            }).fail((xhr) => {
+                                toastr.error(xhr?.responseJSON?.message || 'Erro ao reordenar.');
                             });
                         }
                     });
@@ -730,7 +737,11 @@
                 $('#lessonVideo').val('');
                 $('#lessonVideoFile').val('');
                 $('#lessonVideoFileLabel').html('<i class="fas fa-cloud-upload-alt text-lg"></i><span>Selecionar video para envio</span>');
-                $('#lessonContent').val('');
+                if (window.jQuery && $.fn && $.fn.summernote && $('#lessonContent').next('.note-editor').length) {
+                    $('#lessonContent').summernote('code', '');
+                } else {
+                    $('#lessonContent').val('');
+                }
                 $('#attachmentList').empty();
                 updateLessonPreviewConfig();
                 openModal('lesson-modal');
@@ -758,7 +769,11 @@
                         $('#lessonVideoFile').val('');
                         $('#lessonVideoFileLabel').html('<i class="fas fa-cloud-upload-alt text-lg"></i><span>Selecionar video para envio</span>');
                     }
-                    $('#lessonContent').val(lesson.content || '');
+                    if (window.jQuery && $.fn && $.fn.summernote && $('#lessonContent').next('.note-editor').length) {
+                        $('#lessonContent').summernote('code', lesson.content || '');
+                    } else {
+                        $('#lessonContent').val(lesson.content || '');
+                    }
                     updateLessonPreviewConfig();
                     if (!lesson.duration || Number(lesson.duration) <= 0) {
                         agendarDeteccaoDuracaoUrl(false);
@@ -887,7 +902,7 @@
                         }
                     };
 
-                    const timeout = setTimeout(() => finalizar(0, new Error('Tempo esgotado ao detectar duração do YouTube.')), 12000);
+                    const timeout = setTimeout(() => finalizar(0, new Error('Tempo esgotado ao detectar duracao do YouTube.')), 18000);
 
                     player = new window.YT.Player(probeId, {
                         videoId: videoId,
@@ -896,15 +911,29 @@
                         playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1, playsinline: 1 },
                         events: {
                             onReady: function (event) {
-                                setTimeout(() => {
-                                    clearTimeout(timeout);
+                                const inicio = Date.now();
+                                const tentar = function () {
                                     const duracao = Math.floor(Number(event.target.getDuration()) || 0);
-                                    finalizar(duracao);
-                                }, 700);
+                                    if (duracao > 0) {
+                                        clearTimeout(timeout);
+                                        finalizar(duracao);
+                                        return;
+                                    }
+
+                                    if ((Date.now() - inicio) >= 15000) {
+                                        clearTimeout(timeout);
+                                        finalizar(0, new Error('Nao foi possivel detectar a duracao do YouTube.'));
+                                        return;
+                                    }
+
+                                    setTimeout(tentar, 400);
+                                };
+
+                                tentar();
                             },
                             onError: function () {
                                 clearTimeout(timeout);
-                                finalizar(0, new Error('Vídeo do YouTube indisponível para prévia.'));
+                                finalizar(0, new Error('Video do YouTube indisponivel para previa.'));
                             }
                         }
                     });
@@ -1026,6 +1055,9 @@
                 const id = $('#lessonId').val();
                 const url = id ? `${lessonBaseUrl}/${id}` : lessonStoreUrl;
                 const formData = new FormData(document.getElementById('lessonForm'));
+                if (window.jQuery && $.fn && $.fn.summernote && $('#lessonContent').next('.note-editor').length) {
+                    formData.set('content', $('#lessonContent').summernote('code') || '');
+                }
                 if (id) formData.append('_method', 'PUT');
 
                 const $btn = $(this);
@@ -1077,6 +1109,63 @@
                 });
             });
 
+            $(document).on('change', '#lessonAttachmentsInput', function (event) {
+                if (!lessonBaseUrl) return;
+
+                const lessonId = Number($('#lessonId').val() || 0);
+                const arquivos = Array.from((event.target.files || []));
+
+                if (!lessonId) {
+                    toastr.warning('Salve a aula primeiro para enviar materiais de apoio.');
+                    event.target.value = '';
+                    return;
+                }
+
+                if (!arquivos.length) {
+                    return;
+                }
+
+                let indice = 0;
+                const enviarProximo = function () {
+                    if (indice >= arquivos.length) {
+                        event.target.value = '';
+                        editLesson(lessonId);
+                        return;
+                    }
+
+                    const arquivo = arquivos[indice];
+                    indice += 1;
+
+                    const nomeArquivo = String((arquivo && arquivo.name) || 'arquivo')
+                        .replace(/[\r\n\t]+/g, ' ')
+                        .trim()
+                        .substring(0, 180);
+
+                    const formData = new FormData();
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('file', arquivo);
+                    formData.append('name', nomeArquivo || 'arquivo');
+
+                    $.ajax({
+                        url: `${lessonBaseUrl}/${lessonId}/attachments`,
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function () {
+                            toastr.success('Material enviado com sucesso.');
+                            enviarProximo();
+                        },
+                        error: function (xhr) {
+                            toastr.error(xhr?.responseJSON?.message || 'Falha ao enviar material de apoio.');
+                            enviarProximo();
+                        }
+                    });
+                };
+
+                enviarProximo();
+            });
+
             function deleteAttachment(lessonId, attId) {
                 if (!lessonBaseUrl) return;
                 Swal.fire({
@@ -1117,6 +1206,40 @@
                     }
                 });
             }
+
+            function enviarImagemConteudoAulaPainel(file, $editor) {
+                if (!lessonContentImageUploadUrl) {
+                    toastr.warning('Salve o curso primeiro para enviar imagens no conteúdo.');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('image', file);
+
+                $.ajax({
+                    url: lessonContentImageUploadUrl,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    success: function (response) {
+                        if (response && response.url) {
+                            $editor.summernote('insertImage', response.url);
+                            return;
+                        }
+
+                        toastr.error('Falha ao inserir a imagem no conteúdo.');
+                    },
+                    error: function (xhr) {
+                        toastr.error(xhr?.responseJSON?.message || 'Falha ao enviar imagem do conteúdo.');
+                    }
+                });
+            }
             // Summernote Initialization
             const summernoteConfig = {
                 height: 300,
@@ -1129,7 +1252,14 @@
                     ['table', ['table']],
                     ['insert', ['link', 'picture', 'video']],
                     ['view', ['fullscreen', 'codeview', 'help']],
-                ]
+                ],
+                callbacks: {
+                    onImageUpload: function (files) {
+                        if (!files || !files.length) return;
+                        const $editor = $(this);
+                        Array.from(files).forEach((file) => enviarImagemConteudoAulaPainel(file, $editor));
+                    }
+                }
             };
 
             const initSummernoteEditors = () => {
@@ -1416,7 +1546,7 @@
                             <ul id="attachmentList" class="space-y-2"></ul>
 
                             <div class="relative group">
-                                <input type="file" name="attachments[]" multiple
+                                <input type="file" id="lessonAttachmentsInput" name="attachments[]" multiple
                                     class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                                 <div
                                     class="w-full px-5 py-4 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-400 flex items-center justify-center gap-2 group-hover:border-blue-400 group-hover:bg-blue-50/10 transition-all">
