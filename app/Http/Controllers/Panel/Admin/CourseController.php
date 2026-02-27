@@ -22,11 +22,16 @@ class CourseController extends Controller
     public function index(Request $request)
     {
         $this->ensurePermission('courses.view');
+        $user = Auth::user();
+
+        if (!$user->isAdmin()) {
+            $this->repairLegacyOwnershipForCurrentUser();
+        }
 
         $query = Course::query()->with(['creator'])->withCount(['lessons', 'enrollments'])->latest();
 
         // If not superadmin, only show courses created by the user
-        if (!Auth::user()->isAdmin()) {
+        if (!$user->isAdmin()) {
             $this->applyOwnerFilter($query);
         }
 
@@ -277,6 +282,7 @@ class CourseController extends Controller
 
         $authUserId = (int) Auth::id();
         $authUserName = trim((string) (Auth::user()->name ?? ''));
+        $normalizedAuthUserName = $this->normalizeOwnerName($authUserName);
 
         $ownsByUserId = (int) $course->user_id === $authUserId;
         $ownsByLegacyCreatedBy = false;
@@ -286,8 +292,8 @@ class CourseController extends Controller
             $ownsByLegacyCreatedBy = (int) ($course->created_by ?? 0) === $authUserId;
         }
 
-        if ((empty($course->user_id) || (int) $course->user_id === 1) && $authUserName !== '') {
-            $ownsByAuthorFallback = trim((string) ($course->author_name ?? '')) === $authUserName;
+        if ((empty($course->user_id) || in_array((int) $course->user_id, [0, 1], true)) && $normalizedAuthUserName !== '') {
+            $ownsByAuthorFallback = $this->normalizeOwnerName((string) ($course->author_name ?? '')) === $normalizedAuthUserName;
         }
 
         if (!$ownsByUserId && !$ownsByLegacyCreatedBy && !$ownsByAuthorFallback) {
@@ -299,24 +305,82 @@ class CourseController extends Controller
     {
         $authUserId = (int) Auth::id();
         $authUserName = trim((string) (Auth::user()->name ?? ''));
+        $normalizedAuthUserName = $this->normalizeOwnerName($authUserName);
 
-        $query->where(function ($ownerQuery) use ($authUserId, $authUserName) {
+        $query->where(function ($ownerQuery) use ($authUserId, $normalizedAuthUserName) {
             $ownerQuery->where('user_id', $authUserId);
 
             if (Schema::hasColumn('courses', 'created_by')) {
                 $ownerQuery->orWhere('created_by', $authUserId);
             }
 
-            if ($authUserName !== '') {
-                $ownerQuery->orWhere(function ($fallbackQuery) use ($authUserName) {
+            if ($normalizedAuthUserName !== '') {
+                $ownerQuery->orWhere(function ($fallbackQuery) use ($normalizedAuthUserName) {
                     $fallbackQuery->where(function ($courseOwnerQuery) {
                         $courseOwnerQuery->whereNull('user_id')
-                            ->orWhere('user_id', 1);
+                            ->orWhereIn('user_id', [0, 1]);
                     })
-                        ->where('author_name', $authUserName);
+                        ->whereRaw('LOWER(TRIM(author_name)) = ?', [$normalizedAuthUserName]);
                 });
             }
         });
+    }
+
+    protected function repairLegacyOwnershipForCurrentUser(): void
+    {
+        $user = Auth::user();
+        if (!$user || !Schema::hasColumn('courses', 'user_id')) {
+            return;
+        }
+
+        $authUserId = (int) $user->id;
+        if ($authUserId <= 0) {
+            return;
+        }
+
+        if (Schema::hasColumn('courses', 'created_by')) {
+            Course::query()
+                ->where(function ($query) {
+                    $query->whereNull('user_id')
+                        ->orWhereIn('user_id', [0, 1]);
+                })
+                ->where('created_by', $authUserId)
+                ->update(['user_id' => $authUserId]);
+        }
+
+        $normalizedAuthUserName = $this->normalizeOwnerName((string) ($user->name ?? ''));
+        if ($normalizedAuthUserName === '') {
+            return;
+        }
+
+        Course::query()
+            ->select(['id', 'author_name'])
+            ->where(function ($query) {
+                $query->whereNull('user_id')
+                    ->orWhereIn('user_id', [0, 1]);
+            })
+            ->whereNotNull('author_name')
+            ->get()
+            ->each(function (Course $course) use ($authUserId, $normalizedAuthUserName) {
+                if ($this->normalizeOwnerName((string) ($course->author_name ?? '')) !== $normalizedAuthUserName) {
+                    return;
+                }
+
+                Course::query()
+                    ->whereKey($course->id)
+                    ->update(['user_id' => $authUserId]);
+            });
+    }
+
+    protected function normalizeOwnerName(string $value): string
+    {
+        $value = str_replace("\u{00A0}", ' ', $value);
+        $value = preg_replace('/\s+/u', ' ', trim($value)) ?? '';
+        if ($value === '') {
+            return '';
+        }
+
+        return mb_strtolower(Str::ascii($value));
     }
 
     public function reorderLessons(Request $request, Course $course)

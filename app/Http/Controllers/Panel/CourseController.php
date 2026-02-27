@@ -7,32 +7,37 @@ use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
+        $this->repairLegacyOwnershipForCurrentUser($user);
+        $normalizedUserName = $this->normalizeOwnerName((string) ($user->name ?? ''));
+
         $courses = Course::query()
-            ->where(function ($query) use ($user) {
+            ->where(function ($query) use ($user, $normalizedUserName) {
                 $query->where('user_id', $user->id);
 
                 if (Schema::hasColumn('courses', 'created_by')) {
                     $query->orWhere('created_by', $user->id);
                 }
 
-                if (trim((string) ($user->name ?? '')) !== '') {
-                    $query->orWhere(function ($fallbackQuery) use ($user) {
+                if ($normalizedUserName !== '') {
+                    $query->orWhere(function ($fallbackQuery) use ($normalizedUserName) {
                         $fallbackQuery->where(function ($courseOwnerQuery) {
                             $courseOwnerQuery->whereNull('user_id')
-                                ->orWhere('user_id', 1);
+                                ->orWhereIn('user_id', [0, 1]);
                         })
-                            ->where('author_name', trim((string) ($user->name ?? '')));
+                            ->whereRaw('LOWER(TRIM(author_name)) = ?', [$normalizedUserName]);
                     });
                 }
             })
             ->latest()
             ->get();
+
         return view('panel.courses.index', compact('courses'));
     }
 
@@ -52,10 +57,10 @@ class CourseController extends Controller
             'status' => 'required|in:draft,published,archived,paused',
             'thumbnail' => 'nullable|image|max:10240',
         ], [], [
-            'title' => 'Título',
-            'short_description' => 'Descrição curta',
-            'full_description' => 'Descrição completa',
-            'price' => 'Preço',
+            'title' => 'Titulo',
+            'short_description' => 'Descricao curta',
+            'full_description' => 'Descricao completa',
+            'price' => 'Preco',
             'status' => 'Status',
             'thumbnail' => 'Thumbnail',
         ]);
@@ -93,10 +98,10 @@ class CourseController extends Controller
             'status' => 'required|in:draft,published,archived,paused',
             'thumbnail' => 'nullable|image|max:10240',
         ], [], [
-            'title' => 'Título',
-            'short_description' => 'Descrição curta',
-            'full_description' => 'Descrição completa',
-            'price' => 'Preço',
+            'title' => 'Titulo',
+            'short_description' => 'Descricao curta',
+            'full_description' => 'Descricao completa',
+            'price' => 'Preco',
             'status' => 'Status',
             'thumbnail' => 'Thumbnail',
         ]);
@@ -120,6 +125,62 @@ class CourseController extends Controller
     {
         $this->authorize('delete', $course);
         $course->delete();
-        return redirect()->route('panel.courses.index')->with('success', 'Curso excluído com sucesso!');
+        return redirect()->route('panel.courses.index')->with('success', 'Curso excluido com sucesso!');
+    }
+
+    protected function repairLegacyOwnershipForCurrentUser($user): void
+    {
+        if (!$user || !Schema::hasColumn('courses', 'user_id')) {
+            return;
+        }
+
+        $authUserId = (int) $user->id;
+        if ($authUserId <= 0) {
+            return;
+        }
+
+        if (Schema::hasColumn('courses', 'created_by')) {
+            Course::query()
+                ->where(function ($query) {
+                    $query->whereNull('user_id')
+                        ->orWhereIn('user_id', [0, 1]);
+                })
+                ->where('created_by', $authUserId)
+                ->update(['user_id' => $authUserId]);
+        }
+
+        $normalizedUserName = $this->normalizeOwnerName((string) ($user->name ?? ''));
+        if ($normalizedUserName === '') {
+            return;
+        }
+
+        Course::query()
+            ->select(['id', 'author_name'])
+            ->where(function ($query) {
+                $query->whereNull('user_id')
+                    ->orWhereIn('user_id', [0, 1]);
+            })
+            ->whereNotNull('author_name')
+            ->get()
+            ->each(function (Course $course) use ($authUserId, $normalizedUserName) {
+                if ($this->normalizeOwnerName((string) ($course->author_name ?? '')) !== $normalizedUserName) {
+                    return;
+                }
+
+                Course::query()
+                    ->whereKey($course->id)
+                    ->update(['user_id' => $authUserId]);
+            });
+    }
+
+    protected function normalizeOwnerName(string $value): string
+    {
+        $value = str_replace("\u{00A0}", ' ', $value);
+        $value = preg_replace('/\s+/u', ' ', trim($value)) ?? '';
+        if ($value === '') {
+            return '';
+        }
+
+        return mb_strtolower(Str::ascii($value));
     }
 }
