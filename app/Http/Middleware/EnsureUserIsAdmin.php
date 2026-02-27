@@ -47,10 +47,6 @@ class EnsureUserIsAdmin
             return false;
         }
 
-        if (session()->has('impersonator_id') && session()->get('impersonator_is_admin')) {
-            return true;
-        }
-
         $routeName = (string) optional($request->route())->getName();
         if ($routeName === '') {
             return false;

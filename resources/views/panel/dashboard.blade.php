@@ -6,10 +6,9 @@
     @php
         $plan = $plan ?? null;
         $stats = $stats ?? [];
-        $isImpersonatingAdmin = session()->has('impersonator_id') && session()->get('impersonator_is_admin');
-        $canAccessCommunity = auth()->user()->canAccessFeature('community') || $isImpersonatingAdmin;
-        $canAccessCourses = auth()->user()->canAccessFeature('courses_access') || (method_exists(auth()->user(), 'hasPurchasedCourses') && auth()->user()->hasPurchasedCourses()) || $isImpersonatingAdmin;
-        $canSellOnMarketplace = auth()->user()->canSellOnMarketplace() || $isImpersonatingAdmin;
+        $canAccessCommunity = auth()->user()->canAccessFeature('community');
+        $canAccessCourses = auth()->user()->canAccessFeature('courses_access') || (method_exists(auth()->user(), 'hasPurchasedCourses') && auth()->user()->hasPurchasedCourses());
+        $canSellOnMarketplace = auth()->user()->canSellOnMarketplace();
         $coursesCount = (int) ($stats['courses_count'] ?? 0);
         $ordersPaidCount = (int) ($stats['orders_paid_count'] ?? 0);
         $ordersPaidTotal = (float) ($stats['orders_paid_total'] ?? 0);

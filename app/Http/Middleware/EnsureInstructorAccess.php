@@ -23,10 +23,6 @@ class EnsureInstructorAccess
             return redirect()->route('login');
         }
 
-        if (session()->has('impersonator_id') && session()->get('impersonator_is_admin')) {
-            return $next($request);
-        }
-
         if (method_exists($user, 'canAccessInstructorArea') && $user->canAccessInstructorArea()) {
             return $next($request);
         }

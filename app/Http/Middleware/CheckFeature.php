@@ -24,11 +24,6 @@ class CheckFeature
             return redirect()->guest(route('login'));
         }
 
-        // Impersonation: admin/superadmin bypasses feature checks.
-        if (session()->has('impersonator_id') && session()->get('impersonator_is_admin')) {
-            return $next($request);
-        }
-
         $feature = trim((string) $feature);
 
         if (!$user->canAccessFeature($feature) && !$this->hasEntitlementOverride($request, $user, $feature)) {

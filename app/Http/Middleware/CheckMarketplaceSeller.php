@@ -20,19 +20,14 @@ class CheckMarketplaceSeller
             return $next($request);
         }
 
-        // Impersonação (admin/superadmin): liberar acesso ao painel do vendedor
-        if (session()->has('impersonator_id') && session()->get('impersonator_is_admin')) {
-            return $next($request);
-        }
-
         if (!$user->canSellOnMarketplace()) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Você não possui permissão de vendas no marketplace.'], 403);
+                return response()->json(['message' => 'VocÃª nÃ£o possui permissÃ£o de vendas no marketplace.'], 403);
             }
 
             return redirect()
                 ->route('panel.dashboard')
-                ->with('error', 'Você não possui permissão para acessar o painel do Marketplace.');
+                ->with('error', 'VocÃª nÃ£o possui permissÃ£o para acessar o painel do Marketplace.');
         }
 
         return $next($request);
