@@ -11,6 +11,50 @@
         $certMeta = $normalized['meta'] ?? [];
         $elements = $normalized['elements'] ?? [];
         $backgroundFit = ($certMeta['backgroundFit'] ?? 'cover') === 'stretch' ? 'stretch' : 'cover';
+
+        $formatFontFamilyCss = static function ($value): string {
+            $raw = is_string($value) ? trim($value) : '';
+            if ($raw === '') {
+                return 'Arial, sans-serif';
+            }
+
+            $genericFamilies = [
+                'serif',
+                'sans-serif',
+                'monospace',
+                'cursive',
+                'fantasy',
+                'system-ui',
+                'emoji',
+                'math',
+                'fangsong',
+                'ui-serif',
+                'ui-sans-serif',
+                'ui-monospace',
+            ];
+
+            $items = array_filter(array_map('trim', explode(',', $raw)), static fn ($item) => $item !== '');
+            if (count($items) === 0) {
+                return 'Arial, sans-serif';
+            }
+
+            $formatted = [];
+            foreach ($items as $family) {
+                $isQuoted = preg_match('/^(["\']).*\1$/', $family) === 1;
+                $isGeneric = in_array(mb_strtolower($family), $genericFamilies, true);
+
+                if ($isQuoted || $isGeneric) {
+                    $formatted[] = $family;
+                    continue;
+                }
+
+                // Quote custom families to preserve spaces and special chars.
+                $escaped = str_replace(["\\", "'"], ["\\\\", "\\'"], $family);
+                $formatted[] = "'{$escaped}'";
+            }
+
+            return implode(', ', $formatted);
+        };
     @endphp
 
     @if(!empty($fontCss))
@@ -136,6 +180,7 @@
                     $textAlign = $style['textAlign'] ?? 'left';
                     $lineHeight = $style['lineHeight'] ?? null;
                     $letterSpacing = $style['letterSpacing'] ?? null;
+                    $fontFamilyCss = $formatFontFamilyCss($style['fontFamily'] ?? null);
                 @endphp
 
                 <div class="element" style="
@@ -144,7 +189,7 @@
                             font-size: {{ $style['fontSize'] }}px;
                             color: {{ $style['color'] }};
                             font-weight: {{ $style['fontWeight'] }};
-                            font-family: {{ $style['fontFamily'] ?? 'Arial, sans-serif' }};
+                            font-family: {{ $fontFamilyCss }};
                             text-align: {{ $textAlign }};
                             z-index: {{ $style['zIndex'] ?? 10 }};
                             white-space: {{ $isMultiline ? 'pre-line' : 'nowrap' }};

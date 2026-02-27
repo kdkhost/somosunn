@@ -94,6 +94,17 @@ class CertificateFontCssGenerator
             return "";
         }
 
+        $absPath = public_path($relPath);
+        if (!is_file($absPath)) {
+            Log::warning("Certificate font skipped: file not found", [
+                "font_id" => $font->id,
+                "font_family" => $font->font_family,
+                "file_path" => $font->file_path,
+                "resolved_path" => $absPath,
+            ]);
+            return "";
+        }
+
         $ext = strtolower(pathinfo($relPath, PATHINFO_EXTENSION));
         if ($ext === "woff2") {
             // Dompdf (php-font-lib) does not support WOFF2
@@ -116,7 +127,9 @@ class CertificateFontCssGenerator
             return "";
         }
 
-        $src = $isPreview ? ("/" . $relPath) : $this->normalizeFsPathForCss(public_path($relPath));
+        $src = $isPreview
+            ? asset($relPath)
+            : $this->toFileUri($absPath);
         $family = $this->escapeCssString((string) $font->font_family);
 
         return "@font-face{font-family:'{$family}';src:url('{$src}') format('{$format}');font-style:normal;font-weight:normal;}\n";
@@ -152,7 +165,21 @@ class CertificateFontCssGenerator
                 continue;
             }
 
-            $src = $isPreview ? ("/" . ltrim($relPath, "/")) : $this->normalizeFsPathForCss(public_path(ltrim($relPath, "/")));
+            $normalizedRelPath = ltrim($relPath, "/");
+            $absPath = public_path($normalizedRelPath);
+            if (!is_file($absPath)) {
+                Log::warning("Certificate google font skipped: cached file not found", [
+                    "font_id" => $font->id,
+                    "font_family" => $font->font_family,
+                    "rel_path" => $normalizedRelPath,
+                    "resolved_path" => $absPath,
+                ]);
+                continue;
+            }
+
+            $src = $isPreview
+                ? asset($normalizedRelPath)
+                : $this->toFileUri($absPath);
 
             $css .= "@font-face{font-family:'{$family}';src:url('{$src}') format('{$format}');font-style:{$style};font-weight:{$weight};}\n";
         }
@@ -474,9 +501,21 @@ class CertificateFontCssGenerator
         @file_put_contents($manifestPath, json_encode($faces, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 
-    private function normalizeFsPathForCss(string $path): string
+    private function toFileUri(string $path): string
     {
-        return str_replace("\\", "/", $path);
+        $normalized = str_replace("\\", "/", $path);
+
+        // Windows: C:/path -> file:///C:/path
+        if (preg_match("/^[A-Za-z]:\//", $normalized) === 1) {
+            return "file:///" . $normalized;
+        }
+
+        if (!str_starts_with($normalized, "/")) {
+            $normalized = "/" . ltrim($normalized, "/");
+        }
+
+        // Linux/Unix: /path -> file:///path
+        return "file://" . $normalized;
     }
 
     private function escapeCssString(string $value): string

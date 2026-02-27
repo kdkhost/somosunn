@@ -10,13 +10,10 @@ use App\Models\Mentorship;
 use App\Models\Event;
 use App\Models\User;
 use App\Models\Enrollment;
-use Dompdf\Dompdf;
-use Dompdf\Options;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CertificateIssued;
-use App\Services\Certificate\CertificateFontCssGenerator;
 use Illuminate\Support\Facades\Auth;
 
 class CertificateController extends Controller
@@ -117,7 +114,8 @@ class CertificateController extends Controller
             return $certQuery->first();
 
         $certHash = Str::random(24);
-        $output = $this->generatePdfContent($user, $type, $product, $certHash);
+        $generator = app(\App\Services\Certificate\CertificateGenerator::class);
+        $output = $generator->generatePdfContent($user, $type, $product, $certHash);
         $path = "certificates/{$certHash}.pdf";
         Storage::disk('public')->put($path, $output);
 
@@ -131,37 +129,6 @@ class CertificateController extends Controller
             'issued_at' => now(),
             'workload' => ($type === 'course' ? $product->total_hours : ($product->duration_hours ?? 0))
         ]);
-    }
-
-    private function generatePdfContent($user, $type, $product, $certHash)
-    {
-        $options = new Options();
-        $options->set('isRemoteEnabled', true);
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('chroot', public_path());
-        $dompdf = new Dompdf($options);
-
-        $authorName = $type === 'course' ? $product->author_name : ($type === 'mentorship' ? ($product->mentor->name ?? 'Mentor') : ($product->user->name ?? 'Organizador'));
-        $workload = $type === 'course' ? $product->total_hours : ($product->duration_hours ?? 0);
-
-        $fontCss = app(CertificateFontCssGenerator::class)->buildFontCss($product->certificate_settings ?? [], false);
-
-        $html = view('admin.certificates.template', [
-            'user' => $user,
-            'course' => $product,
-            'certHash' => $certHash,
-            'authorName' => $authorName,
-            'workload' => $workload,
-            'type' => $type,
-            'fontCss' => $fontCss,
-            'isPreview' => false
-        ])->render();
-
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape');
-        $dompdf->render();
-
-        return $dompdf->output();
     }
 
     public function destroy(Certificate $certificate)
