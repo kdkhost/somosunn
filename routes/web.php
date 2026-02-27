@@ -609,6 +609,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
 
     // Extrato de Splits (AdminLTE)
     Route::get('splits', [\App\Http\Controllers\Admin\SplitController::class, 'index'])->name('splits.index');
+    Route::post('splits/{split}/pay', [\App\Http\Controllers\Admin\SplitController::class, 'pay'])->name('splits.pay');
 
     // Certificates (Acessível a Admin e Instrutores)
     Route::get('/certificates', [\App\Http\Controllers\Admin\CertificateController::class, 'index'])

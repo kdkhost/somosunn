@@ -26,4 +26,23 @@ class SplitController extends Controller
 
         return view('admin.splits.index', compact('splits'));
     }
+
+    public function pay(OrderSplit $split)
+    {
+        if ($split->status === 'paid') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este rateio já foi liquidado anteriormente.'
+            ], 422);
+        }
+
+        $split->update([
+            'status' => 'paid'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Rateio liquidado com sucesso!'
+        ]);
+    }
 }

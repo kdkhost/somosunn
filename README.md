@@ -204,6 +204,7 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
   - Nova tabela `order_splits` para auditoria e rastreamento de cada centavo distribuído.
   - **Extratos de Rateio**:
     - Visualização global para o Superadmin (AdminLTE) com filtros por pedido e recebedor.
+    - **Liquidação Manual**: Botão para confirmar o repasse via PIX diretamente no extrato do AdminLTE, com confirmação SweetAlert2.
     - Visualização pessoal para Membros (Novo Painel) para acompanhamento de ganhos reais.
   - Campo **Chave PIX** adicionado e validado no perfil do usuário em ambos os painéis (Bootstrap & Tailwind).
 - **Webhook Inteligente:**
