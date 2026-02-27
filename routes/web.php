@@ -437,6 +437,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::resource('events', \App\Http\Controllers\Panel\Admin\EventController::class);
 
         // Certificates Management
+        Route::post('certificates/generate', [\App\Http\Controllers\Panel\Admin\CertificateController::class, 'generate'])->name('certificates.generate');
         Route::resource('certificates', \App\Http\Controllers\Panel\Admin\CertificateController::class);
 
         // Mural de Vagas (Admin)
