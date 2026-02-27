@@ -90,7 +90,22 @@ class LessonController extends Controller
         $hasFullAccess = $this->hasFullCourseAccess($course);
 
         if (!$this->canViewLesson($course, $lesson)) {
-            abort(403, 'Você precisa comprar este curso para ver esta aula.');
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'message' => 'VocÃª precisa comprar este curso para ver esta aula.',
+                ], 403);
+            }
+
+            $routeParam = !empty($course->slug) ? $course->slug : $course->id;
+
+            return redirect()
+                ->route('courses.show', $routeParam)
+                ->with('access_blocked', [
+                    'type' => 'course',
+                    'course_id' => (int) $course->id,
+                    'lesson_id' => (int) $lesson->id,
+                ])
+                ->with('warning', 'ConteÃºdo bloqueado. Escolha como deseja liberar o acesso.');
         }
 
         $previewLimitSeconds = 0;
@@ -291,7 +306,22 @@ class LessonController extends Controller
         }
 
         if (!$this->canViewLesson($course, $lesson)) {
-            abort(403, 'Voce nao tem permissao para baixar este material.');
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'message' => 'VocÃª precisa comprar este curso para ver esta aula.',
+                ], 403);
+            }
+
+            $routeParam = !empty($course->slug) ? $course->slug : $course->id;
+
+            return redirect()
+                ->route('courses.show', $routeParam)
+                ->with('access_blocked', [
+                    'type' => 'course',
+                    'course_id' => (int) $course->id,
+                    'lesson_id' => (int) $lesson->id,
+                ])
+                ->with('warning', 'ConteÃºdo bloqueado. Escolha como deseja liberar o acesso.');
         }
 
         if (!Storage::disk('public')->exists($attachment->file_path)) {
@@ -387,7 +417,22 @@ class LessonController extends Controller
         }
 
         if (!$this->canViewLesson($course, $lesson)) {
-            abort(403, 'Você não tem permissão para atualizar o progresso desta aula.');
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'message' => 'VocÃª precisa comprar este curso para ver esta aula.',
+                ], 403);
+            }
+
+            $routeParam = !empty($course->slug) ? $course->slug : $course->id;
+
+            return redirect()
+                ->route('courses.show', $routeParam)
+                ->with('access_blocked', [
+                    'type' => 'course',
+                    'course_id' => (int) $course->id,
+                    'lesson_id' => (int) $lesson->id,
+                ])
+                ->with('warning', 'ConteÃºdo bloqueado. Escolha como deseja liberar o acesso.');
         }
 
         if (!Auth::check()) {
@@ -497,7 +542,22 @@ class LessonController extends Controller
         }
 
         if (!$this->canViewLesson($course, $lesson)) {
-            abort(403, 'Você não tem permissão para adicionar anotações nesta aula.');
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'message' => 'VocÃª precisa comprar este curso para ver esta aula.',
+                ], 403);
+            }
+
+            $routeParam = !empty($course->slug) ? $course->slug : $course->id;
+
+            return redirect()
+                ->route('courses.show', $routeParam)
+                ->with('access_blocked', [
+                    'type' => 'course',
+                    'course_id' => (int) $course->id,
+                    'lesson_id' => (int) $lesson->id,
+                ])
+                ->with('warning', 'ConteÃºdo bloqueado. Escolha como deseja liberar o acesso.');
         }
 
         if (!Auth::check()) {
@@ -537,7 +597,22 @@ class LessonController extends Controller
         }
 
         if (!$this->canViewLesson($course, $lesson)) {
-            abort(403, 'Você não tem permissão para remover anotações nesta aula.');
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'message' => 'VocÃª precisa comprar este curso para ver esta aula.',
+                ], 403);
+            }
+
+            $routeParam = !empty($course->slug) ? $course->slug : $course->id;
+
+            return redirect()
+                ->route('courses.show', $routeParam)
+                ->with('access_blocked', [
+                    'type' => 'course',
+                    'course_id' => (int) $course->id,
+                    'lesson_id' => (int) $lesson->id,
+                ])
+                ->with('warning', 'ConteÃºdo bloqueado. Escolha como deseja liberar o acesso.');
         }
 
         if (!Auth::check()) {

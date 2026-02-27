@@ -71,6 +71,11 @@
             border: 1px solid rgba(59, 130, 246, 0.15);
         }
 
+        .mentorship-price-value {
+            white-space: nowrap;
+            letter-spacing: -0.02em;
+        }
+
         .mentorship-cta {
             background: linear-gradient(135deg, #1f5edb, #2f7df6);
             box-shadow: 0 18px 35px -18px rgba(37, 99, 235, 0.55);
@@ -117,7 +122,15 @@
         $description = trim((string) ($mentorship->description ?? ''));
         $heroExcerpt = $description !== ''
             ? Str::limit(strip_tags($description), 160)
-            : 'Acompanhamento com orientaÃ§Ã£o prÃ¡tica para acelerar resultados em networking e negÃ³cios.';
+            : 'Acompanhamento com orientaÃƒÂ§ÃƒÂ£o prÃƒÂ¡tica para acelerar resultados em networking e negÃƒÂ³cios.';
+        $currentUser = Auth::user();
+        $hasFullAccess = $currentUser ? $currentUser->hasMentorshipAccess($mentorship) : false;
+        $canAccessByPlan = $currentUser ? $currentUser->canAccessFeature('mentorships_access') : false;
+        $accessBlocked = session('access_blocked');
+        $showAccessModal = is_array($accessBlocked)
+            && ($accessBlocked['type'] ?? null) === 'mentorship'
+            && (int) ($accessBlocked['mentorship_id'] ?? 0) === (int) $mentorship->id;
+        $showAccessModal = $showAccessModal || (bool) request()->query('locked');
 
         $selectedRating = old('rating', optional($myReview)->rating);
         $selectedRating = is_numeric($selectedRating) ? max(1, min(5, (int) $selectedRating)) : null;
@@ -186,7 +199,7 @@
                         class="absolute inset-0 w-full h-full object-cover scale-110 saturate-[1.1] brightness-[0.85]"
                         style="filter: blur({{ $heroBlurPx }}px); opacity: 0.7;" aria-hidden="true">
 
-                    <!-- Película transparente em cor degradê -->
+                    <!-- PelÃ­cula transparente em cor degradÃª -->
                     <div class="absolute inset-0" style="background: linear-gradient(135deg, 
                                 {{ $hexToRgba($sitePrimary, 0.8 * $heroFilmScale) }} 0%, 
                                 {{ $hexToRgba($siteSecondary, 0.7 * $heroFilmScale) }} 50%, 
@@ -280,7 +293,7 @@
                                 {!! \App\Support\RichText::toHtml($description) !!}
                             </div>
                         @else
-                            <p class="mt-5 text-slate-600 leading-relaxed">Sem descrição.</p>
+                            <p class="mt-5 text-slate-600 leading-relaxed">Sem descriÃ§Ã£o.</p>
                         @endif
                     </div>
 
@@ -294,7 +307,7 @@
                         </div>
                         <div class="mt-5 mentorship-price rounded-2xl p-5">
                             <div class="flex items-end justify-between gap-3">
-                                <p class="text-4xl font-black text-slate-900">
+                                <p class="text-4xl font-black text-slate-900 mentorship-price-value">
                                     {{ $price > 0 ? 'R$ ' . number_format($price, 2, ',', '.') : 'Gratuito' }}
                                 </p>
                                 @if($flashActive && $regularPrice > 0 && $price < $regularPrice)
@@ -307,7 +320,7 @@
 
                         @if($flashActive && $mentorship->flash_sale_ends_at)
                             <div class="mt-4 inline-flex items-center gap-2 rounded-full bg-rose-50 border border-rose-200 px-3 py-1 text-xs font-black text-rose-800">
-                                <i class="fas fa-bolt"></i> Promoção relâmpago termina {{ $mentorship->flash_sale_ends_at->diffForHumans() }}
+                                <i class="fas fa-bolt"></i> PromoÃ§Ã£o relÃ¢mpago termina {{ $mentorship->flash_sale_ends_at->diffForHumans() }}
                             </div>
                         @endif
 
@@ -332,14 +345,33 @@
                                     <div class="text-sm text-slate-500">{{ $slotsLabel }}</div>
                                 </div>
                             </div>
+
+                            @if($mentorship->is_certificate_enabled)
+                                <div class="flex items-start gap-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center shrink-0">
+                                        <i class="fas fa-certificate text-amber-500"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-slate-900">Certificado de conclusão</div>
+                                        <div class="text-sm text-slate-500">Disponível após finalizar a mentoria.</div>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
 
                         <div class="mt-10 flex flex-col gap-4">
                             @if($price > 0)
-                                <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
-                                    class="mentorship-cta text-white px-8 py-4 rounded-2xl font-bold inline-flex items-center justify-center gap-3 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap mentorship-float">
-                                    Comprar mentoria <i class="fas fa-lock"></i>
-                                </a>
+                                @if($hasFullAccess)
+                                    <a href="{{ route('panel.dashboard') }}"
+                                        class="px-8 py-4 rounded-2xl font-bold inline-flex items-center justify-center gap-3 bg-emerald-500 text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
+                                        Acesso liberado <i class="fas fa-check-circle"></i>
+                                    </a>
+                                @else
+                                    <button type="button" data-access-modal-trigger
+                                        class="mentorship-cta text-white px-8 py-4 rounded-2xl font-bold inline-flex items-center justify-center gap-3 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap mentorship-float">
+                                        Comprar mentoria <i class="fas fa-lock"></i>
+                                    </button>
+                                @endif
                             @endif
 
                             <a href="{{ route('premium') }}"
@@ -354,7 +386,7 @@
                         </div>
 
                         <p class="mt-8 text-xs text-slate-400 text-center leading-relaxed">
-                            Acesso exclusivo para membros. Você pode comprar esta mentoria (quando disponível) ou acessar via planos Premium (conforme regras do seu plano).
+                            Acesso exclusivo para membros. VocÃª pode comprar esta mentoria (quando disponÃ­vel) ou acessar via planos Premium (conforme regras do seu plano).
                         </p>
                     </aside>
                 </div>
@@ -362,20 +394,20 @@
                 <div class="mentorship-card p-8 md:p-10 mt-6">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                         <div>
-                            <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Avaliações</h2>
-                            <p class="text-sm text-slate-500">Comentários dos membros sobre esta mentoria.</p>
+                            <h2 class="text-2xl sm:text-3xl font-black text-slate-900">AvaliaÃ§Ãµes</h2>
+                            <p class="text-sm text-slate-500">ComentÃ¡rios dos membros sobre esta mentoria.</p>
                         </div>
                         @if($reviewsCount > 0)
                             <div
                                 class="inline-flex items-center gap-2 rounded-full bg-amber-50 text-amber-700 px-4 py-2 text-sm font-semibold">
                                 <i class="fas fa-star"></i>
                                 {{ number_format((float) $reviewsAvg, 1, ',', '.') }}/5 ({{ $reviewsCount }}
-                                {{ $reviewsCount === 1 ? 'avaliação' : 'avaliações' }})
+                                {{ $reviewsCount === 1 ? 'avaliaÃ§Ã£o' : 'avaliaÃ§Ãµes' }})
                             </div>
                         @endif
                     </div>
 
-                    @include('reviews.list', ['reviews' => $reviews, 'emptyMessage' => 'Esta mentoria ainda não possui avaliações aprovadas.'])
+                    @include('reviews.list', ['reviews' => $reviews, 'emptyMessage' => 'Esta mentoria ainda nÃ£o possui avaliaÃ§Ãµes aprovadas.'])
 
                     @include('reviews.form', [
                         'action' => route('mentorships.reviews.store', $mentorship->id),
@@ -385,4 +417,78 @@
             </div>
         </section>
     </div>
+
+    @if($price > 0)
+        <div id="mentorship-access-modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" data-mentorship-modal-close></div>
+            <div class="relative w-full max-w-xl rounded-3xl bg-white shadow-2xl border border-slate-100 overflow-hidden">
+                <div class="p-6 sm:p-8">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Conteúdo premium</p>
+                            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
+                                Desbloqueie {{ $mentorship->title ?? 'esta mentoria' }}
+                            </h3>
+                        </div>
+                        <button type="button" class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:text-slate-700"
+                            data-mentorship-modal-close>
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <div class="mt-5 rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Para acessar este conteúdo, você pode <strong>fazer upgrade do seu plano</strong> e/ou
+                            <strong>comprar a mentoria</strong>.
+                            Mesmo com upgrade, mentorias pagas exigem compra para liberar o acesso completo.
+                        </p>
+                    </div>
+
+                    <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                        <a href="{{ route('premium', ['feature' => 'mentorships_access']) }}"
+                            class="flex-1 px-6 py-3 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 text-center">
+                            Fazer upgrade
+                        </a>
+                        <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
+                            class="flex-1 px-6 py-3 rounded-xl font-bold text-white text-center"
+                            style="background: linear-gradient(135deg, #1f5edb, #2f7df6);">
+                            Comprar mentoria
+                        </a>
+                    </div>
+
+                    @if($currentUser && $canAccessByPlan)
+                        <p class="mt-4 text-xs text-slate-500">
+                            Seu plano atual permite acesso a mentorias, mas este conteúdo é pago e requer compra.
+                        </p>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <script>
+            (function () {
+                const modal = document.getElementById('mentorship-access-modal');
+                if (!modal) return;
+                const openModal = () => {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                };
+                const closeModal = () => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                };
+
+                document.querySelectorAll('[data-access-modal-trigger]').forEach((btn) => {
+                    btn.addEventListener('click', openModal);
+                });
+                document.querySelectorAll('[data-mentorship-modal-close]').forEach((btn) => {
+                    btn.addEventListener('click', closeModal);
+                });
+
+                if (@json($showAccessModal)) {
+                    openModal();
+                }
+            })();
+        </script>
+    @endif
 @endsection

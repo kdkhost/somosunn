@@ -27,6 +27,11 @@ class CheckFeature
         $feature = trim((string) $feature);
 
         if (!$user->canAccessFeature($feature) && !$this->hasEntitlementOverride($request, $user, $feature)) {
+            $lockedRedirect = $this->redirectToLockedContent($request, $feature);
+            if ($lockedRedirect) {
+                return $lockedRedirect;
+            }
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' => 'Funcionalidade nao incluida no seu plano.',
@@ -40,6 +45,56 @@ class CheckFeature
         }
 
         return $next($request);
+    }
+
+    private function redirectToLockedContent(Request $request, string $feature)
+    {
+        if ($request->expectsJson()) {
+            return null;
+        }
+
+        $courseFeatures = [
+            'courses_lessons_access',
+            'courses_lessons_attachments_download',
+        ];
+
+        if (in_array($feature, $courseFeatures, true)) {
+            $courseId = $this->resolveCourseId($request->route('course'));
+            if ($courseId) {
+                $course = Course::query()->find($courseId);
+                if ($course) {
+                    $routeParam = !empty($course->slug) ? $course->slug : $course->id;
+
+                    return redirect()
+                        ->route('courses.show', $routeParam)
+                        ->with('access_blocked', [
+                            'type' => 'course',
+                            'course_id' => (int) $course->id,
+                            'feature' => $feature,
+                        ])
+                        ->with('warning', 'Conteudo bloqueado. Escolha como deseja liberar o acesso.');
+                }
+            }
+        }
+
+        if ($feature === 'mentorships_access') {
+            $mentorshipId = $this->resolveMentorshipId($request->route('mentorship'));
+            if ($mentorshipId) {
+                $mentorship = Mentorship::query()->find($mentorshipId);
+                if ($mentorship) {
+                    return redirect()
+                        ->route('mentorships.show', $mentorship)
+                        ->with('access_blocked', [
+                            'type' => 'mentorship',
+                            'mentorship_id' => (int) $mentorship->id,
+                            'feature' => $feature,
+                        ])
+                        ->with('warning', 'Conteudo bloqueado. Escolha como deseja liberar o acesso.');
+                }
+            }
+        }
+
+        return null;
     }
 
     private function hasEntitlementOverride(Request $request, $user, string $feature): bool

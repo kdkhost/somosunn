@@ -22,6 +22,14 @@
     $isPaused = (string) ($course->status ?? '') === 'paused';
     $authorName = $course->author_name ?? optional($course->creator)->name ?? 'UNN Academy';
     $firstLesson = $course->lessons->first();
+    $currentUser = Auth::user();
+    $canAccessByPlan = $currentUser ? $currentUser->canAccessFeature('courses_access') : false;
+    $effectivePrice = (float) ($course->effective_price ?? $course->price ?? 0);
+    $accessBlocked = session('access_blocked');
+    $showAccessModal = is_array($accessBlocked)
+        && ($accessBlocked['type'] ?? null) === 'course'
+        && (int) ($accessBlocked['course_id'] ?? 0) === (int) $course->id;
+    $showAccessModal = $showAccessModal || (bool) request()->query('locked');
 
     $selectedRating = old('rating', optional($myReview)->rating);
     $selectedRating = is_numeric($selectedRating) ? max(1, min(5, (int) $selectedRating)) : null;
@@ -66,11 +74,10 @@
                         @else
                             @php
                                 $regularPrice = (float) ($course->price ?? 0);
-                                $effectivePrice = (float) ($course->effective_price ?? $regularPrice);
                                 $flashActive = method_exists($course, 'isFlashSaleActive') ? (bool) $course->isFlashSaleActive() : false;
                             @endphp
                             <div class="flex items-end gap-3 mb-4">
-                                <div class="text-3xl font-bold text-gray-900">
+                                <div class="text-3xl font-bold text-gray-900 whitespace-nowrap leading-none">
                                     {{ $effectivePrice > 0 ? 'R$ ' . number_format($effectivePrice, 2, ',', '.') : 'Gratuito' }}
                                 </div>
                                 @if($flashActive && $regularPrice > 0 && $effectivePrice < $regularPrice)
@@ -164,6 +171,12 @@
                                 <a href="{{ route('courses.lessons.show', [$course->id, $lesson->id]) }}" class="text-sm font-semibold text-[#1F5EDB] transition">
                                     Assistir @if($lesson->duration) <span class="text-gray-400 font-normal ml-1">({{ gmdate('H:i', $lesson->duration) }})</span> @endif
                                 </a>
+                            @else
+                                <button type="button"
+                                    class="text-sm font-semibold text-slate-500 hover:text-[#1F5EDB] transition inline-flex items-center gap-2"
+                                    data-access-modal-trigger>
+                                    Desbloquear <i class="fas fa-lock text-xs"></i>
+                                </button>
                             @endif
                         </div>
                     @empty
@@ -196,4 +209,78 @@
         </div>
     </div>
 </div>
+
+@if($effectivePrice > 0)
+    <div id="access-modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" data-access-modal-close></div>
+        <div class="relative w-full max-w-xl rounded-3xl bg-white shadow-2xl border border-slate-100 overflow-hidden">
+            <div class="p-6 sm:p-8">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Conteúdo premium</p>
+                        <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
+                            Desbloqueie {{ $course->title }}
+                        </h3>
+                    </div>
+                    <button type="button" class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:text-slate-700"
+                        data-access-modal-close>
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="mt-5 rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Para acessar este conteúdo, você pode <strong>fazer upgrade do seu plano</strong> e/ou
+                        <strong>comprar o curso</strong>.
+                        Mesmo com upgrade, cursos pagos exigem compra para liberar o acesso completo.
+                    </p>
+                </div>
+
+                <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                    <a href="{{ route('premium', ['feature' => 'courses_access']) }}"
+                        class="flex-1 px-6 py-3 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 text-center">
+                        Fazer upgrade
+                    </a>
+                    <a href="{{ route('checkout.show', $course->slug ?: $course->id) }}"
+                        class="flex-1 px-6 py-3 rounded-xl font-bold text-white text-center"
+                        style="background: linear-gradient(135deg, #1f5edb, #2f7df6);">
+                        Comprar curso
+                    </a>
+                </div>
+
+                @if($currentUser && $canAccessByPlan)
+                    <p class="mt-4 text-xs text-slate-500">
+                        Seu plano atual permite acesso a cursos, mas este conteúdo é pago e requer compra.
+                    </p>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const modal = document.getElementById('access-modal');
+            if (!modal) return;
+            const openModal = () => {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            };
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+
+            document.querySelectorAll('[data-access-modal-trigger]').forEach((btn) => {
+                btn.addEventListener('click', openModal);
+            });
+            document.querySelectorAll('[data-access-modal-close]').forEach((btn) => {
+                btn.addEventListener('click', closeModal);
+            });
+
+            if (@json($showAccessModal)) {
+                openModal();
+            }
+        })();
+    </script>
+@endif
 @endsection

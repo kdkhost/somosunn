@@ -23,6 +23,77 @@
             opacity: 0.28;
             pointer-events: none;
         }
+
+        .mentorship-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.75rem;
+            background: #fff;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            box-shadow: 0 18px 45px -32px rgba(15, 23, 42, 0.45);
+        }
+
+        .mentorship-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.02), rgba(99, 102, 241, 0.08));
+            opacity: 0;
+            transition: opacity .35s ease;
+            pointer-events: none;
+        }
+
+        .mentorship-card:hover::after {
+            opacity: 1;
+        }
+
+        .mentorship-media {
+            position: relative;
+            height: 180px;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.25), rgba(14, 116, 144, 0.25));
+        }
+
+        .mentorship-media::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.0), rgba(15, 23, 42, 0.35));
+        }
+
+        .mentorship-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.02);
+            transition: transform .4s ease;
+        }
+
+        .mentorship-card:hover .mentorship-media img {
+            transform: scale(1.06);
+        }
+
+        .mentorship-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: rgba(248, 250, 252, 0.9);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            color: #334155;
+        }
+
+        .mentorship-excerpt {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
     </style>
 @endpush
 
@@ -33,6 +104,23 @@
         $totalCount = method_exists($paginator, 'total') ? (int) $paginator->total() : $mentorshipsCollection->count();
 
         $pluralLabel = $totalCount === 1 ? 'mentoria' : 'mentorias';
+
+        $resolveImageUrl = function (?string $path): ?string {
+            $path = trim((string) $path);
+            if ($path === '') {
+                return null;
+            }
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                return $path;
+            }
+            if (str_starts_with($path, 'storage/')) {
+                return asset($path);
+            }
+            if (str_starts_with($path, 'uploads/')) {
+                return asset($path);
+            }
+            return asset('storage/' . ltrim($path, '/'));
+        };
     @endphp
 
     <div class="min-h-screen">
@@ -50,7 +138,7 @@
                             Mentorias Premium UNN
                         </h1>
                         <p class="mt-3 text-white/80 text-base sm:text-lg">
-                            Conteúdo gravado + acompanhamento de mentores
+                            ConteÃºdo gravado + acompanhamento de mentores
                         </p>
                     </div>
                 </div>
@@ -61,9 +149,9 @@
             <div class="max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
                     <div>
-                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900">Mentorias disponíveis</h2>
+                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900">Mentorias disponÃ­veis</h2>
                         <p class="text-gray-600 mt-2 max-w-2xl">
-                            Escolha uma mentoria e acelere seu crescimento com orientação prática.
+                            Escolha uma mentoria e acelere seu crescimento com orientaÃ§Ã£o prÃ¡tica.
                         </p>
                     </div>
                     <span class="text-sm font-bold text-slate-500 uppercase tracking-wider">
@@ -80,10 +168,24 @@
                                 $slots = $mentorship->slots;
                                 $slotsLabel = is_null($slots) ? 'A confirmar' : (string) $slots;
                                 $showUrl = !empty($mentorship->id) ? route('mentorships.show', $mentorship->id) : '#';
+                                $mentorshipImageUrl = $resolveImageUrl($mentorship->image ?? null);
+                                $rawDescription = (string) ($mentorship->description ?? '');
+                                $excerpt = trim(strip_tags($rawDescription));
+                                $excerpt = $excerpt !== '' ? Str::limit($excerpt, 140) : 'Sem descrição.';
+                                $typeLabel = match ($mentorship->type ?? '') {
+                                    \App\Models\Mentorship::TYPE_ONLINE => 'Online',
+                                    \App\Models\Mentorship::TYPE_PRESENCIAL => 'Presencial',
+                                    default => 'Premium',
+                                };
                             @endphp
 
-                            <article class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-lg transition overflow-hidden">
-                                <div class="p-8">
+                            <article class="mentorship-card group flex flex-col h-full">
+                                <div class="mentorship-media">
+                                    @if($mentorshipImageUrl)
+                                        <img src="{{ $mentorshipImageUrl }}" alt="{{ $mentorship->title ?? 'Mentoria' }}">
+                                    @endif
+                                </div>
+                                <div class="p-8 flex flex-col h-full">
                                     <div class="flex items-start justify-between gap-4">
                                         <div>
                                             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">{{ $mentorName }}</p>
@@ -93,15 +195,21 @@
                                         </div>
                                         <div class="shrink-0 text-right">
                                             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Investimento</p>
-                                            <p class="mt-1 text-lg font-black" style="color: var(--unn-azul-1)">
+                                            <p class="mt-1 text-base sm:text-lg font-black whitespace-nowrap leading-none"
+                                                style="color: var(--unn-azul-1)">
                                                 {{ $price > 0 ? 'R$ '.number_format($price, 2, ',', '.') : 'Gratuito' }}
                                             </p>
                                         </div>
                                     </div>
 
-                                    <p class="mt-4 text-slate-600 text-sm leading-relaxed">
-                                        {{ Str::limit($mentorship->description ?? 'Sem descrição.', 140) }}
+                                    <p class="mt-4 text-slate-600 text-sm leading-relaxed mentorship-excerpt">
+                                        {{ $excerpt }}
                                     </p>
+
+                                    <div class="mt-6 flex flex-wrap gap-2">
+                                        <span class="mentorship-chip"><i class="fas fa-crown text-[0.65rem]"></i> Premium</span>
+                                        <span class="mentorship-chip"><i class="fas fa-satellite-dish text-[0.65rem]"></i> {{ $typeLabel }}</span>
+                                    </div>
 
                                     <div class="mt-6 grid grid-cols-2 gap-3">
                                         <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
@@ -110,11 +218,11 @@
                                         </div>
                                         <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
                                             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Formato</p>
-                                            <p class="mt-1 font-black text-slate-900">Premium</p>
+                                            <p class="mt-1 font-black text-slate-900">{{ $typeLabel }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="mt-8 flex flex-col sm:flex-row gap-3">
+                                    <div class="mt-auto pt-6 flex flex-col sm:flex-row gap-3">
                                         <a href="{{ $showUrl }}"
                                             class="px-8 py-4 rounded-xl font-bold border-2 border-slate-100 text-slate-600 hover:bg-slate-50 transition-all duration-300 inline-flex items-center justify-center">
                                             Saiba mais
@@ -145,8 +253,8 @@
                     <div class="max-w-3xl mx-auto">
                         <div class="bg-white rounded-[32px] shadow-2xl p-10 text-center">
                             <div class="text-slate-400 mb-4"><i class="fas fa-chalkboard-teacher text-5xl"></i></div>
-                            <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Nenhuma mentoria disponível</h2>
-                            <p class="mt-2 text-slate-600">No momento não temos mentorias abertas. Volte em breve.</p>
+                            <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Nenhuma mentoria disponÃ­vel</h2>
+                            <p class="mt-2 text-slate-600">No momento nÃ£o temos mentorias abertas. Volte em breve.</p>
 
                             <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
                                 <a href="{{ route('premium') }}"
@@ -155,7 +263,7 @@
                                 </a>
                                 <a href="{{ route('home') }}"
                                     class="px-8 py-4 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center">
-                                    Voltar ao início
+                                    Voltar ao inÃ­cio
                                 </a>
                             </div>
                         </div>
