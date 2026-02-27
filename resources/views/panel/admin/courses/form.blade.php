@@ -462,15 +462,11 @@
                                         class="w-10 h-10 inline-flex items-center justify-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-900 transition-all shadow-sm">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form action="{{ route('courses.lessons.destroy', [$course, $lesson]) }}" method="POST"
-                                        onsubmit="return confirmAction(event, 'Excluir aula?', 'Deseja realmente remover esta aula?' );"
-                                        class="inline">
-                                        @csrf @method('DELETE')
-                                        <button type="submit"
-                                            class="w-10 h-10 inline-flex items-center justify-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-900 transition-all shadow-sm">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button"
+                                        onclick="return confirmDeleteLesson('{{ route('courses.lessons.destroy', [$course, $lesson]) }}');"
+                                        class="w-10 h-10 inline-flex items-center justify-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-900 transition-all shadow-sm">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
                                 </div>
                             </div>
                         @empty
@@ -1385,6 +1381,49 @@
                             form.submit();
                         }
                     });
+                    return false;
+                };
+
+                window.confirmDeleteLesson = function (url) {
+                    Swal.fire({
+                        title: 'Excluir aula?',
+                        text: 'Deseja realmente remover esta aula?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3b82f6',
+                        cancelButtonColor: '#ef4444',
+                        confirmButtonText: 'Sim, confirmar!',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true,
+                        customClass: {
+                            popup: 'rounded-[2rem] dark:bg-slate-900 border-none shadow-2xl',
+                            title: 'text-2xl font-black text-slate-800 dark:text-white',
+                            htmlContainer: 'text-sm font-medium text-slate-500 dark:text-slate-400',
+                            confirmButton: 'rounded-xl px-6 py-3 font-bold',
+                            cancelButton: 'rounded-xl px-6 py-3 font-bold'
+                        }
+                    }).then((result) => {
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+                        $.ajax({
+                            url: url,
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                _method: 'DELETE'
+                            },
+                            success: function () {
+                                toastr.success('Aula removida com sucesso.');
+                                window.location.reload();
+                            },
+                            error: function () {
+                                toastr.error('Nao foi possivel remover a aula.');
+                            }
+                        });
+                    });
+
                     return false;
                 };
 
