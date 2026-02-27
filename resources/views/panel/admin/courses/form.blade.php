@@ -747,6 +747,9 @@
                     $('#lessonVideo').val(lesson.video_url || '');
                     $('#lessonContent').val(lesson.content || '');
                     updateLessonPreviewConfig();
+                    if (!lesson.duration || Number(lesson.duration) <= 0) {
+                        agendarDeteccaoDuracaoUrl(false);
+                    }
 
                     // Attachments
                     const $list = $('#attachmentList').empty();
@@ -769,6 +772,210 @@
                     openModal('lesson-modal');
                 });
             }
+
+            let promessaApiYoutube = null;
+            let temporizadorDeteccaoDuracaoUrl = null;
+
+            function extrairIdYoutube(url) {
+                const valor = String(url || '').trim();
+                if (!valor) return null;
+
+                try {
+                    const normalizado = /^(https?:)?\/\//i.test(valor) ? valor : ('https://' + valor.replace(/^\/+/, ''));
+                    const parsed = new URL(normalizado);
+                    const host = String(parsed.hostname || '').toLowerCase();
+                    const pathParts = String(parsed.pathname || '').split('/').filter(Boolean);
+
+                    if (host === 'youtu.be' && pathParts[0]) return pathParts[0];
+
+                    if (host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com')) {
+                        if (pathParts.length >= 2 && ['embed', 'shorts', 'live'].includes(pathParts[0])) {
+                            return pathParts[1];
+                        }
+                        const v = parsed.searchParams.get('v');
+                        if (v) return v;
+                        const vi = parsed.searchParams.get('vi');
+                        if (vi) return vi;
+                    }
+                } catch (e) { }
+
+                const match = valor.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?.*v=|embed\/|shorts\/|live\/)|youtube-nocookie\.com\/embed\/)([^?&#/]+)/i);
+                return match && match[1] ? match[1] : null;
+            }
+
+            function carregarApiYoutube() {
+                if (window.YT && typeof window.YT.Player === 'function') {
+                    return Promise.resolve(window.YT);
+                }
+
+                if (promessaApiYoutube) {
+                    return promessaApiYoutube;
+                }
+
+                promessaApiYoutube = new Promise((resolve, reject) => {
+                    const anterior = window.onYouTubeIframeAPIReady;
+                    window.onYouTubeIframeAPIReady = function () {
+                        if (typeof anterior === 'function') {
+                            try { anterior(); } catch (e) { }
+                        }
+                        resolve(window.YT);
+                    };
+
+                    if (!document.querySelector('script[data-youtube-iframe-api="1"]')) {
+                        const script = document.createElement('script');
+                        script.src = 'https://www.youtube.com/iframe_api';
+                        script.async = true;
+                        script.setAttribute('data-youtube-iframe-api', '1');
+                        script.onerror = () => reject(new Error('Falha ao carregar API do YouTube.'));
+                        document.head.appendChild(script);
+                    }
+
+                    setTimeout(() => {
+                        if (!(window.YT && typeof window.YT.Player === 'function')) {
+                            reject(new Error('Tempo esgotado ao carregar API do YouTube.'));
+                        }
+                    }, 12000);
+                });
+
+                return promessaApiYoutube;
+            }
+
+            function detectarDuracaoYoutube(videoId) {
+                return carregarApiYoutube().then(() => new Promise((resolve, reject) => {
+                    const probeId = 'yt-duration-probe-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                    const probe = document.createElement('div');
+                    probe.id = probeId;
+                    probe.style.cssText = 'position:fixed;left:-99999px;top:-99999px;width:1px;height:1px;opacity:0;pointer-events:none;';
+                    document.body.appendChild(probe);
+
+                    let player = null;
+                    let finalizado = false;
+
+                    const finalizar = (duracao = 0, erro = null) => {
+                        if (finalizado) return;
+                        finalizado = true;
+
+                        if (player && typeof player.destroy === 'function') {
+                            try { player.destroy(); } catch (e) { }
+                        }
+                        if (probe && probe.parentNode) {
+                            probe.parentNode.removeChild(probe);
+                        }
+
+                        if (erro) {
+                            reject(erro);
+                            return;
+                        }
+
+                        if (duracao > 0) {
+                            resolve(duracao);
+                        } else {
+                            reject(new Error('Não foi possível detectar a duração do vídeo.'));
+                        }
+                    };
+
+                    const timeout = setTimeout(() => finalizar(0, new Error('Tempo esgotado ao detectar duração do YouTube.')), 12000);
+
+                    player = new window.YT.Player(probeId, {
+                        videoId: videoId,
+                        width: '1',
+                        height: '1',
+                        playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1, playsinline: 1 },
+                        events: {
+                            onReady: function (event) {
+                                setTimeout(() => {
+                                    clearTimeout(timeout);
+                                    const duracao = Math.floor(Number(event.target.getDuration()) || 0);
+                                    finalizar(duracao);
+                                }, 700);
+                            },
+                            onError: function () {
+                                clearTimeout(timeout);
+                                finalizar(0, new Error('Vídeo do YouTube indisponível para prévia.'));
+                            }
+                        }
+                    });
+                }));
+            }
+
+            function detectarDuracaoVideoRemoto(url) {
+                return new Promise((resolve, reject) => {
+                    const probe = document.createElement('video');
+                    probe.preload = 'metadata';
+                    probe.muted = true;
+                    probe.style.display = 'none';
+
+                    const finalizar = (duracao = 0, erro = null) => {
+                        try {
+                            probe.pause();
+                            probe.removeAttribute('src');
+                            probe.load();
+                        } catch (e) { }
+
+                        if (probe.parentNode) {
+                            probe.parentNode.removeChild(probe);
+                        }
+
+                        if (erro) {
+                            reject(erro);
+                            return;
+                        }
+
+                        if (duracao > 0) {
+                            resolve(duracao);
+                        } else {
+                            reject(new Error('Não foi possível detectar a duração.'));
+                        }
+                    };
+
+                    probe.onloadedmetadata = function () {
+                        const duracao = Math.floor(Number(probe.duration) || 0);
+                        finalizar(duracao);
+                    };
+
+                    probe.onerror = function () {
+                        finalizar(0, new Error('Falha ao carregar metadados do vídeo.'));
+                    };
+
+                    document.body.appendChild(probe);
+                    probe.src = url;
+                });
+            }
+
+            function detectarDuracaoPorUrlAula(mostrarErro = false) {
+                const rawUrl = ($('#lessonVideo').val() || '').trim();
+                if (!rawUrl) return;
+
+                const normalizada = /^(https?:)?\/\//i.test(rawUrl) ? rawUrl : ('https://' + rawUrl.replace(/^\/+/, ''));
+                const idYoutube = extrairIdYoutube(normalizada);
+
+                const promessa = idYoutube
+                    ? detectarDuracaoYoutube(idYoutube)
+                    : detectarDuracaoVideoRemoto(normalizada);
+
+                promessa.then((duracao) => {
+                    if (!Number.isFinite(duracao) || duracao <= 0) return;
+                    $('#lessonDuration').val(duracao);
+                    toastr.info('Duração detectada automaticamente: ' + duracao + 's');
+                }).catch(() => {
+                    if (mostrarErro) {
+                        toastr.warning('Não foi possível detectar a duração automática para este link.');
+                    }
+                });
+            }
+
+            function agendarDeteccaoDuracaoUrl(mostrarErro = false) {
+                if (temporizadorDeteccaoDuracaoUrl) {
+                    clearTimeout(temporizadorDeteccaoDuracaoUrl);
+                }
+                temporizadorDeteccaoDuracaoUrl = setTimeout(() => {
+                    detectarDuracaoPorUrlAula(mostrarErro);
+                }, 650);
+            }
+
+            $(document).on('change blur', '#lessonVideo', function () {
+                agendarDeteccaoDuracaoUrl(false);
+            });
 
             $(document).on('change', '#lessonPreview, #lessonPreviewMode', updateLessonPreviewConfig);
             updateLessonPreviewConfig();

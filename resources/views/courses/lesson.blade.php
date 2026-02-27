@@ -98,18 +98,23 @@
                                 !preg_match('/^(https?:)?\\/\\//i', $normalizedVideoUrl)
                             ) {
                                 $candidate = ltrim(str_replace('\\', '/', $normalizedVideoUrl), '/');
-                                if (\Illuminate\Support\Str::startsWith($candidate, 'storage/app/public/')) {
-                                    $candidate = 'storage/' . substr($candidate, strlen('storage/app/public/'));
-                                } elseif (\Illuminate\Support\Str::startsWith($candidate, 'public/')) {
-                                    $candidate = substr($candidate, strlen('public/'));
-                                }
-
-                                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($candidate)) {
-                                    $normalizedVideoUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($candidate);
-                                } elseif (\Illuminate\Support\Str::startsWith($candidate, 'storage/')) {
-                                    $normalizedVideoUrl = '/' . $candidate;
+                                $providerCandidate = preg_replace('/^www\\./i', '', $candidate);
+                                if (preg_match('/^(youtube\\.com|m\\.youtube\\.com|youtu\\.be|vimeo\\.com|player\\.vimeo\\.com)\\//i', $providerCandidate)) {
+                                    $normalizedVideoUrl = 'https://' . $providerCandidate;
                                 } else {
-                                    $normalizedVideoUrl = '/' . $candidate;
+                                    if (\Illuminate\Support\Str::startsWith($candidate, 'storage/app/public/')) {
+                                        $candidate = 'storage/' . substr($candidate, strlen('storage/app/public/'));
+                                    } elseif (\Illuminate\Support\Str::startsWith($candidate, 'public/')) {
+                                        $candidate = substr($candidate, strlen('public/'));
+                                    }
+
+                                    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($candidate)) {
+                                        $normalizedVideoUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($candidate);
+                                    } elseif (\Illuminate\Support\Str::startsWith($candidate, 'storage/')) {
+                                        $normalizedVideoUrl = '/' . $candidate;
+                                    } else {
+                                        $normalizedVideoUrl = '/' . $candidate;
+                                    }
                                 }
                             }
                         @endphp
@@ -166,9 +171,43 @@
                                 </video>
                             </div>
                         @else
-                            <iframe src="{{ str_replace('youtu.be/', 'youtube.com/embed/', $normalizedVideoUrl) }}" frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
+                            @php
+                                $fallbackUrl = trim((string) $normalizedVideoUrl);
+                                $youtubeId = null;
+                                $vimeoId = null;
+
+                                if (preg_match('/(?:youtu\\.be\\/|youtube\\.com\\/(?:watch\\?v=|embed\\/|shorts\\/|live\\/)|youtube-nocookie\\.com\\/embed\\/)([^?&#\\/]+)/i', $fallbackUrl, $m)) {
+                                    $youtubeId = $m[1] ?? null;
+                                }
+
+                                if (!$youtubeId) {
+                                    $parsedFallback = parse_url($fallbackUrl);
+                                    if (!empty($parsedFallback['query'])) {
+                                        parse_str($parsedFallback['query'], $queryFallback);
+                                        if (!empty($queryFallback['v'])) {
+                                            $youtubeId = $queryFallback['v'];
+                                        }
+                                    }
+                                }
+
+                                if (!$youtubeId && preg_match('/(?:vimeo\\.com\\/(?:video\\/)?)(\\d+)/i', $fallbackUrl, $m)) {
+                                    $vimeoId = $m[1] ?? null;
+                                }
+                            @endphp
+
+                            @if(!empty($youtubeId))
+                                <iframe src="https://www.youtube.com/embed/{{ urlencode($youtubeId) }}" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
+                            @elseif(!empty($vimeoId))
+                                <iframe src="https://player.vimeo.com/video/{{ urlencode($vimeoId) }}" frameborder="0"
+                                    allow="autoplay; fullscreen; picture-in-picture" allowfullscreen
+                                    class="absolute inset-0 w-full h-full"></iframe>
+                            @else
+                                <video class="absolute inset-0 w-full h-full object-contain" controls playsinline preload="metadata">
+                                    <source src="{{ $fallbackUrl }}">
+                                </video>
+                            @endif
                         @endif
                     @else
                         <div class="flex items-center justify-center h-full text-white">

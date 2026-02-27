@@ -651,6 +651,15 @@
                 display: none;
             }
 
+            .unn-video-float-anchor {
+                display: block;
+                width: 100%;
+                height: 1px;
+                margin: 0;
+                padding: 0;
+                pointer-events: none;
+            }
+
             .unn-video-float {
                 position: fixed !important;
                 width: var(--unn-float-width, 420px) !important;
@@ -1101,22 +1110,41 @@
 
                 function extractYouTubeId(url) {
                     if (!url) return null;
+                    try {
+                        const parsed = new URL(String(url));
+                        const host = String(parsed.hostname || '').toLowerCase();
+                        const path = String(parsed.pathname || '');
+
+                        if (host === 'youtu.be') {
+                            const shortId = path.replace(/^\/+/, '').split('/')[0];
+                            if (shortId) return shortId;
+                        }
+
+                        if (host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com')) {
+                            const pathParts = path.split('/').filter(Boolean);
+                            if (pathParts.length >= 2 && ['embed', 'shorts', 'live'].includes(pathParts[0])) {
+                                return pathParts[1];
+                            }
+                        }
+
+                        const v = parsed.searchParams.get('v');
+                        if (v) return v;
+                        const vi = parsed.searchParams.get('vi');
+                        if (vi) return vi;
+                    } catch (e) { /* ignore */ }
+
                     const patterns = [
                         /youtu\.be\/([^?&#/]+)/i,
-                        /youtube\.com\/watch\?v=([^?&#/]+)/i,
+                        /youtube\.com\/watch\?.*v=([^?&#/]+)/i,
                         /youtube\.com\/embed\/([^?&#/]+)/i,
                         /youtube\.com\/shorts\/([^?&#/]+)/i,
+                        /youtube\.com\/live\/([^?&#/]+)/i,
+                        /youtube-nocookie\.com\/embed\/([^?&#/]+)/i,
                     ];
                     for (const pattern of patterns) {
                         const match = String(url).match(pattern);
                         if (match && match[1]) return match[1];
                     }
-
-                    try {
-                        const parsed = new URL(String(url));
-                        const v = parsed.searchParams.get('v');
-                        if (v) return v;
-                    } catch (e) { /* ignore */ }
 
                     return null;
                 }
@@ -1184,7 +1212,7 @@
                     if (url.startsWith('/')) return url;
 
                     // Allow common providers without protocol.
-                    if (/^(www\.)?(youtube\.com|youtu\.be|vimeo\.com|player\.vimeo\.com)\//i.test(url)) {
+                    if (/^(www\.)?(youtube\.com|m\.youtube\.com|youtu\.be|vimeo\.com|player\.vimeo\.com)\//i.test(url)) {
                         url = url.replace(/^www\./i, '');
                         return 'https://' + url;
                     }
@@ -1454,6 +1482,7 @@
                     let disabled = false;
                     let manualToggle = false; // Track manual toggle state
                     let pipWindow = null; // Store reference to PiP window
+                    let isFloating = false;
 
                     const clampInt = function (value, fallback, min, max) {
                         const parsed = parseInt(String(value || ''), 10);
@@ -1466,6 +1495,16 @@
 
                     host.style.setProperty('--unn-float-width', width + 'px');
                     host.style.setProperty('--unn-float-height', height + 'px');
+
+                    // Stable marker used for viewport detection to avoid flicker when host turns fixed.
+                    const anchor = document.createElement('div');
+                    anchor.className = 'unn-video-float-anchor';
+                    anchor.setAttribute('aria-hidden', 'true');
+                    if (host.parentNode) {
+                        try {
+                            host.parentNode.insertBefore(anchor, host);
+                        } catch (e) { }
+                    }
 
                     // Placeholder to keep space in the original document
                     const placeholder = document.createElement('div');
@@ -1541,6 +1580,7 @@
                                 }
                                 pipWindow = null;
                                 manualToggle = false;
+                                isFloating = false;
 
                                 // Clean up checks
                                 if (player && typeof player.resize === 'function') {
@@ -1558,13 +1598,20 @@
                     async function setFloating(on) {
                         if (disabled && !manualToggle) on = false;
 
+                        if (!on && !pipWindow && !isFloating) {
+                            return;
+                        }
+
                         if (on) {
                             // Priority 1: Document PiP (New Window + Watermark)
                             // Only triggered via manual toggle
                             if (manualToggle && 'documentPictureInPicture' in window) {
                                 if (!pipWindow) {
                                     const success = await enterDocumentPiP();
-                                    if (success) return;
+                                    if (success) {
+                                        isFloating = true;
+                                        return;
+                                    }
                                 } else {
                                     return; // Already open
                                 }
@@ -1577,6 +1624,7 @@
                                 placeholder.style.height = rect.height + 'px';
                                 placeholder.style.display = 'block';
                                 host.classList.add('unn-video-float');
+                                isFloating = true;
                             }
                         } else {
                             // Turn Off
@@ -1585,6 +1633,7 @@
                             } else if (host.classList.contains('unn-video-float')) {
                                 host.classList.remove('unn-video-float');
                                 placeholder.style.display = 'none';
+                                isFloating = false;
                             }
                         }
 
@@ -1605,7 +1654,7 @@
                             disabled = false;
                             setFloating(false);
                         } else {
-                            manualToggle = !host.classList.contains('unn-video-float');
+                            manualToggle = !isFloating;
                             disabled = !manualToggle;
                             setFloating(manualToggle);
                         }
@@ -1627,12 +1676,13 @@
                                     setFloating(!entry.isIntersecting);
                                 }
                             }
-                        }, { threshold: 0.15 });
-                        observer.observe(host);
+                        }, { threshold: 0.01, rootMargin: '-84px 0px -84px 0px' });
+                        observer.observe(anchor);
                     } else {
                         const onScroll = function () {
                             if (manualToggle || pipWindow) return;
-                            const rect = host.getBoundingClientRect();
+                            const target = anchor || host;
+                            const rect = target.getBoundingClientRect();
                             const inView = rect.bottom > 100 && rect.top < (window.innerHeight - 100);
                             setFloating(!inView);
                         };
