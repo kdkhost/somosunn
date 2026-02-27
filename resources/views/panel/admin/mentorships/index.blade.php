@@ -93,7 +93,7 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @forelse($mentorships as $mentorship)
-                            <tr class="group hover:bg-slate-50/50 transition-all">
+                            <tr class="group hover:bg-slate-50/70 dark:hover:bg-slate-800/70 transition-all">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-4">
                                         @if($mentorship->image)
@@ -129,7 +129,7 @@
                                             @endif
                                         </div>
                                         <span
-                                            class="text-sm font-medium text-slate-600 dark:text-slate-400 transition-colors">{{ $mentorship->mentor->name ?? 'N/A' }}</span>
+                                            class="text-sm font-semibold text-slate-700 dark:text-slate-200 transition-colors">{{ $mentorship->mentor->name ?? 'N/A' }}</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
@@ -138,7 +138,7 @@
                                             class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider {{ $mentorship->type == 'online' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-800/50' }} transition-colors">
                                             {{ $mentorship->type }}
                                         </span>
-                                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium transition-colors">
+                                        <p class="text-xs text-slate-600 dark:text-slate-300 font-medium transition-colors">
                                             {{ $mentorship->slots ?? '∞' }} vagas
                                         </p>
                                     </div>
@@ -160,17 +160,16 @@
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
                                         <a href="{{ route('panel.admin.mentorships.edit', $mentorship) }}"
-                                            class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all border border-transparent hover:border-blue-100 dark:hover:border-blue-800/50 text-slate-400 dark:text-slate-500"
+                                            class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-300 rounded-xl transition-all border border-transparent hover:border-blue-100 dark:hover:border-blue-800/50 text-slate-500 dark:text-slate-300"
                                             title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form action="{{ route('panel.admin.mentorships.destroy', $mentorship) }}" method="POST"
-                                            onsubmit="return confirmAction(event, 'Excluir mentoria?', 'Tem certeza que deseja excluir esta mentoria?')">
-                                            ;"
+                                            onsubmit="return confirmAction(event, 'Excluir mentoria?', 'Tem certeza que deseja excluir esta mentoria?')"
                                             class="inline">
                                             @csrf @method('DELETE')
                                             <button type="submit"
-                                                class="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-400 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-800/50 text-slate-400 dark:text-slate-500"
+                                                class="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-300 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-800/50 text-slate-500 dark:text-slate-300"
                                                 title="Excluir">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>

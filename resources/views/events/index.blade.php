@@ -692,24 +692,62 @@
                                 </a>
                             </div>
                         @else
-                            <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-white">
-                                Você já está conectado
-                            </h2>
-                            <p class="mt-4 text-white/80 text-lg sm:text-xl">
-                                Explore os próximos eventos, garanta seu ingresso e acompanhe as atualizações.
-                            </p>
+                            @php
+                                $userName = trim((string) (auth()->user()->name ?? ''));
+                                $firstName = $userName !== '' ? explode(' ', $userName)[0] : 'Membro';
+                                $eventsCount = method_exists($events, 'total') ? (int) $events->total() : (is_countable($events) ? count($events) : 0);
+                                $ctaTarget = $featuredEvent ? route('events.show', $featuredEvent) : route('events.index');
+                            @endphp
 
-                            <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                                <a href="{{ route('events.index') }}"
-                                    class="inline-flex items-center justify-center gap-3 px-5 py-3 sm:px-10 sm:py-4 rounded-full font-black text-sm sm:text-base bg-white shadow-lg hover:shadow-xl transition whitespace-nowrap"
-                                    style="color: var(--unn-azul-1)">
-                                    <i class="fas fa-calendar-check"></i>
-                                    Ver eventos
-                                </a>
-                                <a href="{{ route('premium') }}"
-                                    class="inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-10 sm:py-4 rounded-full font-black border-2 border-white text-white bg-white/10 hover:bg-white/15 transition whitespace-nowrap">
-                                    <i class="fas fa-crown"></i> Benefícios Premium
-                                </a>
+                            <div class="max-w-5xl mx-auto text-left">
+                                <div class="grid grid-cols-1 lg:grid-cols-[1.35fr_0.95fr] gap-4 md:gap-5">
+                                    <div class="rounded-3xl border border-white/25 bg-white/10 backdrop-blur-md p-6 md:p-8 shadow-[0_20px_55px_rgba(0,0,0,.18)]">
+                                        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-[0.16em] bg-white/20 text-white/90">
+                                            <i class="fas fa-sparkles"></i> Seu acesso está ativo
+                                        </span>
+
+                                        <h2 class="mt-4 text-3xl md:text-4xl font-black text-white leading-tight">
+                                            Bem-vindo de volta, {{ $firstName }}.
+                                        </h2>
+                                        <p class="mt-3 text-white/85 text-base md:text-lg leading-relaxed">
+                                            Sua agenda de networking está pronta. Entre em um evento agora ou avance para o próximo nível.
+                                        </p>
+
+                                        <div class="mt-7 flex flex-col sm:flex-row gap-3">
+                                            <a href="{{ $ctaTarget }}"
+                                                class="inline-flex items-center justify-center gap-3 px-5 py-3 md:px-7 md:py-3.5 rounded-2xl font-black text-sm md:text-base bg-white shadow-xl hover:shadow-2xl transition"
+                                                style="color: var(--unn-azul-1)">
+                                                <i class="fas fa-ticket-alt"></i>
+                                                Quero meu ingresso
+                                            </a>
+                                            <a href="{{ route('premium') }}"
+                                                class="inline-flex items-center justify-center gap-3 px-5 py-3 md:px-7 md:py-3.5 rounded-2xl font-black text-sm md:text-base border-2 border-white text-white bg-white/10 hover:bg-white/20 transition">
+                                                <i class="fas fa-crown"></i> Upgrade Premium
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="rounded-3xl border border-white/20 bg-[#0f3ddf]/55 backdrop-blur-md p-6 shadow-[0_16px_36px_rgba(0,0,0,.18)]">
+                                        <h3 class="text-sm font-bold uppercase tracking-[0.14em] text-white/80">Radar UNN</h3>
+                                        <div class="mt-4 space-y-3">
+                                            <div class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3">
+                                                <p class="text-[11px] uppercase tracking-[0.12em] font-semibold text-white/70">Eventos disponíveis</p>
+                                                <p class="mt-1 text-2xl font-black text-white">{{ $eventsCount }}</p>
+                                            </div>
+                                            <div class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3">
+                                                <p class="text-[11px] uppercase tracking-[0.12em] font-semibold text-white/70">Destaque atual</p>
+                                                <p class="mt-1 text-sm font-bold text-white leading-snug">
+                                                    {{ $featuredEvent ? \Illuminate\Support\Str::limit($featuredEvent->title, 42) : 'Novos eventos em breve' }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <a href="{{ route('panel.dashboard') }}"
+                                            class="mt-4 inline-flex w-full items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-white/15 hover:bg-white/20 border border-white/30 text-white font-bold transition">
+                                            <i class="fas fa-chart-line"></i> Abrir meu painel
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         @endguest
                     </div>
