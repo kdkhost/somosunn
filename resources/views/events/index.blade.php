@@ -670,26 +670,48 @@
                         style="background-image: radial-gradient(rgba(255,255,255,0.45) 1px, transparent 1px); background-size: 42px 42px;"></div>
 
                     <div class="relative">
-                        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-white">
-                            Pronto para transformar sua rede?
-                        </h2>
-                        <p class="mt-4 text-white/80 text-lg sm:text-xl">
-                            Junte-se a milhares de empreendedores que já estão crescendo juntos.
-                        </p>
+                        @guest
+                            <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-white">
+                                Pronto para transformar sua rede?
+                            </h2>
+                            <p class="mt-4 text-white/80 text-lg sm:text-xl">
+                                Junte-se a milhares de empreendedores que já estão crescendo juntos.
+                            </p>
 
-                        <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <a href="{{ route('register') }}"
-                                class="inline-flex items-center justify-center gap-3 px-5 py-3 sm:px-10 sm:py-4 rounded-full font-black text-sm sm:text-base bg-white shadow-lg hover:shadow-xl transition whitespace-nowrap"
-                                style="color: var(--unn-azul-1)">
-                                <i class="fas fa-rocket"></i>
-                                <span class="sm:hidden">Começar grátis</span>
-                                <span class="hidden sm:inline">Começar agora - É grátis</span>
-                            </a>
-                            <a href="{{ route('premium') }}"
-                                class="inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-10 sm:py-4 rounded-full font-black border-2 border-white text-white bg-white/10 hover:bg-white/15 transition whitespace-nowrap">
-                                <i class="fas fa-crown"></i> Ver planos Premium
-                            </a>
-                        </div>
+                            <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                                <a href="{{ route('register') }}"
+                                    class="inline-flex items-center justify-center gap-3 px-5 py-3 sm:px-10 sm:py-4 rounded-full font-black text-sm sm:text-base bg-white shadow-lg hover:shadow-xl transition whitespace-nowrap"
+                                    style="color: var(--unn-azul-1)">
+                                    <i class="fas fa-rocket"></i>
+                                    <span class="sm:hidden">Começar grátis</span>
+                                    <span class="hidden sm:inline">Começar agora - É grátis</span>
+                                </a>
+                                <a href="{{ route('premium') }}"
+                                    class="inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-10 sm:py-4 rounded-full font-black border-2 border-white text-white bg-white/10 hover:bg-white/15 transition whitespace-nowrap">
+                                    <i class="fas fa-crown"></i> Ver planos Premium
+                                </a>
+                            </div>
+                        @else
+                            <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-white">
+                                Você já está conectado
+                            </h2>
+                            <p class="mt-4 text-white/80 text-lg sm:text-xl">
+                                Explore os próximos eventos, garanta seu ingresso e acompanhe as atualizações.
+                            </p>
+
+                            <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                                <a href="{{ route('events.index') }}"
+                                    class="inline-flex items-center justify-center gap-3 px-5 py-3 sm:px-10 sm:py-4 rounded-full font-black text-sm sm:text-base bg-white shadow-lg hover:shadow-xl transition whitespace-nowrap"
+                                    style="color: var(--unn-azul-1)">
+                                    <i class="fas fa-calendar-check"></i>
+                                    Ver eventos
+                                </a>
+                                <a href="{{ route('premium') }}"
+                                    class="inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-10 sm:py-4 rounded-full font-black border-2 border-white text-white bg-white/10 hover:bg-white/15 transition whitespace-nowrap">
+                                    <i class="fas fa-crown"></i> Benefícios Premium
+                                </a>
+                            </div>
+                        @endguest
                     </div>
                 </div>
             </div>
