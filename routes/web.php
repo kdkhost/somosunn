@@ -672,6 +672,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             ->middleware('check.feature:fonts_access')->name('fonts.index');
         Route::post('/fonts', [\App\Http\Controllers\Admin\CustomFontController::class, 'store'])
             ->middleware('check.feature:fonts_create')->name('fonts.store');
+        Route::post('/fonts/detect-metadata', [\App\Http\Controllers\Admin\CustomFontController::class, 'detectMetadata'])
+            ->middleware('check.feature:fonts_create')->name('fonts.detect-metadata');
         Route::delete('/fonts/{font}', [\App\Http\Controllers\Admin\CustomFontController::class, 'destroy'])
             ->middleware('check.feature:fonts_delete')->name('fonts.destroy');
         Route::get('/fonts/api/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])

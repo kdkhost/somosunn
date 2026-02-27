@@ -156,6 +156,62 @@
 @push('scripts')
     <script>
         $(document).ready(function () {
+            const $nameInput = $('input[name="name"]');
+            const $familyInput = $('input[name="font_family"]');
+
+            function normalizeFontValue(value) {
+                return (value || '').toString().replace(/\s+/g, ' ').trim();
+            }
+
+            function buildFallbackFromFile(fileName) {
+                const baseName = (fileName || '').toString().replace(/\.[^/.]+$/, '');
+                const normalized = normalizeFontValue(baseName.replace(/[_-]+/g, ' '));
+
+                if (!normalized) {
+                    return 'Fonte Personalizada';
+                }
+
+                return normalized;
+            }
+
+            function fillFontFields(name, family) {
+                const detectedName = normalizeFontValue(name);
+                const detectedFamily = normalizeFontValue(family).replace(/^['"]+|['"]+$/g, '');
+
+                if (detectedName) {
+                    $nameInput.val(detectedName);
+                }
+
+                if (detectedFamily) {
+                    $familyInput.val(detectedFamily);
+                }
+            }
+
+            function detectFontMetadata(file) {
+                if (!file) {
+                    return;
+                }
+
+                const detectData = new FormData();
+                detectData.append('_token', '{{ csrf_token() }}');
+                detectData.append('font_file', file);
+
+                $.ajax({
+                    url: '{{ route("admin.fonts.detect-metadata") }}',
+                    type: 'POST',
+                    data: detectData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        fillFontFields(response.name, response.font_family);
+                    },
+                    error: function () {
+                        const fallback = buildFallbackFromFile(file.name);
+                        fillFontFields(fallback, fallback);
+                    }
+                });
+            }
+
             // Toggle form fields based on type
             $('#fontType').on('change', function () {
                 const type = $(this).val();
@@ -178,6 +234,9 @@
             $('#font_file').on('change', function () {
                 const fileName = $(this).val().split('\\').pop();
                 $(this).next('.custom-file-label').html(fileName);
+
+                const file = this.files && this.files[0] ? this.files[0] : null;
+                detectFontMetadata(file);
             });
 
             // Form Submit
