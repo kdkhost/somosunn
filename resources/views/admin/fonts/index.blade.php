@@ -165,9 +165,12 @@
                 if (type === 'google_link') {
                     $('#google_font_url').attr('required', true);
                     $('#font_file').removeAttr('required');
+                    $('#font_file').val('');
+                    $('#font_file').next('.custom-file-label').html('Escolher arquivo...');
                 } else if (type === 'file') {
                     $('#font_file').attr('required', true);
                     $('#google_font_url').removeAttr('required');
+                    $('#google_font_url').val('');
                 }
             });
 
