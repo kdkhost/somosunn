@@ -108,6 +108,15 @@
                                     <p>Minhas vendas</p>
                                 </a>
                             </li>
+                            @if(auth()->user()->isAdmin())
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.splits.index') }}"
+                                        class="nav-link {{ $is('admin.splits.index') }}">
+                                        <i class="fas fa-money-bill-wave nav-icon text-success"></i>
+                                        <p>Extrato de Splits</p>
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </li>
                 @endif

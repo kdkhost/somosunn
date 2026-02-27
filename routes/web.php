@@ -424,6 +424,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         // Orders Management
         Route::post('orders/{order}/refund', [\App\Http\Controllers\Panel\Admin\OrderController::class, 'refund'])->name('orders.refund');
         Route::resource('orders', \App\Http\Controllers\Panel\Admin\OrderController::class)->only(['index', 'show']);
+        Route::get('splits', [\App\Http\Controllers\Admin\SplitController::class, 'index'])->name('splits.index');
         Route::post('orders/{order}/invoice', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'issueForOrder'])->name('orders.invoice');
 
         // Invoices Management
@@ -480,7 +481,6 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
                 Route::put('/', [\App\Http\Controllers\LessonController::class, 'update'])->name('update');
                 Route::delete('/', [\App\Http\Controllers\LessonController::class, 'destroy'])->name('destroy');
                 Route::get('details', [\App\Http\Controllers\LessonController::class, 'getDetails'])->name('details');
-
                 // Attachments
                 Route::post('attachments', [\App\Http\Controllers\LessonController::class, 'uploadAttachment'])->name('attachments.store');
                 Route::put('attachments/{attachment}', [\App\Http\Controllers\LessonController::class, 'renameAttachment'])->name('attachments.rename');
@@ -495,6 +495,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     // Preferência de Tema
     Route::post('/theme/toggle', [\App\Http\Controllers\Panel\ThemeController::class, 'update'])->name('theme.toggle');
 
+    // Split de Pagamentos (Membro)
+    Route::get('/recebimentos', [\App\Http\Controllers\Panel\SplitController::class, 'index'])->name('splits.index');
+
     // Perfil (completo) - permitido mesmo sem plano ativo (whitelist no middleware)
     Route::get('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'update'])->name('profile.update');
@@ -502,8 +505,6 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     // Certificados (Aluno)
     Route::get('/certificados', [\App\Http\Controllers\Panel\CertificateController::class, 'index'])->name('certificates.index');
     Route::post('/certificados/gerar', [\App\Http\Controllers\Panel\CertificateController::class, 'generate'])->name('certificates.generate');
-    // Note: show/download routes might be missing or exist elsewhere. Let's check Controller methods.
-    // Panel\CertificateController has show/download. We need routes for them too.
     Route::get('/certificados/{certificate}', [\App\Http\Controllers\Panel\CertificateController::class, 'show'])->name('certificates.show');
     Route::get('/certificados/{certificate}/download', [\App\Http\Controllers\Panel\CertificateController::class, 'download'])->name('certificates.download');
 

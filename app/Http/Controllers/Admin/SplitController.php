@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\OrderSplit;
+use Illuminate\Http\Request;
+
+class SplitController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = OrderSplit::with(['order', 'receiver'])->latest();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('receiver', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })->orWhereHas('order', function ($q) use ($search) {
+                $q->where('id', $search);
+            });
+        }
+
+        $splits = $query->paginate(20);
+
+        return view('admin.splits.index', compact('splits'));
+    }
+}

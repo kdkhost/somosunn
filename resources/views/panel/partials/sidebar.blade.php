@@ -121,6 +121,11 @@
                     <i class="fas fa-receipt w-5 opacity-80"></i>
                     Minhas vendas
                 </a>
+                <a href="{{ route('panel.splits.index') }}"
+                    class="{{ $navItemClass(request()->routeIs('panel.splits.index')) }}">
+                    <i class="fas fa-money-bill-wave w-5 opacity-80 text-green-500"></i>
+                    Meus recebimentos
+                </a>
             </div>
         @endif
 
@@ -197,7 +202,8 @@
                     Painel administrativo
                 </a>
 
-                <div class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                <div
+                    class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
                     Gestao
                 </div>
                 <a href="{{ route('panel.admin.users.index') }}"
@@ -251,7 +257,8 @@
                     Logs de atividade
                 </a>
 
-                <div class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                <div
+                    class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
                     Conteudo
                 </div>
                 <a href="{{ route('panel.admin.courses.index') }}"
@@ -290,7 +297,8 @@
                     CMS e paginas
                 </a>
 
-                <div class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                <div
+                    class="mt-4 mb-2 px-4 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
                     Ajustes
                 </div>
                 <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"

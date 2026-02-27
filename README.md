@@ -200,13 +200,17 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
   - Implementação de sistema de rateio (Split) para vendas de membros.
   - Divisão configurável entre: **Vendedor, Plataforma, Tráfego Pago e Superadmin**.
   - Validação de integridade: a soma das porcentagens é validada no admin para garantir exatamente 100%.
-- **Gestão Financeira e Transparência:**
+- **Gestão Financeira, Transparência e Auditoria:**
   - Nova tabela `order_splits` para auditoria e rastreamento de cada centavo distribuído.
-  - Campo **Chave PIX** adicionado ao perfil do usuário (Membro e Admin) para destinação automática de recebimentos.
+  - **Extratos de Rateio**:
+    - Visualização global para o Superadmin (AdminLTE) com filtros por pedido e recebedor.
+    - Visualização pessoal para Membros (Novo Painel) para acompanhamento de ganhos reais.
+  - Campo **Chave PIX** adicionado e validado no perfil do usuário em ambos os painéis (Bootstrap & Tailwind).
 - **Webhook Inteligente:**
   - O processamento de pagamentos agora dispara automaticamente o cálculo do split no momento da aprovação da ordem.
-- **MercadoPago & MCP:**
-  - Sistema preparado para suportar splits via API ou transferências diretas via PIX baseado nas ordens liquidadas.
+- **Interface e Navegação:**
+  - Injeção dinâmica de links de extrato nos menus laterais de ambos os sistemas.
+  - Correção de bugs de sintaxe e visibilidade no formulário de perfil do novo painel.
 
 ### 25/02/2026 — Padronização de UX, Sistema de Parceiros e Expansão
 - **Monitoramento de Saúde (Dashboards):**
