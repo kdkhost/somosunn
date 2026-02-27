@@ -607,6 +607,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         Route::get('/vendas', [\App\Http\Controllers\Admin\MarketplaceController::class, 'sales'])->name('sales');
     });
 
+    // Extrato de Splits (AdminLTE)
+    Route::get('splits', [\App\Http\Controllers\Admin\SplitController::class, 'index'])->name('splits.index');
+
     // Certificates (Acessível a Admin e Instrutores)
     Route::get('/certificates', [\App\Http\Controllers\Admin\CertificateController::class, 'index'])
         ->middleware('check.feature:certificates_access')->name('certificates.index');
