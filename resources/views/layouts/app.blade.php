@@ -608,12 +608,23 @@
 
             .unn-video-player .plyr__video-wrapper {
                 height: 100%;
+                overflow: hidden;
             }
 
             .unn-video-player video {
                 width: 100%;
                 height: 100%;
                 object-fit: contain;
+            }
+
+            .unn-video-player iframe,
+            .unn-video-player .plyr__video-wrapper iframe,
+            .unn-video-player .plyr__video-embed iframe {
+                width: 100% !important;
+                height: 100% !important;
+                display: block;
+                border: 0;
+                overflow: hidden;
             }
 
             /* Ensure controls are always visible initially */
@@ -1367,7 +1378,8 @@
                             target.src = 'https://www.youtube.com/embed/' + encodeURIComponent(youtubeId);
                             target.setAttribute('allowfullscreen', '');
                             target.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-                            target.className = 'w-full h-full min-h-[400px]';
+                            target.setAttribute('scrolling', 'no');
+                            target.className = 'w-full h-full';
                             wrapper.appendChild(target);
                         }
                     } else if (vimeoId) {
@@ -1381,7 +1393,8 @@
                             target.src = 'https://player.vimeo.com/video/' + encodeURIComponent(vimeoId);
                             target.setAttribute('allowfullscreen', '');
                             target.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
-                            target.className = 'w-full h-full min-h-[400px]';
+                            target.setAttribute('scrolling', 'no');
+                            target.className = 'w-full h-full';
                             wrapper.appendChild(target);
                         }
                     } else {
