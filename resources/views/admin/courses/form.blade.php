@@ -125,6 +125,39 @@
         .custom-file-label::after {
             content: "Procurar";
         }
+
+        .course-thumb-dropzone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            background: #f8fafc;
+            min-height: 92px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            cursor: pointer;
+            transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
+        }
+
+        .course-thumb-dropzone:hover,
+        .course-thumb-dropzone:focus {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            box-shadow: 0 0 0 0.18rem rgba(59, 130, 246, .18);
+            outline: none;
+        }
+
+        .course-thumb-dropzone.is-dragover {
+            border-color: #2563eb;
+            background: #dbeafe;
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, .2);
+        }
+
+        .course-thumb-dropzone .dropzone-main {
+            color: #334155;
+            font-weight: 600;
+            line-height: 1.4;
+        }
     </style>
 @endpush
 
@@ -209,12 +242,16 @@
                                                         @endif
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <div class="custom-file mb-2">
-                                                            <input type="file" name="thumbnail" class="custom-file-input"
-                                                                id="courseThumbnail"
-                                                                accept="image/png, image/jpeg, image/jpg">
-                                                            <label class="custom-file-label" for="courseThumbnail"
-                                                                data-browse="Buscar">Escolher nova imagem</label>
+                                                        <input type="file" name="thumbnail" class="d-none" id="courseThumbnail"
+                                                            accept="image/png, image/jpeg, image/jpg, image/webp">
+                                                        <div id="courseThumbnailDropzone" class="course-thumb-dropzone mb-2"
+                                                            role="button" tabindex="0" aria-label="Selecionar imagem de capa">
+                                                            <div class="dropzone-main">
+                                                                <i class="fas fa-cloud-upload-alt mr-1 text-primary"></i>
+                                                                Arraste e solte a capa aqui ou clique para selecionar
+                                                            </div>
+                                                            <small class="text-muted mt-1 d-block"
+                                                                id="courseThumbnailFilename">Nenhum arquivo selecionado.</small>
                                                         </div>
                                                         <small class="text-muted d-block">Recomendado: 1280x720px
                                                             (JPG/PNG)</small>
@@ -1095,10 +1132,46 @@
     <script>
         Dropzone.autoDiscover = false;
 
+        function initCourseSummernoteEditors(tryCount = 0) {
+            if (!(window.jQuery && $.fn && $.fn.summernote)) {
+                if (tryCount < 25) {
+                    setTimeout(function () {
+                        initCourseSummernoteEditors(tryCount + 1);
+                    }, 180);
+                }
+                return;
+            }
+
+            const fullDescription = $('#fullDescription');
+            if (fullDescription.length && !fullDescription.next('.note-editor').length) {
+                fullDescription.summernote({
+                    height: 260,
+                    lang: 'pt-BR',
+                    placeholder: 'Detalhe o conteúdo do curso...'
+                });
+            }
+
+            const lessonContent = $('#lessonContent');
+            if (lessonContent.length && !lessonContent.next('.note-editor').length) {
+                lessonContent.summernote({
+                    height: 150,
+                    lang: 'pt-BR',
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['font', ['strikethrough', 'superscript', 'subscript']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['insert', ['link', 'picture', 'video']],
+                        ['view', ['fullscreen', 'codeview']]
+                    ]
+                });
+            }
+        }
+
         $(document).ready(function () {
             $('#video_floating_enabled').on('change', function () {
                 $('#video_floating_size_group').toggle(this.checked);
             });
+            initCourseSummernoteEditors();
         });
 
         // Helper functions
@@ -1118,7 +1191,11 @@
             $('#video-source-tab a').removeClass('disabled');
 
             // Reset Summernote
-            $('#lessonContent').summernote('reset');
+            if (window.jQuery && $.fn && $.fn.summernote && $('#lessonContent').next('.note-editor').length) {
+                $('#lessonContent').summernote('reset');
+            } else {
+                $('#lessonContent').val('');
+            }
 
             if (lesson) {
                 // Edit Mode
@@ -1150,7 +1227,11 @@
                 $('#video-source-tab a').addClass('disabled'); // Disable tab switching
 
                 // Set Content
-                $('#lessonContent').summernote('code', lesson.content || '');
+                if (window.jQuery && $.fn && $.fn.summernote && $('#lessonContent').next('.note-editor').length) {
+                    $('#lessonContent').summernote('code', lesson.content || '');
+                } else {
+                    $('#lessonContent').val(lesson.content || '');
+                }
 
                 $('#lessonDuration').val(lesson.duration);
                 if (lesson.is_free_preview) $('#lessonPreview').prop('checked', true);
@@ -1169,16 +1250,7 @@
 
             // Ensure Summernote is visible/init
             setTimeout(function () {
-                $('#lessonContent').summernote({
-                    height: 150,
-                    toolbar: [
-                        ['style', ['bold', 'italic', 'underline', 'clear']],
-                        ['font', ['strikethrough', 'superscript', 'subscript']],
-                        ['para', ['ul', 'ol', 'paragraph']],
-                        ['insert', ['link', 'picture', 'video']],
-                        ['view', ['fullscreen', 'codeview']]
-                    ]
-                });
+                initCourseSummernoteEditors();
             }, 200);
         }
 
@@ -1481,7 +1553,7 @@
                 var file = event.target.files[0];
                 if (file) {
                     // Update Label
-                    $(this).next('.custom-file-label').html(file.name);
+                    $('#courseThumbnailFilename').text(file.name);
 
                     // Show Preview
                     var reader = new FileReader();
@@ -1507,6 +1579,66 @@
                     reader.readAsDataURL(file);
                 }
             });
+
+            // Thumbnail drag-and-drop
+            const thumbInput = document.getElementById('courseThumbnail');
+            const thumbDropzone = document.getElementById('courseThumbnailDropzone');
+            const setThumbFile = function (file) {
+                if (!thumbInput || !file) return;
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                thumbInput.files = dt.files;
+                $(thumbInput).trigger('change');
+            };
+
+            if (thumbDropzone && thumbInput) {
+                const preventDefaults = function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                };
+
+                ['dragenter', 'dragover', 'dragleave', 'dragend', 'drop'].forEach(function (name) {
+                    thumbDropzone.addEventListener(name, preventDefaults);
+                });
+
+                ['dragenter', 'dragover'].forEach(function (name) {
+                    thumbDropzone.addEventListener(name, function () {
+                        thumbDropzone.classList.add('is-dragover');
+                    });
+                });
+
+                ['dragleave', 'dragend', 'drop'].forEach(function (name) {
+                    thumbDropzone.addEventListener(name, function () {
+                        thumbDropzone.classList.remove('is-dragover');
+                    });
+                });
+
+                thumbDropzone.addEventListener('click', function () {
+                    thumbInput.click();
+                });
+
+                thumbDropzone.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        thumbInput.click();
+                    }
+                });
+
+                thumbDropzone.addEventListener('drop', function (e) {
+                    const files = e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files : null;
+                    if (!files || !files.length) return;
+
+                    const file = files[0];
+                    const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+                    if (allowed.indexOf((file.type || '').toLowerCase()) === -1) {
+                        toastr.error('Use apenas imagens JPG, JPEG, PNG ou WEBP.');
+                        return;
+                    }
+
+                    setThumbFile(file);
+                    toastr.success('Capa selecionada com arrasta e solta.');
+                });
+            }
 
             // Signature Preview Function
             function previewSignature(input) {

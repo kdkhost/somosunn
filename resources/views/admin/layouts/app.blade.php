@@ -589,11 +589,16 @@
 
             function shouldDisablePjax(href) {
                 if (!href) return false;
+                const fullReloadPrefixes = ['/admin/events', '/admin/courses'];
                 try {
                     const url = new URL(href, window.location.origin);
-                    return url.pathname.endsWith('/admin/events');
+                    return fullReloadPrefixes.some(function (prefix) {
+                        return url.pathname === prefix || url.pathname.startsWith(prefix + '/');
+                    });
                 } catch (e) {
-                    return href.indexOf('/admin/events') !== -1;
+                    return fullReloadPrefixes.some(function (prefix) {
+                        return href.indexOf(prefix) !== -1;
+                    });
                 }
             }
             $('.nav-sidebar a, .navbar a').each(function () {
