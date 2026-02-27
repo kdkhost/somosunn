@@ -3,6 +3,9 @@
 @section('title', 'Sobre a UNN - União Nacional de Networking')
 
 @section('content')
+@php
+    $visionText = trim((string) \App\Models\SiteContent::getValue('about', 'vision'));
+@endphp
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
     <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
@@ -14,8 +17,7 @@
                         Conheça a <span class="unn-title-gradient">UNN</span>
                     </h1>
                     <p class="text-xl text-gray-600 leading-relaxed mb-8">
-                        A União Nacional de Networking é a maior comunidade de empreendedores do Brasil, 
-                        conectando pessoas que querem crescer juntas através de parcerias estratégicas e negócios colaborativos.
+                        {{ $visionText !== '' ? $visionText : 'A União Nacional de Networking é a maior comunidade de empreendedores do Brasil, conectando pessoas que querem crescer juntas através de parcerias estratégicas e negócios colaborativos.' }}
                     </p>
                     <div class="flex flex-wrap gap-4">
                         <a href="{{ route('register') }}" class="btn-primary text-white px-8 py-4 rounded-full font-bold inline-flex items-center gap-2 shadow-lg hover:shadow-xl transition">

@@ -13,14 +13,14 @@
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">Configure os detalhes da
                     oportunidade de emprego.</p>
             </div>
-            <a href="{{ route('admin.jobs.index') }}"
+            <a href="{{ route('panel.admin.jobs.index') }}"
                 class="text-sm font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors flex items-center gap-2">
                 <i class="fas fa-arrow-left"></i>
                 <span>Voltar</span>
             </a>
         </div>
 
-        <form action="{{ $vacancy->exists ? route('admin.jobs.update', $vacancy) : route('admin.jobs.store') }}"
+        <form action="{{ $vacancy->exists ? route('panel.admin.jobs.update', $vacancy) : route('panel.admin.jobs.store') }}"
             method="POST" class="space-y-6" id="jobForm">
             @csrf
             @if($vacancy->exists) @method('PUT') @endif

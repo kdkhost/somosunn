@@ -3,6 +3,9 @@
 @section('title', 'Nossos Valores - UNN')
 
 @section('content')
+@php
+    $valuesText = trim((string) \App\Models\SiteContent::getValue('about', 'values'));
+@endphp
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
     <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
@@ -11,7 +14,7 @@
                 Nossos <span class="unn-title-gradient">Valores</span>
             </h1>
             <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Os princípios que guiam tudo o que fazemos na UNN.
+                {{ $valuesText !== '' ? $valuesText : 'Os princípios que guiam tudo o que fazemos na UNN.' }}
             </p>
         </div>
     </section>

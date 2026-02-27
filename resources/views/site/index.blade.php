@@ -4,9 +4,38 @@
 
 @section('content')
     @php
-        $heroTitle = \App\Models\Setting::get('home_hero_title', 'Conectando empreendedores.');
-        $heroSubtitle = \App\Models\Setting::get('home_hero_subtitle', 'Criando oportunidades reais.');
-        $heroText = \App\Models\Setting::get('home_hero_text', 'A UNN é uma comunidade de networking estratégico onde empreendedores compartilham experiências, constroem conexões e crescem juntos.');
+        $resolveContent = function ($value, $fallback = '') {
+            $value = trim((string) $value);
+            if ($value !== '') {
+                return $value;
+            }
+            return (string) $fallback;
+        };
+
+        $heroTitle = $resolveContent(
+            \App\Models\SiteContent::getValue('home', 'hero_title'),
+            \App\Models\Setting::get('hero_title', \App\Models\Setting::get('home_hero_title', 'Conectando empreendedores.'))
+        );
+        $heroSubtitle = $resolveContent(
+            \App\Models\SiteContent::getValue('home', 'hero_subtitle'),
+            \App\Models\Setting::get('hero_subtitle', \App\Models\Setting::get('home_hero_subtitle', 'Criando oportunidades reais.'))
+        );
+        $heroText = $resolveContent(
+            \App\Models\SiteContent::getValue('home', 'hero_text'),
+            \App\Models\Setting::get('home_hero_text', 'A UNN é uma comunidade de networking estratégico onde empreendedores compartilham experiências, constroem conexões e crescem juntos.')
+        );
+
+        $heroImagePath = \App\Models\SiteContent::getValue('home', 'hero_image');
+        $heroImageUrl = '';
+        if ($heroImagePath) {
+            $heroImageUrl = asset('storage/' . ltrim($heroImagePath, '/'));
+        }
+        if ($heroImageUrl === '') {
+            $heroImageUrl = \App\Models\Setting::getUrl('hero_image');
+        }
+        if ($heroImageUrl === '') {
+            $heroImageUrl = 'https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800';
+        }
     @endphp
 
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
@@ -36,7 +65,7 @@
                     <div class="hidden lg:block">
                         <div class="relative">
                             <div class="absolute inset-0 btn-primary rounded-3xl opacity-20 blur-3xl"></div>
-                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800"
+                            <img src="{{ $heroImageUrl }}"
                                 alt="Networking" class="relative w-full rounded-3xl shadow-2xl">
                         </div>
                     </div>

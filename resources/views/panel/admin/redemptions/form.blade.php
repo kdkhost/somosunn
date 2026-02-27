@@ -13,14 +13,14 @@
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">Configure o produto ou serviço
                     para troca de pontos.</p>
             </div>
-            <a href="{{ route('admin.redemptions.index') }}"
+            <a href="{{ route('panel.admin.redemptions.index') }}"
                 class="text-sm font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors flex items-center gap-2">
                 <i class="fas fa-arrow-left"></i>
                 <span>Voltar</span>
             </a>
         </div>
 
-        <form action="{{ $item->exists ? route('admin.redemptions.update', $item) : route('admin.redemptions.store') }}"
+        <form action="{{ $item->exists ? route('panel.admin.redemptions.update', $item) : route('panel.admin.redemptions.store') }}"
             method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @if($item->exists) @method('PUT') @endif

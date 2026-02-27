@@ -86,15 +86,15 @@
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             {{-- Legacy Routes for now as placeholders --}}
-                            <a href="{{ route('admin.invoices.show', $order->invoice) }}"
+                            <a href="{{ route('panel.admin.invoices.show', $order->invoice) }}"
                                 class="flex items-center justify-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors">
                                 <i class="fas fa-eye"></i> Ver
                             </a>
-                            <a href="{{ route('admin.invoices.pdf', $order->invoice) }}" target="_blank"
+                            <a href="{{ route('panel.admin.invoices.pdf', $order->invoice) }}" target="_blank"
                                 class="flex items-center justify-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors">
                                 <i class="fas fa-file-pdf"></i> PDF
                             </a>
-                            <form action="{{ route('admin.invoices.send', $order->invoice) }}" method="POST" class="col-span-2">
+                            <form action="{{ route('panel.admin.invoices.send', $order->invoice) }}" method="POST" class="col-span-2">
                                 @csrf
                                 <input type="hidden" name="force" value="1">
                                 <button type="submit"
@@ -104,7 +104,7 @@
                             </form>
                         </div>
                     @else
-                        <form action="{{ route('admin.orders.invoice', $order) }}" method="POST">
+                        <form action="{{ route('panel.admin.orders.invoice', $order) }}" method="POST">
                             @csrf
                             <button type="submit"
                                 class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-sm shadow-blue-200">

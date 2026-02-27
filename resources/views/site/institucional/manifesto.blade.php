@@ -3,6 +3,9 @@
 @section('title', 'Manifesto UNN - Nossa Visão')
 
 @section('content')
+@php
+    $manifestoContent = \App\Models\SiteContent::getValue('about', 'manifesto');
+@endphp
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
     <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
@@ -21,6 +24,9 @@
         <div class="max-w-4xl mx-auto">
             <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-12">
                 <article class="prose prose-lg max-w-none">
+                    @if(!empty($manifestoContent))
+                        {!! $manifestoContent !!}
+                    @else
                     <p class="text-2xl font-bold mb-8" style="color: var(--unn-azul-1)">
                         "Acreditamos que ninguém cresce sozinho."
                     </p>
@@ -63,6 +69,7 @@
                         </p>
                         <p class="text-gray-500">— Filosofia UNN</p>
                     </div>
+                @endif
                 </article>
             </div>
         </div>

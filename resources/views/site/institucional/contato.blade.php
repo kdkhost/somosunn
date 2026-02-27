@@ -45,10 +45,15 @@
         return $value;
     };
 
-    $socialInstagram = $normalizeSocialUrl(\App\Models\Setting::get('social_instagram'), 'instagram');
-    $socialFacebook = $normalizeSocialUrl(\App\Models\Setting::get('social_facebook'), 'facebook');
-    $socialYoutube = $normalizeSocialUrl(\App\Models\Setting::get('social_youtube'), 'youtube');
-    $socialLinkedin = $normalizeSocialUrl(\App\Models\Setting::get('social_linkedin'), 'linkedin');
+    $footerInstagram = \App\Models\SiteContent::getValue('footer', 'instagram_url');
+    $footerFacebook = \App\Models\SiteContent::getValue('footer', 'facebook_url');
+    $footerYoutube = \App\Models\SiteContent::getValue('footer', 'youtube_url');
+    $footerLinkedin = \App\Models\SiteContent::getValue('footer', 'linkedin_url');
+
+    $socialInstagram = $normalizeSocialUrl($footerInstagram ?: \App\Models\Setting::get('social_instagram'), 'instagram');
+    $socialFacebook = $normalizeSocialUrl($footerFacebook ?: \App\Models\Setting::get('social_facebook'), 'facebook');
+    $socialYoutube = $normalizeSocialUrl($footerYoutube ?: \App\Models\Setting::get('social_youtube'), 'youtube');
+    $socialLinkedin = $normalizeSocialUrl($footerLinkedin ?: \App\Models\Setting::get('social_linkedin'), 'linkedin');
 
     $socialLinks = array_values(array_filter([
         ['url' => $socialInstagram, 'icon' => 'fab fa-instagram', 'title' => 'Instagram'],

@@ -93,6 +93,7 @@ class CMSController extends Controller
             default => [
                 'hero_title' => 'text',
                 'hero_subtitle' => 'text',
+                'hero_text' => 'text',
                 'hero_image' => 'image',
             ],
         };

@@ -11,11 +11,14 @@
 * Contato: contato@kdkhost.com.br
 * Licenciamento: Uso restrito conforme contrato/termos aplicáveis.
 --}}
+@php
+    $footerText = trim((string) \App\Models\Setting::get('footer_text'));
+@endphp
 <footer class="bg-white border-t border-gray-100 mt-auto">
     <div class="max-w-7xl mx-auto px-6 py-6 grid grid-cols-1 sm:grid-cols-2 gap-2 items-center text-gray-500">
         <div
             class="text-xs sm:text-sm text-center sm:text-left flex items-center justify-center sm:justify-start gap-4">
-            <span>© {{ date('Y') }} UNN.</span>
+            <span>{{ $footerText !== '' ? $footerText : '© ' . date('Y') . ' UNN.' }}</span>
             <a href="{{ route('jobs.public.index') }}" class="hover:text-[#1F5EDB] transition-colors font-medium">Vagas
                 Abertas</a>
         </div>

@@ -74,6 +74,13 @@
                                 <textarea name="hero_subtitle" rows="4"
                                     class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-600 dark:text-slate-400 font-medium">{{ $contents['hero_subtitle'] ?? '' }}</textarea>
                             </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Texto
+                                    (Hero)</label>
+                                <textarea name="hero_text" rows="4"
+                                    class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-600 dark:text-slate-400 font-medium">{{ $contents['hero_text'] ?? '' }}</textarea>
+                            </div>
                         </div>
 
                         <div>
@@ -181,7 +188,6 @@
 
     @push('styles')
         <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
-    @endpush
     @endpush
 
     @push('scripts')

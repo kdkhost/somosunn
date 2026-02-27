@@ -41,6 +41,11 @@
                                     class="form-control">{{ old('hero_subtitle', $contents['hero_subtitle'] ?? '') }}</textarea>
                             </div>
                             <div class="form-group">
+                                <label>Texto do Hero</label>
+                                <textarea name="hero_text" rows="4"
+                                    class="form-control">{{ old('hero_text', $contents['hero_text'] ?? '') }}</textarea>
+                            </div>
+                            <div class="form-group">
                                 <label>Imagem de Fundo (Hero)</label>
                                 <input type="file" name="hero_image" class="form-control-file" accept="image/*">
                                 @if(!empty($contents['hero_image']))

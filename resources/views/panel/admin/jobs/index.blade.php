@@ -15,7 +15,7 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <a href="{{ route('admin.jobs.create') }}"
+                <a href="{{ route('panel.admin.jobs.create') }}"
                     class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2">
                     <i class="fas fa-plus"></i>
                     <span>Nova Vaga</span>
@@ -83,11 +83,11 @@
                                 <td class="px-6 py-4 text-right">
                                     <div
                                         class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <a href="{{ route('admin.jobs.edit', $vacancy) }}"
+                                        <a href="{{ route('panel.admin.jobs.edit', $vacancy) }}"
                                             class="p-2 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('admin.jobs.destroy', $vacancy) }}" method="POST"
+                                        <form action="{{ route('panel.admin.jobs.destroy', $vacancy) }}" method="POST"
                                             class="inline delete-form">
                                             @csrf @method('DELETE')
                                             <button type="button"
