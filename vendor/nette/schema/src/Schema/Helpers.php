@@ -121,13 +121,12 @@ final class Helpers
 	}
 
 
-	/** @param  array{?float, ?float}  $range */
 	public static function validateRange(mixed $value, array $range, Context $context, string $types = ''): void
 	{
 		if (is_array($value) || is_string($value)) {
 			[$length, $label] = is_array($value)
 				? [count($value), 'items']
-				: (in_array('unicode', explode('|', $types), strict: true)
+				: (in_array('unicode', explode('|', $types), true)
 					? [Nette\Utils\Strings::length($value), 'characters']
 					: [strlen($value), 'bytes']);
 
@@ -148,7 +147,6 @@ final class Helpers
 	}
 
 
-	/** @param  array{?float, ?float}  $range */
 	public static function isInRange(mixed $value, array $range): bool
 	{
 		return ($range[0] === null || $value >= $range[0])
@@ -168,7 +166,6 @@ final class Helpers
 	}
 
 
-	/** @return \Closure(mixed): mixed */
 	public static function getCastStrategy(string $type): \Closure
 	{
 		if (Nette\Utils\Validators::isBuiltinType($type)) {

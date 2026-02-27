@@ -20,7 +20,6 @@ final class AnyOf implements Schema
 {
 	use Base;
 
-	/** @var mixed[] */
 	private array $set;
 
 

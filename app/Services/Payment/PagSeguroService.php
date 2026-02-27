@@ -15,15 +15,31 @@ class PagSeguroService
 
     private function getBaseUrl(): string
     {
-        $isSandbox = Setting::get('payments.pagseguro.sandbox', false);
-        return $isSandbox ? $this->baseUrlSandbox : $this->baseUrlProd;
+        $env = Setting::get('pagseguro_env', config('payments.pagseguro.env', 'sandbox'));
+        return ($env === 'sandbox') ? $this->baseUrlSandbox : $this->baseUrlProd;
     }
 
     private function getSellerConfig(Order $order): array
     {
+        $env = Setting::get('pagseguro_env', config('payments.pagseguro.env', 'sandbox'));
+        $prefix = $env === 'production' ? 'pagseguro_prod_' : 'pagseguro_sandbox_';
+
+        $platformToken = Setting::get($prefix . 'token');
+        if (empty($platformToken)) {
+            $platformToken = Setting::get('pagseguro_token');
+        }
+        if (empty($platformToken)) {
+            $platformToken = config('payments.pagseguro.access_token');
+        }
+
+        $platformEmail = Setting::get('pagseguro_email');
+        if (empty($platformEmail)) {
+            $platformEmail = config('payments.pagseguro.email');
+        }
+
         $config = [
-            'token' => trim((string) config('payments.pagseguro.access_token')),
-            'email' => trim((string) config('payments.pagseguro.email')), // Legacy or identification
+            'token' => trim((string) $platformToken),
+            'email' => trim((string) $platformEmail), // Legacy or identification
             'is_platform' => true,
             'pass_fee' => null
         ];
