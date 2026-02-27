@@ -1,12 +1,12 @@
 <style>
     :root {
-        --unn-placeholder-light: #64748b;
-        --unn-placeholder-dark: #94a3b8;
+        --unn-placeholder-claro: #64748b;
+        --unn-placeholder-escuro: #94a3b8;
     }
 
     input::placeholder,
     textarea::placeholder {
-        color: var(--unn-placeholder-light) !important;
+        color: var(--unn-placeholder-claro) !important;
         opacity: 1 !important;
     }
 
@@ -14,13 +14,13 @@
     html.dark textarea::placeholder,
     body.dark-mode input::placeholder,
     body.dark-mode textarea::placeholder {
-        color: var(--unn-placeholder-dark) !important;
+        color: var(--unn-placeholder-escuro) !important;
         opacity: 1 !important;
     }
 
     input::-webkit-input-placeholder,
     textarea::-webkit-input-placeholder {
-        color: var(--unn-placeholder-light) !important;
+        color: var(--unn-placeholder-claro) !important;
         opacity: 1 !important;
     }
 
@@ -28,13 +28,13 @@
     html.dark textarea::-webkit-input-placeholder,
     body.dark-mode input::-webkit-input-placeholder,
     body.dark-mode textarea::-webkit-input-placeholder {
-        color: var(--unn-placeholder-dark) !important;
+        color: var(--unn-placeholder-escuro) !important;
         opacity: 1 !important;
     }
 
     input:-ms-input-placeholder,
     textarea:-ms-input-placeholder {
-        color: var(--unn-placeholder-light) !important;
+        color: var(--unn-placeholder-claro) !important;
         opacity: 1 !important;
     }
 
@@ -42,14 +42,14 @@
     html.dark textarea:-ms-input-placeholder,
     body.dark-mode input:-ms-input-placeholder,
     body.dark-mode textarea:-ms-input-placeholder {
-        color: var(--unn-placeholder-dark) !important;
+        color: var(--unn-placeholder-escuro) !important;
         opacity: 1 !important;
     }
 </style>
 
 <script>
     (function () {
-        const SKIP_INPUT_TYPES = new Set([
+        const TIPOS_IGNORADOS = new Set([
             'hidden',
             'file',
             'checkbox',
@@ -62,136 +62,287 @@
             'image'
         ]);
 
-        function normalizeText(text) {
-            if (!text) return '';
+        const PALAVRAS_PORTUGUES = [
+            'digite', 'informe', 'nome', 'sobrenome', 'apelido', 'usuario', 'e-mail', 'email', 'senha', 'confirmar',
+            'telefone', 'celular', 'endereco', 'bairro', 'cidade', 'estado', 'pais', 'cep', 'titulo', 'descricao',
+            'mensagem', 'codigo', 'cupom', 'valor', 'preco', 'data', 'hora', 'buscar', 'pesquisar', 'opcional', 'ex'
+        ];
 
-            return text
+        const MAPA_FRASES_INGLES = [
+            ['type here', 'Digite aqui'],
+            ['search here', 'Pesquise aqui'],
+            ['search', 'Pesquisar'],
+            ['full name', 'Nome completo'],
+            ['first name', 'Nome'],
+            ['last name', 'Sobrenome'],
+            ['user name', 'Nome de usuario'],
+            ['username', 'Nome de usuario'],
+            ['email address', 'E-mail'],
+            ['email', 'E-mail'],
+            ['password confirmation', 'Confirmacao de senha'],
+            ['confirm password', 'Confirmar senha'],
+            ['password', 'Senha'],
+            ['phone number', 'Telefone'],
+            ['phone', 'Telefone'],
+            ['mobile', 'Celular'],
+            ['address', 'Endereco'],
+            ['city', 'Cidade'],
+            ['state', 'Estado'],
+            ['country', 'Pais'],
+            ['zip code', 'CEP'],
+            ['postal code', 'CEP'],
+            ['title', 'Titulo'],
+            ['description', 'Descricao'],
+            ['message', 'Mensagem'],
+            ['code', 'Codigo'],
+            ['coupon', 'Cupom'],
+            ['url', 'URL'],
+            ['link', 'Link'],
+            ['image', 'Imagem'],
+            ['file', 'Arquivo'],
+            ['upload', 'Envio'],
+            ['price', 'Preco'],
+            ['amount', 'Valor'],
+            ['number', 'Numero'],
+            ['date', 'Data'],
+            ['time', 'Hora']
+        ];
+
+        function escaparRegex(texto) {
+            return texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function normalizarTexto(texto) {
+            if (!texto) return '';
+
+            return String(texto)
                 .replace(/\s+/g, ' ')
                 .replace(/\s*\*+\s*$/g, '')
+                .replace(/\(\s*optional\s*\)/ig, '')
                 .replace(/\(\s*opcional\s*\)/ig, '')
                 .trim();
         }
 
-        function fromInputName(element) {
-            const name = (element.getAttribute('name') || '').trim();
-            if (!name) return '';
+        function primeiraMaiuscula(texto) {
+            if (!texto) return '';
+            return texto.charAt(0).toUpperCase() + texto.slice(1);
+        }
 
-            const normalized = name
+        function parecePortugues(texto) {
+            const frase = normalizarTexto(texto).toLowerCase();
+            if (!frase) return false;
+            if (/[áàâãéêíóôõúç]/i.test(frase)) return true;
+            return PALAVRAS_PORTUGUES.some(function (palavra) {
+                return frase.includes(palavra);
+            });
+        }
+
+        function traduzirParaPortugues(texto) {
+            let resultado = normalizarTexto(texto);
+            if (!resultado) return '';
+
+            MAPA_FRASES_INGLES.forEach(function (item) {
+                const origem = item[0];
+                const destino = item[1];
+                const regex = new RegExp('\\b' + escaparRegex(origem) + '\\b', 'gi');
+                resultado = resultado.replace(regex, destino);
+            });
+
+            resultado = resultado.replace(/^ex:\s*/i, 'Ex.: ');
+            resultado = resultado.replace(/^example:\s*/i, 'Ex.: ');
+
+            return normalizarTexto(resultado);
+        }
+
+        function textoDoNomeCampo(elemento) {
+            const nome = (elemento.getAttribute('name') || '').trim();
+            if (!nome) return '';
+
+            const limpo = nome
                 .replace(/\[\]$/g, '')
                 .replace(/\[[^\]]*\]/g, ' ')
                 .replace(/[_\-]+/g, ' ');
 
-            return normalizeText(normalized);
+            return normalizarTexto(limpo);
         }
 
-        function findLabelByFor(element) {
-            const id = element.id;
+        function textoLabelPorFor(elemento) {
+            const id = elemento.id;
             if (!id || !window.CSS || typeof window.CSS.escape !== 'function') return '';
 
             const label = document.querySelector('label[for="' + window.CSS.escape(id) + '"]');
-            return label ? normalizeText(label.textContent) : '';
+            return label ? normalizarTexto(label.textContent) : '';
         }
 
-        function findNearbyLabel(element) {
-            const parentLabel = element.closest('label');
-            if (parentLabel) {
-                const text = normalizeText(parentLabel.textContent);
-                if (text) return text;
+        function textoLabelProximo(elemento) {
+            const labelPai = elemento.closest('label');
+            if (labelPai) {
+                const texto = normalizarTexto(labelPai.textContent);
+                if (texto) return texto;
             }
 
-            const wrappers = ['.form-group', '.form-field', '.field', '.input-group', '.mb-2', '.mb-3', '.mb-4'];
-            for (const selector of wrappers) {
-                const wrapper = element.closest(selector);
-                if (!wrapper) continue;
+            const seletores = ['.form-group', '.form-field', '.field', '.input-group', '.mb-2', '.mb-3', '.mb-4'];
+            for (const seletor of seletores) {
+                const caixa = elemento.closest(seletor);
+                if (!caixa) continue;
 
-                const localLabel = wrapper.querySelector('label');
-                if (localLabel) {
-                    const text = normalizeText(localLabel.textContent);
-                    if (text) return text;
+                const label = caixa.querySelector('label');
+                if (label) {
+                    const texto = normalizarTexto(label.textContent);
+                    if (texto) return texto;
                 }
             }
 
             return '';
         }
 
-        function guessPlaceholder(element) {
-            const aria = normalizeText(element.getAttribute('aria-label') || '');
+        function textoBaseCampo(elemento) {
+            const aria = normalizarTexto(elemento.getAttribute('aria-label') || '');
             if (aria) return aria;
 
-            const labelFor = findLabelByFor(element);
+            const labelFor = textoLabelPorFor(elemento);
             if (labelFor) return labelFor;
 
-            const nearby = findNearbyLabel(element);
-            if (nearby) return nearby;
+            const labelProximo = textoLabelProximo(elemento);
+            if (labelProximo) return labelProximo;
 
-            return fromInputName(element);
+            return textoDoNomeCampo(elemento);
         }
 
-        function shouldHandle(element) {
-            if (!(element instanceof HTMLElement)) return false;
-            if (element.matches('[data-no-auto-placeholder], [data-no-auto-placeholder="1"]')) return false;
+        function placeholderPorTipo(elemento) {
+            const tipo = (elemento.getAttribute('type') || 'text').toLowerCase();
 
-            const tag = element.tagName.toLowerCase();
+            if (tipo === 'email') return 'Digite seu e-mail';
+            if (tipo === 'password') return 'Digite sua senha';
+            if (tipo === 'url') return 'https://seusite.com.br';
+            if (tipo === 'tel') return '(00) 00000-0000';
+            if (tipo === 'search') return 'Pesquise aqui';
+            if (tipo === 'date') return 'dd/mm/aaaa';
+            if (tipo === 'time') return 'hh:mm';
+            if (tipo === 'datetime-local') return 'dd/mm/aaaa hh:mm';
+            if (tipo === 'number') return 'Digite um valor';
+
+            if (elemento.tagName.toLowerCase() === 'textarea') {
+                return 'Digite sua mensagem';
+            }
+
+            return 'Digite aqui';
+        }
+
+        function placeholderFinal(elemento, textoBase) {
+            const tipo = (elemento.getAttribute('type') || 'text').toLowerCase();
+            const base = normalizarTexto(textoBase);
+            if (!base) return placeholderPorTipo(elemento);
+
+            const baseMinuscula = base.toLowerCase();
+
+            if (tipo === 'date' || tipo === 'time' || tipo === 'datetime-local') {
+                return placeholderPorTipo(elemento);
+            }
+
+            if (/^https?:\/\//i.test(base) || /^ex\.\s*:/i.test(base) || /^ex:\s*/i.test(base)) {
+                return base.replace(/^ex:\s*/i, 'Ex.: ');
+            }
+
+            if (baseMinuscula.startsWith('digite ') || baseMinuscula.startsWith('informe ') || baseMinuscula.startsWith('pesquise ')) {
+                return primeiraMaiuscula(base);
+            }
+
+            if (baseMinuscula.startsWith('selecione ')) {
+                return primeiraMaiuscula(base);
+            }
+
+            if (tipo === 'search') {
+                return 'Pesquise ' + baseMinuscula;
+            }
+
+            return 'Digite ' + baseMinuscula;
+        }
+
+        function deveTratar(elemento) {
+            if (!(elemento instanceof HTMLElement)) return false;
+            if (elemento.matches('[data-no-auto-placeholder], [data-no-auto-placeholder="1"]')) return false;
+
+            const tag = elemento.tagName.toLowerCase();
             if (tag === 'textarea') return true;
             if (tag !== 'input') return false;
 
-            const type = (element.getAttribute('type') || 'text').toLowerCase();
-            return !SKIP_INPUT_TYPES.has(type);
+            const tipo = (elemento.getAttribute('type') || 'text').toLowerCase();
+            return !TIPOS_IGNORADOS.has(tipo);
         }
 
-        function hasPlaceholder(element) {
-            return normalizeText(element.getAttribute('placeholder') || '') !== '';
+        function placeholderAtual(elemento) {
+            return normalizarTexto(elemento.getAttribute('placeholder') || '');
         }
 
-        function applyPlaceholder(element) {
-            if (!shouldHandle(element)) return;
-            if (hasPlaceholder(element)) return;
+        function gerarPlaceholderPortugues(elemento) {
+            const atual = placeholderAtual(elemento);
+            const precisaTraduzirAtual = atual !== '' && !parecePortugues(atual);
 
-            const placeholder = guessPlaceholder(element);
-            if (!placeholder) return;
+            let base = '';
+            if (atual !== '' && !precisaTraduzirAtual) {
+                base = atual;
+            } else if (atual !== '' && precisaTraduzirAtual) {
+                base = traduzirParaPortugues(atual);
+            }
 
-            element.setAttribute('placeholder', placeholder);
-            element.setAttribute('data-auto-placeholder', '1');
+            if (!base) {
+                base = traduzirParaPortugues(textoBaseCampo(elemento));
+            }
+
+            return placeholderFinal(elemento, base);
         }
 
-        function applyToContainer(container) {
+        function aplicarPlaceholder(elemento) {
+            if (!deveTratar(elemento)) return;
+
+            const novoPlaceholder = gerarPlaceholderPortugues(elemento);
+            if (!novoPlaceholder) return;
+
+            if (placeholderAtual(elemento) !== novoPlaceholder) {
+                elemento.setAttribute('placeholder', novoPlaceholder);
+                elemento.setAttribute('data-auto-placeholder', '1');
+            }
+        }
+
+        function aplicarEmContainer(container) {
             if (!container || !(container instanceof HTMLElement || container instanceof Document)) return;
 
             if (container instanceof HTMLElement) {
-                applyPlaceholder(container);
+                aplicarPlaceholder(container);
             }
 
-            const fields = container.querySelectorAll('input, textarea');
-            fields.forEach(applyPlaceholder);
+            const campos = container.querySelectorAll('input, textarea');
+            campos.forEach(aplicarPlaceholder);
         }
 
-        function initAutoPlaceholders() {
-            applyToContainer(document);
+        function iniciarPlaceholdersEmPortugues() {
+            aplicarEmContainer(document);
 
             if (window.jQuery) {
                 window.jQuery(document).on('shown.bs.modal pjax:end ajaxComplete', function () {
-                    applyToContainer(document);
+                    aplicarEmContainer(document);
                 });
             }
 
             if (!window.MutationObserver || !document.body) return;
 
-            const observer = new MutationObserver(function (mutations) {
-                for (const mutation of mutations) {
-                    mutation.addedNodes.forEach(function (node) {
+            const observador = new MutationObserver(function (mutacoes) {
+                for (const mutacao of mutacoes) {
+                    mutacao.addedNodes.forEach(function (node) {
                         if (!(node instanceof HTMLElement)) return;
-                        applyToContainer(node);
+                        aplicarEmContainer(node);
                     });
                 }
             });
 
-            observer.observe(document.body, { childList: true, subtree: true });
+            observador.observe(document.body, { childList: true, subtree: true });
         }
 
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initAutoPlaceholders);
+            document.addEventListener('DOMContentLoaded', iniciarPlaceholdersEmPortugues);
         } else {
-            initAutoPlaceholders();
+            iniciarPlaceholdersEmPortugues();
         }
     })();
 </script>
