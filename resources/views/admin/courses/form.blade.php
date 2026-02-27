@@ -1462,13 +1462,31 @@
             }
 
             // Edit Lesson Click
-            $('.btn-edit-lesson').on('click', function () {
-                const id = $(this).data('id');
-                // Fetch basic data from data attributes or DOM? Better fetch clean JSON.
-                // Simple approach: get row data. But for edit stability, fetching details is better.
-                $.get('/courses/{{ $course->id }}/lessons/' + id + '/details', function (data) {
+            window.abrirEdicaoAula = function (id) {
+                const lessonId = Number(id || 0);
+                if (!lessonId) return;
+
+                $.get('/courses/{{ $course->id }}/lessons/' + lessonId + '/details', function (data) {
                     openLessonModal(data);
+                }).fail(function (xhr) {
+                    let mensagem = 'Não foi possível carregar os dados da aula para edição.';
+                    if (xhr && xhr.status === 403) {
+                        mensagem = 'Você não tem permissão para editar esta aula.';
+                    } else if (xhr && xhr.status === 404) {
+                        mensagem = 'A aula não foi encontrada.';
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro ao editar aula',
+                        text: mensagem
+                    });
                 });
+            };
+
+            $(document).on('click', '.btn-edit-lesson', function (e) {
+                e.preventDefault();
+                abrirEdicaoAula($(this).data('id'));
             });
 
             let promessaApiYoutube = null;
