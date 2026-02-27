@@ -7,12 +7,18 @@ use App\Models\Lesson;
 use App\Models\LessonAttachment;
 use App\Models\LessonBookmark;
 use App\Models\LessonProgress;
+use App\Services\LessonVideoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class LessonController extends Controller
 {
+    public function __construct(
+        private LessonVideoService $lessonVideoService
+    ) {
+    }
+
     public function store(Request $request, Course $course)
     {
         $this->authorize('update', $course);
@@ -37,32 +43,41 @@ class LessonController extends Controller
             'free_preview_seconds' => 'exclude_unless:is_free_preview,1|nullable|integer|min:1|required_if:free_preview_mode,time',
         ]);
 
-        $videoUrl = $validated['video_url'] ?? null;
-
-        if ($request->hasFile('video_file')) {
-            $path = $request->file('video_file')->store('course-videos', 'public');
-            $videoUrl = Storage::disk('public')->url($path);
-        }
-
+        $videoExterno = $this->normalizarVideoExterno($validated['video_url'] ?? null);
         $previewData = $this->buildPreviewData($request, (int) ($validated['duration'] ?? 0));
 
         $lesson = $course->lessons()->create([
             'title' => $validated['title'],
             'order' => $validated['order'],
-            'video_url' => $videoUrl,
-            'content' => $validated['content'],
-            'duration' => $request->duration ?? 0,
+            'video_url' => $request->hasFile('video_file') ? null : $videoExterno,
+            'content' => $validated['content'] ?? null,
+            'duration' => (int) ($validated['duration'] ?? 0),
         ] + $previewData);
+
+        $mensagemVideo = null;
+        if ($request->hasFile('video_file')) {
+            $resultadoProcessamento = $this->lessonVideoService->processarUploadVideo($lesson, $request->file('video_file'));
+            $mensagemVideo = $resultadoProcessamento['message'] ?? null;
+            $lesson->refresh();
+        } elseif ($videoExterno !== null) {
+            $this->lessonVideoService->definirVideoExterno($lesson, $videoExterno);
+            $lesson->refresh();
+        }
+
+        $mensagem = 'Aula criada com sucesso';
+        if (is_string($mensagemVideo) && trim($mensagemVideo) !== '') {
+            $mensagem .= '. ' . trim($mensagemVideo);
+        }
 
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Aula criada com sucesso',
+                'message' => $mensagem,
                 'lesson' => $lesson,
             ]);
         }
 
-        return back()->with('success', 'Aula adicionada.');
+        return back()->with('success', $mensagem);
     }
 
     public function show(Course $course, Lesson $lesson)
@@ -125,9 +140,11 @@ class LessonController extends Controller
             }
         }
 
+        $playbackUrl = $this->resolverUrlPlayback($course, $lesson);
+
         return view(
             'courses.lesson',
-            compact('course', 'lesson', 'previous', 'next', 'resumeAt', 'bookmarks', 'hasFullAccess', 'previewLimitSeconds')
+            compact('course', 'lesson', 'previous', 'next', 'resumeAt', 'bookmarks', 'hasFullAccess', 'previewLimitSeconds', 'playbackUrl')
         );
     }
 
@@ -156,35 +173,51 @@ class LessonController extends Controller
             'free_preview_seconds' => 'exclude_unless:is_free_preview,1|nullable|integer|min:1|required_if:free_preview_mode,time',
         ]);
 
-        $videoUrl = $validated['video_url'] ?? $lesson->video_url;
-        if ($request->hasFile('video_file')) {
-            $path = $request->file('video_file')->store('course-videos', 'public');
-            $videoUrl = Storage::disk('public')->url($path);
-        }
+        $possuiNovoUpload = $request->hasFile('video_file');
+        $videoExternoInformado = trim((string) $request->input('video_url', '')) !== '';
+        $videoExterno = $videoExternoInformado
+            ? $this->normalizarVideoExterno((string) $request->input('video_url'))
+            : null;
 
         $duration = array_key_exists('duration', $validated)
             ? (int) $validated['duration']
             : (int) ($lesson->duration ?? 0);
         $previewData = $this->buildPreviewData($request, $duration);
 
-        $lesson->update(array_merge($validated, $previewData, [
-            'video_url' => $videoUrl,
-        ]));
+        $dadosAtualizacao = $validated;
+        unset($dadosAtualizacao['video_url'], $dadosAtualizacao['video_file']);
+
+        $lesson->update(array_merge($dadosAtualizacao, $previewData));
+
+        $mensagemVideo = null;
+        if ($possuiNovoUpload) {
+            $resultadoProcessamento = $this->lessonVideoService->processarUploadVideo($lesson, $request->file('video_file'));
+            $mensagemVideo = $resultadoProcessamento['message'] ?? null;
+        } elseif ($videoExternoInformado && $videoExterno !== null) {
+            $this->lessonVideoService->definirVideoExterno($lesson, $videoExterno);
+        }
+
+        $lesson->refresh();
+        $mensagem = 'Aula atualizada com sucesso';
+        if (is_string($mensagemVideo) && trim($mensagemVideo) !== '') {
+            $mensagem .= '. ' . trim($mensagemVideo);
+        }
 
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Aula atualizada com sucesso',
+                'message' => $mensagem,
                 'lesson' => $lesson,
             ]);
         }
 
-        return back()->with('success', 'Aula atualizada.');
+        return back()->with('success', $mensagem);
     }
 
     public function destroy(Course $course, Lesson $lesson)
     {
         $this->authorize('update', $course);
+        $this->lessonVideoService->limparArquivosVideo($lesson);
         $lesson->delete();
         return back()->with('success', 'Aula removida.');
     }
@@ -291,7 +324,23 @@ class LessonController extends Controller
     public function getDetails(Course $course, Lesson $lesson)
     {
         $this->authorize('update', $course);
-        return response()->json($lesson->load('attachments'));
+
+        $lesson->load('attachments');
+
+        return response()->json([
+            'id' => $lesson->id,
+            'title' => $lesson->title,
+            'order' => $lesson->order,
+            'video_url' => $lesson->video_url,
+            'content' => $lesson->content,
+            'duration' => (int) ($lesson->duration ?? 0),
+            'is_free_preview' => (bool) $lesson->is_free_preview,
+            'free_preview_mode' => $lesson->free_preview_mode,
+            'free_preview_seconds' => $lesson->free_preview_seconds,
+            'video_has_upload' => $lesson->possuiVideoInterno(),
+            'video_transcode_status' => (string) ($lesson->video_transcode_status ?? LessonVideoService::STATUS_NONE),
+            'attachments' => $lesson->attachments,
+        ]);
     }
 
     public function updatePlaybackProgress(Request $request, Course $course, Lesson $lesson)
@@ -497,6 +546,86 @@ class LessonController extends Controller
         }
 
         return $course->enrollments()->where('user_id', Auth::id())->exists();
+    }
+
+    private function resolverUrlPlayback(Course $course, Lesson $lesson): ?string
+    {
+        if ($lesson->possuiVideoInterno()) {
+            if ($lesson->hlsPronto()) {
+                return route('courses.lessons.stream', [$course, $lesson, 'master.m3u8']);
+            }
+
+            return route('courses.lessons.stream', [$course, $lesson, 'source']);
+        }
+
+        $urlExterna = $this->normalizarVideoExterno($lesson->video_url);
+        if ($urlExterna !== null) {
+            return $urlExterna;
+        }
+
+        $legado = $this->resolverPathLegadoVideoPublico($lesson->video_url);
+        if ($legado !== null) {
+            return route('courses.lessons.stream', [$course, $lesson, 'source']);
+        }
+
+        return null;
+    }
+
+    private function normalizarVideoExterno(?string $url): ?string
+    {
+        $url = trim((string) ($url ?? ''));
+        if ($url === '') {
+            return null;
+        }
+
+        if (preg_match('/^https?:\/\//i', $url)) {
+            return $url;
+        }
+
+        if (str_starts_with($url, '//')) {
+            return request()->getScheme() . ':' . $url;
+        }
+
+        if (preg_match('/^(www\.)?(youtube\.com|m\.youtube\.com|youtu\.be|vimeo\.com|player\.vimeo\.com)\//i', $url)) {
+            $normalizado = preg_replace('/^www\./i', '', $url);
+            return 'https://' . ltrim((string) $normalizado, '/');
+        }
+
+        return null;
+    }
+
+    private function resolverPathLegadoVideoPublico(?string $videoUrl): ?string
+    {
+        $url = trim((string) ($videoUrl ?? ''));
+        if ($url === '') {
+            return null;
+        }
+
+        $valor = str_replace('\\', '/', $url);
+        $hostApp = parse_url((string) config('app.url'), PHP_URL_HOST);
+
+        if (preg_match('/^https?:\/\//i', $valor)) {
+            $hostUrl = parse_url($valor, PHP_URL_HOST);
+            if ($hostApp && $hostUrl && strcasecmp((string) $hostUrl, (string) $hostApp) !== 0) {
+                return null;
+            }
+            $path = (string) parse_url($valor, PHP_URL_PATH);
+            $valor = ltrim($path, '/');
+        }
+
+        $valor = ltrim($valor, '/');
+        if (str_starts_with($valor, 'storage/')) {
+            $valor = substr($valor, strlen('storage/'));
+        }
+        if (str_starts_with($valor, 'public/')) {
+            $valor = substr($valor, strlen('public/'));
+        }
+
+        if (!preg_match('/^course-videos\//i', $valor)) {
+            return null;
+        }
+
+        return Storage::disk('public')->exists($valor) ? $valor : null;
     }
 
     private function buildPreviewData(Request $request, int $durationSeconds = 0): array

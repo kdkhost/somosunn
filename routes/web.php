@@ -273,6 +273,13 @@ Route::delete('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\Lesson
 Route::get('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'show'])
     ->middleware(['check.feature:courses_lessons_access'])
     ->name('courses.lessons.show');
+Route::get('courses/{course}/lessons/{lesson}/stream/key', [\App\Http\Controllers\LessonVideoStreamController::class, 'key'])
+    ->middleware(['check.feature:courses_lessons_access'])
+    ->name('courses.lessons.stream.key');
+Route::get('courses/{course}/lessons/{lesson}/stream/{path?}', [\App\Http\Controllers\LessonVideoStreamController::class, 'stream'])
+    ->middleware(['check.feature:courses_lessons_access'])
+    ->where('path', '.*')
+    ->name('courses.lessons.stream');
 
 // Attachments (granular)
 Route::post('courses/{course}/lessons/{lesson}/attachments', [\App\Http\Controllers\LessonController::class, 'uploadAttachment'])

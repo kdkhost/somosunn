@@ -746,9 +746,18 @@
                     $('#lessonPreview').prop('checked', !!lesson.is_free_preview);
                     $('#lessonPreviewMode').val(lesson.free_preview_mode || 'full');
                     $('#lessonPreviewSeconds').val(lesson.free_preview_seconds || '');
-                    $('#lessonVideo').val(lesson.video_url || '');
-                    $('#lessonVideoFile').val('');
-                    $('#lessonVideoFileLabel').html('<i class="fas fa-cloud-upload-alt text-lg"></i><span>Selecionar video para envio</span>');
+                    if (lesson.video_has_upload) {
+                        const statusHls = (lesson.video_transcode_status || '') === 'ready'
+                            ? 'Video interno protegido (HLS ativo)'
+                            : 'Video interno protegido (processando)';
+                        $('#lessonVideo').val('');
+                        $('#lessonVideoFile').val('');
+                        $('#lessonVideoFileLabel').html('<i class="fas fa-lock text-lg"></i><span>' + statusHls + '</span>');
+                    } else {
+                        $('#lessonVideo').val(lesson.video_url || '');
+                        $('#lessonVideoFile').val('');
+                        $('#lessonVideoFileLabel').html('<i class="fas fa-cloud-upload-alt text-lg"></i><span>Selecionar video para envio</span>');
+                    }
                     $('#lessonContent').val(lesson.content || '');
                     updateLessonPreviewConfig();
                     if (!lesson.duration || Number(lesson.duration) <= 0) {

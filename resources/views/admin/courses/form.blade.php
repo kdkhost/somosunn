@@ -1250,11 +1250,15 @@
                 $('#lessonOrder').val(lesson.order);
                 // Video Logic
                 const videoUrl = lesson.video_url || '';
-                if (videoUrl.includes('storage/') || videoUrl.includes('course-videos/')) {
+                const videoInternoProtegido = !!lesson.video_has_upload;
+                if (videoInternoProtegido || videoUrl.includes('storage/') || videoUrl.includes('course-videos/')) {
                     // Local File
                     $('#lessonVideo').val(''); // Clear URL field
-                    const fileName = videoUrl.split('/').pop();
-                    $('#lessonVideoFileLabel').text('Arquivo atual: ' + fileName);
+                    const statusHls = (lesson.video_transcode_status || '') === 'ready'
+                        ? 'Arquivo atual: video interno protegido (HLS ativo)'
+                        : 'Arquivo atual: video interno protegido (processando)';
+                    const fileName = videoUrl ? videoUrl.split('/').pop() : '';
+                    $('#lessonVideoFileLabel').text(fileName ? ('Arquivo atual: ' + fileName) : statusHls);
 
                     // Switch tab to file
                     $('#pills-file-tab').tab('show');

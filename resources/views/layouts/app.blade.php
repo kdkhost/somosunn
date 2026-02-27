@@ -1006,6 +1006,7 @@
             window.UNN = window.UNN || {};
             window.UNN.videoPlayer = {!! $videoPlayerConfigJson !!};
         </script>
+        <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
         <script src="{{ asset('vendor/plyr/plyr.polyfilled.js') }}"></script>
         <script>
             (function () {
@@ -1236,6 +1237,7 @@
                     if (!url) return false;
                     const cleaned = String(url).split('#')[0].split('?')[0].toLowerCase();
                     return (
+                        cleaned.endsWith('.m3u8') ||
                         cleaned.endsWith('.mp4') ||
                         cleaned.endsWith('.webm') ||
                         cleaned.endsWith('.ogg') ||
@@ -1243,8 +1245,15 @@
                     );
                 }
 
+                function isHlsManifest(url) {
+                    if (!url) return false;
+                    const cleaned = String(url).split('#')[0].split('?')[0].toLowerCase();
+                    return cleaned.endsWith('.m3u8');
+                }
+
                 function guessMimeType(url) {
                     const cleaned = String(url).split('#')[0].split('?')[0].toLowerCase();
+                    if (cleaned.endsWith('.m3u8')) return 'application/vnd.apple.mpegurl';
                     if (cleaned.endsWith('.webm')) return 'video/webm';
                     if (cleaned.endsWith('.ogg')) return 'video/ogg';
                     return 'video/mp4';
@@ -1366,6 +1375,7 @@
                     // We will re-evaluate 'host' after Plyr init if needed.
                     let host = wrapper.closest('[data-unn-video-host]') || wrapper;
 
+                    const videoEhHls = isHlsManifest(url);
                     let target;
                     if (youtubeId) {
                         if (plyrAvailable) {
@@ -1409,13 +1419,51 @@
 
                         wrapper.appendChild(target);
                     }
+
+                    const anexarHlsSeNecessario = function (videoEl) {
+                        if (!videoEl || videoEl.tagName !== 'VIDEO' || !videoEhHls) {
+                            return null;
+                        }
+
+                        const nativeHls =
+                            typeof videoEl.canPlayType === 'function' &&
+                            (videoEl.canPlayType('application/vnd.apple.mpegurl') ||
+                                videoEl.canPlayType('application/x-mpegURL'));
+
+                        if (nativeHls) {
+                            return null;
+                        }
+
+                        if (typeof Hls === 'undefined' || !Hls.isSupported()) {
+                            return null;
+                        }
+
+                        try {
+                            const hls = new Hls({
+                                enableWorker: true,
+                                lowLatencyMode: false,
+                                backBufferLength: 90,
+                            });
+
+                            hls.loadSource(String(url));
+                            hls.attachMedia(videoEl);
+                            return hls;
+                        } catch (e) {
+                            return null;
+                        }
+                    };
+
                     bindPlaybackProtections(target, disableContextMenu, blockDownload);
 
+                    let instanciaHls = null;
+
                     if (!plyrAvailable) {
+                        instanciaHls = anexarHlsSeNecessario(target);
                         wrapper.__unnVideoApi = {
                             player: null,
                             media: target && target.tagName === 'VIDEO' ? target : null,
                             wrapper: wrapper,
+                            hls: instanciaHls,
                         };
                         wrapper.dispatchEvent(new CustomEvent('unn:video-ready', { detail: wrapper.__unnVideoApi }));
                         applyWatermark(wrapper);
@@ -1429,6 +1477,7 @@
 
                     const player = new Plyr(target, options);
                     const media = (player && player.media) ? player.media : null;
+                    instanciaHls = anexarHlsSeNecessario(media || target);
                     if (media) {
                         bindPlaybackProtections(media, disableContextMenu, blockDownload);
                     }
@@ -1440,6 +1489,7 @@
                         player: player,
                         media: media,
                         wrapper: wrapper,
+                        hls: instanciaHls,
                     };
                     wrapper.dispatchEvent(new CustomEvent('unn:video-ready', { detail: wrapper.__unnVideoApi }));
                     applyWatermark(container);

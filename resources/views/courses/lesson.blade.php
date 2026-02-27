@@ -90,34 +90,7 @@
 
                 <div class="relative w-full overflow-hidden shadow-2xl mb-8 bg-black rounded-xl" style="aspect-ratio: 16/9;"
                     data-unn-video-host>
-                    @if($lesson->video_url)
-                        @php
-                            $normalizedVideoUrl = trim((string) $lesson->video_url);
-                            if (
-                                $normalizedVideoUrl !== '' &&
-                                !preg_match('/^(https?:)?\\/\\//i', $normalizedVideoUrl)
-                            ) {
-                                $candidate = ltrim(str_replace('\\', '/', $normalizedVideoUrl), '/');
-                                $providerCandidate = preg_replace('/^www\\./i', '', $candidate);
-                                if (preg_match('/^(youtube\\.com|m\\.youtube\\.com|youtu\\.be|vimeo\\.com|player\\.vimeo\\.com)\\//i', $providerCandidate)) {
-                                    $normalizedVideoUrl = 'https://' . $providerCandidate;
-                                } else {
-                                    if (\Illuminate\Support\Str::startsWith($candidate, 'storage/app/public/')) {
-                                        $candidate = 'storage/' . substr($candidate, strlen('storage/app/public/'));
-                                    } elseif (\Illuminate\Support\Str::startsWith($candidate, 'public/')) {
-                                        $candidate = substr($candidate, strlen('public/'));
-                                    }
-
-                                    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($candidate)) {
-                                        $normalizedVideoUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($candidate);
-                                    } elseif (\Illuminate\Support\Str::startsWith($candidate, 'storage/')) {
-                                        $normalizedVideoUrl = '/' . $candidate;
-                                    } else {
-                                        $normalizedVideoUrl = '/' . $candidate;
-                                    }
-                                }
-                            }
-                        @endphp
+                    @if(!empty($playbackUrl))
                         @php
                             $usePlyr = (string) \App\Models\Setting::get('video_player_enabled', '1') === '1';
 
@@ -151,7 +124,7 @@
                             }
                         @endphp
                         @if($usePlyr)
-                            <div class="absolute inset-0" data-unn-video-player data-video-url="{{ $normalizedVideoUrl }}"
+                            <div class="absolute inset-0" data-unn-video-player data-video-url="{{ $playbackUrl }}"
                                 data-progress-url="{{ route('courses.lessons.progress.update', [$course->id, $lesson->id]) }}"
                                 data-bookmark-store-url="{{ route('courses.lessons.bookmarks.store', [$course->id, $lesson->id]) }}"
                                 data-bookmark-delete-url-template="{{ route('courses.lessons.bookmarks.destroy', [$course->id, $lesson->id, '__BOOKMARK_ID__']) }}"
@@ -167,12 +140,12 @@
                                 data-preview-limit-seconds="{{ (int) ($previewLimitSeconds ?? 0) }}"
                                 data-checkout-url="{{ route('checkout.show', $course->id) }}">
                                 <video class="w-full h-full object-contain" controls playsinline preload="metadata">
-                                    <source src="{{ $normalizedVideoUrl }}">
+                                    <source src="{{ $playbackUrl }}">
                                 </video>
                             </div>
                         @else
                             @php
-                                $fallbackUrl = trim((string) $normalizedVideoUrl);
+                                $fallbackUrl = trim((string) $playbackUrl);
                                 $youtubeId = null;
                                 $vimeoId = null;
 
