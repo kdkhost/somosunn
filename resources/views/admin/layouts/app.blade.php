@@ -390,19 +390,12 @@
 
     @if($isSuperAdmin)
         <div class="wrapper">
-            @if($preloaderEnabled && (!auth()->check() || !auth()->user() || !auth()->user()->isAdmin()))
-                <div class="preloader flex-column justify-content-center align-items-center">
-                    <img class="animation__shake" src="{{ $preloaderImage }}" alt="UNN" height="80" width="80">
-                </div>
-            @endif
-
             @include('admin.partials.navbar')
             @include('admin.partials.sidebar')
 
             <div class="content-wrapper">
                 @if(View::hasSection('page_title') || View::hasSection('breadcrumb'))
-                    <div class="content-header">
-                        <div class="container-fluid">
+                        <div class="content-header">
                             <div class="d-flex justify-content-between align-items-center py-2">
                                 <h1 class="m-0 h4">@yield('page_title')</h1>
                                 <ol class="breadcrumb mb-0">
@@ -417,15 +410,15 @@
                         </div>
                     </div>
                 @endif
-                <section class="content">
-                    <div class="container-fluid pb-4" id="pjax-container">
-                        @yield('content')
-                    </div>
-                </section>
-            </div>
+            <section class="content">
+                <div class="container-fluid pb-4" id="pjax-container">
+                    @yield('content')
+                </div>
+            </section>
+        </div>
 
-            @include('admin.partials.control-sidebar')
-            @include('admin.partials.footer')
+        @include('admin.partials.control-sidebar')
+        @include('admin.partials.footer')
         </div>
     @else
         @include('partials.header')
@@ -532,7 +525,8 @@
             }
         }
     </style>
-    <button type="button" id="adminBackToTop" class="admin-back-to-top" aria-label="Voltar ao topo" title="Voltar ao topo">
+    <button type="button" id="adminBackToTop" class="admin-back-to-top" aria-label="Voltar ao topo"
+        title="Voltar ao topo">
         <i class="fas fa-chevron-up"></i>
     </button>
     <script>

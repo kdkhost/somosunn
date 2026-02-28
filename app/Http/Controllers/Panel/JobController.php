@@ -33,7 +33,7 @@ class JobController extends Controller
                 }
             ])
             ->latest()
-            ->get();
+            ->paginate(12);
 
         return view('panel.jobs.index', compact('vacancies'));
     }
