@@ -5,20 +5,28 @@
 @push('styles')
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-highlight: rgba(255, 255, 255, 0.15);
+            --glass-bg: rgba(255, 255, 255, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-highlight: rgba(255, 255, 255, 0.9);
+            --unn-accent-glow: rgba(43, 110, 250, 0.2);
+            --unn-primary-gradient: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f8fafc 100%);
+        }
+        .dark {
+            --glass-bg: rgba(15, 23, 42, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --glass-highlight: rgba(255, 255, 255, 0.1);
             --unn-accent-glow: rgba(43, 110, 250, 0.4);
             --unn-primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
         }
 
         /* Hero complex background with animated blobs */
         .unn-jobs-hero {
-            background-color: #020617;
+            background-color: #f8fafc;
             background-image: var(--unn-primary-gradient);
             position: relative;
             z-index: 1;
         }
+        .dark .unn-jobs-hero { background-color: #020617; }
 
         /* Animated Blob 1 */
         .blob-1 {
@@ -30,11 +38,12 @@
             left: -200px;
             border-radius: 50%;
             filter: blur(80px);
-            opacity: 0.35;
+            opacity: 0.15;
             z-index: -1;
             animation: float-blob 20s infinite alternate ease-in-out;
             pointer-events: none;
         }
+        .dark .blob-1 { opacity: 0.35; }
 
         /* Animated Blob 2 */
         .blob-2 {
@@ -46,11 +55,12 @@
             right: -100px;
             border-radius: 50%;
             filter: blur(100px);
-            opacity: 0.25;
+            opacity: 0.1;
             z-index: -1;
             animation: float-blob-reverse 25s infinite alternate-reverse ease-in-out;
             pointer-events: none;
         }
+        .dark .blob-2 { opacity: 0.25; }
 
         @keyframes float-blob {
             0% {
@@ -86,8 +96,9 @@
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid var(--glass-border);
-            box-shadow: inset 0 1px 0 0 var(--glass-highlight), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            box-shadow: inset 0 1px 0 0 var(--glass-highlight), 0 20px 40px -10px rgba(0, 0, 0, 0.05);
         }
+        .dark .glass-panel { box-shadow: inset 0 1px 0 0 var(--glass-highlight), 0 20px 40px -10px rgba(0, 0, 0, 0.5); }
 
         .glass-card {
             background: rgba(255, 255, 255, 0.85);
@@ -117,15 +128,17 @@
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-image: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            background-image: linear-gradient(135deg, #0f172a 0%, #334155 100%);
         }
+        .dark .text-gradient-primary { background-image: linear-gradient(135deg, #fff 0%, #cbd5e1 100%); }
 
         .text-gradient-accent {
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-image: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            background-image: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
         }
+        .dark .text-gradient-accent { background-image: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); }
 
         /* Advanced Hover Utilities */
         .hover-lift {
@@ -150,6 +163,20 @@
             background: #fff;
             border-color: var(--unn-azul-1);
             box-shadow: 0 0 0 4px rgba(43, 110, 250, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0);
+        }
+        .dark .filter-input {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .dark .filter-input:focus-within {
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .bg-grid-hero {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M0 10h40M10 0v40M0 20h40M20 0v40M0 30h40M30 0v40' stroke='rgba(0,0,0,0.03)' stroke-width='1'/%3E%3C/svg%3E");
+        }
+        .dark .bg-grid-hero {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M0 10h40M10 0v40M0 20h40M20 0v40M0 30h40M30 0v40' stroke='rgba(255,255,255,0.03)' stroke-width='1'/%3E%3C/svg%3E");
         }
 
         /* Grid Background Pattern */
@@ -213,14 +240,12 @@
             <div class="blob-1"></div>
             <div class="blob-2"></div>
 
-            <div
-                class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CjxwYXRoIGQ9Ik0wIDBoNDB2NDBIMHoiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiIHN0cm9rZS13aWR0aD0iMSIvPgo8L3N2Zz4=')] opacity-50">
-            </div>
+            <div class="absolute inset-0 bg-grid-hero opacity-50"></div>
 
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
                 <div
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel text-blue-200 text-xs font-black tracking-widest uppercase mb-8 transform hover:scale-105 transition-transform cursor-default">
-                    <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel text-blue-800 dark:text-blue-200 text-xs font-black tracking-widest uppercase mb-8 transform hover:scale-105 transition-transform cursor-default shadow-sm dark:shadow-none">
+                    <span class="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400 animate-pulse"></span>
                     Carreiras & Oportunidades
                 </div>
 
@@ -229,7 +254,7 @@
                     na <span class="text-gradient-accent">UNN Startups</span>
                 </h1>
 
-                <p class="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-medium mb-12">
+                <p class="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-medium mb-12">
                     Conecte-se com empresas inovadoras, aplique para vagas exclusivas e acelere sua trajetória profissional
                     com precisão.
                 </p>
@@ -241,7 +266,7 @@
                             <i class="fas fa-search text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
                             <input type="text" name="area" placeholder="Cargo, tecnologia ou palavra-chave..."
                                 value="{{ request('area') }}"
-                                class="w-full h-full bg-transparent border-none focus:ring-0 text-slate-700 font-medium placeholder:font-normal placeholder:text-slate-400">
+                                class="w-full h-full bg-transparent border-none focus:ring-0 text-slate-700 dark:text-slate-200 font-medium placeholder:font-normal placeholder:text-slate-400">
                         </div>
 
                         <div class="w-full md:w-64 filter-input relative flex items-center h-14 md:h-16 px-5 group">
@@ -249,7 +274,7 @@
                                 class="fas fa-map-marker-alt text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
                             <input type="text" name="local" placeholder="Ex: São Paulo, Remoto"
                                 value="{{ request('local') }}"
-                                class="w-full h-full bg-transparent border-none focus:ring-0 text-slate-700 font-medium placeholder:font-normal placeholder:text-slate-400">
+                                class="w-full h-full bg-transparent border-none focus:ring-0 text-slate-700 dark:text-slate-200 font-medium placeholder:font-normal placeholder:text-slate-400">
                         </div>
 
                         <button type="submit"
