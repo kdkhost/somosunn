@@ -1361,7 +1361,7 @@
                                 if (!lessons.length) return;
 
                                 $.ajax({
-                                    url: '{{ route('courses.lessons.reorder', $course) }}',
+                                    url: '{{ route('admin.courses.lessons.reorder', $course) }}',
                                     method: 'POST',
                                     data: {
                                         _token: '{{ csrf_token() }}',
