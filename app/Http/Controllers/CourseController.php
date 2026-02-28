@@ -48,7 +48,7 @@ class CourseController extends Controller
             ->whereIn('status', $publicStatuses)
             ->orderByDesc('is_featured')
             ->orderByDesc('id')
-            ->paginate(12);
+            ->paginate(\App\Models\Setting::get('frontend_item_limit', 9));
 
         // If no courses exist, provide demo data
         if ($demoMode && $courses->isEmpty()) {
@@ -328,9 +328,7 @@ class CourseController extends Controller
 
         // Trigger Certificate / Completion Logic
         // We reuse the logic from LessonController that handles this check
-        $lessonController = new LessonController();
-        $dummyLesson = $lessons->last(); // Just to pass a lesson, though logic might not strictly need it if called differently
-
+        // ($lessonVideoService is injected in LessonController, we bypass direct instantiation)
         // However, LessonController::checkCourseAndIssueCertificate is protected/private or designed to be called internally.
         // Let's replicate the essential part or trigger it via a lesson update if needed.
         // Actually, looking at previous context, `checkCourseAndIssueCertificate` is called by `updatePlaybackProgress`.

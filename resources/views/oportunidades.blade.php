@@ -231,7 +231,7 @@
                                 @if($featuredJob->salary_range)
                                     <div class="text-slate-500 font-medium text-sm w-full sm:w-auto text-center sm:text-left">
                                         <i class="fas fa-coins text-yellow-500 mr-1"></i> Remuneração: <strong
-                                            class="text-slate-800">{{ $featuredJob->salary_range }}</strong>
+                                            class="text-slate-800">{{ is_numeric($featuredJob->salary_range) ? 'R$ ' . number_format((float) $featuredJob->salary_range, 2, ',', '.') : $featuredJob->salary_range }}</strong>
                                     </div>
                                 @endif
                             </div>
@@ -332,7 +332,7 @@
                                 <div
                                     class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between group-hover:bg-blue-50 transition-colors z-10 w-full shrink-0">
                                     <span class="font-bold text-sm text-slate-700 truncate pr-2">
-                                        {{ $vaga->salary_range ?? 'A combinar' }}
+                                        {{ is_numeric($vaga->salary_range) ? 'R$ ' . number_format((float) $vaga->salary_range, 2, ',', '.') : ($vaga->salary_range ?? 'A combinar') }}
                                     </span>
                                     <span
                                         class="btn-primary text-white text-[10px] px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all font-black uppercase tracking-widest shadow-md shrink-0">
@@ -343,12 +343,78 @@
                         @endforeach
                     </div>
 
-                    <div class="mt-16 flex justify-center">
+                    <div class="mt-16 flex justify-center unn-pagination-wrapper">
                         {{ $vagas->links('pagination::tailwind') }}
                     </div>
                 @endif
             </div>
         </section>
+
+        <style>
+            /* Ajustes Finos para Paginação Tailwind Nativa ficar mais bonita/clara */
+            .unn-pagination-wrapper nav div.hidden.sm\:flex-1.sm\:flex.sm\:items-center.sm\:justify-between {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+
+            .unn-pagination-wrapper nav p.text-sm.text-gray-700.leading-5 {
+                color: #64748b;
+                /* slate-500 */
+                font-weight: 500;
+            }
+
+            .unn-pagination-wrapper nav span.relative.z-0.inline-flex.shadow-sm.rounded-md {
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+                border-radius: 9999px;
+                overflow: hidden;
+                border: 1px solid #e2e8f0;
+                /* slate-200 */
+                background: white;
+            }
+
+            .unn-pagination-wrapper nav span.relative.z-0.inline-flex.shadow-sm.rounded-md>span,
+            .unn-pagination-wrapper nav span.relative.z-0.inline-flex.shadow-sm.rounded-md>a {
+                padding: 0.75rem 1.25rem;
+                font-weight: 700;
+                font-size: 0.875rem;
+                color: #475569;
+                /* slate-600 */
+                border: none;
+                border-right: 1px solid #f1f5f9;
+                /* slate-100 */
+                background-color: transparent;
+                transition: all 0.2s;
+            }
+
+            .unn-pagination-wrapper nav span.relative.z-0.inline-flex.shadow-sm.rounded-md>span:last-child,
+            .unn-pagination-wrapper nav span.relative.z-0.inline-flex.shadow-sm.rounded-md>a:last-child {
+                border-right: none;
+            }
+
+            .unn-pagination-wrapper nav span.relative.z-0.inline-flex.shadow-sm.rounded-md>a:hover {
+                background-color: #f8fafc;
+                /* hover do botão */
+                color: #2563eb;
+                /* blue-600 */
+            }
+
+            /* Item Ativo nativo do tailwind pagination blade */
+            .unn-pagination-wrapper nav span[aria-current="page"]>span {
+                background-color: #2563eb !important;
+                /* var(--unn-azul-1) / blue-600 */
+                color: white !important;
+                position: relative;
+                z-index: 10;
+            }
+
+            /* Item desabilitado (Setas cinzas) */
+            .unn-pagination-wrapper nav span[aria-disabled="true"]>span {
+                color: #cbd5e1;
+                /* slate-300 */
+                background-color: #f8fafc;
+            }
+        </style>
 
         <!-- Call to Action Banner Limpo/Claro (Substituindo o neon) -->
         <section class="py-12 md:py-16 px-4 md:px-12 lg:px-24 bg-transparent pb-24">
