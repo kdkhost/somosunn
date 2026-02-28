@@ -195,6 +195,17 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Refatoração de Controllers:**
   - Simplificação do `SettingController` delegando a resolução de URLs para o Model, aumentando a manutenibilidade.
 
+### 27/02/2026 — Integração MercadoPago e Pagamentos Síncronos
+- **Gateway Checkout:**
+  - Resolução definitiva de conflitos de CSS com o Container Brick do MercadoPago.
+  - Implementação de Identificação de Integrador (`Integrator ID`) e Plataforma (`Platform ID`) para rastreabilidade de transações de parceiros.
+- **Processamento Síncrono (Webhooks Automáticos):**
+  - Refatoração da lógica do Webhook de pagamento. Operações como comissões de afiliados, split de vendas e liberação de acesso a cursos agora ocorrem de forma **Síncrona** logo após o banco processar o limite do cartão.
+  - O aluno recebe acesso imediato no exato milissegundo em que a tela de Checkout é processada com sucesso (`approved/PAID`), evitando qualquer espera (comum com a assincronicidade dos webhooks padrão).
+- **Simulador de Pagamentos e Pix:**
+  - Inserção de fluxos independentes de Pix no Checkout (bypass no Brick).
+  - Modo Simulador implementado para facilitar testes de homologação/ambiente de desenvolvimento quando chaves de Gateway não estão presentes.
+
 ### 27/02/2026 — Split de Pagamento Marketplace
 - **Divisão Automatizada de Vendas:**
   - Implementação de sistema de rateio (Split) para vendas de membros.
