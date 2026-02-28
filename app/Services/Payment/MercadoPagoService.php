@@ -119,7 +119,7 @@ class MercadoPagoService
         }
 
         $response = Http::withToken($token)
-            ->withHeaders(['X-Idempotency-Key' => 'pix-' . $order->id . '-' . time()])
+            ->withHeaders($this->commonHeaders('pix-' . $order->id))
             ->post("{$this->baseUrl}/v1/payments", $paymentData);
 
         if ($response->failed()) {
@@ -184,11 +184,7 @@ class MercadoPagoService
         }
 
         $response = Http::withToken($token)
-            ->withHeaders([
-                'X-Idempotency-Key' => 'cc-' . $order->id . '-' . time(),
-                'X-Integrator-Id' => Setting::get('mercadopago_integrator_id', config('payments.mercadopago.integrator_id', '')),
-                'X-Platform-Id' => Setting::get('mercadopago_platform_id', config('payments.mercadopago.platform_id', '')),
-            ])
+            ->withHeaders($this->commonHeaders('cc-' . $order->id))
             ->post("{$this->baseUrl}/v1/payments", $paymentData);
 
         if ($response->failed()) {
@@ -229,7 +225,7 @@ class MercadoPagoService
         }
 
         $response = Http::withToken($token)
-            ->withHeaders(['X-Idempotency-Key' => 'sub-' . uniqid() . '-' . time()])
+            ->withHeaders($this->commonHeaders('sub-' . ($userData['external_reference'] ?? uniqid())))
             ->post("{$this->baseUrl}/preapproval", $subscriptionData);
 
         if ($response->failed()) {
@@ -627,5 +623,20 @@ class MercadoPagoService
     private function calculateApplicationFee(Order $order): ?float
     {
         return null;
+    }
+
+    /**
+     * Cabeçalhos comuns para todas as requisições da plataforma.
+     * Inclui Idempotência, Integrador ID e Platform ID.
+     */
+    private function commonHeaders(string $idempotencyKeySuffix): array
+    {
+        return [
+            'X-Idempotency-Key' => $idempotencyKeySuffix . '-' . time(),
+            'X-Integrator-Id' => (string) Setting::get('mercadopago_integrator_id', config('payments.mercadopago.integrator_id', '')),
+            'X-Platform-Id' => (string) Setting::get('mercadopago_platform_id', config('payments.mercadopago.platform_id', '')),
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
     }
 }

@@ -47,13 +47,24 @@ class PaymentWebhookController extends Controller
             $token = (string) config('payments.mercadopago.access_token');
 
             if (!$token) {
+                // Fallback de segurança se o config não estiver populado (o AppServiceProvider deveria cuidar disso)
+                $env = Setting::get('mercadopago_env', 'sandbox');
+                $prefix = $env === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
+                $token = Setting::get($prefix . 'access_token', Setting::get('mercadopago_access_token'));
+            }
+
+            if (!$token) {
                 Log::warning('MP Webhook: missing token', ['seller_id' => (string) $seller_id]);
                 return response('OK', 200);
             }
 
             $response = Http::withToken($token)->get('https://api.mercadopago.com/v1/payments/' . $paymentId);
             if (!$response->successful()) {
-                Log::warning('MP Webhook: failed to fetch payment', ['payment_id' => $paymentId, 'status' => $response->status()]);
+                Log::warning('MP Webhook: failed to fetch payment', [
+                    'payment_id' => $paymentId,
+                    'status' => $response->status(),
+                    'error' => $response->body()
+                ]);
                 return response('OK', 200);
             }
 
