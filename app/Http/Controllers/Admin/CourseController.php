@@ -58,24 +58,12 @@ class CourseController extends Controller
 
     public function index()
     {
-        $this->ensurePermission('courses.view');
-
-        $query = Course::latest();
-
-        // Se não for admin, mostra apenas cursos do próprio usuário
-        if (!Auth::user()->isAdmin()) {
-            $query->where('user_id', Auth::id());
-        }
-
-        $courses = $query->get();
-        return view('admin.courses.index', compact('courses'));
+        return redirect()->route('panel.admin.courses.index');
     }
 
     public function create()
     {
-        $this->ensurePermission('courses.create');
-
-        return view('admin.courses.form', ['course' => new Course]);
+        return redirect()->route('panel.admin.courses.create');
     }
 
     public function store(Request $request)

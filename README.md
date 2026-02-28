@@ -225,6 +225,15 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
   - Correção de bugs de sintaxe e visibilidade no formulário de perfil do novo painel.
   - **Refinamento de UI**: Ajuste do botão de fechar nos modais de conteúdo premium (Cursos e Mentorias) para garantir um círculo perfeito e geometria simétrica, removendo bordas/fundos estáticos indesejados.
 
+### 27/02/2026 (Noite) — Redesign Glassmorphism e Correções de UI
+- **Página de Vagas (Carreiras):**
+  - Redesign completo adotando estética **Glassmorphism** com gradientes escuros e interações 3D "on-hover".
+  - Ampliação da listagem por página de 8 para **12 oportunidades** para densidade otimizada.
+- **Painel Administrativo:**
+  - Resolução de layout "quebrado" no menu Cursos para Superadmins (AdminLTE). Redirecionamento forçado para interface renovada no Tailwind.
+- **Gestão de Perfil:**
+  - Correção lógica que impedia a gravação da opção "Pessoa Física": a máscara de CPF (14 chars com traços) estava ativando indevidamente "Pessoa Jurídica" no salvamento da view.
+
 ### 25/02/2026 — Padronização de UX, Sistema de Parceiros e Expansão
 - **Monitoramento de Saúde (Dashboards):**
   - **Saúde da Comunidade (Admin):** Integração de seção visual no novo painel administrativo com indicadores de engajamento do ecossistema.

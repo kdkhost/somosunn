@@ -55,8 +55,8 @@
                         de Pessoa</label>
                     <select name="person_type" id="person_type"
                         class="w-full rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-sm">
-                        <option value="F" {{ old('person_type', strlen($user->doc) > 11 ? 'J' : 'F') == 'F' ? 'selected' : '' }}>Pessoa Física</option>
-                        <option value="J" {{ old('person_type', strlen($user->doc) > 11 ? 'J' : 'F') == 'J' ? 'selected' : '' }}>Pessoa Jurídica</option>
+                        <option value="F" {{ old('person_type', strlen(preg_replace('/\D/', '', $user->doc)) > 11 ? 'J' : 'F') == 'F' ? 'selected' : '' }}>Pessoa Física</option>
+                        <option value="J" {{ old('person_type', strlen(preg_replace('/\D/', '', $user->doc)) > 11 ? 'J' : 'F') == 'J' ? 'selected' : '' }}>Pessoa Jurídica</option>
                     </select>
                 </div>
 

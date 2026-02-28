@@ -28,7 +28,7 @@ class OportunidadesTesteController extends Controller
                 $query->where('type', 'like', '%' . $request->tipo . '%');
             }
 
-            $vagas = $query->orderByDesc('expires_at')->paginate(8);
+            $vagas = $query->orderByDesc('expires_at')->paginate(12);
             return view('oportunidades', compact('vagas'));
         } catch (\Throwable $e) {
             \Log::error("Erro ao carregar vagas-abertas: " . $e->getMessage(), [
