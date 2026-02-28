@@ -13,16 +13,14 @@
         }
         $siteTheme = $settings['site_theme'] ?? 'light';
 
-        $isSuperAdmin = false;
+        $isAdmin = false;
         try {
             if (auth()->check()) {
                 $u = auth()->user();
-                $role = (string) ($u->role ?? '');
-                $level = (string) ($u->level ?? '');
-                $isSuperAdmin = ($role === 'superadmin') || in_array($level, ['superadmin', 'sucesso'], true);
+                $isAdmin = method_exists($u, 'isAdmin') ? $u->isAdmin() : false;
             }
         } catch (\Throwable $e) {
-            $isSuperAdmin = false;
+            $isAdmin = false;
         }
 
         $resolvePublicAsset = function (?string $value) {
@@ -88,7 +86,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @if(!$isSuperAdmin)
+    @if(!$isAdmin)
         <script>
             window.tailwind = window.tailwind || {};
             window.tailwind.config = { corePlugins: { preflight: false } };
@@ -388,7 +386,7 @@
         </div>
     @endif
 
-    @if($isSuperAdmin)
+    @if($isAdmin)
         <div class="wrapper">
             @include('admin.partials.navbar')
             @include('admin.partials.sidebar')

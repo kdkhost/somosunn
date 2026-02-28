@@ -332,11 +332,11 @@
 
                                 <div
                                     class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between group-hover:bg-blue-50 transition-colors z-10 w-full shrink-0">
-                                    <span class="font-bold text-sm text-slate-700 truncate pr-2">
+                                    <span class="font-bold text-sm text-slate-700 truncate pr-4">
                                         {{ is_numeric($vaga->salary_range) ? 'R$ ' . number_format((float) $vaga->salary_range, 2, ',', '.') : ($vaga->salary_range ?? 'A combinar') }}
                                     </span>
                                     <span
-                                        class="btn-primary text-white text-[10px] px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all font-black uppercase tracking-widest shadow-md shrink-0">
+                                        class="btn-primary text-white text-[10px] px-3 py-2 rounded-lg transition-all font-black uppercase tracking-widest shadow-md shrink-0">
                                         Ver vaga <i class="fas fa-arrow-right ml-1"></i>
                                     </span>
                                 </div>
