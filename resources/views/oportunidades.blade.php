@@ -381,8 +381,9 @@
                 font-size: 0.875rem;
                 color: #475569;
                 /* slate-600 */
-                border: none;
-                border-right: 1px solid #f1f5f9;
+                border: none !important;
+                box-shadow: none !important;
+                border-right: 1px solid #f1f5f9 !important;
                 /* slate-100 */
                 background-color: transparent;
                 transition: all 0.2s;
@@ -390,7 +391,7 @@
 
             .unn-pagination-wrapper nav span.relative.z-0.inline-flex.shadow-sm.rounded-md>span:last-child,
             .unn-pagination-wrapper nav span.relative.z-0.inline-flex.shadow-sm.rounded-md>a:last-child {
-                border-right: none;
+                border-right: none !important;
             }
 
             .unn-pagination-wrapper nav span.relative.z-0.inline-flex.shadow-sm.rounded-md>a:hover {

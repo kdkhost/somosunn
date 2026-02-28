@@ -137,14 +137,12 @@
                                     <p>Meus Cursos</p>
                                 </a></li>
                             @if(auth()->user()->isAdmin())
-                                <li class="nav-item"><a href="{{ route('panel.admin.courses.index') }}"
-                                        class="nav-link {{ $is('panel.admin.courses.index') }}"><i
-                                            class="fas fa-cog nav-icon"></i>
+                                <li class="nav-item"><a href="{{ route('admin.courses.index') }}"
+                                        class="nav-link {{ $is('admin.courses.index') }}"><i class="fas fa-cog nav-icon"></i>
                                         <p>Gerenciar</p>
                                     </a></li>
-                                <li class="nav-item"><a href="{{ route('panel.admin.courses.create') }}"
-                                        class="nav-link {{ $is('panel.admin.courses.create') }}"><i
-                                            class="fas fa-plus nav-icon"></i>
+                                <li class="nav-item"><a href="{{ route('admin.courses.create') }}"
+                                        class="nav-link {{ $is('admin.courses.create') }}"><i class="fas fa-plus nav-icon"></i>
                                         <p>Novo</p>
                                     </a></li>
                             @endif
