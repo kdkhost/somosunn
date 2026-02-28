@@ -290,11 +290,7 @@ class CheckoutController extends Controller
                 }
 
                 if ($status === 'PAID') {
-                    $order->update([
-                        'status' => 'paid',
-                        'paid_at' => now(),
-                        'transaction_id' => (string) ($paymentResult['id'] ?? null),
-                    ]);
+                    app(PaymentWebhookController::class)->processPaidOrder($order, $paymentResult['id'] ?? null, $paymentResult);
                     return response()->json(['success' => true, 'redirect' => route('checkout.success', $order)]);
                 } else {
                     // Declined or Pending
@@ -321,11 +317,7 @@ class CheckoutController extends Controller
                 }
 
                 if (($paymentResult['status'] ?? '') === 'approved') {
-                    $order->update([
-                        'status' => 'paid',
-                        'paid_at' => now(),
-                        'transaction_id' => (string) ($paymentResult['id'] ?? null),
-                    ]);
+                    app(PaymentWebhookController::class)->processPaidOrder($order, $paymentResult['id'] ?? null, $paymentResult);
 
                     return response()->json([
                         'success' => true,

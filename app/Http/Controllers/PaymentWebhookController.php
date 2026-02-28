@@ -120,7 +120,7 @@ class PaymentWebhookController extends Controller
         return response('OK', 200);
     }
 
-    private function processPaidOrder(Order $order, $transactionId, $data)
+    public function processPaidOrder(Order $order, $transactionId, $data)
     {
         $wasPaid = (string) $order->status === 'paid';
 
