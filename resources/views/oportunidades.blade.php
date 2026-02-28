@@ -159,7 +159,8 @@
             </div>
         </section>
 
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 -mt-8 md:-mt-16 mb-20 pt-10">
+        <section
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 {{ $featuredJob && (request()->page == 1 || !request()->has('page')) ? '-mt-8 md:-mt-16' : 'mt-8 md:mt-12' }} mb-20 pt-10">
             <!-- Vaga de Destaque Card Limpo -->
             @if($featuredJob && (request()->page == 1 || !request()->has('page')))
                 <div

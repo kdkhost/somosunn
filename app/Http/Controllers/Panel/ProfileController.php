@@ -76,6 +76,11 @@ class ProfileController extends Controller
             $data['segment'] = $request->segment_select;
         }
 
+        // Limpar máscara do documento (remover tudo que não for número)
+        if (isset($data['doc'])) {
+            $data['doc'] = preg_replace('/\D/', '', $data['doc']);
+        }
+
         // 2. Process Interests
         $interests = $request->interests_list ?? [];
         if (!empty($request->interests_custom)) {
