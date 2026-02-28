@@ -58,12 +58,22 @@ class CourseController extends Controller
 
     public function index()
     {
-        return redirect()->route('panel.admin.courses.index');
+        $this->ensurePermission('courses.view');
+
+        $query = Course::query()->latest();
+
+        if (!auth()->user()->isAdmin()) {
+            $query->where('user_id', auth()->id());
+        }
+
+        $courses = $query->get();
+        return view('admin.courses.index', compact('courses'));
     }
 
     public function create()
     {
-        return redirect()->route('panel.admin.courses.create');
+        $this->ensurePermission('courses.create');
+        return view('admin.courses.form');
     }
 
     public function store(Request $request)
