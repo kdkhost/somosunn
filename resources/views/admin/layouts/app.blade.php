@@ -395,30 +395,29 @@
 
             <div class="content-wrapper">
                 @if(View::hasSection('page_title') || View::hasSection('breadcrumb'))
-                        <div class="content-header">
-                            <div class="d-flex justify-content-between align-items-center py-2">
-                                <h1 class="m-0 h4">@yield('page_title')</h1>
-                                <ol class="breadcrumb mb-0">
-                                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" data-pjax>Home</a></li>
-                                    @hasSection('breadcrumb_items')
-                                        @yield('breadcrumb_items')
-                                    @else
-                                        <li class="breadcrumb-item active">@yield('page_title')</li>
-                                    @endif
-                                </ol>
-                            </div>
+                    <div class="content-header">
+                        <div class="d-flex justify-content-between align-items-center py-2">
+                            <h1 class="m-0 h4">@yield('page_title')</h1>
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" data-pjax>Home</a></li>
+                                @hasSection('breadcrumb_items')
+                                    @yield('breadcrumb_items')
+                                @else
+                                    <li class="breadcrumb-item active">@yield('page_title')</li>
+                                @endif
+                            </ol>
                         </div>
                     </div>
                 @endif
-            <section class="content">
-                <div class="container-fluid pb-4" id="pjax-container">
-                    @yield('content')
-                </div>
-            </section>
-        </div>
+                <section class="content">
+                    <div class="container-fluid pb-4" id="pjax-container">
+                        @yield('content')
+                    </div>
+                </section>
+            </div>
 
-        @include('admin.partials.control-sidebar')
-        @include('admin.partials.footer')
+            @include('admin.partials.control-sidebar')
+            @include('admin.partials.footer')
         </div>
     @else
         @include('partials.header')
