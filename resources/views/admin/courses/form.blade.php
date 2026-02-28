@@ -1158,9 +1158,9 @@
     <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
     <script>
         Dropzone.autoDiscover = false;
-        const aulaStoreUrlAdmin = @json($course->exists ? route('admin.courses.lessons.store', $course) : null);
+        const aulaStoreUrlAdmin = @json($course->exists ? route('courses.lessons.store', $course) : null);
         const aulaBaseUrlAdmin = aulaStoreUrlAdmin;
-        const aulaImagemConteudoUrlAdmin = @json($course->exists ? route('admin.courses.lessons.content-image', $course) : null);
+        const aulaImagemConteudoUrlAdmin = @json($course->exists ? route('courses.lessons.content-image', $course) : null);
 
         function enviarImagemConteudoAula(file, $editor) {
             if (!aulaImagemConteudoUrlAdmin) {
@@ -1283,7 +1283,7 @@
                         if (!lessons.length) return;
 
                         $.ajax({
-                            url: '{{ route('admin.courses.lessons.reorder', $course) }}',
+                            url: '{{ route('courses.lessons.reorder', $course) }}',
                             method: 'POST',
                             data: {
                                 _token: '{{ csrf_token() }}',
