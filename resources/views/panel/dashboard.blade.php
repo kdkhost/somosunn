@@ -60,7 +60,7 @@
             $quickLinks = [
                 ['route' => 'social.feed', 'icon' => 'fa-comments', 'label' => 'Feed Social', 'color' => 'bg-pink-500'],
                 ['route' => 'courses.index', 'icon' => 'fa-play-circle', 'label' => 'Aulas', 'color' => 'bg-blue-500'],
-                ['route' => 'jobs.index', 'icon' => 'fa-search-dollar', 'label' => 'Vagas', 'color' => 'bg-emerald-500'],
+                ['route' => 'panel.jobs.index', 'icon' => 'fa-search-dollar', 'label' => 'Vagas', 'color' => 'bg-emerald-500'],
                 ['route' => 'chat.index', 'icon' => 'fa-paper-plane', 'label' => 'Mensagens', 'color' => 'bg-indigo-500'],
             ];
         @endphp
