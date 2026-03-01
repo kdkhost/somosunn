@@ -260,15 +260,15 @@
                 @endif
 
                 <div class="pt-4">
-                    <div class="flex gap-3">
+                    <div class="flex flex-wrap gap-3">
                         <button type="submit" form="ps-save-form"
-                            class="flex-1 inline-flex items-center justify-center rounded-xl bg-lime-600 text-white px-6 py-3.5 text-sm font-bold hover:bg-lime-700 transition-all shadow-lg shadow-lime-500/20 hover:shadow-xl hover:-translate-y-1">
+                            class="flex-1 min-w-[140px] inline-flex items-center justify-center rounded-xl bg-lime-600 text-white px-5 py-3.5 text-sm font-bold hover:bg-lime-700 transition-all shadow-lg shadow-lime-500/20 hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
                             <i class="fas fa-save mr-2"></i> Salvar PagSeguro
                         </button>
 
                         @if($pagseguro->enabled && $pagseguro->access_token)
                             <button type="submit" form="ps-test-form"
-                                class="inline-flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white px-6 py-3.5 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+                                class="shrink-0 inline-flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white px-5 py-3.5 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all whitespace-nowrap">
                                 <i class="fas fa-sync-alt mr-2"></i> Testar Conexão
                             </button>
                         @endif

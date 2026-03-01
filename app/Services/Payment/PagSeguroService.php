@@ -273,18 +273,23 @@ class PagSeguroService
             throw new Exception('Credenciais PagSeguro não encontradas.');
         }
 
-        // Test Endpoint: usually just try to list something relative to account
-        // V4 doesn't have a simple "me" endpoint like MP. We can try listing orders with limit 1 or creating a dummy intent?
-        // Or introspection? 
-        // Safest: public keys lookup or similar.
-        // Let's try /public-keys -> if token is valid, it returns keys.
-
+        $token = trim((string) $account->access_token);
         $baseUrl = $this->getBaseUrl();
-        $response = Http::withToken($account->access_token)
-            ->get("{$baseUrl}/public-keys");
 
-        if ($response->failed()) {
-            throw new Exception('Falha na validação PagSeguro: ' . $response->body());
+        // PagSeguro v4: POST /public-keys com body {"type":"CREDIT_CARD"} é o endpoint
+        // de menor impacto para validar credenciais sem criar transações.
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+            'Content-Type' => 'application/json',
+        ])->post("{$baseUrl}/public-keys", ['type' => 'CREDIT_CARD']);
+
+        // 200 = válido | 422 = token válido mas parâmetro errado (aceitável) | 4xx auth = inválido
+        if ($response->status() === 401 || $response->status() === 403) {
+            throw new Exception('Token PagSeguro inválido ou sem permissão (HTTP ' . $response->status() . ').');
+        }
+
+        if ($response->serverError()) {
+            throw new Exception('Erro no servidor PagSeguro ao validar credenciais.');
         }
 
         return true;
