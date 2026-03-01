@@ -151,7 +151,8 @@
                             Escolher
                         </button>
                         <input type="file" id="input_watermark" name="watermark_image" class="hidden" accept="image/*" onchange="previewImage(this, 'watermark_preview')">
-                        <button type="button" class="px-3 py-2 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition">
+                        <input type="hidden" name="remove_watermark_image" id="remove_watermark_image" value="0">
+                        <button type="button" onclick="document.getElementById('remove_watermark_image').value='1'; const wp=document.getElementById('watermark_preview'); const ph=document.getElementById('watermark_placeholder'); if(wp){wp.src='';wp.classList.add('hidden');} if(ph){ph.classList.remove('hidden');}" class="px-3 py-2 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
@@ -206,6 +207,19 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Advanced JSON Options -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
+        <button type="button" onclick="document.getElementById('advancedJson').classList.toggle('hidden')"
+            class="flex items-center gap-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition">
+            <i class="fas fa-cogs"></i> Configurações Avançadas (JSON)
+        </button>
+        <div id="advancedJson" class="hidden mt-4">
+            <textarea name="video_plyr_options_json" rows="5"
+                class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm font-mono text-slate-800 dark:text-white">{{ $settings['video_plyr_options_json'] ?? '' }}</textarea>
+            <p class="text-xs text-slate-400 mt-2">Cuidado: o JSON gerado pelos checkboxes acima sobrescreverá este campo ao salvar, a menos que você modifique o script JS.</p>
         </div>
     </div>
 </div>

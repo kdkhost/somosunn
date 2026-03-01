@@ -63,6 +63,38 @@
                 </div>
             </div>
         </div>
+
+        {{-- Divisão de Vendas (Split) --}}
+        <div class="border-t border-slate-100 dark:border-slate-800 pt-6">
+            <div class="flex items-center gap-2 mb-3">
+                <i class="fas fa-divide text-slate-400"></i>
+                <h4 class="font-bold text-slate-700 dark:text-slate-300 text-sm">Divisão de Vendas (Split)</h4>
+            </div>
+            <div class="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30 rounded-2xl p-3 mb-4 text-xs text-amber-700 dark:text-amber-400 font-medium">
+                <i class="fas fa-exclamation-triangle mr-1"></i> A soma das porcentagens deve ser exatamente <strong>100%</strong>.
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                @foreach([
+                    'marketplace_split_seller_percent' => ['Vendedor (%)', '70'],
+                    'marketplace_split_platform_percent' => ['Plataforma (%)', '10'],
+                    'marketplace_split_traffic_percent' => ['Tráfego Pago (%)', '10'],
+                    'marketplace_split_superadmin_percent' => ['Superadmin (%)', '10'],
+                ] as $field => $meta)
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-2">{{ $meta[0] }}</label>
+                    <div class="relative">
+                        <input type="number" name="{{ $field }}" min="0" max="100" step="0.01"
+                            value="{{ $settings[$field] ?? $meta[1] }}"
+                            class="split-input w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold text-slate-800 dark:text-white">
+                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none font-bold text-slate-400">%</div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            <div id="split-total-warning" class="mt-3 text-red-500 text-xs font-bold hidden">
+                <i class="fas fa-times-circle mr-1"></i> A soma atual é <span id="split-total-value">0</span>%. Ajuste para 100%.
+            </div>
+        </div>
     </div>
 
     <!-- Hero Carousel -->
@@ -175,6 +207,11 @@
                                 placeholder="URL (ex: /shop)"
                                 class="px-3 py-2 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 outline-none transition-all text-[10px] font-medium text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500">
                         </div>
+                        <select name="marketplace_hero_slide_{{ $slide }}_button_target"
+                            class="w-full px-3 py-2 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:border-blue-600 outline-none transition-all text-[10px] font-medium">
+                            <option value="_self" {{ ($settings["marketplace_hero_slide_{$slide}_button_target"] ?? '_self') == '_self' ? 'selected' : '' }}>Mesma Aba</option>
+                            <option value="_blank" {{ ($settings["marketplace_hero_slide_{$slide}_button_target"] ?? '_self') == '_blank' ? 'selected' : '' }}>Nova Aba</option>
+                        </select>
                     </div>
                 </div>
             @endforeach
@@ -328,3 +365,23 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const inputs = document.querySelectorAll('.split-input');
+    const warning = document.getElementById('split-total-warning');
+    const totalSpan = document.getElementById('split-total-value');
+    if (!inputs.length || !warning) return;
+    function calcSplit() {
+        let total = 0;
+        inputs.forEach(i => total += parseFloat(i.value || 0));
+        total = Math.round(total * 100) / 100;
+        if (totalSpan) totalSpan.textContent = total;
+        warning.classList.toggle('hidden', total === 100);
+    }
+    inputs.forEach(i => i.addEventListener('input', calcSplit));
+    calcSplit();
+});
+</script>
+@endpush

@@ -221,4 +221,52 @@
             </div>
         </div>
     </div>
+
+    <!-- Preloader -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-8 space-y-6">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                <i class="fas fa-spinner"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-slate-800 dark:text-white text-lg">Preloader</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Animação exibida enquanto o site carrega.</p>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
+            <label class="font-bold text-slate-700 dark:text-slate-300" for="preloader_enabled">Ativar Animação de Carregamento</label>
+            <label for="preloader_enabled" class="relative inline-flex items-center cursor-pointer">
+                <input type="hidden" name="preloader_enabled" value="0">
+                <input type="checkbox" name="preloader_enabled" id="preloader_enabled" value="1" class="sr-only peer" {{ ($settings['preloader_enabled'] ?? 0) ? 'checked' : '' }}>
+                <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+        </div>
+
+        <div class="max-w-xs space-y-3">
+            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300">Imagem do Preloader (GIF/SVG)</label>
+            <div class="w-32 h-32 rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden">
+                @if($url = $getUrl('preloader_image'))
+                    <img id="preview_preloader_image" src="{{ $url }}" class="w-full h-full object-contain">
+                @else
+                    <div class="text-center p-4">
+                        <i class="fas fa-spinner fa-spin text-2xl text-slate-300"></i>
+                    </div>
+                @endif
+            </div>
+            <div class="flex gap-2">
+                <button type="button" onclick="document.getElementById('input_preloader_image').click()"
+                    class="flex-1 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                    <i class="fas fa-upload mr-1"></i> Selecionar
+                </button>
+                <input type="file" id="input_preloader_image" name="preloader_image" class="hidden" accept="image/*"
+                    onchange="previewImage(this, 'preview_preloader_image')">
+                <input type="hidden" name="remove_preloader_image" id="remove_preloader_image" value="0">
+                <button type="button" onclick="removeImage('preloader_image', 'preview_preloader_image')"
+                    class="px-3 py-2 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition">
+                    <i class="fas fa-trash-alt text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
