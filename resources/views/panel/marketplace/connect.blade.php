@@ -257,10 +257,14 @@
                             </button>
 
                             @if($pagseguro->enabled && $pagseguro->access_token)
-                                <a href="{{ route('settings.payment.test', ['provider' => 'pagseguro']) }}"
+                                <form action="{{ route('panel.marketplace.payments.test') }}" method="POST" style="display:inline">
+                                @csrf
+                                <input type="hidden" name="provider" value="pagseguro">
+                                <button type="submit"
                                     class="inline-flex items-center justify-center rounded-xl bg-white border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white px-6 py-3.5 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
                                     <i class="fas fa-sync-alt mr-2"></i> Testar Conexão
-                                </a>
+                                </button>
+                                </form>
                             @endif
                         </div>
                     </div>

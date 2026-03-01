@@ -52,6 +52,22 @@ class GatewayAccount extends Model
             ->get()
             ->keyBy('provider');
 
+        if ($accounts->isEmpty()) {
+            // Log para diagnóstico — mostra o que existe na tabela para esse seller
+            $allAccounts = self::where('user_id', $sellerId)->get();
+            \Illuminate\Support\Facades\Log::warning('GatewayAccount::resolveForSeller — nenhuma conta ativa encontrada', [
+                'seller_id'     => $sellerId,
+                'total_records' => $allAccounts->count(),
+                'records'       => $allAccounts->map(fn($a) => [
+                    'id'           => $a->id,
+                    'provider'     => $a->provider,
+                    'enabled'      => $a->enabled,
+                    'has_token'    => !empty($a->getAttributes()['access_token']),
+                    'token_length' => strlen((string) $a->getAttributes()['access_token']),
+                ])->toArray(),
+            ]);
+        }
+
         // Verificar se algum gateway está marcado como preferido
         $preferred = null;
         foreach ($accounts as $provider => $account) {
