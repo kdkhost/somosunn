@@ -68,9 +68,15 @@ class MercadoPagoService
         }
 
         $response = Http::withToken($token)
+            ->withHeaders($this->commonHeaders('pref-' . $order->id))
             ->post("{$this->baseUrl}/checkout/preferences", $preferenceData);
 
         if ($response->failed()) {
+            \Log::error('MercadoPago Preference Error', [
+                'order_id' => $order->id,
+                'status'   => $response->status(),
+                'body'     => $response->body(),
+            ]);
             throw new Exception('MercadoPago Preference Error: ' . $response->body());
         }
 
