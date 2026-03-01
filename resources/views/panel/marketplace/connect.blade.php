@@ -57,21 +57,24 @@
             <div class="flex-1 space-y-6">
                 <!-- OAuth -->
                 <div class="bg-blue-50 dark:bg-blue-900/10 rounded-2xl p-5 border border-blue-100 dark:border-blue-800/50">
-                    <h4 class="font-bold text-blue-900 dark:text-blue-300 mb-2 text-sm">Conexão Automática</h4>
-                    <p class="text-xs text-blue-700 dark:text-blue-400 mb-4 leading-relaxed">
-                        Conecte sua conta do Mercado Pago para receber pagamentos via PIX, Boleto e Cartão com split
-                        automático.
+                    <h4 class="font-bold text-blue-900 dark:text-blue-300 mb-1 text-sm">Conexão via OAuth <span class="ml-1 text-xs font-normal text-blue-500">(opcional)</span></h4>
+                    <p class="text-xs text-blue-700 dark:text-blue-400 mb-1 leading-relaxed">
+                        Autorize o app da plataforma a processar pagamentos em seu nome com <strong>split automático</strong>.
+                        Necessário apenas se quiser que sua taxa de plataforma seja descontada automaticamente pelo MercadoPago.
+                    </p>
+                    <p class="text-xs text-blue-500 dark:text-blue-500 mb-4">
+                        Se você já configurou seu token manualmente abaixo, os pagamentos <strong>já funcionam</strong> sem OAuth.
                     </p>
 
                     @if($mercadopago->enabled && $mercadopago->access_token && $mercadopago->provider == 'mercadopago')
-                        <a href="{{ route('gateway.mercadopago.connect') }}"
+                        <a href="{{ route('gateway.mercadopago.connect') }}" target="_blank"
                             class="w-full inline-flex items-center justify-center px-4 py-3 bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 rounded-xl text-sm font-bold shadow-sm hover:bg-blue-50 dark:hover:bg-slate-700 transition-all">
-                            <i class="fas fa-sync-alt mr-2"></i> Atualizar Conexão
+                            <i class="fas fa-sync-alt mr-2"></i> Atualizar Conexão OAuth
                         </a>
                     @else
-                        <a href="{{ route('gateway.mercadopago.connect') }}"
+                        <a href="{{ route('gateway.mercadopago.connect') }}" target="_blank"
                             class="w-full inline-flex items-center justify-center px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02]">
-                            Conectar Agora
+                            <i class="fas fa-link mr-2"></i> Conectar via OAuth
                         </a>
                     @endif
                 </div>
