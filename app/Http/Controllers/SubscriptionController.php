@@ -32,9 +32,20 @@ class SubscriptionController extends Controller
             return redirect()->route('portal')->with('info', 'Você já possui este plano ativo.');
         }
 
-        $publicKey = (string) config('payments.mercadopago.public_key');
-        $accessToken = (string) config('payments.mercadopago.access_token');
-        $paymentConfigured = trim($accessToken) !== '' && trim($publicKey) !== '';
+        // Resolver credenciais: primeiro tenta da tabela settings (prefixado por ambiente),
+        // depois config/env. Mesma lógica do MercadoPagoService::getSellerConfig.
+        $env = \App\Models\Setting::get('mercadopago_env', config('payments.mercadopago.env', 'sandbox'));
+        $prefix = $env === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
+
+        $publicKey = \App\Models\Setting::get($prefix . 'public_key')
+            ?: \App\Models\Setting::get('mercadopago_public_key')
+            ?: config('payments.mercadopago.public_key', '');
+
+        $accessToken = \App\Models\Setting::get($prefix . 'access_token')
+            ?: \App\Models\Setting::get('mercadopago_access_token')
+            ?: config('payments.mercadopago.access_token', '');
+
+        $paymentConfigured = trim((string) $accessToken) !== '' && trim((string) $publicKey) !== '';
 
         return view('site.subscription.checkout', compact('plan', 'publicKey', 'paymentConfigured'));
     }

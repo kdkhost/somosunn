@@ -66,6 +66,31 @@ class GatewayAccount extends Model
                     'token_length' => strlen((string) $a->getAttributes()['access_token']),
                 ])->toArray(),
             ]);
+
+            // Fallback: usar credenciais globais da plataforma (config/payments.php / .env)
+            $globalMpToken     = trim((string) config('payments.mercadopago.access_token', ''));
+            $globalMpPublicKey = trim((string) config('payments.mercadopago.public_key', ''));
+            $globalPsToken     = trim((string) config('payments.pagseguro.token', ''));
+
+            $mpGlobal = ($globalMpToken !== '' && $globalMpPublicKey !== '');
+            $psGlobal = ($globalPsToken !== '');
+
+            if ($mpGlobal || $psGlobal) {
+                \Illuminate\Support\Facades\Log::info('GatewayAccount::resolveForSeller — usando credenciais globais da plataforma como fallback', [
+                    'seller_id' => $sellerId,
+                    'mp'        => $mpGlobal,
+                    'ps'        => $psGlobal,
+                ]);
+
+                $preferred = $mpGlobal ? 'mercadopago' : 'pagseguro';
+
+                return [
+                    'mpEnabled'        => $mpGlobal,
+                    'psEnabled'        => $psGlobal,
+                    'preferredGateway' => $preferred,
+                    'useGlobalCredentials' => true,
+                ];
+            }
         }
 
         // Verificar se algum gateway está marcado como preferido
