@@ -164,16 +164,7 @@ class SocialAuthController extends Controller
 
     private function resolveDefaultPlan(): ?Plan
     {
-        try {
-            $plan = Plan::query()->where('slug', 'cliente')->first();
-            if ($plan) {
-                return $plan;
-            }
-
-            return Plan::query()->orderBy('price')->orderBy('id')->first();
-        } catch (\Throwable $e) {
-            return null;
-        }
+        return Plan::getFreePlan();
     }
 
     private function trySaveSocialAvatar(User $user, ?string $avatarUrl): void

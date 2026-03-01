@@ -164,6 +164,17 @@
                                 </div>
                             </label>
 
+                            <label class="flex items-center justify-between cursor-pointer group p-3 rounded-2xl border border-green-100 dark:border-green-900/30 bg-green-50/30 dark:bg-green-950/20">
+                                <div>
+                                    <span class="text-sm font-bold text-slate-700 dark:text-slate-300 transition-colors">Plano Gratuito Padrão</span>
+                                    <p class="text-xs text-slate-500 dark:text-slate-500 mt-0.5">Atribuído automaticamente a todo novo cadastro</p>
+                                </div>
+                                <div class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="is_free" value="1" class="sr-only peer" {{ old('is_free', $plan->is_free ?? false) ? 'checked' : '' }}>
+                                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                                </div>
+                            </label>
+
                             <div class="pt-4 space-y-2">
                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 transition-colors">Slug (URL)</label>
                                 <input type="text" name="slug" value="{{ old('slug', $plan->slug) }}" placeholder="Ex: pro, vip"

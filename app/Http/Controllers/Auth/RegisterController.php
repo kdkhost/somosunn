@@ -35,9 +35,9 @@ class RegisterController extends Controller
             'address' => $data['address'] ?? null,
         ]);
 
-        // Vincula pacote inicial (cliente) para liberar o Painel do Membro imediatamente
+        // Vincula plano gratuito para liberar o Painel do Membro imediatamente
         try {
-            $defaultPlan = Plan::query()->where('slug', 'cliente')->first() ?? Plan::query()->orderBy('price')->orderBy('id')->first();
+            $defaultPlan = Plan::getFreePlan();
             if ($defaultPlan) {
                 $user->plan_id = (int) $defaultPlan->id;
                 $user->plan_expires_at = null;

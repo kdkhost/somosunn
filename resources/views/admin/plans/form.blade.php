@@ -66,6 +66,13 @@
                         <label class="custom-control-label" for="is_active">Plano ativo</label>
                     </div>
                 </div>
+                <div class="form-group col-md-4">
+                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-4">
+                        <input type="hidden" name="is_free" value="0">
+                        <input type="checkbox" class="custom-control-input" id="is_free" name="is_free" value="1" {{ old('is_free',$plan->is_free ?? false) ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="is_free">Plano gratuito padrão <small class="text-muted">(atribuído a novos cadastros)</small></label>
+                    </div>
+                </div>
                 <div class="form-group col-md-3">
                     <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-primary mt-4">
                         <input type="hidden" name="is_recurring" value="0">

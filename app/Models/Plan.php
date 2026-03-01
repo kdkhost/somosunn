@@ -26,6 +26,7 @@ class Plan extends Model
         'permissions',
         'comparison',
         'is_active',
+        'is_free',
         'mp_plan_id',
         'is_recurring'
     ];
@@ -38,11 +39,28 @@ class Plan extends Model
         'is_active' => 'boolean',
         'prorata' => 'boolean',
         'is_recurring' => 'boolean',
+        'is_free' => 'boolean',
         'benefits' => 'array',
         'permissions' => 'array',
         'comparison' => 'array',
         'price' => 'decimal:2'
     ];
+
+    /**
+     * Retorna o plano gratuito padrão da plataforma.
+     * Prioridade: is_free=true → slug 'cliente' → menor preço.
+     */
+    public static function getFreePlan(): ?self
+    {
+        try {
+            return static::query()->where('is_free', true)->where('is_active', true)->first()
+                ?? static::query()->where('slug', 'cliente')->where('is_active', true)->first()
+                ?? static::query()->where('price', 0)->where('is_active', true)->orderBy('id')->first()
+                ?? static::query()->where('is_active', true)->orderBy('price')->orderBy('id')->first();
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
 
     public function hasFeature($feature)
     {

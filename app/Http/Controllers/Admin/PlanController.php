@@ -91,6 +91,7 @@ class PlanController extends Controller
         DB::transaction(function () use ($data) {
             $plan = Plan::create($data);
             $this->enforceSingleHighlight($plan);
+            $this->enforceSingleFree($plan);
 
             if ($plan->is_recurring && empty($plan->mp_plan_id)) {
                 $this->syncWithMercadoPago($plan);
@@ -129,6 +130,7 @@ class PlanController extends Controller
         DB::transaction(function () use ($plan, $data) {
             $plan->update($data);
             $this->enforceSingleHighlight($plan);
+            $this->enforceSingleFree($plan);
 
             if ($plan->is_recurring) {
                 $this->syncWithMercadoPago($plan);
@@ -201,6 +203,7 @@ class PlanController extends Controller
             'comparison.priority_support' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
             'is_recurring' => 'nullable|boolean',
+            'is_free' => 'nullable|boolean',
         ]);
 
         $data['slug'] = $this->generateUniqueSlug($data['slug'] ?: $data['name'], $id);
@@ -209,6 +212,7 @@ class PlanController extends Controller
         $data['coupons_enabled'] = $request->boolean('coupons_enabled');
         $data['is_active'] = $request->boolean('is_active', true);
         $data['is_recurring'] = $request->boolean('is_recurring');
+        $data['is_free'] = $request->boolean('is_free');
 
         // Handle benefits from textarea
         $benefitsRaw = $request->input('benefits', '');
@@ -265,7 +269,17 @@ class PlanController extends Controller
             ]);
     }
 
-    private function syncWithMercadoPago(Plan $plan): void
+    private function enforceSingleFree(Plan $plan): void
+    {
+        if (!$plan->is_free) {
+            return;
+        }
+
+        Plan::query()
+            ->where('id', '!=', $plan->id)
+            ->where('is_free', true)
+            ->update(['is_free' => false]);
+    }
     {
         try {
             // Se já tem um ID, talvez queiramos atualizar no futuro. 

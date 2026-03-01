@@ -87,6 +87,7 @@ class PlanController extends Controller
         DB::transaction(function () use ($data) {
             $plan = Plan::create($data);
             $this->enforceSingleHighlight($plan);
+            $this->enforceSingleFree($plan);
         });
 
         return redirect()->route('panel.admin.plans.index')->with('success', 'Plano criado com sucesso.');
@@ -117,6 +118,7 @@ class PlanController extends Controller
         DB::transaction(function () use ($plan, $data) {
             $plan->update($data);
             $this->enforceSingleHighlight($plan);
+            $this->enforceSingleFree($plan);
         });
 
         return redirect()->route('panel.admin.plans.index')->with('success', 'Plano atualizado com sucesso.');
@@ -176,6 +178,7 @@ class PlanController extends Controller
             'comparison.individual_mentorship' => 'nullable|string|max:50',
             'comparison.priority_support' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
+            'is_free' => 'nullable|boolean',
         ]);
 
         $data['slug'] = $this->generateUniqueSlug($data['slug'] ?: $data['name'], $id);
@@ -183,6 +186,7 @@ class PlanController extends Controller
         $data['is_featured'] = $data['highlight'];
         $data['coupons_enabled'] = $request->boolean('coupons_enabled');
         $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_free'] = $request->boolean('is_free');
 
         // Handle benefits from textarea
         $benefitsRaw = $request->input('benefits', '');
@@ -237,6 +241,18 @@ class PlanController extends Controller
                 'highlight' => false,
                 'is_featured' => false,
             ]);
+    }
+
+    private function enforceSingleFree(Plan $plan): void
+    {
+        if (!$plan->is_free) {
+            return;
+        }
+
+        Plan::query()
+            ->where('id', '!=', $plan->id)
+            ->where('is_free', true)
+            ->update(['is_free' => false]);
     }
 
     private function generateUniqueSlug(string $value, ?int $ignoreId = null): string
