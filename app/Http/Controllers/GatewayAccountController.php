@@ -109,13 +109,36 @@ class GatewayAccountController extends Controller
             return redirect()->route('panel.marketplace.payments')->with('error', 'Código de autorização não recebido.');
         }
 
+        $clientId     = config('payments.mercadopago.client_id');
+        $clientSecret = config('payments.mercadopago.client_secret');
+        $redirectUri  = config('payments.mercadopago.redirect_uri');
+
+        Log::info('OAuth MP callback iniciado', [
+            'user_id'      => Auth::id(),
+            'client_id'    => $clientId,
+            'has_secret'   => !empty($clientSecret),
+            'redirect_uri' => $redirectUri,
+            'code_length'  => strlen($code),
+        ]);
+
+        if (empty($clientId) || empty($clientSecret)) {
+            Log::error('OAuth MP: client_id ou client_secret não configurados no .env');
+            return redirect()->route('panel.marketplace.payments')
+                ->with('error', 'Configuração OAuth incompleta no servidor (client_id/client_secret ausente). Contate o administrador.');
+        }
+
         try {
             $response = Http::post('https://api.mercadopago.com/oauth/token', [
-                'client_secret' => config('payments.mercadopago.client_secret'),
-                'client_id' => config('payments.mercadopago.client_id'),
-                'grant_type' => 'authorization_code',
-                'code' => $code,
-                'redirect_uri' => config('payments.mercadopago.redirect_uri'),
+                'client_secret' => $clientSecret,
+                'client_id'     => $clientId,
+                'grant_type'    => 'authorization_code',
+                'code'          => $code,
+                'redirect_uri'  => $redirectUri,
+            ]);
+
+            Log::info('OAuth MP resposta', [
+                'status' => $response->status(),
+                'body'   => $response->body(),
             ]);
 
             if ($response->successful()) {
@@ -137,12 +160,16 @@ class GatewayAccountController extends Controller
                 return redirect()->route('panel.marketplace.payments')->with('success', 'Conta do Mercado Pago conectada com sucesso!');
             }
 
-            Log::error('Erro OAuth Mercado Pago: ' . $response->body());
-            return redirect()->route('panel.marketplace.payments')->with('error', 'Houve um erro ao conectar com o Mercado Pago.');
+            Log::error('Erro OAuth Mercado Pago', [
+                'status' => $response->status(),
+                'body'   => $response->body(),
+            ]);
+            $mpError = $response->json('error_description') ?? $response->json('message') ?? 'Erro desconhecido';
+            return redirect()->route('panel.marketplace.payments')->with('error', 'Erro ao conectar: ' . $mpError);
 
         } catch (\Exception $e) {
-            Log::error('Exceção OAuth MP: ' . $e->getMessage());
-            return redirect()->route('panel.marketplace.payments')->with('error', 'Erro interno ao processar conexão.');
+            Log::error('Exceção OAuth MP: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return redirect()->route('panel.marketplace.payments')->with('error', 'Erro interno: ' . $e->getMessage());
         }
     }
 }
