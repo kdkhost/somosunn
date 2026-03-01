@@ -101,12 +101,12 @@ class GatewayAccountController extends Controller
         $state = session('mp_oauth_state');
 
         if (!$state || $request->input('state') !== $state) {
-            return redirect()->route('settings')->with('error', 'Estado inválido na autenticação. Tente novamente.');
+            return redirect()->route('panel.marketplace.payments')->with('error', 'Estado inválido na autenticação. Tente novamente.');
         }
 
         $code = $request->input('code');
         if (!$code) {
-            return redirect()->route('settings')->with('error', 'Código de autorização não recebido.');
+            return redirect()->route('panel.marketplace.payments')->with('error', 'Código de autorização não recebido.');
         }
 
         try {
@@ -124,25 +124,25 @@ class GatewayAccountController extends Controller
                 GatewayAccount::updateOrCreate(
                     ['user_id' => Auth::id(), 'provider' => 'mercadopago'],
                     [
-                        'public_key' => $data['public_key'],
+                        'public_key' => $data['public_key'] ?? null,
                         'access_token' => $data['access_token'],
-                        'refresh_token' => $data['refresh_token'],
-                        'token_expires_in' => $data['expires_in'],
-                        'user_id_mp' => $data['user_id'],
+                        'refresh_token' => $data['refresh_token'] ?? null,
+                        'token_expires_in' => $data['expires_in'] ?? null,
+                        'user_id_mp' => $data['user_id'] ?? null,
                         'enabled' => true,
-                        'extra' => $data // Salva todo o payload JSON para debug/futuro
+                        'extra' => array_merge($data, ['marketplace_enabled' => true]),
                     ]
                 );
 
-                return redirect()->route('settings')->with('success', 'Conta do Mercado Pago conectada com sucesso!');
+                return redirect()->route('panel.marketplace.payments')->with('success', 'Conta do Mercado Pago conectada com sucesso!');
             }
 
             Log::error('Erro OAuth Mercado Pago: ' . $response->body());
-            return redirect()->route('settings')->with('error', 'Houve um erro ao conectar com o Mercado Pago.');
+            return redirect()->route('panel.marketplace.payments')->with('error', 'Houve um erro ao conectar com o Mercado Pago.');
 
         } catch (\Exception $e) {
             Log::error('Exceção OAuth MP: ' . $e->getMessage());
-            return redirect()->route('settings')->with('error', 'Erro interno ao processar conexão.');
+            return redirect()->route('panel.marketplace.payments')->with('error', 'Erro interno ao processar conexão.');
         }
     }
 }
