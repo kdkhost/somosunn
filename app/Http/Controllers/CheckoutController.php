@@ -29,23 +29,19 @@ class CheckoutController extends Controller
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
         }
 
-        // Check MercadoPago
-        $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
-        $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
-        $mpEnabled = $mpAccessToken !== '' && $mpPublicKey !== '';
-
-        // Check PagSeguro
-        $psToken = trim((string) config('payments.pagseguro.access_token'));
-        $psEmail = trim((string) config('payments.pagseguro.email')); // Or client_id check
-        $psEnabled = $psToken !== '';
+        // Verificar gateways configurados pelo vendedor (tabela gateway_accounts)
+        $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
+        $mpEnabled        = $gateways['mpEnabled'];
+        $psEnabled        = $gateways['psEnabled'];
+        $preferredGateway = $gateways['preferredGateway'];
 
         if (!$mpEnabled && !$psEnabled) {
             return redirect()
                 ->route('courses.show', $course->slug ?: $course->id)
-                ->with('error', 'Nenhum método de pagamento disponível no momento.');
+                ->with('error', 'Este curso não está disponível para compra: o criador ainda não configurou um método de pagamento.');
         }
 
-        return view('checkout.index', compact('course', 'mpEnabled', 'psEnabled'));
+        return view('checkout.index', compact('course', 'mpEnabled', 'psEnabled', 'preferredGateway'));
     }
 
     public function process(Request $request, Course $course, MercadoPagoService $mpService, \App\Services\Payment\PagSeguroService $psService, CouponService $couponService)
@@ -68,15 +64,19 @@ class CheckoutController extends Controller
 
         $gatewayProvider = $request->input('gateway_provider', 'mercadopago');
 
-        // Validation: Check if selected gateway is enabled
-        if ($gatewayProvider === 'mercadopago') {
-            $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
-            if (empty($mpAccessToken))
-                $gatewayProvider = 'pagseguro'; // Fallback? Or error.
+        // Validar que o vendedor tem o gateway selecionado configurado
+        $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $course->user_id);
+        if (($gatewayProvider === 'mercadopago' && !$gateways['mpEnabled'])
+            || ($gatewayProvider === 'pagseguro' && !$gateways['psEnabled'])) {
+            // Fallback automático para o gateway disponível
+            if ($gateways['mpEnabled']) {
+                $gatewayProvider = 'mercadopago';
+            } elseif ($gateways['psEnabled']) {
+                $gatewayProvider = 'pagseguro';
+            } else {
+                return back()->with('error', 'Método de pagamento não disponível para este produto. O vendedor ainda não configurou um gateway.');
+            }
         }
-
-        // If still empty or invalid, defaults to what's available? 
-        // For now trusting the input or default.
 
         $order = null;
         $couponCode = $couponService->normalizeCode($request->input('coupon_code'));

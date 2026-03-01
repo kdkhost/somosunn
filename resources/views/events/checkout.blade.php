@@ -121,6 +121,49 @@
                                         class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" {{ $isDemo ? 'disabled' : '' }}>
                                     <p class="text-xs text-gray-500 mt-2">Se tiver um cupom, aplique aqui antes do pagamento.</p>
                                 </div>
+
+                                @if(($mpEnabled ?? false) || ($psEnabled ?? false))
+                                    <div class="pt-4 border-t border-gray-100">
+                                        <label class="block text-sm font-medium text-gray-700 mb-3">Forma de Pagamento</label>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            @if($mpEnabled ?? false)
+                                                <label class="cursor-pointer">
+                                                    <input type="radio" name="gateway_provider" value="mercadopago" class="peer sr-only"
+                                                        {{ (($preferredGateway ?? null) !== 'pagseguro') ? 'checked' : '' }}>
+                                                    <div class="p-4 rounded-xl border-2 border-gray-200 hover:border-blue-500 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
+                                                        <div class="flex items-center gap-3">
+                                                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                                                                <i class="fas fa-hand-holding-dollar"></i>
+                                                            </div>
+                                                            <div>
+                                                                <p class="font-bold text-gray-900">Mercado Pago</p>
+                                                                <p class="text-xs text-gray-500">Cartão, Pix, Boleto</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            @endif
+
+                                            @if($psEnabled ?? false)
+                                                <label class="cursor-pointer">
+                                                    <input type="radio" name="gateway_provider" value="pagseguro" class="peer sr-only"
+                                                        {{ (!($mpEnabled ?? false) || ($preferredGateway ?? null) === 'pagseguro') ? 'checked' : '' }}>
+                                                    <div class="p-4 rounded-xl border-2 border-gray-200 hover:border-green-500 peer-checked:border-green-600 peer-checked:bg-green-50 transition-all">
+                                                        <div class="flex items-center gap-3">
+                                                            <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                                                                <i class="fas fa-credit-card"></i>
+                                                            </div>
+                                                            <div>
+                                                                <p class="font-bold text-gray-900">PagSeguro</p>
+                                                                <p class="text-xs text-gray-500">Cartão, Pix</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
                             @endif
 
                             @guest

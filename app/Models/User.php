@@ -198,6 +198,11 @@ class User extends Authenticatable
         return $this->belongsTo(\App\Models\Plan::class);
     }
 
+    public function gatewayAccounts()
+    {
+        return $this->hasMany(\App\Models\GatewayAccount::class);
+    }
+
     public function eventRegistrations()
     {
         return $this->hasMany(EventRegistration::class);

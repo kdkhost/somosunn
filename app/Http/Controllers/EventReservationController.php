@@ -29,6 +29,9 @@ class EventReservationController extends Controller
         }
 
         $isPaid = (float) $event->effective_price > 0;
+        $mpEnabled        = false;
+        $psEnabled        = false;
+        $preferredGateway = null;
         if ($isPaid) {
             $seller = $event->user ?: User::find($event->user_id);
             if ($seller && !$seller->canSellOnMarketplace()) {
@@ -37,14 +40,17 @@ class EventReservationController extends Controller
                     ->with('error', 'Este organizador não está habilitado para vender no marketplace.');
             }
 
-            $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
-            $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
-            $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+            // Verificar gateways configurados pelo vendedor (tabela gateway_accounts)
+            $gateways = $seller ? \App\Models\GatewayAccount::resolveForSeller((int) $seller->id)
+                : ['mpEnabled' => false, 'psEnabled' => false, 'preferredGateway' => null];
+            $mpEnabled        = $gateways['mpEnabled'];
+            $psEnabled        = $gateways['psEnabled'];
+            $preferredGateway = $gateways['preferredGateway'];
 
-            if (!$paymentsConfigured) {
+            if (!$mpEnabled && !$psEnabled) {
                 return redirect()
                     ->route('events.show', $event)
-                    ->with('error', 'Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.');
+                    ->with('error', 'Este evento não está disponível para compra: o organizador ainda não configurou um método de pagamento.');
             }
         }
 
@@ -55,10 +61,10 @@ class EventReservationController extends Controller
                 ->first();
         }
 
-        return view('events.checkout', compact('event', 'registration'));
+        return view('events.checkout', compact('event', 'registration', 'mpEnabled', 'psEnabled', 'preferredGateway'));
     }
 
-    public function reserve(Request $request, Event $event, CouponService $couponService)
+    public function reserve(Request $request, Event $event, CouponService $couponService, \App\Services\Payment\MercadoPagoService $mpService)
     {
         $this->abortIfDisabledOrUnpublished($event);
 
@@ -78,10 +84,25 @@ class EventReservationController extends Controller
         ]);
 
         $isPaid = (float) $event->effective_price > 0;
-        $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
-        $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
-        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
         $seller = $event->user ?: User::find($event->user_id);
+        $sellerId = $seller ? (int) $seller->id : (int) ($event->user_id ?? 0);
+
+        // Determinar gateways disponíveis e gateway selecionado pelo comprador
+        $paymentsConfigured = false;
+        $gatewayProvider = 'mercadopago';
+        if ($isPaid && $sellerId) {
+            $gateways = \App\Models\GatewayAccount::resolveForSeller($sellerId);
+            $paymentsConfigured = $gateways['mpEnabled'] || $gateways['psEnabled'];
+            $defaultGateway = $gateways['preferredGateway'] ?? ($gateways['mpEnabled'] ? 'mercadopago' : 'pagseguro');
+            $requestedGateway = $request->input('gateway_provider', $defaultGateway);
+            if ($requestedGateway === 'pagseguro' && $gateways['psEnabled']) {
+                $gatewayProvider = 'pagseguro';
+            } elseif ($gateways['mpEnabled']) {
+                $gatewayProvider = 'mercadopago';
+            } elseif ($gateways['psEnabled']) {
+                $gatewayProvider = 'pagseguro';
+            }
+        }
 
         if ($isPaid) {
             if ($seller && !$seller->canSellOnMarketplace()) {
@@ -93,7 +114,7 @@ class EventReservationController extends Controller
             if (!$paymentsConfigured) {
                 return redirect()
                     ->route('events.show', $event)
-                    ->with('error', 'Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.');
+                    ->with('error', 'Pagamento indisponível: o organizador ainda não configurou um método de pagamento.');
             }
         }
 
@@ -141,7 +162,6 @@ class EventReservationController extends Controller
         $regularUnitPrice = (float) $event->current_price;
         $currentPrice = (float) $event->effective_price;
         $couponCode = $isPaid ? $couponService->normalizeCode($request->input('coupon_code')) : '';
-        $sellerId = $seller ? (int) $seller->id : (int) ($event->user_id ?? 0);
 
         try {
             DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $regularUnitPrice, $currentPrice, $couponCode, $couponService, &$registration, &$order) {
@@ -227,7 +247,7 @@ class EventReservationController extends Controller
                         'fee_amount' => 0,
                         'platform_fee_amount' => $platformFeeAmount,
                         'currency' => 'BRL',
-                        'gateway' => 'mercadopago',
+                        'gateway' => $gatewayProvider,
                         'gateway_account_id' => null,
                         'metadata' => [
                             'context' => 'event',
@@ -246,7 +266,7 @@ class EventReservationController extends Controller
                         'total_amount' => $finalTotal,
                         'platform_fee_amount' => $platformFeeAmount,
                         'currency' => 'BRL',
-                        'gateway' => 'mercadopago',
+                        'gateway' => $gatewayProvider,
                         'metadata' => array_merge($order->metadata ?? [], [
                             'context' => 'event',
                             'sale_type' => 'event',
@@ -350,72 +370,46 @@ class EventReservationController extends Controller
         }
 
         if (!$paymentsConfigured) {
-            return redirect()->route('events.show', $event)->with('error', 'Pagamento indisponível: o MercadoPago ainda não foi configurado na plataforma.');
+            return redirect()->route('events.show', $event)->with('error', 'Pagamento indisponível: o organizador ainda não configurou um método de pagamento.');
         }
 
-        $token = data_get($order->metadata, 'public_token');
+        try {
+            $order->load('items', 'user');
 
-        $backUrls = [
-            'success' => route('events.payment.success', ['order' => $order->id, 'token' => $token]),
-            'failure' => route('events.payment.failure', ['order' => $order->id, 'token' => $token]),
-            'pending' => route('events.payment.pending', ['order' => $order->id, 'token' => $token]),
-        ];
+            if ($gatewayProvider === 'pagseguro') {
+                return view('checkout.pagseguro_transparent', [
+                    'order' => $order,
+                    'publicKey' => config('payments.pagseguro.public_key'),
+                ]);
+            }
 
-        $preferenceData = [
-            'items' => $order->items->map(fn($item) => [
-                'title' => $item->title,
-                'quantity' => (int) $item->quantity,
-                'currency_id' => 'BRL',
-                'unit_price' => (float) $item->price,
-            ])->values()->all(),
-            'payer' => [
-                'name' => $order->user->name,
-                'email' => $order->user->email,
-            ],
-            'back_urls' => $backUrls,
-            'auto_return' => 'approved',
-            'external_reference' => (string) $order->id,
-            'statement_descriptor' => 'UNN EVENTOS',
-            'notification_url' => route('api.webhooks.mercadopago'),
-        ];
+            // MercadoPago — usa o token correto do vendedor via MercadoPagoService
+            $preference = $mpService->createPreference($order, [
+                'statement_descriptor' => 'UNN EVENTOS',
+                'back_urls' => [
+                    'success' => route('events.payment.success', $order->id),
+                    'failure' => route('events.payment.failure', $order->id),
+                    'pending' => route('events.payment.pending', $order->id),
+                ],
+            ]);
 
-        $response = Http::withToken($mpAccessToken)
-            ->post('https://api.mercadopago.com/checkout/preferences', $preferenceData);
+            $order->update([
+                'metadata' => array_merge($order->metadata ?? [], [
+                    'mercadopago_preference_id' => $preference['id'] ?? null,
+                    'mercadopago_init_point' => $preference['init_point'] ?? null,
+                    'mercadopago_sandbox_init_point' => $preference['sandbox_init_point'] ?? null,
+                ]),
+            ]);
 
-        if ($response->failed()) {
-            return redirect()->route('events.show', $event)->with('error', 'Falha ao iniciar pagamento. Tente novamente.');
+            $initPoint = $preference['init_point'] ?? $preference['sandbox_init_point'] ?? null;
+            if (!$initPoint) {
+                return redirect()->route('events.show', $event)->with('error', 'Pagamento indisponível no momento.');
+            }
+
+            return redirect()->away($initPoint);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erro ao iniciar pagamento: ' . $e->getMessage());
         }
-
-        $pref = $response->json();
-        $order->update([
-            'seller_id' => $sellerId > 0 ? $sellerId : null,
-            'gateway' => 'mercadopago',
-            'gateway_account_id' => null,
-            'metadata' => array_merge($order->metadata ?? [], [
-                'mercadopago_preference_id' => $pref['id'] ?? null,
-                'mercadopago_init_point' => $pref['init_point'] ?? null,
-                'mercadopago_sandbox_init_point' => $pref['sandbox_init_point'] ?? null,
-            ]),
-        ]);
-
-        $initPoint = $pref['init_point'] ?? null;
-        $sandboxInitPoint = $pref['sandbox_init_point'] ?? null;
-
-        $useSandbox = (bool) config('payments.mercadopago.sandbox', false);
-        if (!$useSandbox) {
-            $useSandbox = str_starts_with($mpAccessToken, 'TEST');
-        }
-        if ($useSandbox && $sandboxInitPoint) {
-            $initPoint = $sandboxInitPoint;
-        }
-        if (!$initPoint) {
-            $initPoint = $sandboxInitPoint;
-        }
-        if (!$initPoint) {
-            return redirect()->route('events.show', $event)->with('error', 'Pagamento indisponível no momento.');
-        }
-
-        return redirect()->away($initPoint);
     }
 
     public function paymentSuccess(Order $order, Request $request)

@@ -29,22 +29,19 @@ class MentorshipCheckoutController extends Controller
                 ->with('error', 'Este criador não está habilitado para vender no marketplace.');
         }
 
-        // Check MercadoPago
-        $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
-        $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
-        $mpEnabled = $mpAccessToken !== '' && $mpPublicKey !== '';
-
-        // Check PagSeguro
-        $psToken = trim((string) config('payments.pagseguro.access_token'));
-        $psEnabled = $psToken !== '';
+        // Verificar gateways configurados pelo vendedor (tabela gateway_accounts)
+        $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
+        $mpEnabled        = $gateways['mpEnabled'];
+        $psEnabled        = $gateways['psEnabled'];
+        $preferredGateway = $gateways['preferredGateway'];
 
         if (!$mpEnabled && !$psEnabled) {
             return redirect()
                 ->route('mentorships.show', $mentorship)
-                ->with('error', 'Nenhum método de pagamento disponível no momento.');
+                ->with('error', 'Esta mentoria não está disponível para compra: o mentor ainda não configurou um método de pagamento.');
         }
 
-        return view('checkout.mentorship', compact('mentorship', 'mpEnabled', 'psEnabled'));
+        return view('checkout.mentorship', compact('mentorship', 'mpEnabled', 'psEnabled', 'preferredGateway'));
     }
 
     public function process(Request $request, Mentorship $mentorship, MercadoPagoService $mpService, \App\Services\Payment\PagSeguroService $psService, CouponService $couponService)
@@ -66,10 +63,18 @@ class MentorshipCheckoutController extends Controller
         ]);
 
         $gatewayProvider = $request->input('gateway_provider', 'mercadopago');
-        if ($gatewayProvider === 'mercadopago') {
-            $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
-            if (empty($mpAccessToken))
+
+        // Validar que o vendedor/mentor tem o gateway selecionado configurado
+        $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $mentorship->mentor_id);
+        if (($gatewayProvider === 'mercadopago' && !$gateways['mpEnabled'])
+            || ($gatewayProvider === 'pagseguro' && !$gateways['psEnabled'])) {
+            if ($gateways['mpEnabled']) {
+                $gatewayProvider = 'mercadopago';
+            } elseif ($gateways['psEnabled']) {
                 $gatewayProvider = 'pagseguro';
+            } else {
+                return back()->with('error', 'Método de pagamento não disponível para esta mentoria. O mentor ainda não configurou um gateway.');
+            }
         }
 
         $order = null;
