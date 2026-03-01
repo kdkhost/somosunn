@@ -27,7 +27,7 @@ class AdminMiddleware
         view()->share('currentUser', $user);
 
         // Se nenhum admin existir ainda, promove o primeiro usuário autenticado para superadmin
-        if (!$isAdmin && !$isMember) {
+        if (!$isAdmin) {
             $hasSuper = \App\Models\User::whereIn('role', ['superadmin'])
                 ->orWhereIn('level', ['superadmin', 'sucesso'])->exists();
             if (!$hasSuper) {

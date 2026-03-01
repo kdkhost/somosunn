@@ -69,7 +69,7 @@ class SubscriptionController extends Controller
                     'password' => Hash::make($request->password),
                     'doc' => $request->cpf,
                     'phone' => $request->phone,
-                    'level' => 'Iniciante',
+                    'level' => 'iniciante',
                 ]);
                 Auth::login($user);
 

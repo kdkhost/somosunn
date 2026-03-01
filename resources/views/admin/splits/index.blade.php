@@ -71,7 +71,7 @@
                                 <a href="{{ route('admin.orders.show', $split->order_id) }}">#{{ $split->order_id }}</a>
                             </td>
                             <td>
-                                @if($split->receiver_type === 'user' && $split->receiver)
+                                @if(in_array($split->receiver_type, ['seller', 'superadmin']) && $split->receiver)
                                     <strong>{{ $split->receiver->name }}</strong><br>
                                     <small>{{ $split->receiver->email }}</small>
                                 @else

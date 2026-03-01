@@ -113,7 +113,7 @@ class EventReservationController extends Controller
                 'password' => Hash::make($request->string('password')->toString()),
                 'doc' => $request->string('cpf')->toString(),
                 'phone' => $request->string('phone')->toString(),
-                'level' => 'Iniciante',
+                'level' => 'iniciante',
             ]);
 
             // Vincula pacote inicial (cliente) para liberar o Painel do Membro imediatamente

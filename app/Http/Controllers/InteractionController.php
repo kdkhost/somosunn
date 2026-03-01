@@ -11,14 +11,17 @@ class InteractionController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'user_from_id' => 'required|integer|exists:users,id',
-            'user_to_id' => 'required|integer|exists:users,id|different:user_from_id',
+            'user_to_id' => 'required|integer|exists:users,id',
             'message' => 'nullable|string|max:500',
             'meta' => 'nullable|array',
         ]);
 
-        $from = User::findOrFail($data['user_from_id']);
+        $from = $request->user();
         $to = User::findOrFail($data['user_to_id']);
+
+        if ($from->id === $to->id) {
+            return response()->json(['message' => 'Você não pode se conectar consigo mesmo.'], 422);
+        }
 
         if ($from->level !== $to->level) {
             return response()->json([

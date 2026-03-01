@@ -11,7 +11,7 @@ class SplitController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $splits = OrderSplit::where('receiver_type', 'user')
+        $splits = OrderSplit::where('receiver_type', 'seller')
             ->where('receiver_id', $user->id)
             ->with(['order'])
             ->latest()

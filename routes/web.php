@@ -187,8 +187,8 @@ Route::post('/password/reset', [\App\Http\Controllers\Auth\ResetPasswordControll
 Route::get('/auth/redirect/{provider}', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])->name('social.redirect');
 Route::get('/auth/callback/{provider}', [\App\Http\Controllers\Auth\SocialAuthController::class, 'callback'])->name('social.callback');
 
-// File uploads
-Route::post('/upload', [\App\Http\Controllers\UploadController::class, 'upload'])->name('upload.file');
+// File uploads (requer autenticação — impede upload anônimo)
+Route::post('/upload', [\App\Http\Controllers\UploadController::class, 'upload'])->middleware('auth')->name('upload.file');
 
 // Webhooks and payments endpoints (placeholders)
 Route::post('/webhook/mercadopago', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])
@@ -205,8 +205,8 @@ Route::post('/backend/install/run', [\App\Http\Controllers\InstallController::cl
 Route::post('/backend/install/test-connection', [\App\Http\Controllers\InstallController::class, 'testConnection'])->name('install.test-connection.legacy');
 Route::get('/backend/install/run', fn() => redirect()->route('install.index.legacy'));
 
-Route::post('/api/interactions', [InteractionController::class, 'store'])->name('api.interactions.store');
-Route::post('/api/satisfactions', [SatisfactionController::class, 'store'])->name('api.satisfactions.store');
+Route::post('/api/interactions', [InteractionController::class, 'store'])->middleware('auth')->name('api.interactions.store');
+Route::post('/api/satisfactions', [SatisfactionController::class, 'store'])->middleware('auth')->name('api.satisfactions.store');
 Route::get('/api/ranking', [RankingController::class, 'index'])->name('api.ranking.index');
 
 // PWA manifest (dynamic)
