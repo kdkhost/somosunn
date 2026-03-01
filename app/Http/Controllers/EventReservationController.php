@@ -48,6 +48,14 @@ class EventReservationController extends Controller
             $preferredGateway = $gateways['preferredGateway'];
 
             if (!$mpEnabled && !$psEnabled) {
+                \Illuminate\Support\Facades\Log::warning('EventCheckout: organizador sem gateway configurado', [
+                    'event_id'    => $event->id,
+                    'event_user_id' => $event->user_id,
+                    'seller_id'   => $seller ? $seller->id : null,
+                    'seller_found' => $seller !== null,
+                    'mp_enabled'  => $mpEnabled,
+                    'ps_enabled'  => $psEnabled,
+                ]);
                 return redirect()
                     ->route('events.show', $event)
                     ->with('error', 'Este evento não está disponível para compra: o organizador ainda não configurou um método de pagamento.');
