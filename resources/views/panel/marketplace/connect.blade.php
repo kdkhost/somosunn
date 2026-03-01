@@ -225,7 +225,8 @@
             </div>
 
             <div class="flex-1">
-                <form action="{{ route('settings.payment.update') }}" method="POST" class="space-y-5">
+                {{-- Form de salvar PagSeguro (sem botão aqui, o botão fica abaixo via form="") --}}
+                <form id="ps-save-form" action="{{ route('settings.payment.update') }}" method="POST" class="space-y-5">
                     @csrf
                     <input type="hidden" name="provider" value="pagseguro">
 
@@ -248,27 +249,31 @@
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Gere um token no painel do PagSeguro
                             (Preferências > Integrações).</p>
                     </div>
-
-                    <div class="pt-4">
-                        <div class="flex gap-3">
-                            <button type="submit"
-                                class="flex-1 inline-flex items-center justify-center rounded-xl bg-lime-600 text-white px-6 py-3.5 text-sm font-bold hover:bg-lime-700 transition-all shadow-lg shadow-lime-500/20 hover:shadow-xl hover:-translate-y-1">
-                                <i class="fas fa-save mr-2"></i> Salvar PagSeguro
-                            </button>
-
-                            @if($pagseguro->enabled && $pagseguro->access_token)
-                                <form action="{{ route('panel.marketplace.payments.test') }}" method="POST" style="display:inline">
-                                @csrf
-                                <input type="hidden" name="provider" value="pagseguro">
-                                <button type="submit"
-                                    class="inline-flex items-center justify-center rounded-xl bg-white border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white px-6 py-3.5 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                                    <i class="fas fa-sync-alt mr-2"></i> Testar Conexão
-                                </button>
-                                </form>
-                            @endif
-                        </div>
-                    </div>
                 </form>
+
+                {{-- Form separado para testar (evita nesting de forms) --}}
+                @if($pagseguro->enabled && $pagseguro->access_token)
+                    <form id="ps-test-form" action="{{ route('panel.marketplace.payments.test') }}" method="POST" style="display:none">
+                        @csrf
+                        <input type="hidden" name="provider" value="pagseguro">
+                    </form>
+                @endif
+
+                <div class="pt-4">
+                    <div class="flex gap-3">
+                        <button type="submit" form="ps-save-form"
+                            class="flex-1 inline-flex items-center justify-center rounded-xl bg-lime-600 text-white px-6 py-3.5 text-sm font-bold hover:bg-lime-700 transition-all shadow-lg shadow-lime-500/20 hover:shadow-xl hover:-translate-y-1">
+                            <i class="fas fa-save mr-2"></i> Salvar PagSeguro
+                        </button>
+
+                        @if($pagseguro->enabled && $pagseguro->access_token)
+                            <button type="submit" form="ps-test-form"
+                                class="inline-flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white px-6 py-3.5 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+                                <i class="fas fa-sync-alt mr-2"></i> Testar Conexão
+                            </button>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
 
