@@ -26,10 +26,15 @@ class MercadoPagoService
         // Check Seller Override
         $passFee = $config['pass_fee'] ?? ($globalBehavior === 'pass');
 
+        // application_fee só é válido para tokens OAuth de marketplace.
+        // Tokens diretos (cadastrados manualmente) não suportam split automático.
+        // Se is_marketplace não estiver setado como true, não calcular fee para envio à API.
+        $isMarketplace = $config['is_platform'] ? true : ($config['is_marketplace'] ?? false);
+
         $finalAmount = $originalAmount;
         $applicationFee = 0.0;
 
-        if ($feePercent > 0 && !$config['is_platform']) {
+        if ($feePercent > 0 && !$config['is_platform'] && $isMarketplace) {
             if ($passFee) {
                 // Pass Fee: Add fee to total.
                 // Formula: Total = Original + (Original * Fee%)
@@ -188,14 +193,29 @@ class MercadoPagoService
             ->post("{$this->baseUrl}/v1/payments", $paymentData);
 
         if ($response->failed()) {
+            $causes = $response->json('cause') ?? [];
+            $causeDetail = is_array($causes) && !empty($causes)
+                ? implode(', ', array_map(fn($c) => ($c['code'] ?? '') . ':' . ($c['description'] ?? ''), $causes))
+                : '';
+
             \Log::error('MercadoPago Credit Card Error', [
                 'order_id' => $order->id,
                 'http_status' => $response->status(),
                 'mp_message' => $response->json('message'),
                 'mp_cause' => $response->json('cause'),
+                'mp_error' => $response->json('error'),
+                'is_marketplace' => $config['is_marketplace'] ?? false,
+                'application_fee' => $calc['application_fee'],
+                'transaction_amount' => $calc['transaction_amount'],
+                'payment_method_id' => $data['payment_method_id'] ?? null,
                 'body' => $response->body(),
             ]);
-            $msg = $response->json('message') ?? $response->body();
+
+            // Mensagem mais informativa para depuração
+            $msg = $response->json('message') ?? $response->json('error') ?? $response->body();
+            if ($causeDetail !== '') {
+                $msg .= ' [' . $causeDetail . ']';
+            }
             throw new Exception('Falha ao processar cartão: ' . $msg);
         }
 
@@ -589,6 +609,7 @@ class MercadoPagoService
             'token' => trim((string) $platformToken),
             'public_key' => trim((string) $platformPublicKey),
             'is_platform' => true,
+            'is_marketplace' => false,
             'pass_fee' => null
         ];
 
@@ -604,10 +625,15 @@ class MercadoPagoService
                     $passFee = (bool) $sellerAccount->extra['pass_fee'];
                 }
 
+                // marketplace_enabled = true: token via OAuth, suporta application_fee (split automático)
+                // false/ausente: token direto do vendedor, NÃO enviar application_fee
+                $isMarketplace = !empty($sellerAccount->extra['marketplace_enabled']);
+
                 $config = [
                     'token' => $sellerAccount->access_token,
                     'public_key' => $sellerAccount->public_key,
                     'is_platform' => false,
+                    'is_marketplace' => $isMarketplace,
                     'pass_fee' => $passFee
                 ];
             }
@@ -631,12 +657,23 @@ class MercadoPagoService
      */
     private function commonHeaders(string $idempotencyKeySuffix): array
     {
-        return [
+        $headers = [
             'X-Idempotency-Key' => $idempotencyKeySuffix . '-' . time(),
-            'X-Integrator-Id' => (string) Setting::get('mercadopago_integrator_id', config('payments.mercadopago.integrator_id', '')),
-            'X-Platform-Id' => (string) Setting::get('mercadopago_platform_id', config('payments.mercadopago.platform_id', '')),
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
         ];
+
+        // Só envia estes headers se tiverem valor — string vazia causa internal_error na API
+        $integratorId = trim((string) Setting::get('mercadopago_integrator_id', config('payments.mercadopago.integrator_id', '')));
+        if ($integratorId !== '') {
+            $headers['X-Integrator-Id'] = $integratorId;
+        }
+
+        $platformId = trim((string) Setting::get('mercadopago_platform_id', config('payments.mercadopago.platform_id', '')));
+        if ($platformId !== '') {
+            $headers['X-Platform-Id'] = $platformId;
+        }
+
+        return $headers;
     }
 }
