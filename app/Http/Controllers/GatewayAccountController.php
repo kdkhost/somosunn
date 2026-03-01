@@ -89,11 +89,26 @@ class GatewayAccountController extends Controller
         $redirectUri = config('payments.mercadopago.redirect_uri');
         $state = Str::random(40);
 
-        session(['mp_oauth_state' => $state]);
+        // PKCE: gera code_verifier e code_challenge (S256)
+        $codeVerifier = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+        $codeChallenge = rtrim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '=');
 
-        $url = "https://auth.mercadopago.com.br/authorization?client_id={$appId}&response_type=code&platform_id=mp&state={$state}&redirect_uri={$redirectUri}";
+        session([
+            'mp_oauth_state'         => $state,
+            'mp_oauth_code_verifier' => $codeVerifier,
+        ]);
 
-        return redirect($url);
+        $params = http_build_query([
+            'client_id'             => $appId,
+            'response_type'         => 'code',
+            'platform_id'           => 'mp',
+            'state'                 => $state,
+            'redirect_uri'          => $redirectUri,
+            'code_challenge'        => $codeChallenge,
+            'code_challenge_method' => 'S256',
+        ]);
+
+        return redirect('https://auth.mercadopago.com.br/authorization?' . $params);
     }
 
     public function callback(Request $request)
@@ -127,14 +142,26 @@ class GatewayAccountController extends Controller
                 ->with('error', 'Configuração OAuth incompleta no servidor (client_id/client_secret ausente). Contate o administrador.');
         }
 
+        $codeVerifier = session('mp_oauth_code_verifier');
+
+        Log::info('OAuth MP PKCE', [
+            'has_code_verifier' => !empty($codeVerifier),
+        ]);
+
         try {
-            $response = Http::post('https://api.mercadopago.com/oauth/token', [
+            $payload = [
                 'client_secret' => $clientSecret,
                 'client_id'     => $clientId,
                 'grant_type'    => 'authorization_code',
                 'code'          => $code,
                 'redirect_uri'  => $redirectUri,
-            ]);
+            ];
+
+            if (!empty($codeVerifier)) {
+                $payload['code_verifier'] = $codeVerifier;
+            }
+
+            $response = Http::post('https://api.mercadopago.com/oauth/token', $payload);
 
             Log::info('OAuth MP resposta', [
                 'status' => $response->status(),
