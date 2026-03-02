@@ -7,7 +7,9 @@ use App\Models\Lesson;
 use App\Models\LessonAttachment;
 use App\Models\LessonBookmark;
 use App\Models\LessonProgress;
+use App\Models\PointsLog;
 use App\Services\LessonVideoService;
+use App\Services\PointsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -470,9 +472,38 @@ class LessonController extends Controller
             }
         }
 
+        // Gamificação: conclusão de aula
+        if ($justCompleted) {
+            try {
+                (new PointsService())->award(Auth::user(), 'complete_lesson', ['lesson_id' => $lesson->id, 'course_id' => $course->id]);
+            } catch (\Throwable $e) {
+                \Log::warning('Falha ao pontuar complete_lesson: ' . $e->getMessage());
+            }
+        }
+
         $courseCompleted = false;
         if ($justCompleted) {
             $courseCompleted = $this->checkCourseAndIssueCertificate($course);
+        }
+
+        // Gamificação: conclusão de curso (apenas uma vez por curso)
+        if ($courseCompleted) {
+            try {
+                $ps = new PointsService();
+                // Guard portátil: verifica pelo course_id no JSON sem depender de JSON_EXTRACT
+                $alreadyCompletedCourse = PointsLog::where('user_id', Auth::id())
+                    ->where('action_key', 'complete_course')
+                    ->where('meta', 'like', '%"course_id":' . $course->id . '%')
+                    ->exists();
+
+                if (!$alreadyCompletedCourse) {
+                    $ps->award(Auth::user(), 'complete_course', ['course_id' => $course->id]);
+                    // first_course é não-repetível: PointsService bloqueia automaticamente após o primeiro
+                    $ps->award(Auth::user(), 'first_course', ['course_id' => $course->id]);
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Falha ao pontuar complete_course: ' . $e->getMessage());
+            }
         }
 
         return response()->json([
@@ -524,6 +555,13 @@ class LessonController extends Controller
                             'issued_at' => now(),
                             'workload' => $workloadHours
                         ]);
+
+                        // Gamificação: certificado emitido
+                        try {
+                            (new PointsService())->award($user, 'earn_certificate', ['course_id' => $course->id]);
+                        } catch (\Throwable $pe) {
+                            \Log::warning('Falha ao pontuar earn_certificate: ' . $pe->getMessage());
+                        }
                     } catch (\Exception $e) {
                         \Log::error("Failed to issue certificate for user {$user->id} in course {$course->id}: " . $e->getMessage());
                     }

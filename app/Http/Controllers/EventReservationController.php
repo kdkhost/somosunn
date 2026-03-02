@@ -374,6 +374,15 @@ class EventReservationController extends Controller
         }
 
         if (!$isPaid) {
+            // Gamificação: inscrição gratuita confirmada
+            if ($registration && $user) {
+                try {
+                    (new \App\Services\PointsService())->award($user, 'attend_event', ['event_id' => $event->id]);
+                } catch (\Throwable $e) {
+                    \Log::warning('Falha ao pontuar attend_event: ' . $e->getMessage());
+                }
+            }
+
             return redirect()->route('events.show', $event)->with('success', 'Vaga confirmada com sucesso!');
         }
 

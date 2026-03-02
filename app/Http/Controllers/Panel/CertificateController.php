@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
+use App\Services\PointsService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -134,6 +135,16 @@ class CertificateController extends Controller
             'issued_at' => now(),
             'workload' => $workload
         ]);
+
+        // Gamificação: certificado emitido manualmente pelo painel do membro
+        try {
+            $awardKey = $type === 'course' ? 'earn_certificate' : null;
+            if ($awardKey) {
+                (new PointsService())->award($user, $awardKey, [$type . '_id' => $id]);
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao pontuar earn_certificate (painel): ' . $e->getMessage());
+        }
 
         return redirect()->route('panel.certificates.index')->with('success', 'Certificado gerado com sucesso!');
     }

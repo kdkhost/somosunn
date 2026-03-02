@@ -58,6 +58,19 @@ class ItemReviewController extends Controller
             ]
         );
 
+        // Gamificação: pontuar nova avaliação (somente na criação, não na atualização)
+        if (!$existingReview) {
+            try {
+                (new \App\Services\PointsService())->award(
+                    Auth::user(),
+                    'review',
+                    ['reviewable_type' => $reviewable->getMorphClass(), 'reviewable_id' => $reviewable->getKey()]
+                );
+            } catch (\Throwable $e) {
+                \Log::warning('Falha ao pontuar review: ' . $e->getMessage());
+            }
+        }
+
         // Notificar o criador (instrutor/mentor)
         $creator = null;
         if ($reviewable instanceof Course) {

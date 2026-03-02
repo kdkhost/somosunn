@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Panel\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Mentorship;
 use App\Models\User;
+use App\Services\PointsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -65,7 +66,17 @@ class MentorshipController extends Controller
             $data['certificate_settings'] = is_string($request->certificate_settings) ? json_decode($request->certificate_settings, true) : $request->certificate_settings;
         }
 
-        Mentorship::create($data);
+        $mentorship = Mentorship::create($data);
+
+        // Gamificação: premia o mentor por criar a primeira mentoria (não-repetível)
+        try {
+            $mentorUser = isset($data['mentor_id']) ? User::find($data['mentor_id']) : null;
+            if ($mentorUser) {
+                (new PointsService())->award($mentorUser, 'mentor', ['mentorship_id' => $mentorship->id]);
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao pontuar mentor: ' . $e->getMessage());
+        }
 
         return redirect()->route('panel.admin.mentorships.index')->with('success', 'Mentoria criada com sucesso.');
     }

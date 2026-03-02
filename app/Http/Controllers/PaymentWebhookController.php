@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\OrderSplit;
 use App\Services\CouponService;
 use App\Services\InvoiceService;
+use App\Services\PointsService;
 use App\Support\EmailQueueSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -316,6 +317,16 @@ class PaymentWebhookController extends Controller
                 }
 
                 $reg->update(['status' => EventRegistration::STATUS_PAID]);
+
+                // Gamificação: participação em evento pago confirmada
+                try {
+                    $regUser = User::find($reg->user_id);
+                    if ($regUser) {
+                        (new PointsService())->award($regUser, 'attend_event', ['event_id' => $reg->event_id]);
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('Falha ao pontuar attend_event (pago): ' . $e->getMessage());
+                }
             }
 
             if ($needsManualRefund) {
@@ -357,7 +368,7 @@ class PaymentWebhookController extends Controller
                     continue;
                 }
 
-                Enrollment::firstOrCreate([
+                $mentorshipEnrollment = Enrollment::firstOrCreate([
                     'user_id' => $order->user_id,
                     'enrollable_id' => $mentorship->id,
                     'enrollable_type' => Mentorship::class,
@@ -366,6 +377,18 @@ class PaymentWebhookController extends Controller
                     'started_at' => now(),
                     'progress' => [],
                 ]);
+
+                // Gamificação: inscrição em mentoria confirmada (somente na criação)
+                if ($mentorshipEnrollment->wasRecentlyCreated) {
+                    try {
+                        $enrolledUser = User::find($order->user_id);
+                        if ($enrolledUser) {
+                            (new PointsService())->award($enrolledUser, 'attend_mentorship', ['mentorship_id' => $mentorship->id]);
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning('Falha ao pontuar attend_mentorship: ' . $e->getMessage());
+                    }
+                }
             }
         }
     }
