@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Como Funciona - UNN')
+@section('title', $page->get('seo_title', 'Como Funciona - UNN'))
 
 @section('content')
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
@@ -11,7 +11,7 @@
                 <span class="unn-title-gradient">Como</span> Funciona
             </h1>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Entenda como a UNN pode transformar sua rede de contatos e impulsionar seus negócios.
+                {{ $page->get('hero_subtitle', 'Entenda como a UNN pode transformar sua rede de contatos e impulsionar seus negócios.') }}
             </p>
         </div>
     </section>
@@ -19,82 +19,32 @@
     <!-- Steps -->
     <section class="py-16 px-6 md:px-12 lg:px-24">
         <div class="max-w-5xl mx-auto">
+            @php
+                $steps = $page->get('steps', [
+                    ['direction' => 'row',         'title' => 'Cadastre-se na Plataforma',      'text' => 'Crie sua conta gratuitamente e preencha seu perfil completo. Quanto mais informações você compartilhar, melhores serão as conexões que a plataforma irá sugerir para você.',                                  'li' => ['Cadastro rápido em menos de 2 minutos', 'Perfil personalizado com suas especialidades', 'Integração com LinkedIn']],
+                    ['direction' => 'row-reverse',  'title' => 'Conecte-se com Outros Membros', 'text' => 'Navegue pela comunidade, encontre empreendedores com interesses similares e inicie conversas. Nossa plataforma facilita o primeiro contato e incentiva conexões genuínas.',                                 'li' => ['Sistema de match inteligente', 'Chat integrado na plataforma', 'Grupos temáticos por setor']],
+                    ['direction' => 'row',         'title' => 'Participe de Eventos',           'text' => 'Compareça aos nossos eventos presenciais e online. Networking acontece de verdade quando olhamos nos olhos um do outro. Nossos eventos são cuidadosamente planejados para maximizar conexões.',            'li' => ['Eventos presenciais em todo Brasil', 'Webinars semanais com especialistas', 'Mentorias em grupo']],
+                    ['direction' => 'row-reverse',  'title' => 'Feche Negócios',                 'text' => 'Transforme conexões em parcerias e negócios reais. Membros da UNN já geraram mais de R$ 50 milhões em negócios entre si. Sua próxima grande oportunidade pode estar a uma conexão de distância.',        'li' => ['Sistema de indicações entre membros', 'Acompanhamento de deals fechados', 'Cases de sucesso da comunidade']],
+                ]);
+            @endphp
+
             <div class="space-y-12">
-                <!-- Step 1 -->
-                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
+                @foreach ($steps as $i => $step)
+                <div class="flex flex-col md:flex-row{{ $step['direction'] === 'row-reverse' ? '-reverse' : '' }} gap-6 md:gap-8 items-center">
                     <div class="w-16 h-16 md:w-24 md:h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-2xl md:text-4xl font-black shrink-0">
-                        1
+                        {{ $i + 1 }}
                     </div>
                     <div class="flex-1 bg-white rounded-3xl p-6 md:p-8 shadow-lg">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-3">Cadastre-se na Plataforma</h3>
-                        <p class="text-gray-600 mb-4">
-                            Crie sua conta gratuitamente e preencha seu perfil completo. Quanto mais informações você compartilhar, 
-                            melhores serão as conexões que a plataforma irá sugerir para você.
-                        </p>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ $step['title'] }}</h3>
+                        <p class="text-gray-600 mb-4">{{ $step['text'] }}</p>
                         <ul class="space-y-2 text-gray-600">
-                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> Cadastro rápido em menos de 2 minutos</li>
-                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> Perfil personalizado com suas especialidades</li>
-                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> Integração com LinkedIn</li>
+                            @foreach ($step['li'] as $item)
+                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> {{ $item }}</li>
+                            @endforeach
                         </ul>
                     </div>
                 </div>
-
-                <!-- Step 2 -->
-                <div class="flex flex-col md:flex-row-reverse gap-6 md:gap-8 items-center">
-                    <div class="w-16 h-16 md:w-24 md:h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-2xl md:text-4xl font-black shrink-0">
-                        2
-                    </div>
-                    <div class="flex-1 bg-white rounded-3xl p-6 md:p-8 shadow-lg">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-3">Conecte-se com Outros Membros</h3>
-                        <p class="text-gray-600 mb-4">
-                            Navegue pela comunidade, encontre empreendedores com interesses similares e inicie conversas. 
-                            Nossa plataforma facilita o primeiro contato e incentiva conexões genuínas.
-                        </p>
-                        <ul class="space-y-2 text-gray-600">
-                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> Sistema de match inteligente</li>
-                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> Chat integrado na plataforma</li>
-                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> Grupos temáticos por setor</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Step 3 -->
-                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
-                    <div class="w-16 h-16 md:w-24 md:h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-2xl md:text-4xl font-black shrink-0">
-                        3
-                    </div>
-                    <div class="flex-1 bg-white rounded-3xl p-6 md:p-8 shadow-lg">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-3">Participe de Eventos</h3>
-                        <p class="text-gray-600 mb-4">
-                            Compareça aos nossos eventos presenciais e online. Networking acontece de verdade quando 
-                            olhamos nos olhos um do outro. Nossos eventos são cuidadosamente planejados para maximizar conexões.
-                        </p>
-                        <ul class="space-y-2 text-gray-600">
-                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> Eventos presenciais em todo Brasil</li>
-                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> Webinars semanais com especialistas</li>
-                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> Mentorias em grupo</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Step 4 -->
-                <div class="flex flex-col md:flex-row-reverse gap-6 md:gap-8 items-center">
-                    <div class="w-16 h-16 md:w-24 md:h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-2xl md:text-4xl font-black shrink-0">
-                        4
-                    </div>
-                    <div class="flex-1 bg-white rounded-3xl p-6 md:p-8 shadow-lg">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-3">Feche Negócios</h3>
-                        <p class="text-gray-600 mb-4">
-                            Transforme conexões em parcerias e negócios reais. Membros da UNN já geraram mais de R$ 50 milhões 
-                            em negócios entre si. Sua próxima grande oportunidade pode estar a uma conexão de distância.
-                        </p>
-                        <ul class="space-y-2 text-gray-600">
-                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> Sistema de indicações entre membros</li>
-                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> Acompanhamento de deals fechados</li>
-                            <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> Cases de sucesso da comunidade</li>
-                        </ul>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>
@@ -102,9 +52,9 @@
     <!-- Planos -->
     <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
         <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl font-black text-gray-900 mb-4 text-center">Escolha seu Plano</h2>
+            <h2 class="text-3xl font-black text-gray-900 mb-4 text-center">{{ $page->get('plans_title', 'Escolha seu Plano') }}</h2>
             <p class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-                Temos opções para todos os estágios da sua jornada empreendedora.
+                {{ $page->get('plans_subtitle', 'Temos opções para todos os estágios da sua jornada empreendedora.') }}
             </p>
             
             <div class="grid md:grid-cols-3 gap-8">
@@ -186,11 +136,11 @@
     <!-- CTA -->
     <section class="py-16 px-6 md:px-12 lg:px-24" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
         <div class="max-w-4xl mx-auto text-center text-white">
-            <h2 class="text-3xl lg:text-4xl font-black mb-4">Pronto para começar?</h2>
-            <p class="text-lg opacity-90 mb-8">Crie sua conta agora e comece a fazer conexões valiosas.</p>
+            <h2 class="text-3xl lg:text-4xl font-black mb-4">{{ $page->get('cta_title', 'Pronto para começar?') }}</h2>
+            <p class="text-lg opacity-90 mb-8">{{ $page->get('cta_subtitle', 'Crie sua conta agora e comece a fazer conexões valiosas.') }}</p>
             <a href="{{ route('register') }}" class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition" style="color: var(--unn-azul-1)">
                 <i class="fas fa-rocket"></i>
-                Criar conta grátis
+                {{ $page->get('cta_btn', 'Criar conta grátis') }}
             </a>
         </div>
     </section>

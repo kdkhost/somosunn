@@ -77,11 +77,11 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureUserIsAdmin::class])->grou
 
 
 // Institutional Pages
-Route::get('/sobre', fn() => view('site.institucional.sobre'))->name('sobre');
-Route::get('/manifesto', fn() => view('site.institucional.manifesto'))->name('manifesto');
-Route::get('/quem-somos', fn() => view('site.institucional.quem-somos'))->name('quem-somos');
-Route::get('/como-funciona', fn() => view('site.institucional.como-funciona'))->name('como-funciona');
-Route::get('/valores', fn() => view('site.institucional.valores'))->name('valores');
+Route::get('/sobre', [\App\Http\Controllers\InstitucionalController::class, 'sobre'])->name('sobre');
+Route::get('/manifesto', [\App\Http\Controllers\InstitucionalController::class, 'manifesto'])->name('manifesto');
+Route::get('/quem-somos', [\App\Http\Controllers\InstitucionalController::class, 'quemSomos'])->name('quem-somos');
+Route::get('/como-funciona', [\App\Http\Controllers\InstitucionalController::class, 'comoFunciona'])->name('como-funciona');
+Route::get('/valores', [\App\Http\Controllers\InstitucionalController::class, 'valores'])->name('valores');
 Route::get('/contato', fn() => view('site.institucional.contato'))->name('contato');
 Route::post('/contato', [ContactController::class, 'send'])->middleware('throttle:5,1')->name('contato.send');
 
