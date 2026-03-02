@@ -87,21 +87,21 @@
     </div>
 
     {{-- ===== SEU LINK DE INDICAÇÃO ===== --}}
-    <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm">
+    <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm overflow-hidden">
         <h2 class="text-xl font-black text-slate-900 dark:text-white mb-1">Seu link de indicação</h2>
         <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Compartilhe este link. O sistema registra automaticamente quem entrou pelo seu convite.</p>
 
         {{-- Input + Copiar --}}
-        <div class="flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 mb-6">
-            <i class="fas fa-link text-slate-400 shrink-0"></i>
+        <div class="flex items-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2.5 mb-6 overflow-hidden">
+            <i class="fas fa-link text-slate-400 shrink-0 text-sm"></i>
             <input id="referralLinkInput" type="text" readonly
                    value="{{ $referralLink }}"
-                   class="flex-1 bg-transparent text-sm font-mono text-slate-700 dark:text-slate-300 outline-none truncate">
+                   class="flex-1 min-w-0 bg-transparent text-sm font-mono text-slate-700 dark:text-slate-300 outline-none truncate">
             <button onclick="copyReferralLink()"
                     id="copyBtn"
-                    class="shrink-0 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-sm font-bold px-4 py-2 rounded-xl transition-all">
+                    class="shrink-0 flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-sm font-bold px-3 py-2 rounded-xl transition-all whitespace-nowrap">
                 <i class="fas fa-copy" id="copyIcon"></i>
-                <span id="copyText">Copiar</span>
+                <span id="copyText" class="hidden sm:inline">Copiar</span>
             </button>
         </div>
 
