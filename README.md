@@ -342,5 +342,14 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
   - ARIA: role=search, role=article, aria-label nos campos e cards, aria-hidden nos icones decorativos.
   - Busca por palavra-chave agora cobre titulo, descricao e tipo (antes so tipo).
 
+### 02/03/2026 (Noite II) - Dashboard do Membro e Melhorias Gerais
+- **Widget de Pontos no Dashboard:** card ambar no dashboard do membro mostrando total de pontos, posicao no ranking e pontos do mes atual — vinculado a /painel/meus-pontos.
+- **DashboardController:** agora passa userPoints, rankPosition e pontosEsteMes para a view.
+- **Revisao do sistema:**
+  - Menu mobile do frontend confirmado funcional (abertura/fechamento suave, Escape, overlay).
+  - Cron management ja completo no painel admin/superadmin.
+  - Permissoes e widgets condicionais por perfil ja implementados.
+- **Oportunidades — filtros avancados:** campos empresa e tipo adicionados ao formulario; busca por palavra-chave expandida para titulo+descricao+tipo.
+
 ---
 © 2026 UNN Networking. Todos os direitos reservados.
