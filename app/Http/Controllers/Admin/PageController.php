@@ -10,15 +10,74 @@ use Illuminate\View\View;
 
 class PageController extends Controller
 {
-    /** Campos de nível raiz editáveis no formulário (mapeados dentro de data[]). */
-    private const FLAT_FIELDS = [
-        'hero_title',
-        'hero_subtitle',
-        'cta_text',
-        'cta_url',
-        'body',
-        'seo_title',
-        'seo_description',
+    /**
+     * Campos escalares editáveis por slug.
+     * Campos de array JSON são tratados separadamente via SLUG_JSON_FIELDS.
+     */
+    private const SLUG_SCALAR_FIELDS = [
+        'home' => [
+            'hero_title', 'hero_subtitle', 'body', 'hero_cta_text', 'hero_cta2_text',
+            'stat_1_value', 'stat_1_label', 'stat_2_value', 'stat_2_label',
+            'stat_3_value', 'stat_3_label', 'stat_4_value', 'stat_4_label',
+            'about_title', 'about_subtitle',
+            'about_card_1_title', 'about_card_1_text', 'about_card_2_title', 'about_card_2_text',
+            'about_card_3_title', 'about_card_3_text', 'about_card_4_title', 'about_card_4_text',
+            'events_title', 'events_subtitle', 'mentorships_title', 'mentorships_subtitle',
+            'community_title', 'community_beginner_title', 'community_beginner_desc',
+            'community_success_title', 'community_success_desc',
+            'ranking_title', 'ranking_subtitle', 'testimonials_title',
+            'cta_section_title', 'cta_section_subtitle', 'cta_section_btn_primary', 'cta_section_btn_secondary',
+            'seo_title', 'seo_description',
+        ],
+        'sobre' => [
+            'seo_title', 'seo_description', 'hero_title', 'vision',
+            'cta_btn_primary', 'cta_btn_secondary',
+            'stat_1_value', 'stat_1_label', 'stat_2_value', 'stat_2_label',
+            'stat_3_value', 'stat_3_label', 'stat_4_value', 'stat_4_label',
+            'history_title', 'history_lead', 'history_p1', 'history_p2',
+            'diff_title',
+            'diff_card_1_title', 'diff_card_1_text',
+            'diff_card_2_title', 'diff_card_2_text',
+            'diff_card_3_title', 'diff_card_3_text',
+            'cta_title', 'cta_subtitle', 'cta_btn',
+        ],
+        'manifesto' => [
+            'seo_title', 'seo_description',
+            'hero_title', 'hero_title_highlight', 'hero_subtitle', 'quote_top',
+            'section_1_title', 'section_1_text', 'section_2_title', 'section_2_text',
+            'section_3_title', 'section_3_text', 'section_4_title', 'section_4_text',
+            'section_5_title', 'section_5_text',
+            'quote_bottom', 'quote_author',
+            'pillars_title', 'pillar_1_title', 'pillar_2_title', 'pillar_3_title', 'pillar_4_title',
+            'pillars_link_text', 'cta_title', 'cta_subtitle', 'cta_btn',
+        ],
+        'valores' => [
+            'seo_title', 'seo_description', 'hero_subtitle',
+            'blockquote_text', 'blockquote_author',
+            'cta_title', 'cta_subtitle', 'cta_btn',
+        ],
+        'como-funciona' => [
+            'seo_title', 'seo_description', 'hero_subtitle',
+            'plans_title', 'plans_subtitle',
+            'cta_title', 'cta_subtitle', 'cta_btn',
+        ],
+        'quem-somos' => [
+            'seo_title', 'seo_description', 'hero_subtitle',
+            'founders_title', 'team_title', 'stats_title',
+            'stat_1_value', 'stat_1_label', 'stat_2_value', 'stat_2_label',
+            'stat_3_value', 'stat_3_label', 'stat_4_value', 'stat_4_label',
+            'cta_title', 'cta_subtitle', 'cta_btn',
+        ],
+    ];
+
+    /** Campos JSON (arrays) por slug — enviados como textarea JSON no form. */
+    private const SLUG_JSON_FIELDS = [
+        'home'          => ['testimonials'],
+        'sobre'         => [],
+        'manifesto'     => [],
+        'valores'       => ['values'],
+        'como-funciona' => ['steps'],
+        'quem-somos'    => ['founders', 'team'],
     ];
 
     public function index(): View
@@ -32,63 +91,53 @@ class PageController extends Controller
     {
         $data = $page->data ?? [];
 
-        // Flatteners para preencher o form a partir das diversas estruturas de slug
-        $heroNode  = $data['hero'] ?? [];
-        $seoNode   = $data['seo']  ?? [];
-
-        $flat = [
-            'hero_title'      => $data['hero_title']      ?? $heroNode['headline']    ?? $heroNode['title']    ?? '',
-            'hero_subtitle'   => $data['hero_subtitle']   ?? $heroNode['subheadline'] ?? $heroNode['subtitle'] ?? '',
-            'cta_text'        => $data['cta_text']        ?? $heroNode['cta_text']    ?? '',
-            'cta_url'         => $data['cta_url']         ?? $heroNode['cta_url']     ?? '',
-            'body'            => $data['body']            ?? $heroNode['body']        ?? '',
-            'seo_title'       => $data['seo_title']       ?? $seoNode['title']        ?? '',
-            'seo_description' => $data['seo_description'] ?? $seoNode['description']  ?? '',
-        ];
-
-        return view('admin.pages.edit', compact('page', 'flat'));
+        return view('admin.pages.edit', compact('page', 'data'));
     }
 
     public function update(Request $request, Page $page): RedirectResponse
     {
-        $validated = $request->validate([
+        $slug         = $page->slug;
+        $scalarFields = self::SLUG_SCALAR_FIELDS[$slug] ?? [];
+        $jsonFields   = self::SLUG_JSON_FIELDS[$slug]   ?? [];
+
+        $request->validate([
             'title'           => ['nullable', 'string', 'max:255'],
-            'hero_title'      => ['nullable', 'string', 'max:255'],
-            'hero_subtitle'   => ['nullable', 'string', 'max:255'],
-            'cta_text'        => ['nullable', 'string', 'max:120'],
-            'cta_url'         => ['nullable', 'string', 'max:255'],
-            'body'            => ['nullable', 'string'],
-            'seo_title'       => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string', 'max:320'],
         ], [
-            'title.max'           => 'O título não pode ultrapassar 255 caracteres.',
-            'hero_title.max'      => 'O título do hero não pode ultrapassar 255 caracteres.',
-            'hero_subtitle.max'   => 'O subtítulo não pode ultrapassar 255 caracteres.',
-            'cta_text.max'        => 'O texto do botão não pode ultrapassar 120 caracteres.',
-            'seo_title.max'       => 'O título SEO não pode ultrapassar 255 caracteres.',
             'seo_description.max' => 'A descrição SEO não pode ultrapassar 320 caracteres.',
         ]);
 
-        // Mescla os campos editados dentro de data[] sem apagar chaves não mapeadas
-        $existingData = $page->data ?? [];
+        $newData = $page->data ?? [];
 
-        $flatUpdate = array_filter([
-            'hero_title'      => $validated['hero_title']      ?? null,
-            'hero_subtitle'   => $validated['hero_subtitle']   ?? null,
-            'cta_text'        => $validated['cta_text']        ?? null,
-            'cta_url'         => $validated['cta_url']         ?? null,
-            'body'            => $validated['body']            ?? null,
-            'seo_title'       => $validated['seo_title']       ?? null,
-            'seo_description' => $validated['seo_description'] ?? null,
-        ], fn($v) => $v !== null);
+        // Campos escalares: whitelist por slug
+        foreach ($scalarFields as $field) {
+            if ($request->exists($field)) {
+                $newData[$field] = $request->input($field, '');
+            }
+        }
+
+        // Campos JSON: textarea enviado como {campo}_json
+        foreach ($jsonFields as $field) {
+            $raw = trim($request->input("{$field}_json", ''));
+            if ($raw !== '') {
+                $decoded = json_decode($raw, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $newData[$field] = $decoded;
+                } else {
+                    return back()
+                        ->withInput()
+                        ->withErrors(["{$field}_json" => "JSON inválido no campo \"{$field}\". Verifique a sintaxe."]);
+                }
+            }
+        }
 
         $page->update([
-            'title' => $validated['title'] ?: $page->title,
-            'data'  => array_merge($existingData, $flatUpdate),
+            'title' => $request->input('title') ?: $page->title,
+            'data'  => $newData,
         ]);
 
         return redirect()
             ->route('admin.pages.index')
-            ->with('success', 'Página "' . $page->slug . '" salva com sucesso.');
+            ->with('success', 'Página "' . $slug . '" salva com sucesso.');
     }
 }

@@ -9,125 +9,64 @@
 @endsection
 
 @section('content')
+
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h5><i class="icon fas fa-ban"></i> Verifique os erros</h5>
+        <ul class="mb-0">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+    </div>
+@endif
+
 <form method="POST" action="{{ route('admin.pages.update', $page) }}">
     @csrf
     @method('PUT')
 
     <div class="row">
 
-        {{-- Coluna principal --}}
+        {{-- ===== COLUNA PRINCIPAL: campos específicos do slug ===== --}}
         <div class="col-lg-8">
 
-            {{-- Hero / Conteúdo principal --}}
-            <div class="card card-outline card-primary">
-                <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-heading mr-1"></i> Hero / Cabeçalho</h3>
-                </div>
-                <div class="card-body">
+            @php $partialView = 'admin.pages.partials.' . $page->slug; @endphp
 
-                    <div class="form-group">
-                        <label for="hero_title">Título principal</label>
-                        <input type="text"
-                               id="hero_title"
-                               name="hero_title"
-                               class="form-control @error('hero_title') is-invalid @enderror"
-                               value="{{ old('hero_title', $flat['hero_title']) }}"
-                               placeholder="Ex: Bem-vindo à Somos UNN">
-                        @error('hero_title')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+            @if (View::exists($partialView))
+                @include($partialView, ['data' => $data])
+            @else
+                {{-- Fallback genérico para slugs sem partial --}}
+                <div class="card card-outline card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-code mr-1"></i> Dados JSON brutos</h3>
                     </div>
-
-                    <div class="form-group">
-                        <label for="hero_subtitle">Subtítulo / Slogan</label>
-                        <input type="text"
-                               id="hero_subtitle"
-                               name="hero_subtitle"
-                               class="form-control @error('hero_subtitle') is-invalid @enderror"
-                               value="{{ old('hero_subtitle', $flat['hero_subtitle']) }}"
-                               placeholder="Ex: A comunidade que transforma talentos em carreiras.">
-                        @error('hero_subtitle')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="cta_text">Texto do botão (CTA)</label>
-                            <input type="text"
-                                   id="cta_text"
-                                   name="cta_text"
-                                   class="form-control @error('cta_text') is-invalid @enderror"
-                                   value="{{ old('cta_text', $flat['cta_text']) }}"
-                                   placeholder="Ex: Comece agora">
-                            @error('cta_text')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="cta_url">URL do botão (CTA)</label>
-                            <input type="text"
-                                   id="cta_url"
-                                   name="cta_url"
-                                   class="form-control @error('cta_url') is-invalid @enderror"
-                                   value="{{ old('cta_url', $flat['cta_url']) }}"
-                                   placeholder="Ex: /cadastro">
-                            @error('cta_url')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            {{-- Body genérico --}}
-            <div class="card card-outline card-secondary">
-                <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-align-left mr-1"></i> Conteúdo / Corpo</h3>
-                </div>
-                <div class="card-body">
-                    <div class="form-group mb-0">
-                        <label for="body">Texto principal</label>
-                        <textarea id="body"
-                                  name="body"
-                                  rows="8"
-                                  class="form-control @error('body') is-invalid @enderror"
-                                  placeholder="Texto livre exibido no corpo da página. Suporta HTML.">{{ old('body', $flat['body']) }}</textarea>
-                        @error('body')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="form-text text-muted">Aceita HTML simples. Use com cuidado.</small>
+                    <div class="card-body">
+                        <p class="text-muted small">Nenhum formulário específico para este slug. Edite os dados diretamente em JSON:</p>
+                        <textarea name="raw_json" rows="20" class="form-control font-monospace" style="font-family: monospace; font-size: 13px">{{ json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</textarea>
                     </div>
                 </div>
-            </div>
+            @endif
 
         </div>
 
-        {{-- Coluna lateral --}}
+        {{-- ===== COLUNA LATERAL: campos comuns a todas as páginas ===== --}}
         <div class="col-lg-4">
 
             {{-- Identificação --}}
-            <div class="card card-outline card-info">
+            <div class="card card-outline card-info sticky-top" style="top: 70px">
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-tag mr-1"></i> Identificação</h3>
                 </div>
                 <div class="card-body">
                     <div class="form-group">
                         <label>Slug <small class="text-muted">(somente leitura)</small></label>
-                        <input type="text" class="form-control" value="{{ $page->slug }}" readonly>
+                        <input type="text" class="form-control bg-light" value="{{ $page->slug }}" readonly>
                     </div>
-                    <div class="form-group mb-0">
-                        <label for="title">Título da página</label>
+                    <div class="form-group">
+                        <label for="title">Título <small class="text-muted">(exibido no painel)</small></label>
                         <input type="text"
                                id="title"
                                name="title"
                                class="form-control @error('title') is-invalid @enderror"
-                               value="{{ old('title', $page->title) }}"
-                               placeholder="Nome exibido no painel">
-                        @error('title')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                               value="{{ old('title', $page->title) }}">
+                        @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
             </div>
@@ -139,45 +78,45 @@
                 </div>
                 <div class="card-body">
                     <div class="form-group">
-                        <label for="seo_title">Título SEO <small class="text-muted">(meta title)</small></label>
+                        <label for="seo_title">Meta title</label>
                         <input type="text"
                                id="seo_title"
                                name="seo_title"
                                class="form-control @error('seo_title') is-invalid @enderror"
-                               value="{{ old('seo_title', $flat['seo_title']) }}"
-                               placeholder="Ex: Somos UNN — Plataforma de Cursos"
-                               maxlength="255">
-                        @error('seo_title')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                               value="{{ old('seo_title', $data['seo_title'] ?? '') }}"
+                               maxlength="255"
+                               placeholder="Ex: Sobre Nós — UNN">
+                        @error('seo_title')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="form-group mb-0">
-                        <label for="seo_description">Descrição SEO <small class="text-muted">(meta description)</small></label>
+                        <label for="seo_description">Meta description</label>
                         <textarea id="seo_description"
                                   name="seo_description"
                                   rows="3"
                                   maxlength="320"
                                   class="form-control @error('seo_description') is-invalid @enderror"
-                                  placeholder="Resumo exibido nos resultados do Google (até 160 caracteres idealmente).">{{ old('seo_description', $flat['seo_description']) }}</textarea>
-                        @error('seo_description')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="form-text text-muted">
-                            <span id="seo-desc-count">0</span>/320 caracteres
-                        </small>
+                                  placeholder="Até 160 caracteres recomendado">{{ old('seo_description', $data['seo_description'] ?? '') }}</textarea>
+                        @error('seo_description')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <small class="form-text text-muted"><span id="seo-desc-count">0</span>/320 caracteres</small>
                     </div>
                 </div>
             </div>
 
             {{-- Ações --}}
             <div class="card">
-                <div class="card-body d-flex gap-2">
-                    <button type="submit" class="btn btn-primary btn-block">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary btn-block mb-2">
                         <i class="fas fa-save mr-1"></i> Salvar alterações
                     </button>
                     <a href="{{ route('admin.pages.index') }}" class="btn btn-secondary btn-block">
-                        Cancelar
+                        <i class="fas fa-times mr-1"></i> Cancelar
                     </a>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-clock mr-1"></i>
+                            Última atualização: {{ $page->updated_at?->format('d/m/Y H:i') ?? '—' }}
+                        </small>
+                    </div>
                 </div>
             </div>
 
@@ -196,6 +135,26 @@
         desc.addEventListener('input', update);
         update();
     }
+
+    // Formata e valida todos os textareas JSON da página
+    document.querySelectorAll('textarea[data-json]').forEach(function (ta) {
+        // Botão de formato
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-xs btn-outline-secondary mt-1';
+        btn.innerHTML = '<i class="fas fa-magic"></i> Formatar JSON';
+        btn.onclick = function () {
+            try {
+                const parsed = JSON.parse(ta.value);
+                ta.value = JSON.stringify(parsed, null, 2);
+                ta.classList.remove('is-invalid');
+            } catch (e) {
+                ta.classList.add('is-invalid');
+                alert('JSON inválido: ' + e.message);
+            }
+        };
+        ta.after(btn);
+    });
 })();
 </script>
 @endpush
