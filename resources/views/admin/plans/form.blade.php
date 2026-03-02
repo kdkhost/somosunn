@@ -80,6 +80,12 @@
                         <label class="custom-control-label" for="is_recurring">Assinatura (Recorrente)</label>
                     </div>
                 </div>
+                <div class="form-group col-md-3" id="billing_cycle_group" style="{{ old('is_recurring', $plan->is_recurring) ? '' : 'display:none' }}">
+                    <label for="billing_cycle">Ciclo de cobrança <small class="text-muted">(meses)</small></label>
+                    <input type="number" class="form-control @error('billing_cycle') is-invalid @enderror" id="billing_cycle" name="billing_cycle" min="1" max="12" value="{{ old('billing_cycle', $plan->billing_cycle ?? 1) }}">
+                    @error('billing_cycle')<span class="invalid-feedback">{{ $message }}</span>@enderror
+                    <small class="text-muted">Intervalo entre cobranças no MercadoPago.</small>
+                </div>
             </div>
 
             <div class="form-row">
@@ -201,4 +207,16 @@
         </form>
     </div>
 </div>
+@push('scripts')
+<script>
+(function () {
+    var toggle = document.getElementById('is_recurring');
+    var group  = document.getElementById('billing_cycle_group');
+    if (!toggle || !group) return;
+    toggle.addEventListener('change', function () {
+        group.style.display = this.checked ? '' : 'none';
+    });
+})();
+</script>
+@endpush
 @endsection

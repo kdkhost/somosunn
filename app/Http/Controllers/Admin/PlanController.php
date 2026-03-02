@@ -204,6 +204,7 @@ class PlanController extends Controller
             'is_active' => 'nullable|boolean',
             'is_recurring' => 'nullable|boolean',
             'is_free' => 'nullable|boolean',
+            'billing_cycle' => 'nullable|integer|min:1|max:12',
         ]);
 
         $data['slug'] = $this->generateUniqueSlug($data['slug'] ?: $data['name'], $id);
