@@ -62,6 +62,28 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar worker de videos de aulas: ' . $e->getMessage());
         }
 
+        // Pontua semanalmente os 10 usuários no topo do ranking de pontos
+        try {
+            $schedule->command('points:award-top-ranking')
+                ->weekly()
+                ->sundays()
+                ->at('00:05')
+                ->withoutOverlapping()
+                ->name('points-award-top-ranking');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar agendamento de top ranking: ' . $e->getMessage());
+        }
+
+        // Premia aniversariantes do dia com birthday_bonus
+        try {
+            $schedule->command('points:award-birthday-bonus')
+                ->dailyAt('01:00')
+                ->withoutOverlapping()
+                ->name('points-award-birthday-bonus');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar agendamento de birthday bonus: ' . $e->getMessage());
+        }
+
         // Carregar tarefas dinamicas do banco
         try {
             if (\Schema::hasTable('scheduled_tasks')) {
