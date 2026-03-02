@@ -527,6 +527,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::post('my-jobs/applications/{application}/status', [\App\Http\Controllers\Panel\MyJobController::class, 'updateApplicationStatus'])->name('my-jobs.application.status');
     Route::resource('my-jobs', \App\Http\Controllers\Panel\MyJobController::class);
 
+    // Pontos do Membro
+    Route::get('/meus-pontos', [\App\Http\Controllers\Panel\PointsController::class, 'index'])->name('points.index');
+
     // Loja de Pontos (Usuário)
     Route::get('/resgate', [\App\Http\Controllers\RedemptionItemController::class, 'index'])->name('redemptions.shop');
     Route::get('/resgate/historico', [\App\Http\Controllers\RedemptionItemController::class, 'history'])->name('redemptions.history');

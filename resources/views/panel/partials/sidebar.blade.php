@@ -95,6 +95,12 @@
             </a>
         @endif
 
+        <a href="{{ route('panel.points.index') }}"
+            class="{{ $navItemClass(request()->routeIs('panel.points.*')) }}">
+            <i class="fas fa-coins w-5 opacity-80"></i>
+            Meus Pontos
+        </a>
+
         <a href="{{ route('panel.redemptions.shop') }}"
             class="{{ $navItemClass(request()->routeIs('panel.redemptions.*')) }}">
             <i class="fas fa-gift w-5 opacity-80"></i>
