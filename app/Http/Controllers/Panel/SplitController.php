@@ -17,6 +17,6 @@ class SplitController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view('panel.splits.index', compact('splits'));
+        return view('panel.splits.index', compact('splits', 'user'));
     }
 }
