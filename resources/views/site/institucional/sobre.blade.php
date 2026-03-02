@@ -26,6 +26,12 @@
                     </div>
                 </div>
                 <div class="relative mt-8 lg:mt-0">
+                    @if($page->get('hero_image'))
+                        <img src="{{ asset('storage/' . $page->get('hero_image')) }}"
+                             alt="{{ $page->get('hero_title', 'Sobre a UNN') }}"
+                             class="w-full rounded-3xl shadow-2xl mb-6 object-cover"
+                             style="max-height: 260px;">
+                    @endif
                     <div class="bg-white rounded-3xl shadow-2xl p-4 md:p-8">
                         <div class="grid grid-cols-2 gap-3 md:gap-6">
                             <div class="text-center p-3 md:p-6 bg-slate-50 rounded-2xl">

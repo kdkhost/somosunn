@@ -76,7 +76,9 @@ class PageController extends Controller
      * O valor armazenado é o path relativo ao disco 'public'.
      */
     private const SLUG_IMAGE_FIELDS = [
-        'home' => ['hero_image'],
+        'home'       => ['hero_image'],
+        'sobre'      => ['hero_image'],
+        'quem-somos' => ['cover_image'],
     ];
 
     /** Campos JSON (arrays) por slug — enviados como textarea JSON no form. */

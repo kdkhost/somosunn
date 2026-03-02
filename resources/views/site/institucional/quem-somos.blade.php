@@ -13,6 +13,14 @@
             <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 {{ $page->get('hero_subtitle', 'Conheça as pessoas por trás da maior comunidade de networking do Brasil.') }}
             </p>
+            @if($page->get('cover_image'))
+                <div class="mt-10">
+                    <img src="{{ asset('storage/' . $page->get('cover_image')) }}"
+                         alt="Quem Somos - UNN"
+                         class="w-full max-w-4xl mx-auto rounded-3xl shadow-2xl object-cover"
+                         style="max-height: 340px; display: block;">
+                </div>
+            @endif
         </div>
     </section>
 

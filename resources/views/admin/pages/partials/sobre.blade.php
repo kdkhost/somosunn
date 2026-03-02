@@ -23,6 +23,30 @@
                 <input type="text" name="cta_btn_secondary" class="form-control" value="{{ old('cta_btn_secondary', $data['cta_btn_secondary'] ?? '') }}" placeholder="Conhecer a equipe">
             </div>
         </div>
+        {{-- Imagem do hero --}}
+        <div class="form-group mb-0">
+            <label>Imagem do Hero <small class="text-muted">(JPG, PNG, WebP — máx 6 MB)</small></label>
+            @if (!empty($data['hero_image']))
+                <div class="mb-2">
+                    <img src="{{ asset('storage/' . $data['hero_image']) }}"
+                         alt="Imagem atual do hero"
+                         class="img-thumbnail"
+                         style="max-height: 160px; max-width: 320px; object-fit: cover;">
+                    <div class="mt-1">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="remove_hero_image" name="remove_hero_image" value="1">
+                            <label class="custom-control-label text-danger" for="remove_hero_image">Remover imagem atual</label>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="hero_image" name="hero_image" accept="image/*">
+                <label class="custom-file-label" for="hero_image">
+                    {{ !empty($data['hero_image']) ? 'Substituir imagem...' : 'Escolher imagem...' }}
+                </label>
+            </div>
+        </div>
     </div>
 </div>
 
