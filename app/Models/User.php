@@ -136,6 +136,7 @@ class User extends Authenticatable
         'email',
         'password',
         'gender',
+        'birth_date',
         'cpf',
         'phone',
         'bio',
@@ -178,7 +179,11 @@ class User extends Authenticatable
         'facebook_id',
         'linkedin_id',
         'avatar',
-        'pix_key'
+        'pix_key',
+        // Sistema de indicação e aniversário
+        'referral_code',
+        'referred_by',
+        'birth_date',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -188,10 +193,27 @@ class User extends Authenticatable
         'plan_expires_at' => 'datetime',
         'extra_features' => 'array',
         'social_links' => 'array',
-        'hide_profile' => 'boolean'
+        'hide_profile' => 'boolean',
+        'birth_date' => 'date',
     ];
 
     protected $appends = ['profile_photo_url'];
+
+    /**
+     * Auto-gera um código de referência único ao criar o usuário.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (self $user) {
+            if (empty($user->referral_code)) {
+                do {
+                    $code = 'UNN' . strtoupper(\Illuminate\Support\Str::random(7));
+                } while (self::where('referral_code', $code)->exists());
+
+                $user->referral_code = $code;
+            }
+        });
+    }
 
     public function plan()
     {
