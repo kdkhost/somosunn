@@ -13,7 +13,7 @@
                     <span class="unn-title-gradient">{{ ($pageData['hero_title'] ?? null) ?: 'Membros UNN' }}</span>
                 </h1>
                 <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                    {{ ($pageData['hero_subtitle'] ?? null) ?: 'Conheça os empreendedores que fazem parte da nossa comunidade exclusiva de networking empresarial.' }}
+                    {!! ($pageData['hero_subtitle'] ?? null) ?: 'Conheça os empreendedores que fazem parte da nossa comunidade exclusiva de networking empresarial.' !!}
                 </p>
             </div>
         </section>

@@ -102,13 +102,13 @@
                     <div class="text-center">
                         <span
                             class="inline-flex items-center justify-center px-6 py-2 rounded-full text-sm font-bold text-white border border-white/20 bg-white/15 backdrop-blur">
-                            Carreiras & Oportunidades
+                            {{ ($pageData['hero_badge'] ?? null) ?: 'Carreiras &amp; Oportunidades' }}
                         </span>
                         <h1 class="mt-6 text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-6">
                             {{ ($pageData['hero_title'] ?? null) ?: 'Descubra seu próximo passo na UNN Startups' }}
                         </h1>
                         <p class="mt-3 text-white/80 text-base sm:text-lg mb-8 max-w-2xl mx-auto">
-                            {{ ($pageData['hero_subtitle'] ?? null) ?: 'Conecte-se com empresas inovadoras, aplique para vagas exclusivas e acelere sua trajetória profissional com precisão.' }}
+                            {!! ($pageData['hero_subtitle'] ?? null) ?: 'Conecte-se com empresas inovadoras, aplique para vagas exclusivas e acelere sua trajetória profissional com precisão.' !!}
                         </p>
 
                         <!-- Search/Filter Bar -->

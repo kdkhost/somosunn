@@ -15,6 +15,13 @@ $slugRoutes = [
     'valores'       => 'valores',
     'como-funciona' => 'como-funciona',
     'quem-somos'    => 'quem-somos',
+    'eventos'       => 'events.index',
+    'membros'       => 'membros',
+    'vagas-abertas' => 'jobs.public.index',
+    'cursos'        => 'courses.index',
+    'portal'        => 'portal',
+    'premium'       => 'premium',
+    'feed'          => 'social.feed',
 ];
 $siteUrl = isset($slugRoutes[$page->slug]) ? route($slugRoutes[$page->slug]) : null;
 
@@ -61,6 +68,32 @@ $slugSections = [
         'sec-stats'    => ['icon' => 'fa-chart-bar',    'label' => 'UNN em Números'],
         'sec-cta'      => ['icon' => 'fa-bullhorn',     'label' => 'CTA Final'],
     ],
+    // Páginas de app
+    'eventos' => [
+        'sec-hero' => ['icon' => 'fa-calendar-alt', 'label' => 'Hero & Badge'],
+        'sec-cta'  => ['icon' => 'fa-bullhorn',     'label' => 'CTA Final'],
+    ],
+    'membros' => [
+        'sec-hero' => ['icon' => 'fa-users', 'label' => 'Hero'],
+    ],
+    'vagas-abertas' => [
+        'sec-hero' => ['icon' => 'fa-briefcase', 'label' => 'Hero & Badge'],
+    ],
+    'cursos' => [
+        'sec-hero' => ['icon' => 'fa-graduation-cap', 'label' => 'Hero & Badge'],
+    ],
+    'portal' => [
+        'sec-hero'  => ['icon' => 'fa-network-wired', 'label' => 'Hero'],
+        'sec-stats' => ['icon' => 'fa-chart-bar',     'label' => 'Estatísticas'],
+        'sec-cta'   => ['icon' => 'fa-bullhorn',      'label' => 'CTA Final'],
+    ],
+    'premium' => [
+        'sec-hero'  => ['icon' => 'fa-crown',  'label' => 'Hero & Imagem'],
+        'sec-plans' => ['icon' => 'fa-tags',   'label' => 'Seção de Planos'],
+    ],
+    'feed' => [
+        'sec-seo' => ['icon' => 'fa-search', 'label' => 'SEO'],
+    ],
 ];
 $sections = $slugSections[$page->slug] ?? [];
 
@@ -71,6 +104,13 @@ $slugColors = [
     'valores'       => 'danger',
     'como-funciona' => 'success',
     'quem-somos'    => 'secondary',
+    'eventos'       => 'primary',
+    'membros'       => 'info',
+    'vagas-abertas' => 'success',
+    'cursos'        => 'warning',
+    'portal'        => 'secondary',
+    'premium'       => 'danger',
+    'feed'          => 'dark',
 ];
 $badgeColor = $slugColors[$page->slug] ?? 'dark';
 @endphp
@@ -317,6 +357,27 @@ $badgeColor = $slugColors[$page->slug] ?? 'dark';
             }
         });
     });
+
+    /* Summernote compacto para subtítulos / campos HTML curtos */
+    if (typeof $ !== 'undefined' && $.fn && $.fn.summernote) {
+        $('.summernote-sm').summernote({
+            height: 120,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol']],
+                ['insert', ['link']],
+                ['view', ['codeview']]
+            ],
+            callbacks: {
+                onChange: function () {
+                    /* dispara o dirty-check do formulário */
+                    const form = document.getElementById('page-form');
+                    if (form) form.dispatchEvent(new Event('change'));
+                }
+            }
+        });
+    }
 
     /* Formatar + Copiar JSON */
     document.querySelectorAll('textarea[data-json]').forEach(ta => {

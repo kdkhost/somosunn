@@ -86,28 +86,27 @@
                     <div>
                         <span class="inline-block px-4 py-2 rounded-full text-sm font-bold mb-4 md:mb-6"
                             style="background: var(--unn-azul-1); color: white">
-                            <i class="fas fa-crown mr-2"></i> Associação Premium
+                            <i class="fas fa-crown mr-2"></i> {{ ($pageData['hero_badge'] ?? null) ?: 'Associação Premium' }}
                         </span>
                         <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient">
-                            Invista no seu <span class="unn-title-gradient">crescimento</span>
+                            {{ ($pageData['hero_title'] ?? null) ?: 'Invista no seu crescimento' }}
                         </h1>
                         <p class="text-xl text-gray-600 leading-relaxed mb-8">
-                            Escolha o plano ideal para você e desbloqueie todo o potencial da maior comunidade de networking
-                            do Brasil.
+                            {!! ($pageData['hero_subtitle'] ?? null) ?: 'Escolha o plano ideal para você e desbloqueie todo o potencial da maior comunidade de networking do Brasil.' !!}
                         </p>
                         <div class="flex items-center gap-6 text-sm text-gray-500">
                             <span class="flex items-center gap-2">
-                                <i class="fas fa-check-circle" style="color: var(--unn-azul-1)"></i> Sem fidelidade
+                                <i class="fas fa-check-circle" style="color: var(--unn-azul-1)"></i> {{ ($pageData['hero_trust_1'] ?? null) ?: 'Sem fidelidade' }}
                             </span>
                             <span class="flex items-center gap-2">
-                                <i class="fas fa-check-circle" style="color: var(--unn-azul-1)"></i> Cancele quando quiser
+                                <i class="fas fa-check-circle" style="color: var(--unn-azul-1)"></i> {{ ($pageData['hero_trust_2'] ?? null) ?: 'Cancele quando quiser' }}
                             </span>
                         </div>
                     </div>
                     <div class="hidden lg:block">
                         <div class="relative">
                             <div class="absolute inset-0 btn-primary rounded-3xl opacity-20 blur-3xl"></div>
-                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800"
+                            <img src="{{ (!empty($pageData['hero_image'])) ? asset('storage/'.$pageData['hero_image']) : 'https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800' }}"
                                 alt="Networking" class="relative w-full rounded-3xl shadow-2xl">
                         </div>
                     </div>
@@ -143,9 +142,8 @@
         <section class="py-16 px-6 md:px-12 lg:px-24" id="planos">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-8">
-                    <h2 class="text-4xl font-black unn-title-gradient mb-4">Escolha seu Plano</h2>
-                    <p class="text-gray-600 max-w-2xl mx-auto">Todos os planos incluem acesso à comunidade. Quanto maior o
-                        plano, mais recursos exclusivos.</p>
+                    <h2 class="text-4xl font-black unn-title-gradient mb-4">{{ ($pageData['plans_title'] ?? null) ?: 'Escolha seu Plano' }}</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">{{ ($pageData['plans_subtitle'] ?? null) ?: 'Todos os planos incluem acesso à comunidade. Quanto maior o plano, mais recursos exclusivos.' }}</p>
                 </div>
 
                 @php

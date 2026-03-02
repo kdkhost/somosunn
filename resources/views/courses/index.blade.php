@@ -105,7 +105,7 @@
                         <div
                             class="inline-flex items-center gap-3 px-6 py-2 rounded-full text-sm font-bold text-white border border-white/20 bg-white/15 backdrop-blur animate-fade-in shadow-lg">
                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-                            UNN ACADEMY
+                            {{ ($pageData['hero_badge'] ?? null) ?: 'UNN ACADEMY' }}
                         </div>
 
                         <h1
@@ -114,7 +114,7 @@
                         </h1>
 
                         <p class="text-white/80 text-lg md:text-xl font-medium max-w-2xl leading-relaxed">
-                            {{ ($pageData['hero_subtitle'] ?? null) ?: 'Domine as habilidades que transformam mercados. Conteúdo prático para quem não aceita o comum.' }}
+                            {!! ($pageData['hero_subtitle'] ?? null) ?: 'Domine as habilidades que transformam mercados. Conteúdo prático para quem não aceita o comum.' !!}
                         </p>
                     </div>
 

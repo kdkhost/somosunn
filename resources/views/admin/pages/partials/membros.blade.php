@@ -1,0 +1,20 @@
+{{-- Partial: membros --}}
+{{-- $data = $page->data ?? [] --}}
+
+<div id="sec-hero" class="card card-outline card-info">
+    <div class="card-header"><h3 class="card-title"><i class="fas fa-users mr-1"></i> Hero</h3></div>
+    <div class="card-body">
+        <div class="form-group">
+            <label>Título principal</label>
+            <input type="text" name="hero_title" class="form-control"
+                   value="{{ old('hero_title', $data['hero_title'] ?? '') }}"
+                   placeholder="Membros UNN">
+            <small class="form-text text-muted">Exibido como heading H1 no topo da página.</small>
+        </div>
+        <div class="form-group mb-0">
+            <label>Subtítulo / descrição</label>
+            <textarea name="hero_subtitle" rows="3" class="form-control summernote-sm"
+                      placeholder="Conheça os empreendedores que fazem parte da nossa comunidade exclusiva de networking empresarial.">{{ old('hero_subtitle', $data['hero_subtitle'] ?? '') }}</textarea>
+        </div>
+    </div>
+</div>

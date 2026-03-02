@@ -70,12 +70,35 @@ class PageController extends Controller
             'cta_title', 'cta_subtitle', 'cta_btn',
         ],
         // Páginas de aplicação
-        'eventos'     => ['seo_title', 'seo_description', 'hero_title', 'hero_subtitle'],
-        'membros'     => ['seo_title', 'seo_description', 'hero_title', 'hero_subtitle'],
-        'vagas-abertas' => ['seo_title', 'seo_description', 'hero_title', 'hero_subtitle'],
-        'cursos'      => ['seo_title', 'seo_description', 'hero_title', 'hero_subtitle'],
-        'portal'      => ['seo_title', 'seo_description', 'hero_title', 'hero_subtitle'],
-        'premium'     => ['seo_title', 'seo_description', 'hero_title', 'hero_subtitle', 'plans_title', 'plans_subtitle'],
+        'eventos'     => [
+            'seo_title', 'seo_description',
+            'hero_badge', 'hero_title', 'hero_subtitle',
+            'cta_title', 'cta_subtitle', 'cta_btn',
+        ],
+        'membros'     => [
+            'seo_title', 'seo_description',
+            'hero_title', 'hero_subtitle',
+        ],
+        'vagas-abertas' => [
+            'seo_title', 'seo_description',
+            'hero_badge', 'hero_title', 'hero_subtitle',
+        ],
+        'cursos'      => [
+            'seo_title', 'seo_description',
+            'hero_badge', 'hero_title', 'hero_subtitle',
+        ],
+        'portal'      => [
+            'seo_title', 'seo_description',
+            'hero_title', 'hero_subtitle',
+            'stat_1_value', 'stat_1_label', 'stat_2_value', 'stat_2_label',
+            'stat_3_value', 'stat_3_label', 'stat_4_value', 'stat_4_label',
+            'cta_title', 'cta_subtitle', 'cta_btn',
+        ],
+        'premium'     => [
+            'seo_title', 'seo_description',
+            'hero_badge', 'hero_title', 'hero_subtitle', 'hero_trust_1', 'hero_trust_2',
+            'plans_title', 'plans_subtitle',
+        ],
         'feed'        => ['seo_title', 'seo_description'],
     ];
 
@@ -84,9 +107,13 @@ class PageController extends Controller
      * O valor armazenado é o path relativo ao disco 'public'.
      */
     private const SLUG_IMAGE_FIELDS = [
-        'home'       => ['hero_image'],
-        'sobre'      => ['hero_image'],
-        'quem-somos' => ['cover_image'],
+        'home'         => ['hero_image'],
+        'sobre'        => ['hero_image'],
+        'quem-somos'   => ['cover_image'],
+        'eventos'      => ['hero_image'],
+        'cursos'       => ['hero_image'],
+        'portal'       => ['hero_image'],
+        'premium'      => ['hero_image'],
     ];
 
     /** Campos JSON (arrays) por slug — enviados como textarea JSON no form. */

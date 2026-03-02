@@ -12,7 +12,7 @@
                 {{ ($pageData['hero_title'] ?? null) ?: 'Portal de Networking' }}
             </h1>
             <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                {{ ($pageData['hero_subtitle'] ?? null) ?: 'Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.' }}
+                {!! ($pageData['hero_subtitle'] ?? null) ?: 'Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.' !!}
             </p>
         </div>
     </section>
@@ -22,20 +22,20 @@
         <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                 <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">120+</p>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Palestras</p>
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">{{ ($pageData['stat_1_value'] ?? null) ?: '120+' }}</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">{{ ($pageData['stat_1_label'] ?? null) ?: 'Palestras' }}</p>
                 </div>
                 <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">50+</p>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Mentorias</p>
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">{{ ($pageData['stat_2_value'] ?? null) ?: '50+' }}</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">{{ ($pageData['stat_2_label'] ?? null) ?: 'Mentorias' }}</p>
                 </div>
                 <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">5.000+</p>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Membros</p>
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">{{ ($pageData['stat_3_value'] ?? null) ?: '5.000+' }}</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">{{ ($pageData['stat_3_label'] ?? null) ?: 'Membros' }}</p>
                 </div>
                 <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">95%</p>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Satisfação</p>
+                    <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">{{ ($pageData['stat_4_value'] ?? null) ?: '95%' }}</p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">{{ ($pageData['stat_4_label'] ?? null) ?: 'Satisfação' }}</p>
                 </div>
             </div>
         </div>
