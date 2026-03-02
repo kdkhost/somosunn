@@ -21,8 +21,16 @@ class RegisterController extends Controller
             'gender' => 'nullable|string|in:male,female,other,prefer_not_to_say',
             'phone' => 'nullable|string',
             'cep' => 'nullable|string',
-            'address' => 'nullable|string'
+            'address' => 'nullable|string',
+            'ref' => 'nullable|string|max:20',
         ]);
+
+        // Resolve referidor pelo código de indicação
+        $referrer = null;
+        $refCode = trim((string) ($data['ref'] ?? $request->query('ref', '')));
+        if ($refCode !== '') {
+            $referrer = User::where('referral_code', $refCode)->first();
+        }
 
         $user = User::create([
             'name' => $data['name'],
@@ -33,6 +41,7 @@ class RegisterController extends Controller
             'phone' => $data['phone'] ?? null,
             'cep' => $data['cep'] ?? null,
             'address' => $data['address'] ?? null,
+            'referred_by' => $referrer?->id,
         ]);
 
         // Vincula plano gratuito para liberar o Painel do Membro imediatamente
@@ -51,6 +60,11 @@ class RegisterController extends Controller
         try {
             $ps = new \App\Services\PointsService();
             $ps->award($user, 'signup');
+
+            // Premia o referidor por ter indicado um novo membro
+            if ($referrer) {
+                $ps->award($referrer, 'referral', ['new_user_id' => $user->id, 'new_user_name' => $user->name]);
+            }
         } catch (\Throwable $e) {
             \Log::error('Points award error: ' . $e->getMessage());
         }

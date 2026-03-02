@@ -18,6 +18,9 @@
 
                 <form method="POST" action="{{ route('register') }}" class="space-y-5">
                     @csrf
+                    @if(request()->filled('ref'))
+                        <input type="hidden" name="ref" value="{{ e(request()->query('ref')) }}">
+                    @endif
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Nome completo</label>
                         <input name="name" type="text" required

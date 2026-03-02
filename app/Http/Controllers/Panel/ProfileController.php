@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
-use App\Models\PointsLog;
 use App\Services\PointsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -28,6 +27,7 @@ class ProfileController extends Controller
             'phone' => 'nullable|string|max:20',
             'doc' => 'nullable|string|max:20',
             'gender' => 'nullable|string|in:male,female,other,prefer_not_to_say',
+            'birth_date' => 'nullable|date|before:today',
             'occupation' => 'nullable|string|max:100',
             'company' => 'nullable|string|max:100',
 
@@ -147,18 +147,11 @@ class ProfileController extends Controller
         $saved = $user->save();
         $user->refresh();
 
-        // Gamificação: pontuar completar perfil (apenas 1x)
+        // Gamificação: pontuar completar perfil (PointsService bloqueia repetição automaticamente)
         try {
             $isProfileComplete = method_exists($user, 'isProfileComplete') ? $user->isProfileComplete() : false;
             if ($isProfileComplete && !$wasProfileComplete) {
-                $alreadyAwarded = PointsLog::query()
-                    ->where('user_id', $user->id)
-                    ->where('action_key', 'complete_profile')
-                    ->exists();
-
-                if (!$alreadyAwarded) {
-                    (new PointsService())->award($user, 'complete_profile');
-                }
+                (new PointsService())->award($user, 'complete_profile');
             }
         } catch (\Throwable $e) {
             \Log::warning('Falha ao pontuar completar perfil: ' . $e->getMessage());
