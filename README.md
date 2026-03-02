@@ -334,5 +334,13 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
   - Inbox dedicado: /compartilhamentos/pendentes.
   - Comando share-requests:expire (diario 02:00) expira solicitacoes em lote.
 
+### 02/03/2026 (Noite) - Pagina de Oportunidades Moderna
+- **Melhorias em /vagas-abertas:**
+  - Filtros avancados com 4 campos server-side: cargo/palavra-chave, localidade, empresa e tipo de vaga.
+  - Badge PARCEIRO (violeta) nos cards de vagas de empresas cadastradas na tabela de parceiros.
+  - Select com tipos de vagas populados dinamicamente do banco.
+  - ARIA: role=search, role=article, aria-label nos campos e cards, aria-hidden nos icones decorativos.
+  - Busca por palavra-chave agora cobre titulo, descricao e tipo (antes so tipo).
+
 ---
 © 2026 UNN Networking. Todos os direitos reservados.
