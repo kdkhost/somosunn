@@ -2,7 +2,7 @@
 {{-- $data = $page->data ?? [] --}}
 
 {{-- Intro --}}
-<div class="card card-outline card-primary">
+<div id="sec-header" class="card card-outline card-primary">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-heart mr-1"></i> Cabeçalho</h3></div>
     <div class="card-body">
         <div class="form-group mb-0">
@@ -13,7 +13,7 @@
 </div>
 
 {{-- Valores (array JSON) --}}
-<div class="card card-outline card-secondary">
+<div id="sec-values" class="card card-outline card-secondary">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-list-ul mr-1"></i> Os 6 Valores</h3>
         <div class="card-tools">
@@ -37,7 +37,7 @@
 </div>
 
 {{-- Blockquote --}}
-<div class="card card-outline card-warning">
+<div id="sec-quote" class="card card-outline card-warning">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-quote-left mr-1"></i> Citação Central</h3></div>
     <div class="card-body">
         <div class="form-group">
@@ -52,7 +52,7 @@
 </div>
 
 {{-- CTA --}}
-<div class="card card-outline card-success">
+<div id="sec-cta" class="card card-outline card-success">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3></div>
     <div class="card-body">
         <div class="form-group">

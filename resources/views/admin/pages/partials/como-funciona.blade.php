@@ -2,7 +2,7 @@
 {{-- $data = $page->data ?? [] --}}
 
 {{-- Intro --}}
-<div class="card card-outline card-primary">
+<div id="sec-header" class="card card-outline card-primary">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-cogs mr-1"></i> Cabeçalho</h3></div>
     <div class="card-body">
         <div class="form-group mb-0">
@@ -13,7 +13,7 @@
 </div>
 
 {{-- Steps (array JSON) --}}
-<div class="card card-outline card-secondary">
+<div id="sec-steps" class="card card-outline card-secondary">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-list-ol mr-1"></i> Passos (4 etapas)</h3>
         <div class="card-tools"><span class="badge badge-secondary">JSON</span></div>
@@ -36,7 +36,7 @@
 </div>
 
 {{-- Planos --}}
-<div class="card card-outline card-warning">
+<div id="sec-plans" class="card card-outline card-warning">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-tags mr-1"></i> Seção Planos</h3></div>
     <div class="card-body">
         <div class="form-group">
@@ -51,7 +51,7 @@
 </div>
 
 {{-- CTA --}}
-<div class="card card-outline card-success">
+<div id="sec-cta" class="card card-outline card-success">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3></div>
     <div class="card-body">
         <div class="form-group">

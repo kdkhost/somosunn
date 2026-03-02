@@ -2,7 +2,7 @@
 {{-- $data = $page->data ?? [] --}}
 
 {{-- Hero --}}
-<div class="card card-outline card-primary">
+<div id="sec-hero" class="card card-outline card-primary">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-heading mr-1"></i> Hero</h3></div>
     <div class="card-body">
         <div class="form-group">
@@ -25,33 +25,33 @@
         </div>
         {{-- Imagem do hero --}}
         <div class="form-group mb-0">
-            <label>Imagem do Hero <small class="text-muted">(JPG, PNG, WebP — máx 6 MB)</small></label>
-            @if (!empty($data['hero_image']))
-                <div class="mb-2">
-                    <img src="{{ asset('storage/' . $data['hero_image']) }}"
-                         alt="Imagem atual do hero"
-                         class="img-thumbnail"
-                         style="max-height: 160px; max-width: 320px; object-fit: cover;">
-                    <div class="mt-1">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="remove_hero_image" name="remove_hero_image" value="1">
-                            <label class="custom-control-label text-danger" for="remove_hero_image">Remover imagem atual</label>
-                        </div>
-                    </div>
-                </div>
-            @endif
+            <label class="font-weight-bold">Imagem do Hero <small class="text-muted font-weight-normal">(JPG, PNG, WebP — máx 6 MB — aparece ao lado dos stats)</small></label>
+            <div class="mb-2">
+                <img id="prev-sobre-img"
+                     src="{{ !empty($data['hero_image']) ? asset('storage/'.$data['hero_image']) : '' }}"
+                     class="img-fluid rounded shadow-sm {{ empty($data['hero_image']) ? 'd-none' : '' }}"
+                     style="max-height:220px;max-width:100%;object-fit:cover;border:1px solid #dee2e6"
+                     alt="Preview da imagem">
+            </div>
             <div class="custom-file">
-                <input type="file" class="custom-file-input" id="hero_image" name="hero_image" accept="image/*">
+                <input type="file" class="custom-file-input" id="hero_image" name="hero_image"
+                       accept="image/*" data-preview="prev-sobre-img">
                 <label class="custom-file-label" for="hero_image">
                     {{ !empty($data['hero_image']) ? 'Substituir imagem...' : 'Escolher imagem...' }}
                 </label>
             </div>
+            @if (!empty($data['hero_image']))
+                <div class="custom-control custom-checkbox mt-2">
+                    <input type="checkbox" class="custom-control-input" id="remove_hero_image" name="remove_hero_image" value="1">
+                    <label class="custom-control-label text-danger" for="remove_hero_image">Remover imagem atual</label>
+                </div>
+            @endif
         </div>
     </div>
 </div>
 
 {{-- Estatísticas --}}
-<div class="card card-outline card-info">
+<div id="sec-stats" class="card card-outline card-info">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> Estatísticas (4 números)</h3></div>
     <div class="card-body">
         @foreach ([1,2,3,4] as $i)
@@ -70,7 +70,7 @@
 </div>
 
 {{-- História --}}
-<div class="card card-outline card-secondary">
+<div id="sec-history" class="card card-outline card-secondary">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-book-open mr-1"></i> Nossa História</h3></div>
     <div class="card-body">
         <div class="form-group">
@@ -93,7 +93,7 @@
 </div>
 
 {{-- Diferenciais --}}
-<div class="card card-outline card-secondary">
+<div id="sec-diff" class="card card-outline card-secondary">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-star mr-1"></i> Diferenciais</h3></div>
     <div class="card-body">
         <div class="form-group">
@@ -117,7 +117,7 @@
 </div>
 
 {{-- CTA --}}
-<div class="card card-outline card-success">
+<div id="sec-cta" class="card card-outline card-success">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3></div>
     <div class="card-body">
         <div class="form-group">

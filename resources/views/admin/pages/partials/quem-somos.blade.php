@@ -2,7 +2,7 @@
 {{-- $data = $page->data ?? [] --}}
 
 {{-- Intro --}}
-<div class="card card-outline card-primary">
+<div id="sec-header" class="card card-outline card-primary">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-users mr-1"></i> Cabeçalho</h3></div>
     <div class="card-body">
         <div class="form-group">
@@ -11,33 +11,33 @@
         </div>
         {{-- Imagem de capa --}}
         <div class="form-group mb-0">
-            <label>Imagem de capa <small class="text-muted">(banner abaixo do título — JPG, PNG, WebP — máx 6 MB)</small></label>
-            @if (!empty($data['cover_image']))
-                <div class="mb-2">
-                    <img src="{{ asset('storage/' . $data['cover_image']) }}"
-                         alt="Imagem atual de capa"
-                         class="img-thumbnail"
-                         style="max-height: 160px; max-width: 320px; object-fit: cover;">
-                    <div class="mt-1">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="remove_cover_image" name="remove_cover_image" value="1">
-                            <label class="custom-control-label text-danger" for="remove_cover_image">Remover imagem atual</label>
-                        </div>
-                    </div>
-                </div>
-            @endif
+            <label class="font-weight-bold">Imagem de capa <small class="text-muted font-weight-normal">(banner abaixo do título — JPG, PNG, WebP — máx 6 MB)</small></label>
+            <div class="mb-2">
+                <img id="prev-cover-img"
+                     src="{{ !empty($data['cover_image']) ? asset('storage/'.$data['cover_image']) : '' }}"
+                     class="img-fluid rounded shadow-sm {{ empty($data['cover_image']) ? 'd-none' : '' }}"
+                     style="max-height:220px;max-width:100%;object-fit:cover;border:1px solid #dee2e6"
+                     alt="Preview da capa">
+            </div>
             <div class="custom-file">
-                <input type="file" class="custom-file-input" id="cover_image" name="cover_image" accept="image/*">
+                <input type="file" class="custom-file-input" id="cover_image" name="cover_image"
+                       accept="image/*" data-preview="prev-cover-img">
                 <label class="custom-file-label" for="cover_image">
                     {{ !empty($data['cover_image']) ? 'Substituir imagem...' : 'Escolher imagem...' }}
                 </label>
             </div>
+            @if (!empty($data['cover_image']))
+                <div class="custom-control custom-checkbox mt-2">
+                    <input type="checkbox" class="custom-control-input" id="remove_cover_image" name="remove_cover_image" value="1">
+                    <label class="custom-control-label text-danger" for="remove_cover_image">Remover imagem atual</label>
+                </div>
+            @endif
         </div>
     </div>
 </div>
 
 {{-- Fundadores (array JSON) --}}
-<div class="card card-outline card-secondary">
+<div id="sec-founders" class="card card-outline card-secondary">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-crown mr-1"></i> Fundadores</h3>
         <div class="card-tools"><span class="badge badge-secondary">JSON</span></div>
@@ -61,7 +61,7 @@
 </div>
 
 {{-- Equipe (array JSON) --}}
-<div class="card card-outline card-secondary">
+<div id="sec-team" class="card card-outline card-secondary">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-user-friends mr-1"></i> Equipe</h3>
         <div class="card-tools"><span class="badge badge-secondary">JSON</span></div>
@@ -85,7 +85,7 @@
 </div>
 
 {{-- Estatísticas --}}
-<div class="card card-outline card-info">
+<div id="sec-stats" class="card card-outline card-info">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> UNN em Números</h3></div>
     <div class="card-body">
         <div class="form-group">
@@ -109,7 +109,7 @@
 </div>
 
 {{-- CTA --}}
-<div class="card card-outline card-success">
+<div id="sec-cta" class="card card-outline card-success">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3></div>
     <div class="card-body">
         <div class="form-group">

@@ -2,7 +2,7 @@
 {{-- $data = $page->data ?? [] --}}
 
 {{-- Hero --}}
-<div class="card card-outline card-primary">
+<div id="sec-hero" class="card card-outline card-primary">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-fist-raised mr-1"></i> Hero</h3></div>
     <div class="card-body">
         <div class="form-row">
@@ -27,7 +27,7 @@
 </div>
 
 {{-- Seções do manifesto --}}
-<div class="card card-outline card-secondary">
+<div id="sec-sections" class="card card-outline card-secondary">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-list mr-1"></i> Seções do Manifesto</h3></div>
     <div class="card-body">
         @foreach ([1,2,3,4,5] as $i)
@@ -45,7 +45,7 @@
 </div>
 
 {{-- Citação final --}}
-<div class="card card-outline card-secondary">
+<div id="sec-quote" class="card card-outline card-secondary">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-quote-right mr-1"></i> Citação Final</h3></div>
     <div class="card-body">
         <div class="form-group">
@@ -60,7 +60,7 @@
 </div>
 
 {{-- Pilares --}}
-<div class="card card-outline card-warning">
+<div id="sec-pillars" class="card card-outline card-warning">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-columns mr-1"></i> Pilares</h3></div>
     <div class="card-body">
         <div class="form-group">
@@ -83,7 +83,7 @@
 </div>
 
 {{-- CTA --}}
-<div class="card card-outline card-success">
+<div id="sec-cta" class="card card-outline card-success">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3></div>
     <div class="card-body">
         <div class="form-group">
