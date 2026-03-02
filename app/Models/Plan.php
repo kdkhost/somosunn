@@ -28,7 +28,9 @@ class Plan extends Model
         'is_active',
         'is_free',
         'mp_plan_id',
-        'is_recurring'
+        'is_recurring',
+        'sort_order',
+        'price_periods',
     ];
 
     protected $casts = [
@@ -43,7 +45,9 @@ class Plan extends Model
         'benefits' => 'array',
         'permissions' => 'array',
         'comparison' => 'array',
-        'price' => 'decimal:2'
+        'price' => 'decimal:2',
+        'price_periods' => 'array',
+        'sort_order' => 'integer',
     ];
 
     /**
@@ -60,6 +64,77 @@ class Plan extends Model
         } catch (\Throwable $e) {
             return null;
         }
+    }
+
+    /**
+     * Retorna o preço para um período específico.
+     * Usa price_periods se disponível, caso contrário retorna o preço base.
+     *
+     * @param string|null $period mensal|trimestral|semestral|anual
+     */
+    public function getPriceForPeriod(?string $period = null): float
+    {
+        $period = $period ? strtolower(trim($period)) : 'mensal';
+        $periods = $this->price_periods;
+        if (is_array($periods) && isset($periods[$period]) && $periods[$period] > 0) {
+            return (float) $periods[$period];
+        }
+        return (float) $this->price;
+    }
+
+    /**
+     * Retorna todos os períodos disponíveis com seus preços.
+     * Sempre inclui pelo menos 'mensal' com o preço base.
+     */
+    public function getAvailablePeriods(): array
+    {
+        $base = [
+            'mensal'     => (float) $this->price,
+            'trimestral' => null,
+            'semestral'  => null,
+            'anual'      => null,
+        ];
+
+        $periods = $this->price_periods;
+        if (is_array($periods)) {
+            foreach ($periods as $key => $value) {
+                if (array_key_exists($key, $base) && $value > 0) {
+                    $base[$key] = (float) $value;
+                }
+            }
+        }
+
+        // Remove períodos sem preço definido (exceto mensal)
+        return array_filter($base, fn($v, $k) => $k === 'mensal' || $v !== null, ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
+     * Calcula prorrata para upgrade de plano:
+     * dias restantes no plano atual × (novo_preço_diário − preço_diário_atual).
+     */
+    public static function calculateProrata(self $currentPlan, self $newPlan, string $period = 'mensal'): float
+    {
+        $daysInPeriod = match ($period) {
+            'trimestral' => 90,
+            'semestral'  => 180,
+            'anual'      => 365,
+            default      => 30,
+        };
+
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $expiresAt = $user?->plan_expires_at;
+
+        $daysRemaining = $expiresAt ? max(0, (int) now()->diffInDays($expiresAt, false)) : 0;
+        if ($daysRemaining <= 0) {
+            return $newPlan->getPriceForPeriod($period);
+        }
+
+        $dailyCurrent = $currentPlan->getPriceForPeriod($period) / $daysInPeriod;
+        $dailyNew     = $newPlan->getPriceForPeriod($period) / $daysInPeriod;
+        $diff = ($dailyNew - $dailyCurrent) * $daysRemaining;
+
+        return max(0, round($diff, 2));
     }
 
     public function hasFeature($feature)

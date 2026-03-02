@@ -669,6 +669,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         // Plans CRUD
         Route::post('plans/{plan}/toggle-active', [\App\Http\Controllers\Admin\PlanController::class, 'toggleActive'])
             ->middleware('check.feature:plans_access')->name('plans.toggle-active');
+        Route::post('plans/reorder', [\App\Http\Controllers\Admin\PlanController::class, 'reorder'])
+            ->middleware('check.feature:plans_access')->name('plans.reorder');
         Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)
             ->middleware('check.feature:plans_access')->names('plans');
 

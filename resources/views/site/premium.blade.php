@@ -140,7 +140,7 @@
         <!-- Pricing Section -->
         <section class="py-16 px-6 md:px-12 lg:px-24" id="planos">
             <div class="max-w-7xl mx-auto">
-                <div class="text-center mb-12">
+                <div class="text-center mb-8">
                     <h2 class="text-4xl font-black unn-title-gradient mb-4">Escolha seu Plano</h2>
                     <p class="text-gray-600 max-w-2xl mx-auto">Todos os planos incluem acesso à comunidade. Quanto maior o
                         plano, mais recursos exclusivos.</p>
@@ -148,72 +148,207 @@
 
                 @php
                     $recommendedPlanIds = ($recommendedPlans ?? collect())->pluck('id')->all();
+                    $allPeriods = $allPeriods ?? ['mensal' => 'Mensal'];
+                    $planPriceData = $planPriceData ?? [];
                 @endphp
 
-                <div class="grid md:grid-cols-{{ min(3, $plans->count() ?: 1) }} gap-8">
+                {{-- Toggle de Período --}}
+                @if(count($allPeriods) > 1)
+                <div class="flex justify-center mb-10">
+                    <div class="inline-flex bg-slate-100 rounded-2xl p-1 gap-1" role="group" id="period-toggle">
+                        @foreach($allPeriods as $pk => $pl)
+                            <button type="button"
+                                class="period-btn px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none
+                                    {{ $pk === 'mensal' ? 'bg-white text-blue-700 shadow-sm font-bold' : 'text-gray-500 hover:text-gray-700' }}"
+                                data-period="{{ $pk }}">
+                                {{ $pl }}
+                                @if($pk !== 'mensal')
+                                    <span class="ml-1 text-xs text-emerald-600 font-bold discount-badge-{{ $pk }}"></span>
+                                @endif
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                <div class="grid md:grid-cols-{{ min(4, max(1, $plans->count())) }} gap-8 items-start">
                     @forelse($plans as $plan)
                         @php
                             $isRecommendedForFeature = in_array($plan->id, $recommendedPlanIds, true);
+                            $periods = $planPriceData[$plan->id] ?? ['mensal' => (float)$plan->price];
                         @endphp
 
-                        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg {{ $plan->highlight ? 'shadow-2xl ring-2' : '' }} {{ ($plan->highlight || $isRecommendedForFeature) ? 'relative' : '' }}"
-                            style="{{ $plan->highlight ? '--tw-ring-color: var(--unn-azul-1)' : '' }}">
+                        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg {{ $plan->highlight ? 'shadow-2xl ring-2 -mt-4' : '' }} relative"
+                            style="{{ $plan->highlight ? '--tw-ring-color: var(--unn-azul-1)' : '' }}"
+                            data-plan-id="{{ $plan->id }}">
 
                             @if($plan->highlight)
-                                <span
-                                    class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 btn-primary text-white text-sm font-bold rounded-full">
+                                <span class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 btn-primary text-white text-sm font-bold rounded-full whitespace-nowrap">
                                     MAIS POPULAR
                                 </span>
                             @endif
 
                             @if($isRecommendedForFeature)
-                                <span
-                                    class="absolute -top-4 {{ $plan->highlight ? 'right-4' : 'left-1/2 -translate-x-1/2' }} px-4 py-1 bg-emerald-500 text-white text-xs font-black rounded-full shadow-lg">
-                                    RECOMENDADO PARA ESTE ACESSO
+                                <span class="absolute -top-4 {{ $plan->highlight ? 'right-4' : 'left-1/2 -translate-x-1/2' }} px-4 py-1 bg-emerald-500 text-white text-xs font-black rounded-full shadow-lg whitespace-nowrap">
+                                    RECOMENDADO
                                 </span>
                             @endif
 
                             <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $plan->name }}</h3>
-                            <div class="mb-2">
+                            <div class="mb-1 plan-price-wrap" data-plan="{{ $plan->id }}">
                                 @if($plan->price > 0)
-                                    <span class="text-5xl font-black" style="color: var(--unn-azul-1)">R$
-                                        {{ number_format($plan->price, 0, ',', '.') }}</span>
-                                    <span class="text-gray-500">/{{ $plan->period }}</span>
+                                    <span class="text-5xl font-black plan-price-amount" data-prices="{{ json_encode($periods) }}" style="color: var(--unn-azul-1)">
+                                        R$ {{ number_format($plan->price, 0, ',', '.') }}</span>
+                                    <span class="text-gray-500 plan-period-label">/mensal</span>
+                                    <div class="text-xs text-emerald-600 font-semibold plan-period-note mt-1" style="min-height:18px"></div>
                                 @else
                                     <span class="text-5xl font-black text-gray-900">Grátis</span>
                                 @endif
                             </div>
 
                             @if($plan->description)
-                                <p class="text-gray-500 mb-8">{{ $plan->description }}</p>
+                                <p class="text-gray-500 mb-6 text-sm">{{ $plan->description }}</p>
                             @else
-                                <p class="text-gray-500 mb-8">&nbsp;</p>
+                                <p class="text-gray-500 mb-6">&nbsp;</p>
                             @endif
 
-                            <ul class="space-y-4 mb-8">
+                            <ul class="space-y-3 mb-8">
                                 @php $benefits = is_array($plan->benefits) ? $plan->benefits : json_decode($plan->benefits ?? '[]', true); @endphp
                                 @foreach($benefits as $benefit)
-                                    <li class="flex items-center gap-3 text-gray-600">
-                                        <i class="fas fa-check text-green-500"></i>
+                                    <li class="flex items-center gap-3 text-gray-600 text-sm">
+                                        <i class="fas fa-check text-green-500 flex-shrink-0"></i>
                                         {{ $benefit }}
                                     </li>
                                 @endforeach
                             </ul>
 
                             <a href="{{ $plan->price > 0 ? route('subscription.checkout', ['plan' => $plan->id]) : route('register') }}"
-                                class="block w-full text-center py-4 rounded-xl font-bold transition {{ $plan->highlight ? 'btn-primary text-white shadow-lg hover:shadow-xl' : 'border-2 hover:bg-slate-50' }}"
-                                style="{{ !$plan->highlight ? 'border-color: var(--unn-azul-1); color: var(--unn-azul-1)' : '' }}">
-                                {{ $plan->price > 0 ? 'Assinar ' . ($plan->name) : 'Começar grátis' }}
+                                class="plan-checkout-link block w-full text-center py-4 rounded-xl font-bold transition {{ $plan->highlight ? 'btn-primary text-white shadow-lg hover:shadow-xl' : 'border-2 hover:bg-slate-50' }}"
+                                style="{{ !$plan->highlight ? 'border-color: var(--unn-azul-1); color: var(--unn-azul-1)' : '' }}"
+                                data-plan="{{ $plan->id }}"
+                                data-base-url="{{ $plan->price > 0 ? route('subscription.checkout', ['plan' => $plan->id]) : route('register') }}"
+                                data-free="{{ $plan->price > 0 ? '0' : '1' }}">
+                                {{ $plan->price > 0 ? 'Assinar ' . $plan->name : 'Começar grátis' }}
                             </a>
                         </div>
                     @empty
-                        <div class="col-span-3 text-center py-12">
+                        <div class="col-span-4 text-center py-12">
                             <p class="text-gray-500 italic">Nenhum plano disponível no momento.</p>
                         </div>
                     @endforelse
                 </div>
+
+                {{-- Nota de prorrata para upgrades/downgrades --}}
+                @auth
+                @if($plans->count() > 1)
+                <p class="text-center text-xs text-gray-400 mt-6">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Upgrade ou downgrade de plano? O valor é calculado proporcionalmente (prorrata) aos dias restantes.
+                </p>
+                @endif
+                @endauth
             </div>
         </section>
+
+        @push('scripts')
+        <script>
+        (function () {
+            var planPriceData = @json($planPriceData ?? []);
+            var currentPeriod = 'mensal';
+
+            var periodLabels = {
+                mensal: '/mensal',
+                trimestral: '/trimestre',
+                semestral: '/semestre',
+                anual: '/ano'
+            };
+
+            // Calcular desconto % em relação ao mensal×N
+            function discountText(planPrices, period) {
+                var monthly = planPrices['mensal'] || 0;
+                if (!monthly) return '';
+                var months = { trimestral: 3, semestral: 6, anual: 12 };
+                var n = months[period];
+                if (!n) return '';
+                var periodPrice = planPrices[period] || 0;
+                if (!periodPrice) return '';
+                var full = monthly * n;
+                var pct = Math.round((1 - periodPrice / full) * 100);
+                return pct > 0 ? '-' + pct + '%' : '';
+            }
+
+            function updatePrices(period) {
+                currentPeriod = period;
+
+                // Atualizar badges de desconto nos botões
+                ['trimestral', 'semestral', 'anual'].forEach(function (p) {
+                    var badges = document.querySelectorAll('.discount-badge-' + p);
+                    badges.forEach(function (b) {
+                        // find any plan that has this period
+                        var sample = Object.values(planPriceData).find(function (pp) {
+                            return pp[p] > 0;
+                        });
+                        b.textContent = sample ? discountText(sample, p) : '';
+                    });
+                });
+
+                // Atualizar preços nos cards
+                document.querySelectorAll('.plan-price-amount').forEach(function (el) {
+                    var prices = null;
+                    try { prices = JSON.parse(el.getAttribute('data-prices')); } catch(e) {}
+                    if (!prices) return;
+
+                    var price = prices[period] !== undefined ? prices[period] : prices['mensal'];
+                    if (!price) return;
+
+                    // Format
+                    el.textContent = 'R$ ' + Math.round(price).toLocaleString('pt-BR');
+
+                    // Period label
+                    var card = el.closest('[data-plan-id]');
+                    if (!card) return;
+                    var lbl = card.querySelector('.plan-period-label');
+                    if (lbl) lbl.textContent = periodLabels[period] || '/' + period;
+
+                    // Note: discount vs monthly×N
+                    var note = card.querySelector('.plan-period-note');
+                    if (note) {
+                        var allPrices = prices;
+                        var txt = period !== 'mensal' ? discountText(allPrices, period) : '';
+                        note.textContent = txt ? ('Economize ' + txt + ' vs mensal') : '';
+                    }
+                });
+
+                // Atualizar links de checkout
+                document.querySelectorAll('.plan-checkout-link').forEach(function (a) {
+                    if (a.dataset.free === '1') return;
+                    var base = a.dataset.baseUrl;
+                    a.href = base + (base.indexOf('?') >= 0 ? '&' : '?') + 'period=' + period;
+                });
+            }
+
+            // Botões de período
+            var toggle = document.getElementById('period-toggle');
+            if (toggle) {
+                toggle.addEventListener('click', function (e) {
+                    var btn = e.target.closest('.period-btn');
+                    if (!btn) return;
+                    var p = btn.dataset.period;
+                    toggle.querySelectorAll('.period-btn').forEach(function (b) {
+                        b.classList.remove('bg-white', 'text-blue-700', 'shadow-sm', 'font-bold');
+                        b.classList.add('text-gray-500');
+                    });
+                    btn.classList.add('bg-white', 'text-blue-700', 'shadow-sm', 'font-bold');
+                    btn.classList.remove('text-gray-500');
+                    updatePrices(p);
+                });
+            }
+
+            // Init discounts on buttons
+            updatePrices('mensal');
+        })();
+        </script>
+        @endpush
 
         <!-- Benefícios -->
         <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">

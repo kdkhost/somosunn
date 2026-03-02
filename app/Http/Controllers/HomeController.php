@@ -102,7 +102,8 @@ class HomeController extends Controller
 
     public function premium()
     {
-        $plans = \App\Models\Plan::where('is_active', true)
+        $allActive = \App\Models\Plan::where('is_active', true)
+            ->orderBy('sort_order')
             ->orderByDesc('highlight')
             ->orderBy('price')
             ->get();
@@ -112,19 +113,29 @@ class HomeController extends Controller
 
         $recommendedPlans = collect();
         if ($requiredFeature !== '') {
-            $recommendedPlans = $plans
-                ->filter(function ($plan) use ($requiredFeature) {
-                    return method_exists($plan, 'hasFeature') ? (bool) $plan->hasFeature($requiredFeature) : false;
-                })
+            $recommendedPlans = $allActive
+                ->filter(fn($plan) => method_exists($plan, 'hasFeature') && (bool) $plan->hasFeature($requiredFeature))
                 ->values();
+        }
 
-            if ($recommendedPlans->isNotEmpty()) {
-                $recommendedIds = $recommendedPlans->pluck('id')->all();
-                $plans = $recommendedPlans
-                    ->concat($plans->reject(fn($plan) => in_array($plan->id, $recommendedIds, true)))
-                    ->values();
+        // Reposicionamento: plano destacado sempre no centro
+        $plans = $this->centerHighlightedPlan($allActive);
+
+        // Períodos disponíveis entre todos os planos (para o toggle de período)
+        $allPeriods = ['mensal' => 'Mensal'];
+        foreach ($plans as $plan) {
+            foreach (($plan->price_periods ?? []) as $pk => $pv) {
+                if ($pv > 0 && in_array($pk, ['trimestral','semestral','anual'], true)) {
+                    $allPeriods[$pk] = ucfirst($pk);
+                }
             }
         }
+        ksort($allPeriods);
+
+        // Dados de preços por período para o JS (keyed por plan id)
+        $planPriceData = $plans->mapWithKeys(fn($plan) => [
+            $plan->id => $plan->getAvailablePeriods(),
+        ])->all();
 
         $testimonials = collect();
         if (view()->shared('unnDbAvailable')) {
@@ -144,8 +155,30 @@ class HomeController extends Controller
             'testimonials',
             'requiredFeature',
             'requiredFeatureLabel',
-            'recommendedPlans'
+            'recommendedPlans',
+            'allPeriods',
+            'planPriceData'
         ));
+    }
+
+    /**
+     * Reposiciona o plano com highlight=true para o centro da coleção.
+     */
+    private function centerHighlightedPlan(\Illuminate\Support\Collection $plans): \Illuminate\Support\Collection
+    {
+        $highlighted = $plans->firstWhere('highlight', true);
+        if (!$highlighted || $plans->count() <= 1) {
+            return $plans;
+        }
+
+        $others = $plans->filter(fn($p) => $p->id !== $highlighted->id)->values();
+        $total  = $others->count() + 1;
+        $center = (int) floor($total / 2);
+
+        $before = $others->slice(0, $center)->values();
+        $after  = $others->slice($center)->values();
+
+        return $before->push($highlighted)->merge($after)->values();
     }
 
     // Webhook placeholders

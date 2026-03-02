@@ -19,16 +19,52 @@
                     <input name="name" class="form-control" value="{{ old('name',$plan->name) }}" required>
                 </div>
                 <div class="form-group col-md-3">
-                    <label>Preço</label>
+                    <label>Preço base <small class="text-muted">(mensal padrão)</small></label>
                     <input name="price" class="form-control mask-money" value="{{ old('price',$plan->price) }}" required>
                 </div>
                 <div class="form-group col-md-3">
-                    <label>Período</label>
+                    <label>Período padrão</label>
                     <select name="period" class="form-control">
                         @foreach(['mensal','trimestral','semestral','anual','vitalício'] as $p)
                             <option value="{{ $p }}" {{ old('period',$plan->period)==$p?'selected':'' }}>{{ ucfirst($p) }}</option>
                         @endforeach
                     </select>
+                </div>
+            </div>
+
+            {{-- Preços por período --}}
+            <div class="card card-outline card-primary mb-3">
+                <div class="card-header p-2">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-calendar-alt mr-1"></i> Preços por Período
+                        <small class="text-muted font-weight-normal ml-2">Deixe 0 ou vazio para ocultar esta opção no site</small>
+                    </h6>
+                </div>
+                <div class="card-body p-3">
+                    <div class="form-row">
+                        @php
+                            $pricePeriods = old('price_periods', $plan->price_periods ?? []);
+                            $periodLabels = ['mensal' => 'Mensal', 'trimestral' => 'Trimestral (3×)', 'semestral' => 'Semestral (6×)', 'anual' => 'Anual (12×)'];
+                        @endphp
+                        @foreach($periodLabels as $key => $label)
+                            <div class="form-group col-md-3">
+                                <label class="small">{{ $label }}</label>
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend"><span class="input-group-text">R$</span></div>
+                                    <input type="number" step="0.01" min="0" name="price_periods[{{ $key }}]"
+                                        class="form-control"
+                                        value="{{ old('price_periods.'.$key, $pricePeriods[$key] ?? ($key === 'mensal' ? $plan->price : '')) }}"
+                                        placeholder="0,00">
+                                </div>
+                                @if($key !== 'mensal')
+                                    <small class="text-muted">Total cobrado de uma vez</small>
+                                @else
+                                    <small class="text-muted">= Preço base acima</small>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                    <small class="text-info"><i class="fas fa-info-circle"></i> O cliente escolherá o período no momento da assinatura. Upgrade/downgrade calculam prorrata automaticamente.</small>
                 </div>
             </div>
 

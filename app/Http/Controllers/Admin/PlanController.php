@@ -70,7 +70,7 @@ class PlanController extends Controller
 
     public function index()
     {
-        $plans = Plan::orderByDesc('highlight')->orderBy('price')->paginate(12);
+        $plans = Plan::orderBy('sort_order')->orderByDesc('highlight')->orderBy('price')->paginate(24);
         return view('admin.plans.index', compact('plans'));
     }
 
@@ -205,7 +205,22 @@ class PlanController extends Controller
             'is_recurring' => 'nullable|boolean',
             'is_free' => 'nullable|boolean',
             'billing_cycle' => 'nullable|integer|min:1|max:12',
+            'price_periods' => 'nullable|array',
+            'price_periods.mensal' => 'nullable|numeric|min:0',
+            'price_periods.trimestral' => 'nullable|numeric|min:0',
+            'price_periods.semestral' => 'nullable|numeric|min:0',
+            'price_periods.anual' => 'nullable|numeric|min:0',
         ]);
+
+        // Normaliza price_periods: guarda apenas os que foram preenchidos com valor > 0
+        $rawPeriods = $request->input('price_periods', []);
+        if (!is_array($rawPeriods)) {
+            $rawPeriods = [];
+        }
+        $data['price_periods'] = array_filter(
+            array_map(fn($v) => is_numeric($v) ? (float) str_replace(',', '.', str_replace('.', '', str_replace(',', '.', $v))) : null, $rawPeriods),
+            fn($v) => $v !== null && $v >= 0
+        ) ?: null;
 
         $data['slug'] = $this->generateUniqueSlug($data['slug'] ?: $data['name'], $id);
         $data['highlight'] = $request->boolean('highlight');
@@ -354,5 +369,26 @@ class PlanController extends Controller
         }
 
         return back()->with('success', $message);
+    }
+
+    /**
+     * Recebe a nova ordem dos planos via drag-and-drop (Kanban).
+     * Payload: [{id: 1, sort_order: 0}, {id: 2, sort_order: 1}, ...]
+     */
+    public function reorder(Request $request)
+    {
+        $request->validate([
+            'items'             => 'required|array|min:1',
+            'items.*.id'        => 'required|integer|exists:plans,id',
+            'items.*.sort_order'=> 'required|integer|min:0',
+        ]);
+
+        DB::transaction(function () use ($request) {
+            foreach ($request->input('items') as $item) {
+                Plan::where('id', $item['id'])->update(['sort_order' => $item['sort_order']]);
+            }
+        });
+
+        return response()->json(['status' => 'ok']);
     }
 }

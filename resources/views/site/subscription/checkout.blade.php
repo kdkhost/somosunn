@@ -80,17 +80,69 @@
                             @endif
                             <div>
                                 <h4 class="font-bold text-gray-900">{{ $plan->name }}</h4>
-                                <p class="text-sm text-gray-500">Assinatura {{ $plan->period }} dias</p>
+                                <p class="text-sm text-gray-500">Assinatura {{ ucfirst($period ?? 'mensal') }}</p>
                             </div>
                         </div>
+
+                        {{-- Seletor de período --}}
+                        @php
+                            $availablePeriods = $availablePeriods ?? ['mensal' => (float)$plan->price];
+                            $selectedPeriod   = $period ?? 'mensal';
+                            $effectivePrice   = $effectivePrice ?? $plan->price;
+                            $prorataAmount    = $prorataAmount ?? null;
+                            $isUpgrade        = $isUpgrade ?? false;
+                            $isDowngrade      = $isDowngrade ?? false;
+                        @endphp
+
+                        @if(count($availablePeriods) > 1)
+                        <div class="mb-4">
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Período</p>
+                            <div class="flex flex-col gap-2" id="period-options">
+                                @foreach($availablePeriods as $pk => $pv)
+                                @php
+                                    $periodNames = ['mensal'=>'Mensal','trimestral'=>'Trimestral (3 meses)','semestral'=>'Semestral (6 meses)','anual'=>'Anual (12 meses)'];
+                                    $monthly = $availablePeriods['mensal'] ?? 0;
+                                    $months = ['trimestral'=>3,'semestral'=>6,'anual'=>12];
+                                    $pct = 0;
+                                    if ($pk !== 'mensal' && $monthly > 0 && isset($months[$pk])) {
+                                        $full = $monthly * $months[$pk];
+                                        $pct = $full > 0 ? round((1 - $pv/$full)*100) : 0;
+                                    }
+                                @endphp
+                                <label class="flex items-center justify-between gap-3 p-3 rounded-xl border-2 cursor-pointer transition
+                                    {{ $pk === $selectedPeriod ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-blue-300' }}"
+                                    data-period-opt="{{ $pk }}" data-price="{{ $pv }}">
+                                    <div class="flex items-center gap-2">
+                                        <input type="radio" name="period" value="{{ $pk }}" form="paymentForm"
+                                            class="text-blue-600 period-radio"
+                                            {{ $pk === $selectedPeriod ? 'checked' : '' }}>
+                                        <span class="font-medium text-sm">{{ $periodNames[$pk] ?? ucfirst($pk) }}</span>
+                                        @if($pct > 0)
+                                            <span class="text-xs bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">-{{ $pct }}%</span>
+                                        @endif
+                                    </div>
+                                    <span class="font-bold text-gray-900 text-sm" data-pv="{{ $pk }}">R$ {{ number_format($pv, 2, ',', '.') }}</span>
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        @else
+                        <input type="hidden" name="period" value="{{ $selectedPeriod }}" form="paymentForm">
+                        @endif
 
                         <div class="border-t border-gray-100 py-4 space-y-2">
                             <div class="flex justify-between text-gray-600">
                                 <span>Subtotal</span>
-                                <span>R$ {{ number_format((float) $plan->price, 2, ',', '.') }}</span>
+                                <span id="checkout-subtotal">R$ {{ number_format((float) $effectivePrice, 2, ',', '.') }}</span>
                             </div>
+                            @if($isUpgrade && $prorataAmount !== null && $prorataAmount < $plan->getPriceForPeriod($selectedPeriod))
+                            <div class="flex justify-between text-emerald-600 font-medium text-sm">
+                                <span><i class="fas fa-bolt mr-1"></i> Desconto prorrata (upgrade)</span>
+                                <span>- R$ {{ number_format($plan->getPriceForPeriod($selectedPeriod) - $prorataAmount, 2, ',', '.') }}</span>
+                            </div>
+                            @endif
                             <div class="flex justify-between text-green-600 font-medium">
-                                <span>Desconto</span>
+                                <span>Desconto cupom</span>
                                 <span>- R$ 0,00</span>
                             </div>
                         </div>
@@ -98,9 +150,15 @@
                         <div class="border-t border-gray-100 pt-4 mb-6">
                             <div class="flex justify-between items-center">
                                 <span class="font-bold text-gray-900">Total</span>
-                                <span class="text-2xl font-black text-blue-600">R$
-                                    {{ number_format((float) $plan->price, 2, ',', '.') }}</span>
+                                <span class="text-2xl font-black text-blue-600" id="checkout-total">R$
+                                    {{ number_format((float) $effectivePrice, 2, ',', '.') }}</span>
                             </div>
+                            @if($isDowngrade)
+                            <p class="text-xs text-amber-600 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Downgrade: o novo plano será ativado ao término do período atual.
+                            </p>
+                            @endif
                         </div>
 
                         <div class="bg-blue-50 rounded-xl p-4 text-sm text-blue-700">
@@ -477,5 +535,44 @@
 
             </script>
         @endif
+    @endpush
+
+    @push('scripts')
+    <script>
+    (function () {
+        // Atualiza total na sidebar quando o usuário troca o período no checkout
+        var radios = document.querySelectorAll('.period-radio');
+        if (!radios.length) return;
+
+        var subtotalEl = document.getElementById('checkout-subtotal');
+        var totalEl    = document.getElementById('checkout-total');
+
+        function fmt(val) {
+            return 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        radios.forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                var period = this.value;
+                var opts   = document.querySelectorAll('[data-period-opt]');
+
+                opts.forEach(function (opt) {
+                    var active = opt.dataset.periodOpt === period;
+                    opt.classList.toggle('border-blue-600', active);
+                    opt.classList.toggle('bg-blue-50', active);
+                    opt.classList.toggle('border-gray-200', !active);
+                });
+
+                // Pegar preço do label selecionado
+                var selected = document.querySelector('[data-period-opt="' + period + '"]');
+                if (!selected) return;
+                var price = parseFloat(selected.dataset.price);
+
+                if (subtotalEl) subtotalEl.textContent = fmt(price);
+                if (totalEl)    totalEl.textContent    = fmt(price);
+            });
+        });
+    })();
+    </script>
     @endpush
 @endsection

@@ -27,14 +27,44 @@ class SubscriptionController extends Controller
 
     public function checkout(Plan $plan)
     {
-        // Se usuário logado já tiver plano ativo, redirecionar
-        if (Auth::check() && Auth::user()->plan_id == $plan->id) {
-            return redirect()->route('portal')->with('info', 'Você já possui este plano ativo.');
+        // Período selecionado pelo usuário (ou padrão mensal)
+        $period = $this->normalizePeriod(request()->query('period', 'mensal'));
+
+        // Preço efetivo para o período escolhido
+        $effectivePrice = $plan->getPriceForPeriod($period);
+
+        // Períodos disponíveis para o plano
+        $availablePeriods = $plan->getAvailablePeriods();
+
+        // Prorrata (se o usuário já tem plano ativo e está fazendo upgrade)
+        $prorataAmount = null;
+        $isUpgrade = false;
+        $isDowngrade = false;
+        $currentPlan = null;
+
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            if ($user->plan_id == $plan->id) {
+                return redirect()->route('portal')->with('info', 'Você já possui este plano ativo.');
+            }
+
+            if ($user->plan_id) {
+                $currentPlan = Plan::find($user->plan_id);
+                if ($currentPlan) {
+                    $currentPrice = $currentPlan->getPriceForPeriod($period);
+                    if ($effectivePrice > $currentPrice) {
+                        $isUpgrade    = true;
+                        $prorataAmount = Plan::calculateProrata($currentPlan, $plan, $period);
+                    } elseif ($effectivePrice < $currentPrice) {
+                        $isDowngrade = true;
+                    }
+                }
+            }
         }
 
-        // Resolver credenciais: primeiro tenta da tabela settings (prefixado por ambiente),
-        // depois config/env. Mesma lógica do MercadoPagoService::getSellerConfig.
-        $env = \App\Models\Setting::get('mercadopago_env', config('payments.mercadopago.env', 'sandbox'));
+        // Resolver credenciais MercadoPago
+        $env    = \App\Models\Setting::get('mercadopago_env', config('payments.mercadopago.env', 'sandbox'));
         $prefix = $env === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
 
         $publicKey = \App\Models\Setting::get($prefix . 'public_key')
@@ -47,23 +77,30 @@ class SubscriptionController extends Controller
 
         $paymentConfigured = trim((string) $accessToken) !== '' && trim((string) $publicKey) !== '';
 
-        return view('site.subscription.checkout', compact('plan', 'publicKey', 'paymentConfigured'));
+        return view('site.subscription.checkout', compact(
+            'plan', 'publicKey', 'paymentConfigured',
+            'period', 'effectivePrice', 'availablePeriods',
+            'prorataAmount', 'isUpgrade', 'isDowngrade', 'currentPlan'
+        ));
     }
 
     public function process(Request $request, Plan $plan)
     {
-        $isPaidPlan = (float) $plan->price > 0;
+        $period       = $this->normalizePeriod($request->input('period', 'mensal'));
+        $effectivePrice = $plan->getPriceForPeriod($period);
+        $isPaidPlan   = $effectivePrice > 0;
 
         $request->validate([
             'payment_method' => $isPaidPlan ? 'required|in:credit_card,pix' : 'nullable',
+            'period'         => 'nullable|string|in:mensal,trimestral,semestral,anual',
             // Dados pessoais (se não logado)
-            'name' => Auth::check() ? 'nullable' : 'required|string|max:255',
-            'email' => Auth::check() ? 'nullable' : 'required|email|unique:users,email',
-            'cpf' => (Auth::check() && Auth::user()?->doc) ? 'nullable|string' : 'required|string', // Validar CPF se possível
+            'name'     => Auth::check() ? 'nullable' : 'required|string|max:255',
+            'email'    => Auth::check() ? 'nullable' : 'required|email|unique:users,email',
+            'cpf'      => (Auth::check() && Auth::user()?->doc) ? 'nullable|string' : 'required|string',
             'password' => Auth::check() ? 'nullable' : 'required|min:8|confirmed',
             // Cartão de crédito
-            'token' => $isPaidPlan ? 'required_if:payment_method,credit_card' : 'nullable',
-            'installments' => $isPaidPlan ? 'required_if:payment_method,credit_card' : 'nullable',
+            'token'             => $isPaidPlan ? 'required_if:payment_method,credit_card' : 'nullable',
+            'installments'      => $isPaidPlan ? 'required_if:payment_method,credit_card' : 'nullable',
             'payment_method_id' => $isPaidPlan ? 'required_if:payment_method,credit_card' : 'nullable',
             'issuer_id' => $isPaidPlan ? 'required_if:payment_method,credit_card' : 'nullable',
         ]);
@@ -100,8 +137,8 @@ class SubscriptionController extends Controller
             // Free plan: activate immediately (no payment)
             if (!$isPaidPlan) {
                 $user->update([
-                    'plan_id' => $plan->id,
-                    'plan_expires_at' => $this->planExpiresAt($plan),
+                    'plan_id'        => $plan->id,
+                    'plan_expires_at' => $this->planExpiresAt($plan, $period),
                 ]);
 
                 DB::commit();
@@ -118,33 +155,46 @@ class SubscriptionController extends Controller
                 throw new \RuntimeException('MercadoPago não configurado para assinaturas.');
             }
 
+            // Prorrata para upgrade
+            $prorataAmount = 0.0;
+            if ($user->plan_id && $user->plan_id != $plan->id) {
+                $currentPlan = Plan::find($user->plan_id);
+                if ($currentPlan && $effectivePrice > $currentPlan->getPriceForPeriod($period)) {
+                    $prorataAmount = Plan::calculateProrata($currentPlan, $plan, $period);
+                    $effectivePrice = min($effectivePrice, $prorataAmount > 0 ? $prorataAmount : $effectivePrice);
+                }
+            }
+
             // Create order (snapshot)
             $order = Order::create([
-                'user_id' => $user->id,
-                'seller_id' => null,
-                'status' => 'pending',
-                'total_amount' => $plan->price,
-                'fee_amount' => 0,
+                'user_id'             => $user->id,
+                'seller_id'           => null,
+                'status'              => 'pending',
+                'total_amount'        => $effectivePrice,
+                'fee_amount'          => 0,
                 'platform_fee_amount' => 0,
-                'currency' => 'BRL',
-                'gateway' => 'mercadopago',
-                'gateway_account_id' => null,
+                'currency'            => 'BRL',
+                'gateway'             => 'mercadopago',
+                'gateway_account_id'  => null,
                 'metadata' => [
-                    'context' => 'subscription',
-                    'sale_type' => 'subscription',
+                    'context'      => 'subscription',
+                    'sale_type'    => 'subscription',
+                    'period'       => $period,
+                    'prorata'      => $prorataAmount > 0 ? $prorataAmount : null,
                     'public_token' => Str::random(40),
                 ],
             ]);
 
             $order->items()->create([
                 'item_type' => 'plan',
-                'item_id' => $plan->id,
-                'title' => $plan->name,
-                'price' => $plan->price,
-                'quantity' => 1,
+                'item_id'   => $plan->id,
+                'title'     => $plan->name . ' (' . ucfirst($period) . ')',
+                'price'     => $effectivePrice,
+                'quantity'  => 1,
                 'data' => [
                     'plan_slug' => $plan->slug,
-                    'period' => $plan->period,
+                    'period'    => $period,
+                    'prorata'   => $prorataAmount > 0 ? $prorataAmount : null,
                 ],
             ]);
 
@@ -153,7 +203,7 @@ class SubscriptionController extends Controller
                 // Simular pagamento sem chamar a API (modo debug sem chaves MP)
                 if ($request->payment_method === 'pix') {
                     // Pix simulado: gera QR Code fictício para demonstração do fluxo
-                    $fakePixCode = 'SIM.' . strtoupper(Str::random(20)) . '.' . number_format((float) $plan->price, 2, '', '');
+                    $fakePixCode = 'SIM.' . strtoupper(Str::random(20)) . '.' . number_format((float) $effectivePrice, 2, '', '');
                     // QR Code 1x1 pixel PNG transparente em base64 (placeholder seguro)
                     $fakeQrBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
                     DB::commit();
@@ -250,25 +300,43 @@ class SubscriptionController extends Controller
         return view('site.subscription.success', compact('order', 'planName'));
     }
 
-    private function planExpiresAt(Plan $plan): ?\Carbon\Carbon
+    private function planExpiresAt(Plan $plan, string $period = 'mensal'): ?\Carbon\Carbon
     {
-        $period = trim((string) ($plan->period ?? ''));
-        $periodLower = Str::lower($period);
+        // Período escolhido pelo usuário tem prioridade
+        $period = $this->normalizePeriod($period);
+        if ($period !== 'mensal') {
+            return match ($period) {
+                'trimestral' => now()->addMonths(3),
+                'semestral'  => now()->addMonths(6),
+                'anual'      => now()->addYear(),
+                default      => now()->addMonth(),
+            };
+        }
+
+        // Fallback: usa o período configurado no plano
+        $planPeriod = trim((string) ($plan->period ?? ''));
+        $periodLower = \Illuminate\Support\Str::lower($planPeriod);
 
         if ($periodLower === 'vitalício' || $periodLower === 'vitalicio') {
             return null;
         }
 
-        if (ctype_digit($period)) {
-            return now()->addDays((int) $period);
+        if (ctype_digit($planPeriod)) {
+            return now()->addDays((int) $planPeriod);
         }
 
         return match ($periodLower) {
-            'mensal' => now()->addMonth(),
-            'trimestral' => now()->addMonths(3),
-            'semestral' => now()->addMonths(6),
-            'anual' => now()->addYear(),
-            default => now()->addMonth(),
+            'mensal'      => now()->addMonth(),
+            'trimestral'  => now()->addMonths(3),
+            'semestral'   => now()->addMonths(6),
+            'anual'       => now()->addYear(),
+            default       => now()->addMonth(),
         };
+    }
+
+    private function normalizePeriod(string $period): string
+    {
+        $p = strtolower(trim($period));
+        return in_array($p, ['mensal', 'trimestral', 'semestral', 'anual'], true) ? $p : 'mensal';
     }
 }
