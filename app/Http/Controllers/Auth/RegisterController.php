@@ -57,14 +57,11 @@ class RegisterController extends Controller
         }
 
         // Award signup points (if rules exist)
+        // Nota: pontos de referral para o indicador são dados SOMENTE após pagamento de plano
+        //       (ver PaymentWebhookController::activatePlanForOrder)
         try {
             $ps = new \App\Services\PointsService();
             $ps->award($user, 'signup');
-
-            // Premia o referidor por ter indicado um novo membro
-            if ($referrer) {
-                $ps->award($referrer, 'referral', ['new_user_id' => $user->id, 'new_user_name' => $user->name]);
-            }
         } catch (\Throwable $e) {
             \Log::error('Points award error: ' . $e->getMessage());
         }

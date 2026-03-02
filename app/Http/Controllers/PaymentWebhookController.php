@@ -414,6 +414,86 @@ class PaymentWebhookController extends Controller
             'plan_id' => $plan->id,
             'plan_expires_at' => $this->planExpiresAt($plan),
         ]);
+
+        // Gamificação: pontos de referral para o indicador
+        // Concedidos apenas quando o comprador paga um plano pago (não gratuito)
+        // e existe um referidor vinculado. Deduplicação por order_id no meta.
+        $this->awardReferralPointsForPlanOrder($plan, $user, $order);
+    }
+
+    private function awardReferralPointsForPlanOrder(Plan $plan, User $user, Order $order): void
+    {
+        // Apenas para planos pagos
+        if ($plan->is_free || (float) $plan->price <= 0) {
+            return;
+        }
+
+        // O comprador precisa ter sido indicado
+        if (!$user->referred_by) {
+            return;
+        }
+
+        $referrer = User::find($user->referred_by);
+        if (!$referrer) {
+            return;
+        }
+
+        try {
+            // Busca a regra de pontos 'referral' ativa
+            $rule = \App\Models\PointsRule::where('key', 'referral')->where('active', true)->first();
+            if (!$rule || $rule->points <= 0) {
+                return;
+            }
+
+            // Deduplicação própria por order_id: nunca creditar o mesmo pedido duas vezes.
+            // NÃO usamos PointsService::award() para evitar o bloqueio da guarda
+            // repeatable=false, pois um mesmo indicador pode indicar múltiplas pessoas.
+            $alreadyAwarded = \App\Models\PointsLog::where('user_id', $referrer->id)
+                ->where('action_key', 'referral')
+                ->where('meta', 'LIKE', '%"order_id":' . $order->id . '%')
+                ->exists();
+
+            if ($alreadyAwarded) {
+                return;
+            }
+
+            \App\Models\PointsLog::create([
+                'user_id'    => $referrer->id,
+                'action_key' => 'referral',
+                'points'     => $rule->points,
+                'meta'       => json_encode([
+                    'new_user_id'   => $user->id,
+                    'new_user_name' => $user->name,
+                    'order_id'      => $order->id,
+                    'plan_id'       => $plan->id,
+                    'plan_name'     => $plan->name,
+                ]),
+            ]);
+
+            $referrer->increment('points', $rule->points);
+
+            Log::info('Referral points awarded after plan payment.', [
+                'referrer_id' => $referrer->id,
+                'buyer_id'    => $user->id,
+                'order_id'    => $order->id,
+                'plan'        => $plan->name,
+                'points'      => $rule->points,
+            ]);
+
+            // Notifica o indicador em tempo real
+            $referrer->notify(new \App\Notifications\AppNotification([
+                'message'      => 'Seu indicado ' . $user->name . ' assinou um plano! Você ganhou +' . $rule->points . ' pontos de indicação.',
+                'type'         => 'ReferralRewarded',
+                'action_url'   => route('panel.referral.index'),
+                'action_label' => 'Ver indicações',
+            ]));
+
+        } catch (\Throwable $e) {
+            Log::warning('Falha ao pontuar referral por pagamento de plano: ' . $e->getMessage(), [
+                'order_id'    => $order->id,
+                'referrer_id' => $referrer->id ?? null,
+            ]);
+        }
     }
 
     private function planExpiresAt(Plan $plan): ?\Carbon\Carbon

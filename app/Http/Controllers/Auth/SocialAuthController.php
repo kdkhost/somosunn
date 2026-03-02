@@ -194,14 +194,12 @@ class SocialAuthController extends Controller
             }
         }
 
-        // Gamificação: pontos de cadastro + indicação
+        // Gamificação: pontos de cadastro
+        // Nota: pontos de referral para o indicador são dados SOMENTE após pagamento de plano
+        //       (ver PaymentWebhookController::activatePlanForOrder)
         if ($isNewUser) {
             try {
-                $ps = new PointsService();
-                $ps->award($user, 'signup');
-                if ($referrer) {
-                    $ps->award($referrer, 'referral', ['new_user_id' => $user->id, 'new_user_name' => $user->name]);
-                }
+                (new PointsService())->award($user, 'signup');
             } catch (\Throwable $e) {
                 Log::warning('Social signup points award failed.', ['error' => $e->getMessage()]);
             }
