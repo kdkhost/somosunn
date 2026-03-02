@@ -248,11 +248,28 @@ class HomeController extends Controller
                 ->orderByDesc('score')
                 ->get()
                 ->filter(function ($rank) {
-                    // Exclui se não tem user ou se user é admin/superadmin
                     return $rank->user && !in_array($rank->user->role, ['admin', 'superadmin']);
                 })
-                ->take(6)
+                ->take(3)
                 ->values();
+
+            // Fallback: se não há entradas no Ranking, usa os 3 usuários com mais pontos
+            if ($leaderboard->isEmpty()) {
+                $leaderboard = User::whereNotIn('role', ['admin', 'superadmin'])
+                    ->where('points', '>', 0)
+                    ->orderByDesc('points')
+                    ->take(3)
+                    ->get()
+                    ->map(fn ($u) => (object) [
+                        'user'               => $u,
+                        'score'              => $u->points ?? 0,
+                        'level'              => $u->level ?? 'iniciante',
+                        'interactions_count' => 0,
+                        'average_rating'     => null,
+                        'is_points_fallback' => true,
+                    ])
+                    ->values();
+            }
         } catch (\Throwable $e) {
             Log::warning('Falha ao montar overview de networking: ' . $e->getMessage());
         }
