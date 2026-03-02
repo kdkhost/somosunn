@@ -325,6 +325,12 @@
                                     <p>FAQ</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.pages.index') }}" class="nav-link {{ $is('admin.pages.*') }}">
+                                    <i class="fas fa-file-alt nav-icon"></i>
+                                    <p>Páginas do Site</p>
+                                </a>
+                            </li>
                             <li class="nav-item has-treeview {{ $open('admin.settings*') }}">
                                 <a href="#" class="nav-link {{ $is('admin.settings*') }}">
                                     <i class="nav-icon fas fa-cogs"></i>
