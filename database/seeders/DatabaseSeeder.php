@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             PlansSeederUtf8::class,
             MailTemplateSeeder::class,
             ScheduledTasksSeeder::class,
+            PageSeeder::class,
         ]);
     }
 }
