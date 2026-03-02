@@ -3,6 +3,7 @@
 ## Novidades Recentes (mar/2026)
 
 - **Sistema de Gamificação completo (Pontos):** Todas as 21 regras de pontos ativas agora são disparadas automaticamente pelas ações do usuário. Veja a seção de Funcionalidades para detalhes.
+- **Página "Meus Pontos" para membros:** O membro visualiza seu saldo, posição no ranking, pontos do mês, top 10 da plataforma e histórico completo de pontos ganhos (acessível em `/painel/meus-pontos` e no sidebar).
 - **Programa de Indicação ("Indique e Ganhe"):** Cada membro possui um link de referral único. Ao indicar alguém que se cadastra, o indicador recebe pontos automaticamente.
 - **Bônus de Aniversário:** Sistema agendado concede pontos no aniversário do membro (executa diariamente às 01h).
 - **Ranking Top 10:** Toda semana (domingo à meia-noite), os 10 membros com mais pontos recebem bônus automático.
@@ -61,6 +62,7 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 - **Bônus de aniversário:** Concedido automaticamente 1x por ano (comando `points:award-birthday-bonus`).
 - **Ranking Top 10:** Premiação semanal automática (comando `points:award-top-ranking`).
 - **Regras configuráveis** pelo painel admin em `/admin/points-rules`.
+- **Página "Meus Pontos"** em `/painel/meus-pontos`: saldo, posição no ranking, pontos do mês, top 10 e histórico completo.
 
 ### 5. Novidades 2026
 - **Menu Mobile Responsivo:** Menu principal funcional em todas as telas e dispositivos.
@@ -291,6 +293,7 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Programa de Indicação:** link referral único por membro com UI no perfil (copiar + WhatsApp + Telegram).
 - **Comandos agendados:** `points:award-top-ranking` (domingo 00:05) e `points:award-birthday-bonus` (diário 01:00).
 - **Fix PaymentService:** `computeFee()` agora respeita `false` explícito; configuração do banco só é lida quando o parâmetro não for fornecido.
+- **Página "Meus Pontos" (membro):** `/painel/meus-pontos` com saldo, ranking, pontos do mês, top 10, histórico paginado e dicas de engajamento.
 - **Regra pendente:** `help_member` (15pts) aguarda implementação de feature de fórum/Q&A.
 
 ---
