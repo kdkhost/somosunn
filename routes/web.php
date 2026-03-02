@@ -636,11 +636,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
 
     // Depoimentos (moderação por permissões)
     Route::get('/testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'index'])->middleware('check.feature:testimonials_access')->name('testimonials.index');
+    Route::get('/testimonials/create', [\App\Http\Controllers\Admin\TestimonialController::class, 'create'])->middleware('check.feature:testimonials_edit')->name('testimonials.create');
+    Route::post('/testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'store'])->middleware('check.feature:testimonials_edit')->name('testimonials.store');
     Route::get('/testimonials/{testimonial}/edit', [\App\Http\Controllers\Admin\TestimonialController::class, 'edit'])->middleware('check.feature:testimonials_edit')->name('testimonials.edit');
     Route::put('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'update'])->middleware('check.feature:testimonials_edit')->name('testimonials.update');
+    Route::patch('/testimonials/{testimonial}/toggle', [\App\Http\Controllers\Admin\TestimonialController::class, 'toggle'])->middleware('check.feature:testimonials_edit')->name('testimonials.toggle');
     Route::post('/testimonials/{testimonial}/approve', [\App\Http\Controllers\Admin\TestimonialController::class, 'approve'])->middleware('check.feature:testimonials_approve')->name('testimonials.approve');
     Route::post('/testimonials/{testimonial}/reject', [\App\Http\Controllers\Admin\TestimonialController::class, 'reject'])->middleware('check.feature:testimonials_reject')->name('testimonials.reject');
     Route::delete('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'destroy'])->middleware('check.feature:testimonials_delete')->name('testimonials.destroy');
+    Route::get('/testimonials/import-google', [\App\Http\Controllers\Admin\TestimonialController::class, 'importGoogle'])->middleware('check.feature:testimonials_edit')->name('testimonials.import-google');
 
     // Avaliações de cursos e mentorias (moderação)
     Route::get('/reviews', [\App\Http\Controllers\Admin\ItemReviewController::class, 'index'])->middleware('check.feature:reviews_access')->name('reviews.index');

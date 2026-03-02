@@ -1,4 +1,4 @@
-﻿@extends('admin.layouts.app')
+@extends('admin.layouts.app')
 
 @section('page_title', 'Editar Página — ' . $page->slug)
 

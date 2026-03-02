@@ -297,6 +297,57 @@
             </div>
         </div>
     </div>
+
+    {{-- GOOGLE MEU NEGÓCIO --}}
+    <div class="card card-outline card-info mb-4">
+        <div class="card-header">
+            <h3 class="card-title font-weight-bold">
+                <i class="fab fa-google mr-2"></i> Google Meu Negócio (Depoimentos)
+            </h3>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-3">
+                Configure o ID do local e a chave da API do Google para importar automaticamente os reviews
+                do Google Meu Negócio na seção de <strong>Depoimentos</strong>.
+                <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener" class="ml-1">
+                    <i class="fas fa-external-link-alt fa-xs"></i> Como encontrar o Place ID
+                </a>
+            </p>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label for="google_business_place_id">Place ID do seu negócio</label>
+                    <input type="text" class="form-control"
+                        id="google_business_place_id"
+                        name="google_business_place_id"
+                        placeholder="Ex.: ChIJ..."
+                        value="{{ $settings['google_business_place_id'] ?? '' }}">
+                    <small class="form-text text-muted">
+                        Encontre em
+                        <a href="https://maps.google.com" target="_blank">maps.google.com</a>
+                        → pesquise seu negócio → compartilhe → copie o link (contém o Place ID).
+                    </small>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="google_places_api_key">Chave da API Google Places</label>
+                    <input type="text" class="form-control"
+                        id="google_places_api_key"
+                        name="google_places_api_key"
+                        placeholder="AIza..."
+                        value="{{ $settings['google_places_api_key'] ?? '' }}">
+                    <small class="form-text text-muted">
+                        Crie em <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a>.
+                        Ative a API <em>Places (New)</em>.
+                    </small>
+                </div>
+            </div>
+            <div class="alert alert-warning py-2 mb-0 small">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                A API pública do Google Places retorna os <strong>5 reviews mais recentes</strong>.
+                Após salvar as configurações, vá em <strong>Depoimentos → Importar do Google</strong>.
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @push('scripts')

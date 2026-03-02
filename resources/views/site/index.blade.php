@@ -350,31 +350,45 @@
             <div class="max-w-7xl mx-auto">
                 <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">{{ $homePage->get('testimonials_title', 'O que dizem nossos membros') }}</h2>
 
-                <div class="grid md:grid-cols-3 gap-8">
-                    @php
-                        $testimonials = $homePage->get('testimonials', [
-                            ['name' => 'Carlos Eduardo', 'role' => 'CEO, Tech Solutions', 'text' => 'A UNN transformou minha forma de fazer negócios. Em 6 meses, fechei parcerias que mudaram minha empresa.', 'rating' => 5],
-                            ['name' => 'Ana Paula Lima', 'role' => 'Fundadora, EcoModa', 'text' => 'O networking aqui é diferente. São conexões genuínas com pessoas que realmente querem ajudar.', 'rating' => 5],
-                            ['name' => 'Roberto Silva', 'role' => 'Investidor Anjo', 'text' => 'Encontrei projetos incríveis para investir e empreendedores talentosos. A comunidade é de altíssimo nível.', 'rating' => 5],
+                @php
+                    // Usa depoimentos do banco; cai para fallback estático somente se vazio
+                    $siteTestimonials = ($dbTestimonials ?? collect())->isNotEmpty()
+                        ? ($dbTestimonials ?? collect())
+                        : collect([
+                            (object)['display_name'=>'Carlos Eduardo','author_title'=>'CEO, Tech Solutions','content'=>'A UNN transformou minha forma de fazer negócios. Em 6 meses, fechei parcerias que mudaram minha empresa.','rating'=>5,'resolved_avatar'=>null],
+                            (object)['display_name'=>'Ana Paula Lima','author_title'=>'Fundadora, EcoModa','content'=>'O networking aqui é diferente. São conexões genuínas com pessoas que realmente querem ajudar.','rating'=>5,'resolved_avatar'=>null],
+                            (object)['display_name'=>'Roberto Silva','author_title'=>'Investidor Anjo','content'=>'Encontrei projetos incríveis para investir e empreendedores talentosos. A comunidade é de altíssimo nível.','rating'=>5,'resolved_avatar'=>null],
                         ]);
-                    @endphp
+                @endphp
 
-                    @foreach($testimonials as $testimonial)
+                <div class="grid md:grid-cols-3 gap-8">
+                    @foreach($siteTestimonials as $testimonial)
+                        @php
+                            $tName   = method_exists($testimonial,'offsetGet') ? ($testimonial['name'] ?? $testimonial->display_name ?? 'Anônimo') : ($testimonial->display_name ?? 'Anônimo');
+                            $tRole   = method_exists($testimonial,'offsetGet') ? ($testimonial['role'] ?? '') : ($testimonial->author_title ?? '');
+                            $tText   = method_exists($testimonial,'offsetGet') ? ($testimonial['text'] ?? '') : ($testimonial->content ?? '');
+                            $tRating = method_exists($testimonial,'offsetGet') ? ($testimonial['rating'] ?? 5) : ($testimonial->rating ?? 5);
+                            $tAvatar = is_object($testimonial) && isset($testimonial->resolved_avatar) ? $testimonial->resolved_avatar : null;
+                        @endphp
                         <div class="bg-white rounded-3xl p-8 shadow-lg">
                             <div class="flex gap-1 mb-4">
-                                @for($i = 0; $i < $testimonial['rating']; $i++)
+                                @for($i = 0; $i < $tRating; $i++)
                                     <i class="fas fa-star text-yellow-500"></i>
                                 @endfor
                             </div>
-                            <p class="text-gray-600 mb-6 italic">"{{ $testimonial['text'] }}"</p>
+                            <p class="text-gray-600 mb-6 italic">"{{ $tText }}"</p>
                             <div class="flex items-center gap-4">
-                                <div
-                                    class="w-12 h-12 btn-primary rounded-full flex items-center justify-center text-white font-bold">
-                                    {{ substr($testimonial['name'], 0, 1) }}
-                                </div>
+                                @if($tAvatar)
+                                    <img src="{{ $tAvatar }}" alt="{{ $tName }}"
+                                        class="w-12 h-12 rounded-full object-cover flex-shrink-0">
+                                @else
+                                    <div class="w-12 h-12 btn-primary rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                                        {{ strtoupper(substr($tName, 0, 1)) }}
+                                    </div>
+                                @endif
                                 <div>
-                                    <p class="font-bold text-gray-900">{{ $testimonial['name'] }}</p>
-                                    <p class="text-sm text-gray-500">{{ $testimonial['role'] }}</p>
+                                    <p class="font-bold text-gray-900">{{ $tName }}</p>
+                                    <p class="text-sm text-gray-500">{{ $tRole }}</p>
                                 </div>
                             </div>
                         </div>

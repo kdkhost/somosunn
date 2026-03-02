@@ -60,6 +60,20 @@ class HomeController extends Controller
 
         $homePage = Page::findBySlug('home') ?? new Page();
 
+        $dbTestimonials = collect();
+        if (view()->shared('unnDbAvailable')) {
+            try {
+                $dbTestimonials = \App\Models\Testimonial::forSite()
+                    ->with('user')
+                    ->orderByDesc('is_featured')
+                    ->orderByDesc('created_at')
+                    ->limit(6)
+                    ->get();
+            } catch (\Throwable $e) {
+                \Log::warning('Falha ao carregar depoimentos: ' . $e->getMessage());
+            }
+        }
+
         return view('site.index', [
             'freeEvents'       => $freeEvents,
             'paidMentorings'   => $paidMentorings,
@@ -68,6 +82,7 @@ class HomeController extends Controller
             'showNoRankingMsg' => $showNoRankingMsg,
             'isDemo'           => false,
             'homePage'         => $homePage,
+            'dbTestimonials'   => $dbTestimonials,
         ]);
     }
 
