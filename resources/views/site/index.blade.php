@@ -1,28 +1,26 @@
 @extends('layouts.app')
 
-@section('title', 'UNN - Conectando Empreendedores')
+@section('title', $homePage->get('seo_title', 'UNN - Conectando Empreendedores'))
 
 @section('content')
     @php
-        $resolveContent = function ($value, $fallback = '') {
-            $value = trim((string) $value);
-            if ($value !== '') {
-                return $value;
-            }
-            return (string) $fallback;
-        };
+        // Helper: $homePage->get() tem prioridade; cai para SiteContent e Settings como legado
+        $p = fn(string $key, string $fallback = '') => (string) ($homePage->get($key) ?: $fallback);
 
-        $heroTitle = $resolveContent(
-            \App\Models\SiteContent::getValue('home', 'hero_title'),
-            \App\Models\Setting::get('hero_title', \App\Models\Setting::get('home_hero_title', 'Conectando empreendedores.'))
+        $heroTitle = $p('hero_title',
+            (string) (\App\Models\SiteContent::getValue('home', 'hero_title')
+                ?: \App\Models\Setting::get('hero_title',
+                    \App\Models\Setting::get('home_hero_title', 'Conectando empreendedores.')))
         );
-        $heroSubtitle = $resolveContent(
-            \App\Models\SiteContent::getValue('home', 'hero_subtitle'),
-            \App\Models\Setting::get('hero_subtitle', \App\Models\Setting::get('home_hero_subtitle', 'Criando oportunidades reais.'))
+        $heroSubtitle = $p('hero_subtitle',
+            (string) (\App\Models\SiteContent::getValue('home', 'hero_subtitle')
+                ?: \App\Models\Setting::get('hero_subtitle',
+                    \App\Models\Setting::get('home_hero_subtitle', 'Criando oportunidades reais.')))
         );
-        $heroText = $resolveContent(
-            \App\Models\SiteContent::getValue('home', 'hero_text'),
-            \App\Models\Setting::get('home_hero_text', 'A UNN é uma comunidade de networking estratégico onde empreendedores compartilham experiências, constroem conexões e crescem juntos.')
+        $heroText = $p('body',
+            (string) (\App\Models\SiteContent::getValue('home', 'hero_text')
+                ?: \App\Models\Setting::get('home_hero_text',
+                    'A UNN é uma comunidade de networking estratégico onde empreendedores compartilham experiências, constroem conexões e crescem juntos.'))
         );
 
         $heroImagePath = \App\Models\SiteContent::getValue('home', 'hero_image');
@@ -53,11 +51,11 @@
                         <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
                             <a href="{{ route('register') }}"
                                 class="btn-primary text-white px-6 py-3 md:px-10 md:py-4 rounded-xl font-bold text-base md:text-lg inline-flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition">
-                                Quero fazer parte <i class="fas fa-arrow-right"></i>
+                                {{ $homePage->get('hero_cta_text', 'Quero fazer parte') }} <i class="fas fa-arrow-right"></i>
                             </a>
                             <a href="{{ route('sobre') }}"
                                 class="bg-white text-gray-700 px-6 py-3 md:px-10 md:py-4 rounded-xl font-bold border-2 border-gray-200 hover:border-blue-500 transition inline-flex items-center justify-center gap-2 text-base md:text-lg">
-                                <i class="fas fa-play-circle"></i> Conhecer a UNN
+                                <i class="fas fa-play-circle"></i> {{ $homePage->get('hero_cta2_text', 'Conhecer a UNN') }}
                             </a>
                         </div>
                     </div>
@@ -80,23 +78,23 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                     <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
                         <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">
-                            5.000+</p>
-                        <p class="text-xs sm:text-sm text-gray-500 mt-1">Empreendedores</p>
-                    </div>
-                    <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                        <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">R$
-                            50M+</p>
-                        <p class="text-xs sm:text-sm text-gray-500 mt-1">Em negócios gerados</p>
+                            {{ $homePage->get('stat_1_value', '5.000+') }}</p>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-1">{{ $homePage->get('stat_1_label', 'Empreendedores') }}</p>
                     </div>
                     <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
                         <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">
-                            200+</p>
-                        <p class="text-xs sm:text-sm text-gray-500 mt-1">Eventos realizados</p>
+                            {{ $homePage->get('stat_2_value', 'R$ 50M+') }}</p>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-1">{{ $homePage->get('stat_2_label', 'Em negócios gerados') }}</p>
                     </div>
                     <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                        <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">27
-                        </p>
-                        <p class="text-xs sm:text-sm text-gray-500 mt-1">Estados</p>
+                        <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">
+                            {{ $homePage->get('stat_3_value', '200+') }}</p>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-1">{{ $homePage->get('stat_3_label', 'Eventos realizados') }}</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                        <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">
+                            {{ $homePage->get('stat_4_value', '27') }}</p>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-1">{{ $homePage->get('stat_4_label', 'Estados') }}</p>
                     </div>
                 </div>
             </div>
@@ -106,9 +104,8 @@
         <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-12">
-                    <h2 class="text-4xl font-black unn-title-gradient mb-4">O que é a UNN</h2>
-                    <p class="text-gray-600 text-lg max-w-2xl mx-auto">A UNN nasceu para unir empreendedores que acreditam
-                        no crescimento colaborativo.</p>
+                    <h2 class="text-4xl font-black unn-title-gradient mb-4">{{ $homePage->get('about_title', 'O que é a UNN') }}</h2>
+                    <p class="text-gray-600 text-lg max-w-2xl mx-auto">{{ $homePage->get('about_subtitle', 'A UNN nasceu para unir empreendedores que acreditam no crescimento colaborativo.') }}</p>
                 </div>
 
                 <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -116,30 +113,29 @@
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-handshake text-white text-2xl"></i>
                         </div>
-                        <h3 class="text-lg font-bold unn-title-gradient mb-2">Conexões reais</h3>
-                        <p class="text-sm text-gray-600">Networking genuíno com empreendedores que compartilham seus valores
-                        </p>
+                        <h3 class="text-lg font-bold unn-title-gradient mb-2">{{ $homePage->get('about_card_1_title', 'Conexões reais') }}</h3>
+                        <p class="text-sm text-gray-600">{{ $homePage->get('about_card_1_text', 'Networking genuíno com empreendedores que compartilham seus valores') }}</p>
                     </div>
                     <div class="bg-slate-50 rounded-3xl p-8 text-center">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-chart-line text-white text-2xl"></i>
                         </div>
-                        <h3 class="text-lg font-bold unn-title-gradient mb-2">Crescimento coletivo</h3>
-                        <p class="text-sm text-gray-600">Juntos somos mais fortes e alcançamos resultados maiores</p>
+                        <h3 class="text-lg font-bold unn-title-gradient mb-2">{{ $homePage->get('about_card_2_title', 'Crescimento coletivo') }}</h3>
+                        <p class="text-sm text-gray-600">{{ $homePage->get('about_card_2_text', 'Juntos somos mais fortes e alcançamos resultados maiores') }}</p>
                     </div>
                     <div class="bg-slate-50 rounded-3xl p-8 text-center">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-lightbulb text-white text-2xl"></i>
                         </div>
-                        <h3 class="text-lg font-bold unn-title-gradient mb-2">Troca de experiências</h3>
-                        <p class="text-sm text-gray-600">Aprenda com quem já passou pelos desafios que você enfrenta</p>
+                        <h3 class="text-lg font-bold unn-title-gradient mb-2">{{ $homePage->get('about_card_3_title', 'Troca de experiências') }}</h3>
+                        <p class="text-sm text-gray-600">{{ $homePage->get('about_card_3_text', 'Aprenda com quem já passou pelos desafios que você enfrenta') }}</p>
                     </div>
                     <div class="bg-slate-50 rounded-3xl p-8 text-center">
                         <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-briefcase text-white text-2xl"></i>
                         </div>
-                        <h3 class="text-lg font-bold unn-title-gradient mb-2">Oportunidades</h3>
-                        <p class="text-sm text-gray-600">Parcerias estratégicas que geram resultados concretos</p>
+                        <h3 class="text-lg font-bold unn-title-gradient mb-2">{{ $homePage->get('about_card_4_title', 'Oportunidades') }}</h3>
+                        <p class="text-sm text-gray-600">{{ $homePage->get('about_card_4_text', 'Parcerias estratégicas que geram resultados concretos') }}</p>
                     </div>
                 </div>
             </div>
@@ -150,8 +146,8 @@
             <div class="max-w-7xl mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <div>
-                        <h2 class="text-3xl font-black text-gray-900">Palestras gratuitas</h2>
-                        <p class="text-gray-500">Eventos que chegam em breve</p>
+                        <h2 class="text-3xl font-black text-gray-900">{{ $homePage->get('events_title', 'Palestras gratuitas') }}</h2>
+                        <p class="text-gray-500">{{ $homePage->get('events_subtitle', 'Eventos que chegam em breve') }}</p>
                     </div>
                     @if(isset($isDemo) && $isDemo)
                         <span class="text-sm text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full font-semibold">
@@ -215,8 +211,8 @@
             <div class="max-w-7xl mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <div>
-                        <h2 class="text-3xl font-black text-gray-900">Mentorias premium</h2>
-                        <p class="text-gray-500">Conteúdo gravado + acompanhamento de mentores</p>
+                        <h2 class="text-3xl font-black text-gray-900">{{ $homePage->get('mentorships_title', 'Mentorias premium') }}</h2>
+                        <p class="text-gray-500">{{ $homePage->get('mentorships_subtitle', 'Conteúdo gravado + acompanhamento de mentores') }}</p>
                     </div>
                     <a href="{{ route('mentorships.index') }}"
                         class="hidden md:inline-flex items-center gap-2 font-semibold" style="color: var(--unn-azul-1)">
@@ -261,7 +257,7 @@
         <!-- Comunidade por níveis -->
         <section class="py-16 px-6 md:px-12 lg:px-24">
             <div class="max-w-6xl mx-auto">
-                <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">Comunidade por níveis</h2>
+                <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">{{ $homePage->get('community_title', 'Comunidade por níveis') }}</h2>
 
                 <div class="grid md:grid-cols-2 gap-8">
                     <div class="bg-white rounded-3xl p-8 shadow-lg text-center">
@@ -269,21 +265,20 @@
                             style="background: #3B82F620">
                             <i class="fas fa-seedling text-2xl" style="color: #3B82F6"></i>
                         </div>
-                        <p class="text-sm font-semibold text-gray-500 uppercase mb-2">Empreendedores iniciantes</p>
+                        <p class="text-sm font-semibold text-gray-500 uppercase mb-2">{{ $homePage->get('community_beginner_title', 'Empreendedores iniciantes') }}</p>
                         <p class="text-5xl font-black" style="color: var(--unn-azul-1)">
                             {{ number_format($levelSummary['iniciante'] ?? 0, 0, '', '.') }}</p>
-                        <p class="text-gray-500 mt-3">Conectados entre si e acolhidos por quem já percorreu a jornada.</p>
+                        <p class="text-gray-500 mt-3">{{ $homePage->get('community_beginner_desc', 'Conectados entre si e acolhidos por quem já percorreu a jornada.') }}</p>
                     </div>
                     <div class="bg-white rounded-3xl p-8 shadow-lg text-center">
                         <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
                             style="background: #8B5CF620">
                             <i class="fas fa-crown text-2xl" style="color: #8B5CF6"></i>
                         </div>
-                        <p class="text-sm font-semibold text-gray-500 uppercase mb-2">Empresários de sucesso</p>
+                        <p class="text-sm font-semibold text-gray-500 uppercase mb-2">{{ $homePage->get('community_success_title', 'Empresários de sucesso') }}</p>
                         <p class="text-5xl font-black" style="color: #8B5CF6">
                             {{ number_format($levelSummary['sucesso'] ?? 0, 0, '', '.') }}</p>
-                        <p class="text-gray-500 mt-3">Mentores ativos, parceiros e investidores prontos para novas
-                            oportunidades.</p>
+                        <p class="text-gray-500 mt-3">{{ $homePage->get('community_success_desc', 'Mentores ativos, parceiros e investidores prontos para novas oportunidades.') }}</p>
                     </div>
                 </div>
             </div>
@@ -294,8 +289,8 @@
             <div class="max-w-7xl mx-auto">
                 <div class="flex items-center justify-between mb-8">
                     <div>
-                        <h2 class="text-3xl font-black text-gray-900">Ranking do networking</h2>
-                        <p class="text-gray-500">Baseado nas avaliações após cada conexão</p>
+                        <h2 class="text-3xl font-black text-gray-900">{{ $homePage->get('ranking_title', 'Ranking do networking') }}</h2>
+                        <p class="text-gray-500">{{ $homePage->get('ranking_subtitle', 'Baseado nas avaliações após cada conexão') }}</p>
                     </div>
                     <span class="text-sm uppercase tracking-wider text-gray-500">{{ $topRankings->count() }} líderes</span>
                 </div>
@@ -352,15 +347,15 @@
         <!-- Depoimentos -->
         <section class="py-16 px-6 md:px-12 lg:px-24">
             <div class="max-w-7xl mx-auto">
-                <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">O que dizem nossos membros</h2>
+                <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">{{ $homePage->get('testimonials_title', 'O que dizem nossos membros') }}</h2>
 
                 <div class="grid md:grid-cols-3 gap-8">
                     @php
-                        $testimonials = [
+                        $testimonials = $homePage->get('testimonials', [
                             ['name' => 'Carlos Eduardo', 'role' => 'CEO, Tech Solutions', 'text' => 'A UNN transformou minha forma de fazer negócios. Em 6 meses, fechei parcerias que mudaram minha empresa.', 'rating' => 5],
                             ['name' => 'Ana Paula Lima', 'role' => 'Fundadora, EcoModa', 'text' => 'O networking aqui é diferente. São conexões genuínas com pessoas que realmente querem ajudar.', 'rating' => 5],
                             ['name' => 'Roberto Silva', 'role' => 'Investidor Anjo', 'text' => 'Encontrei projetos incríveis para investir e empreendedores talentosos. A comunidade é de altíssimo nível.', 'rating' => 5],
-                        ];
+                        ]);
                     @endphp
 
                     @foreach($testimonials as $testimonial)
@@ -391,18 +386,18 @@
         <section class="py-16 px-6 md:px-12 lg:px-24"
             style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
             <div class="max-w-4xl mx-auto text-center text-white">
-                <h2 class="text-3xl lg:text-4xl font-black mb-4">Pronto para transformar sua rede?</h2>
-                <p class="text-lg opacity-90 mb-8">Junte-se a milhares de empreendedores que já estão crescendo juntos.</p>
+                <h2 class="text-3xl lg:text-4xl font-black mb-4">{{ $homePage->get('cta_section_title', 'Pronto para transformar sua rede?') }}</h2>
+                <p class="text-lg opacity-90 mb-8">{{ $homePage->get('cta_section_subtitle', 'Junte-se a milhares de empreendedores que já estão crescendo juntos.') }}</p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="{{ route('register') }}"
                         class="inline-flex items-center justify-center gap-2 bg-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold hover:bg-blue-50 transition"
                         style="color: var(--unn-azul-1)">
                         <i class="fas fa-rocket"></i>
-                        Começar agora - É grátis
+                        {{ $homePage->get('cta_section_btn_primary', 'Começar agora - É grátis') }}
                     </a>
                     <a href="{{ route('premium') }}"
                         class="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold hover:bg-white/10 transition">
-                        Ver planos Premium
+                        {{ $homePage->get('cta_section_btn_secondary', 'Ver planos Premium') }}
                     </a>
                 </div>
             </div>

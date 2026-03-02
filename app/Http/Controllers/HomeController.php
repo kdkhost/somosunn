@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Event;
 use App\Models\Mentorship;
+use App\Models\Page;
 use App\Models\Ranking;
 use App\Models\User;
 
@@ -57,13 +58,16 @@ class HomeController extends Controller
         $topRankings = $overview['leaderboard'];
         $showNoRankingMsg = $topRankings->isEmpty();
 
+        $homePage = Page::findBySlug('home') ?? new Page();
+
         return view('site.index', [
-            'freeEvents' => $freeEvents,
-            'paidMentorings' => $paidMentorings,
-            'levelSummary' => $levelSummary,
-            'topRankings' => $topRankings,
+            'freeEvents'       => $freeEvents,
+            'paidMentorings'   => $paidMentorings,
+            'levelSummary'     => $levelSummary,
+            'topRankings'      => $topRankings,
             'showNoRankingMsg' => $showNoRankingMsg,
-            'isDemo' => false,
+            'isDemo'           => false,
+            'homePage'         => $homePage,
         ]);
     }
 
