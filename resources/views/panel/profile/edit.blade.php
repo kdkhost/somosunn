@@ -76,6 +76,14 @@
                 </div>
 
                 <div>
+                    <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Data de nascimento</label>
+                    <input type="date" name="birth_date"
+                        value="{{ old('birth_date', $user->birth_date ? $user->birth_date->format('Y-m-d') : '') }}"
+                        class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm dark:bg-slate-950 dark:text-white focus:border-blue-500 focus:ring-blue-500">
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Usado para o bônus de aniversário.</p>
+                </div>
+
+                <div>
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">E-mail *</label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}" required maxlength="120"
                         placeholder="exemplo@email.com"
@@ -416,7 +424,60 @@
         </div>
     </form>
 
+    {{-- LINK DE INDICAÇÃO --}}
+    @php
+        $referralLink = route('register') . '?ref=' . ($user->referral_code ?? '');
+    @endphp
+    <div class="mt-4 bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 transition-colors duration-300">
+        <h2 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fas fa-user-plus text-slate-500"></i> Indique e ganhe
+        </h2>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
+            Compartilhe seu link exclusivo. Quando alguém se cadastrar usando ele, você ganha
+            <strong>100 pontos</strong>!
+        </p>
+        <div class="mt-4 flex items-center gap-2">
+            <input id="referral_link_input" type="text" readonly value="{{ $referralLink }}"
+                class="flex-1 rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm bg-slate-50 dark:bg-slate-950 dark:text-white">
+            <button onclick="copyReferralLink()" type="button"
+                class="inline-flex items-center gap-2 rounded-full bg-[#1F5EDB] px-5 py-3 text-sm font-bold text-white hover:brightness-110 transition">
+                <i class="fas fa-copy"></i> Copiar
+            </button>
+        </div>
+        @if($user->referral_code)
+            <div class="mt-2 flex gap-3 flex-wrap">
+                <a href="https://wa.me/?text={{ urlencode('Ei! Entre na plataforma usando meu link e comece aprendendo: ' . $referralLink) }}"
+                   target="_blank" rel="noopener"
+                   class="inline-flex items-center gap-1 text-xs text-green-600 hover:underline font-bold">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+                <a href="https://t.me/share/url?url={{ urlencode($referralLink) }}&text={{ urlencode('Entre na plataforma com meu convite!') }}"
+                   target="_blank" rel="noopener"
+                   class="inline-flex items-center gap-1 text-xs text-blue-500 hover:underline font-bold">
+                    <i class="fab fa-telegram"></i> Telegram
+                </a>
+            </div>
+        @endif
+    </div>
+
     @push('scripts')
+        <script>
+        function copyReferralLink() {
+            var input = document.getElementById('referral_link_input');
+            if (!input) return;
+            input.select();
+            input.setSelectionRange(0, 99999);
+            try {
+                navigator.clipboard.writeText(input.value);
+            } catch(e) {
+                document.execCommand('copy');
+            }
+            var btn = event.currentTarget;
+            var original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+            setTimeout(function(){ btn.innerHTML = original; }, 2000);
+        }
+        </script>
         <style>
             /* Hide FilePond Credits */
             .filepond--credits {
