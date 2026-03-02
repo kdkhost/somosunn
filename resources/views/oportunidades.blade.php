@@ -114,27 +114,55 @@
 
                         <!-- Search/Filter Bar -->
                         <div
-                            class="max-w-4xl mx-auto bg-white/10 border border-white/20 backdrop-blur-md p-3 md:p-4 rounded-3xl md:rounded-full">
-                            <form method="GET" action="" class="flex flex-col md:flex-row gap-3 md:gap-2 relative">
-                                <div class="flex-1 filter-input relative flex items-center h-14 bg-white rounded-full px-5">
-                                    <i class="fas fa-search text-slate-400 mr-2"></i>
-                                    <input type="text" name="area" placeholder="Cargo, tecnologia ou palavra-chave..."
-                                        value="{{ request('area') }}"
-                                        class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 font-medium placeholder:text-slate-400">
+                            class="max-w-4xl mx-auto bg-white/10 border border-white/20 backdrop-blur-md p-3 md:p-4 rounded-3xl"
+                            role="search" aria-label="Filtros de vagas">
+                            <form method="GET" action="" class="flex flex-col gap-3">
+                                {{-- Linha 1: Busca principal + Local + Buscar --}}
+                                <div class="flex flex-col md:flex-row gap-3 md:gap-2">
+                                    <div class="flex-1 filter-input relative flex items-center h-14 bg-white rounded-full px-5">
+                                        <i class="fas fa-search text-slate-400 mr-2" aria-hidden="true"></i>
+                                        <input type="text" name="area" id="filtro-area"
+                                            placeholder="Cargo, tecnologia ou palavra-chave..."
+                                            value="{{ request('area') }}"
+                                            aria-label="Buscar por cargo ou palavra-chave"
+                                            class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 font-medium placeholder:text-slate-400">
+                                    </div>
+                                    <div class="w-full md:w-56 filter-input relative flex items-center h-14 bg-white rounded-full px-5">
+                                        <i class="fas fa-map-marker-alt text-slate-400 mr-2" aria-hidden="true"></i>
+                                        <input type="text" name="local" id="filtro-local"
+                                            placeholder="Ex: São Paulo, Remoto"
+                                            value="{{ request('local') }}"
+                                            aria-label="Filtrar por localidade"
+                                            class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 font-medium placeholder:text-slate-400">
+                                    </div>
+                                    <button type="submit"
+                                        class="h-14 px-8 rounded-full btn-primary font-bold flex items-center justify-center gap-2 shrink-0 shadow-lg group"
+                                        aria-label="Buscar vagas">
+                                        Buscar <i class="fas fa-search text-sm group-hover:scale-110 transition-transform" aria-hidden="true"></i>
+                                    </button>
                                 </div>
-
-                                <div
-                                    class="w-full md:w-64 filter-input relative flex items-center h-14 bg-white rounded-full px-5">
-                                    <i class="fas fa-map-marker-alt text-slate-400 mr-2"></i>
-                                    <input type="text" name="local" placeholder="Ex: São Paulo, Remoto"
-                                        value="{{ request('local') }}"
-                                        class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 font-medium placeholder:text-slate-400">
+                                {{-- Linha 2: Filtros avançados (empresa + tipo) --}}
+                                <div class="flex flex-col md:flex-row gap-3 md:gap-2">
+                                    <div class="flex-1 filter-input relative flex items-center h-12 bg-white/90 rounded-full px-5">
+                                        <i class="fas fa-building text-slate-400 mr-2" aria-hidden="true"></i>
+                                        <input type="text" name="empresa" id="filtro-empresa"
+                                            placeholder="empresa (ex: Acme, Google…)"
+                                            value="{{ request('empresa') }}"
+                                            aria-label="Filtrar por empresa"
+                                            class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 text-sm font-medium placeholder:text-slate-400">
+                                    </div>
+                                    <div class="w-full md:w-56 filter-input relative flex items-center h-12 bg-white/90 rounded-full px-5">
+                                        <i class="fas fa-layer-group text-slate-400 mr-2" aria-hidden="true"></i>
+                                        <select name="tipo" id="filtro-tipo"
+                                            aria-label="Filtrar por tipo de vaga"
+                                            class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-sm font-medium {{ request('tipo') ? 'text-slate-700' : 'text-slate-400' }} cursor-pointer appearance-none">
+                                            <option value="">Tipo de vaga</option>
+                                            @foreach($tiposDisponiveis as $tipo)
+                                                <option value="{{ $tipo }}" {{ request('tipo') == $tipo ? 'selected' : '' }}>{{ $tipo }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
-
-                                <button type="submit"
-                                    class="h-14 px-8 rounded-full btn-primary font-bold flex items-center justify-center gap-2 shrink-0 shadow-lg group">
-                                    Buscar <i class="fas fa-search text-sm group-hover:scale-110 transition-transform"></i>
-                                </button>
                             </form>
                         </div>
                         @if(request()->anyFilled(['area', 'local', 'empresa', 'tipo']))
@@ -210,7 +238,14 @@
                                 @if($featuredJob->is_demo)
                                     <span
                                         class="px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-xs font-bold border border-amber-100">
-                                        <i class="fas fa-flask"></i> Modo Demo
+                                        <i class="fas fa-flask" aria-hidden="true"></i> Modo Demo
+                                    </span>
+                                @endif
+                                @if(isset($partnerNames) && in_array(mb_strtolower(trim((string)$featuredJob->company_name)), $partnerNames))
+                                    <span
+                                        class="px-3 py-1 bg-violet-50 text-violet-700 rounded-full text-xs font-bold border border-violet-100 flex items-center gap-1"
+                                        title="Empresa parceira UNN">
+                                        <i class="fas fa-handshake" aria-hidden="true"></i> Empresa Parceira
                                     </span>
                                 @endif
                             </div>
@@ -269,13 +304,15 @@
                         </a>
                     </div>
                 @else
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative" role="list" aria-label="Lista de vagas disponíveis">
                         <!-- BG Light Pattern -->
                         <div class="absolute inset-0 bg-grid-pattern opacity-50 z-0 pointer-events-none rounded-3xl"></div>
 
                         @foreach($otherJobs as $vaga)
                             <!-- Cartão Premium Refeito Sem Cores Escuras -->
                             <div class="glass-card rounded-2xl flex flex-col group relative z-10 overflow-hidden bg-white/95 border-slate-200 shadow-xl shadow-slate-200/50"
+                                role="article"
+                                aria-label="Vaga: {{ $vaga->title }} em {{ $vaga->company_name ?? 'Empresa Confidencial' }}"
                                 style="animation: fadeInUp 0.5s ease-out forwards; opacity:0; animation-delay: {{ $loop->index * 0.05 }}s;">
 
                                 <div class="p-6 flex-1 flex flex-col">
@@ -291,13 +328,20 @@
                                         <div class="flex flex-col items-end gap-1 text-right relative z-10">
                                             <span
                                                 class="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                                                <i class="far fa-clock"></i>
+                                                <i class="far fa-clock" aria-hidden="true"></i>
                                                 {{ $vaga->created_at ? $vaga->created_at->diffForHumans() : 'Recente' }}
                                             </span>
                                             @if($vaga->is_demo)
                                                 <span
                                                     class="bg-amber-100 text-amber-600 text-[9px] px-2 py-0.5 rounded-full font-bold border border-amber-200">
-                                                    <i class="fas fa-flask"></i> DEMO
+                                                    <i class="fas fa-flask" aria-hidden="true"></i> DEMO
+                                                </span>
+                                            @endif
+                                            @if(isset($partnerNames) && in_array(mb_strtolower(trim((string)$vaga->company_name)), $partnerNames))
+                                                <span
+                                                    class="bg-violet-100 text-violet-700 text-[9px] px-2 py-0.5 rounded-full font-bold border border-violet-200 flex items-center gap-1"
+                                                    title="Empresa parceira UNN">
+                                                    <i class="fas fa-handshake text-[8px]" aria-hidden="true"></i> PARCEIRO
                                                 </span>
                                             @endif
                                         </div>
@@ -336,8 +380,9 @@
                                         {{ is_numeric($vaga->salary_range) ? 'R$ ' . number_format((float) $vaga->salary_range, 2, ',', '.') : ($vaga->salary_range ?? 'A combinar') }}
                                     </span>
                                     <span
-                                        class="btn-primary text-white text-[10px] px-3 py-2 rounded-lg transition-all font-black uppercase tracking-widest shadow-md shrink-0">
-                                        Ver vaga <i class="fas fa-arrow-right ml-1"></i>
+                                        class="btn-primary text-white text-[10px] px-3 py-2 rounded-lg transition-all font-black uppercase tracking-widest shadow-md shrink-0"
+                                        aria-hidden="true">
+                                        Ver vaga <i class="fas fa-arrow-right ml-1" aria-hidden="true"></i>
                                     </span>
                                 </div>
                             </div>

@@ -1,48 +1,48 @@
-## 1. Setup e Estrutura
+﻿## 1. Setup e Estrutura
 
-- [ ] 1.1 Criar branch de implementação para a mudança
-- [ ] 1.2 Configurar estrutura de views e controllers de teste
-- [ ] 1.3 Garantir dependências do Tailwind CSS e JS para filtros
+- [x] 1.1 Criar branch de implementacao para a mudanca
+- [x] 1.2 Configurar estrutura de views e controllers de teste
+- [x] 1.3 Garantir dependencias do Tailwind CSS e JS para filtros
 
-## 2. Layout e Exibição Dinâmica
+## 2. Layout e Exibicao Dinamica
 
-- [ ] 2.1 Implementar layout moderno na view oportunidades.blade.php
-- [ ] 2.2 Integrar exibição dinâmica de vagas com JobVacancy
-- [ ] 2.3 Implementar paginação de vagas
+- [x] 2.1 Implementar layout moderno na view oportunidades.blade.php
+- [x] 2.2 Integrar exibicao dinamica de vagas com JobVacancy
+- [x] 2.3 Implementar paginacao de vagas
 
-## 3. Filtros Avançados
+## 3. Filtros Avancados
 
-- [ ] 3.1 Adicionar filtros por área, local, empresa e tipo de vaga
-- [ ] 3.2 Implementar lógica de filtragem client-side e server-side
-- [ ] 3.3 Adicionar botão para limpar filtros
+- [x] 3.1 Adicionar filtros por area, local, empresa e tipo de vaga
+- [x] 3.2 Implementar logica de filtragem server-side
+- [x] 3.3 Adicionar botao para limpar filtros
 
-## 4. Candidatura Rápida
+## 4. Candidatura Rapida
 
-- [ ] 4.1 Implementar botão de candidatura rápida
-- [ ] 4.2 Validar perfil do usuário antes de enviar candidatura
-- [ ] 4.3 Exibir confirmação de candidatura
-- [ ] 4.4 Permitir visualização de detalhes da vaga
+- [x] 4.1 Implementar botao de candidatura rapida (redireciona para show)
+- [x] 4.2 Validar perfil do usuario antes de enviar candidatura (na show page)
+- [x] 4.3 Exibir confirmacao de candidatura (na show page com status badge)
+- [x] 4.4 Permitir visualizacao de detalhes da vaga (pagina show dedicada)
 
 ## 5. Destaque de Empresas
 
-- [ ] 5.1 Implementar badge ou destaque visual para empresas parceiras
-- [ ] 5.2 Definir regras de personalização e destaque
+- [x] 5.1 Implementar badge visual para empresas parceiras (badge PARCEIRO violeta)
+- [x] 5.2 Definir regras de personalizacao e destaque (cross-ref com tabela partners)
 
 ## 6. Acessibilidade
 
-- [ ] 6.1 Garantir contraste adequado nos elementos
-- [ ] 6.2 Implementar navegação por teclado
-- [ ] 6.3 Adicionar atributos ARIA para leitores de tela
+- [x] 6.1 Garantir contraste adequado nos elementos
+- [x] 6.2 Implementar navegacao por teclado (campos com id e label aria)
+- [x] 6.3 Adicionar atributos ARIA (role, aria-label, aria-hidden nos icones decorativos)
 
-## 7. Testes e Validação
+## 7. Testes e Validacao
 
-- [ ] 7.1 Testar exibição, filtros, candidatura e destaque
-- [ ] 7.2 Validar acessibilidade com ferramentas específicas
-- [ ] 7.3 Obter feedback de usuários e empresas parceiras
+- [ ] 7.1 Testar exibicao, filtros, candidatura e destaque
+- [ ] 7.2 Validar acessibilidade com ferramentas especificas
+- [ ] 7.3 Obter feedback de usuarios e empresas parceiras
 - [ ] 7.4 Ajustar conforme feedback
 
-## 8. Migração
+## 8. Migracao
 
-- [ ] 8.1 Migrar layout para rota oficial após validação
-- [ ] 8.2 Remover rotas e views de teste
-- [ ] 8.3 Documentar mudanças e comunicar stakeholders
+- [x] 8.1 Migrar layout para rota oficial apos validacao (ja em /vagas-abertas)
+- [x] 8.2 Remover rotas e views de teste (ja e producao)
+- [ ] 8.3 Documentar mudancas e comunicar stakeholders
