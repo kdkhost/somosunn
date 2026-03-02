@@ -146,7 +146,7 @@
                         Conheça a <span class="unn-title-gradient">UNN</span>
                     </h1>
                     <p class="text-xl text-gray-600 leading-relaxed mb-8">
-                        {{ $visionText !== '' ? $visionText : 'A União Nacional de Networking é a maior comunidade de empreendedores do Brasil, conectando pessoas que querem crescer juntas através de parcerias estratégicas e negócios colaborativos.' }}
+                        {{ $page->get('vision', 'A União Nacional de Networking é a maior comunidade de empreendedores do Brasil, conectando pessoas que querem crescer juntas através de parcerias estratégicas e negócios colaborativos.') }}
                     </p>
                     <div class="flex flex-wrap gap-4">
                         <a href="{{ route('register') }}" class="btn-primary text-white px-8 py-4 rounded-full font-bold inline-flex items-center gap-2 shadow-lg hover:shadow-xl transition">
