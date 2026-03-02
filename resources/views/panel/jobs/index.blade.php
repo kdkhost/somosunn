@@ -91,9 +91,6 @@
             @empty
                 <div class="col-span-full py-12 text-center">
                     <div class="text-slate-400 dark:text-slate-600 text-5xl mb-4 opacity-20">
-            @empty
-                <div class="col-span-full py-12 text-center">
-                    <div class="text-slate-400 dark:text-slate-600 text-5xl mb-4 opacity-20">
                         <i class="fas fa-search"></i>
                     </div>
                     <p class="text-slate-500 dark:text-slate-400 italic font-medium">Nenhuma vaga disponível no momento. Volte
