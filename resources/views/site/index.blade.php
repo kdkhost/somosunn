@@ -23,7 +23,8 @@
                     'A UNN é uma comunidade de networking estratégico onde empreendedores compartilham experiências, constroem conexões e crescem juntos.'))
         );
 
-        $heroImagePath = \App\Models\SiteContent::getValue('home', 'hero_image');
+        $heroImagePath = $homePage->get('hero_image')
+            ?: \App\Models\SiteContent::getValue('home', 'hero_image');
         $heroImageUrl = '';
         if ($heroImagePath) {
             $heroImageUrl = asset('storage/' . ltrim($heroImagePath, '/'));

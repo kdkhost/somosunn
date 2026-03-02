@@ -18,7 +18,7 @@
     </div>
 @endif
 
-<form method="POST" action="{{ route('admin.pages.update', $page) }}">
+<form method="POST" action="{{ route('admin.pages.update', $page) }}" enctype="multipart/form-data">
     @csrf
     @method('PUT')
 
@@ -135,6 +135,16 @@
         desc.addEventListener('input', update);
         update();
     }
+
+    // Atualiza label dos custom-file-input com o nome do arquivo selecionado
+    document.querySelectorAll('.custom-file-input').forEach(function (input) {
+        input.addEventListener('change', function () {
+            const label = this.nextElementSibling;
+            if (label) {
+                label.textContent = this.files.length > 0 ? this.files[0].name : 'Escolher imagem...';
+            }
+        });
+    });
 
     // Formata e valida todos os textareas JSON da página
     document.querySelectorAll('textarea[data-json]').forEach(function (ta) {

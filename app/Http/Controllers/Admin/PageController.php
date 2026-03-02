@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Page;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -70,6 +71,14 @@ class PageController extends Controller
         ],
     ];
 
+    /**
+     * Campos de imagem por slug — recebidos via file input no form.
+     * O valor armazenado é o path relativo ao disco 'public'.
+     */
+    private const SLUG_IMAGE_FIELDS = [
+        'home' => ['hero_image'],
+    ];
+
     /** Campos JSON (arrays) por slug — enviados como textarea JSON no form. */
     private const SLUG_JSON_FIELDS = [
         'home'          => ['testimonials'],
@@ -100,11 +109,22 @@ class PageController extends Controller
         $scalarFields = self::SLUG_SCALAR_FIELDS[$slug] ?? [];
         $jsonFields   = self::SLUG_JSON_FIELDS[$slug]   ?? [];
 
-        $request->validate([
+        $imageFields  = self::SLUG_IMAGE_FIELDS[$slug]  ?? [];
+
+        // Regras de validação
+        $rules = [
             'title'           => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string', 'max:320'],
-        ], [
+        ];
+        foreach ($imageFields as $field) {
+            $rules[$field]            = ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif,svg', 'max:6144'];
+            $rules['remove_' . $field] = ['nullable', 'boolean'];
+        }
+
+        $request->validate($rules, [
             'seo_description.max' => 'A descrição SEO não pode ultrapassar 320 caracteres.',
+            '*.image'   => 'O arquivo deve ser uma imagem.',
+            '*.max'     => 'A imagem não pode ultrapassar 6 MB.',
         ]);
 
         $newData = $page->data ?? [];
@@ -113,6 +133,30 @@ class PageController extends Controller
         foreach ($scalarFields as $field) {
             if ($request->exists($field)) {
                 $newData[$field] = $request->input($field, '');
+            }
+        }
+
+        // Campos de imagem: upload de arquivo
+        foreach ($imageFields as $field) {
+            $removeKey   = 'remove_' . $field;
+            $currentPath = $newData[$field] ?? null;
+
+            if ($request->boolean($removeKey)) {
+                // Remover imagem existente
+                if ($currentPath) {
+                    Storage::disk('public')->delete($currentPath);
+                }
+                $newData[$field] = null;
+                continue;
+            }
+
+            if ($request->hasFile($field)) {
+                // Apagar a imagem anterior
+                if ($currentPath) {
+                    Storage::disk('public')->delete($currentPath);
+                }
+                $path = $request->file($field)->store('pages/' . $slug, 'public');
+                $newData[$field] = $path;
             }
         }
 
