@@ -1,5 +1,13 @@
 # UNN — Plataforma de Networking
 
+## Novidades Recentes (mar/2026)
+
+- **Sistema de Gamificação completo (Pontos):** Todas as 21 regras de pontos ativas agora são disparadas automaticamente pelas ações do usuário. Veja a seção de Funcionalidades para detalhes.
+- **Programa de Indicação ("Indique e Ganhe"):** Cada membro possui um link de referral único. Ao indicar alguém que se cadastra, o indicador recebe pontos automaticamente.
+- **Bônus de Aniversário:** Sistema agendado concede pontos no aniversário do membro (executa diariamente às 01h).
+- **Ranking Top 10:** Toda semana (domingo à meia-noite), os 10 membros com mais pontos recebem bônus automático.
+- **Streak de Login:** Logins consecutivos por 7 ou 30 dias concedem bônus progressivos.
+
 ## Novidades Recentes (fev/2026)
 
 - **Menu mobile 100% responsivo:** Navegação aprimorada em smartphones, com abertura/fechamento suave e acessibilidade total.
@@ -44,7 +52,17 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 - **Relatórios:** Dashboards financeiros, de vendas e de engajamento.
 - **Configurações:** Controle total da plataforma via painel (cores, imagens, textos, integrações).
 
-### 4. Novidades 2026
+### 4. Gamificação (Sistema de Pontos)
+- **21 regras ativas:** Pontos concedidos por login, streak, publicação, comentário, curtida, compartilhamento, aula, curso, certificado, evento, mentoria, avaliação, indicação, aniversário e ranking.
+- **Não-repetição automática:** O `PointsService` bloqueia automaticamente ações únicas (ex: completar perfil, primeiro curso) sem lógica duplicada nos controllers.
+- **Limite diário:** Regras com `max_daily` (ex: posts, comentários) são respeitadas automaticamente.
+- **Streak de login:** 7 e 30 dias consecutivos concedem bônus progressivos.
+- **Programa de indicação:** Link de referral único por membro; indicador pontua ao novo usuário se cadastrar.
+- **Bônus de aniversário:** Concedido automaticamente 1x por ano (comando `points:award-birthday-bonus`).
+- **Ranking Top 10:** Premiação semanal automática (comando `points:award-top-ranking`).
+- **Regras configuráveis** pelo painel admin em `/admin/points-rules`.
+
+### 5. Novidades 2026
 - **Menu Mobile Responsivo:** Menu principal funcional em todas as telas e dispositivos.
 - **Dashboard Dinâmica:** Widgets e métricas em tempo real, segmentados por perfil.
 - **Cron Interno:** Gerencie tarefas agendadas direto pelo painel admin (menu "Cron").
@@ -259,6 +277,21 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
   - Injeção automática de headers de identificação em transações via cartão de crédito para rastreamento de qualidade.
 - **MCP Server:**
   - Comando `php artisan mcp:configure` aprimorado para exibir status completo da integração.
+
+### 02/03/2026 — Sistema de Gamificação Completo (Pontos)
+- **21 de 22 regras implementadas end-to-end:**
+  - `signup`, `daily_login`, `streak_7days`, `streak_30days`, `complete_profile`
+  - `publish_post`, `comment`, `receive_like`, `share_social`
+  - `complete_lesson`, `complete_course`, `first_course`, `earn_certificate`
+  - `attend_event`, `attend_mentorship`, `referral`, `review`, `mentor`
+  - `top_10_ranking` (comando semanal), `birthday_bonus` (comando diário)
+- **PointsService robusto:** guarda de não-repetição, limite diário (`max_daily`) e cálculo de streak.
+- **Migração de infraestrutura:** campo `meta` expandido para TEXT; colunas `birth_date`, `referral_code` e `referred_by` adicionadas à tabela `users`.
+- **User model:** gera código de referral único (`UNN` + 7 chars aleatórios) automaticamente no cadastro.
+- **Programa de Indicação:** link referral único por membro com UI no perfil (copiar + WhatsApp + Telegram).
+- **Comandos agendados:** `points:award-top-ranking` (domingo 00:05) e `points:award-birthday-bonus` (diário 01:00).
+- **Fix PaymentService:** `computeFee()` agora respeita `false` explícito; configuração do banco só é lida quando o parâmetro não for fornecido.
+- **Regra pendente:** `help_member` (15pts) aguarda implementação de feature de fórum/Q&A.
 
 ---
 © 2026 UNN Networking. Todos os direitos reservados.
