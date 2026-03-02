@@ -309,6 +309,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Course::class, 'wishlists', 'user_id', 'course_id')->withTimestamps();
     }
 
+    public function conversations()
+    {
+        return $this->belongsToMany(Conversation::class)->withPivot('role', 'joined_at')->withTimestamps();
+    }
+
     /**
      * Envia notificação de reset de senha em português.
      */
