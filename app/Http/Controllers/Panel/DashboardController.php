@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Order;
+use App\Models\PointsLog;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -213,7 +214,22 @@ class DashboardController extends Controller
             'empresa' => !blank($user->company),
         ];
 
-        return view('panel.dashboard', compact('user', 'plan', 'stats', 'suggestedUsers', 'communityCount', 'myHealth', 'myHealthDetails'));
+        // --- Pontos de Gamificação ---
+        $userPoints = 0;
+        $rankPosition = 0;
+        $pontosEsteMes = 0;
+        try {
+            $userPoints = (int) ($user->points ?? 0);
+            $rankPosition = \App\Models\User::where('points', '>', $userPoints)->count() + 1;
+            $pontosEsteMes = (int) PointsLog::where('user_id', $user->id)
+                ->whereYear('created_at', now()->year)
+                ->whereMonth('created_at', now()->month)
+                ->sum('points');
+        } catch (\Throwable $e) {
+            // Ignorar se tabela ainda não existir
+        }
+
+        return view('panel.dashboard', compact('user', 'plan', 'stats', 'suggestedUsers', 'communityCount', 'myHealth', 'myHealthDetails', 'userPoints', 'rankPosition', 'pontosEsteMes'));
     }
 }
 

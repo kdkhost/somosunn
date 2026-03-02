@@ -192,6 +192,23 @@
                 </div>
             @endif
 
+            <!-- Widget: Pontos UNN -->
+            @if($userPoints > 0 || true)
+                <a href="{{ route('panel.points.index') }}" class="relative group bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-8 rounded-[2.5rem] border border-amber-200/60 dark:border-amber-800/40 shadow-sm hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 hover:-translate-y-2 block">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-3xl mb-8 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-500">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h4 class="text-amber-500 dark:text-amber-400 text-xs font-black uppercase tracking-[0.2em] mb-3">Meus Pontos</h4>
+                    <div class="flex items-end justify-between">
+                        <span class="text-5xl font-black text-slate-900 dark:text-white tracking-tighter" id="counter-pontos">{{ number_format($userPoints) }}</span>
+                        <div class="text-amber-500 text-xs font-black flex items-center gap-1 bg-amber-100 dark:bg-amber-900/40 px-2 py-1 rounded-lg">
+                            <i class="fas fa-trophy text-[10px]"></i> #{{ $rankPosition }}
+                        </div>
+                    </div>
+                    <p class="text-xs text-amber-500/80 font-semibold mt-3">{{ $pontosEsteMes }} pts este mês</p>
+                </a>
+            @endif
+
             <!-- Widget: Investimento -->
             <div class="relative group bg-indigo-900 p-8 rounded-[2.5rem] border border-indigo-800 shadow-2xl transition-all duration-500 hover:-translate-y-2 col-span-1 md:col-span-2 overflow-hidden shadow-indigo-950/40">
                 <div class="absolute top-0 right-0 p-8 opacity-10">
