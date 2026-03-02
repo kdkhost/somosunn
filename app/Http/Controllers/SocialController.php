@@ -460,7 +460,7 @@ class SocialController extends Controller
 
         // Gamificação: pontuar publicação (se regra existir)
         try {
-            (new \App\Services\PointsService())->award(Auth::user(), 'publish', ['post_id' => $post->id]);
+            (new \App\Services\PointsService())->award(Auth::user(), 'publish_post', ['post_id' => $post->id]);
         } catch (\Throwable $e) {
             \Log::warning('Falha ao pontuar publicação: ' . $e->getMessage());
         }
@@ -497,6 +497,13 @@ class SocialController extends Controller
                     'action_url' => route('social.feed'), // Ou uma rota específica do post se existir
                     'action_label' => 'Ver publicação'
                 ]));
+
+                // Gamificação: pontuar o autor do post por receber uma reação
+                try {
+                    (new \App\Services\PointsService())->award($post->user, 'receive_like', ['post_id' => $post->id, 'by_user_id' => Auth::id()]);
+                } catch (\Throwable $e) {
+                    \Log::warning('Falha ao pontuar receive_like: ' . $e->getMessage());
+                }
             }
         }
 
@@ -516,6 +523,13 @@ class SocialController extends Controller
             'parent_id' => $validated['parent_id'] ?? null,
             'content' => $validated['content'],
         ]);
+
+        // Gamificação: pontuar comentário
+        try {
+            (new \App\Services\PointsService())->award(Auth::user(), 'comment', ['post_id' => $post->id, 'comment_id' => $comment->id]);
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao pontuar comment: ' . $e->getMessage());
+        }
 
         // Notificar o autor do post (se não for o próprio autor comentando)
         if ($post->user_id !== Auth::id()) {
@@ -565,6 +579,13 @@ class SocialController extends Controller
             'content' => $sharedContent,
             'visibility' => 'community',
         ]);
+
+        // Gamificação: compartilhamento de post (max 3x por dia)
+        try {
+            (new \App\Services\PointsService())->award(Auth::user(), 'share_social', ['shared_post_id' => $post->id]);
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao pontuar share_social: ' . $e->getMessage());
+        }
 
         // Notificar o autor original
         if ($post->user_id !== Auth::id()) {
