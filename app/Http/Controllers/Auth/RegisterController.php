@@ -70,7 +70,7 @@ class RegisterController extends Controller
         }
 
         Auth::login($user);
-        return redirect()->route('panel.dashboard')
-            ->with('success', 'Seja bem-vindo à SOMOS UNN! Você já pode acessar seu painel. Se quiser, faça um upgrade de plano para liberar mais recursos.');
+        return redirect()->route('premium')
+            ->with('success', 'Conta criada com sucesso! Escolha um plano para aproveitar ao máximo a plataforma.');
     }
 }

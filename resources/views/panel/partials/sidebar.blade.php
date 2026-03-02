@@ -101,6 +101,12 @@
             Meus Pontos
         </a>
 
+        <a href="{{ route('panel.referral.index') }}"
+            class="{{ $navItemClass(request()->routeIs('panel.referral.*')) }}">
+            <i class="fas fa-user-plus w-5 opacity-80"></i>
+            Indicações
+        </a>
+
         <a href="{{ route('panel.redemptions.shop') }}"
             class="{{ $navItemClass(request()->routeIs('panel.redemptions.*')) }}">
             <i class="fas fa-gift w-5 opacity-80"></i>

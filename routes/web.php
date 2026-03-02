@@ -536,6 +536,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     // Pontos do Membro
     Route::get('/meus-pontos', [\App\Http\Controllers\Panel\PointsController::class, 'index'])->name('points.index');
 
+    // Indicações / Programa de Afiliados
+    Route::get('/indicacoes', [\App\Http\Controllers\Panel\ReferralController::class, 'index'])->name('referral.index');
+
     // Loja de Pontos (Usuário)
     Route::get('/resgate', [\App\Http\Controllers\RedemptionItemController::class, 'index'])->name('redemptions.shop');
     Route::get('/resgate/historico', [\App\Http\Controllers\RedemptionItemController::class, 'history'])->name('redemptions.history');

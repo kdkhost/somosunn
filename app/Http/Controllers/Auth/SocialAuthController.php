@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\PointsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,7 @@ class SocialAuthController extends Controller
 {
     private array $providers = ['google', 'facebook', 'linkedin'];
 
-    public function redirect(string $provider)
+    public function redirect(Request $request, string $provider)
     {
         if (!$this->isSupportedProvider($provider)) {
             abort(404);
@@ -27,6 +28,12 @@ class SocialAuthController extends Controller
 
         if (!$this->isProviderEnabled($provider)) {
             return $this->socialUnavailable($provider, 'Login social desativado para este provedor.');
+        }
+
+        // Preserva código de indicação para usar após o callback
+        $refCode = trim((string) $request->query('ref', session('social_ref', '')));
+        if ($refCode !== '') {
+            session(['social_ref' => $refCode]);
         }
 
         $this->applyProviderRuntimeConfig($provider);
@@ -122,7 +129,9 @@ class SocialAuthController extends Controller
             $user = User::where('email', $email)->first();
         }
 
-        if (!$user) {
+        $isNewUser = ($user === null);
+
+        if ($isNewUser) {
             $user = new User();
             $user->name = $socialUser->getName() ?? $socialUser->getNickname() ?? 'Usuario';
             $user->email = $email;
@@ -142,7 +151,39 @@ class SocialAuthController extends Controller
             $user->email_verified_at = now();
         }
 
-        $user->save();
+        // Resolve código de indicação (guardado na sessão durante o redirect)
+        $referrer = null;
+        if ($isNewUser) {
+            $refCode = trim((string) session('social_ref', ''));
+            session()->forget('social_ref');
+            if ($refCode !== '') {
+                $referrer = User::where('referral_code', $refCode)->where('id', '!=', 0)->first();
+                if ($referrer) {
+                    $user->referred_by = $referrer->id;
+                }
+            }
+        }
+
+        try {
+            $user->save();
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Violação de unicidade de e-mail: pode ser que outro usuário
+            // já tem este e-mail — faz login no usuário existente ao invés de criar um novo
+            if (str_contains($e->getMessage(), '1062') || str_contains($e->getMessage(), 'Duplicate')) {
+                $existing = User::where('email', $email)->first();
+                if ($existing) {
+                    if (!$existing->{$providerIdField}) {
+                        $existing->{$providerIdField} = $providerId;
+                        $existing->save();
+                    }
+                    $this->trySaveSocialAvatar($existing, $socialUser->getAvatar());
+                    Auth::login($existing, true);
+                    return redirect()->intended(route($existing->isAdmin() ? 'panel.admin.dashboard' : 'panel.dashboard'));
+                }
+            }
+            Log::error('Social login user save failed.', ['provider' => $provider, 'email' => $email, 'error' => $e->getMessage()]);
+            return redirect()->route('login')->with('warning', 'Nao foi possivel concluir o cadastro via login social. Tente com e-mail e senha.');
+        }
 
         if (!$user->activePlan()) {
             $defaultPlan = $this->resolveDefaultPlan();
@@ -153,9 +194,27 @@ class SocialAuthController extends Controller
             }
         }
 
+        // Gamificação: pontos de cadastro + indicação
+        if ($isNewUser) {
+            try {
+                $ps = new PointsService();
+                $ps->award($user, 'signup');
+                if ($referrer) {
+                    $ps->award($referrer, 'referral', ['new_user_id' => $user->id, 'new_user_name' => $user->name]);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Social signup points award failed.', ['error' => $e->getMessage()]);
+            }
+        }
+
         $this->trySaveSocialAvatar($user, $socialUser->getAvatar());
 
         Auth::login($user, true);
+
+        // Novo usuário → encaminhar para escolha de plano
+        if ($isNewUser) {
+            return redirect()->route('premium')->with('success', 'Conta criada com sucesso! Escolha um plano para aproveitar ao máximo a plataforma.');
+        }
 
         $redirectRoute = $user->isAdmin() ? 'panel.admin.dashboard' : 'panel.dashboard';
 
