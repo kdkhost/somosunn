@@ -280,6 +280,8 @@ class PlanController extends Controller
             ->where('is_free', true)
             ->update(['is_free' => false]);
     }
+
+    private function syncWithMercadoPago(Plan $plan): void
     {
         try {
             // Se já tem um ID, talvez queiramos atualizar no futuro. 
