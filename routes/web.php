@@ -343,6 +343,12 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
         Route::post('/post/{post}/report', [\App\Http\Controllers\SocialController::class, 'reportPost'])->name('social.post.report');
         Route::post('/post/{post}/unpublish', [\App\Http\Controllers\SocialController::class, 'unpublishPost'])->name('social.post.unpublish');
         Route::delete('/post/{post}', [\App\Http\Controllers\SocialController::class, 'destroyPost'])->name('social.post.destroy');
+
+        // Solicitações de compartilhamento (share-with-approval)
+        Route::get('/compartilhamentos/pendentes', [\App\Http\Controllers\ShareRequestController::class, 'index'])->name('social.share-requests.index');
+        Route::post('/compartilhamentos/{shareRequest}/aprovar', [\App\Http\Controllers\ShareRequestController::class, 'approve'])->name('social.share-requests.approve');
+        Route::post('/compartilhamentos/{shareRequest}/recusar', [\App\Http\Controllers\ShareRequestController::class, 'reject'])->name('social.share-requests.reject');
+        Route::get('/api/compartilhamentos/pendentes/count', [\App\Http\Controllers\ShareRequestController::class, 'pendingCount'])->name('social.share-requests.count');
     });
 
     // Chat (Feature: chat)

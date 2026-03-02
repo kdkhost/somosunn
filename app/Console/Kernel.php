@@ -84,6 +84,16 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar agendamento de birthday bonus: ' . $e->getMessage());
         }
 
+        // Expira solicitações de compartilhamento não respondidas em 7 dias
+        try {
+            $schedule->command('share-requests:expire')
+                ->dailyAt('02:00')
+                ->withoutOverlapping()
+                ->name('share-requests-expire');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar agendamento de expiração de share requests: ' . $e->getMessage());
+        }
+
         // Carregar tarefas dinamicas do banco
         try {
             if (\Schema::hasTable('scheduled_tasks')) {

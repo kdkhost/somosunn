@@ -69,6 +69,7 @@ use App\Models\PostMedia;
 use App\Models\PostReaction;
 use App\Models\PostReport;
 use App\Models\Setting;
+use App\Models\ShareRequest;
 use App\Models\User;
 use App\Services\MemberSuggestionService;
 use Illuminate\Http\Request;
@@ -251,6 +252,7 @@ class SocialController extends Controller
                 'shareTargets' => User::whereIn('id', $connectedUserIds)->orderBy('name')->get(['id', 'name']),
                 'recommendedUsers' => $recommendedUsers,
                 'pendingRequests' => $pendingRequests,
+                'pendingShareRequests' => $pendingShareRequests,
                 'connectionMap' => $connectionMap,
                 'adsEnabled' => $adsEnabled,
                 'adsCode' => $adsCode,
@@ -263,6 +265,7 @@ class SocialController extends Controller
             'shareTargets' => User::whereIn('id', $connectedUserIds)->orderBy('name')->get(['id', 'name']),
             'recommendedUsers' => $recommendedUsers,
             'pendingRequests' => $pendingRequests,
+            'pendingShareRequests' => $pendingShareRequests,
             'connectionMap' => $connectionMap,
             'adsEnabled' => $adsEnabled,
             'adsCode' => $adsCode,
@@ -614,37 +617,49 @@ class SocialController extends Controller
         }
 
         $message = trim((string) ($validated['message'] ?? ''));
-        $sharedContent = "Compartilhou de {$post->user->name}:\n\n" . (string) $post->content;
-        $content = $message !== '' ? ($message . "\n\n" . $sharedContent) : $sharedContent;
 
-        Auth::user()->posts()->create([
-            'content' => $content,
-            'visibility' => 'connections',
-            'shared_to_user_id' => $targetUserId,
+        // Verifica se já existe uma solicitação pendente para o mesmo post e destinatário
+        $alreadyPending = ShareRequest::where('post_id', $post->id)
+            ->where('from_user_id', Auth::id())
+            ->where('to_user_id', $targetUserId)
+            ->pending()
+            ->exists();
+
+        if ($alreadyPending) {
+            return back()->with('info', 'Você já enviou uma solicitação de compartilhamento para esse membro.');
+        }
+
+        // Cria solicitação ao invés de postar diretamente (require consent)
+        ShareRequest::create([
+            'post_id'      => $post->id,
+            'from_user_id' => Auth::id(),
+            'to_user_id'   => $targetUserId,
+            'message'      => $message ?: null,
+            'status'       => 'pending',
+            'expires_at'   => now()->addDays(7),
         ]);
 
         $targetUser = User::find($targetUserId);
         if ($targetUser) {
-            // Notificar o usuário que recebeu o post na timeline
             $targetUser->notify(new \App\Notifications\AppNotification([
-                'message' => Auth::user()->name . ' compartilhou uma publicação diretamente com você.',
-                'type' => 'TimelineShare',
-                'action_url' => route('social.profile', $targetUser->username ?? $targetUser->id),
-                'action_label' => 'Ver timeline'
+                'message'      => Auth::user()->name . ' quer compartilhar uma publicação com você. Aprove ou recuse.',
+                'type'         => 'ShareRequest',
+                'action_url'   => route('social.share-requests.index'),
+                'action_label' => 'Ver solicitações',
             ]));
         }
 
-        // Notificar o autor original (se houver autor e não for quem está compartilhando)
+        // Notificar o autor original
         if ($post->user_id && $post->user_id !== Auth::id()) {
             $post->user->notify(new \App\Notifications\AppNotification([
-                'message' => Auth::user()->name . ' compartilhou sua publicação com um amigo.',
-                'type' => 'PostShared',
-                'action_url' => route('social.feed'),
-                'action_label' => 'Ver detalhes'
+                'message'      => Auth::user()->name . ' está compartilhando sua publicação com um amigo.',
+                'type'         => 'PostShared',
+                'action_url'   => route('social.feed'),
+                'action_label' => 'Ver detalhes',
             ]));
         }
 
-        return back()->with('success', 'Post compartilhado na linha do tempo do membro.');
+        return back()->with('success', 'Solicitação de compartilhamento enviada! ' . ($targetUser ? $targetUser->name : 'O membro') . ' precisará aprovar antes de publicar.');
     }
 
     public function reportPost(Request $request, Post $post)

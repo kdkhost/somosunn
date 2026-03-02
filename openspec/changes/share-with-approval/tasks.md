@@ -1,34 +1,34 @@
 ## 1. Database & Model
 
-- [ ] 1.1 Criar migration para tabela `share_requests` (id, post_id, from_user_id, to_user_id, message, status, expires_at, timestamps)
-- [ ] 1.2 Criar model `ShareRequest` com relacionamentos (post, fromUser, toUser) e scopes (pending, expired)
-- [ ] 1.3 Adicionar índices para performance (to_user_id + status, expires_at)
+- [x] 1.1 Criar migration para tabela `share_requests`
+- [x] 1.2 Criar model `ShareRequest` com relacionamentos e scopes (pending, expired)
+- [x] 1.3 Adicionar índices para performance
 
 ## 2. Controller & Rotas
 
-- [ ] 2.1 Modificar `SocialController::sharePostToUser()` para criar ShareRequest ao invés de Post direto
-- [ ] 2.2 Criar método `ShareRequestController::approve()` que cria o Post e marca request como approved
-- [ ] 2.3 Criar método `ShareRequestController::reject()` que marca request como rejected
-- [ ] 2.4 Criar método `ShareRequestController::index()` para listar pendentes do usuário logado
-- [ ] 2.5 Adicionar rotas POST `/share-request/{id}/approve`, `/share-request/{id}/reject`, GET `/share-requests`
+- [x] 2.1 Modificar `SocialController::sharePostToUser()` para criar ShareRequest ao invés de Post direto
+- [x] 2.2 Criar método `ShareRequestController::approve()` que cria o Post e marca request como approved
+- [x] 2.3 Criar método `ShareRequestController::reject()` que marca request como rejected
+- [x] 2.4 Criar método `ShareRequestController::index()` para listar pendentes do usuário logado
+- [x] 2.5 Adicionar rotas POST `/compartilhamentos/{id}/aprovar`, `/compartilhamentos/{id}/recusar`, GET `/compartilhamentos/pendentes`
 
 ## 3. Views & Frontend
 
-- [ ] 3.1 Atualizar view de feed para mostrar seção de solicitações pendentes (se houver)
-- [ ] 3.2 Criar partial para exibir card de solicitação com botões Aprovar/Rejeitar
-- [ ] 3.3 Atualizar UI de compartilhamento para deixar claro que é "solicitação" quando para outro membro
-- [ ] 3.4 Adicionar badge de contagem no menu/sidebar quando há pendentes
+- [x] 3.1 Atualizar view de feed para mostrar seção de solicitações pendentes (se houver)
+- [x] 3.2 Criar partial para exibir card de solicitação com botões Aprovar/Rejeitar
+- [x] 3.3 Atualizar UI de compartilhamento — mensagem clara de "solicitação" enviada
+- [x] 3.4 Adicionar funções JS approveShareRequest/rejectShareRequest com feedback SweetAlert2
 
 ## 4. Notificações
 
-- [ ] 4.1 Criar notificação para destinatário ao receber nova solicitação
-- [ ] 4.2 Criar notificação para remetente quando solicitação é aprovada
+- [x] 4.1 Criar notificação para destinatário ao receber nova solicitação
+- [x] 4.2 Criar notificação para remetente quando solicitação é aprovada ou recusada
 - [ ] 4.3 Integrar badge de pendentes com sistema de polling existente
 
 ## 5. Jobs & Limpeza
 
-- [ ] 5.1 Criar comando/job para expirar solicitações antigas (7+ dias)
-- [ ] 5.2 Agendar job no scheduler (diário)
+- [x] 5.1 Criar comando `share-requests:expire` para expirar solicitações antigas (7+ dias)
+- [x] 5.2 Agendar comando no Kernel (diário às 02:00)
 
 ## 6. Testes & Validação
 

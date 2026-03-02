@@ -664,6 +664,49 @@
                                 </div>
                             @endif
 
+                            @if(isset($pendingShareRequests) && $pendingShareRequests->isNotEmpty())
+                                <div class="mb-6 pb-6 border-b border-gray-100">
+                                    <h3 class="font-bold text-gray-900 mb-4 flex items-center justify-between">
+                                        <span>Compartilhamentos Pendentes</span>
+                                        <span class="bg-violet-100 text-violet-600 text-[10px] px-2 py-0.5 rounded-full font-bold">{{ $pendingShareRequests->count() }}</span>
+                                    </h3>
+                                    <div class="space-y-4">
+                                        @foreach($pendingShareRequests as $sr)
+                                            <div class="flex flex-col gap-2 bg-violet-50 rounded-xl p-3 text-sm" id="share-req-{{ $sr->id }}">
+                                                <div class="flex items-center gap-2">
+                                                    <img src="{{ $sr->fromUser?->profile_photo_url ?? asset('img/default-user.svg') }}"
+                                                         class="w-8 h-8 rounded-full object-cover shrink-0"
+                                                         onerror="this.src='{{ asset('img/default-user.svg') }}'">
+                                                    <div class="min-w-0">
+                                                        <p class="font-semibold text-gray-800 text-xs leading-tight truncate">{{ $sr->fromUser?->name }}</p>
+                                                        <p class="text-[10px] text-gray-500">quer compartilhar um post com você</p>
+                                                    </div>
+                                                </div>
+                                                @if($sr->message)
+                                                    <p class="text-[11px] text-gray-500 italic truncate">"{{ $sr->message }}"</p>
+                                                @endif
+                                                <div class="flex gap-2">
+                                                    <button type="button"
+                                                        class="flex-1 bg-violet-600 text-white text-[11px] px-3 py-1.5 rounded-lg font-bold hover:bg-violet-700 transition"
+                                                        onclick="approveShareRequest({{ $sr->id }})">
+                                                        <i class="fas fa-check mr-1"></i> Aprovar
+                                                    </button>
+                                                    <button type="button"
+                                                        class="flex-1 bg-gray-100 text-gray-600 text-[11px] px-3 py-1.5 rounded-lg font-bold hover:bg-red-50 hover:text-red-600 transition"
+                                                        onclick="rejectShareRequest({{ $sr->id }})">
+                                                        <i class="fas fa-times mr-1"></i> Recusar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <a href="{{ route('social.share-requests.index') }}"
+                                       class="block mt-3 text-center text-[11px] text-violet-600 hover:underline font-medium">
+                                        Ver todas as solicitações
+                                    </a>
+                                </div>
+                            @endif
+
                             <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
                             <div class="space-y-4">
                                 @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
@@ -2203,6 +2246,60 @@
                     .catch(() => {
                         Swal.fire('Ops!', 'Erro ao aceitar.', 'error');
                     });
+            }
+
+            function approveShareRequest(id) {
+                Swal.fire({
+                    title: 'Aprovar compartilhamento?',
+                    text: 'O post será publicado na sua timeline.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Aprovar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#7c3aed',
+                }).then(result => {
+                    if (!result.isConfirmed) return;
+                    fetch(`/compartilhamentos/${id}/aprovar`, {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': csrfToken, 'Content-Type': 'application/json' }
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('share-req-' + id)?.remove();
+                            Swal.fire('Aprovado!', data.message, 'success');
+                        } else {
+                            Swal.fire('Ops!', data.message || 'Erro ao aprovar.', 'error');
+                        }
+                    })
+                    .catch(() => Swal.fire('Ops!', 'Erro ao aprovar.', 'error'));
+                });
+            }
+
+            function rejectShareRequest(id) {
+                Swal.fire({
+                    title: 'Recusar compartilhamento?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Recusar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#dc2626',
+                }).then(result => {
+                    if (!result.isConfirmed) return;
+                    fetch(`/compartilhamentos/${id}/recusar`, {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': csrfToken, 'Content-Type': 'application/json' }
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('share-req-' + id)?.remove();
+                        } else {
+                            Swal.fire('Ops!', data.message || 'Erro ao recusar.', 'error');
+                        }
+                    })
+                    .catch(() => Swal.fire('Ops!', 'Erro ao recusar.', 'error'));
+                });
             }
 
             function togglePanel(id) {
