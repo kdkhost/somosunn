@@ -1,17 +1,18 @@
 @extends($extends ?? 'layouts.app')
 
-@section('title', 'Portal de Networking - UNN')
+@section('title', ($pageData['seo_title'] ?? null) ?: 'Portal de Networking - UNN')
 
 @section('content')
+@php $pageData = $pageData ?? []; @endphp
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-white">
     <!-- Hero Section -->
     <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
         <div class="max-w-7xl mx-auto text-center">
             <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient">
-                Portal de Networking
+                {{ ($pageData['hero_title'] ?? null) ?: 'Portal de Networking' }}
             </h1>
             <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.
+                {{ ($pageData['hero_subtitle'] ?? null) ?: 'Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.' }}
             </p>
         </div>
     </section>

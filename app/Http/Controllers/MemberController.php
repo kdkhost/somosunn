@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Page;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -180,10 +181,13 @@ class MemberController extends Controller
             return view('site.membros', [
                 'members' => $members,
                 'isDemo' => true,
-                'connectionMap' => $connectionMap
+                'connectionMap' => $connectionMap,
+                'pageData' => Page::where('slug', 'membros')->first()?->data ?? [],
             ]);
         }
 
-        return view('site.membros', compact('members', 'connectionMap'));
+        $pageData = Page::where('slug', 'membros')->first()?->data ?? [];
+
+        return view('site.membros', compact('members', 'connectionMap', 'pageData'));
     }
 }

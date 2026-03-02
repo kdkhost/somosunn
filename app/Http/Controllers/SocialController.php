@@ -69,6 +69,7 @@ use App\Models\PostMedia;
 use App\Models\PostReaction;
 use App\Models\PostReport;
 use App\Models\Setting;
+use App\Models\Page;
 use App\Models\ShareRequest;
 use App\Models\User;
 use App\Services\MemberSuggestionService;
@@ -126,10 +127,17 @@ class SocialController extends Controller
         }
 
         $pendingRequests = collect();
+        $pendingShareRequests = collect();
         if (Auth::check()) {
             $pendingRequests = Connection::where('requested_id', Auth::id())
                 ->where('status', 'pending')
                 ->with('requester')
+                ->get();
+
+            $pendingShareRequests = ShareRequest::where('to_user_id', Auth::id())
+                ->where('status', 'pending')
+                ->with(['fromUser', 'post'])
+                ->latest()
                 ->get();
         }
 
@@ -257,8 +265,11 @@ class SocialController extends Controller
                 'adsEnabled' => $adsEnabled,
                 'adsCode' => $adsCode,
                 'adsConfig' => $adsConfig,
+                'pageData' => Page::where('slug', 'feed')->first()?->data ?? [],
             ]);
         }
+
+        $pageData = Page::where('slug', 'feed')->first()?->data ?? [];
 
         return view('social.feed', [
             'posts' => $posts,
@@ -270,6 +281,7 @@ class SocialController extends Controller
             'adsEnabled' => $adsEnabled,
             'adsCode' => $adsCode,
             'adsConfig' => $adsConfig,
+            'pageData' => $pageData,
         ]);
     }
 

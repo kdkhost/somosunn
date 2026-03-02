@@ -69,6 +69,14 @@ class PageController extends Controller
             'stat_3_value', 'stat_3_label', 'stat_4_value', 'stat_4_label',
             'cta_title', 'cta_subtitle', 'cta_btn',
         ],
+        // Páginas de aplicação
+        'eventos'     => ['seo_title', 'seo_description', 'hero_title', 'hero_subtitle'],
+        'membros'     => ['seo_title', 'seo_description', 'hero_title', 'hero_subtitle'],
+        'vagas-abertas' => ['seo_title', 'seo_description', 'hero_title', 'hero_subtitle'],
+        'cursos'      => ['seo_title', 'seo_description', 'hero_title', 'hero_subtitle'],
+        'portal'      => ['seo_title', 'seo_description', 'hero_title', 'hero_subtitle'],
+        'premium'     => ['seo_title', 'seo_description', 'hero_title', 'hero_subtitle', 'plans_title', 'plans_subtitle'],
+        'feed'        => ['seo_title', 'seo_description'],
     ];
 
     /**
@@ -89,6 +97,13 @@ class PageController extends Controller
         'valores'       => ['values'],
         'como-funciona' => ['steps'],
         'quem-somos'    => ['founders', 'team'],
+        'eventos'       => [],
+        'membros'       => [],
+        'vagas-abertas' => [],
+        'cursos'        => [],
+        'portal'        => [],
+        'premium'       => [],
+        'feed'          => [],
     ];
 
     public function index(): View

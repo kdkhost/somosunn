@@ -116,6 +116,7 @@ class HomeController extends Controller
             'levelSummary' => $overview['levelSummary'],
             'topRankings' => $overview['leaderboard'],
             'isDemo' => config('app.demo_mode') && $mentorings->isEmpty(),
+            'pageData' => Page::where('slug', 'portal')->first()?->data ?? [],
         ]);
     }
 
@@ -169,6 +170,8 @@ class HomeController extends Controller
             }
         }
 
+        $pageData = Page::where('slug', 'premium')->first()?->data ?? [];
+
         return view('site.premium', compact(
             'plans',
             'testimonials',
@@ -176,7 +179,8 @@ class HomeController extends Controller
             'requiredFeatureLabel',
             'recommendedPlans',
             'allPeriods',
-            'planPriceData'
+            'planPriceData',
+            'pageData'
         ));
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\ItemReview;
+use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -92,10 +93,13 @@ class CourseController extends Controller
                 'courses' => $demoCourses,
                 'featuredCourse' => $demoCourses->first(),
                 'isDemo' => true,
+                'pageData' => Page::where('slug', 'cursos')->first()?->data ?? [],
             ]);
         }
 
-        return view('courses.index', compact('courses', 'featuredCourse'));
+        $pageData = Page::where('slug', 'cursos')->first()?->data ?? [];
+
+        return view('courses.index', compact('courses', 'featuredCourse', 'pageData'));
     }
 
     /**

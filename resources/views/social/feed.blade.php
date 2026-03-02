@@ -62,10 +62,11 @@
 
 @extends($extends ?? 'layouts.app')
 
-@section('title', 'Comunidade - UNN')
+@section('title', ($pageData['seo_title'] ?? null) ?: 'Comunidade - UNN')
 
 @section('content')
     @php
+        $pageData = $pageData ?? [];
         $isAdminContext = ($extends ?? 'layouts.app') === 'admin.layouts.app';
 
         $feedUrl = $isAdminContext ? route('admin.social.feed.internal') : route('social.feed');

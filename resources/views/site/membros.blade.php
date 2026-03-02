@@ -1,18 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'Membros - UNN')
+@section('title', ($pageData['seo_title'] ?? null) ?: 'Membros - UNN')
 
 @section('content')
+    @php $pageData = $pageData ?? []; @endphp
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
         <!-- Hero Section -->
         <section class="pt-10 md:pt-24 pb-8 px-4 md:px-12 lg:px-24">
             <div class="max-w-7xl mx-auto text-center">
                 <h1
                     class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient">
-                    <span class="unn-title-gradient">Membros</span> UNN
+                    <span class="unn-title-gradient">{{ ($pageData['hero_title'] ?? null) ?: 'Membros UNN' }}</span>
                 </h1>
                 <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                    Conheça os empreendedores que fazem parte da nossa comunidade exclusiva de networking empresarial.
+                    {{ ($pageData['hero_subtitle'] ?? null) ?: 'Conheça os empreendedores que fazem parte da nossa comunidade exclusiva de networking empresarial.' }}
                 </p>
             </div>
         </section>

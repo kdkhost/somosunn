@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Próximos Eventos - UNN')
+@section('title', ($pageData['seo_title'] ?? null) ?: 'Próximos Eventos - UNN')
 
 @push('styles')
     <style>
@@ -170,6 +170,7 @@
 
 @section('content')
     @php
+        $pageData = $pageData ?? [];
         $events = $events ?? collect();
         $featuredEvent = $featuredEvent ?? ($events->first() ?: null);
         $pastEvents = $pastEvents ?? collect();
@@ -200,10 +201,10 @@
                             Em destaque
                         </span>
                         <h1 class="mt-6 text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white">
-                            Próximo Evento UNN
+                            {{ ($pageData['hero_title'] ?? null) ?: 'Próximo Evento UNN' }}
                         </h1>
                         <p class="mt-3 text-white/80 text-base sm:text-lg">
-                            Não perca a oportunidade de expandir sua rede
+                            {{ ($pageData['hero_subtitle'] ?? null) ?: 'Não perca a oportunidade de expandir sua rede' }}
                         </p>
                     </div>
 

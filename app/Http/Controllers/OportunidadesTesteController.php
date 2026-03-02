@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\JobVacancy;
+use App\Models\Page;
 use App\Models\Partner;
 
 class OportunidadesTesteController extends Controller
@@ -48,7 +49,9 @@ class OportunidadesTesteController extends Controller
                 ->whereNotNull('type')->where('type', '!=', '')
                 ->distinct()->orderBy('type')->pluck('type');
 
-            return view('oportunidades', compact('vagas', 'partnerNames', 'tiposDisponiveis'));
+            $pageData = Page::where('slug', 'vagas-abertas')->first()?->data ?? [];
+
+            return view('oportunidades', compact('vagas', 'partnerNames', 'tiposDisponiveis', 'pageData'));
         } catch (\Throwable $e) {
             \Log::error("Erro ao carregar vagas-abertas: " . $e->getMessage(), [
                 'file' => $e->getFile(),

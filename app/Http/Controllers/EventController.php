@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Page;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -50,7 +51,9 @@ class EventController extends Controller
             ->limit(6)
             ->get();
 
-        return view('events.index', compact('events', 'featuredEvent', 'otherEvents', 'pastEvents'));
+        $pageData = Page::where('slug', 'eventos')->first()?->data ?? [];
+
+        return view('events.index', compact('events', 'featuredEvent', 'otherEvents', 'pastEvents', 'pageData'));
     }
 
     /**

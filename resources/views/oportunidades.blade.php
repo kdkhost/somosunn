@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Oportunidades de Carreira - UNN')
+@section('title', ($pageData['seo_title'] ?? null) ?: 'Oportunidades de Carreira - UNN')
 
 @push('styles')
     <style>
@@ -81,6 +81,7 @@
 
 @section('content')
     @php
+        $pageData = $pageData ?? [];
         $vagasCollection = method_exists($vagas, 'getCollection') ? $vagas->getCollection() : collect($vagas);
         $totalCount = method_exists($vagas, 'total') ? (int) $vagas->total() : $vagasCollection->count();
         $featuredJob = $vagasCollection->first();
@@ -104,12 +105,10 @@
                             Carreiras & Oportunidades
                         </span>
                         <h1 class="mt-6 text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-6">
-                            Descubra seu próximo passo <br class="hidden md:block" />
-                            na UNN Startups
+                            {{ ($pageData['hero_title'] ?? null) ?: 'Descubra seu próximo passo na UNN Startups' }}
                         </h1>
                         <p class="mt-3 text-white/80 text-base sm:text-lg mb-8 max-w-2xl mx-auto">
-                            Conecte-se com empresas inovadoras, aplique para vagas exclusivas e acelere sua trajetória
-                            profissional com precisão.
+                            {{ ($pageData['hero_subtitle'] ?? null) ?: 'Conecte-se com empresas inovadoras, aplique para vagas exclusivas e acelere sua trajetória profissional com precisão.' }}
                         </p>
 
                         <!-- Search/Filter Bar -->

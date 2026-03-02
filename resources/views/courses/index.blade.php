@@ -1,9 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Academy - SOMOS UNN')
+@section('title', ($pageData['seo_title'] ?? null) ?: 'Academy - SOMOS UNN')
 
 @section('content')
     @php
+        $pageData = $pageData ?? [];
         $isDemo = (bool) ($isDemo ?? false);
         $courses = $courses ?? collect();
         $featuredCourse = $featuredCourse ?? null;
@@ -109,11 +110,11 @@
 
                         <h1
                             class="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter text-white leading-tight max-w-5xl">
-                            A Maestria dos Negócios Começa Aqui.
+                            {{ ($pageData['hero_title'] ?? null) ?: 'A Maestria dos Negócios Começa Aqui.' }}
                         </h1>
 
                         <p class="text-white/80 text-lg md:text-xl font-medium max-w-2xl leading-relaxed">
-                            Domine as habilidades que transformam mercados. Conteúdo prático para quem não aceita o comum.
+                            {{ ($pageData['hero_subtitle'] ?? null) ?: 'Domine as habilidades que transformam mercados. Conteúdo prático para quem não aceita o comum.' }}
                         </p>
                     </div>
 

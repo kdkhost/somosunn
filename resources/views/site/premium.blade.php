@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Planos Premium - UNN')
+@section('title', ($pageData['seo_title'] ?? null) ?: 'Planos Premium - UNN')
+
+@php $pageData = $pageData ?? []; @endphp
 
 @php
     $testimonialsCarouselEnabled = (string) \App\Models\Setting::get('testimonials_carousel_enabled', '1') === '1';
