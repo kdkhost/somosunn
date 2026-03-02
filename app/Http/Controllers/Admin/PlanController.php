@@ -228,6 +228,7 @@ class PlanController extends Controller
         $data['coupons_enabled'] = $request->boolean('coupons_enabled');
         $data['is_active'] = $request->boolean('is_active', true);
         $data['is_recurring'] = $request->boolean('is_recurring');
+        $data['billing_cycle'] = (int) ($data['billing_cycle'] ?? 1);
         $data['is_free'] = $request->boolean('is_free');
 
         // Handle benefits from textarea
