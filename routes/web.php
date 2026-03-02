@@ -802,6 +802,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             ->middleware('check.feature:social_access')->name('social.index');
         Route::delete('/social/{post}', [\App\Http\Controllers\Admin\SocialController::class, 'destroy'])
             ->middleware('check.feature:social_delete')->name('social.destroy');
+
+        // Mini-CMS de Páginas
+        Route::get('pages', [\App\Http\Controllers\Admin\PageController::class, 'index'])->name('pages.index');
+        Route::get('pages/{page}/edit', [\App\Http\Controllers\Admin\PageController::class, 'edit'])->name('pages.edit');
+        Route::put('pages/{page}', [\App\Http\Controllers\Admin\PageController::class, 'update'])->name('pages.update');
     });
 });
 
