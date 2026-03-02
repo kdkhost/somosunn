@@ -30,56 +30,56 @@
     </div>
 
     {{-- ===== CARDS RESUMO ===== --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
 
         {{-- Total indicados --}}
-        <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-5 text-white shadow-lg shadow-blue-500/20 flex items-center gap-4">
-            <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
-                <i class="fas fa-user-plus text-xl"></i>
+        <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-white shadow-lg shadow-blue-500/20 flex items-center gap-3">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
+                <i class="fas fa-user-plus text-lg sm:text-xl"></i>
             </div>
-            <div>
-                <p class="text-white/80 text-xs font-semibold">Total indicados</p>
-                <p class="text-3xl font-black">{{ $totalReferred }}</p>
+            <div class="min-w-0">
+                <p class="text-white/80 text-xs font-semibold truncate">Total indicados</p>
+                <p class="text-2xl sm:text-3xl font-black leading-tight">{{ $totalReferred }}</p>
             </div>
         </div>
 
         {{-- Convertidos (pagaram) --}}
-        <div class="bg-gradient-to-br from-emerald-500 to-green-600 rounded-3xl p-5 text-white shadow-lg shadow-emerald-500/20 flex items-center gap-4">
-            <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
-                <i class="fas fa-check-circle text-xl"></i>
+        <div class="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-white shadow-lg shadow-emerald-500/20 flex items-center gap-3">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
+                <i class="fas fa-check-circle text-lg sm:text-xl"></i>
             </div>
-            <div>
-                <p class="text-white/80 text-xs font-semibold">Convertidos</p>
-                <p class="text-3xl font-black">{{ $convertedCount }}</p>
+            <div class="min-w-0">
+                <p class="text-white/80 text-xs font-semibold truncate">Convertidos</p>
+                <p class="text-2xl sm:text-3xl font-black leading-tight">{{ $convertedCount }}</p>
                 @if($totalReferred > 0)
-                    <p class="text-white/70 text-xs">{{ $conversionRate }}% conversão</p>
+                    <p class="text-white/70 text-xs">{{ $conversionRate }}%</p>
                 @endif
             </div>
         </div>
 
         {{-- Pontos ganhos com indicações --}}
-        <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-3xl p-5 text-white shadow-lg shadow-amber-500/20 flex items-center gap-4">
-            <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
-                <i class="fas fa-coins text-xl"></i>
+        <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-white shadow-lg shadow-amber-500/20 flex items-center gap-3">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
+                <i class="fas fa-coins text-lg sm:text-xl"></i>
             </div>
-            <div>
-                <p class="text-white/80 text-xs font-semibold">Pontos ganhos</p>
-                <p class="text-3xl font-black">{{ number_format($totalReferralPoints) }}</p>
+            <div class="min-w-0">
+                <p class="text-white/80 text-xs font-semibold truncate">Pontos ganhos</p>
+                <p class="text-2xl sm:text-3xl font-black leading-tight">{{ number_format($totalReferralPoints) }}</p>
             </div>
         </div>
 
         {{-- Pontos por indicação --}}
-        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 flex items-center gap-4 shadow-sm">
-            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/40 rounded-2xl flex items-center justify-center shrink-0">
-                <i class="fas fa-gift text-green-600 dark:text-green-400 text-xl"></i>
+        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex items-center gap-3 shadow-sm">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900/40 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
+                <i class="fas fa-gift text-green-600 dark:text-green-400 text-lg sm:text-xl"></i>
             </div>
-            <div>
-                <p class="text-slate-500 dark:text-slate-400 text-xs font-semibold">Por indicação</p>
+            <div class="min-w-0">
+                <p class="text-slate-500 dark:text-slate-400 text-xs font-semibold truncate">Por indicação</p>
                 @if($pointsPerReferral)
-                    <p class="text-3xl font-black text-slate-900 dark:text-white">+{{ $pointsPerReferral }}</p>
+                    <p class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white leading-tight">+{{ $pointsPerReferral }}</p>
                     <p class="text-xs text-slate-400 dark:text-slate-500">pontos</p>
                 @else
-                    <p class="text-base font-bold text-slate-400 dark:text-slate-500">Não configurado</p>
+                    <p class="text-sm font-bold text-slate-400 dark:text-slate-500 leading-tight">Não config.</p>
                 @endif
             </div>
         </div>
@@ -106,24 +106,24 @@
         </div>
 
         {{-- Compartilhamento rápido --}}
-        <div class="flex flex-wrap gap-3 mb-6">
+        <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 mb-6">
             <a href="https://wa.me/?text={{ urlencode('Ei! Faça parte da maior comunidade de empreendedores e networking do Brasil. Use meu link: ' . $referralLink) }}"
                target="_blank" rel="noopener noreferrer"
-               class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all active:scale-95">
+               class="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all active:scale-95">
                 <i class="fab fa-whatsapp"></i> WhatsApp
             </a>
             <a href="https://t.me/share/url?url={{ urlencode($referralLink) }}&text={{ urlencode('Entre na plataforma com meu convite e comece a fazer networking!') }}"
                target="_blank" rel="noopener noreferrer"
-               class="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all active:scale-95">
+               class="inline-flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all active:scale-95">
                 <i class="fab fa-telegram"></i> Telegram
             </a>
             <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode($referralLink) }}"
                target="_blank" rel="noopener noreferrer"
-               class="inline-flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all active:scale-95">
+               class="inline-flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all active:scale-95">
                 <i class="fab fa-linkedin"></i> LinkedIn
             </a>
             <a href="mailto:?subject={{ urlencode('Convite para a comunidade UNN') }}&body={{ urlencode('Olá! Quero te convidar para a maior plataforma de networking para empreendedores. Acesse: ' . $referralLink) }}"
-               class="inline-flex items-center gap-2 bg-slate-600 hover:bg-slate-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all active:scale-95">
+               class="inline-flex items-center justify-center gap-2 bg-slate-600 hover:bg-slate-700 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all active:scale-95">
                 <i class="fas fa-envelope"></i> E-mail
             </a>
         </div>
@@ -180,10 +180,10 @@
                 <table class="w-full text-sm">
                     <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest">
                         <tr>
-                            <th class="text-left px-6 py-4">Membro indicado</th>
-                            <th class="text-left px-6 py-4 hidden md:table-cell">Cadastro</th>
-                            <th class="text-left px-6 py-4">Plano / Status</th>
-                            <th class="text-right px-6 py-4">Pontos gerados</th>
+                            <th class="text-left px-3 py-3 sm:px-6 sm:py-4">Membro indicado</th>
+                            <th class="text-left px-3 py-3 sm:px-6 sm:py-4 hidden md:table-cell">Cadastro</th>
+                            <th class="text-left px-3 py-3 sm:px-6 sm:py-4 hidden sm:table-cell">Plano / Status</th>
+                            <th class="text-right px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Pontos</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -211,26 +211,26 @@
                                 }
                             @endphp
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 flex items-center justify-center">
+                                <td class="px-3 py-3 sm:px-6 sm:py-4 max-w-[40vw] sm:max-w-none">
+                                    <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 flex items-center justify-center">
                                             @if($referred->photo)
                                                 <img src="{{ asset($referred->photo) }}" alt="{{ $referred->name }}" class="w-full h-full object-cover">
                                             @else
                                                 <i class="fas fa-user text-slate-400 text-xs"></i>
                                             @endif
                                         </div>
-                                        <div>
-                                            <p class="font-semibold text-slate-900 dark:text-white">{{ $referred->name }}</p>
-                                            <p class="text-xs text-slate-400">{{ $referred->email }}</p>
+                                        <div class="min-w-0">
+                                            <p class="font-semibold text-slate-900 dark:text-white truncate text-xs sm:text-sm">{{ $referred->name }}</p>
+                                            <p class="text-xs text-slate-400 truncate">{{ $referred->email }}</p>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell">
+                                <td class="px-3 py-3 sm:px-6 sm:py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell">
                                     <p class="text-xs">{{ $referred->created_at->format('d/m/Y') }}</p>
                                     <p class="text-xs text-slate-400 dark:text-slate-500">{{ $referred->created_at->diffForHumans() }}</p>
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-3 py-3 sm:px-6 sm:py-4 hidden sm:table-cell">
                                     <div class="flex flex-col gap-1">
                                         <span class="inline-flex w-fit items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full {{ $planStatus['class'] }}">
                                             <span class="w-1.5 h-1.5 rounded-full {{ $planStatus['dot'] }} shrink-0"></span>
@@ -241,16 +241,16 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-right">
+                                <td class="px-3 py-3 sm:px-6 sm:py-4 text-right">
                                     @if($pointsFromThisUser > 0)
                                         <div class="flex flex-col items-end gap-1">
-                                            <span class="inline-flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold px-3 py-1 rounded-full">
+                                            <span class="inline-flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">
                                                 <i class="fas fa-coins"></i> +{{ number_format($pointsFromThisUser) }}
                                             </span>
-                                            <span class="text-xs text-slate-400">{{ $logsFromUser->count() }} pag.</span>
+                                            <span class="text-xs text-slate-400 hidden sm:block">{{ $logsFromUser->count() }} pag.</span>
                                         </div>
                                     @elseif($referred->plan_id)
-                                        <span class="text-xs text-yellow-600 dark:text-yellow-500 font-medium">Aguardando<br>confirmação</span>
+                                        <span class="text-xs text-yellow-600 dark:text-yellow-500 font-medium whitespace-nowrap">Aguardando</span>
                                     @else
                                         <span class="text-slate-400 dark:text-slate-600 text-xs">—</span>
                                     @endif
@@ -280,36 +280,37 @@
             <table class="w-full text-sm">
                 <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest">
                     <tr>
-                        <th class="text-left px-6 py-4">Indicado</th>
-                        <th class="text-left px-6 py-4 hidden md:table-cell">Plano</th>
-                        <th class="text-left px-6 py-4 hidden lg:table-cell">Pedido</th>
-                        <th class="text-left px-6 py-4">Data</th>
-                        <th class="text-right px-6 py-4">Pontos</th>
+                        <th class="text-left px-3 py-3 sm:px-6 sm:py-4">Indicado</th>
+                        <th class="text-left px-3 py-3 sm:px-6 sm:py-4 hidden md:table-cell">Plano</th>
+                        <th class="text-left px-3 py-3 sm:px-6 sm:py-4 hidden lg:table-cell">Pedido</th>
+                        <th class="text-left px-3 py-3 sm:px-6 sm:py-4 hidden sm:table-cell">Data</th>
+                        <th class="text-right px-3 py-3 sm:px-6 sm:py-4">Pontos</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                     @foreach($referralPointsLogs as $log)
                         @php $meta = json_decode($log->meta ?? '{}', true); @endphp
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                            <td class="px-6 py-4">
-                                <p class="font-semibold text-slate-900 dark:text-white">{{ $meta['new_user_name'] ?? '—' }}</p>
+                            <td class="px-3 py-3 sm:px-6 sm:py-4 max-w-[40vw] sm:max-w-none">
+                                <p class="font-semibold text-slate-900 dark:text-white truncate text-xs sm:text-sm">{{ $meta['new_user_name'] ?? '—' }}</p>
+                                <p class="text-xs text-slate-400 sm:hidden">{{ optional($log->created_at)->format('d/m/Y') }}</p>
                             </td>
-                            <td class="px-6 py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell">
+                            <td class="px-3 py-3 sm:px-6 sm:py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell text-xs">
                                 {{ $meta['plan_name'] ?? '—' }}
                             </td>
-                            <td class="px-6 py-4 hidden lg:table-cell">
+                            <td class="px-3 py-3 sm:px-6 sm:py-4 hidden lg:table-cell">
                                 @if(isset($meta['order_id']))
                                     <code class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs px-2 py-0.5 rounded">#{{ $meta['order_id'] }}</code>
                                 @else
                                     <span class="text-slate-400">—</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-slate-500 dark:text-slate-400">
+                            <td class="px-3 py-3 sm:px-6 sm:py-4 text-slate-500 dark:text-slate-400 hidden sm:table-cell">
                                 <p class="text-xs whitespace-nowrap">{{ $log->created_at->format('d/m/Y H:i') }}</p>
                                 <p class="text-xs text-slate-400">{{ $log->created_at->diffForHumans() }}</p>
                             </td>
-                            <td class="px-6 py-4 text-right">
-                                <span class="inline-flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold px-3 py-1 rounded-full">
+                            <td class="px-3 py-3 sm:px-6 sm:py-4 text-right">
+                                <span class="inline-flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">
                                     <i class="fas fa-coins"></i> +{{ number_format($log->points) }}
                                 </span>
                             </td>
@@ -318,9 +319,9 @@
                 </tbody>
                 <tfoot>
                     <tr class="bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700">
-                        <td colspan="4" class="px-6 py-4 text-sm font-bold text-slate-700 dark:text-slate-300">Total acumulado</td>
-                        <td class="px-6 py-4 text-right">
-                            <span class="inline-flex items-center gap-1 bg-amber-200 dark:bg-amber-800/50 text-amber-800 dark:text-amber-300 text-sm font-black px-3 py-1 rounded-full">
+                        <td colspan="2" class="px-3 py-3 sm:px-6 sm:py-4 text-sm font-bold text-slate-700 dark:text-slate-300">Total acumulado</td>
+                        <td class="px-3 py-3 sm:px-6 sm:py-4 text-right">
+                            <span class="inline-flex items-center gap-1 bg-amber-200 dark:bg-amber-800/50 text-amber-800 dark:text-amber-300 text-sm font-black px-3 py-1 rounded-full whitespace-nowrap">
                                 <i class="fas fa-coins"></i> +{{ number_format($totalReferralPoints) }}
                             </span>
                         </td>
