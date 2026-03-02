@@ -1,4 +1,4 @@
-# UNN — Plataforma de Networking
+﻿# UNN — Plataforma de Networking
 
 ## Novidades Recentes (mar/2026)
 
@@ -110,6 +110,25 @@ Configure as URLs no seu gateway (MercadoPago/PagSeguro):
 
 ### SMTP e Emails
 Configure as credenciais no painel admin em **Configurações > SMTP**. Use a ferramenta de "Teste de Envio" para validar.
+
+### 02/03/2026 (Tarde) - Compartilhamento com Aprovacao
+- **Feature share-with-approval na Comunidade:**
+  - Ao compartilhar um post com um membro, e criada uma **solicitacao pendente** (ShareRequest) em vez de publicar diretamente.
+  - O destinatario recebe notificacao e ve as solicitacoes no sidebar do feed e em /compartilhamentos/pendentes.
+  - **Aprovacao:** cria o post na timeline do destinatario com o conteudo original e mensagem opcional.
+  - **Rejeicao/Expiracao:** solicitacao e marcada como rejeitada ou expirada (7 dias); remetente notificado em ambos os casos.
+  - Acoes de aprovar/rejeitar via **AJAX com SweetAlert2** no feed, sem refresh de pagina.
+  - Comando agendado share-requests:expire (diario 02:00) expira solicitacoes antigas em lote.
+  - Pagina dedicada /compartilhamentos/pendentes com listagem paginada das solicitacoes recebidas.
+
+### 02/03/2026 (Tarde) - Compartilhamento com Aprovacao
+- **Feature share-with-approval:**
+  - Compartilhamento entre membros agora requer aprovacao do destinatario antes de publicar na timeline.
+  - **ShareRequest:** criada com status pendente, expira em 7 dias.
+  - Aprovacao via AJAX (SweetAlert2) diretamente no sidebar do feed.
+  - Rejeicao notifica o remetente; aprovacao cria o post e tambem notifica.
+  - Inbox dedicado: /compartilhamentos/pendentes.
+  - Comando share-requests:expire (diario 02:00) expira solicitacoes em lote.
 
 ---
 
@@ -295,6 +314,25 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Fix PaymentService:** `computeFee()` agora respeita `false` explícito; configuração do banco só é lida quando o parâmetro não for fornecido.
 - **Página "Meus Pontos" (membro):** `/painel/meus-pontos` com saldo, ranking, pontos do mês, top 10, histórico paginado e dicas de engajamento.
 - **Regra pendente:** `help_member` (15pts) aguarda implementação de feature de fórum/Q&A.
+
+### 02/03/2026 (Tarde) - Compartilhamento com Aprovacao
+- **Feature share-with-approval na Comunidade:**
+  - Ao compartilhar um post com um membro, e criada uma **solicitacao pendente** (ShareRequest) em vez de publicar diretamente.
+  - O destinatario recebe notificacao e ve as solicitacoes no sidebar do feed e em /compartilhamentos/pendentes.
+  - **Aprovacao:** cria o post na timeline do destinatario com o conteudo original e mensagem opcional.
+  - **Rejeicao/Expiracao:** solicitacao e marcada como rejeitada ou expirada (7 dias); remetente notificado em ambos os casos.
+  - Acoes de aprovar/rejeitar via **AJAX com SweetAlert2** no feed, sem refresh de pagina.
+  - Comando agendado share-requests:expire (diario 02:00) expira solicitacoes antigas em lote.
+  - Pagina dedicada /compartilhamentos/pendentes com listagem paginada das solicitacoes recebidas.
+
+### 02/03/2026 (Tarde) - Compartilhamento com Aprovacao
+- **Feature share-with-approval:**
+  - Compartilhamento entre membros agora requer aprovacao do destinatario antes de publicar na timeline.
+  - **ShareRequest:** criada com status pendente, expira em 7 dias.
+  - Aprovacao via AJAX (SweetAlert2) diretamente no sidebar do feed.
+  - Rejeicao notifica o remetente; aprovacao cria o post e tambem notifica.
+  - Inbox dedicado: /compartilhamentos/pendentes.
+  - Comando share-requests:expire (diario 02:00) expira solicitacoes em lote.
 
 ---
 © 2026 UNN Networking. Todos os direitos reservados.
