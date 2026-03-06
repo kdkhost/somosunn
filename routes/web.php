@@ -481,6 +481,8 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::post('logs/clear', [\App\Http\Controllers\Panel\Admin\ActivityLogController::class, 'clear'])->name('logs.clear');
 
         // Engagement Tools
+        Route::get('indicacoes', [\App\Http\Controllers\Panel\Admin\ReferralAnalyticsController::class, 'index'])->name('referrals.index');
+        Route::get('indicacoes/exportar', [\App\Http\Controllers\Panel\Admin\ReferralAnalyticsController::class, 'export'])->name('referrals.export');
         Route::post('points-rules/exchange-settings', [\App\Http\Controllers\Panel\Admin\PointsRuleController::class, 'updateExchangeSettings'])
             ->name('points-rules.exchange-settings');
         Route::resource('points-rules', \App\Http\Controllers\Panel\Admin\PointsRuleController::class);
@@ -544,6 +546,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
 
     // Indicações / Programa de Afiliados
     Route::get('/indicacoes', [\App\Http\Controllers\Panel\ReferralController::class, 'index'])->name('referral.index');
+    Route::get('/indicacoes/exportar', [\App\Http\Controllers\Panel\ReferralController::class, 'export'])->name('referral.export');
     Route::get('/indicacoes/dados', [\App\Http\Controllers\Panel\ReferralController::class, 'stats'])->name('referral.stats');
     Route::post('/indicacoes/rastreio', [\App\Http\Controllers\Panel\ReferralController::class, 'track'])->name('referral.track');
 

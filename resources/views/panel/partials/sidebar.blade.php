@@ -222,6 +222,7 @@
         ['label' => 'Vendas', 'route' => route('panel.admin.orders.index'), 'icon' => 'fas fa-shopping-cart', 'active' => request()->routeIs('panel.admin.orders.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Faturas', 'route' => route('panel.admin.invoices.index'), 'icon' => 'fas fa-file-invoice', 'active' => request()->routeIs('panel.admin.invoices.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Cupons', 'route' => route('panel.admin.coupons.index'), 'icon' => 'fas fa-ticket-alt', 'active' => request()->routeIs('panel.admin.coupons.*'), 'visible' => $user->isAdmin()],
+        ['label' => 'Afiliados', 'route' => route('panel.admin.referrals.index'), 'icon' => 'fas fa-bullhorn', 'active' => request()->routeIs('panel.admin.referrals.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Regras de pontos', 'route' => route('panel.admin.points-rules.index'), 'icon' => 'fas fa-star', 'active' => request()->routeIs('panel.admin.points-rules.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Ranking', 'route' => route('panel.admin.ranking.index'), 'icon' => 'fas fa-trophy', 'active' => request()->routeIs('panel.admin.ranking.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Vagas', 'route' => route('panel.admin.jobs.index'), 'icon' => 'fas fa-id-card', 'active' => request()->routeIs('panel.admin.jobs.*'), 'visible' => $user->isAdmin()],

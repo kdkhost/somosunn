@@ -9,6 +9,7 @@ use App\Models\ReferralLinkEvent;
 use App\Models\ReferralLinkVisit;
 use App\Models\User;
 use App\Services\AffiliateTrackingService;
+use App\Services\ReferralAnalyticsService;
 use Carbon\Carbon;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
@@ -443,5 +444,148 @@ class AffiliateTrackingServiceTest extends TestCase
         $this->assertSame('Whatsapp', $payload['trackingChannels'][0]['channel']);
         $this->assertSame('/oferta/live', $payload['trackedVisitsFeed'][0]['landing_page_path']);
         $this->assertSame('Lead Live', $payload['trackedVisitsFeed'][0]['registered_user_name']);
+        $this->assertStringContainsString('Funil por canal e origem', $payload['channelFunnelsHtml']);
+        $this->assertStringContainsString('Log detalhado de cliques, visitas e compartilhamentos', $payload['detailedEventsHtml']);
+    }
+
+    public function test_referral_analytics_service_exposes_detailed_events_and_channel_funnel(): void
+    {
+        Carbon::setTestNow('2026-03-06 18:00:00');
+
+        $service = app(ReferralAnalyticsService::class);
+
+        $referrer = User::create([
+            'name' => 'Afiliado Analítico',
+            'email' => 'afiliado-analytics@example.com',
+            'password' => Hash::make('password'),
+            'referral_code' => 'UNNANALYTIC',
+        ]);
+
+        $lead = User::create([
+            'name' => 'Lead Analytics',
+            'email' => 'lead-analytics@example.com',
+            'password' => Hash::make('password'),
+            'referred_by' => $referrer->id,
+        ]);
+
+        $visit = ReferralLinkVisit::create([
+            'referrer_user_id' => $referrer->id,
+            'referral_code' => $referrer->referral_code,
+            'utm_source' => 'linkedin',
+            'landing_page_path' => '/lp/afiliado',
+            'landing_page_url' => 'https://somosunn.com.br/lp/afiliado',
+            'referrer_url' => 'https://www.google.com/search?q=unn',
+            'user_agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1',
+            'country' => 'BR',
+            'region' => 'SP',
+            'city' => 'São Paulo',
+            'clicks_count' => 2,
+            'pageviews_count' => 5,
+            'registered_user_id' => $lead->id,
+            'checkout_started_count' => 1,
+            'purchases_count' => 1,
+            'total_revenue_amount' => 147.90,
+            'first_visited_at' => now()->subMinutes(10),
+            'registered_at' => now()->subMinutes(9),
+        ]);
+
+        ReferralLinkEvent::create([
+            'referral_link_visit_id' => $visit->id,
+            'referrer_user_id' => $referrer->id,
+            'registered_user_id' => $lead->id,
+            'event_type' => 'purchase',
+            'channel' => 'linkedin',
+            'page_path' => '/checkout/3',
+            'page_url' => 'https://somosunn.com.br/checkout/3',
+            'amount' => 147.90,
+            'occurred_at' => now()->subMinutes(5),
+        ]);
+
+        $channelFunnel = $service->buildChannelFunnels($referrer->id);
+        $this->assertCount(1, $channelFunnel);
+        $this->assertSame('Linkedin', $channelFunnel->first()->channel);
+        $this->assertSame(2, $channelFunnel->first()->clicks);
+        $this->assertSame(1, $channelFunnel->first()->purchases);
+        $this->assertSame(100, $channelFunnel->first()->purchase_conversion);
+
+        $events = $service->detailedEventsPaginator($referrer->id, 10, 'events_page');
+        $firstRow = $events->items()[0];
+
+        $this->assertSame('Compra confirmada', $firstRow->event_label);
+        $this->assertSame('https://www.google.com/search?q=unn', $firstRow->source_url);
+        $this->assertSame('/lp/afiliado', $firstRow->landing_page_path);
+        $this->assertSame('Mobile', $firstRow->device_label);
+        $this->assertSame('Safari', $firstRow->browser_label);
+        $this->assertSame('São Paulo / SP / BR', $firstRow->location_label);
+    }
+
+    public function test_referral_analytics_service_ranks_affiliates_globally(): void
+    {
+        Carbon::setTestNow('2026-03-06 19:00:00');
+
+        $service = app(ReferralAnalyticsService::class);
+
+        $bestReferrer = User::create([
+            'name' => 'Afiliado Top',
+            'email' => 'afiliado-top@example.com',
+            'password' => Hash::make('password'),
+            'referral_code' => 'UNNTOP',
+        ]);
+
+        $otherReferrer = User::create([
+            'name' => 'Afiliado Base',
+            'email' => 'afiliado-base@example.com',
+            'password' => Hash::make('password'),
+            'referral_code' => 'UNNBASE',
+        ]);
+
+        ReferralLinkVisit::create([
+            'referrer_user_id' => $bestReferrer->id,
+            'referral_code' => $bestReferrer->referral_code,
+            'clicks_count' => 4,
+            'pageviews_count' => 6,
+            'checkout_started_count' => 2,
+            'purchases_count' => 2,
+            'total_revenue_amount' => 399.80,
+            'first_visited_at' => now()->subHour(),
+            'last_visited_at' => now()->subMinutes(2),
+        ]);
+
+        ReferralLinkVisit::create([
+            'referrer_user_id' => $otherReferrer->id,
+            'referral_code' => $otherReferrer->referral_code,
+            'clicks_count' => 1,
+            'pageviews_count' => 2,
+            'checkout_started_count' => 0,
+            'purchases_count' => 0,
+            'total_revenue_amount' => 0,
+            'first_visited_at' => now()->subHour(),
+            'last_visited_at' => now()->subMinutes(20),
+        ]);
+
+        ReferralLinkEvent::create([
+            'referrer_user_id' => $bestReferrer->id,
+            'event_type' => 'share',
+            'channel' => 'whatsapp',
+            'occurred_at' => now()->subMinutes(5),
+        ]);
+
+        DB::table('points_logs')->insert([
+            'user_id' => $bestReferrer->id,
+            'action_key' => 'referral',
+            'points' => 200,
+            'meta' => json_encode([]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $leaderboard = $service->affiliateLeaderboard(10, 'affiliates_page');
+        $first = $leaderboard->items()[0];
+
+        $this->assertSame('Afiliado Top', $first->name);
+        $this->assertSame(4, $first->clicks);
+        $this->assertSame(2, $first->purchases);
+        $this->assertSame(1, $first->shares_total);
+        $this->assertSame(200, $first->referral_points);
     }
 }

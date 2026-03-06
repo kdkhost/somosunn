@@ -214,6 +214,24 @@
             </div>
         </div>
 
+    <div id="referralChannelFunnelSection">
+    @include('panel.referral.partials.channel-funnel', [
+        'channelFunnels' => $channelFunnels,
+        'title' => 'Funil por canal e origem',
+        'subtitle' => 'Veja de onde vieram os cliques, quantas visualizações cada origem gerou e onde realmente converte.',
+    ])
+    </div>
+
+    <div id="referralEventsLogSection">
+    @include('panel.referral.partials.events-log', [
+        'detailedEvents' => $detailedEvents,
+        'exportUrl' => route('panel.referral.export'),
+        'title' => 'Log detalhado de cliques, visitas e compartilhamentos',
+        'subtitle' => 'Inclui URL de origem exata, landing page, dispositivo, navegador, cidade/país e o resultado de cada ação.',
+        'emptyMessage' => 'Ainda não há cliques, visitas ou compartilhamentos detalhados para este afiliado.',
+    ])
+    </div>
+
     {{-- ===== CARDS RESUMO ===== --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
 
@@ -872,6 +890,28 @@ function escapeReferralHtml(value) {
         .replace(/'/g, '&#039;');
 }
 
+function replaceReferralSectionHtml(elementId, html) {
+    const element = document.getElementById(elementId);
+    if (!element || typeof html !== 'string' || html.trim() === '') {
+        return;
+    }
+
+    element.innerHTML = html;
+}
+
+function buildReferralStatsRequestUrl() {
+    const url = new URL(referralStatsUrl, window.location.origin);
+    const params = new URLSearchParams(window.location.search);
+
+    ['events_page'].forEach((key) => {
+        if (params.has(key)) {
+            url.searchParams.set(key, params.get(key));
+        }
+    });
+
+    return url.toString();
+}
+
 function applyTrackingStatusBanner(tone, message) {
     const banner = document.getElementById('trackingStatusBanner');
     if (!banner) {
@@ -1042,6 +1082,8 @@ function applyReferralTrackingPayload(payload) {
 
     renderTrackingChannelsList(payload.trackingChannels || []);
     renderTrackingVisitsRows(payload.trackedVisitsFeed || []);
+    replaceReferralSectionHtml('referralChannelFunnelSection', payload.channelFunnelsHtml);
+    replaceReferralSectionHtml('referralEventsLogSection', payload.detailedEventsHtml);
 
     replaceReferralChartData(referralDailyChartData, payload.trackingDailyChart || {}, ['labels', 'visits', 'registrations', 'checkouts', 'purchases', 'revenue']);
     replaceReferralChartData(referralAcquisitionChartData, payload.trackingAcquisitionChart || {}, ['labels', 'visits', 'registrations', 'purchases', 'revenue']);
@@ -1062,7 +1104,7 @@ async function refreshReferralTracking() {
     referralRefreshAbortController = new AbortController();
 
     try {
-        const response = await fetch(referralStatsUrl, {
+        const response = await fetch(buildReferralStatsRequestUrl(), {
             method: 'GET',
             credentials: 'same-origin',
             headers: {
