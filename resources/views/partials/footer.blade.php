@@ -12,13 +12,23 @@
 * Licenciamento: Uso restrito conforme contrato/termos aplicáveis.
 --}}
 @php
+    $siteName = trim((string) (\App\Models\Setting::get('app_name') ?: \App\Models\Setting::get('company_name') ?: config('app.name', 'UNN')));
+    if ($siteName === '') {
+        $siteName = 'UNN';
+    }
+
     $footerText = trim((string) \App\Models\Setting::get('footer_text'));
+    $legacyDefaultPattern = '/^(?:©|&copy;)?\s*\d{4}\s+(?:UNN|SOMOS\s+UNN)\.?$/iu';
+
+    if ($footerText === '' || preg_match($legacyDefaultPattern, $footerText)) {
+        $footerText = '© ' . date('Y') . ' ' . $siteName . '.';
+    }
 @endphp
 <footer class="bg-white border-t border-gray-100 mt-auto">
     <div class="max-w-7xl mx-auto px-6 py-6 grid grid-cols-1 sm:grid-cols-2 gap-2 items-center text-gray-500">
         <div
             class="text-xs sm:text-sm text-center sm:text-left flex items-center justify-center sm:justify-start gap-4">
-            <span>{{ $footerText !== '' ? $footerText : '© ' . date('Y') . ' UNN.' }}</span>
+            <span>{{ $footerText }}</span>
             <a href="{{ route('jobs.public.index') }}" class="hover:text-[#1F5EDB] transition-colors font-medium">Vagas
                 Abertas</a>
         </div>
