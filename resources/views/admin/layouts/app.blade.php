@@ -1240,8 +1240,6 @@
             modal.modal('show');
         }
 
-        initTooltips();
-        });
     </script>
 </body>
 
