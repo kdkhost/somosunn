@@ -11,6 +11,7 @@ use App\Models\RedeemableItem;
 use App\Models\Redemption;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
@@ -191,7 +192,11 @@ class DashboardController extends Controller
             'empresa' => !blank($user->company),
         ];
 
-        if (method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace()) {
+        if (
+            method_exists($user, 'canSellOnMarketplace')
+            && $user->canSellOnMarketplace()
+            && $this->supportsSellerHealthMetrics()
+        ) {
             $sellerItemsQuery = RedeemableItem::query()
                 ->where('provider_type', 'seller')
                 ->where('provider_user_id', $user->id);
@@ -258,6 +263,19 @@ class DashboardController extends Controller
             'rankPosition',
             'pontosEsteMes'
         ));
+    }
+
+    private function supportsSellerHealthMetrics(): bool
+    {
+        return Schema::hasTable('redeemable_items')
+            && Schema::hasTable('redemptions')
+            && Schema::hasColumn('redeemable_items', 'provider_type')
+            && Schema::hasColumn('redeemable_items', 'provider_user_id')
+            && Schema::hasColumn('redemptions', 'provider_type')
+            && Schema::hasColumn('redemptions', 'provider_user_id')
+            && Schema::hasColumn('redemptions', 'estimated_delivery_at')
+            && Schema::hasColumn('redemptions', 'tracking_code')
+            && Schema::hasColumn('redemptions', 'tracking_url');
     }
 
     private function buildSalesChart(callable $resolver): array
