@@ -2,17 +2,21 @@
 
 @section('title', 'Detalhes da Fatura')
 
-@section('content')
-    <div class="space-y-6">
-        {{-- Breadcrumb / Header --}}
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 transition-colors">
-                <a href="{{ route('panel.admin.invoices.index') }}"
-                    class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Faturas</a>
-                <i class="fas fa-chevron-right text-xs"></i>
-                <span class="text-slate-900 dark:text-white font-medium transition-colors">{{ $invoice->number ?: '#' . $invoice->id }}</span>
-            </div>
+@section('panel_breadcrumb')
+    <a href="{{ route('panel.admin.invoices.index') }}" class="hover:underline">Faturas</a>
+@endsection
 
+@section('panel_content')
+    <div class="space-y-6">
+        <div class="flex items-center justify-between">
+            <div class="space-y-1">
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">
+                    Fatura {{ $invoice->number ?: '#' . $invoice->id }}
+                </h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400 transition-colors">
+                    Visualize dados, itens e ações relacionadas a esta fatura.
+                </p>
+            </div>
             <div class="flex items-center gap-2">
                 <a href="{{ route('panel.admin.invoices.edit', $invoice) }}"
                     class="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-sm">

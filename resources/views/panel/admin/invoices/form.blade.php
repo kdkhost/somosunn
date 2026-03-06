@@ -2,17 +2,19 @@
 
 @section('title', $invoice->id ? 'Editar Fatura' : 'Nova Fatura')
 
-@section('content')
+@section('panel_breadcrumb')
+    <a href="{{ route('panel.admin.invoices.index') }}" class="hover:underline">Faturas</a>
+@endsection
+
+@section('panel_content')
     <div class="max-w-5xl mx-auto space-y-6">
-        {{-- Header --}}
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-500 transition-colors">
-                <a href="{{ route('panel.admin.invoices.index') }}"
-                    class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Faturas</a>
-                <i class="fas fa-chevron-right text-xs"></i>
-                <span
-                    class="text-slate-900 dark:text-white font-medium transition-colors">{{ $invoice->id ? 'Editar Fatura' : 'Nova Fatura' }}</span>
-            </div>
+        <div class="space-y-1">
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">
+                {{ $invoice->id ? 'Editar Fatura' : 'Nova Fatura' }}
+            </h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 transition-colors">
+                Configure os dados da fatura, itens e envio para o cliente.
+            </p>
         </div>
 
         <form
