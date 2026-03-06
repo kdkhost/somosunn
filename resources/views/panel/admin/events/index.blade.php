@@ -120,6 +120,50 @@
                 font-size: 0.75rem;
                 font-weight: 600;
             }
+
+            .fc .fc-daygrid-event-harness {
+                margin-top: 4px;
+            }
+
+            .fc .fc-daygrid-event,
+            .fc .fc-daygrid-dot-event,
+            .fc .fc-h-event {
+                border-radius: 0.65rem;
+                padding: 3px 8px;
+                min-height: 24px;
+                display: block;
+                overflow: hidden;
+                box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+            }
+
+            .fc .fc-daygrid-dot-event {
+                align-items: center;
+            }
+
+            .fc .fc-daygrid-dot-event .fc-event-dot,
+            .fc .fc-daygrid-dot-event .fc-event-time {
+                display: none;
+            }
+
+            .fc .fc-event-main,
+            .fc .fc-event-title {
+                color: inherit !important;
+                font-weight: 700;
+                line-height: 1.25;
+            }
+
+            .fc .fc-event-title {
+                display: block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .dark .fc .fc-daygrid-event,
+            .dark .fc .fc-daygrid-dot-event,
+            .dark .fc .fc-h-event {
+                box-shadow: 0 8px 18px rgba(2, 6, 23, 0.35);
+            }
         </style>
     @endpush
 
@@ -131,6 +175,8 @@
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
                     locale: 'pt-br',
+                    eventDisplay: 'block',
+                    displayEventTime: false,
                     headerToolbar: {
                         left: 'prev,next today',
                         center: 'title',

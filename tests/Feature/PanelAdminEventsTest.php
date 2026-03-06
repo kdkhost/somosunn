@@ -136,7 +136,7 @@ class PanelAdminEventsTest extends TestCase
             'start_at' => now()->addDay(),
             'end_at' => now()->addDay()->addHour(),
             'published' => false,
-            'color' => '#3b82f6',
+            'color' => '#FACC15',
         ]);
 
         Event::create([
@@ -158,6 +158,9 @@ class PanelAdminEventsTest extends TestCase
             ->assertJsonFragment([
                 'id' => $ownEvent->id,
                 'title' => $ownEvent->title,
+            ])
+            ->assertJsonFragment([
+                'textColor' => '#0F172A',
             ])
             ->assertJsonMissing([
                 'title' => 'Evento de outro usuário',

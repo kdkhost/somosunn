@@ -25,8 +25,6 @@ class EventController extends Controller
 
     public function feed(Request $request)
     {
-        $calendarSettings = $this->loadCalendarSettings();
-        $textColor = (string) ($calendarSettings['event_text_color'] ?? '#ffffff');
         $startRaw = $request->query('start', $request->input('start'));
         $endRaw = $request->query('end', $request->input('end'));
 
@@ -49,14 +47,17 @@ class EventController extends Controller
             $query->where('user_id', Auth::id());
         }
 
-        $events = $query->get()->map(function (Event $event) use ($textColor) {
+        $events = $query->get()->map(function (Event $event) {
+            $backgroundColor = $this->normalizeHexColor((string) ($event->color ?: '#3b82f6'));
+            $textColor = $this->resolveContrastColor($backgroundColor);
+
             return [
                 'id' => $event->id,
                 'title' => $event->title,
                 'start' => $event->start,
                 'end' => $event->end,
-                'backgroundColor' => $event->color,
-                'borderColor' => $event->color,
+                'backgroundColor' => $backgroundColor,
+                'borderColor' => $backgroundColor,
                 'textColor' => $textColor,
                 'allDay' => (bool) $event->all_day,
                 'extendedProps' => [
@@ -219,6 +220,33 @@ class EventController extends Controller
             'event_text_color' => '#FFFFFF',
             'button_color' => '#1F5EDB',
         ];
+    }
+
+    private function normalizeHexColor(string $color, string $fallback = '#3B82F6'): string
+    {
+        $color = strtoupper(trim($color));
+
+        if (preg_match('/^#[0-9A-F]{6}$/', $color)) {
+            return $color;
+        }
+
+        return $fallback;
+    }
+
+    private function resolveContrastColor(string $backgroundColor): string
+    {
+        $hex = ltrim($backgroundColor, '#');
+
+        if (strlen($hex) !== 6) {
+            return '#FFFFFF';
+        }
+
+        $red = hexdec(substr($hex, 0, 2));
+        $green = hexdec(substr($hex, 2, 2));
+        $blue = hexdec(substr($hex, 4, 2));
+        $luminance = (($red * 299) + ($green * 587) + ($blue * 114)) / 1000;
+
+        return $luminance >= 160 ? '#0F172A' : '#FFFFFF';
     }
 
     private function canManageAllEvents(): bool
