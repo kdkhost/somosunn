@@ -1068,11 +1068,20 @@
                 }
 
                 function bindFileToInput(file) {
+                    if (!input.length || !input[0]) {
+                        return false;
+                    }
+
+                    if (typeof DataTransfer === 'undefined') {
+                        return false;
+                    }
+
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(file);
                     input.off('change.upload');
                     input[0].files = dataTransfer.files;
                     input.on('change.upload', onInputChange);
+                    return true;
                 }
 
                 function handleFile(file) {
@@ -1114,13 +1123,17 @@
 
                 function openFileDialog() {
                     if (box.data('opening')) return;
+                    if (!input.length || !input[0]) {
+                        toastr.error('Campo de upload não encontrado.');
+                        return;
+                    }
                     box.data('opening', true);
                     const reset = () => {
                         box.data('opening', false);
                         $(window).off('focus.upload', reset);
                     };
                     $(window).one('focus.upload', reset);
-                    input.trigger('click');
+                    input[0].click();
                 }
 
                 function onInputChange() {
@@ -1145,7 +1158,14 @@
                 });
                 box.on('dragover.upload', function (e) { e.preventDefault(); box.addClass('dragover'); });
                 box.on('dragleave.upload drop.upload', function (e) { e.preventDefault(); box.removeClass('dragover'); });
-                box.on('drop.upload', function (e) { e.preventDefault(); const f = e.originalEvent.dataTransfer.files[0]; handleFile(f); });
+                box.on('drop.upload', function (e) {
+                    e.preventDefault();
+                    const f = e.originalEvent.dataTransfer.files[0];
+                    if (!f) return;
+                    if (removeInputSelector) { $(removeInputSelector).val('0'); }
+                    bindFileToInput(f);
+                    handleFile(f);
+                });
 
                 box.find('.upload-btn').on('click.upload', function (e) {
                     e.preventDefault();

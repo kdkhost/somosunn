@@ -1,4 +1,4 @@
-﻿## 1. Setup e Estrutura
+## 1. Setup e Estrutura
 
 - [x] 1.1 Criar/ajustar estrutura de componentes Blade para widgets dinamicos
 - [ ] 1.2 Configurar Redis e Laravel Echo para tempo real (ou fallback polling)

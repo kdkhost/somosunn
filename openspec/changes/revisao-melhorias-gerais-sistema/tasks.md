@@ -1,4 +1,4 @@
-﻿## 1. Ajustes de Menu Mobile
+## 1. Ajustes de Menu Mobile
 
 - [x] 1.1 Corrigir JS/CSS do menu para responsividade total em smartphones
 - [x] 1.2 Garantir abertura/fechamento suave e navegacao em todas as rotas

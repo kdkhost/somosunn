@@ -1,4 +1,4 @@
-﻿# UNN — Plataforma de Networking
+# UNN — Plataforma de Networking
 
 ## Novidades Recentes (mar/2026)
 
@@ -78,6 +78,7 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 - Este projeto usa **UTF-8 sem BOM** em TODOS os arquivos de texto (PHP, Blade, JS, CSS, JSON, MD, etc.).
 - Nunca salve arquivos como **UTF-8 com BOM** (bytes `EF BB BF` no início do arquivo), pois causa erros de acentuação/pontuação.
 - Antes de commitar, rode: `php tools/check-no-bom.php`.
+- Para bloquear commits com BOM automaticamente, configure uma vez: `git config core.hooksPath .githooks`.
 
 ### Requisitos
 - PHP 8.1+

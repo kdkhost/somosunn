@@ -680,13 +680,23 @@ class SettingController extends Controller
 
     private function storePublic($file, $relativeDir)
     {
+        if (!$file || !$file->isValid()) {
+            throw new \RuntimeException('Arquivo de imagem inválido ou corrompido.');
+        }
+
         $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
         $name = uniqid('', true) . '.' . $ext;
         $targetDir = public_path($relativeDir);
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0775, true);
         }
-        $file->move($targetDir, $name);
+
+        try {
+            $file->move($targetDir, $name);
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('Não foi possível salvar a imagem em ' . $relativeDir . ': ' . $e->getMessage(), 0, $e);
+        }
+
         return $relativeDir . '/' . $name;
     }
 
@@ -705,11 +715,42 @@ class SettingController extends Controller
             }
             return;
         }
+
+        $old = trim((string) $old);
+        if ($old === '') {
+            if ($clearSetting) {
+                Setting::updateOrCreate(['key' => $key], ['value' => '']);
+            }
+            return;
+        }
+
+        if (filter_var($old, FILTER_VALIDATE_URL)) {
+            $old = (string) parse_url($old, PHP_URL_PATH);
+        }
+
+        $old = str_replace('\\', '/', $old);
+        $old = preg_replace('/[?#].*$/', '', $old) ?? $old;
+
+        $publicRoot = str_replace('\\', '/', public_path());
+        if (Str::startsWith($old, $publicRoot)) {
+            $old = ltrim(substr($old, strlen($publicRoot)), '/');
+        }
+
+        $old = ltrim($old, '/');
+
+        if (Str::startsWith($old, 'public/')) {
+            $old = substr($old, strlen('public/'));
+        }
+
+        if (Str::startsWith($old, 'storage/app/public/')) {
+            $old = 'storage/' . substr($old, strlen('storage/app/public/'));
+        }
+
         $paths = [
             public_path($old),
             public_path(ltrim(str_replace('storage/', '', $old), '/')),
         ];
-        foreach ($paths as $path) {
+        foreach (array_unique(array_filter($paths)) as $path) {
             if ($path && file_exists($path)) {
                 @unlink($path);
             }

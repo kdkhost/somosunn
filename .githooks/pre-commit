@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
+cd "$REPO_ROOT"
+
+if ! command -v php >/dev/null 2>&1; then
+    echo "ERRO: PHP não encontrado. Não foi possível validar UTF-8 sem BOM."
+    exit 1
+fi
+
+php tools/check-no-bom.php

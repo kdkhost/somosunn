@@ -1,4 +1,4 @@
-﻿## 1. Setup e Estrutura
+## 1. Setup e Estrutura
 
 - [x] 1.1 Criar branch de implementacao para a mudanca
 - [x] 1.2 Configurar estrutura de views e controllers de teste

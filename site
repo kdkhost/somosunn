@@ -1,4 +1,73 @@
-git pull
-php artisan migrate
-php artisan view:clear
+#!/bin/bash
+set -Eeuo pipefail
+
+PROJECT_DIR="/home/somosunn/public_html"
+BRANCH="${1:-main}"
+LOG_FILE="/home/somosunn/deploy.log"
+APP_WENT_DOWN=0
+
+mkdir -p "$(dirname "$LOG_FILE")"
+touch "$LOG_FILE"
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+cleanup() {
+    local exit_code=$?
+
+    if [[ "$APP_WENT_DOWN" -eq 1 ]]; then
+        php artisan up >/dev/null 2>&1 || true
+    fi
+
+    if [[ "$exit_code" -ne 0 ]]; then
+        echo "[ERRO] Deploy falhou com código $exit_code em $(date '+%Y-%m-%d %H:%M:%S')"
+    else
+        echo "[OK] Deploy finalizado em $(date '+%Y-%m-%d %H:%M:%S')"
+    fi
+
+    exit "$exit_code"
+}
+
+trap cleanup EXIT
+
+echo "========================================"
+echo "Iniciando deploy em $(date '+%Y-%m-%d %H:%M:%S')"
+echo "Projeto: $PROJECT_DIR"
+echo "Branch: $BRANCH"
+echo "========================================"
+
+cd "$PROJECT_DIR"
+
+if [[ ! -d .git ]]; then
+    echo "[ERRO] $PROJECT_DIR não é um repositório Git."
+    exit 1
+fi
+
+if [[ ! -f artisan ]]; then
+    echo "[ERRO] Arquivo artisan não encontrado em $PROJECT_DIR."
+    exit 1
+fi
+
+echo "[1/7] Entrando em manutenção"
+php artisan down || true
+APP_WENT_DOWN=1
+
+echo "[2/7] Atualizando código"
+git pull origin "$BRANCH"
+
+if command -v composer >/dev/null 2>&1; then
+    echo "[3/7] Instalando dependências"
+    composer install --no-dev --optimize-autoloader --no-interaction
+else
+    echo "[3/7] Composer não encontrado; pulando instalação de dependências"
+fi
+
+echo "[4/7] Rodando migrations"
+php artisan migrate --force
+
+echo "[5/7] Limpando caches"
 php artisan optimize:clear
+
+echo "[6/7] Recriando caches"
+php artisan optimize
+
+echo "[7/7] Reiniciando filas"
+php artisan queue:restart || true
