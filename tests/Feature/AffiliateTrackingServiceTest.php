@@ -588,4 +588,30 @@ class AffiliateTrackingServiceTest extends TestCase
         $this->assertSame(1, $first->shares_total);
         $this->assertSame(200, $first->referral_points);
     }
+
+    public function test_referral_csv_export_is_excel_friendly_without_utf8_bom(): void
+    {
+        $service = app(ReferralAnalyticsService::class);
+
+        $referrer = User::create([
+            'name' => 'Afiliado CSV',
+            'email' => 'afiliado-csv@example.com',
+            'password' => Hash::make('password'),
+            'referral_code' => 'UNNCSV',
+        ]);
+
+        $response = $service->exportDetailedEventsCsv($referrer->id, 'rastreio.csv');
+
+        ob_start();
+        $response->sendContent();
+        $content = (string) ob_get_clean();
+        $contentUtf8 = mb_convert_encoding($content, 'UTF-8', 'Windows-1252');
+
+        $this->assertSame('text/csv; charset=Windows-1252', $response->headers->get('Content-Type'));
+        $this->assertFalse(str_starts_with($content, "\xEF\xBB\xBF"));
+        $this->assertStringContainsString('Relatório;', $contentUtf8);
+        $this->assertStringContainsString('Rastreio de Indicações', $contentUtf8);
+        $this->assertStringContainsString('Data/Hora;Afiliado;Código;Ação;Canal;', $contentUtf8);
+        $this->assertStringContainsString('Origem exata', $contentUtf8);
+    }
 }

@@ -278,11 +278,12 @@ class ReferralAnalyticsService
 
         return response()->streamDownload(function () use ($events) {
             $handle = fopen('php://output', 'w');
+            $delimiter = ';';
 
-            fputcsv($handle, ['Relatório', 'Rastreio de Indicações']);
-            fputcsv($handle, ['Gerado em', now()->format('d/m/Y H:i:s')]);
-            fputcsv($handle, []);
-            fputcsv($handle, [
+            $this->writeCsvExcelRow($handle, ['Relatório', 'Rastreio de Indicações'], $delimiter);
+            $this->writeCsvExcelRow($handle, ['Gerado em', now()->format('d/m/Y H:i:s')], $delimiter);
+            $this->writeCsvExcelRow($handle, [], $delimiter);
+            $this->writeCsvExcelRow($handle, [
                 'Data/Hora',
                 'Afiliado',
                 'Código',
@@ -298,12 +299,12 @@ class ReferralAnalyticsService
                 'Cidade/Região/País',
                 'Usuário convertido',
                 'Pedido/Valor',
-            ]);
+            ], $delimiter);
 
             foreach ($events as $event) {
                 $row = $this->serializeDetailedEvent($event);
 
-                fputcsv($handle, [
+                $this->writeCsvExcelRow($handle, [
                     $row['occurred_at_label'],
                     $row['referrer_name'],
                     $row['referral_code'],
@@ -319,13 +320,44 @@ class ReferralAnalyticsService
                     $row['location_label'],
                     $row['result_user_label'],
                     $row['result_value_label'],
-                ]);
+                ], $delimiter);
             }
 
             fclose($handle);
         }, $filename, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Type' => 'text/csv; charset=Windows-1252',
         ]);
+    }
+
+    private function writeCsvExcelRow($handle, array $row, string $delimiter = ';'): void
+    {
+        if ($row === []) {
+            fwrite($handle, PHP_EOL);
+
+            return;
+        }
+
+        fputcsv(
+            $handle,
+            array_map(fn ($value) => $this->encodeCsvExcelValue($value), $row),
+            $delimiter
+        );
+    }
+
+    private function encodeCsvExcelValue(mixed $value): string
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        if (!is_scalar($value)) {
+            $value = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+
+        $string = (string) $value;
+        $encoded = @iconv('UTF-8', 'Windows-1252//TRANSLIT//IGNORE', $string);
+
+        return $encoded !== false ? $encoded : $string;
     }
 
     private function buildDailyTrackingChart(?int $referrerUserId = null, int $days = 14): array
