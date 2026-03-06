@@ -1,4 +1,4 @@
-# UNN â€” Plataforma de Networking
+# UNN — Plataforma de Networking
 
 ## Novidades Recentes (mar/2026)
 
@@ -22,72 +22,72 @@
 
 ## Novidades Recentes (fev/2026)
 
-- **Menu mobile 100% responsivo:** NavegaÃ§Ã£o aprimorada em smartphones, com abertura/fechamento suave e acessibilidade total.
-- **Dashboard com mÃ©tricas em tempo real:** Contadores de visitas e vendas atualizados automaticamente via websockets (Laravel Echo + Pusher).
+- **Menu mobile 100% responsivo:** Navegação aprimorada em smartphones, com abertura/fechamento suave e acessibilidade total.
+- **Dashboard com métricas em tempo real:** Contadores de visitas e vendas atualizados automaticamente via websockets (Laravel Echo + Pusher).
 - **CMS integrado ao frontend:** Conteudos do CMS (Home, Sobre, Manifesto, Valores e Rodape/Redes Sociais) agora refletem diretamente nas paginas publicas, com fallback para Settings quando vazio.
-- **Sistema de Parceiros e Cupons:** Nova plataforma de parcerias com carrossel premium no Marketplace, Ã¡rea de cupons exclusivos para membros adimplentes e **painel de autogestÃ£o** para que parceiros cadastrem seus prÃ³prios benefÃ­cios.
-- **Widgets customizados por perfil:** Cada membro vÃª mÃ©tricas e atalhos conforme seu plano; admin/superadmin tÃªm visÃ£o global consolidada.
+- **Sistema de Parceiros e Cupons:** Nova plataforma de parcerias com carrossel premium no Marketplace, área de cupons exclusivos para membros adimplentes e **painel de autogestão** para que parceiros cadastrem seus próprios benefícios.
+- **Widgets customizados por perfil:** Cada membro vê métricas e atalhos conforme seu plano; admin/superadmin têm visão global consolidada.
 - **Gerenciamento de tarefas agendadas (cron) pelo painel:** Superadmin pode criar, ativar/desativar, rodar e monitorar tarefas agendadas sem depender do cron da hospedagem.
-- **Logs detalhados de execuÃ§Ãµes:** HistÃ³rico de execuÃ§Ãµes e falhas disponÃ­vel para cada tarefa agendada.
+- **Logs detalhados de execuções:** Histórico de execuções e falhas disponível para cada tarefa agendada.
 
-Veja instruÃ§Ãµes detalhadas abaixo para uso dessas funcionalidades.
+Veja instruções detalhadas abaixo para uso dessas funcionalidades.
 
 ## Melhorias de Dashboard (fev/2026)
 
-- Dashboards de membro e admin totalmente refatoradas com widgets dinÃ¢micos Blade.
-- ExibiÃ§Ã£o de mÃ©tricas, vendas, comunidade, ranking, etc. conforme permissÃµes e plano do usuÃ¡rio.
-- Estrutura pronta para integraÃ§Ã£o com dados em tempo real (websockets/Redis) e cache otimizado.
-- Novos componentes Blade em `resources/views/components/widgets/` para fÃ¡cil expansÃ£o e manutenÃ§Ã£o.
-- CÃ³digo preparado para uso de Redis (requer extensÃ£o fileinfo habilitada no PHP para produÃ§Ã£o).
+- Dashboards de membro e admin totalmente refatoradas com widgets dinâmicos Blade.
+- Exibição de métricas, vendas, comunidade, ranking, etc. conforme permissões e plano do usuário.
+- Estrutura pronta para integração com dados em tempo real (websockets/Redis) e cache otimizado.
+- Novos componentes Blade em `resources/views/components/widgets/` para fácil expansão e manutenção.
+- Código preparado para uso de Redis (requer extensão fileinfo habilitada no PHP para produção).
 
-> **AtenÃ§Ã£o:** Para usar cache Redis, habilite a extensÃ£o `fileinfo` no PHP e instale o Predis (`composer require predis/predis`).
+> **Atenção:** Para usar cache Redis, habilite a extensão `fileinfo` no PHP e instale o Predis (`composer require predis/predis`).
 
-# VisÃ£o Geral do Sistema
+# Visão Geral do Sistema
 
-O UNN Ã© uma plataforma completa de networking, cursos e mentorias, desenvolvida em Laravel 10.
+O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida em Laravel 10.
 
 ## Funcionalidades Principais
 
-### 1. GestÃ£o de ConteÃºdo (LMS)
-- **Cursos:** Aulas em vÃ­deo, anexos, controle de progresso e certificaÃ§Ã£o.
-- **Mentorias:** Agendamento, controle de vagas e venda de sessÃµes.
-- **Eventos:** CalendÃ¡rio interativo, venda de ingressos e check-in.
+### 1. Gestão de Conteúdo (LMS)
+- **Cursos:** Aulas em vídeo, anexos, controle de progresso e certificação.
+- **Mentorias:** Agendamento, controle de vagas e venda de sessões.
+- **Eventos:** Calendário interativo, venda de ingressos e check-in.
 
 ### 2. Networking e Comunidade
-- **Feed Social:** PublicaÃ§Ãµes, curtidas e comentÃ¡rios (estilo rede social).
-- **ConexÃµes:** Sistema de solicitaÃ§Ã£o/aceite de conexÃµes entre membros.
+- **Feed Social:** Publicações, curtidas e comentários (estilo rede social).
+- **Conexões:** Sistema de solicitação/aceite de conexões entre membros.
 - **Chat:** Mensagens em tempo real (polling otimizado para cPanel).
-- **Ranking:** GamificaÃ§Ã£o baseada em avaliaÃ§Ãµes e interaÃ§Ãµes.
+- **Ranking:** Gamificação baseada em avaliações e interações.
 
 ### 3. Administrativo
-- **NÃ­veis de Acesso:** Granularidade total (SuperAdmin, Admin, Editor, Instrutor, Membro).
-- **RelatÃ³rios:** Dashboards financeiros, de vendas e de engajamento.
-- **ConfiguraÃ§Ãµes:** Controle total da plataforma via painel (cores, imagens, textos, integraÃ§Ãµes).
+- **Níveis de Acesso:** Granularidade total (SuperAdmin, Admin, Editor, Instrutor, Membro).
+- **Relatórios:** Dashboards financeiros, de vendas e de engajamento.
+- **Configurações:** Controle total da plataforma via painel (cores, imagens, textos, integrações).
 
-### 4. GamificaÃ§Ã£o (Sistema de Pontos)
-- **21 regras ativas:** Pontos concedidos por login, streak, publicaÃ§Ã£o, comentÃ¡rio, curtida, compartilhamento, aula, curso, certificado, evento, mentoria, avaliaÃ§Ã£o, indicaÃ§Ã£o, aniversÃ¡rio e ranking.
-- **NÃ£o-repetiÃ§Ã£o automÃ¡tica:** O `PointsService` bloqueia automaticamente aÃ§Ãµes Ãºnicas (ex: completar perfil, primeiro curso) sem lÃ³gica duplicada nos controllers.
-- **Limite diÃ¡rio:** Regras com `max_daily` (ex: posts, comentÃ¡rios) sÃ£o respeitadas automaticamente.
-- **Streak de login:** 7 e 30 dias consecutivos concedem bÃ´nus progressivos.
-- **Programa de indicaÃ§Ã£o:** Link de referral Ãºnico por membro; indicador pontua ao novo usuÃ¡rio se cadastrar.
-- **BÃ´nus de aniversÃ¡rio:** Concedido automaticamente 1x por ano (comando `points:award-birthday-bonus`).
-- **Ranking Top 10:** PremiaÃ§Ã£o semanal automÃ¡tica (comando `points:award-top-ranking`).
-- **Regras configurÃ¡veis** pelo painel admin em `/admin/points-rules`.
-- **PÃ¡gina "Meus Pontos"** em `/painel/meus-pontos`: saldo, posiÃ§Ã£o no ranking, pontos do mÃªs, top 10 e histÃ³rico completo.
+### 4. Gamificação (Sistema de Pontos)
+- **21 regras ativas:** Pontos concedidos por login, streak, publicação, comentário, curtida, compartilhamento, aula, curso, certificado, evento, mentoria, avaliação, indicação, aniversário e ranking.
+- **Não-repetição automática:** O `PointsService` bloqueia automaticamente ações únicas (ex: completar perfil, primeiro curso) sem lógica duplicada nos controllers.
+- **Limite diário:** Regras com `max_daily` (ex: posts, comentários) são respeitadas automaticamente.
+- **Streak de login:** 7 e 30 dias consecutivos concedem bônus progressivos.
+- **Programa de indicação:** Link de referral único por membro; indicador pontua ao novo usuário se cadastrar.
+- **Bônus de aniversário:** Concedido automaticamente 1x por ano (comando `points:award-birthday-bonus`).
+- **Ranking Top 10:** Premiação semanal automática (comando `points:award-top-ranking`).
+- **Regras configuráveis** pelo painel admin em `/admin/points-rules`.
+- **Página "Meus Pontos"** em `/painel/meus-pontos`: saldo, posição no ranking, pontos do mês, top 10 e histórico completo.
 
 ### 5. Novidades 2026
 - **Menu Mobile Responsivo:** Menu principal funcional em todas as telas e dispositivos.
-- **Dashboard DinÃ¢mica:** Widgets e mÃ©tricas em tempo real, segmentados por perfil.
+- **Dashboard Dinâmica:** Widgets e métricas em tempo real, segmentados por perfil.
 - **Cron Interno:** Gerencie tarefas agendadas direto pelo painel admin (menu "Cron").
-- **Logs de ExecuÃ§Ã£o:** Visualize histÃ³rico de execuÃ§Ãµes e falhas de cada tarefa agendada.
+- **Logs de Execução:** Visualize histórico de execuções e falhas de cada tarefa agendada.
 
 
-## InstalaÃ§Ã£o e Deploy
+## Instalação e Deploy
 
-## UTF-8 sem BOM (OBRIGATÃ“RIO)
+## UTF-8 sem BOM (OBRIGATÓRIO)
 
 - Este projeto usa **UTF-8 sem BOM** em TODOS os arquivos de texto (PHP, Blade, JS, CSS, JSON, MD, etc.).
-- Nunca salve arquivos como **UTF-8 com BOM** (bytes `EF BB BF` no inÃ­cio do arquivo), pois causa erros de acentuaÃ§Ã£o/pontuaÃ§Ã£o.
+- Nunca salve arquivos como **UTF-8 com BOM** (bytes `EF BB BF` no início do arquivo), pois causa erros de acentuação/pontuação.
 - Antes de commitar, rode: `php tools/check-no-bom.php`.
 - Para bloquear commits com BOM automaticamente, configure uma vez: `git config core.hooksPath .githooks`.
 
@@ -96,26 +96,26 @@ O UNN Ã© uma plataforma completa de networking, cursos e mentorias, desenvolvi
 - MySQL 5.7+ / Mariadb
 - Composer 2+
 
-### InstruÃ§Ãµes RÃ¡pidas (cPanel/Compartilhado)
+### Instruções Rápidas (cPanel/Compartilhado)
 1. Configure o banco de dados e o arquivo `.env`.
-2. Execute as migraÃ§Ãµes: `php artisan migrate --seed`.
+2. Execute as migrações: `php artisan migrate --seed`.
 3. Configure o cron job para rodar `php artisan schedule:run` a cada minuto.
 4. Para filas, use QUEUE_CONNECTION=database e configure o worker.
 
-> **Importante (mar/2026):** As entregas de rastreio de afiliados, reconcilia??o hist?rica de pontos e expans?o comercial dependem de migrations recentes. Em toda publica??o, garanta a execu??o de `php artisan migrate`.
+> **Importante (mar/2026):** As entregas de rastreio de afiliados, reconciliação histórica de pontos e expansão comercial dependem de migrations recentes. Em toda publicação, garanta a execução de `php artisan migrate`.
 
 #### Para usar o cron interno (painel):
 - Acesse o menu **Admin > Cron**
-- Cadastre comandos Artisan (ex: `schedule:run`, `queue:work`, etc.) e defina a frequÃªncia (cron/preset)
-- Ative/desative tarefas conforme necessÃ¡rio
-- Execute manualmente e visualize logs de cada execuÃ§Ã£o
+- Cadastre comandos Artisan (ex: `schedule:run`, `queue:work`, etc.) e defina a frequência (cron/preset)
+- Ative/desative tarefas conforme necessário
+- Execute manualmente e visualize logs de cada execução
 
 #### Para dashboards em tempo real:
-- Certifique-se de que as variÃ¡veis PUSHER estÃ£o configuradas no `.env`
-- O painel usarÃ¡ websockets para atualizar contadores automaticamente
+- Certifique-se de que as variáveis PUSHER estão configuradas no `.env`
+- O painel usará websockets para atualizar contadores automaticamente
 
 #### Menu mobile:
-- O menu principal estÃ¡ 100% funcional em smartphones e tablets, com navegaÃ§Ã£o fluida e acessÃ­vel
+- O menu principal está 100% funcional em smartphones e tablets, com navegação fluida e acessível
 
 ### Webhooks de Pagamento
 Configure as URLs no seu gateway (MercadoPago/PagSeguro):
@@ -123,7 +123,7 @@ Configure as URLs no seu gateway (MercadoPago/PagSeguro):
 - `YOUR_DOMAIN/api/v1/webhooks/pagseguro`
 
 ### SMTP e Emails
-Configure as credenciais no painel admin em **ConfiguraÃ§Ãµes > SMTP**. Use a ferramenta de "Teste de Envio" para validar.
+Configure as credenciais no painel admin em **Configurações > SMTP**. Use a ferramenta de "Teste de Envio" para validar.
 
 ### 02/03/2026 (Tarde) - Compartilhamento com Aprovacao
 - **Feature share-with-approval na Comunidade:**
@@ -176,4 +176,4 @@ Configure as credenciais no painel admin em **ConfiguraÃ§Ãµes > SMTP**. Use 
   - Sidebar recolhivel, uploads avancados com FilePond e paginacao aplicada em listagens extensas para reduzir paginas longas.
 
 ---
-? 2026 UNN Networking. Todos os direitos reservados.
+© 2026 UNN Networking. Todos os direitos reservados.

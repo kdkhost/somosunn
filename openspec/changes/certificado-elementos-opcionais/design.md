@@ -38,5 +38,5 @@
 ## Risks / Trade-offs
 
 - [Mais elementos no JSON] → Elementos novos entram como defaults (ocultos por padrão) e podem aparecer na lista de camadas; mitigado mantendo `visible: false` para título/apresentação e `visible` da assinatura dependente de existência do arquivo.
-- [Mudan?a de wrap em multiline] → `pre-line` pode alterar levemente a quebra de texto vs. `normal`; mitigado por manter `maxWidth` e aplicar o mesmo comportamento no PDF.
+- [Mudança de wrap em multiline] → `pre-line` pode alterar levemente a quebra de texto vs. `normal`; mitigado por manter `maxWidth` e aplicar o mesmo comportamento no PDF.
 - [Fontes não suportadas] → Se uma fonte ativa estiver somente em WOFF2, o PDF pode cair em fallback; mitigado via regras existentes do gerador e orientação ao admin.

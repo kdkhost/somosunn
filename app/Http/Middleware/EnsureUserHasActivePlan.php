@@ -63,7 +63,7 @@ class EnsureUserHasActivePlan
             }
 
             return redirect()->route('premium')
-                ->with('warning', 'Escolha um plano para liberar o acesso total Ã  comunidade SOMOS UNN.');
+                ->with('warning', 'Escolha um plano para liberar o acesso total à comunidade SOMOS UNN.');
         }
 
         return $next($request);

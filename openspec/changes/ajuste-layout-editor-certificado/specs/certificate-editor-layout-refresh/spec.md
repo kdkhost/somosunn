@@ -13,5 +13,5 @@ O painel de camadas/elementos MUST exibir labels legíveis em PT-BR (sem caracte
 
 #### Scenario: Labels de elementos aparecem com acentuação correta
 - **WHEN** o editor renderiza a lista de camadas/elementos
-- **THEN** labels como "Data de Conclusão", "Código de Validação" e "Carga Horária" MUST ser exibidas corretamente (sem "ConclusÃ£o", "CÃ³digo", "HorÃ¡ria")
+- **THEN** labels como "Data de Conclusão", "Código de Validação" e "Carga Horária" MUST ser exibidas corretamente (sem "Conclusão", "Código", "Horária")
 

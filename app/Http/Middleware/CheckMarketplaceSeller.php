@@ -22,12 +22,12 @@ class CheckMarketplaceSeller
 
         if (!$user->canSellOnMarketplace()) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'VocÃª nÃ£o possui permissÃ£o de vendas no marketplace.'], 403);
+                return response()->json(['message' => 'Você não possui permissão de vendas no marketplace.'], 403);
             }
 
             return redirect()
                 ->route('panel.dashboard')
-                ->with('error', 'VocÃª nÃ£o possui permissÃ£o para acessar o painel do Marketplace.');
+                ->with('error', 'Você não possui permissão para acessar o painel do Marketplace.');
         }
 
         return $next($request);

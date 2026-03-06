@@ -1,6 +1,6 @@
 ## Why
 
-O editor de certificado está com um layout pouco eficiente: sobra muito espaço em branco na área de trabalho enquanto as configurações ficam concentradas apenas na lateral, exigindo rolagem e dificultando o fluxo de edição. Além disso, alguns rótulos aparecem com acentuação quebrada (ex.: “ConclusÃ£o”), causando confusão e reduzindo a qualidade percebida do sistema.
+O editor de certificado está com um layout pouco eficiente: sobra muito espaço em branco na área de trabalho enquanto as configurações ficam concentradas apenas na lateral, exigindo rolagem e dificultando o fluxo de edição. Além disso, alguns rótulos aparecem com acentuação quebrada (ex.: “Conclusão”), causando confusão e reduzindo a qualidade percebida do sistema.
 
 ## What Changes
 

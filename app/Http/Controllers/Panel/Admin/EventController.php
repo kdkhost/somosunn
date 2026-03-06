@@ -32,7 +32,7 @@ class EventController extends Controller
             $start = $startRaw ? \Carbon\Carbon::parse($startRaw) : now()->startOfMonth()->subMonth();
             $end = $endRaw ? \Carbon\Carbon::parse($endRaw) : now()->endOfMonth()->addMonth();
         } catch (\Throwable $e) {
-            return response()->json(['message' => 'Intervalo invÃ¡lido.'], 422);
+            return response()->json(['message' => 'Intervalo inválido.'], 422);
         }
 
         $query = Event::where(function ($query) use ($start, $end) {

@@ -11,7 +11,7 @@
                 Nossos <span class="unn-title-gradient">Valores</span>
             </h1>
             <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                {{ $page->get('hero_subtitle', 'Os princÃ­pios que guiam tudo o que fazemos na UNN.') }}
+                {{ $page->get('hero_subtitle', 'Os princípios que guiam tudo o que fazemos na UNN.') }}
             </p>
         </div>
     </section>
@@ -22,12 +22,12 @@
             <div class="grid md:grid-cols-2 gap-8">
                 @php
                     $valores = $page->get('values', [
-                        ['icon' => 'fa-heart',         'title' => 'ConfianÃ§a',    'text' => 'A base de qualquer relacionamento duradouro. Cultivamos um ambiente onde a palavra tem valor e os compromissos sÃ£o honrados. ConfianÃ§a nÃ£o se exige, se constrÃ³i.',                                'quote' => 'ConfianÃ§a Ã© a cola invisÃ­vel que mantÃ©m as parcerias unidas.'],
-                        ['icon' => 'fa-hands-helping', 'title' => 'Generosidade', 'text' => 'O verdadeiro networking comeÃ§a quando vocÃª se pergunta: "Como posso ajudar?". Acreditamos que dar sem esperar nada em troca cria as conexÃµes mais poderosas.',                              'quote' => 'Quem planta conexÃµes, colhe oportunidades.'],
-                        ['icon' => 'fa-lightbulb',     'title' => 'InovaÃ§Ã£o',     'text' => 'Nunca paramos de evoluir. Buscamos constantemente novas formas de conectar pessoas e gerar valor. A zona de conforto nÃ£o Ã© lugar para empreendedores.',                                    'quote' => 'Inovar Ã© ver o que todos veem e pensar o que ninguÃ©m pensou.'],
-                        ['icon' => 'fa-trophy',        'title' => 'ExcelÃªncia',   'text' => 'Fazemos o nosso melhor em tudo. Cada evento, cada interaÃ§Ã£o, cada detalhe Ã© pensado para proporcionar a melhor experiÃªncia possÃ­vel aos nossos membros.',                                 'quote' => 'ExcelÃªncia nÃ£o Ã© um ato, Ã© um hÃ¡bito.'],
-                        ['icon' => 'fa-user-shield',   'title' => 'Integridade',  'text' => 'Fazemos o que Ã© certo, mesmo quando ninguÃ©m estÃ¡ olhando. A Ã©tica nos negÃ³cios nÃ£o Ã© opcional, Ã© fundamental. Nossos membros sÃ£o selecionados por seu carÃ¡ter.',                       'quote' => 'O carÃ¡ter se revela nas pequenas decisÃµes do dia a dia.'],
-                        ['icon' => 'fa-users',         'title' => 'Comunidade',   'text' => 'Somos mais fortes juntos. A UNN nÃ£o Ã© apenas uma plataforma, Ã© uma famÃ­lia de empreendedores que se apoiam mutuamente nos desafios e celebram as vitÃ³rias um do outro.', 'quote' => 'Sozinhos vamos mais rÃ¡pido. Juntos vamos mais longe.'],
+                        ['icon' => 'fa-heart',         'title' => 'Confiança',    'text' => 'A base de qualquer relacionamento duradouro. Cultivamos um ambiente onde a palavra tem valor e os compromissos são honrados. Confiança não se exige, se constrói.',                                'quote' => 'Confiança é a cola invisível que mantém as parcerias unidas.'],
+                        ['icon' => 'fa-hands-helping', 'title' => 'Generosidade', 'text' => 'O verdadeiro networking começa quando você se pergunta: "Como posso ajudar?". Acreditamos que dar sem esperar nada em troca cria as conexões mais poderosas.',                              'quote' => 'Quem planta conexões, colhe oportunidades.'],
+                        ['icon' => 'fa-lightbulb',     'title' => 'Inovação',     'text' => 'Nunca paramos de evoluir. Buscamos constantemente novas formas de conectar pessoas e gerar valor. A zona de conforto não é lugar para empreendedores.',                                    'quote' => 'Inovar é ver o que todos veem e pensar o que ninguém pensou.'],
+                        ['icon' => 'fa-trophy',        'title' => 'Excelência',   'text' => 'Fazemos o nosso melhor em tudo. Cada evento, cada interação, cada detalhe é pensado para proporcionar a melhor experiência possível aos nossos membros.',                                 'quote' => 'Excelência não é um ato, é um hábito.'],
+                        ['icon' => 'fa-user-shield',   'title' => 'Integridade',  'text' => 'Fazemos o que é certo, mesmo quando ninguém está olhando. A ética nos negócios não é opcional, é fundamental. Nossos membros são selecionados por seu caráter.',                       'quote' => 'O caráter se revela nas pequenas decisões do dia a dia.'],
+                        ['icon' => 'fa-users',         'title' => 'Comunidade',   'text' => 'Somos mais fortes juntos. A UNN não é apenas uma plataforma, é uma família de empreendedores que se apoiam mutuamente nos desafios e celebram as vitórias um do outro.', 'quote' => 'Sozinhos vamos mais rápido. Juntos vamos mais longe.'],
                     ]);
                 @endphp
 
@@ -54,9 +54,9 @@
         <div class="max-w-4xl mx-auto text-center">
             <i class="fas fa-quote-left text-6xl mb-8" style="color: var(--unn-azul-1); opacity: 0.3"></i>
             <blockquote class="text-3xl font-bold text-gray-900 mb-6">
-                "{{ $page->get('blockquote_text', 'Valores nÃ£o sÃ£o apenas palavras bonitas na parede. SÃ£o os critÃ©rios pelos quais tomamos cada decisÃ£o, grandes ou pequenas, todos os dias.') }}"
+                "{{ $page->get('blockquote_text', 'Valores não são apenas palavras bonitas na parede. São os critérios pelos quais tomamos cada decisão, grandes ou pequenas, todos os dias.') }}"
             </blockquote>
-            <p class="text-gray-500">{{ $page->get('blockquote_author', 'â€” Equipe Fundadora UNN') }}</p>
+            <p class="text-gray-500">{{ $page->get('blockquote_author', '— Equipe Fundadora UNN') }}</p>
         </div>
     </section>
 
@@ -64,7 +64,7 @@
     <section class="py-16 px-6 md:px-12 lg:px-24" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
         <div class="max-w-4xl mx-auto text-center text-white">
             <h2 class="text-3xl lg:text-4xl font-black mb-4">{{ $page->get('cta_title', 'Compartilha desses valores?') }}</h2>
-            <p class="text-lg opacity-90 mb-8">{{ $page->get('cta_subtitle', 'VocÃª estÃ¡ no lugar certo. FaÃ§a parte da nossa comunidade.') }}</p>
+            <p class="text-lg opacity-90 mb-8">{{ $page->get('cta_subtitle', 'Você está no lugar certo. Faça parte da nossa comunidade.') }}</p>
             <a href="{{ route('register') }}" class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition" style="color: var(--unn-azul-1)">
                 <i class="fas fa-handshake"></i>
                 {{ $page->get('cta_btn', 'Fazer parte') }}

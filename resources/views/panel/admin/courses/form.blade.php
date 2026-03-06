@@ -1518,7 +1518,7 @@
                         <div class="md:col-span-2">
                             <label
                                 class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Arquivo
-                                de VÃ­deo (Upload)</label>
+                                de Vídeo (Upload)</label>
                             <div class="relative group">
                                 <input type="file" id="lessonVideoFile" name="video_file" accept="video/*,video/mp4,video/webm"
                                     class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">

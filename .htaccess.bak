@@ -8,7 +8,7 @@
     RewriteEngine On
     RewriteBase /
 
-    # direcionar todas as requisi??es para o front controller do Laravel
+    # direcionar todas as requisições para o front controller do Laravel
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ public/index.php [L]
@@ -23,4 +23,3 @@
     ExpiresByType image/jpeg "access plus 30 days"
     ExpiresByType image/png "access plus 30 days"
 </IfModule>
-
