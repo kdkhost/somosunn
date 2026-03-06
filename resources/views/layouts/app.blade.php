@@ -964,6 +964,8 @@
                 var mobilePanel = document.getElementById('mobile-menu-panel');
                 var mobileOverlay = document.getElementById('mobile-menu-overlay');
                 var mobileClose = document.getElementById('mobile-menu-close');
+                var closeTimer = null;
+                var lastFocused = null;
 
                 if (!mobileToggle || !mobileMenu || !mobilePanel || !mobileOverlay || !mobileClose) {
                     return;
@@ -975,15 +977,26 @@
                 mobileToggle.dataset.mobileMenuBound = '1';
 
                 var openMenu = function () {
+                    if (closeTimer) {
+                        clearTimeout(closeTimer);
+                        closeTimer = null;
+                    }
+
+                    lastFocused = document.activeElement;
                     mobileMenu.classList.remove('hidden');
                     mobileMenu.setAttribute('aria-hidden', 'false');
+                    document.body.style.overflow = 'hidden';
 
                     mobileOverlay.classList.remove('pointer-events-none');
                     mobileOverlay.classList.add('pointer-events-auto');
-                    mobileOverlay.classList.remove('opacity-0');
-                    mobileOverlay.classList.add('opacity-100');
 
-                    mobilePanel.classList.remove('-translate-x-full');
+                    requestAnimationFrame(function () {
+                        requestAnimationFrame(function () {
+                            mobileOverlay.classList.remove('opacity-0');
+                            mobileOverlay.classList.add('opacity-100');
+                            mobilePanel.classList.remove('-translate-x-full');
+                        });
+                    });
                 };
 
                 var closeMenu = function () {
@@ -994,9 +1007,14 @@
                     mobileOverlay.classList.remove('pointer-events-auto');
                     mobileOverlay.classList.add('pointer-events-none');
 
-                    setTimeout(function () {
+                    closeTimer = setTimeout(function () {
                         mobileMenu.classList.add('hidden');
                         mobileMenu.setAttribute('aria-hidden', 'true');
+                        document.body.style.overflow = '';
+
+                        if (lastFocused && typeof lastFocused.focus === 'function') {
+                            lastFocused.focus();
+                        }
                     }, 320);
                 };
 

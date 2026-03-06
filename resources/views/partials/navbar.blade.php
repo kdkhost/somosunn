@@ -41,6 +41,34 @@
 
     $isLogged = Auth::check();
     $currentUser = Auth::user();
+    $filterVisibleChildren = function (array $children) use ($isLogged) {
+        return array_values(array_filter($children, function (array $child) use ($isLogged) {
+            $childSettingKey = $child['setting_key'] ?? null;
+            $childEnabled = $childSettingKey ? \App\Models\Setting::get($childSettingKey, '1') === '1' : true;
+            $childRequiresAuth = (bool) ($child['requires_auth'] ?? false);
+
+            if ($childRequiresAuth && !$isLogged) {
+                return false;
+            }
+
+            return $childEnabled;
+        }));
+    };
+
+    $visibleMenuItems = array_values(array_filter(array_map(function (array $item) use ($filterVisibleChildren) {
+        $settingKey = $item['setting_key'] ?? null;
+        $isEnabled = $settingKey ? \App\Models\Setting::get($settingKey, '1') === '1' : true;
+
+        if (!$isEnabled) {
+            return null;
+        }
+
+        if (isset($item['children'])) {
+            $item['children'] = $filterVisibleChildren($item['children']);
+        }
+
+        return $item;
+    }, $menuItems)));
 @endphp
 
 <nav class="fixed inset-x-0 top-0 z-50 bg-white shadow-xl border-b border-slate-100">
@@ -53,14 +81,8 @@
 
         <div class="flex items-center gap-6">
             <div class="hidden lg:flex items-center gap-4 text-sm font-semibold text-gray-800">
-                @foreach($menuItems as $item)
-                    @php
-                        $settingKey = $item['setting_key'] ?? null;
-                        $isEnabled = $settingKey ? \App\Models\Setting::get($settingKey, '1') === '1' : true;
-                    @endphp
-
-                    @if($isEnabled)
-                        @if(isset($item['children']))
+                @foreach($visibleMenuItems as $item)
+                        @if(!empty($item['children']))
                             <div class="relative group">
                                 <a href="{{ $item['href'] }}" class="inline-flex items-center gap-1 hover:text-[#1F5EDB] transition-colors py-2">
                                     {{ $item['label'] }}
@@ -69,20 +91,10 @@
                                 <div class="absolute right-0 top-full pt-2 hidden group-hover:block z-40">
                                     <div class="rounded-2xl bg-white shadow-xl border border-slate-100 min-w-[220px] py-2 overflow-hidden">
                                         @foreach($item['children'] as $child)
-                                            @php
-                                                $childSettingKey = $child['setting_key'] ?? null;
-                                                $childEnabled = $childSettingKey ? \App\Models\Setting::get($childSettingKey, '1') === '1' : true;
-                                                $childRequiresAuth = (bool) ($child['requires_auth'] ?? false);
-                                                if ($childRequiresAuth && !$isLogged) {
-                                                    $childEnabled = false;
-                                                }
-                                            @endphp
-                                            @if($childEnabled)
-                                                <a href="{{ $child['href'] }}"
-                                                    class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
-                                                    {{ $child['label'] }}
-                                                </a>
-                                            @endif
+                                            <a href="{{ $child['href'] }}"
+                                                class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                                {{ $child['label'] }}
+                                            </a>
                                         @endforeach
                                     </div>
                                 </div>
@@ -90,7 +102,6 @@
                         @else
                             <a href="{{ $item['href'] }}" class="hover:text-[#1F5EDB] transition-colors">{{ $item['label'] }}</a>
                         @endif
-                    @endif
                 @endforeach
             </div>
 
@@ -310,10 +321,38 @@
         @endif
 
         <nav class="px-4 py-4 flex flex-col gap-1 text-gray-700">
-            @foreach($menuItems as $item)
-                <a href="{{ $item['href'] }}" class="block rounded-xl px-4 py-2.5 font-semibold hover:bg-slate-100 transition-colors">
-                    {{ $item['label'] }}
-                </a>
+            @foreach($visibleMenuItems as $item)
+                @php($mobileSection = \Illuminate\Support\Str::slug($item['label']))
+                @if(!empty($item['children']))
+                    <div data-mobile-section="{{ $mobileSection }}"
+                        class="rounded-2xl border border-slate-100 bg-slate-50/80 px-3 py-3">
+                        <div class="flex items-center justify-between px-1 pb-2">
+                            <a href="{{ $item['href'] }}"
+                                class="text-xs font-extrabold uppercase tracking-[0.24em] text-slate-400 hover:text-[#1F5EDB] transition-colors">
+                                {{ $item['label'] }}
+                            </a>
+                            <span class="inline-flex items-center rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-slate-500 shadow-sm">
+                                {{ count($item['children']) }} itens
+                            </span>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            @foreach($item['children'] as $child)
+                                <a href="{{ $child['href'] }}"
+                                    class="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-700 hover:bg-white hover:text-[#1F5EDB] transition-colors">
+                                    <span>{{ $child['label'] }}</span>
+                                    <i class="fas fa-chevron-right text-[11px] opacity-50"></i>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <a href="{{ $item['href'] }}"
+                        data-mobile-section="{{ $mobileSection }}"
+                        class="block rounded-xl px-4 py-2.5 font-semibold hover:bg-slate-100 transition-colors">
+                        {{ $item['label'] }}
+                    </a>
+                @endif
             @endforeach
 
             @if($isLogged)
