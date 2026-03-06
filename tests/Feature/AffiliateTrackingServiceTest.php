@@ -388,4 +388,60 @@ class AffiliateTrackingServiceTest extends TestCase
         $this->assertContains('Whatsapp', $data['trackingSharingChart']['labels']);
         $this->assertSame(3, array_sum($data['trackingSharingChart']['shares']) + array_sum($data['trackingSharingChart']['reshares']) + array_sum($data['trackingSharingChart']['copies']));
     }
+
+    public function test_referral_stats_endpoint_returns_live_tracking_payload(): void
+    {
+        Carbon::setTestNow('2026-03-06 14:30:00');
+
+        $referrer = User::create([
+            'name' => 'Afiliado Tempo Real',
+            'email' => 'afiliado-live@example.com',
+            'password' => Hash::make('password'),
+            'referral_code' => 'UNNLIVE',
+        ]);
+
+        $lead = User::create([
+            'name' => 'Lead Live',
+            'email' => 'lead-live@example.com',
+            'password' => Hash::make('password'),
+            'referred_by' => $referrer->id,
+        ]);
+
+        ReferralLinkVisit::create([
+            'referrer_user_id' => $referrer->id,
+            'referral_code' => $referrer->referral_code,
+            'utm_source' => 'whatsapp',
+            'landing_page_path' => '/oferta/live',
+            'clicks_count' => 3,
+            'pageviews_count' => 7,
+            'registered_user_id' => $lead->id,
+            'checkout_started_count' => 1,
+            'purchases_count' => 1,
+            'total_revenue_amount' => 147.90,
+            'first_visited_at' => now()->subMinute(),
+            'registered_at' => now()->subMinute(),
+        ]);
+
+        ReferralLinkEvent::create([
+            'referrer_user_id' => $referrer->id,
+            'event_type' => 'share',
+            'channel' => 'whatsapp',
+            'occurred_at' => now()->subMinute(),
+        ]);
+
+        $request = Request::create('/painel/indicacoes/dados', 'GET');
+        $request->setUserResolver(fn () => $referrer);
+
+        $response = app(ReferralController::class)->stats($request);
+        $payload = $response->getData(true);
+
+        $this->assertTrue($payload['ok']);
+        $this->assertSame(3, $payload['trackingSummary']['clicks']);
+        $this->assertSame(7, $payload['trackingSummary']['pageviews']);
+        $this->assertSame(1, $payload['trackingSummary']['registrations']);
+        $this->assertSame(1, $payload['trackingSummary']['purchases']);
+        $this->assertSame('Whatsapp', $payload['trackingChannels'][0]['channel']);
+        $this->assertSame('/oferta/live', $payload['trackedVisitsFeed'][0]['landing_page_path']);
+        $this->assertSame('Lead Live', $payload['trackedVisitsFeed'][0]['registered_user_name']);
+    }
 }

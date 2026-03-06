@@ -544,6 +544,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
 
     // Indicações / Programa de Afiliados
     Route::get('/indicacoes', [\App\Http\Controllers\Panel\ReferralController::class, 'index'])->name('referral.index');
+    Route::get('/indicacoes/dados', [\App\Http\Controllers\Panel\ReferralController::class, 'stats'])->name('referral.stats');
     Route::post('/indicacoes/rastreio', [\App\Http\Controllers\Panel\ReferralController::class, 'track'])->name('referral.track');
 
     // Loja de Pontos (Usuário)

@@ -22,14 +22,7 @@ class ReferralController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        if (empty($user->referral_code)) {
-            do {
-                $code = 'UNN' . strtoupper(substr(md5($user->id . microtime()), 0, 7));
-            } while (User::where('referral_code', $code)->exists());
-
-            $user->referral_code = $code;
-            $user->save();
-        }
+        $this->ensureReferralCode($user);
 
         $referralLink = route('register') . '?ref=' . $user->referral_code;
 
@@ -60,66 +53,7 @@ class ReferralController extends Controller
         $plansMap = Plan::whereIn('id', $referredUsers->pluck('plan_id')->filter()->unique()->values())
             ->pluck('name', 'id');
 
-        $trackingAvailable = Schema::hasTable('referral_link_visits') && Schema::hasTable('referral_link_events');
-        $trackingSummary = [
-            'clicks' => 0,
-            'visits' => 0,
-            'pageviews' => 0,
-            'registrations' => 0,
-            'checkout_starts' => 0,
-            'purchases' => 0,
-            'revenue' => 0.0,
-            'shares' => 0,
-            'reshares' => 0,
-            'copies' => 0,
-            'registration_conversion' => 0,
-            'purchase_conversion' => 0,
-        ];
-        $trackingChannels = collect();
-        $trackedVisits = collect();
-        $trackingDailyChart = $this->emptyDailyTrackingChart();
-        $trackingAcquisitionChart = $this->emptyChannelTrackingChart();
-        $trackingSharingChart = $this->emptySharingTrackingChart();
-
-        if ($trackingAvailable) {
-            $visitsQuery = ReferralLinkVisit::query()->where('referrer_user_id', $user->id);
-            $eventsQuery = ReferralLinkEvent::query()->where('referrer_user_id', $user->id);
-
-            $trackingSummary = [
-                'clicks' => (int) (clone $visitsQuery)->sum('clicks_count'),
-                'visits' => (int) (clone $visitsQuery)->count(),
-                'pageviews' => (int) (clone $visitsQuery)->sum('pageviews_count'),
-                'registrations' => (int) (clone $visitsQuery)->whereNotNull('registered_user_id')->count(),
-                'checkout_starts' => (int) (clone $visitsQuery)->sum('checkout_started_count'),
-                'purchases' => (int) (clone $visitsQuery)->sum('purchases_count'),
-                'revenue' => (float) (clone $visitsQuery)->sum('total_revenue_amount'),
-                'shares' => (int) (clone $eventsQuery)->where('event_type', 'share')->count(),
-                'reshares' => (int) (clone $eventsQuery)->where('event_type', 'reshare')->count(),
-                'copies' => (int) (clone $eventsQuery)->where('event_type', 'copy')->count(),
-                'registration_conversion' => 0,
-                'purchase_conversion' => 0,
-            ];
-
-            $trackingSummary['registration_conversion'] = $trackingSummary['visits'] > 0
-                ? (int) round(($trackingSummary['registrations'] / $trackingSummary['visits']) * 100)
-                : 0;
-            $trackingSummary['purchase_conversion'] = $trackingSummary['visits'] > 0
-                ? (int) round(($trackingSummary['purchases'] / $trackingSummary['visits']) * 100)
-                : 0;
-
-            $trackingChannels = $this->buildSharingChannelBreakdown($user->id);
-            $trackingDailyChart = $this->buildDailyTrackingChart($user->id);
-            $trackingAcquisitionChart = $this->buildAcquisitionChannelChart($user->id);
-            $trackingSharingChart = $this->buildSharingChannelChart($trackingChannels);
-
-            $trackedVisits = ReferralLinkVisit::query()
-                ->with('registeredUser:id,name,email,photo')
-                ->where('referrer_user_id', $user->id)
-                ->latest('first_visited_at')
-                ->paginate(15, ['*'], 'tracking_page');
-        }
-
-        return view('panel.referral.index', compact(
+        return view('panel.referral.index', array_merge(compact(
             'user',
             'referralLink',
             'referredUsers',
@@ -129,15 +63,8 @@ class ReferralController extends Controller
             'totalReferred',
             'convertedCount',
             'pendingCount',
-            'plansMap',
-            'trackingAvailable',
-            'trackingSummary',
-            'trackingChannels',
-            'trackingDailyChart',
-            'trackingAcquisitionChart',
-            'trackingSharingChart',
-            'trackedVisits'
-        ));
+            'plansMap'
+        ), $this->buildTrackingDashboardPayload($user)));
     }
 
     public function track(Request $request, AffiliateTrackingService $tracking)
@@ -163,6 +90,115 @@ class ReferralController extends Controller
             'ok' => true,
             'event_type' => $eventType,
         ]);
+    }
+
+    public function stats(Request $request)
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        $this->ensureReferralCode($user);
+
+        $payload = $this->buildTrackingDashboardPayload($user);
+
+        return response()->json([
+            'ok' => true,
+            'trackingAvailable' => $payload['trackingAvailable'],
+            'trackingStatusMessage' => $payload['trackingStatusMessage'],
+            'trackingStatusTone' => $payload['trackingStatusTone'],
+            'trackingUpdatedAt' => $payload['trackingUpdatedAt'],
+            'trackingUpdatedAtLabel' => $payload['trackingUpdatedAtLabel'],
+            'trackingSummary' => $payload['trackingSummary'],
+            'trackingChannels' => $payload['trackingChannels']->values()->all(),
+            'trackedVisitsFeed' => $payload['trackedVisitsFeed'],
+            'trackingDailyChart' => $payload['trackingDailyChart'],
+            'trackingAcquisitionChart' => $payload['trackingAcquisitionChart'],
+            'trackingSharingChart' => $payload['trackingSharingChart'],
+        ]);
+    }
+
+    private function ensureReferralCode(User $user): void
+    {
+        if (!empty($user->referral_code)) {
+            return;
+        }
+
+        do {
+            $code = 'UNN' . strtoupper(substr(md5($user->id . microtime()), 0, 7));
+        } while (User::where('referral_code', $code)->exists());
+
+        $user->referral_code = $code;
+        $user->save();
+    }
+
+    private function buildTrackingDashboardPayload(User $user, int $visitLimit = 10): array
+    {
+        $trackingAvailable = Schema::hasTable('referral_link_visits') && Schema::hasTable('referral_link_events');
+        $trackingSummary = $this->emptyTrackingSummary();
+        $trackingChannels = collect();
+        $trackedVisits = collect();
+        $trackingDailyChart = $this->emptyDailyTrackingChart();
+        $trackingAcquisitionChart = $this->emptyChannelTrackingChart();
+        $trackingSharingChart = $this->emptySharingTrackingChart();
+        $trackingStatusMessage = 'Atualização automática a cada 5 segundos.';
+        $trackingStatusTone = 'success';
+
+        if ($trackingAvailable) {
+            $visitsQuery = ReferralLinkVisit::query()->where('referrer_user_id', $user->id);
+            $eventsQuery = ReferralLinkEvent::query()->where('referrer_user_id', $user->id);
+
+            $trackingSummary = [
+                'clicks' => (int) (clone $visitsQuery)->sum('clicks_count'),
+                'visits' => (int) (clone $visitsQuery)->count(),
+                'pageviews' => (int) (clone $visitsQuery)->sum('pageviews_count'),
+                'registrations' => (int) (clone $visitsQuery)->whereNotNull('registered_user_id')->count(),
+                'checkout_starts' => (int) (clone $visitsQuery)->sum('checkout_started_count'),
+                'purchases' => (int) (clone $visitsQuery)->sum('purchases_count'),
+                'revenue' => round((float) (clone $visitsQuery)->sum('total_revenue_amount'), 2),
+                'shares' => (int) (clone $eventsQuery)->where('event_type', 'share')->count(),
+                'reshares' => (int) (clone $eventsQuery)->where('event_type', 'reshare')->count(),
+                'copies' => (int) (clone $eventsQuery)->where('event_type', 'copy')->count(),
+                'registration_conversion' => 0,
+                'purchase_conversion' => 0,
+            ];
+
+            $trackingSummary['registration_conversion'] = $trackingSummary['visits'] > 0
+                ? (int) round(($trackingSummary['registrations'] / $trackingSummary['visits']) * 100)
+                : 0;
+            $trackingSummary['purchase_conversion'] = $trackingSummary['visits'] > 0
+                ? (int) round(($trackingSummary['purchases'] / $trackingSummary['visits']) * 100)
+                : 0;
+
+            $trackingChannels = $this->buildSharingChannelBreakdown($user->id);
+            $trackingDailyChart = $this->buildDailyTrackingChart($user->id);
+            $trackingAcquisitionChart = $this->buildAcquisitionChannelChart($user->id);
+            $trackingSharingChart = $this->buildSharingChannelChart($trackingChannels);
+
+            $trackedVisits = ReferralLinkVisit::query()
+                ->with('registeredUser:id,name,email,photo')
+                ->where('referrer_user_id', $user->id)
+                ->latest('first_visited_at')
+                ->limit($visitLimit)
+                ->get();
+        } else {
+            $trackingStatusMessage = 'O rastreio detalhado ainda não está ativo neste ambiente. Rode as migrations para criar as tabelas de cliques, visitas e eventos.';
+            $trackingStatusTone = 'warning';
+        }
+
+        return [
+            'trackingAvailable' => $trackingAvailable,
+            'trackingSummary' => $trackingSummary,
+            'trackingChannels' => $trackingChannels,
+            'trackedVisits' => $trackedVisits,
+            'trackedVisitsFeed' => $this->serializeTrackedVisits($trackedVisits),
+            'trackingDailyChart' => $trackingDailyChart,
+            'trackingAcquisitionChart' => $trackingAcquisitionChart,
+            'trackingSharingChart' => $trackingSharingChart,
+            'trackingStatusMessage' => $trackingStatusMessage,
+            'trackingStatusTone' => $trackingStatusTone,
+            'trackingUpdatedAt' => now()->toIso8601String(),
+            'trackingUpdatedAtLabel' => now()->format('d/m/Y H:i:s'),
+        ];
     }
 
     private function buildDailyTrackingChart(int $referrerUserId, int $days = 14): array
@@ -331,6 +367,44 @@ class ReferralController extends Controller
         }
 
         return Str::headline(str_replace(['_', '-', '.'], ' ', $channel));
+    }
+
+    private function serializeTrackedVisits($trackedVisits): array
+    {
+        return $trackedVisits->map(function (ReferralLinkVisit $visit) {
+            return [
+                'id' => $visit->id,
+                'first_visited_at' => $visit->first_visited_at?->format('d/m/Y H:i') ?? '—',
+                'first_visited_human' => $visit->first_visited_at?->diffForHumans() ?? 'agora',
+                'clicks_count' => (int) $visit->clicks_count,
+                'pageviews_count' => (int) $visit->pageviews_count,
+                'source_label' => $this->resolveAcquisitionChannelLabel($visit),
+                'landing_page_path' => $visit->landing_page_path ?: '/',
+                'registered_user_name' => $visit->registeredUser?->name,
+                'registered_at_human' => $visit->registered_at?->diffForHumans() ?? 'cadastrado',
+                'purchases_count' => (int) $visit->purchases_count,
+                'revenue_amount' => round((float) $visit->total_revenue_amount, 2),
+                'revenue_amount_formatted' => number_format((float) $visit->total_revenue_amount, 2, ',', '.'),
+            ];
+        })->all();
+    }
+
+    private function emptyTrackingSummary(): array
+    {
+        return [
+            'clicks' => 0,
+            'visits' => 0,
+            'pageviews' => 0,
+            'registrations' => 0,
+            'checkout_starts' => 0,
+            'purchases' => 0,
+            'revenue' => 0.0,
+            'shares' => 0,
+            'reshares' => 0,
+            'copies' => 0,
+            'registration_conversion' => 0,
+            'purchase_conversion' => 0,
+        ];
     }
 
     private function emptyDailyTrackingChart(): array

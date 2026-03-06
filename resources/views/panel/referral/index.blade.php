@@ -31,7 +31,6 @@
         @endif
     </div>
 
-    @if($trackingAvailable)
         <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
             <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
                 <div>
@@ -40,32 +39,40 @@
                         Cliques, visitas únicas, cadastros, checkouts, compras confirmadas e compartilhamentos.
                     </p>
                 </div>
-                <div class="text-sm text-slate-500 dark:text-slate-400">
+                <div id="trackingConversionMeta" class="text-sm text-slate-500 dark:text-slate-400">
                     Conversão para cadastro: <strong class="text-slate-700 dark:text-slate-200">{{ $trackingConversion }}%</strong>
                     · Compra: <strong class="text-slate-700 dark:text-slate-200">{{ $purchaseConversion }}%</strong>
+                    · Atualizado às <strong id="trackingUpdatedAtLabel" class="text-slate-700 dark:text-slate-200">{{ $trackingUpdatedAtLabel }}</strong>
                 </div>
+            </div>
+
+            <div id="trackingStatusBanner"
+                class="rounded-2xl px-4 py-3 text-sm font-medium {{ $trackingStatusTone === 'success'
+                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300'
+                    : 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300' }}">
+                {{ $trackingStatusMessage }}
             </div>
 
             <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
                 <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4">
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Cliques no link</p>
-                    <p class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['clicks']) }}</p>
-                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['visits']) }} visitas únicas</p>
+                    <p id="trackingClicksValue" class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['clicks']) }}</p>
+                    <p id="trackingClicksMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['visits']) }} visitas únicas · {{ number_format($trackingSummary['pageviews']) }} visualizações</p>
                 </div>
                 <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4">
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Cadastros atribuídos</p>
-                    <p class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['registrations']) }}</p>
-                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['checkout_starts']) }} checkouts iniciados</p>
+                    <p id="trackingRegistrationsValue" class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['registrations']) }}</p>
+                    <p id="trackingRegistrationsMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['checkout_starts']) }} checkouts iniciados · {{ $trackingConversion }}% de conversão</p>
                 </div>
                 <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4">
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Compras confirmadas</p>
-                    <p class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['purchases']) }}</p>
-                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">R$ {{ number_format($trackingSummary['revenue'], 2, ',', '.') }} rastreados</p>
+                    <p id="trackingPurchasesValue" class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['purchases']) }}</p>
+                    <p id="trackingRevenueMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">R$ {{ number_format($trackingSummary['revenue'], 2, ',', '.') }} rastreados · {{ $purchaseConversion }}% de conversão</p>
                 </div>
                 <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4">
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Compartilhamentos</p>
-                    <p class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['shares'] + $trackingSummary['reshares'] + $trackingSummary['copies']) }}</p>
-                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    <p id="trackingSharesValue" class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['shares'] + $trackingSummary['reshares'] + $trackingSummary['copies']) }}</p>
+                    <p id="trackingSharesMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">
                         {{ number_format($trackingSummary['shares']) }} novos · {{ number_format($trackingSummary['reshares']) }} reenvios · {{ number_format($trackingSummary['copies']) }} cópias
                     </p>
                 </div>
@@ -109,12 +116,10 @@
                     <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
                         <h3 class="font-black text-slate-900 dark:text-white">Últimas visitas atribuídas</h3>
                     </div>
-                    @if($trackedVisits->isEmpty())
-                        <div class="px-5 py-8 text-sm text-slate-500 dark:text-slate-400">
-                            Ainda não há visitas rastreadas para este link.
-                        </div>
-                    @else
-                        <div class="overflow-x-auto">
+                    <div id="trackingVisitsEmpty" class="px-5 py-8 text-sm text-slate-500 dark:text-slate-400 {{ $trackedVisits->isEmpty() ? '' : 'hidden' }}">
+                        Ainda não há visitas rastreadas para este link.
+                    </div>
+                    <div id="trackingVisitsTableWrapper" class="overflow-x-auto {{ $trackedVisits->isEmpty() ? 'hidden' : '' }}">
                             <table class="w-full text-sm">
                                 <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest">
                                     <tr>
@@ -124,7 +129,7 @@
                                         <th class="text-right px-5 py-3">Compra</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <tbody id="trackingVisitsRows" class="divide-y divide-slate-100 dark:divide-slate-800">
                                     @foreach($trackedVisits as $visit)
                                         @php
                                             $sourceLabel = $visit->utm_source ?: ($visit->referrer_url ? parse_url($visit->referrer_url, PHP_URL_HOST) : 'direto');
@@ -160,16 +165,12 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="px-5 py-4 border-t border-slate-100 dark:border-slate-800">
-                            {{ $trackedVisits->links() }}
-                        </div>
-                    @endif
+                    </div>
                 </div>
 
                 <div class="rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
                     <h3 class="font-black text-slate-900 dark:text-white">Canais mais usados</h3>
-                    <div class="mt-4 space-y-3">
+                    <div id="trackingChannelsList" class="mt-4 space-y-3">
                         @forelse($trackingChannels as $channel)
                             <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-3">
                                 <div class="flex items-center justify-between gap-3">
@@ -194,25 +195,24 @@
                     <div class="mt-5 space-y-4">
                         <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-4">
                             <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Receita rastreada</p>
-                            <p class="mt-2 text-2xl font-black text-slate-900 dark:text-white">R$ {{ number_format($trackingSummary['revenue'], 2, ',', '.') }}</p>
-                            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['purchases']) }} compra(s) confirmada(s)</p>
+                            <p id="trackingRevenueCardValue" class="mt-2 text-2xl font-black text-slate-900 dark:text-white">R$ {{ number_format($trackingSummary['revenue'], 2, ',', '.') }}</p>
+                            <p id="trackingPurchasesCardValue" class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['purchases']) }} compra(s) confirmada(s)</p>
                         </div>
 
                         <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-4">
                             <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Melhor canal atual</p>
                             @php $topChannel = $trackingChannels->first(); @endphp
-                            @if($topChannel)
-                                <p class="mt-2 text-xl font-black text-slate-900 dark:text-white">{{ $topChannel->channel }}</p>
-                                <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($topChannel->total) }} ação(ões) registradas</p>
-                            @else
-                                <p class="mt-2 text-sm font-semibold text-slate-500 dark:text-slate-400">Sem ações compartilhadas ainda.</p>
-                            @endif
+                            <p id="trackingTopChannelLabel" class="mt-2 {{ $topChannel ? 'text-xl font-black text-slate-900 dark:text-white' : 'text-sm font-semibold text-slate-500 dark:text-slate-400' }}">
+                                {{ $topChannel->channel ?? 'Sem ações compartilhadas' }}
+                            </p>
+                            <p id="trackingTopChannelMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                {{ $topChannel ? number_format($topChannel->total) . ' ação(ões) registradas' : 'Use os botões rápidos ou copie o link para começar a medir os canais.' }}
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    @endif
 
     {{-- ===== CARDS RESUMO ===== --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -581,12 +581,17 @@
 <script src="{{ asset('vendor/chart.js/js/chart.min.js') }}"></script>
 <script>
 const referralTrackUrl = @json(route('panel.referral.track'));
+const referralStatsUrl = @json(route('panel.referral.stats'));
 const referralTrackToken = @json(csrf_token());
 const referralDailyChartData = @json($trackingDailyChart);
 const referralAcquisitionChartData = @json($trackingAcquisitionChart);
 const referralSharingChartData = @json($trackingSharingChart);
 const referralChartCurrency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const referralNumberFormatter = new Intl.NumberFormat('pt-BR');
 const referralCharts = {};
+const referralRefreshIntervalMs = 5000;
+let referralRefreshHandle = null;
+let referralRefreshAbortController = null;
 
 function getReferralChartPalette() {
     const isDark = document.documentElement.classList.contains('dark');
@@ -844,6 +849,265 @@ function initReferralCharts() {
     renderReferralSharingChart();
 }
 
+function replaceReferralChartData(target, payload, keys) {
+    keys.forEach((key) => {
+        target[key] = Array.isArray(payload?.[key]) ? payload[key] : [];
+    });
+}
+
+function formatReferralNumber(value) {
+    return referralNumberFormatter.format(Number(value || 0));
+}
+
+function formatReferralCurrency(value) {
+    return referralChartCurrency.format(Number(value || 0));
+}
+
+function escapeReferralHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function applyTrackingStatusBanner(tone, message) {
+    const banner = document.getElementById('trackingStatusBanner');
+    if (!banner) {
+        return;
+    }
+
+    banner.textContent = message || 'Atualização automática a cada 5 segundos.';
+    banner.className = `rounded-2xl px-4 py-3 text-sm font-medium ${
+        tone === 'success'
+            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300'
+            : 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300'
+    }`;
+}
+
+function renderTrackingChannelsList(channels) {
+    const container = document.getElementById('trackingChannelsList');
+    if (!container) {
+        return;
+    }
+
+    if (!Array.isArray(channels) || channels.length === 0) {
+        container.innerHTML = `
+            <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-6 text-sm text-slate-500 dark:text-slate-400">
+                Os compartilhamentos começam a aparecer aqui assim que você usar os botões rápidos ou copiar seu link.
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = channels.map((channel) => `
+        <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-3">
+            <div class="flex items-center justify-between gap-3">
+                <span class="font-medium text-slate-700 dark:text-slate-300">${escapeReferralHtml(channel.channel)}</span>
+                <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300">${formatReferralNumber(channel.total)}</span>
+            </div>
+            <div class="mt-2 flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <span>${formatReferralNumber(channel.shares)} novos</span>
+                <span>·</span>
+                <span>${formatReferralNumber(channel.reshares)} reenvios</span>
+                <span>·</span>
+                <span>${formatReferralNumber(channel.copies)} cópias</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderTrackingVisitsRows(visits) {
+    const rows = document.getElementById('trackingVisitsRows');
+    const emptyState = document.getElementById('trackingVisitsEmpty');
+    const tableWrapper = document.getElementById('trackingVisitsTableWrapper');
+
+    if (!rows || !emptyState || !tableWrapper) {
+        return;
+    }
+
+    if (!Array.isArray(visits) || visits.length === 0) {
+        rows.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        tableWrapper.classList.add('hidden');
+        return;
+    }
+
+    rows.innerHTML = visits.map((visit) => `
+        <tr>
+            <td class="px-5 py-4">
+                <p class="font-semibold text-slate-900 dark:text-white">${escapeReferralHtml(visit.first_visited_at)}</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                    ${formatReferralNumber(visit.clicks_count)} clique(s) · ${formatReferralNumber(visit.pageviews_count)} página(s)
+                </p>
+            </td>
+            <td class="px-5 py-4">
+                <p class="font-medium text-slate-700 dark:text-slate-300">${escapeReferralHtml(visit.source_label || 'Direto')}</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[220px]">${escapeReferralHtml(visit.landing_page_path || '/')}</p>
+            </td>
+            <td class="px-5 py-4">
+                ${visit.registered_user_name
+                    ? `
+                        <p class="font-medium text-slate-900 dark:text-white">${escapeReferralHtml(visit.registered_user_name)}</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">${escapeReferralHtml(visit.registered_at_human || 'cadastrado')}</p>
+                    `
+                    : '<span class="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">Sem cadastro</span>'
+                }
+            </td>
+            <td class="px-5 py-4 text-right">
+                ${Number(visit.purchases_count || 0) > 0
+                    ? `
+                        <p class="font-semibold text-emerald-600 dark:text-emerald-400">${formatReferralNumber(visit.purchases_count)} compra(s)</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">R$ ${escapeReferralHtml(visit.revenue_amount_formatted || '0,00')}</p>
+                    `
+                    : '<span class="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">Sem compra</span>'
+                }
+            </td>
+        </tr>
+    `).join('');
+
+    emptyState.classList.add('hidden');
+    tableWrapper.classList.remove('hidden');
+}
+
+function applyReferralTrackingPayload(payload) {
+    if (!payload) {
+        return;
+    }
+
+    const summary = payload.trackingSummary || {};
+    const totalShares = Number(summary.shares || 0) + Number(summary.reshares || 0) + Number(summary.copies || 0);
+
+    applyTrackingStatusBanner(payload.trackingStatusTone, payload.trackingStatusMessage);
+
+    const conversionMeta = document.getElementById('trackingConversionMeta');
+    if (conversionMeta) {
+        conversionMeta.innerHTML = `
+            Conversão para cadastro: <strong class="text-slate-700 dark:text-slate-200">${formatReferralNumber(summary.registration_conversion || 0)}%</strong>
+            · Compra: <strong class="text-slate-700 dark:text-slate-200">${formatReferralNumber(summary.purchase_conversion || 0)}%</strong>
+            · Atualizado às <strong id="trackingUpdatedAtLabel" class="text-slate-700 dark:text-slate-200">${escapeReferralHtml(payload.trackingUpdatedAtLabel || '--:--:--')}</strong>
+        `;
+    }
+
+    const map = {
+        trackingClicksValue: formatReferralNumber(summary.clicks),
+        trackingClicksMeta: `${formatReferralNumber(summary.visits)} visitas únicas · ${formatReferralNumber(summary.pageviews)} visualizações`,
+        trackingRegistrationsValue: formatReferralNumber(summary.registrations),
+        trackingRegistrationsMeta: `${formatReferralNumber(summary.checkout_starts)} checkouts iniciados · ${formatReferralNumber(summary.registration_conversion || 0)}% de conversão`,
+        trackingPurchasesValue: formatReferralNumber(summary.purchases),
+        trackingRevenueMeta: `${formatReferralCurrency(summary.revenue)} rastreados · ${formatReferralNumber(summary.purchase_conversion || 0)}% de conversão`,
+        trackingSharesValue: formatReferralNumber(totalShares),
+        trackingSharesMeta: `${formatReferralNumber(summary.shares)} novos · ${formatReferralNumber(summary.reshares)} reenvios · ${formatReferralNumber(summary.copies)} cópias`,
+        trackingRevenueCardValue: formatReferralCurrency(summary.revenue),
+        trackingPurchasesCardValue: `${formatReferralNumber(summary.purchases)} compra(s) confirmada(s)`,
+    };
+
+    Object.entries(map).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    });
+
+    const topChannel = Array.isArray(payload.trackingChannels) && payload.trackingChannels.length > 0
+        ? payload.trackingChannels[0]
+        : null;
+
+    const topChannelLabel = document.getElementById('trackingTopChannelLabel');
+    const topChannelMeta = document.getElementById('trackingTopChannelMeta');
+    if (topChannel) {
+        if (topChannelLabel) {
+            topChannelLabel.textContent = topChannel.channel || 'Outro';
+            topChannelLabel.classList.remove('text-sm', 'font-semibold', 'text-slate-500', 'dark:text-slate-400');
+            topChannelLabel.classList.add('text-xl', 'font-black', 'text-slate-900', 'dark:text-white');
+        }
+
+        if (topChannelMeta) {
+            topChannelMeta.textContent = `${formatReferralNumber(topChannel.total)} ação(ões) registradas`;
+            topChannelMeta.className = 'mt-1 text-xs text-slate-500 dark:text-slate-400';
+        }
+    } else {
+        if (topChannelLabel) {
+            topChannelLabel.textContent = 'Sem ações compartilhadas';
+            topChannelLabel.classList.remove('text-xl', 'font-black', 'text-slate-900', 'dark:text-white');
+            topChannelLabel.classList.add('text-sm', 'font-semibold', 'text-slate-500', 'dark:text-slate-400');
+        }
+
+        if (topChannelMeta) {
+            topChannelMeta.textContent = 'Use os botões rápidos ou copie o link para começar a medir os canais.';
+            topChannelMeta.className = 'mt-1 text-xs text-slate-500 dark:text-slate-400';
+        }
+    }
+
+    renderTrackingChannelsList(payload.trackingChannels || []);
+    renderTrackingVisitsRows(payload.trackedVisitsFeed || []);
+
+    replaceReferralChartData(referralDailyChartData, payload.trackingDailyChart || {}, ['labels', 'visits', 'registrations', 'checkouts', 'purchases', 'revenue']);
+    replaceReferralChartData(referralAcquisitionChartData, payload.trackingAcquisitionChart || {}, ['labels', 'visits', 'registrations', 'purchases', 'revenue']);
+    replaceReferralChartData(referralSharingChartData, payload.trackingSharingChart || {}, ['labels', 'shares', 'reshares', 'copies']);
+
+    initReferralCharts();
+}
+
+async function refreshReferralTracking() {
+    if (!referralStatsUrl) {
+        return;
+    }
+
+    if (referralRefreshAbortController) {
+        referralRefreshAbortController.abort();
+    }
+
+    referralRefreshAbortController = new AbortController();
+
+    try {
+        const response = await fetch(referralStatsUrl, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            signal: referralRefreshAbortController.signal,
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const payload = await response.json();
+        if (payload?.ok) {
+            applyReferralTrackingPayload(payload);
+        }
+    } catch (error) {
+        if (error?.name !== 'AbortError') {
+            console.error('Falha ao atualizar o rastreio de indicações.', error);
+        }
+    } finally {
+        referralRefreshAbortController = null;
+    }
+}
+
+function scheduleReferralRefresh(delay = 800) {
+    window.clearTimeout(window.referralRefreshTimeout);
+    window.referralRefreshTimeout = window.setTimeout(() => {
+        refreshReferralTracking();
+    }, delay);
+}
+
+function startReferralTrackingPolling() {
+    if (referralRefreshHandle) {
+        window.clearInterval(referralRefreshHandle);
+    }
+
+    referralRefreshHandle = window.setInterval(() => {
+        if (!document.hidden) {
+            refreshReferralTracking();
+        }
+    }, referralRefreshIntervalMs);
+}
+
 function trackReferralAction(action, channel, targetUrl = null) {
     const payload = new FormData();
     payload.append('_token', referralTrackToken);
@@ -861,6 +1125,7 @@ function trackReferralAction(action, channel, targetUrl = null) {
 
     if (navigator.sendBeacon) {
         navigator.sendBeacon(referralTrackUrl, payload);
+        scheduleReferralRefresh();
         return;
     }
 
@@ -869,6 +1134,8 @@ function trackReferralAction(action, channel, targetUrl = null) {
         body: payload,
         credentials: 'same-origin',
         keepalive: true,
+    }).then(() => {
+        scheduleReferralRefresh();
     }).catch(() => {});
 }
 
@@ -924,6 +1191,16 @@ document.querySelectorAll('a[href^="https://wa.me/"], a[href^="https://t.me/shar
 });
 
 initReferralCharts();
+startReferralTrackingPolling();
+scheduleReferralRefresh(300);
+
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        scheduleReferralRefresh(150);
+    }
+});
+
+window.addEventListener('focus', () => scheduleReferralRefresh(150));
 
 new MutationObserver(() => {
     initReferralCharts();
