@@ -135,6 +135,9 @@
             </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($freeEvents as $event)
+                @php
+                    $isEventClosed = method_exists($event, 'isClosedForPublic') && $event->isClosedForPublic();
+                @endphp
                 <article class="bg-white rounded-2xl p-5 border border-gray-100 flex flex-col shadow-sm relative">
                     <span class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">Gratuito</span>
                     <img src="{{ $event->thumbnail ?? asset('img/event-default.png') }}" alt="{{ $event->title }}" class="w-full h-28 object-cover rounded-xl mb-3">
@@ -145,7 +148,11 @@
                         <span class="text-xs text-gray-500 flex items-center gap-1"><i class="fas fa-clock"></i> {{ $event->duration ?? '60' }} min</span>
                         <span class="text-xs text-gray-500 flex items-center gap-1"><i class="fas fa-users"></i> {{ $event->participants_count ?? '---' }}</span>
                     </div>
+                    @if($isEventClosed)
+                    <span class="bg-slate-100 text-slate-400 px-4 py-2 rounded-xl font-semibold w-full block text-center mt-3 cursor-not-allowed">Evento encerrado</span>
+                    @else
                     <a href="{{ route('events.show', $event->id) }}" class="btn-primary text-white px-4 py-2 rounded-xl font-semibold w-full block text-center mt-3">Assistir Agora</a>
+                    @endif
                 </article>
                 @endforeach
             </div>
@@ -200,6 +207,9 @@
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($mentorings as $mentorship)
+                @php
+                    $isMentorshipClosed = method_exists($mentorship, 'isClosedForPublic') && $mentorship->isClosedForPublic();
+                @endphp
                 <article class="bg-slate-50 rounded-3xl p-8 border border-gray-100">
                     <div class="flex justify-between items-center mb-3">
                         <p class="text-xs uppercase tracking-wide text-gray-500">{{ optional($mentorship->mentor)->name ?? 'Mentor UNN' }}</p>
@@ -208,10 +218,14 @@
                     <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $mentorship->title }}</h3>
                     <p class="text-gray-600 text-sm mb-4">{{ Str::limit(strip_tags((string) ($mentorship->description ?? '')), 100) }}</p>
                     <p class="text-sm text-gray-500 mb-4">Vagas: <strong>{{ $mentorship->slots }}</strong></p>
-                    @if(isset($mentorship->id))
+                    @if(isset($mentorship->id) && !$isMentorshipClosed)
                     <a href="{{ route('mentorships.show', $mentorship->id) }}" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold w-full block text-center">
                         Ver detalhes
                     </a>
+                    @elseif($isMentorshipClosed)
+                    <span class="bg-slate-200 text-slate-500 px-6 py-3 rounded-xl font-semibold w-full block text-center cursor-not-allowed">
+                        Mentoria encerrada
+                    </span>
                     @else
                     <button class="btn-primary text-white px-6 py-3 rounded-xl font-semibold w-full opacity-70 cursor-not-allowed">
                         Ver detalhes (Demo)

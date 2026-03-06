@@ -20,33 +20,20 @@ class EventController extends Controller
             abort(404, 'Eventos temporariamente indisponível');
         }
 
-        $now = now();
-
-        // Public listing: upcoming events and events that haven't ended yet (ongoing).
-        $events = Event::where('published', true)
+        $events = Event::query()
+            ->where('published', true)
             ->whereNotNull('start_at')
-            ->where(function ($query) use ($now) {
-                $query->where('start_at', '>=', $now)
-                    ->orWhere('end_at', '>=', $now)
-                    // If end_at is empty, keep today's events visible even after the start time (common in quick-create).
-                    ->orWhere(function ($q) use ($now) {
-                        $q->whereNull('end_at')->whereDate('start_at', $now->toDateString());
-                    });
-            })
+            ->publicUpcoming()
             ->orderBy('start_at')
             ->get();
 
         $featuredEvent = $events->first();
         $otherEvents = $featuredEvent ? $events->slice(1)->values() : collect();
 
-        $pastEvents = Event::where('published', true)
+        $pastEvents = Event::query()
+            ->where('published', true)
             ->whereNotNull('start_at')
-            ->where(function ($query) use ($now) {
-                $query->where('end_at', '<', $now)
-                    ->orWhere(function ($q) use ($now) {
-                        $q->whereNull('end_at')->where('start_at', '<', $now);
-                    });
-            })
+            ->publicPast()
             ->orderByDesc('start_at')
             ->limit(6)
             ->get();

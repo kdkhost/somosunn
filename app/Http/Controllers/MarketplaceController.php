@@ -44,13 +44,16 @@ class MarketplaceController extends Controller
 
         $mentorships = $mentorshipsQuery
             ->orderByDesc('id')
-            ->limit(12)
-            ->get();
+            ->limit(36)
+            ->get()
+            ->filter(fn (Mentorship $mentorship) => $mentorship->hasPublicAction())
+            ->take(12)
+            ->values();
 
         $eventsQuery = Event::query()
             ->with('user')
             ->where('published', true)
-            ->where('start_at', '>=', now())
+            ->publicUpcoming()
             ->orderBy('start_at', 'asc');
 
         if ($q !== '') {

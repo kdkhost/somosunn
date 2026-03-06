@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -71,6 +73,39 @@ class Mentorship extends Model
         return (float) ($this->price ?? 0);
     }
 
+    public function latestScheduleAt(): ?Carbon
+    {
+        $moments = $this->extractScheduleMoments($this->schedule);
+
+        if (empty($moments)) {
+            return null;
+        }
+
+        usort($moments, static fn (Carbon $left, Carbon $right) => $left->getTimestamp() <=> $right->getTimestamp());
+
+        return end($moments) ?: null;
+    }
+
+    public function isClosedForPublic(?CarbonInterface $reference = null): bool
+    {
+        $latestScheduleAt = $this->latestScheduleAt();
+
+        if (!$latestScheduleAt) {
+            return false;
+        }
+
+        $comparison = $reference
+            ? Carbon::instance($reference)
+            : now();
+
+        return $latestScheduleAt->lt($comparison);
+    }
+
+    public function hasPublicAction(): bool
+    {
+        return !$this->isClosedForPublic();
+    }
+
     public function mentor()
     {
         return $this->belongsTo(User::class, 'mentor_id');
@@ -89,5 +124,81 @@ class Mentorship extends Model
     public function certificates()
     {
         return $this->hasMany(Certificate::class);
+    }
+
+    private function extractScheduleMoments(mixed $payload, ?string $timezone = null): array
+    {
+        if (!is_array($payload)) {
+            return [];
+        }
+
+        $timezone = $this->resolveScheduleTimezone($payload, $timezone);
+        $moments = [];
+
+        $dateTimeKeys = ['end_at', 'ends_at', 'end_datetime', 'end', 'start_at', 'starts_at', 'start_datetime', 'datetime', 'start'];
+        foreach ($dateTimeKeys as $key) {
+            if (!array_key_exists($key, $payload)) {
+                continue;
+            }
+
+            $parsed = $this->parseScheduleMoment($payload[$key], $timezone);
+            if ($parsed) {
+                $moments[] = $parsed;
+            }
+        }
+
+        if (array_key_exists('date', $payload) && is_scalar($payload['date'])) {
+            $time = $payload['end_time'] ?? $payload['time'] ?? $payload['hour'] ?? '23:59:59';
+            $parsed = $this->parseScheduleMoment(trim((string) $payload['date']) . ' ' . trim((string) $time), $timezone);
+            if ($parsed) {
+                $moments[] = $parsed;
+            }
+        }
+
+        foreach ($payload as $value) {
+            if (is_array($value)) {
+                $moments = array_merge($moments, $this->extractScheduleMoments($value, $timezone));
+            }
+        }
+
+        return $moments;
+    }
+
+    private function parseScheduleMoment(mixed $value, ?string $timezone = null): ?Carbon
+    {
+        if ($value instanceof Carbon) {
+            return $value->copy();
+        }
+
+        if ($value instanceof CarbonInterface) {
+            return Carbon::instance($value);
+        }
+
+        if (!is_scalar($value)) {
+            return null;
+        }
+
+        $raw = trim((string) $value);
+        if ($raw === '') {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($raw, $timezone ?: config('app.timezone'));
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    private function resolveScheduleTimezone(array $payload, ?string $fallback = null): ?string
+    {
+        foreach (['timezone', 'tz'] as $key) {
+            $candidate = trim((string) ($payload[$key] ?? ''));
+            if ($candidate !== '') {
+                return $candidate;
+            }
+        }
+
+        return $fallback;
     }
 }

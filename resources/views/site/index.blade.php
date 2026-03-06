@@ -159,6 +159,11 @@
 
                 <div class="grid md:grid-cols-3 gap-8">
                     @foreach($freeEvents as $event)
+                        @php
+                            $isEventClosed = !($event->is_demo ?? false)
+                                && method_exists($event, 'isClosedForPublic')
+                                && $event->isClosedForPublic();
+                        @endphp
                         <article
                             class="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition flex flex-col justify-between {{ ($event->is_demo ?? false) ? 'ring-2 ring-yellow-400' : '' }}" style="height: 100%">
                             <div>
@@ -186,6 +191,11 @@
                                     })" class="w-full btn-primary text-white py-3 rounded-xl font-semibold opacity-75">
                                     Quero participar
                                 </button>
+                                @elseif($isEventClosed)
+                                    <span
+                                        class="block w-full bg-slate-100 text-slate-400 py-3 rounded-xl font-semibold text-center cursor-not-allowed">
+                                        Evento encerrado
+                                    </span>
                                 @else
                                     <a href="{{ route('events.show', $event->id) }}"
                                         class="block w-full btn-primary text-white py-3 rounded-xl font-semibold text-center">
@@ -223,6 +233,11 @@
 
                 <div class="grid md:grid-cols-3 gap-8">
                     @foreach($paidMentorings as $mentorship)
+                        @php
+                            $isMentorshipClosed = !($mentorship->is_demo ?? false)
+                                && method_exists($mentorship, 'isClosedForPublic')
+                                && $mentorship->isClosedForPublic();
+                        @endphp
                         <article
                             class="bg-slate-50 rounded-3xl p-8 border border-gray-100 {{ ($mentorship->is_demo ?? false) ? 'ring-2 ring-yellow-400' : '' }}">
                             <div class="flex items-center justify-between mb-4">
@@ -234,11 +249,16 @@
                             <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $mentorship->title }}</h3>
                             <p class="text-gray-600 text-sm mb-4">{{ Str::limit(strip_tags((string) ($mentorship->description ?? '')), 100) }}</p>
                             <p class="text-sm text-gray-500 mb-6">Vagas: <strong>{{ $mentorship->slots }}</strong></p>
-                            @if(!($mentorship->is_demo ?? false) && isset($mentorship->id))
+                            @if(!($mentorship->is_demo ?? false) && isset($mentorship->id) && !$isMentorshipClosed)
                                 <a href="{{ route('mentorships.show', $mentorship->id) }}"
                                     class="w-full btn-primary text-white py-3 rounded-xl font-semibold inline-flex items-center justify-center">
                                     Garantir vaga
                                 </a>
+                            @elseif($isMentorshipClosed)
+                                <span
+                                    class="w-full bg-slate-200 text-slate-500 py-3 rounded-xl font-semibold inline-flex items-center justify-center cursor-not-allowed">
+                                    Mentoria encerrada
+                                </span>
                             @else
                                 <button onclick="Swal.fire({
                                     title: 'Mentoria Demo',

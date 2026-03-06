@@ -22,15 +22,21 @@ class HomeController extends Controller
 
         if (view()->shared('unnDbAvailable')) {
             try {
-                $freeEvents = Event::where('published', true)
+                $freeEvents = Event::query()
+                    ->where('published', true)
+                    ->publicUpcoming()
                     ->orderBy('start_at')
                     ->limit(6)
                     ->get();
 
-                $paidMentorings = Mentorship::where('slots', '>', 0)
+                $paidMentorings = Mentorship::query()
+                    ->where('slots', '>', 0)
                     ->orderByDesc('price')
-                    ->limit(3)
-                    ->get();
+                    ->limit(24)
+                    ->get()
+                    ->filter(fn (Mentorship $mentorship) => $mentorship->hasPublicAction())
+                    ->take(3)
+                    ->values();
             } catch (\Throwable $e) {
                 Log::warning('Falha ao carregar eventos/mentorias: ' . $e->getMessage());
             }
@@ -92,10 +98,14 @@ class HomeController extends Controller
         $featuredCourses = collect();
         if (view()->shared('unnDbAvailable')) {
             try {
-                $mentorings = Mentorship::where('slots', '>', 0)
+                $mentorings = Mentorship::query()
+                    ->where('slots', '>', 0)
                     ->orderBy('schedule')
-                    ->limit(6)
-                    ->get();
+                    ->limit(24)
+                    ->get()
+                    ->filter(fn (Mentorship $mentorship) => $mentorship->hasPublicAction())
+                    ->take(6)
+                    ->values();
 
                 // Cursos em destaque: status published OU paused, is_featured = true
                 $featuredCourses = \App\Models\Course::where('is_featured', true)

@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -127,6 +130,97 @@ class Event extends Model
         if ($this->batch_3_price)
             return '3º Lote';
         return 'Entrada';
+    }
+
+    public function publicDeadlineAt(): ?Carbon
+    {
+        $reference = $this->end_at ?: $this->start_at;
+
+        if (!$reference) {
+            return null;
+        }
+
+        $deadline = $reference instanceof CarbonInterface
+            ? Carbon::instance($reference)
+            : Carbon::parse($reference);
+
+        if ($this->all_day && !$this->end_at) {
+            return $deadline->endOfDay();
+        }
+
+        return $deadline;
+    }
+
+    public function isClosedForPublic(?CarbonInterface $reference = null): bool
+    {
+        $deadline = $this->publicDeadlineAt();
+
+        if (!$deadline) {
+            return false;
+        }
+
+        $comparison = $reference
+            ? Carbon::instance($reference)
+            : now();
+
+        return $deadline->lt($comparison);
+    }
+
+    public function hasPublicAction(): bool
+    {
+        return !$this->isClosedForPublic();
+    }
+
+    public function scopePublicUpcoming(Builder $query): Builder
+    {
+        $now = now();
+        $today = $now->copy()->startOfDay();
+
+        return $query->where(function (Builder $scope) use ($now, $today) {
+            $scope->where(function (Builder $builder) use ($now) {
+                $builder->whereNotNull('end_at')
+                    ->where('end_at', '>=', $now);
+            })->orWhere(function (Builder $builder) use ($now, $today) {
+                $builder->whereNull('end_at')
+                    ->where(function (Builder $dateScope) use ($now, $today) {
+                        $dateScope->where(function (Builder $allDayScope) use ($today) {
+                            $allDayScope->where('all_day', true)
+                                ->where('start_at', '>=', $today);
+                        })->orWhere(function (Builder $timedScope) use ($now) {
+                            $timedScope->where(function (Builder $allDayFlagScope) {
+                                $allDayFlagScope->whereNull('all_day')
+                                    ->orWhere('all_day', false);
+                            })->where('start_at', '>=', $now);
+                        });
+                    });
+            });
+        });
+    }
+
+    public function scopePublicPast(Builder $query): Builder
+    {
+        $now = now();
+        $today = $now->copy()->startOfDay();
+
+        return $query->where(function (Builder $scope) use ($now, $today) {
+            $scope->where(function (Builder $builder) use ($now) {
+                $builder->whereNotNull('end_at')
+                    ->where('end_at', '<', $now);
+            })->orWhere(function (Builder $builder) use ($now, $today) {
+                $builder->whereNull('end_at')
+                    ->where(function (Builder $dateScope) use ($now, $today) {
+                        $dateScope->where(function (Builder $allDayScope) use ($today) {
+                            $allDayScope->where('all_day', true)
+                                ->where('start_at', '<', $today);
+                        })->orWhere(function (Builder $timedScope) use ($now) {
+                            $timedScope->where(function (Builder $allDayFlagScope) {
+                                $allDayFlagScope->whereNull('all_day')
+                                    ->orWhere('all_day', false);
+                            })->where('start_at', '<', $now);
+                        });
+                    });
+            });
+        });
     }
 
     public function registrations()

@@ -164,6 +164,7 @@
                                 $price = (float) ($mentorship->price ?? 0);
                                 $slots = $mentorship->slots;
                                 $slotsLabel = is_null($slots) ? 'A confirmar' : (string) $slots;
+                                $isClosed = method_exists($mentorship, 'isClosedForPublic') && $mentorship->isClosedForPublic();
                                 $showUrl = !empty($mentorship->id) ? route('mentorships.show', $mentorship->id) : '#';
                                 $mentorshipImageUrl = $resolveImageUrl($mentorship->image ?? null);
                                 $rawDescription = (string) ($mentorship->description ?? '');
@@ -220,20 +221,31 @@
                                     </div>
 
                                     <div class="mt-auto pt-6 flex flex-col sm:flex-row gap-3">
-                                        <a href="{{ $showUrl }}"
-                                            class="px-8 py-4 rounded-xl font-bold border-2 border-slate-100 text-slate-600 hover:bg-slate-50 transition-all duration-300 inline-flex items-center justify-center">
-                                            Saiba mais
-                                        </a>
-                                        @if($price > 0)
-                                            <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
-                                                class="btn-primary text-white px-8 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_12px_24px_-8px_rgba(31,94,219,0.35)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
-                                                Comprar <i class="fas fa-lock"></i>
-                                            </a>
+                                        @if($isClosed)
+                                            <span
+                                                class="px-8 py-4 rounded-xl font-bold border-2 border-slate-100 bg-slate-50 text-slate-400 inline-flex items-center justify-center cursor-not-allowed">
+                                                Mentoria encerrada
+                                            </span>
+                                            <span
+                                                class="px-8 py-4 rounded-xl font-bold bg-slate-100 text-slate-400 inline-flex items-center justify-center cursor-not-allowed whitespace-nowrap">
+                                                Indisponível
+                                            </span>
                                         @else
                                             <a href="{{ $showUrl }}"
-                                                class="btn-primary text-white px-8 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_12px_24px_-8px_rgba(31,94,219,0.35)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
-                                                Acessar <i class="fas fa-play"></i>
+                                                class="px-8 py-4 rounded-xl font-bold border-2 border-slate-100 text-slate-600 hover:bg-slate-50 transition-all duration-300 inline-flex items-center justify-center">
+                                                Saiba mais
                                             </a>
+                                            @if($price > 0)
+                                                <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
+                                                    class="btn-primary text-white px-8 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_12px_24px_-8px_rgba(31,94,219,0.35)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
+                                                    Comprar <i class="fas fa-lock"></i>
+                                                </a>
+                                            @else
+                                                <a href="{{ $showUrl }}"
+                                                    class="btn-primary text-white px-8 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_12px_24px_-8px_rgba(31,94,219,0.35)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
+                                                    Acessar <i class="fas fa-play"></i>
+                                                </a>
+                                            @endif
                                         @endif
                                     </div>
                                 </div>

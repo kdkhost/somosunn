@@ -22,6 +22,12 @@ class MentorshipCheckoutController extends Controller
             return redirect()->guest(route('login'))->with('error', 'Faça login para finalizar a compra da mentoria.');
         }
 
+        if ($mentorship->isClosedForPublic()) {
+            return redirect()
+                ->route('mentorships.show', $mentorship)
+                ->with('error', 'Esta mentoria já encerrou.');
+        }
+
         $seller = $mentorship->mentor ?: User::find($mentorship->mentor_id);
         if (!$seller || !$seller->canSellOnMarketplace()) {
             return redirect()
@@ -48,6 +54,12 @@ class MentorshipCheckoutController extends Controller
     {
         if (!Auth::check()) {
             return redirect()->guest(route('login'))->with('error', 'Faça login para finalizar a compra da mentoria.');
+        }
+
+        if ($mentorship->isClosedForPublic()) {
+            return redirect()
+                ->route('mentorships.show', $mentorship)
+                ->with('error', 'Esta mentoria já encerrou.');
         }
 
         $seller = $mentorship->mentor ?: User::find($mentorship->mentor_id);

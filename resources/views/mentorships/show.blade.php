@@ -126,6 +126,7 @@
         $currentUser = Auth::user();
         $hasFullAccess = $currentUser ? $currentUser->hasMentorshipAccess($mentorship) : false;
         $canAccessByPlan = $currentUser ? $currentUser->canAccessFeature('mentorships_access') : false;
+        $isClosed = method_exists($mentorship, 'isClosedForPublic') && $mentorship->isClosedForPublic();
         $accessBlocked = session('access_blocked');
         $showAccessModal = is_array($accessBlocked)
             && ($accessBlocked['type'] ?? null) === 'mentorship'
@@ -360,7 +361,12 @@
                         </div>
 
                         <div class="mt-10 flex flex-col gap-4">
-                            @if($price > 0)
+                            @if($isClosed)
+                                <span
+                                    class="px-8 py-4 rounded-2xl font-bold inline-flex items-center justify-center gap-3 bg-slate-100 text-slate-400 cursor-not-allowed whitespace-nowrap">
+                                    Mentoria encerrada <i class="fas fa-ban"></i>
+                                </span>
+                            @elseif($price > 0)
                                 @if($hasFullAccess)
                                     <a href="{{ route('panel.dashboard') }}"
                                         class="px-8 py-4 rounded-2xl font-bold inline-flex items-center justify-center gap-3 bg-emerald-500 text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
@@ -386,7 +392,11 @@
                         </div>
 
                         <p class="mt-8 text-xs text-slate-400 text-center leading-relaxed">
-                            Acesso exclusivo para membros. Você pode comprar esta mentoria (quando disponível) ou acessar via planos Premium (conforme regras do seu plano).
+                            @if($isClosed)
+                                Esta mentoria já encerrou e não aceita novas participações.
+                            @else
+                                Acesso exclusivo para membros. Você pode comprar esta mentoria (quando disponível) ou acessar via planos Premium (conforme regras do seu plano).
+                            @endif
                         </p>
                     </aside>
                 </div>
@@ -451,11 +461,18 @@
                             class="flex-1 px-6 py-3 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 text-center">
                             Fazer upgrade
                         </a>
-                        <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
-                            class="flex-1 px-6 py-3 rounded-xl font-bold text-white text-center"
-                            style="background: linear-gradient(135deg, #1f5edb, #2f7df6);">
-                            Comprar mentoria
-                        </a>
+                        @if($isClosed)
+                            <span
+                                class="flex-1 px-6 py-3 rounded-xl font-bold bg-slate-100 text-slate-400 text-center cursor-not-allowed">
+                                Mentoria encerrada
+                            </span>
+                        @else
+                            <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
+                                class="flex-1 px-6 py-3 rounded-xl font-bold text-white text-center"
+                                style="background: linear-gradient(135deg, #1f5edb, #2f7df6);">
+                                Comprar mentoria
+                            </a>
+                        @endif
                     </div>
 
                     @if($currentUser && $canAccessByPlan)

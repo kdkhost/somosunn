@@ -398,6 +398,7 @@
                                 @foreach($events as $event)
                                     @php
                                         $startDate = is_string($event->start_at) ? \Carbon\Carbon::parse($event->start_at) : $event->start_at;
+                                        $isEventClosed = method_exists($event, 'isClosedForPublic') && $event->isClosedForPublic();
                                         $locationLine = $event->location ?: ($event->address ? 'Local do evento' : 'A confirmar');
 
                                         $relativeLabel = $startDate && method_exists($startDate, 'isToday') && $startDate->isToday()
@@ -518,11 +519,25 @@
                                             </div>
 
                                             <div class="events-col-action md:text-right">
-                                                <a href="{{ $isDemo ? '#' : route('events.show', $event->id) }}"
-                                                    class="events-action-btn inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-black text-white btn-primary shadow-lg hover:shadow-xl transition whitespace-nowrap w-full md:w-auto {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
-                                                    <i class="fas fa-ticket-alt"></i>
-                                                    Detalhes
-                                                </a>
+                                                @if($isDemo)
+                                                    <a href="#"
+                                                        class="events-action-btn inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-black text-white btn-primary shadow-lg hover:shadow-xl transition whitespace-nowrap w-full md:w-auto pointer-events-none opacity-60">
+                                                        <i class="fas fa-ticket-alt"></i>
+                                                        Detalhes
+                                                    </a>
+                                                @elseif($isEventClosed)
+                                                    <span
+                                                        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-black bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed whitespace-nowrap w-full md:w-auto">
+                                                        <i class="fas fa-ban"></i>
+                                                        Encerrado
+                                                    </span>
+                                                @else
+                                                    <a href="{{ route('events.show', $event->id) }}"
+                                                        class="events-action-btn inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-black text-white btn-primary shadow-lg hover:shadow-xl transition whitespace-nowrap w-full md:w-auto">
+                                                        <i class="fas fa-ticket-alt"></i>
+                                                        Detalhes
+                                                    </a>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -652,10 +667,10 @@
                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">GRÁTIS</span>
                                         @endif
                                     </div>
-                                    <a href="{{ $isDemo ? '#' : route('events.show', $event) }}"
-                                        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-bold text-white btn-primary shadow-md hover:shadow-lg transition w-full sm:w-auto sm:min-w-[150px] {{ $isDemo ? 'pointer-events-none opacity-60' : '' }}">
-                                        Ver detalhes <i class="fas fa-arrow-right text-sm"></i>
-                                    </a>
+                                    <span
+                                        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed w-full sm:w-auto sm:min-w-[150px]">
+                                        Evento encerrado <i class="fas fa-ban text-sm"></i>
+                                    </span>
                                 </div>
                             </div>
                         @endforeach

@@ -1025,6 +1025,7 @@
                             $price = (float) ($mentorship->effective_price ?? $regularPrice);
                             $flashActive = method_exists($mentorship, 'isFlashSaleActive') ? (bool) $mentorship->isFlashSaleActive() : false;
                             $flashEndsAtMs = ($flashActive && $mentorship->flash_sale_ends_at) ? ((int) $mentorship->flash_sale_ends_at->timestamp * 1000) : 0;
+                            $isMentorshipClosed = method_exists($mentorship, 'isClosedForPublic') && $mentorship->isClosedForPublic();
                             $buyEnabled = $canBuy && $paymentsConfigured && $price > 0 && $sellerCanSell($sellerId);
                             $mentorName = optional($mentorship->mentor)->name ?? 'Mentor';
                             $desc = \Illuminate\Support\Str::limit(strip_tags((string) ($mentorship->description ?? '')), 90);
@@ -1032,11 +1033,16 @@
                             $imageUrl = $resolveAssetUrl($image);
                             $shareCode = \App\Support\ShortLink::encodeProduct('mentorship', (int) $mentorship->id);
                             $shareUrl = $shareCode ? route('share.product', ['code' => $shareCode]) : '';
+                            $mentorshipShowUrl = $isMentorshipClosed ? null : route('mentorships.show', $mentorship);
                         @endphp
 
                         <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
                             data-product-card>
-                            <a href="{{ route('mentorships.show', $mentorship) }}" class="block">
+                            @if($mentorshipShowUrl)
+                            <a href="{{ $mentorshipShowUrl }}" class="block">
+                            @else
+                            <div class="block opacity-80">
+                            @endif
                                 <div class="aspect-[16/9] bg-slate-100 relative">
                                     @if($imageUrl !== '')
                                         <img src="{{ $imageUrl }}" alt="{{ $mentorship->title }}"
@@ -1108,15 +1114,26 @@
                                         </div>
                                     </div>
                                 </div>
+                            @if($mentorshipShowUrl)
                             </a>
+                            @else
+                            </div>
+                            @endif
 
                             <div class="px-4 pb-4 flex gap-2">
-                                <a href="{{ route('mentorships.show', $mentorship) }}"
-                                    class="flex-1 inline-flex items-center justify-center rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
-                                    Ver
-                                </a>
+                                @if($mentorshipShowUrl)
+                                    <a href="{{ $mentorshipShowUrl }}"
+                                        class="flex-1 inline-flex items-center justify-center rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                        Ver
+                                    </a>
+                                @else
+                                    <span
+                                        class="flex-1 inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                        Encerrada
+                                    </span>
+                                @endif
 
-                                @if($buyEnabled)
+                                @if($buyEnabled && !$isMentorshipClosed)
                                     <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
                                         class="flex-1 inline-flex items-center justify-center rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
                                         Comprar
@@ -1158,6 +1175,7 @@
                             $price = (float) ($event->effective_price ?? $regularPrice);
                             $flashActive = method_exists($event, 'isFlashSaleActive') ? (bool) $event->isFlashSaleActive() : false;
                             $flashEndsAtMs = ($flashActive && $event->flash_sale_ends_at) ? ((int) $event->flash_sale_ends_at->timestamp * 1000) : 0;
+                            $isEventClosed = method_exists($event, 'isClosedForPublic') && $event->isClosedForPublic();
                             $dateLabel = $event->start_at ? (is_string($event->start_at) ? \Carbon\Carbon::parse($event->start_at) : $event->start_at)->format('d/m/Y') : null;
                             $image = trim((string) ($event->image ?? ''));
                             $imageUrl = $resolveAssetUrl($image);
@@ -1165,11 +1183,16 @@
                             $sellerName = optional($event->user)->name ?? 'Organizador';
                             $shareCode = \App\Support\ShortLink::encodeProduct('event', (int) $event->id);
                             $shareUrl = $shareCode ? route('share.product', ['code' => $shareCode]) : '';
+                            $eventShowUrl = $isEventClosed ? null : route('events.show', $event);
                         @endphp
 
                         <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
                             data-product-card>
-                            <a href="{{ route('events.show', $event) }}" class="block">
+                            @if($eventShowUrl)
+                            <a href="{{ $eventShowUrl }}" class="block">
+                            @else
+                            <div class="block opacity-80">
+                            @endif
                                 <div class="aspect-[16/9] bg-slate-100 relative">
                                     @if($imageUrl !== '')
                                         <img src="{{ $imageUrl }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
@@ -1231,15 +1254,26 @@
                                         </div>
                                     </div>
                                 </div>
+                            @if($eventShowUrl)
                             </a>
+                            @else
+                            </div>
+                            @endif
 
                             <div class="px-4 pb-4 flex gap-2">
-                                <a href="{{ route('events.show', $event) }}"
-                                    class="flex-1 inline-flex items-center justify-center rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
-                                    Ver
-                                </a>
+                                @if($eventShowUrl)
+                                    <a href="{{ $eventShowUrl }}"
+                                        class="flex-1 inline-flex items-center justify-center rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                        Ver
+                                    </a>
+                                @else
+                                    <span
+                                        class="flex-1 inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                        Encerrado
+                                    </span>
+                                @endif
 
-                                @if($buyEnabled)
+                                @if($buyEnabled && !$isEventClosed)
                                     <a href="{{ route('events.checkout', $event) }}"
                                         class="flex-1 inline-flex items-center justify-center rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
                                         {{ $price > 0 ? 'Comprar' : 'Reservar' }}
@@ -1247,7 +1281,7 @@
                                 @else
                                     <span
                                         class="flex-1 inline-flex items-center justify-center rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
-                                        Indisponível
+                                        {{ $isEventClosed ? 'Encerrado' : 'Indisponível' }}
                                     </span>
                                 @endif
                             </div>

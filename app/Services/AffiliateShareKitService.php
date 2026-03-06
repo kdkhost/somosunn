@@ -182,7 +182,7 @@ class AffiliateShareKitService
 
         return Event::query()
             ->where('published', true)
-            ->where('start_at', '>=', now()->subDay())
+            ->publicUpcoming()
             ->orderBy('start_at')
             ->limit(3)
             ->get()
@@ -210,8 +210,10 @@ class AffiliateShareKitService
 
         return Mentorship::query()
             ->orderByDesc('id')
-            ->limit(3)
+            ->limit(24)
             ->get()
+            ->filter(fn (Mentorship $mentorship) => $mentorship->hasPublicAction())
+            ->take(3)
             ->map(function (Mentorship $mentorship) use ($user) {
                 return [
                     'type' => 'mentorship',
