@@ -15,8 +15,17 @@ class RedemptionController extends Controller
     public function index()
     {
         $this->authorizeAdmin();
-        $items = RedeemableItem::withCount('redemptions')->latest()->get();
-        $pendingRedemptions = Redemption::with(['user', 'item'])->where('status', 'pending')->latest()->get();
+        $items = RedeemableItem::withCount('redemptions')
+            ->latest()
+            ->paginate(12, ['*'], 'items_page')
+            ->withQueryString();
+
+        $pendingRedemptions = Redemption::with(['user', 'item'])
+            ->where('status', 'pending')
+            ->latest()
+            ->paginate(8, ['*'], 'pending_page')
+            ->withQueryString();
+
         return view('panel.admin.redemptions.index', compact('items', 'pendingRedemptions'));
     }
 

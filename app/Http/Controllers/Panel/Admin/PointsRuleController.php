@@ -15,15 +15,34 @@ class PointsRuleController extends Controller
         $this->ensurePermission('points.view');
 
         $hasCategory = Schema::hasColumn('points_rules', 'category');
+        $query = PointsRule::query();
 
         if ($hasCategory) {
-            $rulesGrouped = PointsRule::grouped();
+            $query
+                ->orderByRaw("CASE WHEN category IS NULL OR category = '' THEN 1 ELSE 0 END")
+                ->orderBy('category')
+                ->orderBy('sort_order')
+                ->orderBy('id');
         } else {
-            $rulesGrouped = collect(['outros' => PointsRule::orderBy('id')->get()]);
+            $query->orderBy('id');
         }
 
+        $rulesPaginator = $query->paginate(20)->withQueryString();
+        $rulesCollection = $rulesPaginator->getCollection();
+        $rulesGrouped = $hasCategory
+            ? $rulesCollection->groupBy(fn (PointsRule $rule) => $rule->category ?: 'outros')
+            : collect(['outros' => $rulesCollection]);
+
         $categories = PointsRule::CATEGORIES;
-        return view('panel.admin.points.index', compact('rulesGrouped', 'categories', 'hasCategory'));
+        $totalRules = $rulesPaginator->total();
+
+        return view('panel.admin.points.index', compact(
+            'rulesGrouped',
+            'rulesPaginator',
+            'categories',
+            'hasCategory',
+            'totalRules'
+        ));
     }
 
     public function create()

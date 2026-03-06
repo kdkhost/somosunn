@@ -8,7 +8,7 @@
 
 @section('panel_content')
 @php
-    $rulesTotal = (int) $rulesGrouped->flatten(1)->count();
+    $rulesTotal = (int) ($totalRules ?? $rulesGrouped->flatten(1)->count());
 
     $categoryThemes = [
         'engajamento' => [
@@ -261,5 +261,11 @@
             </a>
         </div>
     @endforelse
+
+    @if(isset($rulesPaginator) && $rulesPaginator->hasPages())
+        <div class="rounded-[2rem] border border-slate-200 bg-white px-6 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            {{ $rulesPaginator->links() }}
+        </div>
+    @endif
 </div>
 @endsection

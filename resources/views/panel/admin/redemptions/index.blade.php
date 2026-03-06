@@ -101,6 +101,11 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($items->hasPages())
+                        <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
+                            {{ $items->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -108,7 +113,7 @@
             <div class="space-y-6">
                 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest px-2 transition-colors">Solicitações
                     Pendentes</h3>
-                @foreach($pendingRedemptions ?? [] as $redemption)
+                @forelse($pendingRedemptions as $redemption)
                     <div
                         class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4 transition-colors">
                         <div class="flex items-center gap-3">
@@ -145,7 +150,18 @@
                             </form>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div
+                        class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-dashed border-slate-200 dark:border-slate-800 text-center text-sm text-slate-500 dark:text-slate-400">
+                        Nenhuma solicitação pendente no momento.
+                    </div>
+                @endforelse
+
+                @if($pendingRedemptions->hasPages())
+                    <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-4 shadow-sm">
+                        {{ $pendingRedemptions->links() }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>

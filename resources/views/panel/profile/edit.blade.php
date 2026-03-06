@@ -493,30 +493,9 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 // --- 1. FilePond Uploads ---
-                FilePond.registerPlugin(
-                    FilePondPluginImagePreview,
-                    FilePondPluginFileValidateSize,
-                    FilePondPluginFileValidateType
-                );
-
-                // Turn all file input elements into ponds
-                const ponds = document.querySelectorAll('input.filepond');
-                ponds.forEach(input => {
-                    FilePond.create(input, {
-                        labelIdle: '<span class="text-xs">Arraste ou <span class="filepond--label-action">clique</span> para alterar</span>',
-                        credits: false, // Remove "Powered by PQINA"
-                        storeAsFile: true,
-                        labelFileProcessing: 'Enviando...',
-                        labelFileProcessingComplete: 'Pronto',
-                        labelTapToCancel: 'cancelar',
-                        labelTapToUndo: 'desfazer',
-                        stylePanelLayout: 'compact',
-                        styleLoadIndicatorPosition: 'center',
-                        styleProgressIndicatorPosition: 'right bottom',
-                        styleButtonRemoveItemPosition: 'left bottom',
-                        styleButtonProcessItemPosition: 'right bottom',
-                    });
-                });
+                if (typeof window.initializePanelFileUploads === 'function') {
+                    window.initializePanelFileUploads(document);
+                }
 
                 // --- 2. Máscaras Inputmask ---
                 // Verifica se Inputmask carregou

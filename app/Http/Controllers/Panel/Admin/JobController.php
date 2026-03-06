@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Panel\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobVacancy;
-use App\Models\JobApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +12,11 @@ class JobController extends Controller
     public function index()
     {
         $this->authorizeAdmin();
-        $vacancies = JobVacancy::with('user')->withCount('applications')->latest()->get();
+        $vacancies = JobVacancy::with('user')
+            ->withCount('applications')
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
         return view('panel.admin.jobs.index', compact('vacancies'));
     }
 

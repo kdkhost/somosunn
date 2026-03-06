@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Panel\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 
 class RankingController extends Controller
@@ -13,12 +12,20 @@ class RankingController extends Controller
     {
         $this->ensurePermission('ranking.view');
 
-        $top = User::query()
+        $rankingQuery = User::query()
+            ->where('points', '>', 0)
             ->orderByDesc('points')
-            ->limit(100)
+            ->orderBy('name');
+
+        $podium = (clone $rankingQuery)
+            ->limit(3)
             ->get();
 
-        return view('panel.admin.ranking.index', compact('top'));
+        $rankedUsers = $rankingQuery
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('panel.admin.ranking.index', compact('podium', 'rankedUsers'));
     }
 
     private function ensurePermission(string $perm)
