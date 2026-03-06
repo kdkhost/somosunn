@@ -8,11 +8,11 @@ use Illuminate\Console\Command;
 class ReconcileLegacyMemberPoints extends Command
 {
     protected $signature = 'points:reconcile-legacy-members
-        {--dry-run : Simula a reconciliacao sem gravar pontos}
-        {--user=* : Reprocessa apenas IDs especificos}
-        {--chunk=200 : Quantidade de usuarios por lote}';
+        {--dry-run : Simula a reconciliação sem gravar pontos}
+        {--user=* : Reprocessa apenas IDs específicos}
+        {--chunk=200 : Quantidade de usuários por lote}';
 
-    protected $description = 'Reconcilia pontos historicos de cadastro, perfil completo, primeiro curso e mentor para membros antigos.';
+    protected $description = 'Reconcilia pontos históricos de cadastro, perfil, cursos, eventos, mentorias e avaliações para membros antigos.';
 
     public function handle(LegacyMemberPointsBackfillService $service): int
     {
@@ -23,12 +23,12 @@ class ReconcileLegacyMemberPoints extends Command
         );
 
         if (($summary['skipped'] ?? false) === true) {
-            $this->warn('Estrutura minima de pontos nao encontrada. Nada foi processado.');
+            $this->warn('Estrutura mínima de pontos não encontrada. Nada foi processado.');
 
             return self::SUCCESS;
         }
 
-        $mode = $summary['dry_run'] ? 'SIMULACAO' : 'EXECUCAO';
+        $mode = $summary['dry_run'] ? 'SIMULAÇÃO' : 'EXECUÇÃO';
         $this->info("Reconciliação concluída ({$mode}).");
         $this->line('Usuários analisados: ' . $summary['users_scanned']);
         $this->line('Usuários afetados: ' . $summary['users_affected']);
