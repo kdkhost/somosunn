@@ -166,7 +166,7 @@
                         <div class="flex items-center gap-3">
                             <div
                                 class="flex-shrink-0 w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-500">
-                                <i class="brands fa-pix"></i>
+                                <i class="fa-brands fa-pix"></i>
                             </div>
                             <div>
                                 <h5 class="font-bold text-slate-800 dark:text-white text-sm">Pix</h5>

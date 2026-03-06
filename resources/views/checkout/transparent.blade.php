@@ -25,7 +25,7 @@
                             <div class="flex space-x-2 mr-4">
                                 <i class="fab fa-cc-visa text-slate-400 text-xl"></i>
                                 <i class="fab fa-cc-mastercard text-slate-400 text-xl"></i>
-                                <i class="fas fa-pix text-slate-400 text-xl"></i>
+                                <i class="fa-brands fa-pix text-slate-400 text-xl"></i>
                             </div>
                         </div>
                         <div class="p-6 sm:p-8">

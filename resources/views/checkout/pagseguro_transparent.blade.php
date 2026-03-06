@@ -28,7 +28,7 @@
                             <button id="btn-pix"
                                 class="flex-1 pb-2 border-b-2 border-transparent {{ $pixAvailable ? 'text-slate-500 hover:text-slate-700' : 'text-slate-300 cursor-not-allowed' }}"
                                 @disabled(!$pixAvailable)>
-                                <i class="brands fa-pix mr-2"></i> Pix
+                                <i class="fa-brands fa-pix mr-2"></i> Pix
                             </button>
                         </div>
 

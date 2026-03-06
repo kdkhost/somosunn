@@ -190,7 +190,7 @@
                             <div class="d-flex align-items-center">
                                 <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-success mr-3"
                                     style="width: 40px; height: 40px;">
-                                    <i class="brands fa-pix"></i>
+                                    <i class="fa-brands fa-pix"></i>
                                 </div>
                                 <div>
                                     <h6 class="mb-0 font-weight-bold">Pix</h6>
