@@ -136,9 +136,16 @@
                         center: 'title',
                         right: 'dayGridMonth,timeGridWeek,timeGridDay'
                     },
-                    events: '{{ route("panel.admin.events.index") }}',
+                    events: {
+                        url: '{{ route("panel.admin.events.feed") }}',
+                        method: 'GET',
+                        failure: function (error) {
+                            console.error('Falha ao carregar os eventos do calendário.', error);
+                        }
+                    },
                     eventClick: function (info) {
-                        window.location.href = '/painel/admin/events/' + info.event.id + '/edit';
+                        var editUrl = info.event.extendedProps.editUrl || '/painel/admin/events/' + info.event.id + '/edit';
+                        window.location.href = editUrl;
                     },
                     buttonText: {
                         today: 'Hoje',

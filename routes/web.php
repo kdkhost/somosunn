@@ -448,6 +448,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::resource('mentorships', \App\Http\Controllers\Panel\Admin\MentorshipController::class);
 
         // Events Management
+        Route::get('events/feed', [\App\Http\Controllers\Panel\Admin\EventController::class, 'feed'])->name('events.feed');
         Route::resource('events', \App\Http\Controllers\Panel\Admin\EventController::class);
 
         // Certificates Management

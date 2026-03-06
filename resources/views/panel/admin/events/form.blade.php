@@ -2,7 +2,11 @@
 
 @section('title', $event->exists ? 'Editar Evento: ' . $event->title : 'Novo Evento')
 
-@section('content')
+@section('panel_breadcrumb')
+    <a href="{{ route('panel.admin.events.index') }}" class="hover:underline">Eventos</a>
+@endsection
+
+@section('panel_content')
     <div x-data="{ tab: 'general' }" class="space-y-6">
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

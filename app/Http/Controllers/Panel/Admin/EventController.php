@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Panel\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
-use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
@@ -16,11 +14,12 @@ class EventController extends Controller
     {
         $this->ensurePermission('events.view');
 
-        if ($request->ajax() || $request->wantsJson()) {
+        if ($request->ajax() || $request->wantsJson() || $request->boolean('feed')) {
             return $this->feed($request);
         }
 
         $calendarSettings = $this->loadCalendarSettings();
+
         return view('panel.admin.events.index', compact('calendarSettings'));
     }
 
@@ -28,26 +27,29 @@ class EventController extends Controller
     {
         $calendarSettings = $this->loadCalendarSettings();
         $textColor = (string) ($calendarSettings['event_text_color'] ?? '#ffffff');
+        $startRaw = $request->query('start', $request->input('start'));
+        $endRaw = $request->query('end', $request->input('end'));
 
         try {
-            $start = $request->query('start') ? \Carbon\Carbon::parse($request->query('start')) : now()->startOfMonth();
-            $end = $request->query('end') ? \Carbon\Carbon::parse($request->query('end')) : now()->endOfMonth();
+            $start = $startRaw ? \Carbon\Carbon::parse($startRaw) : now()->startOfMonth()->subMonth();
+            $end = $endRaw ? \Carbon\Carbon::parse($endRaw) : now()->endOfMonth()->addMonth();
         } catch (\Throwable $e) {
-            return response()->json(['message' => 'Intervalo inválido.'], 422);
+            return response()->json(['message' => 'Intervalo invÃ¡lido.'], 422);
         }
 
         $query = Event::where(function ($query) use ($start, $end) {
             $query->where('start_at', '<', $end)
-                ->where(function ($q) use ($start) {
-                    $q->where('end_at', '>', $start)->orWhereNull('end_at');
+                ->where(function ($subQuery) use ($start) {
+                    $subQuery->where('end_at', '>', $start)
+                        ->orWhereNull('end_at');
                 });
         });
 
-        if (!Auth::user()->isAdmin()) {
-            $query->where('published', true);
+        if (!$this->canManageAllEvents()) {
+            $query->where('user_id', Auth::id());
         }
 
-        $events = $query->get()->map(function ($event) use ($textColor) {
+        $events = $query->get()->map(function (Event $event) use ($textColor) {
             return [
                 'id' => $event->id,
                 'title' => $event->title,
@@ -60,6 +62,7 @@ class EventController extends Controller
                 'extendedProps' => [
                     'description' => $event->description,
                     'published' => (bool) $event->published,
+                    'editUrl' => route('panel.admin.events.edit', $event),
                 ],
             ];
         });
@@ -67,30 +70,45 @@ class EventController extends Controller
         return response()->json($events);
     }
 
+    public function show(Event $event)
+    {
+        $this->ensurePermission('events.view');
+        $this->ensureCanManage($event);
+
+        return redirect()->route('panel.admin.events.edit', $event);
+    }
+
     public function create()
     {
         $this->ensurePermission('events.create');
-        return view('panel.admin.events.form', ['event' => new Event]);
+
+        return view('panel.admin.events.form', ['event' => new Event()]);
     }
 
     public function edit(Event $event)
     {
         $this->ensurePermission('events.edit');
         $this->ensureCanManage($event);
+
         return view('panel.admin.events.form', compact('event'));
     }
 
     public function store(Request $request)
     {
         $this->ensurePermission('events.create');
+
         $data = $this->serializeRequest($request);
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('event-images', 'public');
         }
 
+        $data['published'] = $request->boolean('published');
+        $data['all_day'] = $request->boolean('all_day');
+        $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         $data['user_id'] = Auth::id();
-        $event = Event::create($data);
+
+        Event::create($data);
 
         return redirect()->route('panel.admin.events.index')->with('success', 'Evento criado com sucesso');
     }
@@ -99,21 +117,31 @@ class EventController extends Controller
     {
         $this->ensurePermission('events.edit');
         $this->ensureCanManage($event);
+
         $data = $this->serializeRequest($request);
 
         if ($request->boolean('remove_image')) {
-            if ($event->image)
+            if ($event->image) {
                 Storage::disk('public')->delete($event->image);
+            }
+
             $data['image'] = null;
         }
 
         if ($request->hasFile('image')) {
-            if ($event->image)
+            if ($event->image) {
                 Storage::disk('public')->delete($event->image);
+            }
+
             $data['image'] = $request->file('image')->store('event-images', 'public');
         }
 
+        $data['published'] = $request->boolean('published');
+        $data['all_day'] = $request->boolean('all_day');
+        $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+
         $event->update($data);
+
         return redirect()->route('panel.admin.events.index')->with('success', 'Evento atualizado');
     }
 
@@ -121,26 +149,34 @@ class EventController extends Controller
     {
         $this->ensurePermission('events.delete');
         $this->ensureCanManage($event);
-        if ($event->image)
+
+        if ($event->image) {
             Storage::disk('public')->delete($event->image);
+        }
+
         $event->delete();
 
-        return response()->json(['status' => 'success']);
+        if (request()->expectsJson()) {
+            return response()->json(['status' => 'success']);
+        }
+
+        return redirect()->route('panel.admin.events.index')->with('success', 'Evento removido com sucesso');
     }
 
-    private function serializeRequest(Request $request)
+    private function serializeRequest(Request $request): array
     {
-        // Normalize money and dates
         $moneyFields = ['price', 'flash_sale_price', 'batch_1_price', 'batch_2_price', 'batch_3_price'];
-        foreach ($moneyFields as $f) {
-            if ($request->has($f))
-                $request->merge([$f => $this->normalizeMoney($request->$f)]);
+        foreach ($moneyFields as $field) {
+            if ($request->has($field)) {
+                $request->merge([$field => $this->normalizeMoney($request->$field)]);
+            }
         }
 
         $dateFields = ['start_at', 'end_at', 'flash_sale_ends_at', 'batch_1_deadline', 'batch_2_deadline', 'batch_3_deadline'];
-        foreach ($dateFields as $f) {
-            if ($request->has($f) && $request->$f)
-                $request->merge([$f => str_replace('T', ' ', $request->$f)]);
+        foreach ($dateFields as $field) {
+            if ($request->has($field) && $request->$field) {
+                $request->merge([$field => str_replace('T', ' ', $request->$field)]);
+            }
         }
 
         return $request->validate([
@@ -149,9 +185,13 @@ class EventController extends Controller
             'end_at' => 'nullable|date|after_or_equal:start_at',
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|max:5120',
+            'remove_image' => 'nullable|boolean',
             'location' => 'nullable|string',
             'address' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
+            'flash_sale_price' => 'nullable|numeric|min:0',
+            'flash_sale_ends_at' => 'nullable|date',
             'capacity' => 'nullable|integer|min:0',
             'published' => 'nullable|boolean',
             'all_day' => 'nullable|boolean',
@@ -160,16 +200,19 @@ class EventController extends Controller
         ]);
     }
 
-    private function normalizeMoney($val)
+    private function normalizeMoney($value): float
     {
-        if (!$val)
+        if (!$value) {
             return 0;
-        $val = str_replace(['R$', ' ', '.'], '', $val);
-        $val = str_replace(',', '.', $val);
-        return (float) $val;
+        }
+
+        $value = str_replace(['R$', ' ', '.'], '', (string) $value);
+        $value = str_replace(',', '.', $value);
+
+        return (float) $value;
     }
 
-    private function loadCalendarSettings()
+    private function loadCalendarSettings(): array
     {
         return [
             'initial_view' => 'dayGridMonth',
@@ -178,17 +221,30 @@ class EventController extends Controller
         ];
     }
 
-    protected function ensurePermission(string $perm)
+    private function canManageAllEvents(): bool
     {
-        if (!Auth::user()->isAdmin() && !Auth::user()->hasPermission($perm))
-            abort(403);
+        $user = Auth::user();
+
+        return $user && $user->isAdmin();
     }
 
-    protected function ensureCanManage(Event $event)
+    protected function ensurePermission(string $permission): void
     {
-        if (Auth::user()->isAdmin())
-            return;
-        if ($event->user_id !== Auth::id())
+        $user = Auth::user();
+
+        if (!$user || (!$user->isAdmin() && !$user->hasPermission($permission))) {
             abort(403);
+        }
+    }
+
+    protected function ensureCanManage(Event $event): void
+    {
+        if ($this->canManageAllEvents()) {
+            return;
+        }
+
+        if ((int) $event->user_id !== (int) Auth::id()) {
+            abort(403);
+        }
     }
 }
