@@ -21,6 +21,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\TrackReferralLink::class,
             \App\Http\Middleware\TrackVisitor::class,
             \App\Http\Middleware\RunInternalCron::class,
             \App\Http\Middleware\LogUserActivity::class,

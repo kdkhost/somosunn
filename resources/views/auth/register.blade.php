@@ -4,7 +4,7 @@
 
 @section('content')
     @php
-        // Logic inside component
+        $currentReferralCode = trim((string) request()->query('ref', session('affiliate_tracking.current.referral_code', session('social_ref', ''))));
     @endphp
     <div class="min-h-screen flex items-center justify-center bg-slate-50 py-16 px-6">
         <div class="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 !px-0">
@@ -18,8 +18,8 @@
 
                 <form method="POST" action="{{ route('register') }}" class="space-y-5">
                     @csrf
-                    @if(request()->filled('ref'))
-                        <input type="hidden" name="ref" value="{{ e(request()->query('ref')) }}">
+                    @if($currentReferralCode !== '')
+                        <input type="hidden" name="ref" value="{{ e($currentReferralCode) }}">
                     @endif
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Nome completo</label>

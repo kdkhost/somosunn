@@ -543,6 +543,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
 
     // Indicações / Programa de Afiliados
     Route::get('/indicacoes', [\App\Http\Controllers\Panel\ReferralController::class, 'index'])->name('referral.index');
+    Route::post('/indicacoes/rastreio', [\App\Http\Controllers\Panel\ReferralController::class, 'track'])->name('referral.track');
 
     // Loja de Pontos (Usuário)
     Route::get('/resgate', [\App\Http\Controllers\RedemptionItemController::class, 'index'])->name('redemptions.shop');

@@ -4,6 +4,7 @@
 
 @php
     $socialLoginEnabled = (string) \App\Models\Setting::get('social_login_enabled', '1') === '1';
+    $referralCode = trim((string) request()->query('ref', session('affiliate_tracking.current.referral_code', session('social_ref', ''))));
 
     $googleEnabled = (string) \App\Models\Setting::get('social_google_enabled', \App\Models\Setting::get('social_google_active', '0')) === '1';
     $facebookEnabled = (string) \App\Models\Setting::get('social_facebook_enabled', \App\Models\Setting::get('social_facebook_active', '0')) === '1';
@@ -68,7 +69,7 @@
     <div {{ $attributes->merge(['class' => 'space-y-4']) }}>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             @foreach($providers as $provider)
-                <a href="{{ route('social.redirect', $provider['key']) }}"
+                <a href="{{ route('social.redirect', ['provider' => $provider['key'], 'ref' => $referralCode !== '' ? $referralCode : null]) }}"
                     class="inline-flex items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">
                     <i class="{{ $provider['icon'] }} {{ $provider['icon_class'] }}"></i>
                     <span>Continuar com {{ $provider['label'] }}</span>

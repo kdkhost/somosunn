@@ -439,7 +439,7 @@
         <div class="mt-4 flex items-center gap-2">
             <input id="referral_link_input" type="text" readonly value="{{ $referralLink }}"
                 class="flex-1 rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm bg-slate-50 dark:bg-slate-950 dark:text-white">
-            <button onclick="copyReferralLink()" type="button"
+            <button onclick="copyReferralLink(event)" type="button"
                 class="inline-flex items-center gap-2 rounded-full bg-[#1F5EDB] px-5 py-3 text-sm font-bold text-white hover:brightness-110 transition">
                 <i class="fas fa-copy"></i> Copiar
             </button>
@@ -462,7 +462,33 @@
 
     @push('scripts')
         <script>
-        function copyReferralLink() {
+        const referralProfileTrackUrl = @json(route('panel.referral.track'));
+        const referralProfileTrackToken = @json(csrf_token());
+
+        function trackReferralProfileAction(action, channel, targetUrl) {
+            const payload = new FormData();
+            payload.append('_token', referralProfileTrackToken);
+            payload.append('action', action);
+            payload.append('channel', channel);
+            payload.append('context', 'panel_profile');
+            if (targetUrl) {
+                payload.append('target_url', targetUrl);
+            }
+
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(referralProfileTrackUrl, payload);
+                return;
+            }
+
+            fetch(referralProfileTrackUrl, {
+                method: 'POST',
+                body: payload,
+                credentials: 'same-origin',
+                keepalive: true,
+            }).catch(() => {});
+        }
+
+        function copyReferralLink(event) {
             var input = document.getElementById('referral_link_input');
             if (!input) return;
             input.select();
@@ -472,10 +498,25 @@
             } catch(e) {
                 document.execCommand('copy');
             }
+            trackReferralProfileAction('copy', 'copy', input.value);
             var btn = event.currentTarget;
             var original = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
             setTimeout(function(){ btn.innerHTML = original; }, 2000);
+        }
+
+        var referralCard = document.getElementById('referral_link_input');
+        if (referralCard) {
+            referralCard = referralCard.closest('div.mt-4');
+        }
+
+        if (referralCard) {
+            referralCard.querySelectorAll('a[href^="https://wa.me/"], a[href^="https://t.me/share/"]').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    var channel = link.href.indexOf('wa.me') !== -1 ? 'whatsapp' : 'telegram';
+                    trackReferralProfileAction('share', channel, link.href);
+                });
+            });
         }
         </script>
         <style>

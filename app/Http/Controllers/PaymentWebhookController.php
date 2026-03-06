@@ -14,6 +14,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\OrderSplit;
 use App\Services\CouponService;
+use App\Services\AffiliateTrackingService;
 use App\Services\InvoiceService;
 use App\Services\PointsService;
 use App\Support\EmailQueueSettings;
@@ -146,6 +147,7 @@ class PaymentWebhookController extends Controller
         app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
         $this->confirmEventRegistrationsForOrder($order);
         $this->activatePlanForOrder($order);
+        app(AffiliateTrackingService::class)->recordPaidOrder($order);
         $this->fulfillDigitalItemsForOrder($order);
         app(InvoiceService::class)->issueAndQueueForOrder($order);
 
@@ -213,6 +215,7 @@ class PaymentWebhookController extends Controller
             app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
             $this->confirmEventRegistrationsForOrder($order);
             $this->activatePlanForOrder($order);
+            app(AffiliateTrackingService::class)->recordPaidOrder($order);
             $this->fulfillDigitalItemsForOrder($order);
             app(InvoiceService::class)->issueAndQueueForOrder($order);
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\AffiliateTrackingService;
 use App\Services\PointsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -20,7 +21,7 @@ class SocialAuthController extends Controller
 {
     private array $providers = ['google', 'facebook', 'linkedin'];
 
-    public function redirect(Request $request, string $provider)
+    public function redirect(Request $request, string $provider, AffiliateTrackingService $tracking)
     {
         if (!$this->isSupportedProvider($provider)) {
             abort(404);
@@ -31,7 +32,7 @@ class SocialAuthController extends Controller
         }
 
         // Preserva código de indicação para usar após o callback
-        $refCode = trim((string) $request->query('ref', session('social_ref', '')));
+        $refCode = trim((string) $request->query('ref', $tracking->currentReferralCode($request) ?: session('social_ref', '')));
         if ($refCode !== '') {
             session(['social_ref' => $refCode]);
         }
@@ -61,7 +62,7 @@ class SocialAuthController extends Controller
         }
     }
 
-    public function callback(Request $request, string $provider)
+    public function callback(Request $request, string $provider, AffiliateTrackingService $tracking)
     {
         if (!$this->isSupportedProvider($provider)) {
             abort(404);
@@ -154,11 +155,11 @@ class SocialAuthController extends Controller
         // Resolve código de indicação (guardado na sessão durante o redirect)
         $referrer = null;
         if ($isNewUser) {
-            $refCode = trim((string) session('social_ref', ''));
+            $refCode = trim((string) session('social_ref', $tracking->currentReferralCode($request) ?: ''));
             session()->forget('social_ref');
             if ($refCode !== '') {
-                $referrer = User::where('referral_code', $refCode)->where('id', '!=', 0)->first();
-                if ($referrer) {
+                $referrer = $tracking->resolveReferrerByCode($refCode);
+                if ($referrer && (int) $referrer->id !== (int) $user->id) {
                     $user->referred_by = $referrer->id;
                 }
             }
@@ -183,6 +184,10 @@ class SocialAuthController extends Controller
             }
             Log::error('Social login user save failed.', ['provider' => $provider, 'email' => $email, 'error' => $e->getMessage()]);
             return redirect()->route('login')->with('warning', 'Nao foi possivel concluir o cadastro via login social. Tente com e-mail e senha.');
+        }
+
+        if ($isNewUser) {
+            $tracking->attachRegisteredUser($request, $user, $referrer?->referral_code ?? null);
         }
 
         if (!$user->activePlan()) {

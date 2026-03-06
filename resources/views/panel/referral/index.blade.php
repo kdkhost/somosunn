@@ -8,6 +8,8 @@
     $pointsPerReferral = $pointsRule?->points ?? 0;
     $conversionRate = $totalReferred > 0 ? round(($convertedCount / $totalReferred) * 100) : 0;
     $potentialPoints = $pendingCount * $pointsPerReferral;
+    $trackingConversion = $trackingSummary['registration_conversion'] ?? 0;
+    $purchaseConversion = $trackingSummary['purchase_conversion'] ?? 0;
 @endphp
 
 <div class="space-y-8">
@@ -28,6 +30,128 @@
             </div>
         @endif
     </div>
+
+    @if($trackingAvailable)
+        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-black text-slate-900 dark:text-white">Rastreio completo do link</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        Cliques, visitas únicas, cadastros, checkouts, compras confirmadas e compartilhamentos.
+                    </p>
+                </div>
+                <div class="text-sm text-slate-500 dark:text-slate-400">
+                    Conversão para cadastro: <strong class="text-slate-700 dark:text-slate-200">{{ $trackingConversion }}%</strong>
+                    · Compra: <strong class="text-slate-700 dark:text-slate-200">{{ $purchaseConversion }}%</strong>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+                <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Cliques no link</p>
+                    <p class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['clicks']) }}</p>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['visits']) }} visitas únicas</p>
+                </div>
+                <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Cadastros atribuídos</p>
+                    <p class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['registrations']) }}</p>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['checkout_starts']) }} checkouts iniciados</p>
+                </div>
+                <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Compras confirmadas</p>
+                    <p class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['purchases']) }}</p>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">R$ {{ number_format($trackingSummary['revenue'], 2, ',', '.') }} rastreados</p>
+                </div>
+                <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Compartilhamentos</p>
+                    <p class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['shares'] + $trackingSummary['reshares'] + $trackingSummary['copies']) }}</p>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                        {{ number_format($trackingSummary['shares']) }} novos · {{ number_format($trackingSummary['reshares']) }} reenvios · {{ number_format($trackingSummary['copies']) }} cópias
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-[1.6fr,1fr] gap-6">
+                <div class="rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+                    <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+                        <h3 class="font-black text-slate-900 dark:text-white">Últimas visitas atribuídas</h3>
+                    </div>
+                    @if($trackedVisits->isEmpty())
+                        <div class="px-5 py-8 text-sm text-slate-500 dark:text-slate-400">
+                            Ainda não há visitas rastreadas para este link.
+                        </div>
+                    @else
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest">
+                                    <tr>
+                                        <th class="text-left px-5 py-3">Visita</th>
+                                        <th class="text-left px-5 py-3">Origem</th>
+                                        <th class="text-left px-5 py-3">Cadastro</th>
+                                        <th class="text-right px-5 py-3">Compra</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                    @foreach($trackedVisits as $visit)
+                                        @php
+                                            $sourceLabel = $visit->utm_source ?: ($visit->referrer_url ? parse_url($visit->referrer_url, PHP_URL_HOST) : 'direto');
+                                        @endphp
+                                        <tr>
+                                            <td class="px-5 py-4">
+                                                <p class="font-semibold text-slate-900 dark:text-white">{{ $visit->first_visited_at?->format('d/m/Y H:i') ?? '—' }}</p>
+                                                <p class="text-xs text-slate-500 dark:text-slate-400">
+                                                    {{ number_format($visit->clicks_count) }} clique(s) · {{ number_format($visit->pageviews_count) }} página(s)
+                                                </p>
+                                            </td>
+                                            <td class="px-5 py-4">
+                                                <p class="font-medium text-slate-700 dark:text-slate-300">{{ $sourceLabel ?: 'direto' }}</p>
+                                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[220px]">{{ $visit->landing_page_path ?: '/' }}</p>
+                                            </td>
+                                            <td class="px-5 py-4">
+                                                @if($visit->registeredUser)
+                                                    <p class="font-medium text-slate-900 dark:text-white">{{ $visit->registeredUser->name }}</p>
+                                                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ $visit->registered_at?->diffForHumans() ?? 'cadastrado' }}</p>
+                                                @else
+                                                    <span class="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">Sem cadastro</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-5 py-4 text-right">
+                                                @if($visit->purchases_count > 0)
+                                                    <p class="font-semibold text-emerald-600 dark:text-emerald-400">{{ number_format($visit->purchases_count) }} compra(s)</p>
+                                                    <p class="text-xs text-slate-500 dark:text-slate-400">R$ {{ number_format((float) $visit->total_revenue_amount, 2, ',', '.') }}</p>
+                                                @else
+                                                    <span class="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">Sem compra</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-5 py-4 border-t border-slate-100 dark:border-slate-800">
+                            {{ $trackedVisits->links() }}
+                        </div>
+                    @endif
+                </div>
+
+                <div class="rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
+                    <h3 class="font-black text-slate-900 dark:text-white">Canais mais usados</h3>
+                    <div class="mt-4 space-y-3">
+                        @forelse($trackingChannels as $channel)
+                            <div class="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-3">
+                                <span class="font-medium text-slate-700 dark:text-slate-300">{{ ucfirst($channel->channel) }}</span>
+                                <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300">{{ number_format($channel->total) }}</span>
+                            </div>
+                        @empty
+                            <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-6 text-sm text-slate-500 dark:text-slate-400">
+                                Os compartilhamentos começam a aparecer aqui assim que você usar os botões rápidos ou copiar seu link.
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 
     {{-- ===== CARDS RESUMO ===== --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -394,6 +518,37 @@
 
 @push('scripts')
 <script>
+const referralTrackUrl = @json(route('panel.referral.track'));
+const referralTrackToken = @json(csrf_token());
+
+function trackReferralAction(action, channel, targetUrl = null) {
+    const payload = new FormData();
+    payload.append('_token', referralTrackToken);
+    payload.append('action', action);
+
+    if (channel) {
+        payload.append('channel', channel);
+    }
+
+    if (targetUrl) {
+        payload.append('target_url', targetUrl);
+    }
+
+    payload.append('context', 'panel_referral');
+
+    if (navigator.sendBeacon) {
+        navigator.sendBeacon(referralTrackUrl, payload);
+        return;
+    }
+
+    fetch(referralTrackUrl, {
+        method: 'POST',
+        body: payload,
+        credentials: 'same-origin',
+        keepalive: true,
+    }).catch(() => {});
+}
+
 function copyReferralLink() {
     const input = document.getElementById('referralLinkInput');
     const btn   = document.getElementById('copyBtn');
@@ -401,6 +556,7 @@ function copyReferralLink() {
     const text  = document.getElementById('copyText');
 
     const doCopy = () => {
+        trackReferralAction('copy', 'copy', input.value);
         icon.className = 'fas fa-check';
         text.textContent = 'Copiado!';
         btn.classList.replace('bg-blue-600', 'bg-green-600');
@@ -425,6 +581,24 @@ function copyReferralLink() {
         doCopy();
     }
 }
+
+document.querySelectorAll('a[href^="https://wa.me/"], a[href^="https://t.me/share/"], a[href^="https://www.linkedin.com/sharing/"], a[href^="mailto:"]').forEach((link) => {
+    link.addEventListener('click', () => {
+        let channel = 'other';
+
+        if (link.href.startsWith('https://wa.me/')) {
+            channel = 'whatsapp';
+        } else if (link.href.startsWith('https://t.me/share/')) {
+            channel = 'telegram';
+        } else if (link.href.startsWith('https://www.linkedin.com/sharing/')) {
+            channel = 'linkedin';
+        } else if (link.href.startsWith('mailto:')) {
+            channel = 'email';
+        }
+
+        trackReferralAction('share', channel, link.href);
+    });
+});
 </script>
 @endpush
 

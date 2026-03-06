@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
 use App\Mail\PaymentConfirmedMail;
+use App\Services\AffiliateTrackingService;
 use App\Services\InvoiceService;
 use Illuminate\Support\Str;
 
@@ -84,7 +85,7 @@ class SubscriptionController extends Controller
         ));
     }
 
-    public function process(Request $request, Plan $plan)
+    public function process(Request $request, Plan $plan, AffiliateTrackingService $tracking)
     {
         $period       = $this->normalizePeriod($request->input('period', 'mensal'));
         $effectivePrice = $plan->getPriceForPeriod($period);
@@ -111,6 +112,7 @@ class SubscriptionController extends Controller
 
             // 1. Criar usuário se necessário
             if (!$user) {
+                $referrer = $tracking->resolveReferrerByCode($tracking->currentReferralCode($request));
                 $user = User::create([
                     'name' => $request->name,
                     'email' => $request->email,
@@ -118,8 +120,10 @@ class SubscriptionController extends Controller
                     'doc' => $request->cpf,
                     'phone' => $request->phone,
                     'level' => 'iniciante',
+                    'referred_by' => $referrer?->id,
                 ]);
                 Auth::login($user);
+                $tracking->attachRegisteredUser($request, $user, $referrer?->referral_code ?? null);
 
                 // Enviar email de boas-vindas
                 try {
@@ -197,6 +201,8 @@ class SubscriptionController extends Controller
                     'prorata'   => $prorataAmount > 0 ? $prorataAmount : null,
                 ],
             ]);
+
+            $tracking->recordCheckoutStarted($request, $order, $plan);
 
             // Charge via MercadoPago
             if ($isSimulation) {

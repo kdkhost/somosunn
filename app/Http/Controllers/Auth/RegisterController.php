@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Plan;
 use App\Models\User;
+use App\Services\AffiliateTrackingService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, AffiliateTrackingService $tracking)
     {
         $data = $request->validate([
             'name' => 'required|string|max:80',
@@ -26,11 +27,8 @@ class RegisterController extends Controller
         ]);
 
         // Resolve referidor pelo código de indicação
-        $referrer = null;
-        $refCode = trim((string) ($data['ref'] ?? $request->query('ref', '')));
-        if ($refCode !== '') {
-            $referrer = User::where('referral_code', $refCode)->first();
-        }
+        $refCode = trim((string) ($data['ref'] ?? $request->query('ref', $tracking->currentReferralCode($request))));
+        $referrer = $tracking->resolveReferrerByCode($refCode);
 
         $user = User::create([
             'name' => $data['name'],
@@ -43,6 +41,8 @@ class RegisterController extends Controller
             'address' => $data['address'] ?? null,
             'referred_by' => $referrer?->id,
         ]);
+
+        $tracking->attachRegisteredUser($request, $user, $refCode);
 
         // Vincula plano gratuito para liberar o Painel do Membro imediatamente
         try {
