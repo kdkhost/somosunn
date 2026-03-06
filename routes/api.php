@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\CourseApiController;
 use App\Http\Controllers\Api\MentorshipApiController;
 use App\Http\Controllers\Api\PlanApiController;
 use App\Http\Controllers\Api\TestimonialApiController;
+use App\Http\Controllers\Api\AffiliateApiController;
 
 Route::prefix('v1')->group(function () {
     Route::get('/health', [HealthController::class, 'show']);
@@ -32,6 +33,14 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
+
+        Route::prefix('/affiliate')->group(function () {
+            Route::get('/overview', [AffiliateApiController::class, 'overview']);
+            Route::get('/materials', [AffiliateApiController::class, 'materials']);
+            Route::get('/offers', [AffiliateApiController::class, 'offers']);
+            Route::get('/landing-page', [AffiliateApiController::class, 'landingPage']);
+            Route::get('/analytics', [AffiliateApiController::class, 'analytics']);
+        });
     });
 });
 

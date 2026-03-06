@@ -345,6 +345,12 @@
         </div>
     </div>
 
+    <div id="referralShareKitSection">
+        @include('panel.referral.partials.share-kit', [
+            'affiliateShareKit' => $affiliateShareKit,
+        ])
+    </div>
+
     {{-- ===== LISTA DE INDICADOS ===== --}}
     <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
         <div class="p-6 md:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4">
@@ -912,6 +918,47 @@ function buildReferralStatsRequestUrl() {
     return url.toString();
 }
 
+async function copyReferralMaterial(button) {
+    const text = button?.dataset?.copyText || '';
+    const channel = button?.dataset?.trackChannel || 'copy';
+    const targetUrl = button?.dataset?.targetUrl || referralStatsUrl;
+
+    if (!text) {
+        return;
+    }
+
+    const originalHtml = button.innerHTML;
+
+    const done = () => {
+        trackReferralAction('copy', channel, targetUrl);
+        button.innerHTML = '<i class="fas fa-check"></i> Copiado';
+        window.setTimeout(() => {
+            button.innerHTML = originalHtml;
+        }, 1800);
+    };
+
+    try {
+        if (navigator.clipboard) {
+            await navigator.clipboard.writeText(text);
+            done();
+            return;
+        }
+
+        const helper = document.createElement('textarea');
+        helper.value = text;
+        helper.setAttribute('readonly', 'readonly');
+        helper.style.position = 'absolute';
+        helper.style.left = '-9999px';
+        document.body.appendChild(helper);
+        helper.select();
+        document.execCommand('copy');
+        document.body.removeChild(helper);
+        done();
+    } catch (error) {
+        console.error('Falha ao copiar material do afiliado.', error);
+    }
+}
+
 function applyTrackingStatusBanner(tone, message) {
     const banner = document.getElementById('trackingStatusBanner');
     if (!banner) {
@@ -1084,6 +1131,7 @@ function applyReferralTrackingPayload(payload) {
     renderTrackingVisitsRows(payload.trackedVisitsFeed || []);
     replaceReferralSectionHtml('referralChannelFunnelSection', payload.channelFunnelsHtml);
     replaceReferralSectionHtml('referralEventsLogSection', payload.detailedEventsHtml);
+    replaceReferralSectionHtml('referralShareKitSection', payload.shareKitHtml);
 
     replaceReferralChartData(referralDailyChartData, payload.trackingDailyChart || {}, ['labels', 'visits', 'registrations', 'checkouts', 'purchases', 'revenue']);
     replaceReferralChartData(referralAcquisitionChartData, payload.trackingAcquisitionChart || {}, ['labels', 'visits', 'registrations', 'purchases', 'revenue']);

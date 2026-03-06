@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use App\Models\PointsLog;
 use App\Models\User;
+use App\Services\AffiliateShareKitService;
 use App\Services\AffiliateTrackingService;
 use App\Services\ReferralAnalyticsService;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ class ReferralController extends Controller
 {
     public function __construct(
         private readonly ReferralAnalyticsService $analytics,
+        private readonly AffiliateShareKitService $shareKit,
     ) {
     }
 
@@ -23,7 +25,7 @@ class ReferralController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        $this->ensureReferralCode($user);
+        $user = $this->shareKit->ensureReferralCode($user);
 
         $referralLink = route('register') . '?ref=' . $user->referral_code;
 
@@ -68,6 +70,7 @@ class ReferralController extends Controller
         ), [
             'channelFunnels' => $this->analytics->buildChannelFunnels($user->id),
             'detailedEvents' => $this->analytics->detailedEventsPaginator($user->id, 20, 'events_page'),
+            'affiliateShareKit' => $this->shareKit->buildForUser($user),
         ], $this->analytics->buildDashboardPayload($user->id)));
     }
 
@@ -101,11 +104,12 @@ class ReferralController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        $this->ensureReferralCode($user);
+        $user = $this->shareKit->ensureReferralCode($user);
 
         $payload = $this->analytics->buildDashboardPayload($user->id);
         $channelFunnels = $this->analytics->buildChannelFunnels($user->id);
         $detailedEvents = $this->analytics->detailedEventsPaginator($user->id, 20, 'events_page');
+        $affiliateShareKit = $this->shareKit->buildForUser($user);
 
         return response()->json([
             'ok' => true,
@@ -132,6 +136,9 @@ class ReferralController extends Controller
                 'subtitle' => 'Inclui URL de origem exata, landing page, dispositivo, navegador, cidade/país e o resultado de cada ação.',
                 'emptyMessage' => 'Ainda não há cliques, visitas ou compartilhamentos detalhados para este afiliado.',
             ])->render(),
+            'shareKitHtml' => view('panel.referral.partials.share-kit', [
+                'affiliateShareKit' => $affiliateShareKit,
+            ])->render(),
         ]);
     }
 
@@ -140,25 +147,11 @@ class ReferralController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        $this->ensureReferralCode($user);
+        $user = $this->shareKit->ensureReferralCode($user);
 
         return $this->analytics->exportDetailedEventsCsv(
             $user->id,
             sprintf('rastreio-indicacoes-%s-%s.csv', $user->referral_code, now()->format('Ymd-His'))
         );
-    }
-
-    private function ensureReferralCode(User $user): void
-    {
-        if (!empty($user->referral_code)) {
-            return;
-        }
-
-        do {
-            $code = 'UNN' . strtoupper(substr(md5($user->id . microtime()), 0, 7));
-        } while (User::where('referral_code', $code)->exists());
-
-        $user->referral_code = $code;
-        $user->save();
     }
 }
