@@ -60,7 +60,7 @@
                     <h3 class="card-title font-weight-bold"><i class="fas fa-gift mr-2"></i>Itens para Resgate</h3>
                     <div class="card-tools">
                         <a href="{{ route('admin.redemptions.create') }}"
-                            class="btn btn-tool btn-sm btn-primary text-white">
+                            class="btn btn-sm btn-primary font-weight-bold shadow-sm px-3">
                             <i class="fas fa-plus mr-1"></i> Novo Item
                         </a>
                     </div>

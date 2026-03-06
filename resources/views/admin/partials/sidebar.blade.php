@@ -253,6 +253,13 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ route('admin.redemptions.index') }}"
+                                    class="nav-link {{ $is('admin.redemptions.*') }}">
+                                    <i class="fas fa-gift nav-icon"></i>
+                                    <p>Itens de Resgate</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('admin.orders.index') }}" class="nav-link {{ $is('admin.orders.*') }}">
                                     <i class="fas fa-shopping-cart nav-icon"></i>
                                     <p>Vendas</p>
@@ -283,13 +290,6 @@
                                     class="nav-link {{ $is('admin.points-rules.*') }}">
                                     <i class="fas fa-star nav-icon"></i>
                                     <p>Regras de Pontos</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.redemptions.index') }}"
-                                    class="nav-link {{ $is('admin.redemptions.*') }}">
-                                    <i class="fas fa-gift nav-icon"></i>
-                                    <p>Resgates</p>
                                 </a>
                             </li>
                             <li class="nav-item">
