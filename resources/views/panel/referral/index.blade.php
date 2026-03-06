@@ -71,6 +71,39 @@
                 </div>
             </div>
 
+            <div class="grid xl:grid-cols-[1.7fr,1fr] gap-6">
+                <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 p-5">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <h3 class="font-black text-slate-900 dark:text-white">Performance diária</h3>
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Últimos 14 dias com visitas, cadastros, checkouts, compras e receita.</p>
+                        </div>
+                        <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300">14 dias</span>
+                    </div>
+                    <div class="mt-5 h-[320px]">
+                        <canvas id="referralDailyChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 p-5">
+                        <h3 class="font-black text-slate-900 dark:text-white">Aquisição por canal</h3>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Origem das visitas, registros e compras atribuídas.</p>
+                        <div class="mt-5 h-[320px]">
+                            <canvas id="referralAcquisitionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 p-5">
+                        <h3 class="font-black text-slate-900 dark:text-white">Distribuição de compartilhamentos</h3>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Leitura visual dos canais que mais espalham seu link.</p>
+                        <div class="mt-5 h-[260px]">
+                            <canvas id="referralSharingChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid lg:grid-cols-[1.6fr,1fr] gap-6">
                 <div class="rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
                     <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
@@ -138,15 +171,43 @@
                     <h3 class="font-black text-slate-900 dark:text-white">Canais mais usados</h3>
                     <div class="mt-4 space-y-3">
                         @forelse($trackingChannels as $channel)
-                            <div class="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-3">
-                                <span class="font-medium text-slate-700 dark:text-slate-300">{{ ucfirst($channel->channel) }}</span>
-                                <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300">{{ number_format($channel->total) }}</span>
+                            <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-3">
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="font-medium text-slate-700 dark:text-slate-300">{{ $channel->channel }}</span>
+                                    <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300">{{ number_format($channel->total) }}</span>
+                                </div>
+                                <div class="mt-2 flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">
+                                    <span>{{ number_format($channel->shares) }} novos</span>
+                                    <span>·</span>
+                                    <span>{{ number_format($channel->reshares) }} reenvios</span>
+                                    <span>·</span>
+                                    <span>{{ number_format($channel->copies) }} cópias</span>
+                                </div>
                             </div>
                         @empty
                             <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-6 text-sm text-slate-500 dark:text-slate-400">
                                 Os compartilhamentos começam a aparecer aqui assim que você usar os botões rápidos ou copiar seu link.
                             </div>
                         @endforelse
+                    </div>
+
+                    <div class="mt-5 space-y-4">
+                        <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Receita rastreada</p>
+                            <p class="mt-2 text-2xl font-black text-slate-900 dark:text-white">R$ {{ number_format($trackingSummary['revenue'], 2, ',', '.') }}</p>
+                            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['purchases']) }} compra(s) confirmada(s)</p>
+                        </div>
+
+                        <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Melhor canal atual</p>
+                            @php $topChannel = $trackingChannels->first(); @endphp
+                            @if($topChannel)
+                                <p class="mt-2 text-xl font-black text-slate-900 dark:text-white">{{ $topChannel->channel }}</p>
+                                <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($topChannel->total) }} ação(ões) registradas</p>
+                            @else
+                                <p class="mt-2 text-sm font-semibold text-slate-500 dark:text-slate-400">Sem ações compartilhadas ainda.</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -517,9 +578,271 @@
 </div>
 
 @push('scripts')
+<script src="{{ asset('vendor/chart.js/js/chart.min.js') }}"></script>
 <script>
 const referralTrackUrl = @json(route('panel.referral.track'));
 const referralTrackToken = @json(csrf_token());
+const referralDailyChartData = @json($trackingDailyChart);
+const referralAcquisitionChartData = @json($trackingAcquisitionChart);
+const referralSharingChartData = @json($trackingSharingChart);
+const referralChartCurrency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const referralCharts = {};
+
+function getReferralChartPalette() {
+    const isDark = document.documentElement.classList.contains('dark');
+
+    return {
+        grid: isDark ? 'rgba(148, 163, 184, 0.14)' : 'rgba(15, 23, 42, 0.08)',
+        ticks: isDark ? '#94a3b8' : '#475569',
+        border: isDark ? '#0f172a' : '#ffffff',
+        visits: '#3b82f6',
+        registrations: '#10b981',
+        checkouts: '#f59e0b',
+        purchases: '#8b5cf6',
+        revenue: '#ef4444',
+    };
+}
+
+function buildReferralAxisOptions() {
+    const palette = getReferralChartPalette();
+
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            legend: {
+                labels: {
+                    color: palette.ticks,
+                    usePointStyle: true,
+                    boxWidth: 10,
+                },
+            },
+        },
+        scales: {
+            x: {
+                grid: { color: palette.grid },
+                ticks: { color: palette.ticks },
+            },
+            y: {
+                beginAtZero: true,
+                grid: { color: palette.grid },
+                ticks: {
+                    color: palette.ticks,
+                    precision: 0,
+                },
+            },
+        },
+    };
+}
+
+function destroyReferralCharts() {
+    Object.values(referralCharts).forEach((chart) => chart?.destroy());
+    Object.keys(referralCharts).forEach((key) => delete referralCharts[key]);
+}
+
+function renderReferralDailyChart() {
+    const canvas = document.getElementById('referralDailyChart');
+    if (!canvas || typeof Chart === 'undefined') {
+        return;
+    }
+
+    const palette = getReferralChartPalette();
+    const options = buildReferralAxisOptions();
+    options.scales.yRevenue = {
+        beginAtZero: true,
+        position: 'right',
+        grid: { drawOnChartArea: false },
+        ticks: {
+            color: palette.ticks,
+            callback: (value) => referralChartCurrency.format(value),
+        },
+    };
+    options.plugins.tooltip = {
+        callbacks: {
+            label: (context) => {
+                if (context.dataset.yAxisID === 'yRevenue') {
+                    return `${context.dataset.label}: ${referralChartCurrency.format(context.parsed.y || 0)}`;
+                }
+
+                return `${context.dataset.label}: ${context.parsed.y || 0}`;
+            },
+        },
+    };
+
+    referralCharts.daily = new Chart(canvas, {
+        data: {
+            labels: referralDailyChartData.labels,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Visitas',
+                    data: referralDailyChartData.visits,
+                    borderColor: palette.visits,
+                    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                    borderWidth: 2,
+                    tension: 0.35,
+                },
+                {
+                    type: 'line',
+                    label: 'Cadastros',
+                    data: referralDailyChartData.registrations,
+                    borderColor: palette.registrations,
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    borderWidth: 2,
+                    tension: 0.35,
+                },
+                {
+                    type: 'line',
+                    label: 'Checkouts',
+                    data: referralDailyChartData.checkouts,
+                    borderColor: palette.checkouts,
+                    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                    borderWidth: 2,
+                    tension: 0.35,
+                },
+                {
+                    type: 'line',
+                    label: 'Compras',
+                    data: referralDailyChartData.purchases,
+                    borderColor: palette.purchases,
+                    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+                    borderWidth: 2,
+                    tension: 0.35,
+                },
+                {
+                    type: 'bar',
+                    label: 'Receita',
+                    data: referralDailyChartData.revenue,
+                    backgroundColor: 'rgba(239, 68, 68, 0.18)',
+                    borderColor: palette.revenue,
+                    borderWidth: 1.5,
+                    borderRadius: 10,
+                    yAxisID: 'yRevenue',
+                },
+            ],
+        },
+        options,
+    });
+}
+
+function renderReferralAcquisitionChart() {
+    const canvas = document.getElementById('referralAcquisitionChart');
+    if (!canvas || typeof Chart === 'undefined') {
+        return;
+    }
+
+    const palette = getReferralChartPalette();
+    const options = buildReferralAxisOptions();
+    options.indexAxis = 'y';
+    options.plugins.tooltip = {
+        callbacks: {
+            label: (context) => {
+                if (context.dataset.label === 'Receita') {
+                    return `${context.dataset.label}: ${referralChartCurrency.format(context.parsed.x || 0)}`;
+                }
+
+                return `${context.dataset.label}: ${context.parsed.x || 0}`;
+            },
+        },
+    };
+
+    referralCharts.acquisition = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: referralAcquisitionChartData.labels,
+            datasets: [
+                {
+                    label: 'Visitas',
+                    data: referralAcquisitionChartData.visits,
+                    backgroundColor: 'rgba(59, 130, 246, 0.82)',
+                    borderRadius: 10,
+                },
+                {
+                    label: 'Cadastros',
+                    data: referralAcquisitionChartData.registrations,
+                    backgroundColor: 'rgba(16, 185, 129, 0.82)',
+                    borderRadius: 10,
+                },
+                {
+                    label: 'Compras',
+                    data: referralAcquisitionChartData.purchases,
+                    backgroundColor: 'rgba(139, 92, 246, 0.82)',
+                    borderRadius: 10,
+                },
+                {
+                    label: 'Receita',
+                    data: referralAcquisitionChartData.revenue,
+                    backgroundColor: 'rgba(239, 68, 68, 0.78)',
+                    borderRadius: 10,
+                },
+            ],
+        },
+        options,
+    });
+}
+
+function renderReferralSharingChart() {
+    const canvas = document.getElementById('referralSharingChart');
+    if (!canvas || typeof Chart === 'undefined') {
+        return;
+    }
+
+    const palette = getReferralChartPalette();
+    const shareTotals = referralSharingChartData.labels.map((_, index) =>
+        (referralSharingChartData.shares[index] || 0)
+        + (referralSharingChartData.reshares[index] || 0)
+        + (referralSharingChartData.copies[index] || 0)
+    );
+
+    referralCharts.sharing = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels: referralSharingChartData.labels,
+            datasets: [
+                {
+                    data: shareTotals,
+                    backgroundColor: [
+                        'rgba(34, 197, 94, 0.88)',
+                        'rgba(14, 165, 233, 0.88)',
+                        'rgba(249, 115, 22, 0.88)',
+                        'rgba(59, 130, 246, 0.88)',
+                        'rgba(168, 85, 247, 0.88)',
+                        'rgba(244, 63, 94, 0.88)',
+                    ],
+                    borderColor: palette.border,
+                    borderWidth: 2,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: palette.ticks,
+                        usePointStyle: true,
+                        boxWidth: 10,
+                    },
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `${context.label}: ${context.parsed || 0} ação(ões)`,
+                    },
+                },
+            },
+        },
+    });
+}
+
+function initReferralCharts() {
+    destroyReferralCharts();
+    renderReferralDailyChart();
+    renderReferralAcquisitionChart();
+    renderReferralSharingChart();
+}
 
 function trackReferralAction(action, channel, targetUrl = null) {
     const payload = new FormData();
@@ -551,9 +874,9 @@ function trackReferralAction(action, channel, targetUrl = null) {
 
 function copyReferralLink() {
     const input = document.getElementById('referralLinkInput');
-    const btn   = document.getElementById('copyBtn');
-    const icon  = document.getElementById('copyIcon');
-    const text  = document.getElementById('copyText');
+    const btn = document.getElementById('copyBtn');
+    const icon = document.getElementById('copyIcon');
+    const text = document.getElementById('copyText');
 
     const doCopy = () => {
         trackReferralAction('copy', 'copy', input.value);
@@ -599,6 +922,12 @@ document.querySelectorAll('a[href^="https://wa.me/"], a[href^="https://t.me/shar
         trackReferralAction('share', channel, link.href);
     });
 });
+
+initReferralCharts();
+
+new MutationObserver(() => {
+    initReferralCharts();
+}).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 </script>
 @endpush
 

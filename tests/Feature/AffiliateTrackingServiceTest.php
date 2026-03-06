@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\Panel\ReferralController;
 use App\Models\Order;
 use App\Models\Plan;
 use App\Models\ReferralLinkEvent;
 use App\Models\ReferralLinkVisit;
 use App\Models\User;
 use App\Services\AffiliateTrackingService;
+use Carbon\Carbon;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -43,8 +45,11 @@ class AffiliateTrackingServiceTest extends TestCase
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
+            $table->string('photo')->nullable();
             $table->string('referral_code', 20)->nullable()->unique();
             $table->unsignedBigInteger('referred_by')->nullable();
+            $table->unsignedBigInteger('plan_id')->nullable();
+            $table->timestamp('plan_expires_at')->nullable();
             $table->timestamps();
         });
 
@@ -138,10 +143,20 @@ class AffiliateTrackingServiceTest extends TestCase
             $table->timestamp('occurred_at')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('points_logs', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->string('action_key')->nullable();
+            $table->integer('points')->default(0);
+            $table->json('meta')->nullable();
+            $table->timestamps();
+        });
     }
 
     protected function tearDown(): void
     {
+        Carbon::setTestNow();
         DB::disconnect('sqlite');
 
         if (isset($this->sqlitePath) && file_exists($this->sqlitePath)) {
@@ -243,5 +258,134 @@ class AffiliateTrackingServiceTest extends TestCase
         $this->assertSame(1, ReferralLinkEvent::query()->where('event_type', 'reshare')->count());
         $this->assertSame(1, ReferralLinkEvent::query()->where('event_type', 'copy')->count());
         $this->assertSame(8, ReferralLinkEvent::query()->count());
+    }
+
+    public function test_referral_panel_exposes_daily_and_channel_charts(): void
+    {
+        Carbon::setTestNow('2026-03-06 12:00:00');
+
+        $referrer = User::create([
+            'name' => 'Afiliado',
+            'email' => 'afiliado-painel@example.com',
+            'password' => Hash::make('password'),
+            'referral_code' => 'UNNPAINEL',
+        ]);
+
+        $paidPlan = Plan::create([
+            'name' => 'Plano Premium',
+            'slug' => 'premium',
+            'price' => 249.90,
+            'is_free' => false,
+            'is_active' => true,
+        ]);
+
+        $leadPaid = User::create([
+            'name' => 'Lead Pago',
+            'email' => 'lead-pago@example.com',
+            'password' => Hash::make('password'),
+            'referred_by' => $referrer->id,
+            'plan_id' => $paidPlan->id,
+            'plan_expires_at' => now()->addMonth(),
+        ]);
+
+        $leadPending = User::create([
+            'name' => 'Lead Pendente',
+            'email' => 'lead-pendente@example.com',
+            'password' => Hash::make('password'),
+            'referred_by' => $referrer->id,
+        ]);
+
+        DB::table('points_logs')->insert([
+            'user_id' => $referrer->id,
+            'action_key' => 'referral',
+            'points' => 120,
+            'meta' => json_encode([
+                'new_user_id' => $leadPaid->id,
+                'new_user_name' => $leadPaid->name,
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $visitOne = ReferralLinkVisit::create([
+            'referrer_user_id' => $referrer->id,
+            'referral_code' => $referrer->referral_code,
+            'utm_source' => 'whatsapp',
+            'landing_page_path' => '/premium',
+            'clicks_count' => 1,
+            'pageviews_count' => 2,
+            'registered_user_id' => $leadPaid->id,
+            'purchases_count' => 1,
+            'checkout_started_count' => 1,
+            'total_revenue_amount' => 199.90,
+            'first_visited_at' => now()->subDays(2),
+            'registered_at' => now()->subDays(2),
+            'first_purchase_at' => now()->subDay(),
+        ]);
+
+        ReferralLinkVisit::create([
+            'referrer_user_id' => $referrer->id,
+            'referral_code' => $referrer->referral_code,
+            'utm_source' => 'whatsapp',
+            'landing_page_path' => '/premium',
+            'clicks_count' => 1,
+            'pageviews_count' => 1,
+            'first_visited_at' => now()->subDays(1),
+        ]);
+
+        ReferralLinkVisit::create([
+            'referrer_user_id' => $referrer->id,
+            'referral_code' => $referrer->referral_code,
+            'utm_source' => 'linkedin',
+            'landing_page_path' => '/evento',
+            'clicks_count' => 1,
+            'pageviews_count' => 1,
+            'registered_user_id' => $leadPending->id,
+            'first_visited_at' => now()->subDays(1),
+            'registered_at' => now()->subDays(1),
+        ]);
+
+        collect([
+            ['event_type' => 'visit', 'channel' => 'whatsapp', 'occurred_at' => now()->subDays(2)],
+            ['event_type' => 'visit', 'channel' => 'whatsapp', 'occurred_at' => now()->subDay()],
+            ['event_type' => 'visit', 'channel' => 'linkedin', 'occurred_at' => now()->subDay()],
+            ['event_type' => 'register', 'channel' => 'whatsapp', 'occurred_at' => now()->subDays(2)],
+            ['event_type' => 'register', 'channel' => 'linkedin', 'occurred_at' => now()->subDay()],
+            ['event_type' => 'checkout_started', 'channel' => 'whatsapp', 'occurred_at' => now()->subDay()],
+            ['event_type' => 'purchase', 'channel' => 'whatsapp', 'occurred_at' => now()->subDay(), 'amount' => 199.90],
+            ['event_type' => 'share', 'channel' => 'whatsapp', 'occurred_at' => now()->subDay()],
+            ['event_type' => 'reshare', 'channel' => 'whatsapp', 'occurred_at' => now()->subDay()],
+            ['event_type' => 'copy', 'channel' => 'copy', 'occurred_at' => now()->subDay()],
+        ])->each(function (array $event) use ($referrer, $visitOne): void {
+            ReferralLinkEvent::create([
+                'referral_link_visit_id' => $event['event_type'] === 'purchase' ? $visitOne->id : null,
+                'referrer_user_id' => $referrer->id,
+                'event_type' => $event['event_type'],
+                'channel' => $event['channel'],
+                'amount' => $event['amount'] ?? null,
+                'occurred_at' => $event['occurred_at'],
+            ]);
+        });
+
+        $this->be($referrer);
+
+        $view = app(ReferralController::class)->index();
+        $data = $view->getData();
+
+        $this->assertCount(14, $data['trackingDailyChart']['labels']);
+        $this->assertSame(3, array_sum($data['trackingDailyChart']['visits']));
+        $this->assertSame(2, array_sum($data['trackingDailyChart']['registrations']));
+        $this->assertSame(1, array_sum($data['trackingDailyChart']['checkouts']));
+        $this->assertSame(1, array_sum($data['trackingDailyChart']['purchases']));
+        $this->assertEquals(199.90, array_sum($data['trackingDailyChart']['revenue']));
+
+        $this->assertSame('Whatsapp', $data['trackingAcquisitionChart']['labels'][0]);
+        $this->assertSame(2, $data['trackingAcquisitionChart']['visits'][0]);
+        $this->assertContains('Linkedin', $data['trackingAcquisitionChart']['labels']);
+
+        $this->assertSame('Whatsapp', $data['trackingChannels']->first()->channel);
+        $this->assertSame(2, $data['trackingChannels']->first()->total);
+        $this->assertContains('Whatsapp', $data['trackingSharingChart']['labels']);
+        $this->assertSame(3, array_sum($data['trackingSharingChart']['shares']) + array_sum($data['trackingSharingChart']['reshares']) + array_sum($data['trackingSharingChart']['copies']));
     }
 }

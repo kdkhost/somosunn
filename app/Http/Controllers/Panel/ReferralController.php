@@ -9,10 +9,11 @@ use App\Models\ReferralLinkEvent;
 use App\Models\ReferralLinkVisit;
 use App\Models\User;
 use App\Services\AffiliateTrackingService;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class ReferralController extends Controller
 {
@@ -76,6 +77,9 @@ class ReferralController extends Controller
         ];
         $trackingChannels = collect();
         $trackedVisits = collect();
+        $trackingDailyChart = $this->emptyDailyTrackingChart();
+        $trackingAcquisitionChart = $this->emptyChannelTrackingChart();
+        $trackingSharingChart = $this->emptySharingTrackingChart();
 
         if ($trackingAvailable) {
             $visitsQuery = ReferralLinkVisit::query()->where('referrer_user_id', $user->id);
@@ -103,14 +107,10 @@ class ReferralController extends Controller
                 ? (int) round(($trackingSummary['purchases'] / $trackingSummary['visits']) * 100)
                 : 0;
 
-            $trackingChannels = ReferralLinkEvent::query()
-                ->select('channel', DB::raw('COUNT(*) as total'))
-                ->where('referrer_user_id', $user->id)
-                ->whereIn('event_type', ['share', 'reshare', 'copy'])
-                ->whereNotNull('channel')
-                ->groupBy('channel')
-                ->orderByDesc('total')
-                ->get();
+            $trackingChannels = $this->buildSharingChannelBreakdown($user->id);
+            $trackingDailyChart = $this->buildDailyTrackingChart($user->id);
+            $trackingAcquisitionChart = $this->buildAcquisitionChannelChart($user->id);
+            $trackingSharingChart = $this->buildSharingChannelChart($trackingChannels);
 
             $trackedVisits = ReferralLinkVisit::query()
                 ->with('registeredUser:id,name,email,photo')
@@ -133,6 +133,9 @@ class ReferralController extends Controller
             'trackingAvailable',
             'trackingSummary',
             'trackingChannels',
+            'trackingDailyChart',
+            'trackingAcquisitionChart',
+            'trackingSharingChart',
             'trackedVisits'
         ));
     }
@@ -160,5 +163,206 @@ class ReferralController extends Controller
             'ok' => true,
             'event_type' => $eventType,
         ]);
+    }
+
+    private function buildDailyTrackingChart(int $referrerUserId, int $days = 14): array
+    {
+        $start = CarbonImmutable::today()->subDays($days - 1)->startOfDay();
+        $period = collect(range(0, $days - 1))->map(
+            fn (int $offset) => $start->addDays($offset)
+        );
+
+        $series = [];
+        foreach ($period as $day) {
+            $series[$day->toDateString()] = [
+                'label' => $day->format('d/m'),
+                'visits' => 0,
+                'registrations' => 0,
+                'checkouts' => 0,
+                'purchases' => 0,
+                'revenue' => 0.0,
+            ];
+        }
+
+        $events = ReferralLinkEvent::query()
+            ->select('event_type', 'amount', 'occurred_at')
+            ->where('referrer_user_id', $referrerUserId)
+            ->whereIn('event_type', ['visit', 'register', 'checkout_started', 'purchase'])
+            ->whereNotNull('occurred_at')
+            ->where('occurred_at', '>=', $start)
+            ->orderBy('occurred_at')
+            ->get();
+
+        foreach ($events as $event) {
+            $dateKey = optional($event->occurred_at)?->timezone(config('app.timezone', 'America/Sao_Paulo'))->toDateString();
+            if (!$dateKey || !isset($series[$dateKey])) {
+                continue;
+            }
+
+            if ($event->event_type === 'visit') {
+                $series[$dateKey]['visits']++;
+                continue;
+            }
+
+            if ($event->event_type === 'register') {
+                $series[$dateKey]['registrations']++;
+                continue;
+            }
+
+            if ($event->event_type === 'checkout_started') {
+                $series[$dateKey]['checkouts']++;
+                continue;
+            }
+
+            if ($event->event_type === 'purchase') {
+                $series[$dateKey]['purchases']++;
+                $series[$dateKey]['revenue'] += (float) ($event->amount ?? 0);
+            }
+        }
+
+        return [
+            'labels' => array_column($series, 'label'),
+            'visits' => array_column($series, 'visits'),
+            'registrations' => array_column($series, 'registrations'),
+            'checkouts' => array_column($series, 'checkouts'),
+            'purchases' => array_column($series, 'purchases'),
+            'revenue' => array_map(static fn ($value) => round((float) $value, 2), array_column($series, 'revenue')),
+        ];
+    }
+
+    private function buildAcquisitionChannelChart(int $referrerUserId, int $limit = 6): array
+    {
+        $rows = ReferralLinkVisit::query()
+            ->select('utm_source', 'referrer_url', 'registered_user_id', 'purchases_count', 'total_revenue_amount')
+            ->where('referrer_user_id', $referrerUserId)
+            ->get()
+            ->groupBy(function (ReferralLinkVisit $visit) {
+                return $this->resolveAcquisitionChannelLabel($visit);
+            })
+            ->map(function ($group, $label) {
+                return [
+                    'label' => $label,
+                    'visits' => (int) $group->count(),
+                    'registrations' => (int) $group->whereNotNull('registered_user_id')->count(),
+                    'purchases' => (int) $group->sum('purchases_count'),
+                    'revenue' => round((float) $group->sum('total_revenue_amount'), 2),
+                ];
+            })
+            ->sortByDesc('visits')
+            ->take($limit)
+            ->values();
+
+        if ($rows->isEmpty()) {
+            return $this->emptyChannelTrackingChart();
+        }
+
+        return [
+            'labels' => $rows->pluck('label')->all(),
+            'visits' => $rows->pluck('visits')->all(),
+            'registrations' => $rows->pluck('registrations')->all(),
+            'purchases' => $rows->pluck('purchases')->all(),
+            'revenue' => $rows->pluck('revenue')->all(),
+        ];
+    }
+
+    private function buildSharingChannelBreakdown(int $referrerUserId)
+    {
+        return ReferralLinkEvent::query()
+            ->select('channel', 'event_type')
+            ->where('referrer_user_id', $referrerUserId)
+            ->whereIn('event_type', ['share', 'reshare', 'copy'])
+            ->whereNotNull('channel')
+            ->get()
+            ->groupBy(fn (ReferralLinkEvent $event) => $this->formatChannelLabel($event->channel))
+            ->map(function ($group, $channel) {
+                $shareCount = (int) $group->where('event_type', 'share')->count();
+                $reshareCount = (int) $group->where('event_type', 'reshare')->count();
+                $copyCount = (int) $group->where('event_type', 'copy')->count();
+
+                return (object) [
+                    'channel' => $channel,
+                    'shares' => $shareCount,
+                    'reshares' => $reshareCount,
+                    'copies' => $copyCount,
+                    'total' => $shareCount + $reshareCount + $copyCount,
+                ];
+            })
+            ->sortByDesc('total')
+            ->values();
+    }
+
+    private function buildSharingChannelChart($trackingChannels): array
+    {
+        if ($trackingChannels->isEmpty()) {
+            return $this->emptySharingTrackingChart();
+        }
+
+        return [
+            'labels' => $trackingChannels->pluck('channel')->all(),
+            'shares' => $trackingChannels->pluck('shares')->all(),
+            'reshares' => $trackingChannels->pluck('reshares')->all(),
+            'copies' => $trackingChannels->pluck('copies')->all(),
+        ];
+    }
+
+    private function resolveAcquisitionChannelLabel(ReferralLinkVisit $visit): string
+    {
+        $utmSource = trim((string) ($visit->utm_source ?? ''));
+        if ($utmSource !== '') {
+            return $this->formatChannelLabel($utmSource);
+        }
+
+        $host = trim((string) parse_url((string) ($visit->referrer_url ?? ''), PHP_URL_HOST));
+        if ($host !== '') {
+            $host = preg_replace('/^www\./i', '', $host) ?: $host;
+
+            return Str::headline($host);
+        }
+
+        return 'Direto';
+    }
+
+    private function formatChannelLabel(?string $channel): string
+    {
+        $channel = trim((string) $channel);
+
+        if ($channel === '') {
+            return 'Outro';
+        }
+
+        return Str::headline(str_replace(['_', '-', '.'], ' ', $channel));
+    }
+
+    private function emptyDailyTrackingChart(): array
+    {
+        return [
+            'labels' => [],
+            'visits' => [],
+            'registrations' => [],
+            'checkouts' => [],
+            'purchases' => [],
+            'revenue' => [],
+        ];
+    }
+
+    private function emptyChannelTrackingChart(): array
+    {
+        return [
+            'labels' => [],
+            'visits' => [],
+            'registrations' => [],
+            'purchases' => [],
+            'revenue' => [],
+        ];
+    }
+
+    private function emptySharingTrackingChart(): array
+    {
+        return [
+            'labels' => [],
+            'shares' => [],
+            'reshares' => [],
+            'copies' => [],
+        ];
     }
 }

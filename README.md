@@ -4,6 +4,7 @@
 
 - **Reconciliacao historica de pontos:** O comando `points:reconcile-legacy-members` e as migrations de marco agora recalculam pontos antigos com base em registros reais de **cadastro, perfil completo, primeiro curso, mentor, curso concluido, certificado, evento, mentoria e avaliacoes**.
 - **Programa de indicacao com rastreio completo:** O painel de indicacoes passou a mostrar **cliques, visitas unicas, pageviews, cadastros atribuidos, checkouts iniciados, compras confirmadas, receita rastreada, copias, compartilhamentos e recompartilhamentos** do link de afiliado.
+- **Painel analitico de indicacoes:** O modulo de afiliados agora inclui **graficos por dia e por canal** para acompanhar performance do link, aquisicao por origem e distribuicao dos compartilhamentos.
 - **Planos pagos com perfil comercial embutido:** Todos os planos pagos passaram a incluir permissoes de **instrutor/vendedor**, e o fluxo de resgates por pontos foi preparado para operar no mesmo ambiente entre admin e vendedor com fornecedor rastreavel.
 - **Painel novo estabilizado:** Foram corrigidos fluxos e layouts de **eventos, mentorias, faturas, regras de pontos, imagens administrativas e editores ricos**, mantendo o padrao visual do painel moderno.
 - **Upload e navegacao padronizados no painel:** Uploads do painel agora usam experiencia unificada com **arrastar e soltar, preview, progresso e tempo restante**, alem de sidebar com submenu e paginacao nas listagens extensas.
@@ -147,6 +148,7 @@ Configure as credenciais no painel admin em **ConfiguraÃ§Ãµes > SMTP**. Use 
   - Novas tabelas de tracking para visitas e eventos do link de referral.
   - Atribuicao persistente desde o clique ate o cadastro, inicio de checkout e compra confirmada.
   - Painel `/painel/indicacoes` com metricas de **cliques, visitas, cadastros, checkouts, compras, receita, copias, compartilhamentos e recompartilhamentos**.
+  - Novos graficos no painel para leitura **diaria (14 dias)** e por **canal/origem**, facilitando acompanhar evolucao, conversao e canais de compartilhamento.
   - Rastreamento de compartilhamento tambem nos atalhos rapidos do perfil e da area de indicacoes.
 - **Fluxo comercial em planos pagos e resgates:**
   - Planos pagos passam a carregar permissoes de instrutor e vendedor automaticamente.
