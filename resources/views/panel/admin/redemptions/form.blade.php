@@ -4,7 +4,6 @@
 
 @section('panel_content')
     <div class="max-w-3xl mx-auto space-y-6">
-        {{-- Header --}}
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">
@@ -23,11 +22,12 @@
         <form action="{{ $item->exists ? route('panel.admin.redemptions.update', $item) : route('panel.admin.redemptions.store') }}"
             method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
-            @if($item->exists) @method('PUT') @endif
+            @if($item->exists)
+                @method('PUT')
+            @endif
 
             <div
                 class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-8 transition-colors">
-                {{-- Image Upload --}}
                 <div>
                     <label
                         class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-4 tracking-widest">Imagem
@@ -83,11 +83,13 @@
                     <label
                         class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest">Descrição
                         detalhada</label>
-                    <textarea name="description" rows="5"
+                    <textarea id="redemptionDescription" name="description" rows="5"
                         class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">{{ old('description', $item->description) }}</textarea>
+                    <p class="mt-2 text-[11px] text-slate-400 dark:text-slate-500">
+                        Use formatação rica para detalhar o item. Envio de imagens e arquivos fica desativado neste campo.
+                    </p>
                 </div>
 
-                {{-- Footer --}}
                 <div
                     class="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800 transition-colors">
                     <label class="flex items-center gap-3 cursor-pointer group">
@@ -105,4 +107,56 @@
             </div>
         </form>
     </div>
+
+    @push('scripts')
+        <script>
+            $(document).ready(function () {
+                const $descriptionField = $('#redemptionDescription');
+
+                if (!(window.jQuery && $.fn && $.fn.summernote) || !$descriptionField.length || $descriptionField.next('.note-editor').length) {
+                    return;
+                }
+
+                $descriptionField.summernote({
+                    height: 260,
+                    lang: 'pt-BR',
+                    placeholder: 'Detalhe o item de resgate, regras de uso, entrega e condições...',
+                    disableDragAndDrop: true,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'underline', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ],
+                    callbacks: {
+                        onChange: function (contents) {
+                            $descriptionField.val(contents);
+                        },
+                        onImageUpload: function () {
+                            return false;
+                        },
+                        onPaste: function (event) {
+                            const clipboardEvent = event.originalEvent || event;
+                            const items = clipboardEvent.clipboardData ? clipboardEvent.clipboardData.items || [] : [];
+                            const hasFile = Array.from(items).some(function (item) {
+                                return item.kind === 'file';
+                            });
+
+                            if (hasFile) {
+                                event.preventDefault();
+                            }
+                        }
+                    }
+                });
+
+                $descriptionField.next('.note-editor').find('.note-editable').on('drop', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                });
+            });
+        </script>
+    @endpush
 @endsection
