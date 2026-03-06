@@ -994,6 +994,8 @@
                 const previewMaxWidth = box.data('preview-max-width');
                 const previewStyle = (previewMaxHeight ? 'max-height:' + previewMaxHeight + 'px;' : '') +
                     (previewMaxWidth ? 'max-width:' + previewMaxWidth + 'px;' : '');
+                const previewImageStyle = String(box.data('preview-image-style') || previewStyle || '').trim();
+                const previewImageClass = String(box.data('preview-image-class') || 'img-fluid').trim();
 
                 if (help.length) {
                     help.text('Aceita: ' + accept + ' • Até ' + sizeMb + (crop ? ' • Possível recorte' : ''));
@@ -1037,7 +1039,10 @@
                             (url ? '<div class="mt-2"><a href="' + url + '" target="_blank" rel="noopener" class="btn btn-xs btn-outline-primary">Abrir</a></div>' : '');
                     }
 
-                    return '<img src="' + url + '" alt="preview" class="img-fluid">';
+                    const imageClassAttr = previewImageClass !== '' ? ' class="' + previewImageClass + '"' : '';
+                    const imageStyleAttr = previewImageStyle !== '' ? ' style="' + previewImageStyle + '"' : '';
+
+                    return '<img src="' + url + '" alt="preview"' + imageClassAttr + imageStyleAttr + '>';
                 }
 
                 function renderEmpty() {
