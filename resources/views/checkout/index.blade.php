@@ -3,6 +3,16 @@
 @section('title', 'Checkout - ' . $course->title)
 
 @section('content')
+    @php
+        $selectedGateway = old('gateway_provider');
+        if (!$selectedGateway) {
+            $selectedGateway = ($mpEnabled ?? true) ? 'mercadopago' : 'pagseguro';
+        }
+
+        $selectedGatewaySummary = $selectedGateway === 'pagseguro'
+            ? 'Pagamento via PagSeguro.'
+            : 'Pagamento via Mercado Pago.';
+    @endphp
     <div class="min-h-screen bg-slate-50 pt-28 pb-20 px-4">
         <div class="max-w-4xl mx-auto">
             <a href="{{ route('courses.show', $course->slug ?: $course->id) }}"
@@ -43,7 +53,7 @@
                                     </p>
                                 @endif
                             </div>
-                            <p class="text-xs text-gray-500 mt-2">Pagamento via MercadoPago.</p>
+                            <p id="gateway-summary-text" class="text-xs text-gray-500 mt-2">{{ $selectedGatewaySummary }}</p>
                         </div>
                     </div>
                 </div>
@@ -70,7 +80,8 @@
                                     @if($mpEnabled ?? true)
                                         <label class="cursor-pointer">
                                             <input type="radio" name="gateway_provider" value="mercadopago" class="peer sr-only"
-                                                {{ ($mpEnabled ?? true) ? 'checked' : '' }}>
+                                                data-gateway-summary="Pagamento via Mercado Pago."
+                                                {{ $selectedGateway === 'mercadopago' ? 'checked' : '' }}>
                                             <div
                                                 class="p-4 rounded-xl border-2 border-gray-200 hover:border-blue-500 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
                                                 <div class="flex items-center gap-3">
@@ -90,7 +101,8 @@
                                     @if($psEnabled ?? false)
                                         <label class="cursor-pointer">
                                             <input type="radio" name="gateway_provider" value="pagseguro" class="peer sr-only"
-                                                {{ !($mpEnabled ?? true) ? 'checked' : '' }}>
+                                                data-gateway-summary="Pagamento via PagSeguro."
+                                                {{ $selectedGateway === 'pagseguro' ? 'checked' : '' }}>
                                             <div
                                                 class="p-4 rounded-xl border-2 border-gray-200 hover:border-green-500 peer-checked:border-green-600 peer-checked:bg-green-50 transition-all">
                                                 <div class="flex items-center gap-3">
@@ -123,4 +135,27 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const summaryText = document.getElementById('gateway-summary-text');
+            const gatewayInputs = document.querySelectorAll('input[name="gateway_provider"]');
+
+            if (!summaryText || gatewayInputs.length === 0) {
+                return;
+            }
+
+            const syncGatewaySummary = () => {
+                const selectedGateway = document.querySelector('input[name="gateway_provider"]:checked');
+                if (!selectedGateway) {
+                    return;
+                }
+
+                summaryText.textContent = selectedGateway.dataset.gatewaySummary || '';
+            };
+
+            gatewayInputs.forEach((input) => input.addEventListener('change', syncGatewaySummary));
+            syncGatewaySummary();
+        });
+    </script>
 @endsection
