@@ -265,11 +265,11 @@ class SocialController extends Controller
                 'adsEnabled' => $adsEnabled,
                 'adsCode' => $adsCode,
                 'adsConfig' => $adsConfig,
-                'pageData' => Page::where('slug', 'feed')->first()?->data ?? [],
+                'pageData' => Page::dataBySlug('feed'),
             ]);
         }
 
-        $pageData = Page::where('slug', 'feed')->first()?->data ?? [];
+        $pageData = Page::dataBySlug('feed');
 
         return view('social.feed', [
             'posts' => $posts,

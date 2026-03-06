@@ -182,11 +182,11 @@ class MemberController extends Controller
                 'members' => $members,
                 'isDemo' => true,
                 'connectionMap' => $connectionMap,
-                'pageData' => Page::where('slug', 'membros')->first()?->data ?? [],
+                'pageData' => Page::dataBySlug('membros'),
             ]);
         }
 
-        $pageData = Page::where('slug', 'membros')->first()?->data ?? [];
+        $pageData = Page::dataBySlug('membros');
 
         return view('site.membros', compact('members', 'connectionMap', 'pageData'));
     }

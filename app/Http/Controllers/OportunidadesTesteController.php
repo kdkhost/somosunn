@@ -49,7 +49,7 @@ class OportunidadesTesteController extends Controller
                 ->whereNotNull('type')->where('type', '!=', '')
                 ->distinct()->orderBy('type')->pluck('type');
 
-            $pageData = Page::where('slug', 'vagas-abertas')->first()?->data ?? [];
+            $pageData = Page::dataBySlug('vagas-abertas');
 
             return view('oportunidades', compact('vagas', 'partnerNames', 'tiposDisponiveis', 'pageData'));
         } catch (\Throwable $e) {

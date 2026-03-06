@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class Page extends Model
 {
     use HasFactory;
+
+    protected static ?bool $pageTableAvailable = null;
 
     protected $fillable = [
         'slug',
@@ -24,7 +27,39 @@ class Page extends Model
      */
     public static function findBySlug(string $slug): ?self
     {
+        if (!static::tableAvailable()) {
+            return null;
+        }
+
         return static::where('slug', $slug)->first();
+    }
+
+    /**
+     * Retorna os dados de uma página pelo slug sem quebrar se a tabela não existir.
+     */
+    public static function dataBySlug(string $slug, array $default = []): array
+    {
+        $data = static::findBySlug($slug)?->data;
+
+        return is_array($data) ? $data : $default;
+    }
+
+    /**
+     * Informa se a tabela de páginas CMS está disponível na base atual.
+     */
+    public static function tableAvailable(): bool
+    {
+        if (static::$pageTableAvailable !== null) {
+            return static::$pageTableAvailable;
+        }
+
+        try {
+            static::$pageTableAvailable = Schema::hasTable((new static())->getTable());
+        } catch (\Throwable) {
+            static::$pageTableAvailable = false;
+        }
+
+        return static::$pageTableAvailable;
     }
 
     /**

@@ -93,11 +93,11 @@ class CourseController extends Controller
                 'courses' => $demoCourses,
                 'featuredCourse' => $demoCourses->first(),
                 'isDemo' => true,
-                'pageData' => Page::where('slug', 'cursos')->first()?->data ?? [],
+                'pageData' => Page::dataBySlug('cursos'),
             ]);
         }
 
-        $pageData = Page::where('slug', 'cursos')->first()?->data ?? [];
+        $pageData = Page::dataBySlug('cursos');
 
         return view('courses.index', compact('courses', 'featuredCourse', 'pageData'));
     }

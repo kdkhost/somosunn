@@ -126,7 +126,7 @@ class HomeController extends Controller
             'levelSummary' => $overview['levelSummary'],
             'topRankings' => $overview['leaderboard'],
             'isDemo' => config('app.demo_mode') && $mentorings->isEmpty(),
-            'pageData' => Page::where('slug', 'portal')->first()?->data ?? [],
+            'pageData' => Page::dataBySlug('portal'),
         ]);
     }
 
@@ -180,7 +180,7 @@ class HomeController extends Controller
             }
         }
 
-        $pageData = Page::where('slug', 'premium')->first()?->data ?? [];
+        $pageData = Page::dataBySlug('premium');
 
         return view('site.premium', compact(
             'plans',

@@ -38,7 +38,7 @@ class EventController extends Controller
             ->limit(6)
             ->get();
 
-        $pageData = Page::where('slug', 'eventos')->first()?->data ?? [];
+        $pageData = Page::dataBySlug('eventos');
 
         return view('events.index', compact('events', 'featuredEvent', 'otherEvents', 'pastEvents', 'pageData'));
     }
