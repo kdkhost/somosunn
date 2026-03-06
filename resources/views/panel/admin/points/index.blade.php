@@ -32,13 +32,23 @@
     {{-- Rules List --}}
     <div class="space-y-8">
         @foreach($rulesGrouped as $category => $rules)
+        @php
+            $categoryKey = is_string($category) && $category !== '' ? $category : 'outros';
+            $categoryMeta = $categories[$categoryKey] ?? null;
+            $categoryLabel = is_array($categoryMeta)
+                ? ($categoryMeta['label'] ?? ucfirst($categoryKey))
+                : (is_string($categoryMeta) ? $categoryMeta : ucfirst($categoryKey));
+            $categoryIcon = is_array($categoryMeta)
+                ? ($categoryMeta['icon'] ?? 'fas fa-tags')
+                : 'fas fa-tags';
+        @endphp
         <div class="space-y-4">
             <div class="flex items-center gap-3 px-2">
                 <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs transition-colors">
-                    <i class="fas fa-tags"></i>
+                    <i class="{{ $categoryIcon }}"></i>
                 </div>
                 <h3 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors">
-                    {{ $categories[$category] ?? ucfirst($category) }}
+                    {{ $categoryLabel }}
                 </h3>
             </div>
 
