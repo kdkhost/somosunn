@@ -167,7 +167,7 @@
                                     GRATUITA
                                 </span>
                                 <h3 class="text-xl font-bold unn-title-gradient mb-3">{{ $event->title }}</h3>
-                                <p class="text-gray-600 text-sm mb-4">{{ Str::limit($event->description, 100) }}</p>
+                                <p class="text-gray-600 text-sm mb-4">{{ Str::limit(strip_tags((string) ($event->description ?? '')), 100) }}</p>
                                 <div class="flex items-center gap-4 text-sm text-gray-500 mb-6">
                                     <span><i class="fas fa-calendar mr-1"></i>
                                         {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y H:i') }}</span>
@@ -232,7 +232,7 @@
                                     {{ number_format($mentorship->price, 2, ',', '.') }}</span>
                             </div>
                             <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $mentorship->title }}</h3>
-                            <p class="text-gray-600 text-sm mb-4">{{ Str::limit($mentorship->description, 100) }}</p>
+                            <p class="text-gray-600 text-sm mb-4">{{ Str::limit(strip_tags((string) ($mentorship->description ?? '')), 100) }}</p>
                             <p class="text-sm text-gray-500 mb-6">Vagas: <strong>{{ $mentorship->slots }}</strong></p>
                             @if(!($mentorship->is_demo ?? false) && isset($mentorship->id))
                                 <a href="{{ route('mentorships.show', $mentorship->id) }}"

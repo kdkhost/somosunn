@@ -105,7 +105,7 @@
                         <span class="text-xs text-gray-400 flex items-center gap-1"><i class="fas fa-clock"></i> {{ $course->total_hours ?? $course->getTotalHoursAttribute() }} horas</span>
                     </div>
                     <h3 class="text-lg font-bold text-gray-900 mb-1">{{ $course->title }}</h3>
-                    <p class="text-gray-600 text-sm mb-2">{{ Str::limit($course->short_description, 80) }}</p>
+                    <p class="text-gray-600 text-sm mb-2">{{ Str::limit(strip_tags((string) ($course->short_description ?? '')), 80) }}</p>
                     <p class="text-xs text-gray-500 mb-2">Por {{ $course->author_name ?? 'Especialista UNN' }}</p>
                     <div class="mt-auto flex flex-col gap-2">
                         @if($course->price > 0)
@@ -140,7 +140,7 @@
                     <img src="{{ $event->thumbnail ?? asset('img/event-default.png') }}" alt="{{ $event->title }}" class="w-full h-28 object-cover rounded-xl mb-3">
                     <h3 class="text-base font-bold text-gray-900 mb-1">{{ $event->title }}</h3>
                     <p class="text-xs text-gray-500 mb-1">{{ $event->speaker ?? $event->author_name ?? 'Palestrante UNN' }}</p>
-                    <p class="text-gray-600 text-xs mb-2">{{ Str::limit($event->description, 60) }}</p>
+                    <p class="text-gray-600 text-xs mb-2">{{ Str::limit(strip_tags((string) ($event->description ?? '')), 60) }}</p>
                     <div class="flex items-center justify-between mt-auto">
                         <span class="text-xs text-gray-500 flex items-center gap-1"><i class="fas fa-clock"></i> {{ $event->duration ?? '60' }} min</span>
                         <span class="text-xs text-gray-500 flex items-center gap-1"><i class="fas fa-users"></i> {{ $event->participants_count ?? '---' }}</span>
@@ -169,7 +169,7 @@
                     <div class="mb-3">
                         <img src="{{ $course->thumbnail ?? asset('img/course-default.png') }}" alt="{{ $course->title }}" class="w-full h-40 object-cover rounded-xl mb-2">
                         <h3 class="text-xl font-bold text-gray-900 mb-1">{{ $course->title }}</h3>
-                        <p class="text-gray-600 text-sm mb-2">{{ Str::limit($course->short_description, 80) }}</p>
+                        <p class="text-gray-600 text-sm mb-2">{{ Str::limit(strip_tags((string) ($course->short_description ?? '')), 80) }}</p>
                     </div>
                     <div class="mt-auto flex flex-col gap-2">
                         <span class="text-xs text-gray-500">Carga horária: <strong>{{ $course->total_hours ?? $course->getTotalHoursAttribute() }}h</strong></span>
@@ -206,7 +206,7 @@
                         <span class="font-bold" style="color: var(--unn-azul-1)">R$ {{ number_format($mentorship->price, 2, ',', '.') }}</span>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $mentorship->title }}</h3>
-                    <p class="text-gray-600 text-sm mb-4">{{ Str::limit($mentorship->description, 100) }}</p>
+                    <p class="text-gray-600 text-sm mb-4">{{ Str::limit(strip_tags((string) ($mentorship->description ?? '')), 100) }}</p>
                     <p class="text-sm text-gray-500 mb-4">Vagas: <strong>{{ $mentorship->slots }}</strong></p>
                     @if(isset($mentorship->id))
                     <a href="{{ route('mentorships.show', $mentorship->id) }}" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold w-full block text-center">
