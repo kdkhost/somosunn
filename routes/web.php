@@ -778,6 +778,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         Route::post('redemptions/{redemption}/cancel', [\App\Http\Controllers\Admin\RedemptionController::class, 'cancel'])->name('redemptions.cancel');
         Route::resource('redemptions', \App\Http\Controllers\Admin\RedemptionController::class);
 
+        Route::prefix('indicacoes')->name('referrals.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\ReferralController::class, 'index'])->name('index');
+            Route::get('/exportar', [\App\Http\Controllers\Admin\ReferralController::class, 'export'])->name('export');
+            Route::post('/rastrear', [\App\Http\Controllers\Admin\ReferralController::class, 'track'])->name('track');
+            Route::post('/tokens', [\App\Http\Controllers\Admin\ReferralController::class, 'storeToken'])->name('tokens.store');
+            Route::put('/tokens/{token}', [\App\Http\Controllers\Admin\ReferralController::class, 'updateToken'])->name('tokens.update');
+            Route::delete('/tokens/{token}', [\App\Http\Controllers\Admin\ReferralController::class, 'destroyToken'])->name('tokens.destroy');
+        });
+
 
         // FAILSAFE ROUTES (DO NOT REMOVE)
         Route::get('/upload/test', fn() => null)->middleware('check.feature:uploads_access')->name('upload.test');

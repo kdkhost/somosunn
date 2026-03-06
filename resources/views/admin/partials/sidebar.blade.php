@@ -227,6 +227,7 @@
                             'admin.jobs.*',
                             'admin.partners.*',
                             'admin.redemptions.*',
+                            'admin.referrals.*',
                             'admin.settings*',
                             'admin.cron.*',
                         ];
@@ -257,6 +258,13 @@
                                     class="nav-link {{ $is('admin.redemptions.*') }}">
                                     <i class="fas fa-gift nav-icon"></i>
                                     <p>Itens de Resgate</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.referrals.index') }}"
+                                    class="nav-link {{ $is('admin.referrals.*') }}">
+                                    <i class="fas fa-bullhorn nav-icon"></i>
+                                    <p>Afiliados</p>
                                 </a>
                             </li>
                             <li class="nav-item">

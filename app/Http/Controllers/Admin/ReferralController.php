@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Panel;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Concerns\ManagesPersonalApiTokens;
 use App\Http\Controllers\Controller;
@@ -12,7 +12,6 @@ use App\Services\AffiliateTrackingService;
 use App\Services\ReferralAnalyticsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ReferralController extends Controller
 {
@@ -24,10 +23,10 @@ class ReferralController extends Controller
     ) {
     }
 
-    public function index()
+    public function index(Request $request)
     {
         /** @var User $user */
-        $user = Auth::user();
+        $user = $request->user();
 
         $user = $this->shareKit->ensureReferralCode($user);
 
@@ -51,7 +50,7 @@ class ReferralController extends Controller
             ->with('plan:id,name,price,is_free')
             ->select('id', 'name', 'email', 'photo', 'created_at', 'plan_id', 'plan_expires_at')
             ->latest()
-            ->paginate(20, ['*'], 'members_page');
+            ->paginate(10, ['*'], 'members_page');
 
         $totalReferred = User::where('referred_by', $user->id)->count();
         $convertedCount = count(array_unique($convertedUserIds));
@@ -60,7 +59,14 @@ class ReferralController extends Controller
         $plansMap = Plan::whereIn('id', $referredUsers->pluck('plan_id')->filter()->unique()->values())
             ->pluck('name', 'id');
 
-        return view('panel.referral.index', array_merge(compact(
+        $selectedReferrerId = $request->integer('referrer');
+        $selectedReferrer = $selectedReferrerId > 0
+            ? User::query()->select('id', 'name', 'email', 'photo', 'referral_code')->find($selectedReferrerId)
+            : null;
+
+        $scopeReferrerId = $selectedReferrer?->id;
+
+        return view('admin.referrals.index', array_merge(compact(
             'user',
             'referralLink',
             'referredUsers',
@@ -70,17 +76,32 @@ class ReferralController extends Controller
             'totalReferred',
             'convertedCount',
             'pendingCount',
-            'plansMap'
+            'plansMap',
+            'selectedReferrer'
         ), [
-            'channelFunnels' => $this->analytics->buildChannelFunnels($user->id),
-            'detailedEvents' => $this->analytics->detailedEventsPaginator($user->id, 20, 'events_page'),
-            'affiliateShareKit' => $this->shareKit->buildForUser($user),
+            'channelFunnels' => $this->analytics->buildChannelFunnels($scopeReferrerId),
+            'detailedEvents' => $this->analytics->detailedEventsPaginator($scopeReferrerId, 20, 'events_page'),
+            'affiliateLeaderboard' => $this->analytics->affiliateLeaderboard(15, 'affiliates_page'),
             'apiTokens' => $this->apiTokensForUser($user),
             'apiTokenPlainText' => session('api_token_plain_text'),
             'apiTokenDeviceName' => session('api_token_device_name'),
             'apiTokensEnabled' => $this->hasPersonalAccessTokensTable(),
             'apiTokenIpTrackingEnabled' => $this->hasPersonalAccessTokenColumn('last_used_ip'),
-        ], $this->analytics->buildDashboardPayload($user->id)));
+        ], $this->analytics->buildDashboardPayload($scopeReferrerId)));
+    }
+
+    public function export(Request $request)
+    {
+        $selectedReferrerId = $request->integer('referrer');
+        $selectedReferrer = $selectedReferrerId > 0
+            ? User::query()->select('id', 'name', 'referral_code')->find($selectedReferrerId)
+            : null;
+
+        $filename = $selectedReferrer
+            ? sprintf('rastreio-afiliado-admin-%s-%s.csv', $selectedReferrer->referral_code ?: $selectedReferrer->id, now()->format('Ymd-His'))
+            : sprintf('rastreio-afiliados-admin-global-%s.csv', now()->format('Ymd-His'));
+
+        return $this->analytics->exportDetailedEventsCsv($selectedReferrer?->id, $filename);
     }
 
     public function storeToken(Request $request): RedirectResponse
@@ -103,7 +124,7 @@ class ReferralController extends Controller
         $plainTextToken = $user->createToken($data['device_name'])->plainTextToken;
 
         return redirect()
-            ->route('panel.referral.index')
+            ->route('admin.referrals.index')
             ->with('success', 'Token da API gerado com sucesso.')
             ->with('api_token_plain_text', $plainTextToken)
             ->with('api_token_device_name', $data['device_name']);
@@ -126,7 +147,7 @@ class ReferralController extends Controller
         ])->save();
 
         return redirect()
-            ->route('panel.referral.index')
+            ->route('admin.referrals.index')
             ->with('success', 'Token renomeado com sucesso.');
     }
 
@@ -139,7 +160,7 @@ class ReferralController extends Controller
         $token->delete();
 
         return redirect()
-            ->route('panel.referral.index')
+            ->route('admin.referrals.index')
             ->with('success', 'Token revogado com sucesso.');
     }
 
@@ -157,7 +178,7 @@ class ReferralController extends Controller
             (string) $data['action'],
             $data['channel'] ?? null,
             [
-                'context' => $data['context'] ?? 'panel_referral',
+                'context' => $data['context'] ?? 'admin_legacy_referral',
                 'target_url' => $data['target_url'] ?? null,
             ]
         );
@@ -167,61 +188,4 @@ class ReferralController extends Controller
             'event_type' => $eventType,
         ]);
     }
-
-    public function stats(Request $request)
-    {
-        /** @var User $user */
-        $user = $request->user();
-
-        $user = $this->shareKit->ensureReferralCode($user);
-
-        $payload = $this->analytics->buildDashboardPayload($user->id);
-        $channelFunnels = $this->analytics->buildChannelFunnels($user->id);
-        $detailedEvents = $this->analytics->detailedEventsPaginator($user->id, 20, 'events_page');
-        $affiliateShareKit = $this->shareKit->buildForUser($user);
-
-        return response()->json([
-            'ok' => true,
-            'trackingAvailable' => $payload['trackingAvailable'],
-            'trackingStatusMessage' => $payload['trackingStatusMessage'],
-            'trackingStatusTone' => $payload['trackingStatusTone'],
-            'trackingUpdatedAt' => $payload['trackingUpdatedAt'],
-            'trackingUpdatedAtLabel' => $payload['trackingUpdatedAtLabel'],
-            'trackingSummary' => $payload['trackingSummary'],
-            'trackingChannels' => $payload['trackingChannels']->values()->all(),
-            'trackedVisitsFeed' => $payload['trackedVisitsFeed'],
-            'trackingDailyChart' => $payload['trackingDailyChart'],
-            'trackingAcquisitionChart' => $payload['trackingAcquisitionChart'],
-            'trackingSharingChart' => $payload['trackingSharingChart'],
-            'channelFunnelsHtml' => view('panel.referral.partials.channel-funnel', [
-                'channelFunnels' => $channelFunnels,
-                'title' => 'Funil por canal e origem',
-                'subtitle' => 'Veja de onde vieram os cliques, quantas visualizações cada origem gerou e onde realmente converte.',
-            ])->render(),
-            'detailedEventsHtml' => view('panel.referral.partials.events-log', [
-                'detailedEvents' => $detailedEvents,
-                'exportUrl' => route('panel.referral.export'),
-                'title' => 'Log detalhado de cliques, visitas e compartilhamentos',
-                'subtitle' => 'Inclui URL de origem exata, landing page, dispositivo, navegador, cidade/país e o resultado de cada ação.',
-                'emptyMessage' => 'Ainda não há cliques, visitas ou compartilhamentos detalhados para este afiliado.',
-            ])->render(),
-            'shareKitHtml' => view('panel.referral.partials.share-kit', [
-                'affiliateShareKit' => $affiliateShareKit,
-            ])->render(),
-        ]);
-    }
-
-    public function export(Request $request)
-    {
-        /** @var User $user */
-        $user = $request->user();
-
-        $user = $this->shareKit->ensureReferralCode($user);
-
-        return $this->analytics->exportDetailedEventsCsv(
-            $user->id,
-            sprintf('rastreio-indicacoes-%s-%s.csv', $user->referral_code, now()->format('Ymd-His'))
-        );
-    }
-
 }
