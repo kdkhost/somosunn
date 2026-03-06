@@ -2,10 +2,14 @@
 
 namespace App\Services\Payment;
 
+use App\Exceptions\PaymentGatewayException;
 use App\Models\Order;
 use App\Models\GatewayAccount;
 use App\Models\Setting;
+use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Exception;
 
 class PagSeguroService
@@ -102,6 +106,89 @@ class PagSeguroService
         ];
     }
 
+    public function isPixAvailable(Order $order): bool
+    {
+        return !Cache::get($this->pixAvailabilityCacheKey($order), false);
+    }
+
+    public function markPixAsUnavailable(Order $order, int $minutes = 360): void
+    {
+        Cache::put($this->pixAvailabilityCacheKey($order), true, now()->addMinutes($minutes));
+    }
+
+    private function pixAvailabilityCacheKey(Order $order): string
+    {
+        $owner = $order->seller_id ?: 'platform';
+
+        return 'pagseguro:pix:whitelist-blocked:' . $owner;
+    }
+
+    private function throwApiException(string $context, Response $response): void
+    {
+        $payload = $response->json();
+        if (!is_array($payload)) {
+            $decoded = json_decode((string) $response->body(), true);
+            $payload = is_array($decoded) ? $decoded : [];
+        }
+
+        $errors = collect(data_get($payload, 'error_messages', []))
+            ->filter(fn ($item) => is_array($item))
+            ->values();
+
+        $codes = $errors
+            ->pluck('code')
+            ->filter()
+            ->map(fn ($code) => strtoupper((string) $code))
+            ->values()
+            ->all();
+
+        $descriptions = $errors
+            ->pluck('description')
+            ->filter()
+            ->map(fn ($description) => trim((string) $description))
+            ->values()
+            ->all();
+
+        $descriptionText = Str::lower(implode(' ', $descriptions));
+        $contextLabel = match ($context) {
+            'pix' => 'o Pix',
+            'credit_card' => 'o pagamento com cartao',
+            'checkout' => 'a sessao de pagamento',
+            default => 'o pagamento',
+        };
+
+        if (in_array('ACCESS_DENIED', $codes, true) && str_contains($descriptionText, 'whitelist')) {
+            throw new PaymentGatewayException(
+                'O Pix do PagSeguro nao esta liberado para esta conta no momento. Solicite a liberacao de whitelist no PagSeguro ou use outro metodo de pagamento disponivel.',
+                'pagseguro_pix_whitelist_required',
+                422,
+                [
+                    'provider' => 'pagseguro',
+                    'status' => $response->status(),
+                    'context' => $context,
+                    'provider_codes' => $codes,
+                    'provider_descriptions' => $descriptions,
+                ]
+            );
+        }
+
+        $detail = $descriptions[0] ?? trim((string) $response->body());
+        $detail = $detail !== '' ? $detail : 'Resposta invalida do PagSeguro.';
+
+        throw new PaymentGatewayException(
+            'Nao foi possivel concluir ' . $contextLabel . ' no PagSeguro. ' . $detail,
+            'pagseguro_api_error',
+            422,
+            [
+                'provider' => 'pagseguro',
+                'status' => $response->status(),
+                'context' => $context,
+                'provider_codes' => $codes,
+                'provider_descriptions' => $descriptions,
+            ]
+        );
+    }
+
     public function createCheckoutSession(Order $order): array
     {
         $config = $this->getSellerConfig($order);
@@ -157,8 +244,7 @@ class PagSeguroService
             ->post("{$baseUrl}/orders", $body);
 
         if ($response->failed()) {
-            // Handle specific errors
-            throw new Exception('PagSeguro Error: ' . $response->body());
+            $this->throwApiException('checkout', $response);
         }
 
         return (array) $response->json();
@@ -194,7 +280,7 @@ class PagSeguroService
         $response = Http::withToken($config['token'])->post("{$baseUrl}/orders", $body);
 
         if ($response->failed()) {
-            throw new Exception('Erro PagSeguro Pix: ' . $response->body());
+            $this->throwApiException('pix', $response);
         }
 
         return $response->json();
@@ -241,7 +327,7 @@ class PagSeguroService
         $response = Http::withToken($config['token'])->post("{$baseUrl}/orders", $body);
 
         if ($response->failed()) {
-            throw new Exception('Erro PagSeguro Cartão: ' . $response->body());
+            $this->throwApiException('credit_card', $response);
         }
 
         return $response->json();

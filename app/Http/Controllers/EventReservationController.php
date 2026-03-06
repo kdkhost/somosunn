@@ -397,6 +397,7 @@ class EventReservationController extends Controller
                 return view('checkout.pagseguro_transparent', [
                     'order' => $order,
                     'publicKey' => config('payments.pagseguro.public_key'),
+                    'pixAvailable' => $psService->isPixAvailable($order),
                 ]);
             }
 

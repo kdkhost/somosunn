@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\PaymentGatewayException;
 use App\Models\Course;
 use App\Models\Order;
 use App\Models\User;
@@ -11,6 +12,7 @@ use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -178,7 +180,8 @@ class CheckoutController extends Controller
                 // Better: 
                 return view('checkout.pagseguro_transparent', [
                     'order' => $order,
-                    'publicKey' => config('payments.pagseguro.public_key') // Using Platform Key for now as encryption key? 
+                    'publicKey' => config('payments.pagseguro.public_key'), // Using Platform Key for now as encryption key? 
+                    'pixAvailable' => $psService->isPixAvailable($order),
                     // Note: If using Split, we should encrypt with Seller's Key? 
                     // V4 Split usually uses Platform Key for encryption and `charges` param to distribute.
                     // So Platform Key is likely correct.
@@ -339,8 +342,31 @@ class CheckoutController extends Controller
                 }
             }
 
+        } catch (PaymentGatewayException $e) {
+            if (
+                $gateway === 'pagseguro'
+                && $paymentMethod === 'pix'
+                && $e->errorCode() === 'pagseguro_pix_whitelist_required'
+            ) {
+                $psService->markPixAsUnavailable($order);
+            }
+
+            Log::warning('Falha controlada no checkout', [
+                'message' => $e->getMessage(),
+                'error_code' => $e->errorCode(),
+                'order_id' => $order->id ?? null,
+                'user_id' => Auth::id(),
+                'gateway' => $gateway ?? null,
+                'context' => $e->context(),
+            ]);
+
+            return response()->json([
+                'error' => $e->getMessage(),
+                'error_code' => $e->errorCode(),
+                'pix_disabled' => $e->errorCode() === 'pagseguro_pix_whitelist_required',
+            ], $e->httpStatus());
         } catch (\Throwable $e) {
-            \Log::error('Erro Checkout', [
+            Log::error('Erro Checkout', [
                 'message' => $e->getMessage(),
                 'order_id' => $order->id ?? null,
                 'user_id' => Auth::id(),
@@ -355,9 +381,21 @@ class CheckoutController extends Controller
                 }
             }
 
+            $errorCode = null;
+            if (Str::contains(Str::lower($message), 'access_denied') && Str::contains(Str::lower($message), 'whitelist')) {
+                if ($gateway === 'pagseguro' && $paymentMethod === 'pix') {
+                    $psService->markPixAsUnavailable($order);
+                }
+
+                $message = 'O Pix do PagSeguro nao esta liberado para esta conta no momento. Solicite a liberacao de whitelist no PagSeguro ou use outro metodo de pagamento disponivel.';
+                $errorCode = 'pagseguro_pix_whitelist_required';
+            }
+
             return response()->json([
-                'error' => $message !== '' ? $message : 'Não foi possível processar o pagamento no momento.'
-            ], 500);
+                'error' => $message !== '' ? $message : 'Nao foi possivel processar o pagamento no momento.',
+                'error_code' => $errorCode,
+                'pix_disabled' => $errorCode === 'pagseguro_pix_whitelist_required',
+            ], $errorCode ? 422 : 500);
         }
     }
 }

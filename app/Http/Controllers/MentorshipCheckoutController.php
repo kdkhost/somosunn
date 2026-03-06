@@ -167,7 +167,8 @@ class MentorshipCheckoutController extends Controller
             if ($gatewayProvider === 'pagseguro') {
                 return view('checkout.pagseguro_transparent', [
                     'order' => $order,
-                    'publicKey' => config('payments.pagseguro.public_key')
+                    'publicKey' => config('payments.pagseguro.public_key'),
+                    'pixAvailable' => $psService->isPixAvailable($order),
                 ]);
             } else {
                 $preference = $mpService->createPreference($order, [

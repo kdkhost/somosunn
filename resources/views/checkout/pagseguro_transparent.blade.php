@@ -3,6 +3,7 @@
 @section('title', 'Checkout PagSeguro - ' . config('app.name'))
 
 @section('content')
+    @php($pixAvailable = $pixAvailable ?? true)
     <div class="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-5xl mx-auto">
             <div class="text-center mb-10">
@@ -25,7 +26,8 @@
                                 <i class="far fa-credit-card mr-2"></i> Cartão de Crédito
                             </button>
                             <button id="btn-pix"
-                                class="flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700">
+                                class="flex-1 pb-2 border-b-2 border-transparent {{ $pixAvailable ? 'text-slate-500 hover:text-slate-700' : 'text-slate-300 cursor-not-allowed' }}"
+                                @disabled(!$pixAvailable)>
                                 <i class="brands fa-pix mr-2"></i> Pix
                             </button>
                         </div>
@@ -83,10 +85,15 @@
 
                         <!-- Form Pix -->
                         <div id="form-pix" class="hidden text-center py-8">
+                            <div id="pix-unavailable-alert"
+                                class="{{ $pixAvailable ? 'hidden' : '' }} mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-left text-sm text-amber-800">
+                                O Pix desta conta do PagSeguro esta indisponivel no momento. E necessario solicitar a liberacao de whitelist no PagSeguro ou usar outro metodo de pagamento.
+                            </div>
                             <p class="text-slate-600 mb-6">Ao clicar em "Gerar Pix", um QR Code será criado para pagamento
                                 instantâneo.</p>
                             <button id="btn-pay-pix"
-                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-green-600 hover:bg-green-700 focus:outline-none transition-colors">
+                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white {{ $pixAvailable ? 'bg-green-600 hover:bg-green-700' : 'bg-slate-300 cursor-not-allowed' }} focus:outline-none transition-colors"
+                                @disabled(!$pixAvailable)>
                                 <i class="fas fa-qrcode mr-2 mt-1"></i> Gerar Pix de R$
                                 {{ number_format($order->total_amount, 2, ',', '.') }}
                             </button>
@@ -146,24 +153,65 @@
     <!-- Note: Sandbox URL: https://stc.sandbox.pagseguro.uol.com.br/... -->
 
     <script>
-        // Toggle Tabs
-        document.getElementById('btn-cc').addEventListener('click', () => {
-            document.getElementById('form-cc').classList.remove('hidden');
-            document.getElementById('form-pix').classList.add('hidden');
-            document.getElementById('btn-cc').classList.replace('text-slate-500', 'text-blue-600');
-            document.getElementById('btn-cc').classList.replace('border-transparent', 'border-blue-600');
-            document.getElementById('btn-pix').classList.replace('text-blue-600', 'text-slate-500');
-            document.getElementById('btn-pix').classList.replace('border-blue-600', 'border-transparent');
-        });
+        const btnCc = document.getElementById('btn-cc');
+        const btnPix = document.getElementById('btn-pix');
+        const formCc = document.getElementById('form-cc');
+        const formPix = document.getElementById('form-pix');
+        const btnPayPix = document.getElementById('btn-pay-pix');
+        const pixUnavailableAlert = document.getElementById('pix-unavailable-alert');
+        const pixInitiallyAvailable = @json($pixAvailable);
 
-        document.getElementById('btn-pix').addEventListener('click', () => {
-            document.getElementById('form-cc').classList.add('hidden');
-            document.getElementById('form-pix').classList.remove('hidden');
-            document.getElementById('btn-pix').classList.replace('text-slate-500', 'text-blue-600');
-            document.getElementById('btn-pix').classList.replace('border-transparent', 'border-blue-600');
-            document.getElementById('btn-cc').classList.replace('text-blue-600', 'text-slate-500');
-            document.getElementById('btn-cc').classList.replace('border-blue-600', 'border-transparent');
-        });
+        function activateCardTab() {
+            formCc.classList.remove('hidden');
+            formPix.classList.add('hidden');
+
+            btnCc.classList.add('text-blue-600', 'border-blue-600');
+            btnCc.classList.remove('text-slate-500', 'border-transparent');
+
+            btnPix.classList.remove('text-blue-600', 'border-blue-600');
+            if (!btnPix.disabled) {
+                btnPix.classList.add('text-slate-500', 'border-transparent');
+            }
+        }
+
+        function activatePixTab() {
+            if (btnPix.disabled) {
+                return;
+            }
+
+            formCc.classList.add('hidden');
+            formPix.classList.remove('hidden');
+
+            btnPix.classList.add('text-blue-600', 'border-blue-600');
+            btnPix.classList.remove('text-slate-500', 'border-transparent');
+
+            btnCc.classList.remove('text-blue-600', 'border-blue-600');
+            btnCc.classList.add('text-slate-500', 'border-transparent');
+        }
+
+        function disablePix(message) {
+            btnPix.disabled = true;
+            btnPix.classList.remove('text-blue-600', 'text-slate-500', 'hover:text-slate-700', 'border-blue-600');
+            btnPix.classList.add('text-slate-300', 'cursor-not-allowed', 'border-transparent');
+
+            btnPayPix.disabled = true;
+            btnPayPix.classList.remove('bg-green-600', 'hover:bg-green-700');
+            btnPayPix.classList.add('bg-slate-300', 'cursor-not-allowed');
+
+            if (message) {
+                pixUnavailableAlert.textContent = message;
+            }
+
+            pixUnavailableAlert.classList.remove('hidden');
+            activateCardTab();
+        }
+
+        btnCc.addEventListener('click', activateCardTab);
+        btnPix.addEventListener('click', activatePixTab);
+
+        if (!pixInitiallyAvailable) {
+            disablePix('O Pix desta conta do PagSeguro esta indisponivel no momento. E necessario solicitar a liberacao de whitelist no PagSeguro ou usar outro metodo de pagamento.');
+        }
 
         // Initialize Session (Required for DirectPayment)
         // We'd need an endpoint to get Session ID from backend.
@@ -184,9 +232,13 @@
 
         // Actually, let's implement the Pix flow fully as it's easiest.
 
-        document.getElementById('btn-pay-pix').addEventListener('click', (e) => {
+        btnPayPix.addEventListener('click', (e) => {
+            if (btnPayPix.disabled) {
+                return;
+            }
+
             e.preventDefault();
-            const btn = e.target;
+            const btn = e.currentTarget;
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
             btn.disabled = true;
@@ -220,6 +272,10 @@
                                         <a href="${data.redirect || '#'}" class="btn btn-primary">Já Paguei</a>
                                      `;
                         document.getElementById('pix-modal').classList.remove('hidden');
+                    } else if (data.error_code === 'pagseguro_pix_whitelist_required' || data.pix_disabled) {
+                        const message = data.error || 'O Pix desta conta do PagSeguro esta indisponivel no momento. Volte e escolha outro metodo de pagamento.';
+                        disablePix(message);
+                        Swal.fire('Pix indisponivel', message, 'warning');
                     } else {
                         Swal.fire('Erro', data.error || 'Desconhecido', 'error');
                     }
@@ -230,7 +286,7 @@
                 })
                 .finally(() => {
                     btn.innerHTML = originalText;
-                    btn.disabled = false;
+                    btn.disabled = btn.classList.contains('cursor-not-allowed');
                 });
         });
 
