@@ -1,4 +1,37 @@
-git pull
-php artisan migrate
+#verificar estado do git
+git status
+
+# guardar alterações locais caso existam
+git stash push -u -m "stash antes do deploy"
+
+# puxar atualização do repositório
+git pull --rebase
+
+# reaplicar alterações locais (se houver)
+git stash pop
+
+# instalar dependências
+composer install --no-dev --optimize-autoloader --no-interaction
+
+# rodar migrations (não apaga banco)
+php artisan migrate --force
+
+# limpar caches
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
 php artisan view:clear
+php artisan event:clear
 php artisan optimize:clear
+
+# recriar caches para produção
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
+
+# reiniciar workers de fila
+php artisan queue:restart
+
+# garantir link do storage
+php artisan storage:link
