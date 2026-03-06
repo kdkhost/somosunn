@@ -54,14 +54,20 @@
             <div class="p-6 flex-1 flex flex-col">
                 <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">{{ $item->name }}</h3>
                 <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mb-6 font-medium transition-colors">
-                    {{ $item->description }}
+                    {{ \Illuminate\Support\Str::limit(strip_tags((string) $item->description), 110) }}
                 </p>
 
                 <div class="mt-auto space-y-4">
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
+                        <div><strong class="text-slate-700 dark:text-slate-200">Vendido/distribuído por:</strong> {{ $item->provider_label }}</div>
+                        @if($item->reference_value !== null)
+                            <div class="mt-1"><strong class="text-slate-700 dark:text-slate-200">Valor de referência:</strong> R$ {{ number_format((float) $item->reference_value, 2, ',', '.') }}</div>
+                        @endif
+                    </div>
                     <div class="flex items-center justify-between text-xs font-bold transition-colors">
                         <span class="text-slate-400 dark:text-slate-600 uppercase">Estoque</span>
                         <span class="{{ $item->stock > 0 ? 'text-emerald-500' : 'text-red-500' }}">
-                            {{ $item->stock > 0 ? $item->stock . ' unidades' : 'Esgotado' }}
+                            {{ $item->stock < 0 ? 'Ilimitado' : ($item->stock > 0 ? $item->stock . ' unidades' : 'Esgotado') }}
                         </span>
                     </div>
 
@@ -84,10 +90,16 @@
             <div class="text-slate-400 dark:text-slate-600 text-6xl mb-4 opacity-10">
                 <i class="fas fa-store-slash"></i>
             </div>
-            <p class="text-slate-500 dark:text-slate-400 italic text-lg transition-colors">Loja vazia no momento. Volte em breve!</p>
+        <p class="text-slate-500 dark:text-slate-400 italic text-lg transition-colors">Loja vazia no momento. Volte em breve!</p>
         </div>
         @endforelse
     </div>
+
+    @if($items->hasPages())
+        <div class="rounded-[2rem] border border-slate-200 bg-white px-6 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            {{ $items->links() }}
+        </div>
+    @endif
 </div>
 
 @push('scripts')

@@ -28,7 +28,7 @@ class EnsureUserIsAdmin
             return $next($request);
         }
 
-        if ($this->canAccessInstructorScopedAdminRoute($request, $user)) {
+        if ($this->canAccessScopedAdminRoute($request, $user)) {
             return $next($request);
         }
 
@@ -41,23 +41,31 @@ class EnsureUserIsAdmin
             ->with('warning', 'Voce nao tem acesso ao painel administrativo. Acesse seu Painel do Membro.');
     }
 
-    private function canAccessInstructorScopedAdminRoute(Request $request, $user): bool
+    private function canAccessScopedAdminRoute(Request $request, $user): bool
     {
-        if (!method_exists($user, 'canAccessInstructorArea') || !$user->canAccessInstructorArea()) {
-            return false;
-        }
-
         $routeName = (string) optional($request->route())->getName();
         if ($routeName === '') {
             return false;
         }
 
-        $allowedPrefixes = [
-            'panel.admin.courses.',
-            'panel.admin.mentorships.',
-            'panel.admin.events.',
-            'panel.admin.certificates.',
-        ];
+        $allowedPrefixes = [];
+
+        if (method_exists($user, 'canAccessInstructorArea') && $user->canAccessInstructorArea()) {
+            $allowedPrefixes = array_merge($allowedPrefixes, [
+                'panel.admin.courses.',
+                'panel.admin.mentorships.',
+                'panel.admin.events.',
+                'panel.admin.certificates.',
+            ]);
+        }
+
+        if (method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace()) {
+            $allowedPrefixes[] = 'panel.admin.redemptions.';
+        }
+
+        if ($allowedPrefixes === []) {
+            return false;
+        }
 
         foreach ($allowedPrefixes as $prefix) {
             if (str_starts_with($routeName, $prefix)) {

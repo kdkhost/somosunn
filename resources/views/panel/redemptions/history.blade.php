@@ -3,121 +3,157 @@
 @section('title', 'Meu Histórico de Resgates')
 
 @section('panel_content')
+    @php
+        $statusClasses = [
+            'pending' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+            'processing' => 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+            'shipped' => 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300',
+            'completed' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+            'cancelled' => 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+        ];
+
+        $statusLabels = [
+            'pending' => 'Pendente',
+            'processing' => 'Em separação',
+            'shipped' => 'Enviado',
+            'completed' => 'Concluído',
+            'cancelled' => 'Cancelado',
+        ];
+    @endphp
+
     <div class="space-y-8">
-        {{-- Header --}}
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-                <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white transition-colors">
+                <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
                     Meus Resgates
                 </h1>
-                <p class="text-slate-500 dark:text-slate-400 mt-1 font-medium transition-colors">Acompanhe o status dos seus
-                    pedidos de prêmios.</p>
+                <p class="mt-1 font-medium text-slate-500 dark:text-slate-400">
+                    Acompanhe aprovação, envio, prazo e responsável pela entrega dos seus resgates.
+                </p>
             </div>
 
             <a href="{{ route('panel.redemptions.shop') }}"
-                class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95">
+                class="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-6 py-3 font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700">
                 <i class="fas fa-store"></i>
                 Voltar para a Loja
             </a>
         </div>
 
-        {{-- History Table/List --}}
-        <div
-            class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
+        <div class="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full min-w-[1100px] text-left">
                     <thead>
-                        <tr
-                            class="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-100 dark:border-slate-800 transition-colors">
-                            <th
-                                class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                                Item</th>
-                            <th
-                                class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 text-center">
-                                Pontos</th>
-                            <th
-                                class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                                Data do Pedido</th>
-                            <th
-                                class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 text-center">
-                                Status</th>
+                        <tr class="border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-950/50">
+                            <th class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Item</th>
+                            <th class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 text-center">Pontos</th>
+                            <th class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Data do pedido</th>
+                            <th class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Entrega</th>
+                            <th class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 text-center">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800 transition-colors">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @forelse($redemptions as $redemption)
-                            <tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all">
+                            <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
                                 <td class="px-8 py-6">
                                     <div class="flex items-center gap-4">
-                                        <div
-                                            class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 overflow-hidden text-slate-400 transition-colors border border-slate-200 dark:border-slate-700">
+                                        <div class="h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800">
                                             @if($redemption->item && $redemption->item->image)
-                                                <img src="{{ asset('storage/' . $redemption->item->image) }}"
-                                                    class="w-full h-full object-cover">
+                                                <img src="{{ asset('storage/' . $redemption->item->image) }}" alt="{{ $redemption->item->name }}" class="h-full w-full object-cover">
                                             @else
-                                                <i class="fas fa-gift text-lg"></i>
+                                                <div class="flex h-full items-center justify-center">
+                                                    <i class="fas fa-gift text-lg"></i>
+                                                </div>
                                             @endif
                                         </div>
                                         <div>
-                                            <div class="font-bold text-slate-900 dark:text-white transition-colors">
-                                                {{ $redemption->item->name ?? 'Item Removido' }}
+                                            <div class="font-bold text-slate-900 dark:text-white">
+                                                {{ $redemption->item->name ?? 'Item removido' }}
                                             </div>
-                                            <div
-                                                class="text-xs text-slate-500 dark:text-slate-400 font-medium transition-colors">
-                                                Cod: #{{ $redemption->id }}</div>
+                                            <div class="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                                                Cód. #{{ $redemption->id }}
+                                            </div>
+                                            <div class="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                                                Vendido/distribuído por: {{ $redemption->provider_label }}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-8 py-6 text-center">
-                                    <span class="font-black text-blue-600 dark:text-blue-400 transition-colors">
-                                        {{ number_format($redemption->points_spent, 0, ',', '.') }} pts
+                                    <span class="font-black text-blue-600 dark:text-blue-400">
+                                        {{ number_format((int) $redemption->points_spent, 0, ',', '.') }} pts
                                     </span>
+                                    @if($redemption->reference_value !== null)
+                                        <div class="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                                            R$ {{ number_format((float) $redemption->reference_value, 2, ',', '.') }}
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-8 py-6">
-                                    <div class="text-slate-600 dark:text-slate-300 font-bold transition-colors">
+                                    <div class="font-bold text-slate-700 dark:text-slate-300">
                                         {{ $redemption->created_at->format('d/m/Y') }}
                                     </div>
-                                    <div class="text-xs text-slate-400 dark:text-slate-500 transition-colors">
+                                    <div class="text-xs text-slate-400 dark:text-slate-500">
                                         às {{ $redemption->created_at->format('H:i') }}
                                     </div>
                                 </td>
+                                <td class="px-8 py-6">
+                                    <div class="space-y-1 text-xs text-slate-500 dark:text-slate-400">
+                                        <div>
+                                            Previsão:
+                                            <span class="font-semibold text-slate-700 dark:text-slate-300">
+                                                {{ optional($redemption->estimated_delivery_at)->format('d/m/Y') ?: 'Não informada' }}
+                                            </span>
+                                        </div>
+                                        @if($redemption->tracking_code)
+                                            <div>
+                                                Rastreio:
+                                                <span class="font-semibold text-slate-700 dark:text-slate-300">{{ $redemption->tracking_code }}</span>
+                                            </div>
+                                        @endif
+                                        @if($redemption->tracking_url)
+                                            <a href="{{ $redemption->tracking_url }}" target="_blank" rel="noopener"
+                                                class="inline-flex items-center gap-1 font-bold text-blue-600 hover:underline dark:text-blue-400">
+                                                Acompanhar entrega
+                                                <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
+                                            </a>
+                                        @endif
+                                        @if($redemption->delivery_notes)
+                                            <div class="line-clamp-2">
+                                                {{ $redemption->delivery_notes }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </td>
                                 <td class="px-8 py-6 text-center">
-                                    @php
-                                        $statusClasses = [
-                                            'pending' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-                                            'completed' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-                                            'cancelled' => 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-                                        ];
-                                        $statusLabels = [
-                                            'pending' => 'Pendente',
-                                            'completed' => 'Concluído',
-                                            'cancelled' => 'Cancelado',
-                                        ];
-                                    @endphp
-                                    <span
-                                        class="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider {{ $statusClasses[$redemption->status] ?? 'bg-slate-100 text-slate-600' }}">
-                                        {{ $statusLabels[$redemption->status] ?? $redemption->status }}
+                                    <span class="inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider {{ $statusClasses[$redemption->status] ?? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300' }}">
+                                        {{ $statusLabels[$redemption->status] ?? ucfirst((string) $redemption->status) }}
                                     </span>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-8 py-20 text-center">
-                                    <div class="text-slate-300 dark:text-slate-700 text-6xl mb-4 opacity-10">
+                                <td colspan="5" class="px-8 py-20 text-center">
+                                    <div class="mb-4 text-6xl text-slate-300 opacity-10 dark:text-slate-700">
                                         <i class="fas fa-history"></i>
                                     </div>
-                                    <p class="text-slate-500 dark:text-slate-400 font-bold text-lg transition-colors">Você ainda
-                                        não realizou nenhum resgate.</p>
-                                    <p class="text-slate-400 dark:text-slate-600 text-sm mt-1 transition-colors">Comece a
-                                        acumular pontos para ganhar prêmios!</p>
+                                    <p class="text-lg font-bold text-slate-500 dark:text-slate-400">Você ainda não realizou nenhum resgate.</p>
+                                    <p class="mt-1 text-sm text-slate-400 dark:text-slate-600">Comece a acumular pontos para ganhar prêmios.</p>
                                     <a href="{{ route('panel.redemptions.shop') }}"
-                                        class="inline-flex mt-6 text-blue-600 dark:text-blue-400 font-black hover:underline transition-all">Ver
-                                        Itens Disponíveis</a>
+                                        class="mt-6 inline-flex text-sm font-black text-blue-600 transition-all hover:underline dark:text-blue-400">
+                                        Ver itens disponíveis
+                                    </a>
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
+            @if($redemptions->hasPages())
+                <div class="border-t border-slate-100 px-6 py-4 dark:border-slate-800">
+                    {{ $redemptions->links() }}
+                </div>
+            @endif
         </div>
     </div>
 @endsection

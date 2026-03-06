@@ -125,6 +125,9 @@
                         ['key' => 'telefone', 'label' => 'Canal de Contato', 'icon' => 'fa-mobile-screen'],
                         ['key' => 'ocupacao', 'label' => 'Área de Atuação', 'icon' => 'fa-briefcase'],
                     ];
+                    if (!empty($sellerHealthChecks ?? [])) {
+                        $checkItems = array_merge($checkItems, $sellerHealthChecks);
+                    }
                 @endphp
 
                 @foreach($checkItems as $item)

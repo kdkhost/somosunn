@@ -9,6 +9,26 @@ class Plan extends Model
 {
     use HasFactory;
 
+    public const PAID_CREATOR_SELLER_FEATURES = [
+        'courses',
+        'courses.create',
+        'courses.edit',
+        'courses.delete',
+        'courses.certificates',
+        'events',
+        'events.create',
+        'events.edit',
+        'events.delete',
+        'mentorships',
+        'mentorships.create',
+        'mentorships.edit',
+        'mentorships.delete',
+        'marketplace',
+        'marketplace.buy',
+        'marketplace.sales',
+        'marketplace.sell',
+    ];
+
     protected $fillable = [
         'name',
         'slug',
@@ -185,6 +205,17 @@ class Plan extends Model
         }
 
         return false;
+    }
+
+    public static function normalizeCommercialPermissions(array $permissions, bool $isFree, float $price = 0): array
+    {
+        $permissions = array_values(array_unique(array_filter($permissions, static fn ($value) => is_string($value) && trim($value) !== '')));
+
+        if ($isFree || $price <= 0) {
+            return $permissions;
+        }
+
+        return array_values(array_unique(array_merge($permissions, self::PAID_CREATOR_SELLER_FEATURES)));
     }
 
     /**

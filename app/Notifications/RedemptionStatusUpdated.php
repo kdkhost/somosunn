@@ -13,7 +13,7 @@ class RedemptionStatusUpdated extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    protected $redemption;
+    protected Redemption $redemption;
 
     public function __construct(Redemption $redemption)
     {
@@ -33,30 +33,70 @@ class RedemptionStatusUpdated extends Notification implements ShouldQueue
 
     public function toMail($notifiable): MailMessage
     {
-        $statusLabel = $this->redemption->status === 'completed' ? 'Concluído' : 'Cancelado';
-        $message = $this->redemption->status === 'completed'
-            ? 'Seu pedido de resgate do item **' . $this->redemption->item->name . '** foi processado e concluído!'
-            : 'Seu pedido de resgate do item **' . $this->redemption->item->name . '** foi cancelado. Seus pontos foram devolvidos ao seu saldo.';
+        $payload = $this->statusPayload();
+        $itemName = (string) ($this->redemption->item->name ?? 'Item resgatado');
 
-        return (new MailMessage)
-            ->subject('Atualização no seu Resgate: ' . $statusLabel)
+        $mail = (new MailMessage)
+            ->subject('Atualização no seu Resgate: ' . $payload['label'])
             ->greeting('Olá, ' . $notifiable->name . '!')
-            ->line($message)
+            ->line(str_replace(':item', $itemName, $payload['message']));
+
+        if ($this->redemption->provider_name) {
+            $mail->line('Responsável: **' . $this->redemption->provider_name . '**');
+        }
+
+        if ($this->redemption->tracking_code) {
+            $mail->line('Código de rastreio: **' . $this->redemption->tracking_code . '**');
+        }
+
+        if ($this->redemption->tracking_url) {
+            $mail->line('Acompanhe a entrega: ' . $this->redemption->tracking_url);
+        }
+
+        return $mail
             ->action('Ver Meus Resgates', route('panel.redemptions.history'))
-            ->line('Obrigado por fazer parte da nossa comunidade!')
+            ->line('Obrigado por fazer parte da nossa comunidade.')
             ->salutation('Atenciosamente, Equipe SOMOS UNN');
     }
 
     public function toArray($notifiable): array
     {
-        $statusLabel = $this->redemption->status === 'completed' ? 'Concluído' : 'Cancelado';
+        $payload = $this->statusPayload();
 
         return [
-            'message' => 'Seu resgate de "' . ($this->redemption->item->name ?? 'item') . '" foi ' . strtolower($statusLabel) . '.',
+            'message' => str_replace(':item', (string) ($this->redemption->item->name ?? 'item'), $payload['message']),
             'type' => 'redemption_update',
             'action_url' => route('panel.redemptions.history'),
             'action_label' => 'Ver Histórico',
             'status' => $this->redemption->status,
+            'provider_name' => $this->redemption->provider_name,
+            'tracking_code' => $this->redemption->tracking_code,
         ];
+    }
+
+    private function statusPayload(): array
+    {
+        return match ((string) $this->redemption->status) {
+            'processing' => [
+                'label' => 'Em separação',
+                'message' => 'Seu pedido de resgate do item **:item** foi aprovado e está em separação.',
+            ],
+            'shipped' => [
+                'label' => 'Enviado',
+                'message' => 'Seu pedido de resgate do item **:item** foi enviado.',
+            ],
+            'completed' => [
+                'label' => 'Concluído',
+                'message' => 'Seu pedido de resgate do item **:item** foi entregue/concluído.',
+            ],
+            'cancelled' => [
+                'label' => 'Cancelado',
+                'message' => 'Seu pedido de resgate do item **:item** foi cancelado. Seus pontos foram devolvidos ao seu saldo.',
+            ],
+            default => [
+                'label' => 'Atualizado',
+                'message' => 'Seu pedido de resgate do item **:item** recebeu uma atualização.',
+            ],
+        };
     }
 }

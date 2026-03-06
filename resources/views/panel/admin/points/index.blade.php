@@ -121,6 +121,54 @@
         </div>
     </div>
 
+    <section class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div class="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+            <div class="space-y-2">
+                <div class="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300">
+                    <i class="fas fa-money-bill-wave text-[10px]"></i>
+                    Cotação dos Pontos
+                </div>
+                <div>
+                    <h2 class="text-lg font-black text-slate-900 dark:text-white">Conversão financeira da troca de pontos</h2>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Cada <strong>{{ number_format((int) ($exchangeSettings['base_points'] ?? 0), 0, ',', '.') }} pontos</strong> valem
+                        <strong>R$ {{ number_format((float) ($exchangeSettings['base_amount'] ?? 0), 2, ',', '.') }}</strong>.
+                        Valor unitário atual: <strong>R$ {{ number_format((float) ($exchangeSettings['point_value'] ?? 0), 4, ',', '.') }}</strong> por ponto.
+                    </p>
+                </div>
+            </div>
+
+            <form action="{{ route('panel.admin.points-rules.exchange-settings') }}" method="POST" class="grid gap-3 sm:grid-cols-3 xl:min-w-[560px]">
+                @csrf
+                <label class="space-y-2">
+                    <span class="block text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Base em pontos</span>
+                    <input type="number" name="base_points" min="1" value="{{ old('base_points', (int) ($exchangeSettings['base_points'] ?? 100)) }}"
+                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
+                        {{ $canManageExchange ? '' : 'readonly' }}>
+                </label>
+                <label class="space-y-2">
+                    <span class="block text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Base em reais</span>
+                    <input type="text" name="base_amount" value="{{ old('base_amount', number_format((float) ($exchangeSettings['base_amount'] ?? 1), 2, ',', '.')) }}"
+                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
+                        {{ $canManageExchange ? '' : 'readonly' }}>
+                </label>
+                <div class="flex items-end">
+                    @if($canManageExchange)
+                        <button type="submit"
+                            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700">
+                            <i class="fas fa-save"></i>
+                            Atualizar cotação
+                        </button>
+                    @else
+                        <div class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-semibold text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
+                            Somente o admin altera a cotação
+                        </div>
+                    @endif
+                </div>
+            </form>
+        </div>
+    </section>
+
     @if($rulesTotal > 0)
         <div class="flex flex-wrap gap-2">
             @foreach($rulesGrouped as $category => $rules)

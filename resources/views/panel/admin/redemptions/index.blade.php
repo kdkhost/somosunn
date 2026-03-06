@@ -1,167 +1,284 @@
 @extends('panel.layouts.app')
 
-@section('title', 'Loja de Resgate de Pontos')
+@section('title', 'Gestão de Resgates')
+
+@php
+    $statusLabels = [
+        'pending' => 'Pendente',
+        'processing' => 'Em separação',
+        'shipped' => 'Enviado',
+        'completed' => 'Concluído',
+        'cancelled' => 'Cancelado',
+    ];
+
+    $statusClasses = [
+        'pending' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+        'processing' => 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+        'shipped' => 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300',
+        'completed' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+        'cancelled' => 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    ];
+@endphp
 
 @section('panel_content')
     <div class="space-y-6">
-        {{-- Header --}}
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">
-                    Itens Resgatáveis
-                </h1>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">Gerencie produtos e serviços
-                    que os usuários podem trocar por pontos.</p>
+        <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+            <div class="space-y-2">
+                <div class="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-300">
+                    <i class="fas fa-exchange-alt text-[10px]"></i>
+                    {{ $canManageAllRedemptions ? 'Administração global' : 'Minha operação de entrega' }}
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Resgates por pontos</h1>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Cadastre itens, acompanhe aprovações, gerencie envio e preserve o responsável fixo pela entrega.
+                    </p>
+                </div>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap gap-3">
+                <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Cotação atual</p>
+                    <p class="mt-1 font-black text-slate-900 dark:text-white">
+                        {{ number_format((int) ($exchangeSettings['base_points'] ?? 0), 0, ',', '.') }} pts = R$ {{ number_format((float) ($exchangeSettings['base_amount'] ?? 0), 2, ',', '.') }}
+                    </p>
+                </div>
                 <a href="{{ route('panel.admin.redemptions.create') }}"
-                    class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2">
+                    class="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700">
                     <i class="fas fa-plus"></i>
-                    <span>Novo Item</span>
+                    Novo item
                 </a>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {{-- Items List --}}
-            <div class="lg:col-span-2 space-y-6">
-                <div
-                    class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr
-                                    class="bg-slate-50/50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800 transition-colors">
-                                    <th
-                                        class="px-6 py-4 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                                        Item</th>
-                                    <th
-                                        class="px-6 py-4 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">
-                                        Custo (Pontos)</th>
-                                    <th
-                                        class="px-6 py-4 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">
-                                        Estoque</th>
-                                    <th
-                                        class="px-6 py-4 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">
-                                        Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800 transition-colors">
-                                @forelse($items as $item)
-                                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-950/30 transition-all group">
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center gap-3">
+        <div class="grid gap-6 xl:grid-cols-[1.4fr_0.9fr]">
+            <section class="rounded-[2rem] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <div class="border-b border-slate-100 px-6 py-5 dark:border-slate-800">
+                    <h2 class="text-lg font-black text-slate-900 dark:text-white">Catálogo de itens</h2>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Itens disponíveis para a troca de pontos com valor de referência e responsável travado.</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[920px] text-left">
+                        <thead class="bg-slate-50 dark:bg-slate-950/50">
+                            <tr class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+                                <th class="px-6 py-4">Item</th>
+                                <th class="px-6 py-4">Responsável</th>
+                                <th class="px-6 py-4 text-right">Valor ref.</th>
+                                <th class="px-6 py-4 text-right">Pontos</th>
+                                <th class="px-6 py-4 text-center">Prazo</th>
+                                <th class="px-6 py-4 text-center">Estoque</th>
+                                <th class="px-6 py-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                            @forelse($items as $item)
+                                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-950/30">
+                                    <td class="px-6 py-5">
+                                        <div class="flex items-center gap-4">
+                                            <div class="h-14 w-14 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950">
                                                 @if($item->image)
-                                                    <img src="{{ asset('storage/' . $item->image) }}"
-                                                        class="w-10 h-10 rounded-lg object-cover">
+                                                    <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover">
                                                 @else
-                                                    <div
-                                                        class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+                                                    <div class="flex h-full items-center justify-center text-slate-300 dark:text-slate-700">
                                                         <i class="fas fa-gift"></i>
                                                     </div>
                                                 @endif
-                                                <div>
-                                                    <div class="text-sm font-bold text-slate-900 dark:text-white">
-                                                        {{ $item->name }}
-                                                    </div>
-                                                    <div
-                                                        class="text-xs {{ $item->is_active ? 'text-emerald-500' : 'text-slate-400' }}">
+                                            </div>
+                                            <div class="min-w-0">
+                                                <div class="truncate text-sm font-black text-slate-900 dark:text-white">{{ $item->name }}</div>
+                                                <div class="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                                                    <span class="rounded-full px-2.5 py-1 font-bold {{ $item->is_active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300' }}">
                                                         {{ $item->is_active ? 'Ativo' : 'Inativo' }}
-                                                    </div>
+                                                    </span>
+                                                    <span class="text-slate-400 dark:text-slate-500">{{ $item->redemptions_count }} resgates</span>
                                                 </div>
                                             </div>
-                                        </td>
-                                        <td class="px-6 py-4 text-center">
-                                            <span
-                                                class="text-sm font-bold text-blue-600">{{ number_format($item->points_cost, 0, ',', '.') }}
-                                                pts</span>
-                                        </td>
-                                        <td class="px-6 py-4 text-center">
-                                            <span
-                                                class="text-sm font-medium text-slate-600 dark:text-slate-400">{{ $item->stock }}</span>
-                                        </td>
-                                        <td class="px-6 py-4 text-right">
-                                            <div
-                                                class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <a href="{{ route('panel.admin.redemptions.edit', $item) }}"
-                                                    class="p-2 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4"
-                                            class="px-6 py-12 text-center text-slate-500 dark:text-slate-400 italic">Nenhum item
-                                            cadastrado.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    @if($items->hasPages())
-                        <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
-                            {{ $items->links() }}
-                        </div>
-                    @endif
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-5 text-sm font-bold text-slate-700 dark:text-slate-300">{{ $item->provider_label }}</td>
+                                    <td class="px-6 py-5 text-right text-sm font-bold text-slate-700 dark:text-slate-300">
+                                        {{ $item->reference_value !== null ? 'R$ ' . number_format((float) $item->reference_value, 2, ',', '.') : '—' }}
+                                    </td>
+                                    <td class="px-6 py-5 text-right text-sm font-black text-blue-600 dark:text-blue-300">
+                                        {{ number_format((int) $item->points_cost, 0, ',', '.') }} pts
+                                    </td>
+                                    <td class="px-6 py-5 text-center text-sm font-semibold text-slate-600 dark:text-slate-400">
+                                        {{ (int) ($item->delivery_lead_days ?? 7) }} dias
+                                    </td>
+                                    <td class="px-6 py-5 text-center text-sm font-semibold text-slate-600 dark:text-slate-400">
+                                        {{ (int) $item->stock < 0 ? 'Ilimitado' : number_format((int) $item->stock, 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-6 py-5">
+                                        <div class="flex justify-end gap-2">
+                                            <a href="{{ route('panel.admin.redemptions.edit', $item) }}"
+                                                class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 transition-all hover:bg-slate-100 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800">
+                                                <i class="fas fa-pen"></i>
+                                                Editar
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="px-6 py-16 text-center text-sm text-slate-500 dark:text-slate-400">
+                                        Nenhum item cadastrado até o momento.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-
-            {{-- Pending Redemptions --}}
-            <div class="space-y-6">
-                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest px-2 transition-colors">Solicitações
-                    Pendentes</h3>
-                @forelse($pendingRedemptions as $redemption)
-                    <div
-                        class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4 transition-colors">
-                        <div class="flex items-center gap-3">
-                            <img src="{{ $redemption->user->profile_photo_url }}" class="w-10 h-10 rounded-full">
-                            <div>
-                                <div class="text-sm font-bold text-slate-900 dark:text-white">{{ $redemption->user->name }}
-                                </div>
-                                <div class="text-xs text-slate-500 italic">{{ $redemption->created_at->diffForHumans() }}</div>
-                            </div>
-                        </div>
-                        <div
-                            class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 transition-colors">
-                            <div class="text-xs font-bold text-slate-400 uppercase mb-1">Item Solicitado</div>
-                            <div class="text-sm font-bold text-slate-700 dark:text-slate-300">{{ $redemption->item->name }}
-                            </div>
-                            <div class="text-xs text-blue-600 font-bold mt-1">-
-                                {{ number_format($redemption->points_spent, 0, ',', '.') }} pts
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <form action="{{ route('panel.admin.redemptions.approve', $redemption) }}" method="POST" class="flex-1">
-                                @csrf
-                                <button type="submit"
-                                    class="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all">
-                                    Aprovar
-                                </button>
-                            </form>
-                            <form action="{{ route('panel.admin.redemptions.cancel', $redemption) }}" method="POST" class="flex-1">
-                                @csrf
-                                <button type="submit"
-                                    class="w-full py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold rounded-xl hover:bg-slate-200 transition-all">
-                                    Cancelar
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @empty
-                    <div
-                        class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-dashed border-slate-200 dark:border-slate-800 text-center text-sm text-slate-500 dark:text-slate-400">
-                        Nenhuma solicitação pendente no momento.
-                    </div>
-                @endforelse
-
-                @if($pendingRedemptions->hasPages())
-                    <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-4 shadow-sm">
-                        {{ $pendingRedemptions->links() }}
+                @if($items->hasPages())
+                    <div class="border-t border-slate-100 px-6 py-4 dark:border-slate-800">
+                        {{ $items->links() }}
                     </div>
                 @endif
+            </section>
+
+            <div class="space-y-6">
+                <section class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-base font-black text-slate-900 dark:text-white">Solicitações pendentes</h2>
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Pedidos aguardando aprovação.</p>
+                        </div>
+                        <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">{{ $pendingRedemptions->total() }}</span>
+                    </div>
+
+                    <div class="mt-5 space-y-4">
+                        @forelse($pendingRedemptions as $redemption)
+                            <article class="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                        <div class="text-sm font-black text-slate-900 dark:text-white">{{ $redemption->user->name }}</div>
+                                        <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $redemption->item->name ?? 'Item removido' }}</div>
+                                        <div class="mt-1 text-xs font-semibold text-slate-400 dark:text-slate-500">Responsável: {{ $redemption->provider_label }}</div>
+                                    </div>
+                                    <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] {{ $statusClasses[$redemption->status] ?? $statusClasses['pending'] }}">
+                                        {{ $statusLabels[$redemption->status] ?? ucfirst($redemption->status) }}
+                                    </span>
+                                </div>
+                                <div class="mt-4 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                                    <span>{{ number_format((int) $redemption->points_spent, 0, ',', '.') }} pts</span>
+                                    <span>{{ $redemption->created_at->format('d/m/Y H:i') }}</span>
+                                </div>
+                                <div class="mt-4 grid grid-cols-2 gap-2">
+                                    <form action="{{ route('panel.admin.redemptions.approve', $redemption) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="w-full rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white transition-all hover:bg-emerald-700">
+                                            Aprovar
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('panel.admin.redemptions.cancel', $redemption) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="w-full rounded-2xl bg-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 transition-all hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+                                            Cancelar
+                                        </button>
+                                    </form>
+                                </div>
+                            </article>
+                        @empty
+                            <div class="rounded-3xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                                Nenhuma solicitação pendente.
+                            </div>
+                        @endforelse
+                    </div>
+
+                    @if($pendingRedemptions->hasPages())
+                        <div class="mt-4">
+                            {{ $pendingRedemptions->links() }}
+                        </div>
+                    @endif
+                </section>
+
+                <section class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-base font-black text-slate-900 dark:text-white">Entregas em andamento</h2>
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Rastreio, observações e conclusão.</p>
+                        </div>
+                        <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-black text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">{{ $deliveryRedemptions->total() }}</span>
+                    </div>
+
+                    <div class="mt-5 space-y-4">
+                        @forelse($deliveryRedemptions as $redemption)
+                            <article class="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+                                <div class="flex flex-wrap items-start justify-between gap-3">
+                                    <div>
+                                        <div class="text-sm font-black text-slate-900 dark:text-white">{{ $redemption->item->name ?? 'Item removido' }}</div>
+                                        <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $redemption->user->name }} · {{ $redemption->provider_label }}</div>
+                                        <div class="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                                            Previsão: {{ optional($redemption->estimated_delivery_at)->format('d/m/Y') ?: 'não definida' }}
+                                        </div>
+                                    </div>
+                                    <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] {{ $statusClasses[$redemption->status] ?? $statusClasses['processing'] }}">
+                                        {{ $statusLabels[$redemption->status] ?? ucfirst($redemption->status) }}
+                                    </span>
+                                </div>
+
+                                <form action="{{ route('panel.admin.redemptions.ship', $redemption) }}" method="POST" class="mt-4 space-y-3">
+                                    @csrf
+                                    <div class="grid gap-3 sm:grid-cols-2">
+                                        <input type="text" name="tracking_code" value="{{ old('tracking_code', $redemption->tracking_code) }}"
+                                            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+                                            placeholder="Código de rastreio">
+                                        <input type="url" name="tracking_url" value="{{ old('tracking_url', $redemption->tracking_url) }}"
+                                            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+                                            placeholder="URL de rastreio">
+                                    </div>
+                                    <textarea name="delivery_notes" rows="2"
+                                        class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+                                        placeholder="Observações sobre preparação, envio ou entrega">{{ old('delivery_notes', $redemption->delivery_notes) }}</textarea>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <button type="submit"
+                                            class="rounded-2xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white transition-all hover:bg-indigo-700">
+                                            Marcar enviado
+                                        </button>
+                                        <button type="submit" formaction="{{ route('panel.admin.redemptions.complete', $redemption) }}"
+                                            class="rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white transition-all hover:bg-emerald-700">
+                                            Entregue
+                                        </button>
+                                        <button type="submit" formaction="{{ route('panel.admin.redemptions.cancel', $redemption) }}"
+                                            class="rounded-2xl bg-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 transition-all hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </form>
+                            </article>
+                        @empty
+                            <div class="rounded-3xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                                Nenhuma entrega em andamento.
+                            </div>
+                        @endforelse
+                    </div>
+
+                    @if($deliveryRedemptions->hasPages())
+                        <div class="mt-4">
+                            {{ $deliveryRedemptions->links() }}
+                        </div>
+                    @endif
+                </section>
+
+                <section class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <h2 class="text-base font-black text-slate-900 dark:text-white">Últimos encerrados</h2>
+                    <div class="mt-4 space-y-3">
+                        @forelse($recentRedemptions as $redemption)
+                            <div class="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-950">
+                                <div>
+                                    <div class="text-sm font-bold text-slate-900 dark:text-white">{{ $redemption->item->name ?? 'Item removido' }}</div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">{{ $redemption->user->name }} · {{ $redemption->provider_label }}</div>
+                                </div>
+                                <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] {{ $statusClasses[$redemption->status] ?? $statusClasses['completed'] }}">
+                                    {{ $statusLabels[$redemption->status] ?? ucfirst($redemption->status) }}
+                                </span>
+                            </div>
+                        @empty
+                            <div class="rounded-3xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                                Ainda não há encerramentos recentes.
+                            </div>
+                        @endforelse
+                    </div>
+                </section>
             </div>
         </div>
     </div>

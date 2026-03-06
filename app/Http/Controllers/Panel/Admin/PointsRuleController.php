@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Panel\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PointsRule;
+use App\Services\PointsExchangeService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,13 +36,17 @@ class PointsRuleController extends Controller
 
         $categories = PointsRule::CATEGORIES;
         $totalRules = $rulesPaginator->total();
+        $exchangeSettings = app(PointsExchangeService::class)->settings();
+        $canManageExchange = Auth::user()->isAdmin();
 
         return view('panel.admin.points.index', compact(
             'rulesGrouped',
             'rulesPaginator',
             'categories',
             'hasCategory',
-            'totalRules'
+            'totalRules',
+            'exchangeSettings',
+            'canManageExchange'
         ));
     }
 
@@ -140,6 +145,34 @@ class PointsRuleController extends Controller
 
         $points_rule->delete();
         return redirect()->route('panel.admin.points-rules.index')->with('success', 'Regra removida!');
+    }
+
+    public function updateExchangeSettings(Request $request, PointsExchangeService $service)
+    {
+        if (!Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        $baseAmount = trim((string) $request->input('base_amount', '1,00'));
+        $baseAmount = str_replace(['R$', ' ', "\u{00A0}"], '', $baseAmount);
+        if (str_contains($baseAmount, ',')) {
+            $baseAmount = str_replace('.', '', $baseAmount);
+            $baseAmount = str_replace(',', '.', $baseAmount);
+        }
+        $request->merge(['base_amount' => $baseAmount]);
+
+        $data = $request->validate([
+            'base_points' => 'required|integer|min:1|max:1000000',
+            'base_amount' => 'required|numeric|min:0.01|max:1000000',
+        ]);
+
+        $data['base_amount'] = (float) $baseAmount;
+
+        $service->persist($data);
+
+        return redirect()
+            ->route('panel.admin.points-rules.index')
+            ->with('success', 'Cotação dos pontos atualizada com sucesso.');
     }
 
     private function ensurePermission(string $perm)

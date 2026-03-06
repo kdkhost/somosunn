@@ -460,6 +460,8 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
 
         // Resgate de Pontos (Admin)
         Route::post('redemptions/{redemption}/approve', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'approve'])->name('redemptions.approve');
+        Route::post('redemptions/{redemption}/ship', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'ship'])->name('redemptions.ship');
+        Route::post('redemptions/{redemption}/complete', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'complete'])->name('redemptions.complete');
         Route::post('redemptions/{redemption}/cancel', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'cancel'])->name('redemptions.cancel');
         Route::resource('redemptions', \App\Http\Controllers\Panel\Admin\RedemptionController::class);
 
@@ -478,6 +480,8 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::post('logs/clear', [\App\Http\Controllers\Panel\Admin\ActivityLogController::class, 'clear'])->name('logs.clear');
 
         // Engagement Tools
+        Route::post('points-rules/exchange-settings', [\App\Http\Controllers\Panel\Admin\PointsRuleController::class, 'updateExchangeSettings'])
+            ->name('points-rules.exchange-settings');
         Route::resource('points-rules', \App\Http\Controllers\Panel\Admin\PointsRuleController::class);
         Route::get('ranking', [\App\Http\Controllers\Panel\Admin\RankingController::class, 'index'])->name('ranking.index');
 
@@ -744,6 +748,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             ->middleware('check.feature:events_access')->names('events');
 
         // Points Rules
+        Route::post('points-rules/exchange-settings', [\App\Http\Controllers\Panel\Admin\PointsRuleController::class, 'updateExchangeSettings'])
+            ->middleware('check.feature:points_access')->name('points-rules.exchange-settings');
         Route::resource('points-rules', \App\Http\Controllers\Admin\PointsRuleController::class)
             ->middleware('check.feature:points_access')->names('points-rules');
 

@@ -225,7 +225,7 @@
         ['label' => 'Regras de pontos', 'route' => route('panel.admin.points-rules.index'), 'icon' => 'fas fa-star', 'active' => request()->routeIs('panel.admin.points-rules.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Ranking', 'route' => route('panel.admin.ranking.index'), 'icon' => 'fas fa-trophy', 'active' => request()->routeIs('panel.admin.ranking.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Vagas', 'route' => route('panel.admin.jobs.index'), 'icon' => 'fas fa-id-card', 'active' => request()->routeIs('panel.admin.jobs.*'), 'visible' => $user->isAdmin()],
-        ['label' => 'Resgates', 'route' => route('panel.admin.redemptions.index'), 'icon' => 'fas fa-exchange-alt', 'active' => request()->routeIs('panel.admin.redemptions.*'), 'visible' => $user->isAdmin()],
+        ['label' => 'Resgates', 'route' => route('panel.admin.redemptions.index'), 'icon' => 'fas fa-exchange-alt', 'active' => request()->routeIs('panel.admin.redemptions.*'), 'visible' => $user->isAdmin() || (method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace())],
         ['label' => 'Logs de atividade', 'route' => route('panel.admin.logs.index'), 'icon' => 'fas fa-history', 'active' => request()->routeIs('panel.admin.logs.*'), 'visible' => $user->isAdmin()],
     ], fn(array $item) => $item['visible']));
 

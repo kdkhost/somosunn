@@ -244,6 +244,11 @@ class PlanController extends Controller
         $data['permissions'] = array_values(array_unique(array_values(array_filter($rawPermissions, function ($name) use ($allowed) {
             return is_string($name) && in_array($name, $allowed, true);
         }))));
+        $data['permissions'] = Plan::normalizeCommercialPermissions(
+            $data['permissions'],
+            (bool) $data['is_free'],
+            (float) ($data['price'] ?? 0)
+        );
 
         $comparison = $request->input('comparison', []);
         if (!is_array($comparison)) {

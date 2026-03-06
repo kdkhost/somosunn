@@ -36,7 +36,11 @@ class PlanFeaturesSeeder extends Seeder
 
             // Preserve existing permissions if they differ from default empty array logic
             // But here we want to enforce the new system.
-            $plan->permissions = $features;
+            $plan->permissions = Plan::normalizeCommercialPermissions(
+                $features,
+                (bool) ($plan->is_free ?? false),
+                (float) ($plan->price ?? 0)
+            );
             $plan->save();
 
             $this->command->info("Updated Plan: {$plan->name} with features: " . implode(', ', $features));

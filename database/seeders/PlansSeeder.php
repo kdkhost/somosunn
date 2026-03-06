@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Plan;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -71,7 +72,11 @@ class PlansSeeder extends Seeder
                     'is_featured'=>$plan['is_featured'],
                     'billing_cycle'=>$plan['billing_cycle'],
                     'prorata'=>$plan['prorata'],
-                    'permissions'=>json_encode($plan['features'] ?? []),
+                    'permissions'=>json_encode(Plan::normalizeCommercialPermissions(
+                        $plan['features'] ?? [],
+                        ((float) ($plan['price'] ?? 0)) <= 0,
+                        (float) ($plan['price'] ?? 0)
+                    )),
                     'created_at'=>$now,
                     'updated_at'=>$now
                 ]
