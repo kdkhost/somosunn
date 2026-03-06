@@ -549,6 +549,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::get('/indicacoes/exportar', [\App\Http\Controllers\Panel\ReferralController::class, 'export'])->name('referral.export');
     Route::get('/indicacoes/dados', [\App\Http\Controllers\Panel\ReferralController::class, 'stats'])->name('referral.stats');
     Route::post('/indicacoes/rastreio', [\App\Http\Controllers\Panel\ReferralController::class, 'track'])->name('referral.track');
+    Route::post('/indicacoes/tokens', [\App\Http\Controllers\Panel\ReferralController::class, 'storeToken'])->name('referral.tokens.store');
+    Route::put('/indicacoes/tokens/{token}', [\App\Http\Controllers\Panel\ReferralController::class, 'updateToken'])->name('referral.tokens.update');
+    Route::delete('/indicacoes/tokens/{token}', [\App\Http\Controllers\Panel\ReferralController::class, 'destroyToken'])->name('referral.tokens.destroy');
 
     // Loja de Pontos (Usuário)
     Route::get('/resgate', [\App\Http\Controllers\RedemptionItemController::class, 'index'])->name('redemptions.shop');

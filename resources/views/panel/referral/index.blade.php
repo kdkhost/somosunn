@@ -31,6 +31,7 @@
         @endif
     </div>
 
+    @if(false)
         <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
             <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
                 <div>
@@ -231,6 +232,7 @@
         'emptyMessage' => 'Ainda não há cliques, visitas ou compartilhamentos detalhados para este afiliado.',
     ])
     </div>
+    @endif
 
     {{-- ===== CARDS RESUMO ===== --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -343,12 +345,6 @@
                 Pontos são creditados somente após o indicado <strong class="text-slate-600 dark:text-slate-400">assinar um plano pago</strong>.
             </p>
         </div>
-    </div>
-
-    <div id="referralShareKitSection">
-        @include('panel.referral.partials.share-kit', [
-            'affiliateShareKit' => $affiliateShareKit,
-        ])
     </div>
 
     {{-- ===== LISTA DE INDICADOS ===== --}}
@@ -598,6 +594,22 @@
             </div>
         </div>
     </div>
+
+    @include('panel.referral.partials.api-tokens', [
+        'apiTokens' => $apiTokens,
+        'apiTokensEnabled' => $apiTokensEnabled,
+        'apiTokenIpTrackingEnabled' => $apiTokenIpTrackingEnabled,
+        'apiTokenPlainText' => $apiTokenPlainText,
+        'apiTokenDeviceName' => $apiTokenDeviceName,
+    ])
+
+    <div id="referralShareKitSection">
+        @include('panel.referral.partials.share-kit', [
+            'affiliateShareKit' => $affiliateShareKit,
+        ])
+    </div>
+
+    @include('panel.referral.partials.tracking-dashboard')
 
 </div>
 

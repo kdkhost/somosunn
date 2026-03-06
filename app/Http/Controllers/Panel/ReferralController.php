@@ -9,8 +9,11 @@ use App\Models\User;
 use App\Services\AffiliateShareKitService;
 use App\Services\AffiliateTrackingService;
 use App\Services\ReferralAnalyticsService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class ReferralController extends Controller
 {
@@ -71,7 +74,72 @@ class ReferralController extends Controller
             'channelFunnels' => $this->analytics->buildChannelFunnels($user->id),
             'detailedEvents' => $this->analytics->detailedEventsPaginator($user->id, 20, 'events_page'),
             'affiliateShareKit' => $this->shareKit->buildForUser($user),
+            'apiTokens' => $this->apiTokensForUser($user),
+            'apiTokenPlainText' => session('api_token_plain_text'),
+            'apiTokenDeviceName' => session('api_token_device_name'),
+            'apiTokensEnabled' => $this->hasPersonalAccessTokensTable(),
+            'apiTokenIpTrackingEnabled' => $this->hasPersonalAccessTokenColumn('last_used_ip'),
         ], $this->analytics->buildDashboardPayload($user->id)));
+    }
+
+    public function storeToken(Request $request): RedirectResponse
+    {
+        if (!$this->hasPersonalAccessTokensTable()) {
+            return back()->withErrors([
+                'api_tokens' => 'A tabela de tokens da API ainda não está disponível. Rode as migrations e tente novamente.',
+            ]);
+        }
+
+        $data = $request->validate([
+            'device_name' => 'required|string|max:120',
+        ], [
+            'device_name.required' => 'Informe o nome do dispositivo ou integração.',
+        ]);
+
+        /** @var User $user */
+        $user = $request->user();
+
+        $plainTextToken = $user->createToken($data['device_name'])->plainTextToken;
+
+        return redirect()
+            ->route('panel.referral.index')
+            ->with('success', 'Token da API gerado com sucesso.')
+            ->with('api_token_plain_text', $plainTextToken)
+            ->with('api_token_device_name', $data['device_name']);
+    }
+
+    public function updateToken(Request $request, int $tokenId): RedirectResponse
+    {
+        $data = $request->validate([
+            'device_name' => 'required|string|max:120',
+        ], [
+            'device_name.required' => 'Informe o nome do dispositivo para renomear o token.',
+        ]);
+
+        /** @var User $user */
+        $user = $request->user();
+        $token = $this->resolveOwnedToken($user, $tokenId);
+
+        $token->forceFill([
+            'name' => $data['device_name'],
+        ])->save();
+
+        return redirect()
+            ->route('panel.referral.index')
+            ->with('success', 'Token renomeado com sucesso.');
+    }
+
+    public function destroyToken(Request $request, int $tokenId): RedirectResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+        $token = $this->resolveOwnedToken($user, $tokenId);
+
+        $token->delete();
+
+        return redirect()
+            ->route('panel.referral.index')
+            ->with('success', 'Token revogado com sucesso.');
     }
 
     public function track(Request $request, AffiliateTrackingService $tracking)
@@ -153,5 +221,60 @@ class ReferralController extends Controller
             $user->id,
             sprintf('rastreio-indicacoes-%s-%s.csv', $user->referral_code, now()->format('Ymd-His'))
         );
+    }
+
+    private function apiTokensForUser(User $user)
+    {
+        if (!$this->hasPersonalAccessTokensTable()) {
+            return collect();
+        }
+
+        $columns = ['id', 'name', 'last_used_at', 'created_at'];
+
+        if ($this->hasPersonalAccessTokenColumn('last_used_ip')) {
+            $columns[] = 'last_used_ip';
+        }
+
+        return $user->tokens()
+            ->latest('id')
+            ->get($columns)
+            ->map(function (PersonalAccessToken $token) {
+                if (!isset($token->last_used_ip)) {
+                    $token->last_used_ip = null;
+                }
+
+                return $token;
+            });
+    }
+
+    private function resolveOwnedToken(User $user, int $tokenId): PersonalAccessToken
+    {
+        abort_unless($this->hasPersonalAccessTokensTable(), 404);
+
+        return $user->tokens()
+            ->whereKey($tokenId)
+            ->firstOrFail();
+    }
+
+    private function hasPersonalAccessTokensTable(): bool
+    {
+        try {
+            return Schema::hasTable('personal_access_tokens');
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    private function hasPersonalAccessTokenColumn(string $column): bool
+    {
+        if (!$this->hasPersonalAccessTokensTable()) {
+            return false;
+        }
+
+        try {
+            return Schema::hasColumn('personal_access_tokens', $column);
+        } catch (\Throwable) {
+            return false;
+        }
     }
 }

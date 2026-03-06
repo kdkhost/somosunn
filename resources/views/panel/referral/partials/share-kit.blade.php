@@ -162,7 +162,7 @@
         <div class="rounded-3xl border border-slate-200 bg-slate-50/70 p-5 dark:border-slate-800 dark:bg-slate-950/40">
             <h3 class="text-base font-black text-slate-900 dark:text-white">API REST para sites e painéis externos</h3>
             <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Use seu token pessoal para consumir materiais, analytics e blocos de landing page em site próprio, microsite ou painel externo.
+                Use o token gerado na seção de acesso API pessoal para consumir materiais, analytics e blocos de landing page em site próprio, microsite ou painel externo.
             </p>
             <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
                 <table class="w-full text-sm">

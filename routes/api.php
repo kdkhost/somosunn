@@ -30,7 +30,7 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/testimonials', [TestimonialApiController::class, 'index']);
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', \App\Http\Middleware\TrackApiTokenUsage::class])->group(function () {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
 

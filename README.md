@@ -6,6 +6,7 @@
 - **Programa de indicacao com rastreio completo:** O painel de indicacoes passou a mostrar **cliques, visitas unicas, pageviews, cadastros atribuidos, checkouts iniciados, compras confirmadas, receita rastreada, copias, compartilhamentos e recompartilhamentos** do link de afiliado.
 - **Afiliados com rastreio detalhado em tempo real:** O modulo de indicacoes agora tambem exibe **tabela detalhada por clique/visita, URL de origem exata, landing page, dispositivo, navegador, cidade/pais, funil por canal, exportacao CSV e visao global no admin em `/painel/admin/indicacoes`**, com atualizacao automatica no painel do afiliado.
 - **Kit promocional e API REST para afiliados:** O afiliado agora recebe **materiais prontos para compartilhamento, blocos de landing page, ofertas recomendadas e endpoints autenticados em `/api/v1/affiliate/*`** para montar site, painel ou microsite externo com o proprio link de indicacao.
+- **Tokens pessoais da API no painel do afiliado:** A area `/painel/indicacoes` agora permite **gerar token, copiar na hora, renomear por dispositivo, revogar acesso e acompanhar ultimo uso/IP** sem depender de chamada manual da API.
 - **Painel analitico de indicacoes:** O modulo de afiliados agora inclui **graficos por dia e por canal** para acompanhar performance do link, aquisicao por origem e distribuicao dos compartilhamentos.
 - **Planos pagos com perfil comercial embutido:** Todos os planos pagos passaram a incluir permissoes de **instrutor/vendedor**, e o fluxo de resgates por pontos foi preparado para operar no mesmo ambiente entre admin e vendedor com fornecedor rastreavel.
 - **Painel novo estabilizado:** Foram corrigidos fluxos e layouts de **eventos, mentorias, faturas, regras de pontos, imagens administrativas e editores ricos**, mantendo o padrao visual do painel moderno.
@@ -155,6 +156,7 @@ Configure as credenciais no painel admin em **ConfiguraÃ§Ãµes > SMTP**. Use 
   - Nova visao global em `/painel/admin/indicacoes` para ranking de afiliados e acompanhamento consolidado de toda a plataforma.
   - Novo **kit promocional do afiliado** com textos prontos, CTA, ativos da marca, ofertas recomendadas e estrutura de landing page pronta para divulgacao.
   - Nova **API REST autenticada** em `/api/v1/affiliate/overview`, `/materials`, `/offers`, `/landing-page` e `/analytics` para o membro montar site, painel ou microsite externo usando o proprio token.
+  - Nova gestao web de **tokens pessoais da API** dentro de `/painel/indicacoes`, com emissao, copia imediata, renomeacao por dispositivo, revogacao e leitura do ultimo uso/IP.
   - Rastreamento de compartilhamento tambem nos atalhos rapidos do perfil e da area de indicacoes.
 - **Fluxo comercial em planos pagos e resgates:**
   - Planos pagos passam a carregar permissoes de instrutor e vendedor automaticamente.
