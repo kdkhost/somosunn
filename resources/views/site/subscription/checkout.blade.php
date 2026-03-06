@@ -69,9 +69,13 @@
                     <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-32">
                         <h3 class="text-lg font-bold text-gray-900 mb-6">Resumo do Pedido</h3>
 
+                        @php
+                            $planImageUrl = $plan->image_url;
+                        @endphp
+
                         <div class="flex items-center gap-4 mb-6">
-                            @if($plan->image)
-                                <img src="{{ asset($plan->image) }}" alt="{{ $plan->name }}"
+                            @if($planImageUrl)
+                                <img src="{{ $planImageUrl }}" alt="{{ $plan->name }}"
                                     class="w-16 h-16 rounded-lg object-cover">
                             @else
                                 <div class="w-16 h-16 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">

@@ -70,6 +70,25 @@ class Plan extends Model
         'sort_order' => 'integer',
     ];
 
+    public function getImageUrlAttribute(): ?string
+    {
+        $path = trim((string) ($this->image ?? ''));
+
+        if ($path === '') {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        if (str_starts_with($path, 'storage/') || str_starts_with($path, 'uploads/')) {
+            return asset($path);
+        }
+
+        return asset('storage/' . ltrim($path, '/'));
+    }
+
     /**
      * Retorna o plano gratuito padrão da plataforma.
      * Prioridade: is_free=true → slug 'cliente' → menor preço.
