@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\EnsureUserHasActivePlan;
+use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\VerifyCsrfToken;
 use App\Models\Event;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
@@ -137,6 +140,7 @@ class PanelAdminEventsTest extends TestCase
             'end_at' => now()->addDay()->addHour(),
             'published' => false,
             'color' => '#FACC15',
+            'image' => 'event-images/capa.png',
         ]);
 
         Event::create([
@@ -146,6 +150,7 @@ class PanelAdminEventsTest extends TestCase
             'end_at' => now()->addDay()->addHours(2),
             'published' => true,
             'color' => '#ef4444',
+            'image' => 'event-images/outra-capa.png',
         ]);
 
         $start = now()->startOfDay()->toIso8601String();
@@ -167,20 +172,34 @@ class PanelAdminEventsTest extends TestCase
             ]);
     }
 
-    public function test_panel_admin_events_store_persists_event_data_from_new_form(): void
+    public function test_panel_admin_events_update_persists_event_data_from_new_form(): void
     {
         $user = User::create([
-            'name' => 'Criador de Eventos',
+            'name' => 'Administrador de Eventos',
             'email' => 'criador-eventos@example.com',
             'password' => Hash::make('password'),
-            'role' => 'member',
-            'extra_features' => ['events_access'],
+            'role' => 'admin',
         ]);
 
-        $response = $this->withoutMiddleware()
+        $event = Event::create([
+            'user_id' => $user->id,
+            'title' => 'Evento base do painel',
+            'start_at' => now()->addDay(),
+            'end_at' => now()->addDay()->addHour(),
+            'price' => 10,
+            'flash_sale_price' => 5,
+            'published' => false,
+            'image' => 'event-images/existente.png',
+        ]);
+
+        $response = $this->withoutMiddleware([
+                EnsureUserHasActivePlan::class,
+                EnsureUserIsAdmin::class,
+                VerifyCsrfToken::class,
+            ])
             ->actingAs($user)
-            ->post(route('panel.admin.events.store'), [
-                'title' => 'Evento novo do painel',
+            ->put(route('panel.admin.events.update', $event), [
+                'title' => 'Evento atualizado do painel',
                 'start_at' => now()->addDays(2)->format('Y-m-d\TH:i'),
                 'end_at' => now()->addDays(2)->addHour()->format('Y-m-d\TH:i'),
                 'price' => '1.234,56',
@@ -193,11 +212,97 @@ class PanelAdminEventsTest extends TestCase
 
         $response->assertRedirect(route('panel.admin.events.index'));
 
-        $event = Event::query()->where('title', 'Evento novo do painel')->firstOrFail();
+        $event = $event->fresh();
 
         $this->assertSame($user->id, (int) $event->user_id);
         $this->assertTrue((bool) $event->published);
         $this->assertSame(1234.56, (float) $event->price);
         $this->assertSame(99.90, (float) $event->flash_sale_price);
+        $this->assertSame('Evento atualizado do painel', $event->title);
+        $this->assertSame('event-images/existente.png', $event->image);
+    }
+
+    public function test_panel_admin_events_store_requires_cover_image(): void
+    {
+        $user = User::create([
+            'name' => 'Criador sem imagem',
+            'email' => 'criador-sem-imagem@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+        ]);
+
+        $response = $this->withoutMiddleware([
+                EnsureUserHasActivePlan::class,
+                EnsureUserIsAdmin::class,
+                VerifyCsrfToken::class,
+            ])
+            ->actingAs($user)
+            ->from(route('panel.admin.events.create'))
+            ->post(route('panel.admin.events.store'), [
+                'title' => 'Evento sem capa',
+                'start_at' => now()->addDays(3)->format('Y-m-d\TH:i'),
+                'end_at' => now()->addDays(3)->addHour()->format('Y-m-d\TH:i'),
+            ]);
+
+        $response->assertRedirect(route('panel.admin.events.create'));
+        $response->assertSessionHasErrors('image');
+    }
+
+    public function test_panel_admin_events_toggle_published_updates_current_status(): void
+    {
+        $user = User::create([
+            'name' => 'Editor de Eventos',
+            'email' => 'editor-eventos@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+        ]);
+
+        $event = Event::create([
+            'user_id' => $user->id,
+            'title' => 'Evento alternável',
+            'start_at' => now()->addDay(),
+            'published' => false,
+            'image' => 'event-images/existente.png',
+        ]);
+
+        $response = $this->withoutMiddleware([
+                EnsureUserHasActivePlan::class,
+                EnsureUserIsAdmin::class,
+                VerifyCsrfToken::class,
+            ])
+            ->actingAs($user)
+            ->post(route('panel.admin.events.toggle-published', $event));
+
+        $response->assertRedirect();
+        $this->assertTrue($event->fresh()->published);
+    }
+
+    public function test_panel_admin_events_edit_view_disables_certificate_tab_when_feature_is_inactive(): void
+    {
+        $user = User::create([
+            'name' => 'Instrutor de Eventos',
+            'email' => 'instrutor-eventos@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+        ]);
+
+        $event = Event::create([
+            'user_id' => $user->id,
+            'title' => 'Evento com certificado desligado',
+            'start_at' => now()->addDay(),
+            'published' => true,
+            'image' => 'event-images/existente.png',
+            'is_certificate_enabled' => false,
+        ]);
+
+        $this->withoutMiddleware([
+                EnsureUserHasActivePlan::class,
+                EnsureUserIsAdmin::class,
+            ])
+            ->actingAs($user)
+            ->get(route('panel.admin.events.edit', $event))
+            ->assertOk()
+            ->assertSee('certificateEnabled', false)
+            ->assertSee('Certificado ativo');
     }
 }

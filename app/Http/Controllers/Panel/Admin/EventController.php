@@ -119,7 +119,7 @@ class EventController extends Controller
         $this->ensurePermission('events.edit');
         $this->ensureCanManage($event);
 
-        $data = $this->serializeRequest($request);
+        $data = $this->serializeRequest($request, $event);
 
         if ($request->boolean('remove_image')) {
             if ($event->image) {
@@ -146,6 +146,28 @@ class EventController extends Controller
         return redirect()->route('panel.admin.events.index')->with('success', 'Evento atualizado');
     }
 
+    public function togglePublished(Event $event)
+    {
+        $this->ensurePermission('events.edit');
+        $this->ensureCanManage($event);
+
+        $event->forceFill([
+            'published' => !$event->published,
+        ])->save();
+
+        $message = $event->published ? 'Evento ativado com sucesso' : 'Evento desativado com sucesso';
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'published' => (bool) $event->published,
+                'message' => $message,
+            ]);
+        }
+
+        return back()->with('success', $message);
+    }
+
     public function destroy(Event $event)
     {
         $this->ensurePermission('events.delete');
@@ -164,7 +186,7 @@ class EventController extends Controller
         return redirect()->route('panel.admin.events.index')->with('success', 'Evento removido com sucesso');
     }
 
-    private function serializeRequest(Request $request): array
+    private function serializeRequest(Request $request, ?Event $event = null): array
     {
         $moneyFields = ['price', 'flash_sale_price', 'batch_1_price', 'batch_2_price', 'batch_3_price'];
         foreach ($moneyFields as $field) {
@@ -186,7 +208,7 @@ class EventController extends Controller
             'end_at' => 'nullable|date|after_or_equal:start_at',
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:5120',
+            'image' => $this->resolveImageRule($request, $event),
             'remove_image' => 'nullable|boolean',
             'location' => 'nullable|string',
             'address' => 'nullable|string',
@@ -199,6 +221,13 @@ class EventController extends Controller
             'is_certificate_enabled' => 'nullable|boolean',
             'certificate_settings' => 'nullable|json',
         ]);
+    }
+
+    private function resolveImageRule(Request $request, ?Event $event = null): string
+    {
+        $hasCurrentImage = $event && filled($event->image) && !$request->boolean('remove_image');
+
+        return $hasCurrentImage ? 'nullable|image|max:5120' : 'required|image|max:5120';
     }
 
     private function normalizeMoney($value): float

@@ -165,10 +165,7 @@ class Plan extends Model
             return false;
         }
 
-        $features = $this->permissions ?? [];
-        if (!is_array($features)) {
-            $features = [];
-        }
+        $features = $this->resolvedPermissions();
 
         if (in_array('*', $features, true)) {
             return true;
@@ -207,12 +204,26 @@ class Plan extends Model
         return false;
     }
 
+    public function resolvedPermissions(): array
+    {
+        $features = $this->permissions ?? [];
+        if (!is_array($features)) {
+            $features = [];
+        }
+
+        return self::normalizeCommercialPermissions(
+            $features,
+            (bool) $this->is_free,
+            (float) ($this->price ?? 0)
+        );
+    }
+
     public static function normalizeCommercialPermissions(array $permissions, bool $isFree, float $price = 0): array
     {
         $permissions = array_values(array_unique(array_filter($permissions, static fn ($value) => is_string($value) && trim($value) !== '')));
 
         if ($isFree || $price <= 0) {
-            return $permissions;
+            return array_values(array_diff($permissions, self::PAID_CREATOR_SELLER_FEATURES));
         }
 
         return array_values(array_unique(array_merge($permissions, self::PAID_CREATOR_SELLER_FEATURES)));

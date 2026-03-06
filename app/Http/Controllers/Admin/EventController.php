@@ -133,7 +133,7 @@ class EventController extends Controller
             'end_at' => 'nullable|date|after_or_equal:start_at',
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:5120',
+            'image' => $this->eventImageRule($request),
             'remove_image' => 'nullable|boolean',
             'location' => 'nullable|string',
             'address' => 'nullable|string',
@@ -241,7 +241,7 @@ class EventController extends Controller
             'end_at' => 'nullable|date|after_or_equal:start_at',
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:5120',
+            'image' => $this->eventImageRule($request, $event),
             'remove_image' => 'nullable|boolean',
             'location' => 'nullable|string',
             'address' => 'nullable|string',
@@ -538,6 +538,13 @@ class EventController extends Controller
         }
 
         Storage::disk('public')->delete($event->image);
+    }
+
+    protected function eventImageRule(Request $request, ?Event $event = null): string
+    {
+        $hasCurrentImage = $event && filled($event->image) && !$request->boolean('remove_image');
+
+        return $hasCurrentImage ? 'nullable|image|max:5120' : 'required|image|max:5120';
     }
 
     /**

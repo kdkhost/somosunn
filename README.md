@@ -150,7 +150,11 @@ Configure as credenciais no painel admin em **ConfiguraÃ§Ãµes > SMTP**. Use 
   - Rastreamento de compartilhamento tambem nos atalhos rapidos do perfil e da area de indicacoes.
 - **Fluxo comercial em planos pagos e resgates:**
   - Planos pagos passam a carregar permissoes de instrutor e vendedor automaticamente.
+  - Planos gratuitos deixaram de liberar, em tempo de execucao, as permissoes comerciais de instrutor e vendedor, mesmo em cadastros antigos.
   - Resgates por pontos foram preparados para operacao compartilhada entre admin e vendedor, com fornecedor identificado e trilha de entrega/rastreio.
+- **Eventos e gamificacao com regras mais restritas:**
+  - A edicao de eventos no painel passou a exigir imagem de capa, ganhou acoes rapidas de ativar/desativar e excluir, e a aba de certificado so fica habilitada quando o certificado do evento estiver ativo.
+  - Membros em plano gratuito deixaram de receber pontos recorrentes em regras repetiveis, preservando apenas pontuacoes unicas quando aplicavel.
 - **Padronizacao e correcoes do painel novo:**
   - Ajustes em uploads de imagens administrativas, FullCalendar de eventos, telas de mentorias/faturas, lista de regras de pontos e inputs ricos com Summernote.
   - Sidebar recolhivel, uploads avancados com FilePond e paginacao aplicada em listagens extensas para reduzir paginas longas.

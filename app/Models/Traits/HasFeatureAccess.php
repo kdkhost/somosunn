@@ -95,8 +95,12 @@ trait HasFeatureAccess
 
         // From plan
         $plan = $this->activePlan();
-        if ($plan && is_array($plan->permissions ?? null)) {
-            $features = array_merge($features, $plan->permissions);
+        if ($plan) {
+            $planFeatures = method_exists($plan, 'resolvedPermissions')
+                ? $plan->resolvedPermissions()
+                : (array) ($plan->permissions ?? []);
+
+            $features = array_merge($features, $planFeatures);
         }
 
         // Extra individual features

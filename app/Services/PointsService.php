@@ -21,6 +21,10 @@ class PointsService
             return false;
         }
 
+        if ($rule->repeatable && $this->usesFreePlan($user)) {
+            return false;
+        }
+
         // Guard: non-repeatable actions can only be awarded once per user lifetime
         if (!$rule->repeatable) {
             if (PointsLog::where('user_id', $user->id)->where('action_key', $actionKey)->exists()) {
@@ -52,6 +56,20 @@ class PointsService
         $user->increment('points', $points);
 
         return true;
+    }
+
+    private function usesFreePlan(User $user): bool
+    {
+        if (!method_exists($user, 'activePlan')) {
+            return false;
+        }
+
+        $plan = $user->activePlan();
+        if (!$plan) {
+            return false;
+        }
+
+        return (bool) $plan->is_free || (float) ($plan->price ?? 0) <= 0;
     }
 
     /**

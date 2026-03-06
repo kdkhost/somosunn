@@ -7,7 +7,10 @@
 @endsection
 
 @section('panel_content')
-    <div x-data="{ tab: 'general' }" class="space-y-6">
+    <div
+        x-data="{ tab: 'general', certificateEnabled: {{ old('is_certificate_enabled', $event->is_certificate_enabled) ? 'true' : 'false' }} }"
+        x-effect="if (!certificateEnabled && tab === 'certificate') { tab = 'general'; }"
+        class="space-y-6">
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -18,11 +21,35 @@
                     de ingressos para seu evento.</p>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
+                @if($event->exists)
+                    <form method="POST" action="{{ route('panel.admin.events.toggle-published', $event) }}">
+                        @csrf
+                        <button type="submit"
+                            class="px-4 py-2 text-sm font-semibold rounded-xl transition-all border {{ $event->published
+                                ? 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300'
+                                : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-300' }}">
+                            <i class="fas {{ $event->published ? 'fa-eye-slash' : 'fa-eye' }} mr-2"></i>
+                            <span>{{ $event->published ? 'Desativar Evento' : 'Ativar Evento' }}</span>
+                        </button>
+                    </form>
+                @endif
                 <a href="{{ route('panel.admin.events.index') }}"
                     class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all">
                     Cancelar
                 </a>
+                @if($event->exists)
+                    <form method="POST" action="{{ route('panel.admin.events.destroy', $event) }}"
+                        onsubmit="return confirm('Deseja realmente excluir este evento? Esta ação não pode ser desfeita.');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-rose-500/20 transition-all flex items-center gap-2">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>Excluir Evento</span>
+                        </button>
+                    </form>
+                @endif
                 <button type="submit" form="eventForm"
                     class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2">
                     <i class="fas fa-save"></i>
@@ -59,11 +86,11 @@
                 <span>Preço & Ingressos</span>
             </button>
             @if($event->exists)
-                <button type="button" @click="tab = 'certificate'"
+                <button type="button" @click="if (certificateEnabled) { tab = 'certificate'; }" :disabled="!certificateEnabled"
                     :class="tab === 'certificate' 
                                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
                                         : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
-                    class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
+                    class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-slate-600 dark:disabled:hover:text-slate-300">
                     <i class="fas fa-certificate"></i>
                     <span>Certificado</span>
                 </button>
@@ -122,6 +149,15 @@
                                 <label for="published"
                                     class="text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors">Publicado</label>
                             </div>
+                            @if($event->exists)
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" name="is_certificate_enabled" id="is_certificate_enabled" value="1"
+                                        x-model="certificateEnabled" @checked(old('is_certificate_enabled', $event->is_certificate_enabled))
+                                        class="w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-700 rounded focus:ring-blue-500 bg-white dark:bg-slate-950">
+                                    <label for="is_certificate_enabled"
+                                        class="text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors">Certificado ativo</label>
+                                </div>
+                            @endif
                         </div>
 
                         <div>
@@ -154,8 +190,11 @@
                                     </div>
                                 @endif
                             </div>
-                            <input type="file" name="image"
+                            <input type="file" name="image" {{ $event->image ? '' : 'required' }}
                                 class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50 transition-all cursor-pointer">
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">
+                                A imagem do evento é obrigatória.
+                            </p>
                         </div>
                     </div>
 
@@ -297,17 +336,14 @@
 
                                 <div class="space-y-6">
                                     <div
-                                        class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 transition-colors">
-                                        <span
-                                            class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase transition-colors">Habilitar
-                                            Certificado</span>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" name="is_certificate_enabled" value="1"
-                                                @checked($event->is_certificate_enabled) class="sr-only peer">
-                                            <div
-                                                class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 dark:after:border-slate-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors">
-                                            </div>
-                                        </label>
+                                        class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 transition-colors">
+                                        <p
+                                            class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase transition-colors">
+                                            Certificado habilitado
+                                        </p>
+                                        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                                            Esta aba só fica ativa quando a opção <strong>Certificado ativo</strong> estiver marcada na aba Geral.
+                                        </p>
                                     </div>
 
                                     <input type="hidden" name="certificate_settings" id="certificate_settings_input">

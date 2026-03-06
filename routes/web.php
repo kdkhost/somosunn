@@ -449,6 +449,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
 
         // Events Management
         Route::get('events/feed', [\App\Http\Controllers\Panel\Admin\EventController::class, 'feed'])->name('events.feed');
+        Route::post('events/{event}/toggle-published', [\App\Http\Controllers\Panel\Admin\EventController::class, 'togglePublished'])->name('events.toggle-published');
         Route::resource('events', \App\Http\Controllers\Panel\Admin\EventController::class);
 
         // Certificates Management

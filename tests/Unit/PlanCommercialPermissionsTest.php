@@ -26,4 +26,29 @@ class PlanCommercialPermissionsTest extends TestCase
         $this->assertNotContains('marketplace.sell', $permissions);
         $this->assertNotContains('courses.create', $permissions);
     }
+
+    public function test_free_plan_strips_instructor_and_seller_permissions_even_if_already_present(): void
+    {
+        $permissions = Plan::normalizeCommercialPermissions([
+            'community',
+            'marketplace.sell',
+            'events.create',
+            'courses.certificates',
+        ], true, 0);
+
+        $this->assertSame(['community'], $permissions);
+    }
+
+    public function test_free_plan_does_not_grant_runtime_access_to_commercial_features(): void
+    {
+        $plan = new Plan([
+            'price' => 0,
+            'is_free' => true,
+            'permissions' => ['community', 'marketplace.sell', 'events.create'],
+        ]);
+
+        $this->assertFalse($plan->hasFeature('marketplace.sell'));
+        $this->assertFalse($plan->hasFeature('events.create'));
+        $this->assertTrue($plan->hasFeature('community'));
+    }
 }
