@@ -19,6 +19,22 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        // Corrige erro do tipo "enum" nas migrations usando Doctrine DBAL (executa logo no início)
+        try {
+            if (
+                class_exists('Doctrine\\DBAL\\Types\\Type') &&
+                \Illuminate\Support\Facades\DB::getDefaultConnection() &&
+                \Illuminate\Support\Facades\DB::connection()->getDoctrineSchemaManager()
+            ) {
+                \Illuminate\Support\Facades\DB::connection()
+                    ->getDoctrineSchemaManager()
+                    ->getDatabasePlatform()
+                    ->registerDoctrineTypeMapping('enum', 'string');
+            }
+        } catch (\Throwable $e) {
+            // Ignora se não estiver usando DBAL
+        }
+
         RateLimiter::for('invoices_email', function ($job) {
             return Limit::perHour(100);
         });

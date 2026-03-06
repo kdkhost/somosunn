@@ -13,6 +13,7 @@
 .DS_Store
 .env.*.local
 .phpunit.result.cache
+/.phpunit.cache/
 /public/hot
 /public/build/
 /public/mix-manifest.json
