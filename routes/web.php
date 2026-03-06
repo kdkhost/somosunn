@@ -82,6 +82,8 @@ Route::get('/manifesto', [\App\Http\Controllers\InstitucionalController::class, 
 Route::get('/quem-somos', [\App\Http\Controllers\InstitucionalController::class, 'quemSomos'])->name('quem-somos');
 Route::get('/como-funciona', [\App\Http\Controllers\InstitucionalController::class, 'comoFunciona'])->name('como-funciona');
 Route::get('/valores', [\App\Http\Controllers\InstitucionalController::class, 'valores'])->name('valores');
+Route::get('/embed/afiliado/{referralCode}', [\App\Http\Controllers\AffiliateEmbedController::class, 'widget'])->name('affiliate.embed.widget');
+Route::get('/embed/afiliado/{referralCode}/criativo/{preset}.svg', [\App\Http\Controllers\AffiliateEmbedController::class, 'graphic'])->name('affiliate.embed.graphic');
 Route::get('/contato', fn() => view('site.institucional.contato'))->name('contato');
 Route::post('/contato', [ContactController::class, 'send'])->middleware('throttle:5,1')->name('contato.send');
 
@@ -483,6 +485,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         // Engagement Tools
         Route::get('indicacoes', [\App\Http\Controllers\Panel\Admin\ReferralAnalyticsController::class, 'index'])->name('referrals.index');
         Route::get('indicacoes/exportar', [\App\Http\Controllers\Panel\Admin\ReferralAnalyticsController::class, 'export'])->name('referrals.export');
+        Route::put('indicacoes/sandbox/{sandboxRequest}', [\App\Http\Controllers\Panel\Admin\ReferralAnalyticsController::class, 'updateSandboxRequest'])->name('referrals.sandbox.update');
         Route::post('points-rules/exchange-settings', [\App\Http\Controllers\Panel\Admin\PointsRuleController::class, 'updateExchangeSettings'])
             ->name('points-rules.exchange-settings');
         Route::resource('points-rules', \App\Http\Controllers\Panel\Admin\PointsRuleController::class);
@@ -549,6 +552,8 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::get('/indicacoes/exportar', [\App\Http\Controllers\Panel\ReferralController::class, 'export'])->name('referral.export');
     Route::get('/indicacoes/dados', [\App\Http\Controllers\Panel\ReferralController::class, 'stats'])->name('referral.stats');
     Route::post('/indicacoes/rastreio', [\App\Http\Controllers\Panel\ReferralController::class, 'track'])->name('referral.track');
+    Route::post('/indicacoes/sandbox', [\App\Http\Controllers\Panel\ReferralController::class, 'storeSandboxRequest'])->name('referral.sandbox.store');
+    Route::post('/indicacoes/playground/executar', [\App\Http\Controllers\Panel\ReferralController::class, 'playground'])->name('referral.playground.execute');
     Route::post('/indicacoes/tokens', [\App\Http\Controllers\Panel\ReferralController::class, 'storeToken'])->name('referral.tokens.store');
     Route::put('/indicacoes/tokens/{token}', [\App\Http\Controllers\Panel\ReferralController::class, 'updateToken'])->name('referral.tokens.update');
     Route::delete('/indicacoes/tokens/{token}', [\App\Http\Controllers\Panel\ReferralController::class, 'destroyToken'])->name('referral.tokens.destroy');
@@ -782,6 +787,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             Route::get('/', [\App\Http\Controllers\Admin\ReferralController::class, 'index'])->name('index');
             Route::get('/exportar', [\App\Http\Controllers\Admin\ReferralController::class, 'export'])->name('export');
             Route::post('/rastrear', [\App\Http\Controllers\Admin\ReferralController::class, 'track'])->name('track');
+            Route::put('/sandbox/{sandboxRequest}', [\App\Http\Controllers\Admin\ReferralController::class, 'updateSandboxRequest'])->name('sandbox.update');
             Route::post('/tokens', [\App\Http\Controllers\Admin\ReferralController::class, 'storeToken'])->name('tokens.store');
             Route::put('/tokens/{token}', [\App\Http\Controllers\Admin\ReferralController::class, 'updateToken'])->name('tokens.update');
             Route::delete('/tokens/{token}', [\App\Http\Controllers\Admin\ReferralController::class, 'destroyToken'])->name('tokens.destroy');

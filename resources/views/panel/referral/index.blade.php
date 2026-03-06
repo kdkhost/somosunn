@@ -606,6 +606,10 @@
     <div id="referralShareKitSection">
         @include('panel.referral.partials.share-kit', [
             'affiliateShareKit' => $affiliateShareKit,
+            'sandboxRequests' => $sandboxRequests,
+            'sandboxLatestRequest' => $sandboxLatestRequest,
+            'sandboxApprovedRequest' => $sandboxApprovedRequest,
+            'sandboxAvailable' => $sandboxAvailable,
         ])
     </div>
 
@@ -618,6 +622,8 @@
 <script>
 const referralTrackUrl = @json(route('panel.referral.track'));
 const referralStatsUrl = @json(route('panel.referral.stats'));
+const referralSandboxPlaygroundUrl = @json(route('panel.referral.playground.execute'));
+const referralSandboxBaseUrl = @json(url('/api/v1/sandbox/affiliate'));
 const referralTrackToken = @json(csrf_token());
 const referralDailyChartData = @json($trackingDailyChart);
 const referralAcquisitionChartData = @json($trackingAcquisitionChart);
@@ -1143,7 +1149,6 @@ function applyReferralTrackingPayload(payload) {
     renderTrackingVisitsRows(payload.trackedVisitsFeed || []);
     replaceReferralSectionHtml('referralChannelFunnelSection', payload.channelFunnelsHtml);
     replaceReferralSectionHtml('referralEventsLogSection', payload.detailedEventsHtml);
-    replaceReferralSectionHtml('referralShareKitSection', payload.shareKitHtml);
 
     replaceReferralChartData(referralDailyChartData, payload.trackingDailyChart || {}, ['labels', 'visits', 'registrations', 'checkouts', 'purchases', 'revenue']);
     replaceReferralChartData(referralAcquisitionChartData, payload.trackingAcquisitionChart || {}, ['labels', 'visits', 'registrations', 'purchases', 'revenue']);
@@ -1274,6 +1279,121 @@ function copyReferralLink() {
     }
 }
 
+function buildAffiliateSandboxRequestUrl() {
+    const endpoint = document.getElementById('affiliateSandboxEndpoint')?.value || 'overview';
+    const perPage = document.getElementById('affiliateSandboxPerPage')?.value || '10';
+    const visitLimit = document.getElementById('affiliateSandboxVisitLimit')?.value || '5';
+
+    if (endpoint === 'analytics') {
+        const url = new URL(`${referralSandboxBaseUrl}/analytics`, window.location.origin);
+        url.searchParams.set('per_page', perPage);
+        url.searchParams.set('visit_limit', visitLimit);
+
+        return url.toString();
+    }
+
+    return `${referralSandboxBaseUrl}/${endpoint}`;
+}
+
+function updateAffiliateSandboxPreview() {
+    const requestUrl = buildAffiliateSandboxRequestUrl();
+    const requestUrlElement = document.getElementById('affiliateSandboxRequestUrl');
+    const curlElement = document.getElementById('affiliateSandboxCurlSnippet');
+
+    if (requestUrlElement) {
+        requestUrlElement.textContent = requestUrl;
+    }
+
+    if (curlElement) {
+        curlElement.textContent = `curl "${requestUrl}" -H "Accept: application/json" -H "Authorization: Bearer SEU_TOKEN"`;
+    }
+}
+
+function copyAffiliateSandboxCurl(button) {
+    const curlElement = document.getElementById('affiliateSandboxCurlSnippet');
+    const requestUrlElement = document.getElementById('affiliateSandboxRequestUrl');
+
+    if (!curlElement) {
+        return;
+    }
+
+    button.dataset.copyText = curlElement.textContent.trim();
+    button.dataset.trackChannel = 'sandbox-curl';
+    button.dataset.targetUrl = requestUrlElement?.textContent?.trim() || referralSandboxBaseUrl;
+
+    copyReferralMaterial(button);
+}
+
+async function runAffiliateSandboxPlayground(button) {
+    const endpoint = document.getElementById('affiliateSandboxEndpoint')?.value || 'overview';
+    const perPage = document.getElementById('affiliateSandboxPerPage')?.value || '10';
+    const visitLimit = document.getElementById('affiliateSandboxVisitLimit')?.value || '5';
+    const metaElement = document.getElementById('affiliateSandboxResponseMeta');
+    const payloadElement = document.getElementById('affiliateSandboxResponsePayload');
+    const originalHtml = button.innerHTML;
+
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Executando';
+
+    if (metaElement) {
+        metaElement.textContent = 'Executando...';
+    }
+
+    try {
+        const body = new URLSearchParams();
+        body.set('endpoint', endpoint);
+
+        if (endpoint === 'analytics') {
+            body.set('per_page', perPage);
+            body.set('visit_limit', visitLimit);
+        }
+
+        const response = await fetch(referralSandboxPlaygroundUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-CSRF-TOKEN': referralTrackToken,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: body.toString(),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result?.ok) {
+            throw result;
+        }
+
+        if (metaElement) {
+            metaElement.textContent = `${result.endpoint} · ${result.duration_ms} ms`;
+        }
+
+        if (payloadElement) {
+            payloadElement.textContent = JSON.stringify({
+                request_url: result.request_url,
+                payload: result.payload,
+            }, null, 2);
+        }
+    } catch (error) {
+        if (metaElement) {
+            metaElement.textContent = 'Falha na execução';
+        }
+
+        if (payloadElement) {
+            payloadElement.textContent = JSON.stringify({
+                ok: false,
+                message: error?.message || 'Não foi possível executar o playground.',
+                errors: error?.errors || null,
+            }, null, 2);
+        }
+    } finally {
+        button.disabled = false;
+        button.innerHTML = originalHtml;
+    }
+}
+
 document.querySelectorAll('a[href^="https://wa.me/"], a[href^="https://t.me/share/"], a[href^="https://www.linkedin.com/sharing/"], a[href^="mailto:"]').forEach((link) => {
     link.addEventListener('click', () => {
         let channel = 'other';
@@ -1292,6 +1412,7 @@ document.querySelectorAll('a[href^="https://wa.me/"], a[href^="https://t.me/shar
     });
 });
 
+updateAffiliateSandboxPreview();
 initReferralCharts();
 startReferralTrackingPolling();
 scheduleReferralRefresh(300);

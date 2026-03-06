@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AffiliateApiSandboxRequest;
 use App\Models\Course;
 use App\Models\Event;
 use App\Models\Mentorship;
@@ -40,14 +41,22 @@ class AffiliateShareKitService
         $socialProof = $this->buildSocialProof();
         $materials = $this->buildMaterials($user, $referral, $branding, $offers, $socialProof);
         $landingPage = $this->buildLandingPage($referral, $branding, $offers, $socialProof);
+        $graphicAssets = $this->buildGraphicAssets($referral, $branding, $offers);
+        $embedWidgets = $this->buildEmbedWidgets($referral, $graphicAssets);
+        $sandbox = $this->buildSandboxStatus($user);
+        $playground = $this->buildPlaygroundGuide($sandbox);
 
         return [
             'referral' => $referral,
             'branding' => $branding,
             'offers' => $offers,
             'materials' => $materials,
+            'graphic_assets' => $graphicAssets,
+            'embed_widgets' => $embedWidgets,
             'landing_page' => $landingPage,
-            'api' => $this->buildApiGuide(),
+            'sandbox' => $sandbox,
+            'playground' => $playground,
+            'api' => $this->buildApiGuide($playground),
         ];
     }
 
@@ -358,12 +367,14 @@ class AffiliateShareKitService
         ];
     }
 
-    private function buildApiGuide(): array
+    private function buildApiGuide(array $playground): array
     {
         $baseUrl = url('/api/v1');
+        $sandboxBaseUrl = $playground['sandbox_base_url'] ?? ($baseUrl . '/sandbox/affiliate');
 
         return [
             'base_url' => $baseUrl,
+            'sandbox_base_url' => $sandboxBaseUrl,
             'auth' => [
                 'login_url' => $baseUrl . '/auth/login',
                 'logout_url' => $baseUrl . '/auth/logout',
@@ -400,6 +411,18 @@ class AffiliateShareKitService
                     'url' => $baseUrl . '/affiliate/analytics',
                     'description' => 'Resumo, canais, funil e eventos detalhados paginados.',
                 ],
+                [
+                    'name' => 'Sandbox overview',
+                    'method' => 'GET',
+                    'url' => $sandboxBaseUrl . '/overview',
+                    'description' => 'Versão de homologação da visão geral, liberada mediante ticket com IP e domínio aprovados.',
+                ],
+                [
+                    'name' => 'Sandbox analytics',
+                    'method' => 'GET',
+                    'url' => $sandboxBaseUrl . '/analytics',
+                    'description' => 'Teste controlado das métricas em ambiente de homologação.',
+                ],
             ],
             'curl_examples' => [
                 'login' => sprintf(
@@ -414,7 +437,184 @@ class AffiliateShareKitService
                     "curl %s -H \"Accept: application/json\" -H \"Authorization: Bearer SEU_TOKEN\"",
                     $baseUrl . '/affiliate/landing-page'
                 ),
+                'sandbox' => sprintf(
+                    "curl %s -H \"Accept: application/json\" -H \"Authorization: Bearer SEU_TOKEN\"",
+                    $sandboxBaseUrl . '/overview'
+                ),
             ],
+        ];
+    }
+
+    private function buildGraphicAssets(array $referral, array $branding, array $offers): array
+    {
+        $mainOffer = collect(array_merge(
+            $offers['plans'] ?? [],
+            $offers['courses'] ?? [],
+            $offers['events'] ?? [],
+            $offers['mentorships'] ?? [],
+        ))->first();
+
+        $title = $mainOffer['title'] ?? ($branding['hero_title'] ?? 'Entre para a comunidade UNN');
+        $subtitle = $mainOffer['subtitle'] ?? ($branding['hero_subtitle'] ?? 'Networking, conteúdo e oportunidades reais.');
+        $cta = $mainOffer['cta_label'] ?? 'Acessar convite oficial';
+
+        $presets = [
+            ['preset' => 'social-landscape', 'title' => 'Post horizontal 1200x628', 'width' => 1200, 'height' => 628],
+            ['preset' => 'social-square', 'title' => 'Post quadrado 1080x1080', 'width' => 1080, 'height' => 1080],
+            ['preset' => 'story', 'title' => 'Story 1080x1920', 'width' => 1080, 'height' => 1920],
+            ['preset' => 'leaderboard', 'title' => 'Banner 728x90', 'width' => 728, 'height' => 90],
+            ['preset' => 'medium-rectangle', 'title' => 'Retângulo 300x250', 'width' => 300, 'height' => 250],
+        ];
+
+        return array_map(function (array $preset) use ($referral, $title, $subtitle, $cta) {
+            $assetUrl = route('affiliate.embed.graphic', [
+                'referralCode' => $referral['code'] ?? 'UNN',
+                'preset' => $preset['preset'],
+            ]);
+
+            return [
+                'preset' => $preset['preset'],
+                'title' => $preset['title'],
+                'width' => $preset['width'],
+                'height' => $preset['height'],
+                'subtitle' => $subtitle,
+                'cta_label' => $cta,
+                'caption' => $referral['short_label'] ?? ($referral['code'] ?? ''),
+                'image_url' => $assetUrl,
+                'download_url' => $assetUrl,
+                'html_snippet' => sprintf(
+                    '<a href="%s" target="_blank" rel="noopener"><img src="%s" width="%d" height="%d" alt="%s" style="max-width:100%%;height:auto;border:0;display:block;"></a>',
+                    e($referral['register_url'] ?? url('/')),
+                    e($assetUrl),
+                    $preset['width'],
+                    $preset['height'],
+                    e($title)
+                ),
+                'markdown_snippet' => sprintf('[![%s](%s)](%s)', $title, $assetUrl, $referral['register_url'] ?? url('/')),
+                'title_text' => $title,
+            ];
+        }, $presets);
+    }
+
+    private function buildEmbedWidgets(array $referral, array $graphicAssets): array
+    {
+        $responsiveGraphic = collect($graphicAssets);
+        $mobile = $responsiveGraphic->firstWhere('preset', 'medium-rectangle');
+        $tablet = $responsiveGraphic->firstWhere('preset', 'leaderboard');
+        $desktop = $responsiveGraphic->firstWhere('preset', 'social-landscape');
+
+        $widgetVariants = [
+            [
+                'key' => 'embed-compact',
+                'title' => 'Widget compacto',
+                'description' => 'Bloco curto para sidebar, blog post ou landing externa.',
+                'iframe_url' => route('affiliate.embed.widget', ['referralCode' => $referral['code'] ?? 'UNN', 'variant' => 'compact']),
+                'width' => 420,
+                'height' => 560,
+            ],
+            [
+                'key' => 'embed-hero',
+                'title' => 'Widget hero',
+                'description' => 'Versão maior para página principal ou dobra inicial.',
+                'iframe_url' => route('affiliate.embed.widget', ['referralCode' => $referral['code'] ?? 'UNN', 'variant' => 'hero']),
+                'width' => 720,
+                'height' => 640,
+            ],
+            [
+                'key' => 'embed-offers',
+                'title' => 'Widget com ofertas',
+                'description' => 'Mostra múltiplas ofertas dentro de um iframe pronto.',
+                'iframe_url' => route('affiliate.embed.widget', ['referralCode' => $referral['code'] ?? 'UNN', 'variant' => 'offers']),
+                'width' => 720,
+                'height' => 760,
+            ],
+        ];
+
+        return array_map(function (array $widget) use ($mobile, $tablet, $desktop, $referral) {
+            return $widget + [
+                'iframe_snippet' => sprintf(
+                    '<iframe src="%s" loading="lazy" style="width:100%%;max-width:%dpx;height:%dpx;border:0;border-radius:24px;overflow:hidden;" referrerpolicy="strict-origin-when-cross-origin"></iframe>',
+                    e($widget['iframe_url']),
+                    $widget['width'],
+                    $widget['height']
+                ),
+                'responsive_html_snippet' => sprintf(
+                    '<a href="%s" target="_blank" rel="noopener"><img src="%s" srcset="%s 300w, %s 728w, %s 1200w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 728px, 1200px" alt="Banner oficial de afiliado" style="width:100%%;height:auto;border:0;display:block;"></a>',
+                    e($referral['register_url'] ?? url('/')),
+                    e($desktop['image_url'] ?? ($mobile['image_url'] ?? url('/'))),
+                    e($mobile['image_url'] ?? url('/')),
+                    e($tablet['image_url'] ?? url('/')),
+                    e($desktop['image_url'] ?? url('/'))
+                ),
+            ];
+        }, $widgetVariants);
+    }
+
+    private function buildSandboxStatus(User $user): array
+    {
+        if (!$this->hasTable('affiliate_api_sandbox_requests')) {
+            return [
+                'available' => false,
+                'enabled' => false,
+                'latest_request' => null,
+                'approved_request' => null,
+            ];
+        }
+
+        $latestRequest = AffiliateApiSandboxRequest::query()
+            ->where('user_id', $user->id)
+            ->latest('id')
+            ->first();
+
+        $approvedRequest = AffiliateApiSandboxRequest::query()
+            ->approved()
+            ->where('user_id', $user->id)
+            ->latest('reviewed_at')
+            ->latest('id')
+            ->first();
+
+        return [
+            'available' => true,
+            'enabled' => $approvedRequest !== null,
+            'latest_request' => $latestRequest ? $this->serializeSandboxRequest($latestRequest) : null,
+            'approved_request' => $approvedRequest ? $this->serializeSandboxRequest($approvedRequest) : null,
+        ];
+    }
+
+    private function buildPlaygroundGuide(array $sandbox): array
+    {
+        $sandboxBaseUrl = url('/api/v1/sandbox/affiliate');
+
+        return [
+            'sandbox_base_url' => $sandboxBaseUrl,
+            'requires_approval' => true,
+            'enabled' => (bool) ($sandbox['enabled'] ?? false),
+            'request_requirements' => [
+                'Explique o motivo do acesso e o tipo de integração que será testado.',
+                'Informe o IP público de origem das chamadas.',
+                'Informe o domínio ou subdomínio onde o sandbox será consumido.',
+            ],
+            'endpoints' => [
+                ['key' => 'overview', 'label' => 'Overview', 'path' => '/overview', 'method' => 'GET'],
+                ['key' => 'materials', 'label' => 'Materials', 'path' => '/materials', 'method' => 'GET'],
+                ['key' => 'offers', 'label' => 'Offers', 'path' => '/offers', 'method' => 'GET'],
+                ['key' => 'landing-page', 'label' => 'Landing Page', 'path' => '/landing-page', 'method' => 'GET'],
+                ['key' => 'analytics', 'label' => 'Analytics', 'path' => '/analytics?per_page=10&visit_limit=5', 'method' => 'GET'],
+            ],
+        ];
+    }
+
+    private function serializeSandboxRequest(AffiliateApiSandboxRequest $request): array
+    {
+        return [
+            'id' => $request->id,
+            'status' => $request->status,
+            'reason' => $request->reason,
+            'requested_domain' => $request->requested_domain,
+            'requested_ip' => $request->requested_ip,
+            'admin_notes' => $request->admin_notes,
+            'reviewed_at' => optional($request->reviewed_at)?->toIso8601String(),
+            'reviewed_at_label' => optional($request->reviewed_at)?->format('d/m/Y H:i'),
         ];
     }
 

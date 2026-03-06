@@ -6,6 +6,7 @@
 - **Programa de indicacao com rastreio completo:** O painel de indicacoes passou a mostrar **cliques, visitas unicas, pageviews, cadastros atribuidos, checkouts iniciados, compras confirmadas, receita rastreada, copias, compartilhamentos e recompartilhamentos** do link de afiliado.
 - **Afiliados com rastreio detalhado em tempo real:** O modulo de indicacoes agora tambem exibe **tabela detalhada por clique/visita, URL de origem exata, landing page, dispositivo, navegador, cidade/pais, funil por canal, exportacao CSV e visao global no admin em `/painel/admin/indicacoes`**, com atualizacao automatica no painel do afiliado.
 - **Kit promocional e API REST para afiliados:** O afiliado agora recebe **materiais prontos para compartilhamento, blocos de landing page, ofertas recomendadas e endpoints autenticados em `/api/v1/affiliate/*`** para montar site, painel ou microsite externo com o proprio link de indicacao.
+- **Central externa do afiliado com embeds, criativos e sandbox:** A area `/painel/indicacoes` agora tambem entrega **widgets em iframe/HTML responsivo, criativos em tamanhos especificos, playground da API e ticket de acesso ao sandbox com motivo, IP e dominio** para homologacao controlada.
 - **Tokens pessoais da API no painel do afiliado:** A area `/painel/indicacoes` agora permite **gerar token, copiar na hora, renomear por dispositivo, revogar acesso e acompanhar ultimo uso/IP** sem depender de chamada manual da API.
 - **Gestao de afiliados tambem no AdminLTE legado:** O superadmin agora acompanha o programa de indicacoes e gerencia seus **tokens pessoais da API** tambem em `/admin/indicacoes`, mantendo link proprio, indicados e rastreio global no painel antigo.
 - **Painel analitico de indicacoes:** O modulo de afiliados agora inclui **graficos por dia e por canal** para acompanhar performance do link, aquisicao por origem e distribuicao dos compartilhamentos.
@@ -157,8 +158,11 @@ Configure as credenciais no painel admin em **ConfiguraÃ§Ãµes > SMTP**. Use 
   - Nova visao global em `/painel/admin/indicacoes` para ranking de afiliados e acompanhamento consolidado de toda a plataforma.
   - Novo **kit promocional do afiliado** com textos prontos, CTA, ativos da marca, ofertas recomendadas e estrutura de landing page pronta para divulgacao.
   - Nova **API REST autenticada** em `/api/v1/affiliate/overview`, `/materials`, `/offers`, `/landing-page` e `/analytics` para o membro montar site, painel ou microsite externo usando o proprio token.
+  - O kit do afiliado passou a incluir **criativos graficos em tamanhos especificos**, **snippets embed/iframe para blog e site externo**, e um **playground interno** para testar respostas reais da API sem sair do painel.
+  - Foi criado um fluxo de **sandbox de homologacao** para afiliados, com solicitacao por ticket, motivo do uso, dominio, IP de origem e aprovacao/revogacao pelo superadmin.
   - Nova gestao web de **tokens pessoais da API** dentro de `/painel/indicacoes`, com emissao, copia imediata, renomeacao por dispositivo, revogacao e leitura do ultimo uso/IP.
   - O AdminLTE legado ganhou a tela `/admin/indicacoes`, combinando **link pessoal do superadmin, lista de indicados, gestao de tokens da API** e o rastreio global consolidado de afiliados.
+  - O AdminLTE legado tambem passou a exibir a **fila de tickets do sandbox** para aprovar ou bloquear o uso da API de testes por afiliado.
   - Rastreamento de compartilhamento tambem nos atalhos rapidos do perfil e da area de indicacoes.
 - **Fluxo comercial em planos pagos e resgates:**
   - Planos pagos passam a carregar permissoes de instrutor e vendedor automaticamente.

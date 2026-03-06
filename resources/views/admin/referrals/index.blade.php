@@ -402,6 +402,11 @@
         </div>
     </div>
 
+    @include('admin.referrals.partials.sandbox-requests', [
+        'sandboxRequestsAvailable' => $sandboxRequestsAvailable ?? false,
+        'sandboxRequests' => $sandboxRequests ?? collect(),
+    ])
+
     <div class="row">
         <div class="col-12">
             <div class="card card-warning card-outline">

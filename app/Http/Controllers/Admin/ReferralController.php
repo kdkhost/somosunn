@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Concerns\ManagesPersonalApiTokens;
 use App\Http\Controllers\Controller;
+use App\Models\AffiliateApiSandboxRequest;
 use App\Models\Plan;
 use App\Models\PointsLog;
 use App\Models\User;
@@ -12,6 +13,7 @@ use App\Services\AffiliateTrackingService;
 use App\Services\ReferralAnalyticsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class ReferralController extends Controller
 {
@@ -82,6 +84,8 @@ class ReferralController extends Controller
             'channelFunnels' => $this->analytics->buildChannelFunnels($scopeReferrerId),
             'detailedEvents' => $this->analytics->detailedEventsPaginator($scopeReferrerId, 20, 'events_page'),
             'affiliateLeaderboard' => $this->analytics->affiliateLeaderboard(15, 'affiliates_page'),
+            'sandboxRequestsAvailable' => $this->hasSandboxRequestsTable(),
+            'sandboxRequests' => $this->sandboxRequestsPaginator(),
             'apiTokens' => $this->apiTokensForUser($user),
             'apiTokenPlainText' => session('api_token_plain_text'),
             'apiTokenDeviceName' => session('api_token_device_name'),
@@ -187,5 +191,47 @@ class ReferralController extends Controller
             'ok' => true,
             'event_type' => $eventType,
         ]);
+    }
+
+    public function updateSandboxRequest(Request $request, AffiliateApiSandboxRequest $sandboxRequest): RedirectResponse
+    {
+        abort_unless($this->hasSandboxRequestsTable(), 404);
+
+        $data = $request->validate([
+            'status' => 'required|string|in:approved,rejected,revoked',
+            'admin_notes' => 'nullable|string|max:4000',
+        ]);
+
+        $sandboxRequest->forceFill([
+            'status' => $data['status'],
+            'admin_notes' => trim((string) ($data['admin_notes'] ?? '')) ?: null,
+            'reviewed_by' => $request->user()?->id,
+            'reviewed_at' => now(),
+        ])->save();
+
+        return redirect()
+            ->route('admin.referrals.index')
+            ->with('success', 'Ticket de sandbox atualizado com sucesso.');
+    }
+
+    private function sandboxRequestsPaginator()
+    {
+        if (!$this->hasSandboxRequestsTable()) {
+            return collect();
+        }
+
+        return AffiliateApiSandboxRequest::query()
+            ->with(['user:id,name,email,referral_code', 'reviewer:id,name'])
+            ->latest('id')
+            ->paginate(12, ['*'], 'sandbox_page');
+    }
+
+    private function hasSandboxRequestsTable(): bool
+    {
+        try {
+            return Schema::hasTable('affiliate_api_sandbox_requests');
+        } catch (\Throwable) {
+            return false;
+        }
     }
 }

@@ -182,6 +182,19 @@ class AffiliatePromoApiTest extends TestCase
             $table->timestamp('occurred_at')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('affiliate_api_sandbox_requests', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->text('reason');
+            $table->string('requested_domain')->nullable();
+            $table->string('requested_ip', 45)->nullable();
+            $table->string('status')->default('pending');
+            $table->text('admin_notes')->nullable();
+            $table->unsignedBigInteger('reviewed_by')->nullable();
+            $table->timestamp('reviewed_at')->nullable();
+            $table->timestamps();
+        });
     }
 
     protected function tearDown(): void
@@ -290,7 +303,13 @@ class AffiliatePromoApiTest extends TestCase
         $this->getJson('/api/v1/affiliate/materials')
             ->assertOk()
             ->assertJsonPath('materials.0.title', 'Convite rápido')
-            ->assertJsonPath('social_links.linkedin', 'https://linkedin.com/company/somosunn');
+            ->assertJsonPath('social_links.linkedin', 'https://linkedin.com/company/somosunn')
+            ->assertJsonStructure([
+                'graphic_assets' => [['preset', 'image_url', 'html_snippet', 'markdown_snippet']],
+                'embed_widgets' => [['key', 'iframe_url', 'iframe_snippet', 'responsive_html_snippet']],
+                'sandbox' => ['available', 'enabled'],
+                'playground' => ['sandbox_base_url', 'enabled', 'endpoints'],
+            ]);
 
         $this->getJson('/api/v1/affiliate/offers')
             ->assertOk()
@@ -300,7 +319,56 @@ class AffiliatePromoApiTest extends TestCase
         $this->getJson('/api/v1/affiliate/landing-page')
             ->assertOk()
             ->assertJsonPath('landing_page.hero.title', 'Networking que gera negócios')
-            ->assertJsonCount(4, 'landing_page.benefits');
+            ->assertJsonCount(4, 'landing_page.benefits')
+            ->assertJsonStructure([
+                'embed_widgets' => [['key', 'iframe_url']],
+            ]);
+
+        $this->get('/embed/afiliado/' . $generatedCode . '?variant=compact')
+            ->assertOk()
+            ->assertSee('Widget de afiliado', false)
+            ->assertSee('Afiliado API');
+
+        $this->get('/embed/afiliado/' . $generatedCode . '/criativo/social-square.svg')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/svg+xml; charset=UTF-8')
+            ->assertSee('<svg', false);
+    }
+
+    public function test_affiliate_sandbox_api_requires_approval_and_exposes_materials_when_enabled(): void
+    {
+        $user = User::create([
+            'name' => 'Afiliado Sandbox',
+            'email' => 'afiliado-sandbox@example.com',
+            'password' => Hash::make('password'),
+            'referral_code' => 'UNNSBOX1',
+        ]);
+
+        $this->actingAs($user, 'sanctum');
+
+        $this->getJson('/api/v1/sandbox/affiliate/materials')
+            ->assertForbidden();
+
+        DB::table('affiliate_api_sandbox_requests')->insert([
+            'user_id' => $user->id,
+            'reason' => 'Testar integração do meu painel privado de afiliados.',
+            'requested_domain' => 'painel.afiliado.local',
+            'requested_ip' => '203.0.113.20',
+            'status' => 'approved',
+            'reviewed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->withHeader('Origin', 'https://painel.afiliado.local')
+            ->getJson('/api/v1/sandbox/affiliate/materials')
+            ->assertOk()
+            ->assertJsonPath('sandbox.enabled', true)
+            ->assertJsonStructure([
+                'graphic_assets' => [['preset', 'image_url']],
+                'embed_widgets' => [['key', 'iframe_url']],
+                'playground' => ['sandbox_base_url', 'enabled'],
+            ]);
     }
 
     public function test_affiliate_api_exposes_analytics_for_external_dashboards(): void

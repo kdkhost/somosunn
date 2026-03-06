@@ -29,6 +29,8 @@ class AffiliateApiController extends Controller
             'referral' => $kit['referral'],
             'branding' => $kit['branding'],
             'summary' => $tracking['trackingSummary'],
+            'sandbox' => $kit['sandbox'],
+            'playground' => $kit['playground'],
             'api' => $kit['api'],
         ]);
     }
@@ -44,6 +46,10 @@ class AffiliateApiController extends Controller
             'referral' => $kit['referral'],
             'branding' => $kit['branding'],
             'materials' => $kit['materials'],
+            'graphic_assets' => $kit['graphic_assets'],
+            'embed_widgets' => $kit['embed_widgets'],
+            'playground' => $kit['playground'],
+            'sandbox' => $kit['sandbox'],
             'social_links' => $kit['branding']['social_links'],
         ]);
     }
@@ -72,6 +78,7 @@ class AffiliateApiController extends Controller
             'referral' => $kit['referral'],
             'branding' => $kit['branding'],
             'landing_page' => $kit['landing_page'],
+            'embed_widgets' => $kit['embed_widgets'],
         ]);
     }
 

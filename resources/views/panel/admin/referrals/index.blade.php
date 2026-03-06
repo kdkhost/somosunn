@@ -185,5 +185,10 @@
         'subtitle' => 'Inclui evento a evento com URL de origem, landing page, dispositivo, localização e desfecho.',
         'emptyMessage' => 'Ainda não há eventos rastreados para este escopo.',
     ])
+
+    @include('panel.admin.referrals.partials.sandbox-requests', [
+        'sandboxRequestsAvailable' => $sandboxRequestsAvailable ?? false,
+        'sandboxRequests' => $sandboxRequests ?? collect(),
+    ])
 </div>
 @endsection

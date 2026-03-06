@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Panel;
 
+use App\Models\AffiliateApiSandboxRequest;
 use App\Http\Controllers\Concerns\ManagesPersonalApiTokens;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
@@ -10,9 +11,11 @@ use App\Models\User;
 use App\Services\AffiliateShareKitService;
 use App\Services\AffiliateTrackingService;
 use App\Services\ReferralAnalyticsService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class ReferralController extends Controller
 {
@@ -60,6 +63,8 @@ class ReferralController extends Controller
         $plansMap = Plan::whereIn('id', $referredUsers->pluck('plan_id')->filter()->unique()->values())
             ->pluck('name', 'id');
 
+        $sandbox = $this->sandboxData($user);
+
         return view('panel.referral.index', array_merge(compact(
             'user',
             'referralLink',
@@ -75,6 +80,10 @@ class ReferralController extends Controller
             'channelFunnels' => $this->analytics->buildChannelFunnels($user->id),
             'detailedEvents' => $this->analytics->detailedEventsPaginator($user->id, 20, 'events_page'),
             'affiliateShareKit' => $this->shareKit->buildForUser($user),
+            'sandboxRequests' => $sandbox['requests'],
+            'sandboxLatestRequest' => $sandbox['latestRequest'],
+            'sandboxApprovedRequest' => $sandbox['approvedRequest'],
+            'sandboxAvailable' => $sandbox['available'],
             'apiTokens' => $this->apiTokensForUser($user),
             'apiTokenPlainText' => session('api_token_plain_text'),
             'apiTokenDeviceName' => session('api_token_device_name'),
@@ -168,6 +177,121 @@ class ReferralController extends Controller
         ]);
     }
 
+    public function storeSandboxRequest(Request $request): RedirectResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        if (!$this->hasSandboxRequestsTable()) {
+            return back()->withErrors([
+                'sandbox' => 'O sandbox da API ainda não está disponível neste ambiente. Rode as migrations e tente novamente.',
+            ]);
+        }
+
+        $data = $request->validate([
+            'reason' => 'required|string|min:12|max:4000',
+            'requested_domain' => 'nullable|string|max:255',
+            'requested_ip' => 'nullable|ip',
+        ], [
+            'reason.required' => 'Explique o motivo da solicitação.',
+            'reason.min' => 'Descreva um pouco melhor o uso pretendido para a API.',
+            'requested_ip.ip' => 'Informe um IP válido.',
+        ]);
+
+        $pending = AffiliateApiSandboxRequest::query()
+            ->where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->latest('id')
+            ->first();
+
+        $payload = [
+            'reason' => trim((string) $data['reason']),
+            'requested_domain' => $this->normalizeDomain($data['requested_domain'] ?? null),
+            'requested_ip' => trim((string) ($data['requested_ip'] ?? '')) ?: null,
+            'status' => 'pending',
+            'admin_notes' => null,
+            'reviewed_by' => null,
+            'reviewed_at' => null,
+        ];
+
+        if ($pending) {
+            $pending->update($payload);
+        } else {
+            AffiliateApiSandboxRequest::query()->create($payload + ['user_id' => $user->id]);
+        }
+
+        return redirect()
+            ->route('panel.referral.index')
+            ->with('success', 'Ticket de acesso ao sandbox enviado. O time vai revisar motivo, IP e domínio informados.');
+    }
+
+    public function playground(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        abort_unless($this->hasSandboxRequestsTable(), 503, 'Sandbox indisponível neste ambiente.');
+
+        $approvedRequest = AffiliateApiSandboxRequest::query()
+            ->approved()
+            ->where('user_id', $user->id)
+            ->latest('reviewed_at')
+            ->latest('id')
+            ->first();
+
+        abort_unless($approvedRequest, 403, 'Sandbox ainda não liberado para este afiliado.');
+
+        $data = $request->validate([
+            'endpoint' => 'required|string|in:overview,materials,offers,landing-page,analytics',
+            'per_page' => 'nullable|integer|min:1|max:100',
+            'visit_limit' => 'nullable|integer|min:1|max:50',
+        ]);
+
+        $startedAt = microtime(true);
+        $kit = $this->shareKit->buildForUser($user);
+
+        $payload = match ($data['endpoint']) {
+            'overview' => [
+                'referral' => $kit['referral'],
+                'branding' => $kit['branding'],
+                'summary' => $this->analytics->buildDashboardPayload($user->id, 5)['trackingSummary'],
+                'sandbox' => $kit['sandbox'],
+                'playground' => $kit['playground'],
+                'api' => $kit['api'],
+            ],
+            'materials' => [
+                'referral' => $kit['referral'],
+                'branding' => $kit['branding'],
+                'materials' => $kit['materials'],
+                'graphic_assets' => $kit['graphic_assets'],
+                'embed_widgets' => $kit['embed_widgets'],
+                'playground' => $kit['playground'],
+                'sandbox' => $kit['sandbox'],
+                'social_links' => $kit['branding']['social_links'] ?? [],
+            ],
+            'offers' => [
+                'referral' => $kit['referral'],
+                'offers' => $kit['offers'],
+            ],
+            'landing-page' => [
+                'referral' => $kit['referral'],
+                'branding' => $kit['branding'],
+                'landing_page' => $kit['landing_page'],
+                'embed_widgets' => $kit['embed_widgets'],
+            ],
+            'analytics' => $this->buildAnalyticsPlaygroundPayload($user, $request),
+        };
+
+        return response()->json([
+            'ok' => true,
+            'endpoint' => $data['endpoint'],
+            'sandbox_base_url' => url('/api/v1/sandbox/affiliate'),
+            'duration_ms' => (int) round((microtime(true) - $startedAt) * 1000),
+            'request_url' => $this->buildSandboxRequestUrl($data['endpoint'], $request),
+            'payload' => $payload,
+        ]);
+    }
+
     public function stats(Request $request)
     {
         /** @var User $user */
@@ -178,8 +302,6 @@ class ReferralController extends Controller
         $payload = $this->analytics->buildDashboardPayload($user->id);
         $channelFunnels = $this->analytics->buildChannelFunnels($user->id);
         $detailedEvents = $this->analytics->detailedEventsPaginator($user->id, 20, 'events_page');
-        $affiliateShareKit = $this->shareKit->buildForUser($user);
-
         return response()->json([
             'ok' => true,
             'trackingAvailable' => $payload['trackingAvailable'],
@@ -205,9 +327,6 @@ class ReferralController extends Controller
                 'subtitle' => 'Inclui URL de origem exata, landing page, dispositivo, navegador, cidade/país e o resultado de cada ação.',
                 'emptyMessage' => 'Ainda não há cliques, visitas ou compartilhamentos detalhados para este afiliado.',
             ])->render(),
-            'shareKitHtml' => view('panel.referral.partials.share-kit', [
-                'affiliateShareKit' => $affiliateShareKit,
-            ])->render(),
         ]);
     }
 
@@ -222,6 +341,103 @@ class ReferralController extends Controller
             $user->id,
             sprintf('rastreio-indicacoes-%s-%s.csv', $user->referral_code, now()->format('Ymd-His'))
         );
+    }
+
+    private function sandboxData(User $user): array
+    {
+        if (!$this->hasSandboxRequestsTable()) {
+            return [
+                'available' => false,
+                'requests' => collect(),
+                'latestRequest' => null,
+                'approvedRequest' => null,
+            ];
+        }
+
+        $requests = AffiliateApiSandboxRequest::query()
+            ->where('user_id', $user->id)
+            ->latest('id')
+            ->limit(5)
+            ->get();
+
+        return [
+            'available' => true,
+            'requests' => $requests,
+            'latestRequest' => $requests->first(),
+            'approvedRequest' => $requests->firstWhere('status', 'approved')
+                ?: AffiliateApiSandboxRequest::query()->approved()->where('user_id', $user->id)->latest('reviewed_at')->first(),
+        ];
+    }
+
+    private function hasSandboxRequestsTable(): bool
+    {
+        try {
+            return Schema::hasTable('affiliate_api_sandbox_requests');
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    private function normalizeDomain(?string $domain): ?string
+    {
+        $domain = trim((string) $domain);
+        if ($domain === '') {
+            return null;
+        }
+
+        $domain = preg_replace('#^https?://#i', '', $domain);
+        $domain = explode('/', $domain)[0] ?? $domain;
+        $domain = strtolower(trim($domain));
+
+        return $domain !== '' ? $domain : null;
+    }
+
+    private function buildSandboxRequestUrl(string $endpoint, Request $request): string
+    {
+        $baseUrl = url('/api/v1/sandbox/affiliate');
+
+        if ($endpoint !== 'analytics') {
+            return $baseUrl . '/' . $endpoint;
+        }
+
+        return $baseUrl . '/analytics?' . http_build_query(array_filter([
+            'per_page' => $request->integer('per_page') ?: 10,
+            'visit_limit' => $request->integer('visit_limit') ?: 5,
+        ]));
+    }
+
+    private function buildAnalyticsPlaygroundPayload(User $user, Request $request): array
+    {
+        $eventsPerPage = max(1, min((int) $request->input('per_page', 10), 100));
+        $visitLimit = max(1, min((int) $request->input('visit_limit', 5), 50));
+
+        $payload = $this->analytics->buildDashboardPayload($user->id, $visitLimit);
+        $channelFunnels = $this->analytics->buildChannelFunnels($user->id);
+        $detailedEvents = $this->analytics->detailedEventsPaginator($user->id, $eventsPerPage, 'page');
+
+        return [
+            'tracking_available' => $payload['trackingAvailable'],
+            'tracking_status_message' => $payload['trackingStatusMessage'],
+            'tracking_status_tone' => $payload['trackingStatusTone'],
+            'updated_at' => $payload['trackingUpdatedAt'],
+            'updated_at_label' => $payload['trackingUpdatedAtLabel'],
+            'summary' => $payload['trackingSummary'],
+            'channels' => $payload['trackingChannels']->values()->all(),
+            'latest_visits' => $payload['trackedVisitsFeed'],
+            'daily_chart' => $payload['trackingDailyChart'],
+            'acquisition_chart' => $payload['trackingAcquisitionChart'],
+            'sharing_chart' => $payload['trackingSharingChart'],
+            'channel_funnels' => $channelFunnels->values()->all(),
+            'detailed_events' => [
+                'data' => collect($detailedEvents->items())->map(fn ($item) => (array) $item)->all(),
+                'meta' => [
+                    'current_page' => $detailedEvents->currentPage(),
+                    'last_page' => $detailedEvents->lastPage(),
+                    'per_page' => $detailedEvents->perPage(),
+                    'total' => $detailedEvents->total(),
+                ],
+            ],
+        ];
     }
 
 }

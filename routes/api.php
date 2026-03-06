@@ -41,6 +41,14 @@ Route::prefix('v1')->group(function () {
             Route::get('/landing-page', [AffiliateApiController::class, 'landingPage']);
             Route::get('/analytics', [AffiliateApiController::class, 'analytics']);
         });
+
+        Route::middleware([\App\Http\Middleware\EnsureAffiliateSandboxApproved::class])->prefix('/sandbox/affiliate')->group(function () {
+            Route::get('/overview', [AffiliateApiController::class, 'overview']);
+            Route::get('/materials', [AffiliateApiController::class, 'materials']);
+            Route::get('/offers', [AffiliateApiController::class, 'offers']);
+            Route::get('/landing-page', [AffiliateApiController::class, 'landingPage']);
+            Route::get('/analytics', [AffiliateApiController::class, 'analytics']);
+        });
     });
 });
 

@@ -6,7 +6,7 @@
     $apiTokenDeviceName = $apiTokenDeviceName ?? null;
 @endphp
 
-<section class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<section id="affiliateApiTokensSection" class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
     <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
             <h2 class="text-lg font-black text-slate-900 dark:text-white">Acesso API pessoal</h2>
