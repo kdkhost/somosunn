@@ -10,6 +10,7 @@
         $testimonials = $testimonials ?? collect();
         $paymentsConfigured = (bool) ($paymentsConfigured ?? false);
         $canSellByUserId = $canSellByUserId ?? [];
+        $paymentsEnabledByUserId = $paymentsEnabledByUserId ?? [];
 
         $user = auth()->user();
         $isAdmin = $user ? $user->isAdmin() : false;
@@ -57,6 +58,13 @@
                 return false;
             }
             return (bool) ($canSellByUserId[$userId] ?? false);
+        };
+
+        $sellerHasPayments = function (?int $userId) use ($paymentsEnabledByUserId): bool {
+            if (!$userId) {
+                return false;
+            }
+            return (bool) ($paymentsEnabledByUserId[$userId] ?? false);
         };
 
         $totalResults = $courses->count() + $mentorships->count() + $events->count();
@@ -896,7 +904,11 @@
                             $thumb = trim((string) ($course->thumbnail ?? ''));
                             $thumbUrl = $resolveAssetUrl($thumb);
                             $hasAccess = $user && ($course instanceof \App\Models\Course) ? $user->hasCourseAccess($course) : false;
-                            $buyEnabled = $canBuy && $paymentsConfigured && $price > 0 && $sellerCanSell($sellerId);
+                            $sellerPaymentsEnabled = $sellerHasPayments($sellerId);
+                            $buyEnabled = $canBuy && $sellerPaymentsEnabled && $price > 0 && $sellerCanSell($sellerId);
+                            $disabledBuyLabel = !$sellerCanSell($sellerId)
+                                ? 'Vendedor indisponível'
+                                : (!$sellerPaymentsEnabled ? 'Pagamento indisponível' : 'Indisponível');
                             $sellerName = optional($course->creator)->name ?? 'Criador';
                             $badge = ($course->is_featured ?? false) ? 'DESTAQUE' : 'CURSO';
                             $shareCode = \App\Support\ShortLink::encodeProduct('course', (int) $course->id);
@@ -991,7 +1003,7 @@
                                 @else
                                     <span
                                         class="flex-1 inline-flex items-center justify-center rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
-                                        Indisponível
+                                        {{ $disabledBuyLabel }}
                                     </span>
                                 @endif
                             </div>
@@ -1026,7 +1038,11 @@
                             $flashActive = method_exists($mentorship, 'isFlashSaleActive') ? (bool) $mentorship->isFlashSaleActive() : false;
                             $flashEndsAtMs = ($flashActive && $mentorship->flash_sale_ends_at) ? ((int) $mentorship->flash_sale_ends_at->timestamp * 1000) : 0;
                             $isMentorshipClosed = method_exists($mentorship, 'isClosedForPublic') && $mentorship->isClosedForPublic();
-                            $buyEnabled = $canBuy && $paymentsConfigured && $price > 0 && $sellerCanSell($sellerId);
+                            $sellerPaymentsEnabled = $sellerHasPayments($sellerId);
+                            $buyEnabled = $canBuy && $sellerPaymentsEnabled && $price > 0 && $sellerCanSell($sellerId);
+                            $disabledBuyLabel = !$sellerCanSell($sellerId)
+                                ? 'Mentor indisponível'
+                                : (!$sellerPaymentsEnabled ? 'Pagamento indisponível' : 'Indisponível');
                             $mentorName = optional($mentorship->mentor)->name ?? 'Mentor';
                             $desc = \Illuminate\Support\Str::limit(strip_tags((string) ($mentorship->description ?? '')), 90);
                             $image = trim((string) ($mentorship->image ?? ''));
@@ -1141,7 +1157,7 @@
                                 @else
                                     <span
                                         class="flex-1 inline-flex items-center justify-center rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
-                                        Indisponível
+                                        {{ $disabledBuyLabel }}
                                     </span>
                                 @endif
                             </div>
@@ -1179,7 +1195,11 @@
                             $dateLabel = $event->start_at ? (is_string($event->start_at) ? \Carbon\Carbon::parse($event->start_at) : $event->start_at)->format('d/m/Y') : null;
                             $image = trim((string) ($event->image ?? ''));
                             $imageUrl = $resolveAssetUrl($image);
-                            $buyEnabled = $price <= 0 ? true : ($canBuy && $paymentsConfigured && $sellerCanSell($sellerId));
+                            $sellerPaymentsEnabled = $sellerHasPayments($sellerId);
+                            $buyEnabled = $price <= 0 ? true : ($canBuy && $sellerPaymentsEnabled && $sellerCanSell($sellerId));
+                            $disabledBuyLabel = !$sellerCanSell($sellerId)
+                                ? 'Organizador indisponível'
+                                : (!$sellerPaymentsEnabled ? 'Pagamento indisponível' : 'Indisponível');
                             $sellerName = optional($event->user)->name ?? 'Organizador';
                             $shareCode = \App\Support\ShortLink::encodeProduct('event', (int) $event->id);
                             $shareUrl = $shareCode ? route('share.product', ['code' => $shareCode]) : '';
@@ -1281,7 +1301,7 @@
                                 @else
                                     <span
                                         class="flex-1 inline-flex items-center justify-center rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
-                                        {{ $isEventClosed ? 'Encerrado' : 'Indisponível' }}
+                                        {{ $isEventClosed ? 'Encerrado' : $disabledBuyLabel }}
                                     </span>
                                 @endif
                             </div>

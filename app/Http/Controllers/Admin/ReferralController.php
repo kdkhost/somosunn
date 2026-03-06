@@ -52,7 +52,7 @@ class ReferralController extends Controller
             ->with('plan:id,name,price,is_free')
             ->select('id', 'name', 'email', 'photo', 'created_at', 'plan_id', 'plan_expires_at')
             ->latest()
-            ->paginate(10, ['*'], 'members_page');
+            ->get();
 
         $totalReferred = User::where('referred_by', $user->id)->count();
         $convertedCount = count(array_unique($convertedUserIds));
@@ -82,10 +82,10 @@ class ReferralController extends Controller
             'selectedReferrer'
         ), [
             'channelFunnels' => $this->analytics->buildChannelFunnels($scopeReferrerId),
-            'detailedEvents' => $this->analytics->detailedEventsPaginator($scopeReferrerId, 20, 'events_page'),
-            'affiliateLeaderboard' => $this->analytics->affiliateLeaderboard(15, 'affiliates_page'),
+            'detailedEvents' => $this->analytics->detailedEventsCollection($scopeReferrerId, 500),
+            'affiliateLeaderboard' => $this->analytics->affiliateLeaderboardCollection($scopeReferrerId, 250),
             'sandboxRequestsAvailable' => $this->hasSandboxRequestsTable(),
-            'sandboxRequests' => $this->sandboxRequestsPaginator(),
+            'sandboxRequests' => $this->sandboxRequestsCollection(),
             'apiTokens' => $this->apiTokensForUser($user),
             'apiTokenPlainText' => session('api_token_plain_text'),
             'apiTokenDeviceName' => session('api_token_device_name'),
@@ -214,7 +214,7 @@ class ReferralController extends Controller
             ->with('success', 'Ticket de sandbox atualizado com sucesso.');
     }
 
-    private function sandboxRequestsPaginator()
+    private function sandboxRequestsCollection()
     {
         if (!$this->hasSandboxRequestsTable()) {
             return collect();
@@ -223,7 +223,7 @@ class ReferralController extends Controller
         return AffiliateApiSandboxRequest::query()
             ->with(['user:id,name,email,referral_code', 'reviewer:id,name'])
             ->latest('id')
-            ->paginate(12, ['*'], 'sandbox_page');
+            ->get();
     }
 
     private function hasSandboxRequestsTable(): bool

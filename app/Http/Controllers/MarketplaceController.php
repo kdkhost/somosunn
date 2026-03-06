@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Event;
+use App\Models\GatewayAccount;
 use App\Models\Mentorship;
 use App\Models\Order;
 use App\Models\Testimonial;
@@ -77,18 +78,29 @@ class MarketplaceController extends Controller
 
         $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
         $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
-        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+        $psToken = trim((string) config('payments.pagseguro.token'));
+        $paymentsConfigured = ($mpAccessToken !== '' && $mpPublicKey !== '') || $psToken !== '';
 
         $canSellByUserId = [];
+        $paymentsEnabledByUserId = [];
 
         foreach ($courses->pluck('creator')->filter()->unique('id') as $seller) {
             $canSellByUserId[(int) $seller->id] = (bool) $seller->canSellOnMarketplace();
+            $gateways = GatewayAccount::resolveForSeller((int) $seller->id);
+            $paymentsEnabledByUserId[(int) $seller->id] = (bool) ($gateways['mpEnabled'] || $gateways['psEnabled']);
+            $paymentsConfigured = $paymentsConfigured || $paymentsEnabledByUserId[(int) $seller->id];
         }
         foreach ($mentorships->pluck('mentor')->filter()->unique('id') as $seller) {
             $canSellByUserId[(int) $seller->id] = (bool) $seller->canSellOnMarketplace();
+            $gateways = GatewayAccount::resolveForSeller((int) $seller->id);
+            $paymentsEnabledByUserId[(int) $seller->id] = (bool) ($gateways['mpEnabled'] || $gateways['psEnabled']);
+            $paymentsConfigured = $paymentsConfigured || $paymentsEnabledByUserId[(int) $seller->id];
         }
         foreach ($events->pluck('user')->filter()->unique('id') as $seller) {
             $canSellByUserId[(int) $seller->id] = (bool) $seller->canSellOnMarketplace();
+            $gateways = GatewayAccount::resolveForSeller((int) $seller->id);
+            $paymentsEnabledByUserId[(int) $seller->id] = (bool) ($gateways['mpEnabled'] || $gateways['psEnabled']);
+            $paymentsConfigured = $paymentsConfigured || $paymentsEnabledByUserId[(int) $seller->id];
         }
 
         return view('marketplace.index', compact(
@@ -98,6 +110,7 @@ class MarketplaceController extends Controller
             'testimonials',
             'paymentsConfigured',
             'canSellByUserId',
+            'paymentsEnabledByUserId',
         ));
     }
 

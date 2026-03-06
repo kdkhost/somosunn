@@ -125,6 +125,33 @@ class ReferralAnalyticsService
         return $paginator;
     }
 
+    public function detailedEventsCollection(?int $referrerUserId = null, ?int $limit = null): Collection
+    {
+        if (!$this->trackingAvailable()) {
+            return collect();
+        }
+
+        $query = $this->eventsQuery($referrerUserId)
+            ->with([
+                'visit.registeredUser:id,name,email',
+                'referrer:id,name,email,referral_code',
+                'registeredUser:id,name,email',
+                'actor:id,name,email',
+            ])
+            ->latest('occurred_at');
+
+        if ($limit !== null) {
+            $query->limit($limit);
+        }
+
+        return $query
+            ->get()
+            ->map(function (ReferralLinkEvent $event) {
+                return (object) $this->serializeDetailedEvent($event);
+            })
+            ->values();
+    }
+
     public function buildChannelFunnels(?int $referrerUserId = null, int $limit = 10): Collection
     {
         if (!$this->trackingAvailable()) {
@@ -173,93 +200,32 @@ class ReferralAnalyticsService
             return $this->emptyPaginator($perPage, $pageName);
         }
 
-        $visitsAggregate = ReferralLinkVisit::query()
-            ->selectRaw('referrer_user_id, SUM(clicks_count) as clicks, COUNT(*) as visits, SUM(pageviews_count) as pageviews, COUNT(registered_user_id) as registrations, SUM(checkout_started_count) as checkouts, SUM(purchases_count) as purchases, SUM(total_revenue_amount) as revenue, MAX(last_visited_at) as last_activity_at')
-            ->whereNotNull('referrer_user_id')
-            ->groupBy('referrer_user_id');
-
-        $eventsAggregate = ReferralLinkEvent::query()
-            ->selectRaw("
-                referrer_user_id,
-                SUM(CASE WHEN event_type = 'share' THEN 1 ELSE 0 END) as shares,
-                SUM(CASE WHEN event_type = 'reshare' THEN 1 ELSE 0 END) as reshares,
-                SUM(CASE WHEN event_type = 'copy' THEN 1 ELSE 0 END) as copies
-            ")
-            ->whereNotNull('referrer_user_id')
-            ->groupBy('referrer_user_id');
-
-        $pointsAggregate = PointsLog::query()
-            ->selectRaw('user_id as referrer_user_id, SUM(points) as referral_points')
-            ->where('action_key', 'referral')
-            ->groupBy('user_id');
-
-        $paginator = User::query()
-            ->leftJoinSub($visitsAggregate, 'visit_aggregate', fn ($join) => $join->on('users.id', '=', 'visit_aggregate.referrer_user_id'))
-            ->leftJoinSub($eventsAggregate, 'event_aggregate', fn ($join) => $join->on('users.id', '=', 'event_aggregate.referrer_user_id'))
-            ->leftJoinSub($pointsAggregate, 'points_aggregate', fn ($join) => $join->on('users.id', '=', 'points_aggregate.referrer_user_id'))
-            ->where(function ($query) {
-                $query->whereNotNull('visit_aggregate.referrer_user_id')
-                    ->orWhereNotNull('event_aggregate.referrer_user_id')
-                    ->orWhereNotNull('points_aggregate.referrer_user_id');
-            })
-            ->select([
-                'users.id',
-                'users.name',
-                'users.email',
-                'users.photo',
-                'users.referral_code',
-                DB::raw('COALESCE(visit_aggregate.clicks, 0) as clicks'),
-                DB::raw('COALESCE(visit_aggregate.visits, 0) as visits'),
-                DB::raw('COALESCE(visit_aggregate.pageviews, 0) as pageviews'),
-                DB::raw('COALESCE(visit_aggregate.registrations, 0) as registrations'),
-                DB::raw('COALESCE(visit_aggregate.checkouts, 0) as checkouts'),
-                DB::raw('COALESCE(visit_aggregate.purchases, 0) as purchases'),
-                DB::raw('COALESCE(visit_aggregate.revenue, 0) as revenue'),
-                DB::raw('COALESCE(event_aggregate.shares, 0) as shares'),
-                DB::raw('COALESCE(event_aggregate.reshares, 0) as reshares'),
-                DB::raw('COALESCE(event_aggregate.copies, 0) as copies'),
-                DB::raw('COALESCE(points_aggregate.referral_points, 0) as referral_points'),
-                DB::raw('visit_aggregate.last_activity_at as last_activity_at'),
-            ])
-            ->orderByDesc(DB::raw('COALESCE(visit_aggregate.revenue, 0)'))
-            ->orderByDesc(DB::raw('COALESCE(visit_aggregate.purchases, 0)'))
-            ->orderByDesc(DB::raw('COALESCE(visit_aggregate.clicks, 0)'))
+        $paginator = $this->affiliateLeaderboardBaseQuery()
             ->paginate($perPage, ['*'], $pageName)
             ->withQueryString();
 
-        $paginator->setCollection(
-            $paginator->getCollection()->map(function ($item) {
-                $lastActivity = data_get($item, 'last_activity_at');
-                $lastActivityAt = $lastActivity ? Carbon::parse($lastActivity) : null;
-
-                return (object) [
-                    'id' => (int) $item->id,
-                    'name' => $item->name,
-                    'email' => $item->email,
-                    'photo' => $item->photo,
-                    'referral_code' => $item->referral_code,
-                    'clicks' => (int) $item->clicks,
-                    'visits' => (int) $item->visits,
-                    'pageviews' => (int) $item->pageviews,
-                    'registrations' => (int) $item->registrations,
-                    'checkouts' => (int) $item->checkouts,
-                    'purchases' => (int) $item->purchases,
-                    'revenue' => round((float) $item->revenue, 2),
-                    'shares' => (int) $item->shares,
-                    'reshares' => (int) $item->reshares,
-                    'copies' => (int) $item->copies,
-                    'shares_total' => (int) $item->shares + (int) $item->reshares + (int) $item->copies,
-                    'referral_points' => (int) round((float) $item->referral_points),
-                    'registration_conversion' => (int) ((int) $item->visits > 0 ? min(100, round(((int) $item->registrations / (int) $item->visits) * 100)) : 0),
-                    'purchase_conversion' => (int) ((int) $item->visits > 0 ? min(100, round(((int) $item->purchases / (int) $item->visits) * 100)) : 0),
-                    'last_activity_at' => $lastActivityAt,
-                    'last_activity_label' => $lastActivityAt?->format('d/m/Y H:i') ?? '—',
-                    'last_activity_human' => $lastActivityAt?->diffForHumans() ?? 'Sem atividade',
-                ];
-            })
-        );
+        $paginator->setCollection($this->transformAffiliateLeaderboardRows($paginator->getCollection()));
 
         return $paginator;
+    }
+
+    public function affiliateLeaderboardCollection(?int $referrerUserId = null, ?int $limit = null): Collection
+    {
+        if (!$this->trackingAvailable()) {
+            return collect();
+        }
+
+        $query = $this->affiliateLeaderboardBaseQuery();
+
+        if ($referrerUserId !== null) {
+            $query->where('users.id', $referrerUserId);
+        }
+
+        if ($limit !== null) {
+            $query->limit($limit);
+        }
+
+        return $this->transformAffiliateLeaderboardRows($query->get())->values();
     }
 
     public function exportDetailedEventsCsv(?int $referrerUserId = null, string $filename = 'rastreio-indicacoes.csv'): StreamedResponse
@@ -527,6 +493,7 @@ class ReferralAnalyticsService
             'id' => $event->id,
             'occurred_at_label' => $event->occurred_at?->format('d/m/Y H:i:s') ?? '—',
             'occurred_at_human' => $event->occurred_at?->diffForHumans() ?? 'agora',
+            'occurred_at_timestamp' => $event->occurred_at?->timestamp ?? 0,
             'event_type' => $event->event_type,
             'event_label' => $eventMeta['label'],
             'event_badge_class' => $eventMeta['badge'],
@@ -698,6 +665,95 @@ class ReferralAnalyticsService
         }
 
         return $query;
+    }
+
+    private function affiliateLeaderboardBaseQuery(): Builder
+    {
+        $visitsAggregate = ReferralLinkVisit::query()
+            ->selectRaw('referrer_user_id, SUM(clicks_count) as clicks, COUNT(*) as visits, SUM(pageviews_count) as pageviews, COUNT(registered_user_id) as registrations, SUM(checkout_started_count) as checkouts, SUM(purchases_count) as purchases, SUM(total_revenue_amount) as revenue, MAX(last_visited_at) as last_activity_at')
+            ->whereNotNull('referrer_user_id')
+            ->groupBy('referrer_user_id');
+
+        $eventsAggregate = ReferralLinkEvent::query()
+            ->selectRaw("
+                referrer_user_id,
+                SUM(CASE WHEN event_type = 'share' THEN 1 ELSE 0 END) as shares,
+                SUM(CASE WHEN event_type = 'reshare' THEN 1 ELSE 0 END) as reshares,
+                SUM(CASE WHEN event_type = 'copy' THEN 1 ELSE 0 END) as copies
+            ")
+            ->whereNotNull('referrer_user_id')
+            ->groupBy('referrer_user_id');
+
+        $pointsAggregate = PointsLog::query()
+            ->selectRaw('user_id as referrer_user_id, SUM(points) as referral_points')
+            ->where('action_key', 'referral')
+            ->groupBy('user_id');
+
+        return User::query()
+            ->leftJoinSub($visitsAggregate, 'visit_aggregate', fn ($join) => $join->on('users.id', '=', 'visit_aggregate.referrer_user_id'))
+            ->leftJoinSub($eventsAggregate, 'event_aggregate', fn ($join) => $join->on('users.id', '=', 'event_aggregate.referrer_user_id'))
+            ->leftJoinSub($pointsAggregate, 'points_aggregate', fn ($join) => $join->on('users.id', '=', 'points_aggregate.referrer_user_id'))
+            ->where(function ($query) {
+                $query->whereNotNull('visit_aggregate.referrer_user_id')
+                    ->orWhereNotNull('event_aggregate.referrer_user_id')
+                    ->orWhereNotNull('points_aggregate.referrer_user_id');
+            })
+            ->select([
+                'users.id',
+                'users.name',
+                'users.email',
+                'users.photo',
+                'users.referral_code',
+                DB::raw('COALESCE(visit_aggregate.clicks, 0) as clicks'),
+                DB::raw('COALESCE(visit_aggregate.visits, 0) as visits'),
+                DB::raw('COALESCE(visit_aggregate.pageviews, 0) as pageviews'),
+                DB::raw('COALESCE(visit_aggregate.registrations, 0) as registrations'),
+                DB::raw('COALESCE(visit_aggregate.checkouts, 0) as checkouts'),
+                DB::raw('COALESCE(visit_aggregate.purchases, 0) as purchases'),
+                DB::raw('COALESCE(visit_aggregate.revenue, 0) as revenue'),
+                DB::raw('COALESCE(event_aggregate.shares, 0) as shares'),
+                DB::raw('COALESCE(event_aggregate.reshares, 0) as reshares'),
+                DB::raw('COALESCE(event_aggregate.copies, 0) as copies'),
+                DB::raw('COALESCE(points_aggregate.referral_points, 0) as referral_points'),
+                DB::raw('visit_aggregate.last_activity_at as last_activity_at'),
+            ])
+            ->orderByDesc(DB::raw('COALESCE(visit_aggregate.revenue, 0)'))
+            ->orderByDesc(DB::raw('COALESCE(visit_aggregate.purchases, 0)'))
+            ->orderByDesc(DB::raw('COALESCE(visit_aggregate.clicks, 0)'));
+    }
+
+    private function transformAffiliateLeaderboardRows(Collection $rows): Collection
+    {
+        return $rows->map(function ($item) {
+            $lastActivity = data_get($item, 'last_activity_at');
+            $lastActivityAt = $lastActivity ? Carbon::parse($lastActivity) : null;
+
+            return (object) [
+                'id' => (int) $item->id,
+                'name' => $item->name,
+                'email' => $item->email,
+                'photo' => $item->photo,
+                'referral_code' => $item->referral_code,
+                'clicks' => (int) $item->clicks,
+                'visits' => (int) $item->visits,
+                'pageviews' => (int) $item->pageviews,
+                'registrations' => (int) $item->registrations,
+                'checkouts' => (int) $item->checkouts,
+                'purchases' => (int) $item->purchases,
+                'revenue' => round((float) $item->revenue, 2),
+                'shares' => (int) $item->shares,
+                'reshares' => (int) $item->reshares,
+                'copies' => (int) $item->copies,
+                'shares_total' => (int) $item->shares + (int) $item->reshares + (int) $item->copies,
+                'referral_points' => (int) round((float) $item->referral_points),
+                'registration_conversion' => (int) ((int) $item->visits > 0 ? min(100, round(((int) $item->registrations / (int) $item->visits) * 100)) : 0),
+                'purchase_conversion' => (int) ((int) $item->visits > 0 ? min(100, round(((int) $item->purchases / (int) $item->visits) * 100)) : 0),
+                'last_activity_at' => $lastActivityAt,
+                'last_activity_timestamp' => $lastActivityAt?->timestamp ?? 0,
+                'last_activity_label' => $lastActivityAt?->format('d/m/Y H:i') ?? '?',
+                'last_activity_human' => $lastActivityAt?->diffForHumans() ?? 'Sem atividade',
+            ];
+        });
     }
 
     private function emptyTrackingSummary(): array
