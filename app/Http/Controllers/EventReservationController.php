@@ -47,8 +47,12 @@ class EventReservationController extends Controller
             $psEnabled        = $gateways['psEnabled'];
             $preferredGateway = $gateways['preferredGateway'];
 
-            // Corrige: só bloqueia se realmente não houver NENHUM gateway (nem global)
-            if (!$mpEnabled && !$psEnabled && empty($gateways['useGlobalCredentials'])) {
+            // Lógica igual ao painel: permite compra se credenciais globais do MercadoPago estão configuradas
+            $mpAccessToken = (string) (config('payments.mercadopago.access_token') ?? '');
+            $mpPublicKey = (string) (config('payments.mercadopago.public_key') ?? '');
+            $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+
+            if (!$mpEnabled && !$psEnabled && empty($gateways['useGlobalCredentials']) && !$paymentsConfigured) {
                 \Illuminate\Support\Facades\Log::warning('EventCheckout: organizador sem gateway configurado', [
                     'event_id'    => $event->id,
                     'event_user_id' => $event->user_id,
@@ -57,6 +61,7 @@ class EventReservationController extends Controller
                     'mp_enabled'  => $mpEnabled,
                     'ps_enabled'  => $psEnabled,
                     'use_global'  => $gateways['useGlobalCredentials'] ?? false,
+                    'mp_global_configured' => $paymentsConfigured,
                 ]);
                 return redirect()
                     ->route('events.show', $event)
