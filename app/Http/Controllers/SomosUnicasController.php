@@ -30,8 +30,8 @@ class SomosUnicasController extends Controller
         // 2) Eventos Somos Únicas (Futuros ou recentes, limitando)
         $events = Event::where('is_somos_unicas', true)
             ->where('published', true)
-            ->where('start_date', '>=', $now->subDays(1)) // Hoje em diante
-            ->orderBy('start_date', 'asc')
+            ->where('start_at', '>=', $now->subDays(1)) // Hoje em diante
+            ->orderBy('start_at', 'asc')
             ->take(6)
             ->get();
 
