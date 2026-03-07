@@ -48,6 +48,7 @@
         @php $heroImg = $data['hero_image'] ?? null; @endphp
         <div class="form-group">
             <label>Imagem Hero <small class="text-muted">(hero_image)</small></label>
+            @include('admin.components.upload-global', ['name'=>'images[hero_image]', 'accept'=>'image/*'])
             @if($heroImg)
                 <div class="mb-2">
                     <img src="{{ asset('storage/'.$heroImg) }}" alt="Hero" class="img-thumbnail" style="max-height:160px;">
@@ -57,13 +58,6 @@
                     </div>
                 </div>
             @endif
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" id="premium_hero_image"
-                       name="images[hero_image]" accept="image/*"
-                       data-preview="premium_hero_preview">
-                <label class="custom-file-label" for="premium_hero_image">Escolher imagem…</label>
-            </div>
-            <img id="premium_hero_preview" src="#" alt="Preview" class="img-thumbnail mt-2 d-none" style="max-height:120px;">
         </div>
 
     </div>

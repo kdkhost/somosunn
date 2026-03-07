@@ -26,20 +26,7 @@
         {{-- Imagem do hero --}}
         <div class="form-group mb-0">
             <label class="font-weight-bold">Imagem do Hero <small class="text-muted font-weight-normal">(JPG, PNG, WebP — máx 6 MB — aparece ao lado dos stats)</small></label>
-            <div class="mb-2">
-                <img id="prev-sobre-img"
-                     src="{{ !empty($data['hero_image']) ? asset('storage/'.$data['hero_image']) : '' }}"
-                     class="img-fluid rounded shadow-sm {{ empty($data['hero_image']) ? 'd-none' : '' }}"
-                     style="max-height:220px;max-width:100%;object-fit:cover;border:1px solid #dee2e6"
-                     alt="Preview da imagem">
-            </div>
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" id="hero_image" name="hero_image"
-                       accept="image/*" data-preview="prev-sobre-img">
-                <label class="custom-file-label" for="hero_image">
-                    {{ !empty($data['hero_image']) ? 'Substituir imagem...' : 'Escolher imagem...' }}
-                </label>
-            </div>
+            @include('admin.components.upload-global', ['name'=>'hero_image', 'accept'=>'image/*'])
             @if (!empty($data['hero_image']))
                 <div class="custom-control custom-checkbox mt-2">
                     <input type="checkbox" class="custom-control-input" id="remove_hero_image" name="remove_hero_image" value="1">

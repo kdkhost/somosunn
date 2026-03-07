@@ -12,20 +12,7 @@
         {{-- Imagem de capa --}}
         <div class="form-group mb-0">
             <label class="font-weight-bold">Imagem de capa <small class="text-muted font-weight-normal">(banner abaixo do título — JPG, PNG, WebP — máx 6 MB)</small></label>
-            <div class="mb-2">
-                <img id="prev-cover-img"
-                     src="{{ !empty($data['cover_image']) ? asset('storage/'.$data['cover_image']) : '' }}"
-                     class="img-fluid rounded shadow-sm {{ empty($data['cover_image']) ? 'd-none' : '' }}"
-                     style="max-height:220px;max-width:100%;object-fit:cover;border:1px solid #dee2e6"
-                     alt="Preview da capa">
-            </div>
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" id="cover_image" name="cover_image"
-                       accept="image/*" data-preview="prev-cover-img">
-                <label class="custom-file-label" for="cover_image">
-                    {{ !empty($data['cover_image']) ? 'Substituir imagem...' : 'Escolher imagem...' }}
-                </label>
-            </div>
+            @include('admin.components.upload-global', ['name'=>'cover_image', 'accept'=>'image/*'])
             @if (!empty($data['cover_image']))
                 <div class="custom-control custom-checkbox mt-2">
                     <input type="checkbox" class="custom-control-input" id="remove_cover_image" name="remove_cover_image" value="1">

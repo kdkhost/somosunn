@@ -8,6 +8,7 @@
         <div class="form-group mb-0">
             <label>Subtítulo do hero</label>
             <input type="text" name="hero_subtitle" class="form-control" value="{{ old('hero_subtitle', $data['hero_subtitle'] ?? '') }}" placeholder="Os princípios que guiam tudo o que fazemos na UNN.">
+        {{-- Se houver upload de imagem, incluir componente global aqui --}}
         </div>
     </div>
 </div>
