@@ -327,21 +327,13 @@ class MercadoPagoService
 
     private function accessToken(): string
     {
-        $env = Setting::get('mercadopago_env', config('payments.mercadopago.env', 'sandbox'));
+        $env = Setting::get('mercadopago_env', 'sandbox');
         $prefix = $env === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
 
         $token = trim((string) Setting::get($prefix . 'access_token', ''));
-
         if ($token === '') {
-            // Fallback for direct key (backwards compatibility)
             $token = trim((string) Setting::get('mercadopago_access_token', ''));
         }
-
-        if ($token === '') {
-            // Final fallback to config (env)
-            $token = trim((string) config('payments.mercadopago.access_token'));
-        }
-
         if ($token === '') {
             throw new Exception('MercadoPago não configurado. Verifique as configurações do gateway da plataforma.');
         }
@@ -567,10 +559,6 @@ class MercadoPagoService
             $token = $account->access_token ?? null;
         }
 
-        if (!$token) {
-            $token = trim((string) config('payments.mercadopago.access_token'));
-        }
-
         if (empty($token)) {
             throw new Exception('Token do Mercado Pago não encontrado.');
         }
@@ -592,23 +580,17 @@ class MercadoPagoService
 
     private function getSellerConfig(Order $order): array
     {
-        $env = Setting::get('mercadopago_env', config('payments.mercadopago.env', 'sandbox'));
+        $env = Setting::get('mercadopago_env', 'sandbox');
         $prefix = $env === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
 
         $platformToken = Setting::get($prefix . 'access_token');
         if (empty($platformToken)) {
             $platformToken = Setting::get('mercadopago_access_token');
         }
-        if (empty($platformToken)) {
-            $platformToken = config('payments.mercadopago.access_token');
-        }
 
         $platformPublicKey = Setting::get($prefix . 'public_key');
         if (empty($platformPublicKey)) {
             $platformPublicKey = Setting::get('mercadopago_public_key');
-        }
-        if (empty($platformPublicKey)) {
-            $platformPublicKey = config('payments.mercadopago.public_key');
         }
 
         $config = [

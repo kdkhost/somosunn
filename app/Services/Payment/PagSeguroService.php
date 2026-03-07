@@ -25,21 +25,15 @@ class PagSeguroService
 
     private function getSellerConfig(Order $order): array
     {
-        $env = Setting::get('pagseguro_env', config('payments.pagseguro.env', 'sandbox'));
+        $env = Setting::get('pagseguro_env', 'sandbox');
         $prefix = $env === 'production' ? 'pagseguro_prod_' : 'pagseguro_sandbox_';
 
         $platformToken = Setting::get($prefix . 'token');
         if (empty($platformToken)) {
             $platformToken = Setting::get('pagseguro_token');
         }
-        if (empty($platformToken)) {
-            $platformToken = config('payments.pagseguro.access_token');
-        }
 
         $platformEmail = Setting::get('pagseguro_email');
-        if (empty($platformEmail)) {
-            $platformEmail = config('payments.pagseguro.email');
-        }
 
         $config = [
             'token' => trim((string) $platformToken),
