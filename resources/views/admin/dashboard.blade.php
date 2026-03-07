@@ -733,11 +733,11 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            renderLegacyAdminServiceVisits(@json([
+            renderLegacyAdminServiceVisits({!! json_encode([
                 'serviceVisitSummary' => $serviceVisitSummary,
                 'serviceVisitTopItems' => $serviceVisitTopItems ?? [],
                 'serviceVisitOwnerLeaders' => $serviceVisitOwnerLeaders ?? [],
-            ]));
+            ]) !!});
 
             window.UNNServiceVisitsRealtime.start({
                 statsUrl: @json(route('admin.dashboard.stats')),
