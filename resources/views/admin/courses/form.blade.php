@@ -384,6 +384,16 @@
                                                     </div>
                                                 </div>
 
+                                                <div class="form-group mb-4">
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="hidden" name="is_somos_unicas" value="0">
+                                                        <input type="checkbox" class="custom-control-input"
+                                                            name="is_somos_unicas" id="is_somos_unicas" value="1" {{ old('is_somos_unicas', $course->is_somos_unicas) ? 'checked' : '' }}>
+                                                        <label class="custom-control-label font-weight-bold text-pink"
+                                                            for="is_somos_unicas" style="color: #ec4899;"><i class="fas fa-venus mr-1"></i> Exibir na área Somos Únicas</label>
+                                                    </div>
+                                                </div>
+
                                                 <script>
                                                     function toggleRecurringOptions(el) {
                                                         document.getElementById('recurring_options').style.display = el.checked ? 'block' : 'none';

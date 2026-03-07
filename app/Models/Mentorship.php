@@ -28,7 +28,8 @@ class Mentorship extends Model
         'certificate_bg',
         'instructor_signature',
         'certificate_settings',
-        'demo_link'
+        'demo_link',
+        'is_somos_unicas',
     ];
 
     const TYPE_ONLINE = 'online';
@@ -81,7 +82,7 @@ class Mentorship extends Model
             return null;
         }
 
-        usort($moments, static fn (Carbon $left, Carbon $right) => $left->getTimestamp() <=> $right->getTimestamp());
+        usort($moments, static fn(Carbon $left, Carbon $right) => $left->getTimestamp() <=> $right->getTimestamp());
 
         return end($moments) ?: null;
     }

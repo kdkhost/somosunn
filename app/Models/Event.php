@@ -40,7 +40,8 @@ class Event extends Model
         'is_certificate_enabled',
         'certificate_bg',
         'instructor_signature',
-        'certificate_settings'
+        'certificate_settings',
+        'is_somos_unicas'
     ];
 
     protected $casts = [

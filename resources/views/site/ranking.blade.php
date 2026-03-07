@@ -42,7 +42,7 @@
                                 $med = $medals[$pos] ?? $medals[2];
                                 $userName = optional($rank->user)->name ?? 'Empreendedor';
                                 $userAvatar = optional($rank->user)->profile_photo_url ?? null;
-                                $userLink = route('social.profile', optional($rank->user)->username ?? '');
+                                $userLink = optional($rank->user)->id ? route('social.profile', $rank->user->id) : '#';
                                 $isFirst = $pos === 0;
                             @endphp
 
@@ -175,7 +175,7 @@
                             @php
                                 $userName = optional($rank->user)->name ?? 'Empreendedor';
                                 $userAvatar = optional($rank->user)->profile_photo_url ?? null;
-                                $userLink = route('social.profile', optional($rank->user)->username ?? '');
+                                $userLink = optional($rank->user)->id ? route('social.profile', $rank->user->id) : '#';
                                 $position = $loop->index + 4; // Contagem após o Top 3
                             @endphp
                             <a href="{{ $userLink }}"
@@ -199,7 +199,8 @@
 
                                 <div class="flex-grow min-w-0">
                                     <h4 class="font-bold text-gray-900 truncate group-hover:text-blue-600 transition">
-                                        {{ $userName }}</h4>
+                                        {{ $userName }}
+                                    </h4>
                                     <p class="text-xs text-gray-500 truncate mt-0.5">
                                         <span class="uppercase tracking-wider font-semibold">{{ ucfirst($rank->level) }}</span>
                                         @if($rank->interactions_count > 0)

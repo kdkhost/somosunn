@@ -79,6 +79,11 @@
                                     <input type="checkbox" name="published" value="1" class="form-check-input" {{ old('published', $event->published) ? 'checked' : '' }}>
                                     <label class="form-check-label">Publicado</label>
                                 </div>
+                                <input type="hidden" name="is_somos_unicas" value="0">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="is_somos_unicas" value="1" class="form-check-input" {{ old('is_somos_unicas', $event->is_somos_unicas) ? 'checked' : '' }}>
+                                    <label class="form-check-label font-weight-bold text-pink" style="color: #ec4899;"><i class="fas fa-venus mr-1"></i> Exibir na área Somos Únicas</label>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <label>Mapa (Clique para marcar)</label>

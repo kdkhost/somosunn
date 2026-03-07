@@ -91,6 +91,9 @@ Route::post('/contato', [ContactController::class, 'send'])->middleware('throttl
 Route::get('/membros', [\App\Http\Controllers\MemberController::class, 'index'])->name('membros');
 Route::get('/ranking', [\App\Http\Controllers\RankingPublicController::class, 'index'])->name('ranking.public');
 
+// Somos Únicas
+Route::get('/somos-unicas', [\App\Http\Controllers\SomosUnicasController::class, 'index'])->name('somos-unicas');
+
 // Vagas Públicas (Externas)
 Route::get('/vagas-abertas', [\App\Http\Controllers\OportunidadesTesteController::class, 'index'])->name('jobs.public.index');
 Route::get('/vagas-abertas/{job}', [\App\Http\Controllers\JobPublicController::class, 'show'])->name('jobs.public.show');

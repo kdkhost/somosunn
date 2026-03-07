@@ -92,6 +92,7 @@ class Course extends Model
         'is_recurring',
         'period',
         'billing_cycle',
+        'is_somos_unicas',
     ];
 
     protected $casts = [
