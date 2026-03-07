@@ -12,13 +12,13 @@
             <div class="max-w-5xl mx-auto px-4 text-center relative z-10">
                 <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-5"
                     style="background:rgba(255,255,255,0.12);color:#93c5fd;border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(10px);">
-                    <i class="fas fa-handshake"></i> ECOSSISTEMA UNN
+                    <i class="fas fa-handshake"></i> ECOSSISTEMA SOMOS UNN
                 </div>
                 <h1 class="text-3xl md:text-4xl font-black text-white mb-3 leading-tight">
                     Empresas <span style="color:#60a5fa;">Parceiras</span>
                 </h1>
                 <p class="text-slate-300 text-base max-w-xl mx-auto mb-8">
-                    Parceiros exclusivos que oferecem condições especiais para membros da plataforma UNN. Clique em um
+                    Parceiros exclusivos que oferecem condições especiais para membros da plataforma SOMOS UNN. Clique em um
                     parceiro para ver os cupons.
                 </p>
 

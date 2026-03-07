@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', $partner->name . ' — Cupons Exclusivos')
-@section('description', 'Acesse cupons e descontos exclusivos de ' . $partner->name . ' para membros da plataforma UNN.')
+@section('description', 'Acesse cupons e descontos exclusivos de ' . $partner->name . ' para membros da plataforma SOMOS UNN.')
 
 @section('content')
     <div class="min-h-screen" style="background:linear-gradient(135deg,#f0f4ff 0%,#f8fafc 60%,#e8f5ff 100%);">
@@ -29,7 +29,7 @@
                     <div class="text-center md:text-left">
                         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-3"
                             style="background:rgba(96,165,250,0.2);color:#93c5fd;border:1px solid rgba(96,165,250,0.3);">
-                            <i class="fas fa-handshake"></i> Parceiro UNN
+                            <i class="fas fa-handshake"></i> Parceiro SOMOS UNN
                         </div>
                         <h1 class="text-2xl md:text-3xl font-black text-white mb-2">{{ $partner->name }}</h1>
                         @if($partner->description)

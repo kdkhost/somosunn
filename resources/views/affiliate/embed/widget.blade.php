@@ -84,7 +84,7 @@
 <body>
     <div class="widget">
         <span class="eyebrow">Indicação oficial</span>
-        <h1 class="title">{{ $landingPage['hero']['title'] ?? ($branding['hero_title'] ?? 'Conheça a UNN') }}</h1>
+        <h1 class="title">{{ $landingPage['hero']['title'] ?? ($branding['hero_title'] ?? 'Conheça a SOMOS UNN') }}</h1>
         <p class="subtitle">{{ $landingPage['hero']['subtitle'] ?? ($branding['hero_subtitle'] ?? 'Use o convite oficial para acessar a comunidade.') }}</p>
 
         <div class="brand">

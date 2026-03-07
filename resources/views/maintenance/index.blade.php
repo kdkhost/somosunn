@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $maintenanceTitle }}</title>
     @php
-        $appName = \App\Models\Setting::get('app_name') ?: config('app.name', 'UNN');
+        $appName = \App\Models\Setting::get('app_name') ?: config('app.name', 'SOMOS UNN');
         $logoUrl = \App\Models\Setting::getUrl('logo_front') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg');
         $faviconUrl = \App\Models\Setting::getUrl('favicon_image') ?: asset('favicon.ico');
         $primaryColor = (string) (\App\Models\Setting::get('site_color_primary') ?: '#1F5EDB');
@@ -431,7 +431,7 @@
             <div class="maintenance-logo-stage">
                 <img src="{{ $logoUrl }}" alt="" class="maintenance-logo">
             </div>
-            <p class="maintenance-visual-caption">Somos UNN</p>
+            <p class="maintenance-visual-caption">SOMOS UNN</p>
             <p class="maintenance-visual-title">Estamos aprimorando a plataforma para entregar uma experiencia ainda melhor.</p>
             <div class="maintenance-pulse-track">
                 <span></span>
