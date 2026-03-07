@@ -25,6 +25,7 @@
                 ['label' => 'Eventos', 'href' => route('events.index'), 'setting_key' => 'feature_events'],
                 ['label' => 'Marketplace', 'href' => route('marketplace.index')],
                 ['label' => 'Membros', 'href' => route('membros')],
+                ['label' => 'Ranking', 'href' => route('ranking.public')],
                 ['label' => 'Vagas Abertas', 'href' => route('jobs.public.index')],
             ],
         ],
@@ -75,59 +76,60 @@
     <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-4 flex items-center justify-between gap-4">
         <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0">
             <div class="inline-flex h-12 md:h-16 w-auto items-center justify-center overflow-hidden">
-                <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain" onerror="this.style.display='none';">
+                <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain"
+                    onerror="this.style.display='none';">
             </div>
         </a>
 
         <div class="flex items-center gap-6">
             <div class="hidden lg:flex items-center gap-4 text-sm font-semibold text-gray-800">
                 @foreach($visibleMenuItems as $item)
-                        @if(!empty($item['children']))
-                            <div class="relative group">
-                                <a href="{{ $item['href'] }}" class="inline-flex items-center gap-1 hover:text-[#1F5EDB] transition-colors py-2">
-                                    {{ $item['label'] }}
-                                    <i class="fas fa-chevron-down text-xs ml-0.5 opacity-70"></i>
-                                </a>
-                                <div class="absolute right-0 top-full pt-2 hidden group-hover:block z-40">
-                                    <div class="rounded-2xl bg-white shadow-xl border border-slate-100 min-w-[220px] py-2 overflow-hidden">
-                                        @foreach($item['children'] as $child)
-                                            <a href="{{ $child['href'] }}"
-                                                class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
-                                                {{ $child['label'] }}
-                                            </a>
-                                        @endforeach
-                                    </div>
+                    @if(!empty($item['children']))
+                        <div class="relative group">
+                            <a href="{{ $item['href'] }}"
+                                class="inline-flex items-center gap-1 hover:text-[#1F5EDB] transition-colors py-2">
+                                {{ $item['label'] }}
+                                <i class="fas fa-chevron-down text-xs ml-0.5 opacity-70"></i>
+                            </a>
+                            <div class="absolute right-0 top-full pt-2 hidden group-hover:block z-40">
+                                <div
+                                    class="rounded-2xl bg-white shadow-xl border border-slate-100 min-w-[220px] py-2 overflow-hidden">
+                                    @foreach($item['children'] as $child)
+                                        <a href="{{ $child['href'] }}"
+                                            class="block px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition bg-white">
+                                            {{ $child['label'] }}
+                                        </a>
+                                    @endforeach
                                 </div>
                             </div>
-                        @else
-                            <a href="{{ $item['href'] }}" class="hover:text-[#1F5EDB] transition-colors">{{ $item['label'] }}</a>
-                        @endif
+                        </div>
+                    @else
+                        <a href="{{ $item['href'] }}" class="hover:text-[#1F5EDB] transition-colors">{{ $item['label'] }}</a>
+                    @endif
                 @endforeach
             </div>
 
             <div class="flex items-center gap-2 sm:gap-4">
                 @if($isLogged)
-                    <div class="relative"
-                        x-data="{
-                            open: false,
-                            total: 0,
-                            items: [],
-                            loading: true,
-                            async fetchNotifications() {
-                                try {
-                                    const r = await fetch('{{ route('notifications.hub') }}');
-                                    if (!r.ok) return;
-                                    const data = await r.json();
-                                    this.total = data.total || 0;
-                                    this.items = (data.items || []).filter(i => i.count > 0);
-                                } catch(e) {
-                                    console.error('Notification hub failed:', e);
-                                } finally {
-                                    this.loading = false;
+                    <div class="relative" x-data="{
+                                open: false,
+                                total: 0,
+                                items: [],
+                                loading: true,
+                                async fetchNotifications() {
+                                    try {
+                                        const r = await fetch('{{ route('notifications.hub') }}');
+                                        if (!r.ok) return;
+                                        const data = await r.json();
+                                        this.total = data.total || 0;
+                                        this.items = (data.items || []).filter(i => i.count > 0);
+                                    } catch(e) {
+                                        console.error('Notification hub failed:', e);
+                                    } finally {
+                                        this.loading = false;
+                                    }
                                 }
-                            }
-                        }"
-                        x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
+                            }" x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
 
                         <button @click="open = !open; fetchNotifications()"
                             class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition relative p-2 focus:outline-none">
@@ -141,7 +143,8 @@
                         <div x-show="open" @click.away="open = false"
                             class="absolute right-0 mt-3 w-72 sm:w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
                             style="display: none;">
-                            <div class="p-4 border-b border-slate-50 dark:border-slate-800 flex justify-between items-center">
+                            <div
+                                class="p-4 border-b border-slate-50 dark:border-slate-800 flex justify-between items-center">
                                 <h3 class="font-bold text-gray-800 dark:text-white">Notificacoes</h3>
                                 <span x-text="total + ' Alerta(s)'"
                                     class="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full uppercase tracking-wider"></span>
@@ -165,7 +168,8 @@
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-bold text-gray-800 dark:text-white truncate"
                                                 x-text="item.count + ' ' + item.label"></p>
-                                            <p class="text-[11px] text-gray-500 dark:text-slate-400">Clique para visualizar</p>
+                                            <p class="text-[11px] text-gray-500 dark:text-slate-400">Clique para visualizar
+                                            </p>
                                         </div>
                                         <i class="fas fa-chevron-right text-[10px] text-gray-300"></i>
                                     </a>
@@ -174,7 +178,8 @@
 
                             <div class="p-3 bg-gray-50 dark:bg-slate-950/50 text-center">
                                 <a href="{{ route('notifications.index') }}"
-                                    class="text-[11px] font-bold text-blue-600 hover:underline">Ver todas as notificacoes</a>
+                                    class="text-[11px] font-bold text-blue-600 hover:underline">Ver todas as
+                                    notificacoes</a>
                             </div>
                         </div>
                     </div>
@@ -195,8 +200,8 @@
                     </a>
                 @else
                     <div class="relative" x-data="{ accountOpen: false }" @keydown.escape.window="accountOpen = false">
-                        <button type="button" @click="accountOpen = !accountOpen"
-                            class="{{ $accountButtonClass }}" style="{{ $accountButtonStyle }}">
+                        <button type="button" @click="accountOpen = !accountOpen" class="{{ $accountButtonClass }}"
+                            style="{{ $accountButtonStyle }}">
                             Minha Conta
                             <i class="fas fa-chevron-down text-xs opacity-70 transition-transform"
                                 :class="{ 'rotate-180': accountOpen }"></i>
@@ -204,7 +209,8 @@
 
                         <div x-show="accountOpen" x-transition.origin.top.right @click.outside="accountOpen = false"
                             class="absolute right-0 top-full pt-3 z-50" style="display: none;">
-                            <div class="rounded-2xl bg-white shadow-2xl border border-slate-100 min-w-[280px] py-3 overflow-hidden">
+                            <div
+                                class="rounded-2xl bg-white shadow-2xl border border-slate-100 min-w-[280px] py-3 overflow-hidden">
                                 <div class="px-5 py-2 border-b border-slate-50 mb-2">
                                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Membro UNN</p>
                                     <p class="text-sm font-bold text-gray-800 truncate">{{ $currentUser?->name }}</p>
@@ -250,7 +256,8 @@
 
                                 @if($currentUser && method_exists($currentUser, 'isAdmin') && $currentUser->isAdmin())
                                     <div class="mt-2 pt-2 border-t border-slate-50">
-                                        <p class="px-5 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Administracao</p>
+                                        <p class="px-5 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                            Administracao</p>
 
                                         <a href="{{ route('panel.admin.dashboard') }}"
                                             class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
@@ -307,10 +314,12 @@
         <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
             <div class="flex items-center gap-3">
                 <div class="inline-flex h-10 w-auto items-center justify-center overflow-hidden">
-                    <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain" onerror="this.style.display='none';">
+                    <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain"
+                        onerror="this.style.display='none';">
                 </div>
             </div>
-            <button id="mobile-menu-close" class="text-gray-500 hover:text-gray-900 text-2xl leading-none px-3">&times;</button>
+            <button id="mobile-menu-close"
+                class="text-gray-500 hover:text-gray-900 text-2xl leading-none px-3">&times;</button>
         </div>
 
         @if($isLogged)
@@ -322,37 +331,37 @@
 
         <nav class="px-4 py-4 flex flex-col gap-1 text-gray-700">
             @foreach($visibleMenuItems as $item)
-                @php($mobileSection = \Illuminate\Support\Str::slug($item['label']))
-                @if(!empty($item['children']))
-                    <div data-mobile-section="{{ $mobileSection }}"
-                        class="rounded-2xl border border-slate-100 bg-slate-50/80 px-3 py-3">
-                        <div class="flex items-center justify-between px-1 pb-2">
-                            <a href="{{ $item['href'] }}"
-                                class="text-xs font-extrabold uppercase tracking-[0.24em] text-slate-400 hover:text-[#1F5EDB] transition-colors">
-                                {{ $item['label'] }}
-                            </a>
-                            <span class="inline-flex items-center rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-slate-500 shadow-sm">
-                                {{ count($item['children']) }} itens
-                            </span>
-                        </div>
-
-                        <div class="flex flex-col gap-1">
-                            @foreach($item['children'] as $child)
-                                <a href="{{ $child['href'] }}"
-                                    class="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-700 hover:bg-white hover:text-[#1F5EDB] transition-colors">
-                                    <span>{{ $child['label'] }}</span>
-                                    <i class="fas fa-chevron-right text-[11px] opacity-50"></i>
-                                </a>
-                            @endforeach
-                        </div>
+            @php($mobileSection = \Illuminate\Support\Str::slug($item['label']))
+            @if(!empty($item['children']))
+                <div data-mobile-section="{{ $mobileSection }}"
+                    class="rounded-2xl border border-slate-100 bg-slate-50/80 px-3 py-3">
+                    <div class="flex items-center justify-between px-1 pb-2">
+                        <a href="{{ $item['href'] }}"
+                            class="text-xs font-extrabold uppercase tracking-[0.24em] text-slate-400 hover:text-[#1F5EDB] transition-colors">
+                            {{ $item['label'] }}
+                        </a>
+                        <span
+                            class="inline-flex items-center rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-slate-500 shadow-sm">
+                            {{ count($item['children']) }} itens
+                        </span>
                     </div>
-                @else
-                    <a href="{{ $item['href'] }}"
-                        data-mobile-section="{{ $mobileSection }}"
-                        class="block rounded-xl px-4 py-2.5 font-semibold hover:bg-slate-100 transition-colors">
-                        {{ $item['label'] }}
-                    </a>
-                @endif
+
+                    <div class="flex flex-col gap-1">
+                        @foreach($item['children'] as $child)
+                            <a href="{{ $child['href'] }}"
+                                class="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-700 hover:bg-white hover:text-[#1F5EDB] transition-colors">
+                                <span>{{ $child['label'] }}</span>
+                                <i class="fas fa-chevron-right text-[11px] opacity-50"></i>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @else
+                <a href="{{ $item['href'] }}" data-mobile-section="{{ $mobileSection }}"
+                    class="block rounded-xl px-4 py-2.5 font-semibold hover:bg-slate-100 transition-colors">
+                    {{ $item['label'] }}
+                </a>
+            @endif
             @endforeach
 
             @if($isLogged)
