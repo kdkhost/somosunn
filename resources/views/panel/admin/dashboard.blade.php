@@ -361,11 +361,12 @@
                 return;
             }
 
-            renderPanelAdminServiceVisits(@json([
+            const payload = {!! json_encode([
                 'serviceVisitSummary' => $serviceVisitSummary,
                 'serviceVisitTopItems' => $serviceVisitTopItems,
                 'serviceVisitOwnerLeaders' => $serviceVisitOwnerLeaders,
-            ]));
+            ]) !!};
+            renderPanelAdminServiceVisits(payload);
 
             window.UNNServiceVisitsRealtime.start({
                 statsUrl: @json(route('panel.admin.dashboard.stats')),

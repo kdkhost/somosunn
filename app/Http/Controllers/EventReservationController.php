@@ -29,8 +29,8 @@ class EventReservationController extends Controller
         }
 
         $isPaid = (float) $event->effective_price > 0;
-        $mpEnabled        = false;
-        $psEnabled        = false;
+        $mpEnabled = false;
+        $psEnabled = false;
         $preferredGateway = null;
         if ($isPaid) {
             $seller = $event->user ?: User::find($event->user_id);
@@ -43,8 +43,8 @@ class EventReservationController extends Controller
             // Verificar gateways configurados pelo vendedor (tabela gateway_accounts)
             $gateways = $seller ? \App\Models\GatewayAccount::resolveForSeller((int) $seller->id)
                 : ['mpEnabled' => false, 'psEnabled' => false, 'preferredGateway' => null, 'useGlobalCredentials' => false];
-            $mpEnabled        = $gateways['mpEnabled'];
-            $psEnabled        = $gateways['psEnabled'];
+            $mpEnabled = $gateways['mpEnabled'];
+            $psEnabled = $gateways['psEnabled'];
             $preferredGateway = $gateways['preferredGateway'];
 
             // Lógica igual ao painel: permite compra se credenciais globais do MercadoPago estão configuradas
@@ -56,13 +56,13 @@ class EventReservationController extends Controller
 
             if (!$mpEnabled && !$psEnabled && empty($gateways['useGlobalCredentials']) && !$paymentsConfigured) {
                 \Illuminate\Support\Facades\Log::warning('EventCheckout: organizador sem gateway configurado', [
-                    'event_id'    => $event->id,
+                    'event_id' => $event->id,
                     'event_user_id' => $event->user_id,
-                    'seller_id'   => $seller ? $seller->id : null,
+                    'seller_id' => $seller ? $seller->id : null,
                     'seller_found' => $seller !== null,
-                    'mp_enabled'  => $mpEnabled,
-                    'ps_enabled'  => $psEnabled,
-                    'use_global'  => $gateways['useGlobalCredentials'] ?? false,
+                    'mp_enabled' => $mpEnabled,
+                    'ps_enabled' => $psEnabled,
+                    'use_global' => $gateways['useGlobalCredentials'] ?? false,
                     'mp_global_configured' => $paymentsConfigured,
                 ]);
                 return redirect()
@@ -81,7 +81,7 @@ class EventReservationController extends Controller
         return view('events.checkout', compact('event', 'registration', 'mpEnabled', 'psEnabled', 'preferredGateway'));
     }
 
-    public function reserve(Request $request, Event $event, CouponService $couponService, \App\Services\Payment\MercadoPagoService $mpService)
+    public function reserve(Request $request, Event $event, CouponService $couponService, \App\Services\Payment\MercadoPagoService $mpService, \App\Services\Payment\PagSeguroService $psService)
     {
         $this->abortIfDisabledOrUnpublished($event);
 
@@ -107,17 +107,38 @@ class EventReservationController extends Controller
         // Determinar gateways disponíveis e gateway selecionado pelo comprador
         $paymentsConfigured = false;
         $gatewayProvider = 'mercadopago';
-        if ($isPaid && $sellerId) {
-            $gateways = \App\Models\GatewayAccount::resolveForSeller($sellerId);
-            $paymentsConfigured = $gateways['mpEnabled'] || $gateways['psEnabled'];
-            $defaultGateway = $gateways['preferredGateway'] ?? ($gateways['mpEnabled'] ? 'mercadopago' : 'pagseguro');
-            $requestedGateway = $request->input('gateway_provider', $defaultGateway);
-            if ($requestedGateway === 'pagseguro' && $gateways['psEnabled']) {
-                $gatewayProvider = 'pagseguro';
-            } elseif ($gateways['mpEnabled']) {
-                $gatewayProvider = 'mercadopago';
-            } elseif ($gateways['psEnabled']) {
-                $gatewayProvider = 'pagseguro';
+        if ($isPaid) {
+            if ($sellerId > 0) {
+                $gateways = \App\Models\GatewayAccount::resolveForSeller($sellerId);
+                $paymentsConfigured = $gateways['mpEnabled'] || $gateways['psEnabled'];
+                $defaultGateway = $gateways['preferredGateway'] ?? ($gateways['mpEnabled'] ? 'mercadopago' : 'pagseguro');
+                $requestedGateway = $request->input('gateway_provider', $defaultGateway);
+                if ($requestedGateway === 'pagseguro' && $gateways['psEnabled']) {
+                    $gatewayProvider = 'pagseguro';
+                } elseif ($gateways['mpEnabled']) {
+                    $gatewayProvider = 'mercadopago';
+                } elseif ($gateways['psEnabled']) {
+                    $gatewayProvider = 'pagseguro';
+                }
+            }
+
+            if (!$paymentsConfigured) {
+                // Fallback para credenciais globais
+                $mpAccessToken = (string) (\App\Models\Setting::get('mercadopago_access_token'));
+                $mpPublicKey = (string) (\App\Models\Setting::get('mercadopago_public_key'));
+                $psToken = (string) (\App\Models\Setting::get('pagseguro_token'));
+
+                if (($mpAccessToken !== '' && $mpPublicKey !== '') || ($psToken !== '')) {
+                    $paymentsConfigured = true;
+                    $requestedGateway = $request->input('gateway_provider', 'mercadopago');
+                    if ($requestedGateway === 'pagseguro' && $psToken !== '') {
+                        $gatewayProvider = 'pagseguro';
+                    } elseif ($mpAccessToken !== '' && $mpPublicKey !== '') {
+                        $gatewayProvider = 'mercadopago';
+                    } elseif ($psToken !== '') {
+                        $gatewayProvider = 'pagseguro';
+                    }
+                }
             }
         }
 
@@ -181,7 +202,7 @@ class EventReservationController extends Controller
         $couponCode = $isPaid ? $couponService->normalizeCode($request->input('coupon_code')) : '';
 
         try {
-            DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $regularUnitPrice, $currentPrice, $couponCode, $couponService, &$registration, &$order) {
+            DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $regularUnitPrice, $currentPrice, $couponCode, $couponService, &$registration, &$order, $gatewayProvider) {
                 $registration = EventRegistration::where('event_id', $event->id)
                     ->where('user_id', $user->id)
                     ->lockForUpdate()
