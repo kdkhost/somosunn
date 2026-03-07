@@ -9,6 +9,9 @@
     <style>
         .referral-legacy-tabs .nav-link { font-weight: 600; color: #495057; }
         .referral-legacy-tabs .nav-link.active { color: #007bff; }
+        .referral-legacy-subtabs { gap: .65rem; }
+        .referral-legacy-subtabs .nav-link { border-radius: 999px; font-weight: 700; color: #495057; background: #f4f6f9; }
+        .referral-legacy-subtabs .nav-link.active { background: #007bff; color: #fff; box-shadow: 0 .35rem .85rem rgba(0, 123, 255, .18); }
         .referral-avatar, .referral-avatar-lg { border-radius: 999px; object-fit: cover; flex-shrink: 0; background: #f4f6f9; }
         .referral-avatar { width: 42px; height: 42px; }
         .referral-avatar-lg { width: 56px; height: 56px; }
@@ -38,6 +41,7 @@
         $selectedScopeLabel = $selectedReferrer?->name ? 'Visão filtrada do afiliado' : 'Visão global da plataforma';
         $referralsPreview = $referredUsers->take(5);
         $activeTab = request('tab');
+        $activeTrackingTab = request('tracking_tab');
 
         if ($errors->has('device_name') || $errors->has('api_tokens') || $apiTokenPlainText) {
             $activeTab = 'api';
@@ -45,6 +49,10 @@
             $activeTab = 'sandbox';
         } elseif (!in_array($activeTab, ['programa', 'indicados', 'api', 'sandbox', 'tracking'], true)) {
             $activeTab = $selectedReferrer ? 'tracking' : 'programa';
+        }
+
+        if (!in_array($activeTrackingTab, ['analysis', 'events'], true)) {
+            $activeTrackingTab = 'analysis';
         }
     @endphp
 
@@ -261,7 +269,7 @@
                         <div class="card-header border-0">
                             <div class="d-flex flex-column flex-xl-row align-items-xl-center justify-content-between">
                                 <div class="mb-3 mb-xl-0"><h3 class="card-title font-weight-bold"><i class="fas fa-chart-line mr-2"></i>Rastreio global de indicações</h3><p class="text-muted mb-0 mt-2">{{ $selectedScopeLabel }} com cliques, origens, compartilhamentos, checkouts e compras.</p></div>
-                                <div class="d-flex flex-wrap" style="gap:.75rem;">@if($selectedReferrer)<a href="{{ route('admin.referrals.index', ['tab' => 'tracking']) }}" class="btn btn-outline-secondary font-weight-bold"><i class="fas fa-filter-circle-xmark mr-1"></i> Limpar filtro</a>@endif<a href="{{ route('admin.referrals.export', ['referrer' => $selectedReferrer?->id]) }}" class="btn btn-primary font-weight-bold"><i class="fas fa-file-csv mr-1"></i> Exportar CSV</a></div>
+                                <div class="d-flex flex-wrap" style="gap:.75rem;">@if($selectedReferrer)<a href="{{ route('admin.referrals.index', ['tab' => 'tracking', 'tracking_tab' => $activeTrackingTab]) }}" class="btn btn-outline-secondary font-weight-bold"><i class="fas fa-filter-circle-xmark mr-1"></i> Limpar filtro</a>@endif<a href="{{ route('admin.referrals.export', ['referrer' => $selectedReferrer?->id]) }}" class="btn btn-primary font-weight-bold"><i class="fas fa-file-csv mr-1"></i> Exportar CSV</a></div>
                             </div>
                         </div>
                         <div class="card-body">
@@ -278,7 +286,24 @@
                                 <div class="col-md-6 col-xl-2 mb-3"><div class="info-box bg-light border referral-stat-card shadow-sm mb-0"><span class="info-box-icon bg-dark"><i class="fas fa-wallet"></i></span><div class="info-box-content"><span class="info-box-text">Receita</span><span class="info-box-number">R$ {{ number_format((float) ($trackingSummary['revenue'] ?? 0), 2, ',', '.') }}</span><small class="text-muted">Atualizado às {{ $trackingUpdatedAtLabel }}</small></div></div></div>
                             </div>
                         </div>
-                    </div>                    <div class="row">
+                    </div>
+
+                    <ul class="nav nav-pills referral-legacy-subtabs mb-4" id="admin-referrals-tracking-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link {{ $activeTrackingTab === 'analysis' ? 'active' : '' }}" id="admin-referrals-tracking-analysis-tab" data-toggle="pill" href="#admin-referrals-tracking-analysis" role="tab" data-tracking-tab-name="analysis">
+                                <i class="fas fa-ranking-star mr-1"></i> Ranking e canais
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ $activeTrackingTab === 'events' ? 'active' : '' }}" id="admin-referrals-tracking-events-tab" data-toggle="pill" href="#admin-referrals-tracking-events" role="tab" data-tracking-tab-name="events">
+                                <i class="fas fa-list-ul mr-1"></i> Log detalhado
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade {{ $activeTrackingTab === 'analysis' ? 'show active' : '' }}" id="admin-referrals-tracking-analysis" role="tabpanel">
+                    <div class="row">
                         <div class="col-xl-8">
                             <div class="card card-primary card-outline shadow-sm mb-4">
                                 <div class="card-header border-0"><h3 class="card-title font-weight-bold"><i class="fas fa-ranking-star mr-2"></i>Ranking de afiliados</h3></div>
@@ -298,7 +323,7 @@
                                                         <td data-order="{{ $affiliate->shares_total }}" class="text-right font-weight-bold">{{ number_format($affiliate->shares_total) }}</td>
                                                         <td data-order="{{ $affiliate->referral_points }}" class="text-right text-warning font-weight-bold">{{ number_format($affiliate->referral_points) }}</td>
                                                         <td data-order="{{ $affiliate->last_activity_timestamp ?? 0 }}"><div class="font-weight-bold">{{ $affiliate->last_activity_label }}</div><small class="text-muted">{{ $affiliate->last_activity_human }}</small></td>
-                                                        <td class="text-right referral-table-actions"><a href="{{ route('admin.referrals.index', ['referrer' => $affiliate->id, 'tab' => 'tracking']) }}" class="btn btn-sm btn-outline-primary font-weight-bold"><i class="fas fa-chart-line mr-1"></i> Ver rastreio</a></td>
+                                                        <td class="text-right referral-table-actions"><a href="{{ route('admin.referrals.index', ['referrer' => $affiliate->id, 'tab' => 'tracking', 'tracking_tab' => 'analysis']) }}" class="btn btn-sm btn-outline-primary font-weight-bold"><i class="fas fa-chart-line mr-1"></i> Ver rastreio</a></td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -346,6 +371,8 @@
                         </div>
                     </div>
 
+                    </div>
+                    <div class="tab-pane fade {{ $activeTrackingTab === 'events' ? 'show active' : '' }}" id="admin-referrals-tracking-events" role="tabpanel">
                     <div class="card card-dark card-outline shadow-sm mb-0">
                         <div class="card-header border-0"><h3 class="card-title font-weight-bold"><i class="fas fa-history mr-2"></i>Log detalhado de cliques, visitas e compartilhamentos</h3></div>
                         <div class="card-body">
@@ -380,6 +407,8 @@
                                 </table>
                             </div>
                         </div>
+                    </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -467,13 +496,33 @@
                 }));
             });
 
-            $('#admin-referrals-tabs a[data-toggle="pill"]').on('shown.bs.tab', function (event) {
-                const tabName = event.target.getAttribute('data-tab-name');
-                if (tabName) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', tabName);
-                    window.history.replaceState({}, '', url.toString());
+            function syncAdminReferralUrl() {
+                const url = new URL(window.location.href);
+                const activeMainTab = $('#admin-referrals-tabs a.nav-link.active').data('tab-name');
+                const activeTrackingTab = $('#admin-referrals-tracking-tabs a.nav-link.active').data('tracking-tab-name');
+
+                if (activeMainTab) {
+                    url.searchParams.set('tab', activeMainTab);
                 }
+
+                if (activeMainTab === 'tracking' && activeTrackingTab) {
+                    url.searchParams.set('tracking_tab', activeTrackingTab);
+                } else {
+                    url.searchParams.delete('tracking_tab');
+                }
+
+                window.history.replaceState({}, '', url.toString());
+            }
+
+            $('#admin-referrals-tabs a[data-toggle="pill"]').on('shown.bs.tab', function () {
+                syncAdminReferralUrl();
+                dataTables.forEach((table) => {
+                    table.columns.adjust().responsive.recalc();
+                });
+            });
+
+            $('#admin-referrals-tracking-tabs a[data-toggle="pill"]').on('shown.bs.tab', function () {
+                syncAdminReferralUrl();
                 dataTables.forEach((table) => {
                     table.columns.adjust().responsive.recalc();
                 });
@@ -483,6 +532,8 @@
                 const target = $(this).data('referral-tab-target');
                 $('#admin-referrals-' + target + '-tab').tab('show');
             });
+
+            syncAdminReferralUrl();
         });
     </script>
 @endpush

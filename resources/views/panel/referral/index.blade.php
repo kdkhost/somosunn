@@ -10,6 +10,15 @@
     $potentialPoints = $pendingCount * $pointsPerReferral;
     $trackingConversion = $trackingSummary['registration_conversion'] ?? 0;
     $purchaseConversion = $trackingSummary['purchase_conversion'] ?? 0;
+    $activePanelTab = request('tab');
+
+    if ($errors->has('device_name') || $errors->has('api_tokens') || $apiTokenPlainText) {
+        $activePanelTab = 'api';
+    } elseif ($errors->has('sandbox') || $errors->has('reason') || $errors->has('requested_domain') || $errors->has('requested_ip')) {
+        $activePanelTab = 'materiais';
+    } elseif (!in_array($activePanelTab, ['programa', 'api', 'materiais', 'rastreio'], true)) {
+        $activePanelTab = 'programa';
+    }
 @endphp
 
 <div class="space-y-8">
@@ -30,6 +39,29 @@
             </div>
         @endif
     </div>
+
+    <div class="rounded-3xl border border-slate-200 bg-white/90 p-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/85">
+        <div class="grid gap-2 md:grid-cols-4">
+            <button type="button" data-panel-referral-tab-target="programa" class="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black transition {{ $activePanelTab === 'programa' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-link text-sm"></i>
+                <span>Programa</span>
+            </button>
+            <button type="button" data-panel-referral-tab-target="api" class="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black transition {{ $activePanelTab === 'api' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-key text-sm"></i>
+                <span>API pessoal</span>
+            </button>
+            <button type="button" data-panel-referral-tab-target="materiais" class="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black transition {{ $activePanelTab === 'materiais' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-box-open text-sm"></i>
+                <span>Materiais e sandbox</span>
+            </button>
+            <button type="button" data-panel-referral-tab-target="rastreio" class="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black transition {{ $activePanelTab === 'rastreio' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-chart-line text-sm"></i>
+                <span>Rastreio completo</span>
+            </button>
+        </div>
+    </div>
+
+    <div data-panel-referral-tab-panel="programa" class="space-y-8 {{ $activePanelTab === 'programa' ? '' : 'hidden' }}">
 
     @if(false)
         <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
@@ -586,34 +618,60 @@
         </div>
 
         {{-- Regras --}}
-        <div class="mt-6 bg-slate-50 dark:bg-slate-800 rounded-2xl px-5 py-4 flex items-start gap-3 text-sm text-slate-500 dark:text-slate-400">
-            <i class="fas fa-info-circle text-blue-500 mt-0.5 shrink-0"></i>
-            <div>
-                <strong class="text-slate-700 dark:text-slate-300">Regras do programa: </strong>
-                Planos gratuitos não geram pontos · Pontos são creditados somente após confirmação do pagamento pelo sistema · Não há limite de indicações
-            </div>
+    <div class="mt-6 bg-slate-50 dark:bg-slate-800 rounded-2xl px-5 py-4 flex items-start gap-3 text-sm text-slate-500 dark:text-slate-400">
+        <i class="fas fa-info-circle text-blue-500 mt-0.5 shrink-0"></i>
+        <div>
+            <strong class="text-slate-700 dark:text-slate-300">Regras do programa: </strong>
+            Planos gratuitos não geram pontos · Pontos são creditados somente após confirmação do pagamento pelo sistema · Não há limite de indicações
         </div>
     </div>
+</div>
 
-    @include('panel.referral.partials.api-tokens', [
-        'apiTokens' => $apiTokens,
-        'apiTokensEnabled' => $apiTokensEnabled,
-        'apiTokenIpTrackingEnabled' => $apiTokenIpTrackingEnabled,
-        'apiTokenPlainText' => $apiTokenPlainText,
-        'apiTokenDeviceName' => $apiTokenDeviceName,
-    ])
+    </div>
 
-    <div id="referralShareKitSection">
-        @include('panel.referral.partials.share-kit', [
-            'affiliateShareKit' => $affiliateShareKit,
-            'sandboxRequests' => $sandboxRequests,
-            'sandboxLatestRequest' => $sandboxLatestRequest,
-            'sandboxApprovedRequest' => $sandboxApprovedRequest,
-            'sandboxAvailable' => $sandboxAvailable,
+    <div data-panel-referral-tab-panel="api" class="space-y-8 {{ $activePanelTab === 'api' ? '' : 'hidden' }}">
+        @include('panel.referral.partials.api-tokens', [
+            'apiTokens' => $apiTokens,
+            'apiTokensEnabled' => $apiTokensEnabled,
+            'apiTokenIpTrackingEnabled' => $apiTokenIpTrackingEnabled,
+            'apiTokenPlainText' => $apiTokenPlainText,
+            'apiTokenDeviceName' => $apiTokenDeviceName,
         ])
     </div>
 
-    @include('panel.referral.partials.tracking-dashboard')
+    <div data-panel-referral-tab-panel="materiais" class="space-y-8 {{ $activePanelTab === 'materiais' ? '' : 'hidden' }}">
+        <div id="referralShareKitSection">
+            @include('panel.referral.partials.share-kit', [
+                'affiliateShareKit' => $affiliateShareKit,
+                'sandboxRequests' => $sandboxRequests,
+                'sandboxLatestRequest' => $sandboxLatestRequest,
+                'sandboxApprovedRequest' => $sandboxApprovedRequest,
+                'sandboxAvailable' => $sandboxAvailable,
+            ])
+        </div>
+    </div>
+
+    <div data-panel-referral-tab-panel="rastreio" class="space-y-8 {{ $activePanelTab === 'rastreio' ? '' : 'hidden' }}">
+        @include('panel.referral.partials.tracking-dashboard')
+
+        <div id="referralChannelFunnelSection">
+            @include('panel.referral.partials.channel-funnel', [
+                'channelFunnels' => $channelFunnels,
+                'title' => 'Funil por canal e origem',
+                'subtitle' => 'Veja de onde vieram os cliques, quantas visualizações cada origem gerou e onde realmente converte.',
+            ])
+        </div>
+
+        <div id="referralEventsLogSection">
+            @include('panel.referral.partials.events-log', [
+                'detailedEvents' => $detailedEvents,
+                'exportUrl' => route('panel.referral.export'),
+                'title' => 'Log detalhado de cliques, visitas e compartilhamentos',
+                'subtitle' => 'Inclui URL de origem exata, landing page, dispositivo, navegador, cidade/país e o resultado de cada ação.',
+                'emptyMessage' => 'Ainda não há cliques, visitas ou compartilhamentos detalhados para este afiliado.',
+            ])
+        </div>
+    </div>
 
 </div>
 
@@ -634,6 +692,50 @@ const referralCharts = {};
 const referralRefreshIntervalMs = 5000;
 let referralRefreshHandle = null;
 let referralRefreshAbortController = null;
+
+function getActiveReferralTab() {
+    const activeButton = document.querySelector('[data-panel-referral-tab-target].bg-blue-600');
+    return activeButton?.dataset?.panelReferralTabTarget || @json($activePanelTab);
+}
+
+function isReferralTrackingTabVisible() {
+    const panel = document.querySelector('[data-panel-referral-tab-panel="rastreio"]');
+    return panel && !panel.classList.contains('hidden');
+}
+
+function setActiveReferralTab(tabName, shouldSyncUrl = true) {
+    const validTabs = ['programa', 'api', 'materiais', 'rastreio'];
+    const nextTab = validTabs.includes(tabName) ? tabName : 'programa';
+
+    document.querySelectorAll('[data-panel-referral-tab-target]').forEach((button) => {
+        const isActive = button.dataset.panelReferralTabTarget === nextTab;
+        button.classList.toggle('bg-blue-600', isActive);
+        button.classList.toggle('text-white', isActive);
+        button.classList.toggle('shadow-lg', isActive);
+        button.classList.toggle('shadow-blue-500/20', isActive);
+        button.classList.toggle('text-slate-600', !isActive);
+        button.classList.toggle('hover:bg-slate-100', !isActive);
+        button.classList.toggle('dark:text-slate-300', !isActive);
+        button.classList.toggle('dark:hover:bg-slate-800', !isActive);
+    });
+
+    document.querySelectorAll('[data-panel-referral-tab-panel]').forEach((panel) => {
+        panel.classList.toggle('hidden', panel.dataset.panelReferralTabPanel !== nextTab);
+    });
+
+    if (shouldSyncUrl) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', nextTab);
+        window.history.replaceState({}, '', url.toString());
+    }
+
+    if (nextTab === 'rastreio') {
+        window.requestAnimationFrame(() => {
+            initReferralCharts();
+            scheduleReferralRefresh(120);
+        });
+    }
+}
 
 function getReferralChartPalette() {
     const isDark = document.documentElement.classList.contains('dark');
@@ -885,6 +987,10 @@ function renderReferralSharingChart() {
 }
 
 function initReferralCharts() {
+    if (!isReferralTrackingTabVisible()) {
+        return;
+    }
+
     destroyReferralCharts();
     renderReferralDailyChart();
     renderReferralAcquisitionChart();
@@ -1412,6 +1518,13 @@ document.querySelectorAll('a[href^="https://wa.me/"], a[href^="https://t.me/shar
     });
 });
 
+document.querySelectorAll('[data-panel-referral-tab-target]').forEach((button) => {
+    button.addEventListener('click', () => {
+        setActiveReferralTab(button.dataset.panelReferralTabTarget);
+    });
+});
+
+setActiveReferralTab(@json($activePanelTab), false);
 updateAffiliateSandboxPreview();
 initReferralCharts();
 startReferralTrackingPolling();
