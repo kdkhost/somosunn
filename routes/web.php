@@ -94,6 +94,16 @@ Route::get('/ranking', [\App\Http\Controllers\RankingPublicController::class, 'i
 // Somos Únicas
 Route::get('/somos-unicas', [\App\Http\Controllers\SomosUnicasController::class, 'index'])->name('somos-unicas');
 
+// Rota Temporária para executar as migrações (apagar depois)
+Route::get('/run-migrations', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return 'Migrações executadas com sucesso! Output: ' . \Illuminate\Support\Facades\Artisan::output() . '<br><a href="/somos-unicas">Voltar para Somos Únicas</a>';
+    } catch (\Exception $e) {
+        return 'Erro ao rodar migrações: ' . $e->getMessage();
+    }
+});
+
 // Vagas Públicas (Externas)
 Route::get('/vagas-abertas', [\App\Http\Controllers\OportunidadesTesteController::class, 'index'])->name('jobs.public.index');
 Route::get('/vagas-abertas/{job}', [\App\Http\Controllers\JobPublicController::class, 'show'])->name('jobs.public.show');
