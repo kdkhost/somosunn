@@ -48,9 +48,11 @@ class EventReservationController extends Controller
             $preferredGateway = $gateways['preferredGateway'];
 
             // Lógica igual ao painel: permite compra se credenciais globais do MercadoPago estão configuradas
-            $mpAccessToken = (string) (config('payments.mercadopago.access_token') ?? '');
-            $mpPublicKey = (string) (config('payments.mercadopago.public_key') ?? '');
-            $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+            // Buscar credenciais globais primeiro no banco, depois fallback para config/.env
+            $mpAccessToken = (string) (\App\Models\Setting::get('mercadopago_access_token') ?: config('payments.mercadopago.access_token'));
+            $mpPublicKey = (string) (\App\Models\Setting::get('mercadopago_public_key') ?: config('payments.mercadopago.public_key'));
+            $psToken = (string) (\App\Models\Setting::get('pagseguro_token') ?: config('payments.pagseguro.token'));
+            $paymentsConfigured = ($mpAccessToken !== '' && $mpPublicKey !== '') || ($psToken !== '');
 
             if (!$mpEnabled && !$psEnabled && empty($gateways['useGlobalCredentials']) && !$paymentsConfigured) {
                 \Illuminate\Support\Facades\Log::warning('EventCheckout: organizador sem gateway configurado', [
