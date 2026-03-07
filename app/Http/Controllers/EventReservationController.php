@@ -54,20 +54,25 @@ class EventReservationController extends Controller
             $psToken = (string) (\App\Models\Setting::get('pagseguro_token'));
             $paymentsConfigured = ($mpAccessToken !== '' && $mpPublicKey !== '') || ($psToken !== '');
 
-            if (!$mpEnabled && !$psEnabled && empty($gateways['useGlobalCredentials']) && !$paymentsConfigured) {
-                \Illuminate\Support\Facades\Log::warning('EventCheckout: organizador sem gateway configurado', [
-                    'event_id' => $event->id,
-                    'event_user_id' => $event->user_id,
-                    'seller_id' => $seller ? $seller->id : null,
-                    'seller_found' => $seller !== null,
-                    'mp_enabled' => $mpEnabled,
-                    'ps_enabled' => $psEnabled,
-                    'use_global' => $gateways['useGlobalCredentials'] ?? false,
-                    'mp_global_configured' => $paymentsConfigured,
-                ]);
-                return redirect()
-                    ->route('events.show', $event)
-                    ->with('error', 'Este evento não está disponível para compra: o organizador ainda não configurou um método de pagamento.');
+            if (!$mpEnabled && !$psEnabled && empty($gateways['useGlobalCredentials'])) {
+                if ($paymentsConfigured) {
+                    $mpEnabled = $mpAccessToken !== '' && $mpPublicKey !== '';
+                    $psEnabled = $psToken !== '';
+                } else {
+                    \Illuminate\Support\Facades\Log::warning('EventCheckout: organizador sem gateway configurado', [
+                        'event_id' => $event->id,
+                        'event_user_id' => $event->user_id,
+                        'seller_id' => $seller ? $seller->id : null,
+                        'seller_found' => $seller !== null,
+                        'mp_enabled' => $mpEnabled,
+                        'ps_enabled' => $psEnabled,
+                        'use_global' => $gateways['useGlobalCredentials'] ?? false,
+                        'mp_global_configured' => $paymentsConfigured,
+                    ]);
+                    return redirect()
+                        ->route('events.show', $event)
+                        ->with('error', 'Este evento não está disponível para compra: o organizador ainda não configurou um método de pagamento.');
+                }
             }
         }
 
