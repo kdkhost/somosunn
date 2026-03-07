@@ -56,13 +56,13 @@ class GatewayAccount extends Model
             // Log para diagnóstico — mostra o que existe na tabela para esse seller
             $allAccounts = self::where('user_id', $sellerId)->get();
             \Illuminate\Support\Facades\Log::warning('GatewayAccount::resolveForSeller — nenhuma conta ativa encontrada', [
-                'seller_id'     => $sellerId,
+                'seller_id' => $sellerId,
                 'total_records' => $allAccounts->count(),
-                'records'       => $allAccounts->map(fn($a) => [
-                    'id'           => $a->id,
-                    'provider'     => $a->provider,
-                    'enabled'      => $a->enabled,
-                    'has_token'    => !empty($a->getAttributes()['access_token']),
+                'records' => $allAccounts->map(fn($a) => [
+                    'id' => $a->id,
+                    'provider' => $a->provider,
+                    'enabled' => $a->enabled,
+                    'has_token' => !empty($a->getAttributes()['access_token']),
                     'token_length' => strlen((string) $a->getAttributes()['access_token']),
                 ])->toArray(),
             ]);
@@ -85,17 +85,12 @@ class GatewayAccount extends Model
             }
         }
 
-        // Se houver preferência explícita, filtrar apenas esse gateway
-        if ($preferred) {
-            $accounts = $accounts->only([$preferred]);
-        }
-
         // Preferido implícito: único gateway configurado
         $impliedPreferred = ($accounts->count() === 1) ? $accounts->keys()->first() : null;
 
         return [
-            'mpEnabled'        => $accounts->has('mercadopago'),
-            'psEnabled'        => $accounts->has('pagseguro'),
+            'mpEnabled' => $accounts->has('mercadopago'),
+            'psEnabled' => $accounts->has('pagseguro'),
             'preferredGateway' => $preferred ?? $impliedPreferred,
         ];
     }
