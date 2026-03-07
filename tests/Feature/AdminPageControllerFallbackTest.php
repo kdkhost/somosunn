@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Http\Controllers\Admin\PageController;
 use App\Models\Page;
+use App\Support\CmsPageCatalog;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +43,7 @@ class AdminPageControllerFallbackTest extends TestCase
 
         Schema::dropAllTables();
         Page::resetTableAvailabilityCache();
+
         Schema::create('users', function (Blueprint $table) {
             $table->id();
         });
@@ -69,5 +71,31 @@ class AdminPageControllerFallbackTest extends TestCase
         $this->assertTrue(isset($data['pages']));
         $this->assertCount(0, $data['pages']);
         $this->assertFalse($data['pageTableAvailable']);
+    }
+
+    public function test_index_recreates_missing_default_pages_when_table_exists(): void
+    {
+        Schema::create('pages', function (Blueprint $table) {
+            $table->id();
+            $table->string('slug', 120)->unique();
+            $table->string('title', 255)->nullable();
+            $table->json('data')->nullable();
+            $table->timestamps();
+        });
+
+        foreach (array_slice(CmsPageCatalog::definitions(), 0, 2) as $page) {
+            Page::query()->create($page);
+        }
+
+        Page::resetTableAvailabilityCache();
+
+        $view = app(PageController::class)->index();
+        $data = $view->getData();
+
+        $this->assertTrue($data['pageTableAvailable']);
+        $this->assertSame(13, Page::query()->count());
+        $this->assertNotNull(Page::query()->where('slug', 'premium')->first());
+        $this->assertNotNull(Page::query()->where('slug', 'eventos')->first());
+        $this->assertCount(13, $data['pages']);
     }
 }

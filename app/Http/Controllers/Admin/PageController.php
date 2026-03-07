@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
+use App\Support\CmsPageCatalog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -69,68 +70,66 @@ class PageController extends Controller
             'stat_3_value', 'stat_3_label', 'stat_4_value', 'stat_4_label',
             'cta_title', 'cta_subtitle', 'cta_btn',
         ],
-        // Páginas de aplicação
-        'eventos'     => [
+        'eventos' => [
             'seo_title', 'seo_description',
             'hero_badge', 'hero_title', 'hero_subtitle',
             'cta_title', 'cta_subtitle', 'cta_btn',
         ],
-        'membros'     => [
-            'seo_title', 'seo_description',
-            'hero_title', 'hero_subtitle',
+        'membros' => [
+            'seo_title', 'seo_description', 'hero_title', 'hero_subtitle',
         ],
         'vagas-abertas' => [
             'seo_title', 'seo_description',
             'hero_badge', 'hero_title', 'hero_subtitle',
         ],
-        'cursos'      => [
+        'cursos' => [
             'seo_title', 'seo_description',
             'hero_badge', 'hero_title', 'hero_subtitle',
         ],
-        'portal'      => [
+        'portal' => [
             'seo_title', 'seo_description',
             'hero_title', 'hero_subtitle',
             'stat_1_value', 'stat_1_label', 'stat_2_value', 'stat_2_label',
             'stat_3_value', 'stat_3_label', 'stat_4_value', 'stat_4_label',
             'cta_title', 'cta_subtitle', 'cta_btn',
         ],
-        'premium'     => [
+        'premium' => [
             'seo_title', 'seo_description',
             'hero_badge', 'hero_title', 'hero_subtitle', 'hero_trust_1', 'hero_trust_2',
             'plans_title', 'plans_subtitle',
         ],
-        'feed'        => ['seo_title', 'seo_description'],
+        'feed' => ['seo_title', 'seo_description'],
     ];
 
     /**
-     * Campos de imagem por slug — recebidos via file input no form.
+     * Campos de imagem por slug - recebidos via file input no form.
      * O valor armazenado é o path relativo ao disco 'public'.
      */
     private const SLUG_IMAGE_FIELDS = [
-        'home'         => ['hero_image'],
-        'sobre'        => ['hero_image'],
-        'quem-somos'   => ['cover_image'],
-        'eventos'      => ['hero_image'],
-        'cursos'       => ['hero_image'],
-        'portal'       => ['hero_image'],
-        'premium'      => ['hero_image'],
+        'home' => ['hero_image'],
+        'sobre' => ['hero_image'],
+        'quem-somos' => ['cover_image'],
+        'eventos' => ['hero_image'],
+        'cursos' => ['hero_image'],
+        'portal' => ['hero_image'],
+        'premium' => ['hero_image'],
     ];
 
-    /** Campos JSON (arrays) por slug — enviados como textarea JSON no form. */
+    /** Campos JSON (arrays) por slug - enviados como textarea JSON no form. */
     private const SLUG_JSON_FIELDS = [
-        'home'          => ['testimonials'],
-        'sobre'         => [],
-        'manifesto'     => [],
-        'valores'       => ['values'],
+        'home' => ['testimonials'],
+        'sobre' => [],
+        'manifesto' => [],
+        'valores' => ['values'],
         'como-funciona' => ['steps'],
-        'quem-somos'    => ['founders', 'team'],
-        'eventos'       => [],
-        'membros'       => [],
+        'quem-somos' => ['founders', 'team'],
+        'eventos' => [],
+        'membros' => [],
         'vagas-abertas' => [],
-        'cursos'        => [],
-        'portal'        => [],
-        'premium'       => [],
-        'feed'          => [],
+        'cursos' => [],
+        'portal' => [],
+        'premium' => [],
+        'feed' => [],
     ];
 
     public function index(): View
@@ -145,6 +144,8 @@ class PageController extends Controller
                 'pageTableAvailable' => false,
             ]);
         }
+
+        CmsPageCatalog::createMissing();
 
         $pages = Page::orderBy('slug')->get();
 
@@ -163,79 +164,78 @@ class PageController extends Controller
 
     public function update(Request $request, Page $page): RedirectResponse
     {
-        $slug         = $page->slug;
+        $slug = $page->slug;
         $scalarFields = self::SLUG_SCALAR_FIELDS[$slug] ?? [];
-        $jsonFields   = self::SLUG_JSON_FIELDS[$slug]   ?? [];
+        $jsonFields = self::SLUG_JSON_FIELDS[$slug] ?? [];
+        $imageFields = self::SLUG_IMAGE_FIELDS[$slug] ?? [];
 
-        $imageFields  = self::SLUG_IMAGE_FIELDS[$slug]  ?? [];
-
-        // Regras de validação
         $rules = [
-            'title'           => ['nullable', 'string', 'max:255'],
+            'title' => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string', 'max:320'],
         ];
+
         foreach ($imageFields as $field) {
-            $rules[$field]            = ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif,svg', 'max:6144'];
+            $rules[$field] = ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif,svg', 'max:6144'];
             $rules['remove_' . $field] = ['nullable', 'boolean'];
         }
 
         $request->validate($rules, [
             'seo_description.max' => 'A descrição SEO não pode ultrapassar 320 caracteres.',
-            '*.image'   => 'O arquivo deve ser uma imagem.',
-            '*.max'     => 'A imagem não pode ultrapassar 6 MB.',
+            '*.image' => 'O arquivo deve ser uma imagem.',
+            '*.max' => 'A imagem não pode ultrapassar 6 MB.',
         ]);
 
         $newData = $page->data ?? [];
 
-        // Campos escalares: whitelist por slug
         foreach ($scalarFields as $field) {
             if ($request->exists($field)) {
                 $newData[$field] = $request->input($field, '');
             }
         }
 
-        // Campos de imagem: upload de arquivo
         foreach ($imageFields as $field) {
-            $removeKey   = 'remove_' . $field;
+            $removeKey = 'remove_' . $field;
             $currentPath = $newData[$field] ?? null;
 
             if ($request->boolean($removeKey)) {
-                // Remover imagem existente
                 if ($currentPath) {
                     Storage::disk('public')->delete($currentPath);
                 }
+
                 $newData[$field] = null;
                 continue;
             }
 
             if ($request->hasFile($field)) {
-                // Apagar a imagem anterior
                 if ($currentPath) {
                     Storage::disk('public')->delete($currentPath);
                 }
-                $path = $request->file($field)->store('pages/' . $slug, 'public');
-                $newData[$field] = $path;
+
+                $newData[$field] = $request->file($field)->store('pages/' . $slug, 'public');
             }
         }
 
-        // Campos JSON: textarea enviado como {campo}_json
         foreach ($jsonFields as $field) {
             $raw = trim($request->input("{$field}_json", ''));
-            if ($raw !== '') {
-                $decoded = json_decode($raw, true);
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $newData[$field] = $decoded;
-                } else {
-                    return back()
-                        ->withInput()
-                        ->withErrors(["{$field}_json" => "JSON inválido no campo \"{$field}\". Verifique a sintaxe."]);
-                }
+
+            if ($raw === '') {
+                continue;
             }
+
+            $decoded = json_decode($raw, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return back()
+                    ->withInput()
+                    ->withErrors(["{$field}_json" => "JSON inválido no campo \"{$field}\". Verifique a sintaxe."]);
+            }
+
+            $newData[$field] = $decoded;
         }
 
         $page->update([
             'title' => $request->input('title') ?: $page->title,
-            'data'  => $newData,
+            'data' => $newData,
         ]);
 
         return redirect()

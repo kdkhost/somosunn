@@ -65,11 +65,13 @@ class PageSeederBootstrapTest extends TestCase
         $this->assertTrue(Schema::hasTable('pages'));
         $this->assertNotNull(Page::query()->where('slug', 'home')->first());
         $this->assertNotNull(Page::query()->where('slug', 'sobre')->first());
+        $this->assertNotNull(Page::query()->where('slug', 'premium')->first());
+        $this->assertNotNull(Page::query()->where('slug', 'portal')->first());
 
         $migration = require database_path('migrations/2026_03_02_000003_create_pages_table.php');
         $migration->up();
 
         $this->assertTrue(Schema::hasTable('pages'));
-        $this->assertSame(6, Page::query()->count());
+        $this->assertSame(13, Page::query()->count());
     }
 }
