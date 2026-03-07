@@ -20,7 +20,7 @@ class SomosUnicasController extends Controller
         $now = Carbon::now();
 
         // 1) Cursos Somos Únicas (Publicados)
-        $courses = Course::with(['author'])
+        $courses = Course::with(['creator'])
             ->where('is_somos_unicas', true)
             ->where('status', 'published')
             ->orderBy('id', 'desc')
