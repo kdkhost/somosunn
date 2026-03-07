@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class EnsureUserHasActivePlan
 {
@@ -24,7 +25,7 @@ class EnsureUserHasActivePlan
             return $next($request);
         }
 
-        \Log::info('CheckPlan: user ' . $user->id . ' accessing ' . $request->path());
+        Log::info('CheckPlan: user ' . $user->id . ' accessing ' . $request->path());
 
         // 2. Admin Bypass
         if ($user->isAdmin()) {
@@ -58,6 +59,13 @@ class EnsureUserHasActivePlan
 
         // 4. Check for Active Plan
         if (!$user->activePlan()) {
+            Log::warning('Acesso bloqueado por ausência de plano ativo', [
+                'user_id' => $user->id,
+                'route' => optional($request->route())->getName(),
+                'path' => $request->path(),
+                'ip' => $request->ip(),
+            ]);
+
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Selecione um plano para continuar.'], 402);
             }

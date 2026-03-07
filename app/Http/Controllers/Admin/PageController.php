@@ -135,9 +135,23 @@ class PageController extends Controller
 
     public function index(): View
     {
+        Page::resetTableAvailabilityCache();
+
+        if (!Page::tableAvailable()) {
+            session()->flash('warning', 'A tabela de páginas CMS ainda não existe nesta base. Rode as migrations ou o seeder correspondente para habilitar o gerenciamento.');
+
+            return view('admin.pages.index', [
+                'pages' => collect(),
+                'pageTableAvailable' => false,
+            ]);
+        }
+
         $pages = Page::orderBy('slug')->get();
 
-        return view('admin.pages.index', compact('pages'));
+        return view('admin.pages.index', [
+            'pages' => $pages,
+            'pageTableAvailable' => true,
+        ]);
     }
 
     public function edit(Page $page): View

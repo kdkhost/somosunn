@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Mentorship;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 class CheckFeature
@@ -27,6 +28,14 @@ class CheckFeature
         $feature = trim((string) $feature);
 
         if (!$user->canAccessFeature($feature) && !$this->hasEntitlementOverride($request, $user, $feature)) {
+            Log::warning('Acesso negado por feature', [
+                'user_id' => $user->id,
+                'feature' => $feature,
+                'route' => optional($request->route())->getName(),
+                'path' => $request->path(),
+                'ip' => $request->ip(),
+            ]);
+
             $lockedRedirect = $this->redirectToLockedContent($request, $feature);
             if ($lockedRedirect) {
                 return $lockedRedirect;

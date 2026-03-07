@@ -15,6 +15,13 @@
             </div>
         </div>
 
+        @if(isset($pageTableAvailable) && $pageTableAvailable === false)
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                A tabela <code>pages</code> ainda não existe nesta base. O módulo de CMS continua acessível, mas sem páginas carregadas até que a estrutura seja criada.
+            </div>
+        @endif
+
         <div class="table-responsive">
             <table class="table table-hover table-striped">
                 <thead>

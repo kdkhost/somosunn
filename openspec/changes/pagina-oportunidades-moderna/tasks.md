@@ -36,7 +36,7 @@
 
 ## 7. Testes e Validacao
 
-- [ ] 7.1 Testar exibicao, filtros, candidatura e destaque
+- [x] 7.1 Testar exibicao, filtros, candidatura e destaque
 - [ ] 7.2 Validar acessibilidade com ferramentas especificas
 - [ ] 7.3 Obter feedback de usuarios e empresas parceiras
 - [ ] 7.4 Ajustar conforme feedback
@@ -45,4 +45,4 @@
 
 - [x] 8.1 Migrar layout para rota oficial apos validacao (ja em /vagas-abertas)
 - [x] 8.2 Remover rotas e views de teste (ja e producao)
-- [ ] 8.3 Documentar mudancas e comunicar stakeholders
+- [x] 8.3 Documentar mudancas e comunicar stakeholders

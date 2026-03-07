@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserIsAdmin
@@ -14,6 +15,12 @@ class EnsureUserIsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check()) {
+            Log::warning('Tentativa de acesso administrativo sem autenticação', [
+                'route' => optional($request->route())->getName(),
+                'path' => $request->path(),
+                'ip' => $request->ip(),
+            ]);
+
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Acesso nao autorizado.'], 403);
             }
@@ -31,6 +38,13 @@ class EnsureUserIsAdmin
         if ($this->canAccessScopedAdminRoute($request, $user)) {
             return $next($request);
         }
+
+        Log::warning('Acesso administrativo negado', [
+            'user_id' => $user->id,
+            'route' => optional($request->route())->getName(),
+            'path' => $request->path(),
+            'ip' => $request->ip(),
+        ]);
 
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Acesso nao autorizado.'], 403);

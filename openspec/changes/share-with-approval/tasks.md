@@ -23,7 +23,7 @@
 
 - [x] 4.1 Criar notificação para destinatário ao receber nova solicitação
 - [x] 4.2 Criar notificação para remetente quando solicitação é aprovada ou recusada
-- [ ] 4.3 Integrar badge de pendentes com sistema de polling existente
+- [x] 4.3 Integrar badge de pendentes com sistema de polling existente
 
 ## 5. Jobs & Limpeza
 
@@ -32,7 +32,7 @@
 
 ## 6. Testes & Validação
 
-- [ ] 6.1 Testar fluxo completo: criar solicitação → aprovar → verificar post criado
-- [ ] 6.2 Testar fluxo de rejeição
-- [ ] 6.3 Testar expiração automática
-- [ ] 6.4 Testar que membro não pode aprovar solicitação de outro membro
+- [x] 6.1 Testar fluxo completo: criar solicitação → aprovar → verificar post criado
+- [x] 6.2 Testar fluxo de rejeição
+- [x] 6.3 Testar expiração automática
+- [x] 6.4 Testar que membro não pode aprovar solicitação de outro membro

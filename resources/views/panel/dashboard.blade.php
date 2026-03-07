@@ -15,6 +15,7 @@
         $sellerPaidCount = (int) ($stats['seller_paid_count'] ?? 0);
         $sellerNetTotal = (float) ($stats['seller_net_total'] ?? 0);
         $communityCount = (int) ($stats['community_count'] ?? 0); // Added to ensure variable exists
+        $dashboardRefreshMs = max(3000, (int) config('dashboard.refresh_interval_ms', 10000));
     @endphp
 
     <!-- Welcome Section -->
@@ -399,7 +400,7 @@
         }
         document.addEventListener('DOMContentLoaded', function () {
             updateDashboardWidgets();
-            setInterval(updateDashboardWidgets, 10000); // Atualiza a cada 10s
+            setInterval(updateDashboardWidgets, {{ $dashboardRefreshMs }});
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -469,7 +470,7 @@
                 }
             });
             updateSalesChart(salesChart);
-            setInterval(function () { updateSalesChart(salesChart); }, 10000);
+            setInterval(function () { updateSalesChart(salesChart); }, {{ $dashboardRefreshMs }});
         });
     </script>
     <style>

@@ -4,134 +4,34 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Connection;
-use App\Models\Course;
-use App\Models\Order;
 use App\Models\PointsLog;
 use App\Models\RedeemableItem;
 use App\Models\Redemption;
 use App\Models\User;
+use App\Services\DashboardMetricsService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
+    public function __construct(private DashboardMetricsService $metrics)
+    {
+    }
+
     public function stats()
     {
         $user = Auth::user();
-        $plan = $user ? $user->activePlan() : null;
-        $stats = [
-            'courses_count' => 0,
-            'orders_paid_count' => 0,
-            'orders_paid_total' => 0.0,
-            'seller_paid_count' => 0,
-            'seller_net_total' => 0.0,
-            'community_count' => (int) User::count(),
-            'mp_balance' => null,
-        ];
-        $salesChart = null;
+        $payload = $user ? $this->metrics->panelStats($user) : ['plan' => null, 'stats' => [], 'sales_chart' => null];
 
-        try {
-            if ($user) {
-                $isAdmin = method_exists($user, 'isAdmin') && $user->isAdmin();
-                $isSuperadmin = method_exists($user, 'isSuperadmin') && $user->isSuperadmin();
-
-                if ($isAdmin || $isSuperadmin) {
-                    $stats['courses_count'] = (int) Course::count();
-                    $stats['orders_paid_count'] = (int) Order::where('status', 'paid')->count();
-                    $stats['orders_paid_total'] = (float) Order::where('status', 'paid')->sum('total_amount');
-                    $stats['seller_paid_count'] = (int) Order::where('status', 'paid')->count();
-                    $stats['seller_net_total'] = (float) Order::where('status', 'paid')->sum('total_amount')
-                        - (float) Order::where('status', 'paid')->sum('platform_fee_amount');
-
-                    $salesChart = $this->buildSalesChart(function ($month, $year) {
-                        return (int) Order::where('status', 'paid')
-                            ->whereMonth('created_at', $month)
-                            ->whereYear('created_at', $year)
-                            ->count();
-                    });
-
-                    try {
-                        $mpService = new \App\Services\Payment\MercadoPagoService();
-                        $stats['mp_balance'] = $mpService->getBalance(null);
-                    } catch (\Throwable $e) {
-                    }
-                } else {
-                    $stats['courses_count'] = (int) Course::where('user_id', $user->id)->count();
-                    $stats['orders_paid_count'] = (int) Order::where('user_id', $user->id)->where('status', 'paid')->count();
-                    $stats['orders_paid_total'] = (float) Order::where('user_id', $user->id)->where('status', 'paid')->sum('total_amount');
-                    $stats['seller_paid_count'] = (int) Order::where('seller_id', $user->id)->where('status', 'paid')->count();
-                    $stats['seller_net_total'] = (float) max(
-                        0,
-                        (float) Order::where('seller_id', $user->id)->where('status', 'paid')->sum('total_amount')
-                        - (float) Order::where('seller_id', $user->id)->where('status', 'paid')->sum('platform_fee_amount')
-                    );
-
-                    $salesChart = $this->buildSalesChart(function ($month, $year) use ($user) {
-                        return (int) Order::where('seller_id', $user->id)
-                            ->where('status', 'paid')
-                            ->whereMonth('created_at', $month)
-                            ->whereYear('created_at', $year)
-                            ->count();
-                    });
-
-                    if ($user->canSellOnMarketplace()) {
-                        try {
-                            $mpService = new \App\Services\Payment\MercadoPagoService();
-                            $stats['mp_balance'] = $mpService->getBalance($user->id);
-                        } catch (\Throwable $e) {
-                        }
-                    }
-                }
-            }
-        } catch (\Throwable $e) {
-        }
-
-        return response()->json([
-            'success' => true,
-            'plan' => $plan?->name,
-            'stats' => $stats,
-            'sales_chart' => $salesChart,
-        ]);
+        return response()->json(['success' => true] + $payload);
     }
 
     public function index()
     {
         $user = Auth::user();
+        $dashboardStats = $user ? $this->metrics->panelStats($user) : ['plan' => null, 'stats' => []];
         $plan = $user ? $user->activePlan() : null;
-        $stats = [
-            'courses_count' => 0,
-            'orders_paid_count' => 0,
-            'orders_paid_total' => 0.0,
-            'seller_paid_count' => 0,
-            'seller_net_total' => 0.0,
-        ];
-
-        try {
-            if ($user) {
-                $isAdmin = method_exists($user, 'isAdmin') && $user->isAdmin();
-                $isSuperadmin = method_exists($user, 'isSuperadmin') && $user->isSuperadmin();
-
-                if ($isAdmin || $isSuperadmin) {
-                    $stats['courses_count'] = (int) Course::count();
-                    $stats['orders_paid_count'] = (int) Order::where('status', 'paid')->count();
-                    $stats['orders_paid_total'] = (float) Order::where('status', 'paid')->sum('total_amount');
-                    $stats['seller_paid_count'] = (int) Order::where('status', 'paid')->count();
-                    $stats['seller_net_total'] = (float) Order::where('status', 'paid')->sum('total_amount')
-                        - (float) Order::where('status', 'paid')->sum('platform_fee_amount');
-                } else {
-                    $stats['courses_count'] = (int) Course::where('user_id', $user->id)->count();
-                    $stats['orders_paid_count'] = (int) Order::where('user_id', $user->id)->where('status', 'paid')->count();
-                    $stats['orders_paid_total'] = (float) Order::where('user_id', $user->id)->where('status', 'paid')->sum('total_amount');
-                    $stats['seller_paid_count'] = (int) Order::where('seller_id', $user->id)->where('status', 'paid')->count();
-                    $stats['seller_net_total'] = (float) max(
-                        0,
-                        (float) Order::where('seller_id', $user->id)->where('status', 'paid')->sum('total_amount')
-                        - (float) Order::where('seller_id', $user->id)->where('status', 'paid')->sum('platform_fee_amount')
-                    );
-                }
-            }
-        } catch (\Throwable $e) {
-        }
+        $stats = $dashboardStats['stats'] ?? [];
 
         $suggestedUsers = collect([]);
         try {
@@ -164,7 +64,7 @@ class DashboardController extends Controller
 
                 $suggestedUsers = $query->inRandomOrder()->take(4)->get();
             }
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
         }
 
         $communityCount = (int) User::count();
@@ -247,7 +147,7 @@ class DashboardController extends Controller
                 ->whereYear('created_at', now()->year)
                 ->whereMonth('created_at', now()->month)
                 ->sum('points');
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
         }
 
         return view('panel.dashboard', compact(
@@ -276,18 +176,5 @@ class DashboardController extends Controller
             && Schema::hasColumn('redemptions', 'estimated_delivery_at')
             && Schema::hasColumn('redemptions', 'tracking_code')
             && Schema::hasColumn('redemptions', 'tracking_url');
-    }
-
-    private function buildSalesChart(callable $resolver): array
-    {
-        $months = collect(range(0, 5))->map(fn ($index) => now()->subMonths(5 - $index)->format('m/Y'));
-
-        return [
-            'labels' => $months->map(fn ($month) => \Carbon\Carbon::createFromFormat('m/Y', $month)->translatedFormat('M/Y')),
-            'data' => $months->map(function ($month) use ($resolver) {
-                [$monthNumber, $year] = explode('/', $month);
-                return $resolver((int) $monthNumber, (int) $year);
-            }),
-        ];
     }
 }

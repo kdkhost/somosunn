@@ -13,6 +13,8 @@
 - **Planos pagos com perfil comercial embutido:** Todos os planos pagos passaram a incluir permissoes de **instrutor/vendedor**, e o fluxo de resgates por pontos foi preparado para operar no mesmo ambiente entre admin e vendedor com fornecedor rastreavel.
 - **Painel novo estabilizado:** Foram corrigidos fluxos e layouts de **eventos, mentorias, faturas, regras de pontos, imagens administrativas e editores ricos**, mantendo o padrao visual do painel moderno.
 - **Upload e navegacao padronizados no painel:** Uploads do painel agora usam experiencia unificada com **arrastar e soltar, preview, progresso e tempo restante**, alem de sidebar com submenu e paginacao nas listagens extensas.
+- **Página de oportunidades validada em produção:** A rota oficial `/vagas-abertas` agora conta com cobertura automatizada para **listagem pública, filtros server-side, destaque de parceiros e fluxo de candidatura na página de detalhes**.
+- **Dashboards com cache aquecido e auditoria de acesso:** As métricas do painel agora usam **cache com aquecimento agendado (`dashboard:warm-cache`)**, mantêm o **polling configurável** e registram **tentativas negadas** por plano ou permissão.
 - **Sistema de gamificacao completo (Pontos):** Todas as 21 regras de pontos ativas agora sao disparadas automaticamente pelas acoes do usuario. Veja a secao de funcionalidades para detalhes.
 - **Pagina "Meus Pontos" para membros:** O membro visualiza seu saldo, posicao no ranking, pontos do mes, top 10 da plataforma e historico completo de pontos ganhos (acessivel em `/painel/meus-pontos` e no sidebar).
 - **Programa de Indicacao ("Indique e Ganhe"):** Cada membro possui um link de referral unico. Ao indicar alguem que se cadastra, o indicador recebe pontos automaticamente.
@@ -104,6 +106,8 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 
 > **Importante (mar/2026):** As entregas de rastreio de afiliados, reconciliação histórica de pontos e expansão comercial dependem de migrations recentes. Em toda publicação, garanta a execução de `php artisan migrate`.
 
+> **Dashboard (mar/2026):** O aquecimento das métricas roda em `dashboard:warm-cache` a cada 5 minutos pelo scheduler. Para ajustar cache e polling use `DASHBOARD_CACHE_TTL_SECONDS`, `DASHBOARD_REFRESH_INTERVAL_MS` e `DASHBOARD_CACHE_STORE`.
+
 #### Para usar o cron interno (painel):
 - Acesse o menu **Admin > Cron**
 - Cadastre comandos Artisan (ex: `schedule:run`, `queue:work`, etc.) e defina a frequência (cron/preset)
@@ -174,6 +178,7 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
 - **Padronizacao e correcoes do painel novo:**
   - Ajustes em uploads de imagens administrativas, FullCalendar de eventos, telas de mentorias/faturas, lista de regras de pontos e inputs ricos com Summernote.
   - Sidebar recolhivel, uploads avancados com FilePond e paginacao aplicada em listagens extensas para reduzir paginas longas.
+  - Dashboards do membro/admin agora contam com **cache de métricas**, **comando de aquecimento agendado**, **logs de negação por plano/permissão** e testes automatizados cobrindo visibilidade de widgets e cache do endpoint `/painel/dashboard/stats`.
 
 ---
 © 2026 UNN Networking. Todos os direitos reservados.

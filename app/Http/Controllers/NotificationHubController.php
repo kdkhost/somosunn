@@ -6,6 +6,7 @@ use App\Models\Connection;
 use App\Models\Message;
 use App\Models\Order;
 use App\Models\Event;
+use App\Models\ShareRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -46,32 +47,37 @@ class NotificationHubController extends Controller
             ->where('status', 'pending')
             ->count();
 
-        // 3. New Sales (Last 24h)
+        // 3. Pending Share Requests
+        $pendingShareRequestsCount = ShareRequest::pending()
+            ->where('to_user_id', $user->id)
+            ->count();
+
+        // 4. New Sales (Last 24h)
         $newSalesCount = Order::where('seller_id', $user->id)
             ->where('status', 'paid')
             ->where('created_at', '>=', now()->subDay())
             ->count();
 
-        // 4. Upcoming Events (Starting within 24h)
+        // 5. Upcoming Events (Starting within 24h)
         $upcomingEventsCount = Event::where('user_id', $user->id)
             ->where('start_at', '>=', now())
             ->where('start_at', '<=', now()->addDay())
             ->count();
 
-        // 5. Expiring Plan Alert
+        // 6. Expiring Plan Alert
         $planExpiresSoon = false;
         if ($user->plan_expires_at) {
             $planExpiresSoon = $user->plan_expires_at->isFuture() && $user->plan_expires_at->diffInDays(now()) <= 7;
         }
 
-        // 6. New Job Vacancies (Unread database notifications)
+        // 7. New Job Vacancies (Unread database notifications)
         $newJobsCount = $user->unreadNotifications()
             ->where('type', 'App\Notifications\JobVacancyPublished')
             ->count();
 
         // Consolidated response
         return response()->json([
-            'total' => $unreadMessagesCount + $pendingConnectionsCount + $newSalesCount + $upcomingEventsCount + ($planExpiresSoon ? 1 : 0) + $newJobsCount,
+            'total' => $unreadMessagesCount + $pendingConnectionsCount + $pendingShareRequestsCount + $newSalesCount + $upcomingEventsCount + ($planExpiresSoon ? 1 : 0) + $newJobsCount,
             'items' => [
                 [
                     'type' => 'messages',
@@ -90,6 +96,15 @@ class NotificationHubController extends Controller
                     'color' => 'text-green-500',
                     'bg' => 'bg-green-50',
                     'route' => route('social.feed')
+                ],
+                [
+                    'type' => 'share_requests',
+                    'count' => $pendingShareRequestsCount,
+                    'label' => 'compartilhamentos pendentes',
+                    'icon' => 'fas fa-share-alt',
+                    'color' => 'text-violet-500',
+                    'bg' => 'bg-violet-50',
+                    'route' => route('social.share-requests.index')
                 ],
                 [
                     'type' => 'sales',

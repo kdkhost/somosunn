@@ -230,9 +230,40 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\GatewayAccount::class);
     }
 
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
     public function eventRegistrations()
     {
         return $this->hasMany(EventRegistration::class);
+    }
+
+    public function isConnectedWith($userId): bool
+    {
+        $targetUserId = (int) $userId;
+
+        if (!$this->exists || $targetUserId <= 0) {
+            return false;
+        }
+
+        if ((int) $this->id === $targetUserId) {
+            return true;
+        }
+
+        return Connection::query()
+            ->where('status', 'accepted')
+            ->where(function ($query) use ($targetUserId) {
+                $query->where(function ($accepted) use ($targetUserId) {
+                    $accepted->where('requester_id', $this->id)
+                        ->where('requested_id', $targetUserId);
+                })->orWhere(function ($accepted) use ($targetUserId) {
+                    $accepted->where('requester_id', $targetUserId)
+                        ->where('requested_id', $this->id);
+                });
+            })
+            ->exists();
     }
 
     public function courses()

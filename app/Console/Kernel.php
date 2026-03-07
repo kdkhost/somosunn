@@ -94,6 +94,15 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar agendamento de expiração de share requests: ' . $e->getMessage());
         }
 
+        try {
+            $schedule->command('dashboard:warm-cache')
+                ->everyFiveMinutes()
+                ->withoutOverlapping()
+                ->name('dashboard-warm-cache');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar aquecimento de cache das dashboards: ' . $e->getMessage());
+        }
+
         // Carregar tarefas dinamicas do banco
         try {
             if (\Schema::hasTable('scheduled_tasks')) {

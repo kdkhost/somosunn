@@ -62,6 +62,11 @@ class Page extends Model
         return static::$pageTableAvailable;
     }
 
+    public static function resetTableAvailabilityCache(): void
+    {
+        static::$pageTableAvailable = null;
+    }
+
     /**
      * Retorna um valor dentro de data pelo(s) path(s) fornecido(s).
      * Aceita dot-notation: get('hero.title').
