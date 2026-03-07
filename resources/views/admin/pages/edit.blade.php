@@ -29,7 +29,7 @@ $slugSections = [
     'home' => [
         'sec-hero'      => ['icon' => 'fa-home',       'label' => 'Hero'],
         'sec-stats'     => ['icon' => 'fa-chart-bar',  'label' => 'Estatísticas'],
-        'sec-about'     => ['icon' => 'fa-info-circle','label' => 'O que é a UNN'],
+        'sec-about'     => ['icon' => 'fa-info-circle','label' => 'O que é a SOMOS UNN'],
         'sec-events'    => ['icon' => 'fa-calendar',   'label' => 'Eventos & Mentorias'],
         'sec-community' => ['icon' => 'fa-users',      'label' => 'Comunidade'],
         'sec-ranking'   => ['icon' => 'fa-trophy',     'label' => 'Ranking & Depoimentos'],
@@ -65,7 +65,7 @@ $slugSections = [
         'sec-header'   => ['icon' => 'fa-users',        'label' => 'Cabeçalho + Imagem'],
         'sec-founders' => ['icon' => 'fa-crown',        'label' => 'Fundadores (JSON)'],
         'sec-team'     => ['icon' => 'fa-user-friends', 'label' => 'Equipe (JSON)'],
-        'sec-stats'    => ['icon' => 'fa-chart-bar',    'label' => 'UNN em Números'],
+        'sec-stats'    => ['icon' => 'fa-chart-bar',    'label' => 'SOMOS UNN em Números'],
         'sec-cta'      => ['icon' => 'fa-bullhorn',     'label' => 'CTA Final'],
     ],
     // Páginas de app
@@ -221,7 +221,7 @@ $badgeColor = $slugColors[$page->slug] ?? 'dark';
                                    class="form-control form-control-sm @error('seo_title') is-invalid @enderror"
                                    value="{{ old('seo_title', $data['seo_title'] ?? '') }}"
                                    maxlength="255"
-                                   placeholder="Ex: Sobre a UNN — Rede de Empreendedores">
+                                   placeholder="Ex: Sobre a SOMOS UNN — Rede de Empreendedores">
                             @error('seo_title')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="form-group mb-0">
