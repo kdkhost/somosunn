@@ -224,6 +224,7 @@ class MentorshipController extends Controller
             'video_platform' => 'nullable|string|max:255',
             'video_link' => 'nullable|string|max:2000',
             'demo_link' => 'nullable|string|max:2000',
+            'is_somos_unicas' => 'nullable|boolean',
         ]);
     }
 

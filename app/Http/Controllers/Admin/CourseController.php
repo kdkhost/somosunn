@@ -109,6 +109,7 @@ class CourseController extends Controller
             'is_recurring' => 'nullable|boolean',
             'period' => 'nullable|string|max:50',
             'billing_cycle' => 'nullable|integer|min:1',
+            'is_somos_unicas' => 'nullable|boolean',
         ]);
 
         $data['is_featured'] = $request->has('is_featured');
@@ -204,6 +205,7 @@ class CourseController extends Controller
             'is_recurring' => 'nullable|boolean',
             'period' => 'nullable|string|max:50',
             'billing_cycle' => 'nullable|integer|min:1',
+            'is_somos_unicas' => 'nullable|boolean',
         ]);
 
         $data['is_featured'] = $request->has('is_featured');
