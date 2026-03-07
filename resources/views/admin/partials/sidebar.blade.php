@@ -211,60 +211,47 @@
                 {{-- Itens exclusivos de Admin --}}
                 @if(auth()->user()->isAdmin())
                     @php
-                        $adminMenuPatterns = [
-                            'admin.users.*',
+                        $marketingPatterns = [
                             'admin.plans.*',
                             'admin.orders.*',
                             'admin.invoices.*',
                             'admin.coupons.*',
-                            'admin.permissions.*',
-                            'admin.points-rules.*',
-                            'admin.ranking',
-                            'admin.mailtemplates.*',
-                            'admin.certificates.*',
-                            'admin.fonts.*',
-                            'admin.faqs.*',
-                            'admin.jobs.*',
-                            'admin.partners.*',
                             'admin.redemptions.*',
                             'admin.referrals.*',
+                        ];
+
+                        $contentPatterns = [
+                            'admin.partners.*',
+                            'admin.jobs.*',
+                            'admin.fonts.*',
+                            'admin.faqs.*',
+                            'admin.pages.*',
+                        ];
+
+                        $systemPatterns = [
+                            'admin.users.*',
+                            'admin.permissions.*',
+                            'admin.points-rules.*',
+                            'admin.mailtemplates.*',
                             'admin.settings*',
+                            'admin.activity_logs.*',
                             'admin.cron.*',
                         ];
                     @endphp
 
                     <li class="nav-header">ADMINISTRAÇÃO</li>
 
-                    <li class="nav-item has-treeview {{ $open($adminMenuPatterns) }}">
-                        <a href="#" class="nav-link {{ $is($adminMenuPatterns) }}">
-                            <i class="nav-icon fas fa-tools"></i>
-                            <p>Administração<i class="right fas fa-angle-left"></i></p>
+                    {{-- 1. Marketing & Vendas --}}
+                    <li class="nav-item has-treeview {{ $open($marketingPatterns) }}">
+                        <a href="#" class="nav-link {{ $is($marketingPatterns) }}">
+                            <i class="nav-icon fas fa-bullhorn"></i>
+                            <p>Gestão & Vendas<i class="right fas fa-angle-left"></i></p>
                         </a>
                         <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item">
-                                <a href="{{ route('admin.users.index') }}" class="nav-link {{ $is('admin.users.*') }}">
-                                    <i class="fas fa-users-cog nav-icon"></i>
-                                    <p>Usuários</p>
-                                </a>
-                            </li>
                             <li class="nav-item">
                                 <a href="{{ route('admin.plans.index') }}" class="nav-link {{ $is('admin.plans.*') }}">
                                     <i class="fas fa-tags nav-icon"></i>
                                     <p>Planos</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.redemptions.index') }}"
-                                    class="nav-link {{ $is('admin.redemptions.*') }}">
-                                    <i class="fas fa-gift nav-icon"></i>
-                                    <p>Itens de Resgate</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.referrals.index') }}"
-                                    class="nav-link {{ $is('admin.referrals.*') }}">
-                                    <i class="fas fa-bullhorn nav-icon"></i>
-                                    <p>Afiliados</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -287,19 +274,29 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.permissions.index') }}"
-                                    class="nav-link {{ $is('admin.permissions.*') }}">
-                                    <i class="fas fa-user-shield nav-icon"></i>
-                                    <p>Permissões</p>
+                                <a href="{{ route('admin.redemptions.index') }}"
+                                    class="nav-link {{ $is('admin.redemptions.*') }}">
+                                    <i class="fas fa-gift nav-icon"></i>
+                                    <p>Itens de Resgate</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.points-rules.index') }}"
-                                    class="nav-link {{ $is('admin.points-rules.*') }}">
-                                    <i class="fas fa-star nav-icon"></i>
-                                    <p>Regras de Pontos</p>
+                                <a href="{{ route('admin.referrals.index') }}"
+                                    class="nav-link {{ $is('admin.referrals.*') }}">
+                                    <i class="fas fa-share-alt nav-icon"></i>
+                                    <p>Afiliados</p>
                                 </a>
                             </li>
+                        </ul>
+                    </li>
+
+                    {{-- 2. Conteúdo do Portal --}}
+                    <li class="nav-item has-treeview {{ $open($contentPatterns) }}">
+                        <a href="#" class="nav-link {{ $is($contentPatterns) }}">
+                            <i class="nav-icon fas fa-photo-video"></i>
+                            <p>Conteúdo do Portal<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
                             <li class="nav-item">
                                 <a href="{{ route('admin.partners.index') }}"
                                     class="nav-link {{ $is('admin.partners.*') }}">
@@ -313,14 +310,6 @@
                                     <p>Mural de Vagas</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.mailtemplates.index') }}"
-                                    class="nav-link {{ $is('admin.mailtemplates.*') }}">
-                                    <i class="fas fa-envelope nav-icon"></i>
-                                    <p>E-mails</p>
-                                </a>
-                            </li>
-                            {{-- Certificates moved to shared section below --}}
                             <li class="nav-item">
                                 <a href="{{ route('admin.fonts.index') }}" class="nav-link {{ $is('admin.fonts.*') }}">
                                     <i class="fas fa-font nav-icon"></i>
@@ -339,9 +328,46 @@
                                     <p>Páginas do Site</p>
                                 </a>
                             </li>
+                        </ul>
+                    </li>
+
+                    {{-- 3. Sistema e Acessos --}}
+                    <li class="nav-item has-treeview {{ $open($systemPatterns) }}">
+                        <a href="#" class="nav-link {{ $is($systemPatterns) }}">
+                            <i class="nav-icon fas fa-cogs"></i>
+                            <p>Sistema e Acessos<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.users.index') }}" class="nav-link {{ $is('admin.users.*') }}">
+                                    <i class="fas fa-users-cog nav-icon"></i>
+                                    <p>Usuários</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.permissions.index') }}"
+                                    class="nav-link {{ $is('admin.permissions.*') }}">
+                                    <i class="fas fa-user-shield nav-icon"></i>
+                                    <p>Permissões</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.points-rules.index') }}"
+                                    class="nav-link {{ $is('admin.points-rules.*') }}">
+                                    <i class="fas fa-star nav-icon"></i>
+                                    <p>Regras de Pontos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.mailtemplates.index') }}"
+                                    class="nav-link {{ $is('admin.mailtemplates.*') }}">
+                                    <i class="fas fa-envelope nav-icon"></i>
+                                    <p>E-mails Automáticos</p>
+                                </a>
+                            </li>
                             <li class="nav-item has-treeview {{ $open('admin.settings*') }}">
                                 <a href="#" class="nav-link {{ $is('admin.settings*') }}">
-                                    <i class="nav-icon fas fa-cogs"></i>
+                                    <i class="nav-icon fas fa-tools"></i>
                                     <p>Configurações<i class="right fas fa-angle-left"></i></p>
                                 </a>
                                 <ul class="nav nav-treeview pl-4">
@@ -441,7 +467,7 @@
                             <li class="nav-item">
                                 <a href="{{ route('admin.cron.index') }}" class="nav-link {{ $is('admin.cron.*') }}">
                                     <i class="fas fa-clock nav-icon"></i>
-                                    <p>Tarefas Agendadas (Cron)</p>
+                                    <p>Cron Jobs</p>
                                 </a>
                             </li>
                         </ul>

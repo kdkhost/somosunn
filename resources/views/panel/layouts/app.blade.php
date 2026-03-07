@@ -161,7 +161,7 @@
             overflow: hidden;
         }
 
-        .panel-upload-progress__bar > span {
+        .panel-upload-progress__bar>span {
             display: block;
             height: 100%;
             width: 0;
@@ -289,26 +289,26 @@
                     card.id = 'panel-upload-progress';
                     card.className = 'panel-upload-progress';
                     card.innerHTML = `
-                        <div class="panel-upload-progress__card">
-                            <div class="flex items-start justify-between gap-4">
-                                <div>
-                                    <p class="text-xs font-black uppercase tracking-[0.25em] text-sky-300">Upload</p>
-                                    <h3 class="mt-1 text-base font-bold text-white">Enviando arquivos</h3>
+                                <div class="panel-upload-progress__card">
+                                    <div class="flex items-start justify-between gap-4">
+                                        <div>
+                                            <p class="text-xs font-black uppercase tracking-[0.25em] text-sky-300">Upload</p>
+                                            <h3 class="mt-1 text-base font-bold text-white">Enviando arquivos</h3>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-sm font-black text-white" data-upload-percent>0%</div>
+                                            <div class="text-[11px] text-slate-300" data-upload-size>0 B / 0 B</div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 panel-upload-progress__bar">
+                                        <span data-upload-fill></span>
+                                    </div>
+                                    <div class="mt-3 flex items-center justify-between gap-3 text-[11px] text-slate-300">
+                                        <span data-upload-status>Preparando envio...</span>
+                                        <span data-upload-remaining>calculando tempo restante...</span>
+                                    </div>
                                 </div>
-                                <div class="text-right">
-                                    <div class="text-sm font-black text-white" data-upload-percent>0%</div>
-                                    <div class="text-[11px] text-slate-300" data-upload-size>0 B / 0 B</div>
-                                </div>
-                            </div>
-                            <div class="mt-4 panel-upload-progress__bar">
-                                <span data-upload-fill></span>
-                            </div>
-                            <div class="mt-3 flex items-center justify-between gap-3 text-[11px] text-slate-300">
-                                <span data-upload-status>Preparando envio...</span>
-                                <span data-upload-remaining>calculando tempo restante...</span>
-                            </div>
-                        </div>
-                    `;
+                            `;
 
                     document.body.appendChild(card);
                     return card;
@@ -494,17 +494,17 @@
                             xhr.addEventListener('load', function () {
                                 form.dataset.uploadSubmitting = 'false';
 
-                                updateUploadProgressCard(progressCard, {
-                                    percent: 100,
-                                    status: 'Finalizando resposta do servidor...',
-                                    remaining: 'quase pronto'
-                                });
-
                                 const contentType = xhr.getResponseHeader('Content-Type') || '';
                                 const currentUrl = normalizeUrl(window.location.href);
                                 const responseUrl = normalizeUrl(xhr.responseURL || form.action || window.location.href);
 
                                 if (xhr.status >= 200 && xhr.status < 400) {
+                                    updateUploadProgressCard(progressCard, {
+                                        percent: 100,
+                                        status: 'Finalizando resposta do servidor...',
+                                        remaining: 'quase pronto'
+                                    });
+
                                     if (responseUrl && responseUrl !== currentUrl) {
                                         window.location.assign(responseUrl);
                                         return;
@@ -521,26 +521,50 @@
                                     return;
                                 }
 
-                                updateUploadProgressCard(progressCard, {
-                                    status: 'Falha ao enviar arquivos',
-                                    remaining: 'verifique os dados e tente novamente'
-                                });
+                                // Handle Validation or Server errors (422, 500, etc)
+                                setUploadCardVisible(false); // Hide the progress immediately
+
+                                let errorMessage = 'Falha ao enviar arquivo. Verifique o tamanho ou o formato e tente novamente.';
+                                if (contentType.includes('application/json')) {
+                                    try {
+                                        const json = JSON.parse(xhr.responseText);
+                                        errorMessage = json.message || errorMessage;
+                                        // If there are specific field errors, format them
+                                        if (json.errors) {
+                                            const details = Object.values(json.errors).flat().join('<br>');
+                                            errorMessage += '<br><br><span class="text-sm rounded">' + details + '</span>';
+                                        }
+                                    } catch (e) { }
+                                }
+
+                                if (typeof Swal !== 'undefined') {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Upload Recusado',
+                                        html: errorMessage,
+                                        confirmButtonText: 'Entendi'
+                                    });
+                                } else {
+                                    alert('Erro no Upload: ' + errorMessage.replace(/<br>/g, '\n').replace(/<[^>]+>/g, ''));
+                                }
                             });
 
                             xhr.addEventListener('error', function () {
                                 form.dataset.uploadSubmitting = 'false';
-                                updateUploadProgressCard(progressCard, {
-                                    status: 'Erro de conexão durante o upload',
-                                    remaining: 'tente novamente'
-                                });
+                                setUploadCardVisible(false);
+                                if (typeof Swal !== 'undefined') {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Erro de Conexão',
+                                        text: 'O upload falhou devido a um problema de rede.',
+                                        confirmButtonText: 'Tentar novamente'
+                                    });
+                                }
                             });
 
                             xhr.addEventListener('abort', function () {
                                 form.dataset.uploadSubmitting = 'false';
-                                updateUploadProgressCard(progressCard, {
-                                    status: 'Upload cancelado',
-                                    remaining: 'envio interrompido'
-                                });
+                                setUploadCardVisible(false);
                             });
 
                             xhr.send(formData);
