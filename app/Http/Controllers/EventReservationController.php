@@ -49,9 +49,9 @@ class EventReservationController extends Controller
 
             // Lógica igual ao painel: permite compra se credenciais globais do MercadoPago estão configuradas
             // Buscar credenciais globais primeiro no banco, depois fallback para config/.env
-            $mpAccessToken = (string) (\App\Models\Setting::get('mercadopago_access_token') ?: config('payments.mercadopago.access_token'));
-            $mpPublicKey = (string) (\App\Models\Setting::get('mercadopago_public_key') ?: config('payments.mercadopago.public_key'));
-            $psToken = (string) (\App\Models\Setting::get('pagseguro_token') ?: config('payments.pagseguro.token'));
+            $mpAccessToken = (string) (\App\Models\Setting::get('mercadopago_access_token'));
+            $mpPublicKey = (string) (\App\Models\Setting::get('mercadopago_public_key'));
+            $psToken = (string) (\App\Models\Setting::get('pagseguro_token'));
             $paymentsConfigured = ($mpAccessToken !== '' && $mpPublicKey !== '') || ($psToken !== '');
 
             if (!$mpEnabled && !$psEnabled && empty($gateways['useGlobalCredentials']) && !$paymentsConfigured) {
