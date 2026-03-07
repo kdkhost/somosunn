@@ -133,6 +133,66 @@ class PanelDashboardMetricsTest extends TestCase
         $this->assertCount(6, $payload['sales_chart']['data']);
     }
 
+    public function test_owner_dashboard_returns_segmented_service_visit_metrics(): void
+    {
+        $planId = $this->createPlan(['courses_access']);
+        $user = $this->createUser([
+            'plan_id' => $planId,
+            'plan_expires_at' => now()->addMonth(),
+        ]);
+        $otherUser = $this->createUser();
+
+        $courseId = $this->insertCourse($user->id, 'Curso Radar');
+        $eventId = $this->insertEvent($user->id, 'Evento Radar');
+        $mentorshipId = $this->insertMentorship($user->id, 'Mentoria Radar');
+        $foreignCourseId = $this->insertCourse($otherUser->id, 'Curso Externo');
+
+        $this->insertServiceVisit('curso', $courseId, 2);
+        $this->insertServiceVisit('evento', $eventId, 1);
+        $this->insertServiceVisit('mentoria', $mentorshipId, 1);
+        $this->insertServiceVisit('curso', $foreignCourseId, 5);
+
+        $this->actingAs($user);
+
+        $payload = $this->getJson(route('panel.dashboard.stats'))->assertOk()->json();
+
+        $this->assertTrue($payload['visit_metrics']['enabled']);
+        $this->assertSame(3, $payload['visit_metrics']['owned_products_count']);
+        $this->assertSame(4, $payload['visit_metrics']['total_visits']);
+        $this->assertSame(2, $payload['visit_metrics']['by_type']['curso']);
+        $this->assertSame(1, $payload['visit_metrics']['by_type']['evento']);
+        $this->assertSame(1, $payload['visit_metrics']['by_type']['mentoria']);
+        $this->assertSame('Curso Radar', $payload['visit_metrics']['top_items'][0]['label']);
+    }
+
+    public function test_admin_dashboard_stats_route_returns_global_service_visit_metrics(): void
+    {
+        $admin = $this->createUser([
+            'role' => 'admin',
+            'level' => 'admin',
+        ]);
+        $owner = $this->createUser();
+
+        $courseId = $this->insertCourse($owner->id, 'Curso Global');
+        $eventId = $this->insertEvent($owner->id, 'Evento Global');
+
+        $this->insertServiceVisit('site', null, 3);
+        $this->insertServiceVisit('curso', $courseId, 4);
+        $this->insertServiceVisit('evento', $eventId, 2);
+
+        $this->actingAs($admin);
+
+        $panelPayload = $this->getJson(route('panel.admin.dashboard.stats'))->assertOk()->json();
+        $legacyPayload = $this->getJson(route('admin.dashboard.stats'))->assertOk()->json();
+
+        $this->assertTrue($panelPayload['serviceVisitsEnabled']);
+        $this->assertSame(9, $panelPayload['serviceVisitSummary']['total']);
+        $this->assertSame(3, $panelPayload['serviceVisitSummary']['site']);
+        $this->assertSame(4, $panelPayload['serviceVisitSummary']['curso']);
+        $this->assertNotEmpty($panelPayload['serviceVisitOwnerLeaders']);
+        $this->assertSame($panelPayload['serviceVisitSummary']['total'], $legacyPayload['serviceVisitSummary']['total']);
+    }
+
     private function setUpSchema(): void
     {
         Schema::dropAllTables();
@@ -205,6 +265,34 @@ class PanelDashboardMetricsTest extends TestCase
             $table->timestamps();
         });
 
+        Schema::create('events', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('title');
+            $table->timestamp('start_at')->nullable();
+            $table->timestamp('end_at')->nullable();
+            $table->boolean('published')->default(true);
+            $table->boolean('all_day')->default(false);
+            $table->string('color')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('mentorships', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('mentor_id')->nullable();
+            $table->string('title');
+            $table->json('schedule')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('service_visits', function (Blueprint $table) {
+            $table->id();
+            $table->string('service_type', 32);
+            $table->unsignedBigInteger('service_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->timestamp('visited_at')->useCurrent();
+        });
+
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
@@ -245,14 +333,54 @@ class PanelDashboardMetricsTest extends TestCase
         return User::query()->findOrFail($id);
     }
 
-    private function insertCourse(int $userId, string $title): void
+    private function insertCourse(int $userId, string $title): int
     {
-        DB::table('courses')->insert([
+        return (int) DB::table('courses')->insertGetId([
             'user_id' => $userId,
             'title' => $title,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+    }
+
+    private function insertEvent(int $userId, string $title): int
+    {
+        return (int) DB::table('events')->insertGetId([
+            'user_id' => $userId,
+            'title' => $title,
+            'start_at' => now()->addDay(),
+            'end_at' => now()->addDays(2),
+            'published' => 1,
+            'all_day' => 0,
+            'color' => '#1F5EDB',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function insertMentorship(int $userId, string $title): int
+    {
+        return (int) DB::table('mentorships')->insertGetId([
+            'mentor_id' => $userId,
+            'title' => $title,
+            'schedule' => json_encode([
+                ['start_at' => now()->addDay()->toDateTimeString()],
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function insertServiceVisit(string $type, ?int $serviceId, int $times): void
+    {
+        foreach (range(1, $times) as $index) {
+            DB::table('service_visits')->insert([
+                'service_type' => $type,
+                'service_id' => $serviceId,
+                'user_id' => null,
+                'visited_at' => now()->subMinutes($index),
+            ]);
+        }
     }
 
     private function insertOrder(int $userId, int $sellerId, string $status, float $total, float $fee): void

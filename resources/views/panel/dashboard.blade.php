@@ -15,6 +15,7 @@
         $sellerPaidCount = (int) ($stats['seller_paid_count'] ?? 0);
         $sellerNetTotal = (float) ($stats['seller_net_total'] ?? 0);
         $communityCount = (int) ($stats['community_count'] ?? 0); // Added to ensure variable exists
+        $visitMetrics = $visitMetrics ?? ['enabled' => false, 'owned_products_count' => 0, 'total_visits' => 0, 'last_24h' => 0, 'by_type' => [], 'top_items' => []];
         $dashboardRefreshMs = max(3000, (int) config('dashboard.refresh_interval_ms', 10000));
     @endphp
 
@@ -236,6 +237,89 @@
         </div>
     </div>
 
+    @if(($visitMetrics['enabled'] ?? false) && (($visitMetrics['owned_products_count'] ?? 0) > 0))
+        <div class="mb-12 animate-fade-in-up" style="animation-delay: 260ms;" id="owner-visit-radar">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8 px-2">
+                <div>
+                    <h3 class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                            <i class="fas fa-signal"></i>
+                        </div>
+                        Radar de Visitas
+                    </h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium mt-2">Acompanhe o interesse pelos produtos sob sua responsabilidade.</p>
+                </div>
+                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-300 text-xs font-black uppercase tracking-widest">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Em tempo real
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+                @foreach([
+                    ['id' => 'counter-owned-visits-total', 'label' => 'Total de visitas', 'value' => $visitMetrics['total_visits'] ?? 0, 'icon' => 'fa-eye', 'color' => 'blue'],
+                    ['id' => 'counter-owned-visits-day', 'label' => 'Últimas 24 horas', 'value' => $visitMetrics['last_24h'] ?? 0, 'icon' => 'fa-clock', 'color' => 'emerald'],
+                    ['id' => 'counter-owned-products', 'label' => 'Produtos monitorados', 'value' => $visitMetrics['owned_products_count'] ?? 0, 'icon' => 'fa-briefcase', 'color' => 'violet'],
+                    ['id' => 'counter-owned-visits-courses', 'label' => 'Cursos visitados', 'value' => $visitMetrics['by_type']['curso'] ?? 0, 'icon' => 'fa-graduation-cap', 'color' => 'amber'],
+                ] as $metric)
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <div class="w-14 h-14 rounded-2xl bg-{{ $metric['color'] }}-50 dark:bg-{{ $metric['color'] }}-900/20 text-{{ $metric['color'] }}-600 dark:text-{{ $metric['color'] }}-300 flex items-center justify-center text-xl mb-6">
+                            <i class="fas {{ $metric['icon'] }}"></i>
+                        </div>
+                        <h4 class="text-slate-400 dark:text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-3">{{ $metric['label'] }}</h4>
+                        <span class="text-5xl font-black text-slate-900 dark:text-white tracking-tighter" id="{{ $metric['id'] }}">{{ $metric['value'] }}</span>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h4 class="text-xl font-black text-slate-900 dark:text-white">Distribuição por tipo</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Quais formatos recebem mais atenção.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4" id="owner-visit-types">
+                        @foreach([
+                            'Cursos' => $visitMetrics['by_type']['curso'] ?? 0,
+                            'Eventos' => $visitMetrics['by_type']['evento'] ?? 0,
+                            'Mentorias' => $visitMetrics['by_type']['mentoria'] ?? 0,
+                            'Palestras' => $visitMetrics['by_type']['palestra'] ?? 0,
+                        ] as $label => $value)
+                            <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40">
+                                <span class="font-bold text-slate-700 dark:text-slate-200">{{ $label }}</span>
+                                <span class="text-lg font-black text-blue-600 dark:text-blue-300">{{ $value }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h4 class="text-xl font-black text-slate-900 dark:text-white">Produtos com maior tráfego</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Os itens mais procurados agora.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4" id="owner-visit-top-items">
+                        @forelse(($visitMetrics['top_items'] ?? []) as $item)
+                            <div class="flex items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40">
+                                <div class="min-w-0">
+                                    <p class="text-sm font-black text-slate-900 dark:text-white truncate">{{ $item['label'] }}</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ $item['type'] }}</p>
+                                </div>
+                                <span class="text-lg font-black text-emerald-600 dark:text-emerald-300">{{ $item['total'] }}</span>
+                            </div>
+                        @empty
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Ainda não há visitas registradas nos seus produtos.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @if($canSellOnMarketplace)
         <!-- Section: Financeiro Vendedor -->
         <div class="mb-12 animate-fade-in-up" style="animation-delay: 300ms;">
@@ -356,12 +440,106 @@
 @endsection
 
 @push('scripts')
+    @include('partials.service-visits-realtime')
     <script>
+        function renderOwnerVisitMetrics(visitMetrics) {
+            if (!visitMetrics || !document.getElementById('owner-visit-radar')) {
+                return;
+            }
+
+            const cardValues = {
+                'counter-owned-visits-total': visitMetrics.total_visits || 0,
+                'counter-owned-visits-day': visitMetrics.last_24h || 0,
+                'counter-owned-products': visitMetrics.owned_products_count || 0,
+                'counter-owned-visits-courses': (visitMetrics.by_type && visitMetrics.by_type.curso) || 0,
+            };
+
+            Object.entries(cardValues).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            });
+
+            const typesContainer = document.getElementById('owner-visit-types');
+            if (typesContainer) {
+                const rows = [
+                    ['Cursos', visitMetrics.by_type?.curso || 0],
+                    ['Eventos', visitMetrics.by_type?.evento || 0],
+                    ['Mentorias', visitMetrics.by_type?.mentoria || 0],
+                    ['Palestras', visitMetrics.by_type?.palestra || 0],
+                ];
+
+                typesContainer.innerHTML = rows.map(([label, value]) => `
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40">
+                        <span class="font-bold text-slate-700 dark:text-slate-200">${label}</span>
+                        <span class="text-lg font-black text-blue-600 dark:text-blue-300">${value}</span>
+                    </div>
+                `).join('');
+            }
+
+            const topItemsContainer = document.getElementById('owner-visit-top-items');
+            if (topItemsContainer) {
+                const topItems = visitMetrics.top_items || [];
+                topItemsContainer.innerHTML = topItems.length
+                    ? topItems.map((item) => `
+                        <div class="flex items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40">
+                            <div class="min-w-0">
+                                <p class="text-sm font-black text-slate-900 dark:text-white truncate">${item.label}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">${item.type}</p>
+                            </div>
+                            <span class="text-lg font-black text-emerald-600 dark:text-emerald-300">${item.total}</span>
+                        </div>
+                    `).join('')
+                    : '<p class="text-sm text-slate-500 dark:text-slate-400">Ainda não há visitas registradas nos seus produtos.</p>';
+            }
+        }
+
+        function syncDashboardWidgets(data) {
+            if (!data || !data.stats) {
+                return;
+            }
+
+            const elCurso = document.getElementById('counter-curso');
+            if (elCurso) elCurso.textContent = data.stats.courses_count;
+
+            const elOrders = document.getElementById('counter-orders');
+            if (elOrders) elOrders.textContent = data.stats.orders_paid_count;
+
+            const elOrdersTotal = document.getElementById('counter-orders-total');
+            if (elOrdersTotal) elOrdersTotal.textContent = 'R$ ' + (data.stats.orders_paid_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+            const elSeller = document.getElementById('counter-seller');
+            if (elSeller) elSeller.textContent = data.stats.seller_paid_count;
+
+            const elSellerTotal = document.getElementById('counter-seller-total');
+            if (elSellerTotal) elSellerTotal.textContent = 'R$ ' + (data.stats.seller_net_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+            const elMpBalance = document.getElementById('counter-mp-balance');
+            if (elMpBalance) {
+                if (data.stats.mp_balance) {
+                    let val = data.stats.mp_balance.total_amount || 0;
+                    elMpBalance.textContent = 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                } else {
+                    elMpBalance.innerHTML = '<span class="text-xs text-gray-400">N/D</span>';
+                }
+            }
+
+            const elCommunity = document.getElementById('counter-community');
+            if (elCommunity) elCommunity.textContent = data.stats.community_count;
+
+            renderOwnerVisitMetrics(data.visit_metrics || null);
+
+            document.querySelectorAll('.animate-pulse').forEach((element) => element.classList.remove('animate-pulse'));
+        }
+
         function updateDashboardWidgets() {
             fetch('{{ route('panel.dashboard.stats') }}')
                 .then(r => r.json())
                 .then(data => {
                     if (data.success && data.stats) {
+                        syncDashboardWidgets(data);
+                        return;
                         const elCurso = document.getElementById('counter-curso');
                         if (elCurso) elCurso.textContent = data.stats.courses_count;
 
@@ -399,8 +577,13 @@
                 }).catch(e => console.error('Dashboard stats update failed:', e));
         }
         document.addEventListener('DOMContentLoaded', function () {
+            renderOwnerVisitMetrics(@json($visitMetrics));
             updateDashboardWidgets();
-            setInterval(updateDashboardWidgets, {{ $dashboardRefreshMs }});
+            window.UNNServiceVisitsRealtime.start({
+                statsUrl: @json(route('panel.dashboard.stats')),
+                refreshMs: @json($dashboardRefreshMs),
+                onPayload: syncDashboardWidgets,
+            });
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

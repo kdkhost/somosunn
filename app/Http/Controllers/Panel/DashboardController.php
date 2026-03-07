@@ -21,7 +21,7 @@ class DashboardController extends Controller
     public function stats()
     {
         $user = Auth::user();
-        $payload = $user ? $this->metrics->panelStats($user) : ['plan' => null, 'stats' => [], 'sales_chart' => null];
+        $payload = $user ? $this->metrics->panelStats($user, request()->boolean('fresh')) : ['plan' => null, 'stats' => [], 'sales_chart' => null];
 
         return response()->json(['success' => true] + $payload);
     }
@@ -32,6 +32,7 @@ class DashboardController extends Controller
         $dashboardStats = $user ? $this->metrics->panelStats($user) : ['plan' => null, 'stats' => []];
         $plan = $user ? $user->activePlan() : null;
         $stats = $dashboardStats['stats'] ?? [];
+        $visitMetrics = $dashboardStats['visit_metrics'] ?? [];
 
         $suggestedUsers = collect([]);
         try {
@@ -161,7 +162,8 @@ class DashboardController extends Controller
             'sellerHealthChecks',
             'userPoints',
             'rankPosition',
-            'pontosEsteMes'
+            'pontosEsteMes',
+            'visitMetrics'
         ));
     }
 

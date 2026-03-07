@@ -22,6 +22,13 @@ class DashboardController extends Controller
         return view('admin.dashboard', $payload);
     }
 
+    public function stats()
+    {
+        return response()->json([
+            'success' => true,
+        ] + $this->metrics->adminPayload(auth()->user(), request()->boolean('fresh')));
+    }
+
     public function getMpBalance()
     {
         try {

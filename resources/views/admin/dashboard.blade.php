@@ -144,6 +144,142 @@
                     </div>
                 </div>
 
+                @php
+                    $serviceVisitSummary = $serviceVisitSummary ?? [
+                        'total' => 0,
+                        'last_24h' => 0,
+                        'site' => 0,
+                        'curso' => 0,
+                        'evento' => 0,
+                        'mentoria' => 0,
+                        'palestra' => 0,
+                        'monitored_products' => 0,
+                    ];
+                @endphp
+
+                <div class="row" id="legacy-admin-service-visits">
+                    <div class="col-12">
+                        <div class="card card-outline card-primary">
+                            <div class="card-header border-0">
+                                <h3 class="card-title"><i class="fas fa-satellite-dish mr-2"></i>Rastreio Global de Visitas</h3>
+                                <div class="card-tools">
+                                    <span class="badge badge-success"><i class="fas fa-circle mr-1"></i>Ao vivo</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                @if($serviceVisitsEnabled ?? false)
+                                    <div class="row mb-4">
+                                        <div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-light shadow-sm">
+                                                <span class="info-box-icon bg-primary"><i class="fas fa-eye"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Total de visitas</span>
+                                                    <span class="info-box-number" id="legacy-visits-total">{{ $serviceVisitSummary['total'] ?? 0 }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-light shadow-sm">
+                                                <span class="info-box-icon bg-success"><i class="fas fa-clock"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Últimas 24h</span>
+                                                    <span class="info-box-number" id="legacy-visits-day">{{ $serviceVisitSummary['last_24h'] ?? 0 }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-light shadow-sm">
+                                                <span class="info-box-icon bg-info"><i class="fas fa-globe"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Site institucional</span>
+                                                    <span class="info-box-number" id="legacy-visits-site">{{ $serviceVisitSummary['site'] ?? 0 }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-light shadow-sm">
+                                                <span class="info-box-icon bg-warning"><i class="fas fa-layer-group"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Produtos monitorados</span>
+                                                    <span class="info-box-number" id="legacy-visits-products">{{ $serviceVisitSummary['monitored_products'] ?? 0 }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-wrap gap-2 mb-4" id="legacy-visit-chips">
+                                        @foreach([
+                                            'Cursos' => $serviceVisitSummary['curso'] ?? 0,
+                                            'Eventos' => $serviceVisitSummary['evento'] ?? 0,
+                                            'Mentorias' => $serviceVisitSummary['mentoria'] ?? 0,
+                                            'Palestras' => $serviceVisitSummary['palestra'] ?? 0,
+                                        ] as $label => $value)
+                                            <span class="badge badge-light border px-3 py-2">{{ $label }}: {{ $value }}</span>
+                                        @endforeach
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Produto</th>
+                                                            <th>Tipo</th>
+                                                            <th class="text-right">Visitas</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="legacy-top-items">
+                                                        @forelse(($serviceVisitTopItems ?? []) as $item)
+                                                            <tr>
+                                                                <td>{{ $item['label'] }}</td>
+                                                                <td>{{ $item['type'] }}</td>
+                                                                <td class="text-right font-weight-bold">{{ $item['total'] }}</td>
+                                                            </tr>
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="3" class="text-center text-muted">Ainda não há visitas registradas.</td>
+                                                            </tr>
+                                                        @endforelse
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Responsável</th>
+                                                            <th>Segmentação</th>
+                                                            <th class="text-right">Total</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="legacy-owner-leaders">
+                                                        @forelse(($serviceVisitOwnerLeaders ?? []) as $leader)
+                                                            <tr>
+                                                                <td>{{ $leader['name'] }}</td>
+                                                                <td class="text-muted">C {{ $leader['curso'] }} • E {{ $leader['evento'] }} • M {{ $leader['mentoria'] }}</td>
+                                                                <td class="text-right font-weight-bold">{{ $leader['total'] }}</td>
+                                                            </tr>
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="3" class="text-center text-muted">Ainda não há responsáveis ranqueados.</td>
+                                                            </tr>
+                                                        @endforelse
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="alert alert-secondary mb-0">O rastreio de visitas ainda não está disponível neste ambiente.</div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- ROW 3: CHARTS --}}
                 <div class="row">
                     {{-- Sales Chart --}}
@@ -514,11 +650,66 @@
 
 @push('scripts')
     {{-- Chart.js & FullCalendar JS --}}
+    @include('partials.service-visits-realtime')
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pt-br.js"></script>
 
     <script>
+        function renderLegacyAdminServiceVisits(payload) {
+            const summary = payload.serviceVisitSummary || {};
+            const topItems = payload.serviceVisitTopItems || [];
+            const leaders = payload.serviceVisitOwnerLeaders || [];
+
+            [
+                ['legacy-visits-total', summary.total || 0],
+                ['legacy-visits-day', summary.last_24h || 0],
+                ['legacy-visits-site', summary.site || 0],
+                ['legacy-visits-products', summary.monitored_products || 0],
+            ].forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            });
+
+            const chips = document.getElementById('legacy-visit-chips');
+            if (chips) {
+                chips.innerHTML = [
+                    ['Cursos', summary.curso || 0],
+                    ['Eventos', summary.evento || 0],
+                    ['Mentorias', summary.mentoria || 0],
+                    ['Palestras', summary.palestra || 0],
+                ].map(([label, value]) => `<span class="badge badge-light border px-3 py-2">${label}: ${value}</span>`).join('');
+            }
+
+            const topItemsBody = document.getElementById('legacy-top-items');
+            if (topItemsBody) {
+                topItemsBody.innerHTML = topItems.length
+                    ? topItems.map((item) => `
+                        <tr>
+                            <td>${item.label}</td>
+                            <td>${item.type}</td>
+                            <td class="text-right font-weight-bold">${item.total}</td>
+                        </tr>
+                    `).join('')
+                    : '<tr><td colspan="3" class="text-center text-muted">Ainda não há visitas registradas.</td></tr>';
+            }
+
+            const leadersBody = document.getElementById('legacy-owner-leaders');
+            if (leadersBody) {
+                leadersBody.innerHTML = leaders.length
+                    ? leaders.map((leader) => `
+                        <tr>
+                            <td>${leader.name}</td>
+                            <td class="text-muted">C ${leader.curso} • E ${leader.evento} • M ${leader.mentoria}</td>
+                            <td class="text-right font-weight-bold">${leader.total}</td>
+                        </tr>
+                    `).join('')
+                    : '<tr><td colspan="3" class="text-center text-muted">Ainda não há responsáveis ranqueados.</td></tr>';
+            }
+        }
+
         function fetchMpBalance() {
             const el = document.getElementById('mp-balance-value');
             if (!el) return;
@@ -542,6 +733,18 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
+            renderLegacyAdminServiceVisits(@json([
+                'serviceVisitSummary' => $serviceVisitSummary,
+                'serviceVisitTopItems' => $serviceVisitTopItems ?? [],
+                'serviceVisitOwnerLeaders' => $serviceVisitOwnerLeaders ?? [],
+            ]));
+
+            window.UNNServiceVisitsRealtime.start({
+                statsUrl: @json(route('admin.dashboard.stats')),
+                refreshMs: @json(max(3000, (int) config('dashboard.refresh_interval_ms', 10000))),
+                onPayload: renderLegacyAdminServiceVisits,
+            });
+
             // Fetch Balance immediately
             @if(isset($isAdmin) && $isAdmin)
                 fetchMpBalance();

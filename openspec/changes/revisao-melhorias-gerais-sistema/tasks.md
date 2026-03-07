@@ -7,8 +7,8 @@
 ## 2. Dashboard e Metricas em Tempo Real
 
 - [x] 2.1 Implementar widgets de dashboard customizados por plano/pacote
-- [ ] 2.2 Integrar contadores de visitas em tempo real usando websockets
-- [ ] 2.3 Exibir metricas segmentadas para responsaveis de cada produto
+- [x] 2.2 Integrar contadores de visitas em tempo real usando websockets
+- [x] 2.3 Exibir metricas segmentadas para responsaveis de cada produto
 - [x] 2.4 Consolidar visao global para admin/superadmin (dashboard admin ja consolidado)
 - [x] 2.5 Garantir atualizacao automatica dos dados sem recarregar pagina
 
@@ -27,5 +27,5 @@
 ## 5. Testes e Validacao
 
 - [ ] 5.1 Testar todas as funcoes em ambiente mobile e desktop
-- [ ] 5.2 Validar atualizacao em tempo real e integridade dos dados
+- [x] 5.2 Validar atualizacao em tempo real e integridade dos dados
 - [x] 5.3 Revisar logs, permissoes e seguranca

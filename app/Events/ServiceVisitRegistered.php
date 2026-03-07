@@ -1,12 +1,9 @@
 <?php
-// UTF-8 sem BOM
+
 namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -15,23 +12,28 @@ class ServiceVisitRegistered implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $serviceType;
-    public $serviceId;
-    public $count;
+    public string $serviceType;
+    public ?int $serviceId;
+    public int $count;
 
-    public function __construct($serviceType, $serviceId, $count)
+    public function __construct(string $serviceType, ?int $serviceId, int $count)
     {
         $this->serviceType = $serviceType;
         $this->serviceId = $serviceId;
         $this->count = $count;
     }
 
-    public function broadcastOn()
+    public function broadcastOn(): Channel
     {
         return new Channel('service-visits');
     }
 
-    public function broadcastWith()
+    public function broadcastAs(): string
+    {
+        return 'service.visit.registered';
+    }
+
+    public function broadcastWith(): array
     {
         return [
             'serviceType' => $this->serviceType,

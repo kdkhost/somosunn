@@ -5,6 +5,7 @@
 - **Reconciliacao historica de pontos:** O comando `points:reconcile-legacy-members` e as migrations de marco agora recalculam pontos antigos com base em registros reais de **cadastro, perfil completo, primeiro curso, mentor, curso concluido, certificado, evento, mentoria e avaliacoes**.
 - **Programa de indicacao com rastreio completo:** O painel de indicacoes passou a mostrar **cliques, visitas unicas, pageviews, cadastros atribuidos, checkouts iniciados, compras confirmadas, receita rastreada, copias, compartilhamentos e recompartilhamentos** do link de afiliado.
 - **Afiliados com rastreio detalhado em tempo real:** O modulo de indicacoes agora tambem exibe **tabela detalhada por clique/visita, URL de origem exata, landing page, dispositivo, navegador, cidade/pais, funil por canal, exportacao CSV e visao global no admin em `/painel/admin/indicacoes`**, com atualizacao automatica no painel do afiliado.
+- **Dashboards com visitas segmentadas em tempo real:** As dashboards de membro, admin e superadmin agora mostram **contadores de visitas por produto, ranking dos itens mais acessados, distribuicao por tipo e atualizacao automatica por websocket/polling**, sem recarregar a pagina.
 - **Kit promocional e API REST para afiliados:** O afiliado agora recebe **materiais prontos para compartilhamento, blocos de landing page, ofertas recomendadas e endpoints autenticados em `/api/v1/affiliate/*`** para montar site, painel ou microsite externo com o proprio link de indicacao.
 - **Central externa do afiliado com embeds, criativos e sandbox:** A area `/painel/indicacoes` agora tambem entrega **widgets em iframe/HTML responsivo, criativos em tamanhos especificos, playground da API e ticket de acesso ao sandbox com motivo, IP e dominio** para homologacao controlada.
 - **Tokens pessoais da API no painel do afiliado:** A area `/painel/indicacoes` agora permite **gerar token, copiar na hora, renomear por dispositivo, revogar acesso e acompanhar ultimo uso/IP** sem depender de chamada manual da API.
@@ -179,6 +180,7 @@ Configure as credenciais no painel admin em **Configurações > SMTP**. Use a fe
   - Ajustes em uploads de imagens administrativas, FullCalendar de eventos, telas de mentorias/faturas, lista de regras de pontos e inputs ricos com Summernote.
   - Sidebar recolhivel, uploads avancados com FilePond e paginacao aplicada em listagens extensas para reduzir paginas longas.
   - Dashboards do membro/admin agora contam com **cache de métricas**, **comando de aquecimento agendado**, **logs de negação por plano/permissão** e testes automatizados cobrindo visibilidade de widgets e cache do endpoint `/painel/dashboard/stats`.
+  - O rastreio de visitas foi expandido para as dashboards com **ranking em tempo real, segmentacao por cursos/eventos/mentorias/palestras/site e visao por responsavel do produto**, incluindo endpoints JSON dedicados para atualizacao sem refresh.
 
 ---
 © 2026 UNN Networking. Todos os direitos reservados.
