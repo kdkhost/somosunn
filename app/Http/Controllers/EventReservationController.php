@@ -48,10 +48,10 @@ class EventReservationController extends Controller
             $preferredGateway = $gateways['preferredGateway'];
 
             // Lógica igual ao painel: permite compra se credenciais globais do MercadoPago estão configuradas
-            // Buscar credenciais globais primeiro no banco, depois fallback para config/.env
-            $mpAccessToken = (string) (\App\Models\Setting::get('mercadopago_access_token'));
-            $mpPublicKey = (string) (\App\Models\Setting::get('mercadopago_public_key'));
-            $psToken = (string) (\App\Models\Setting::get('pagseguro_token'));
+            // Buscar credenciais globais mapeadas pelo AppServiceProvider
+            $mpAccessToken = config('payments.mercadopago.access_token', '');
+            $mpPublicKey = config('payments.mercadopago.public_key', '');
+            $psToken = config('payments.pagseguro.token', '');
             $paymentsConfigured = ($mpAccessToken !== '' && $mpPublicKey !== '') || ($psToken !== '');
 
             // Fallback para cada provedor (mescla do vendedor com a plataforma caso ele deseje credenciais globais)
@@ -121,6 +121,22 @@ class EventReservationController extends Controller
             if ($sellerId > 0) {
                 $gateways = \App\Models\GatewayAccount::resolveForSeller($sellerId);
                 $paymentsConfigured = $gateways['mpEnabled'] || $gateways['psEnabled'];
+
+                // Carrega credenciais globais independentes no backend
+                $mpAccessToken = config('payments.mercadopago.access_token', '');
+                $mpPublicKey = config('payments.mercadopago.public_key', '');
+                $psToken = config('payments.pagseguro.token', '');
+
+                if (empty($gateways['useGlobalCredentials'])) {
+                    if (!$gateways['mpEnabled'] && $mpAccessToken !== '' && $mpPublicKey !== '') {
+                        $gateways['mpEnabled'] = true;
+                    }
+                    if (!$gateways['psEnabled'] && $psToken !== '') {
+                        $gateways['psEnabled'] = true;
+                    }
+                    $paymentsConfigured = $gateways['mpEnabled'] || $gateways['psEnabled'];
+                }
+
                 $defaultGateway = $gateways['preferredGateway'] ?? ($gateways['mpEnabled'] ? 'mercadopago' : 'pagseguro');
                 $requestedGateway = $request->input('gateway_provider', $defaultGateway);
                 if ($requestedGateway === 'pagseguro' && $gateways['psEnabled']) {
@@ -133,10 +149,10 @@ class EventReservationController extends Controller
             }
 
             if (!$paymentsConfigured) {
-                // Fallback para credenciais globais
-                $mpAccessToken = (string) (\App\Models\Setting::get('mercadopago_access_token'));
-                $mpPublicKey = (string) (\App\Models\Setting::get('mercadopago_public_key'));
-                $psToken = (string) (\App\Models\Setting::get('pagseguro_token'));
+                // Instancia garantida caso $paymentsConfigured continue falso
+                $mpAccessToken = config('payments.mercadopago.access_token', '');
+                $mpPublicKey = config('payments.mercadopago.public_key', '');
+                $psToken = config('payments.pagseguro.token', '');
 
                 if (($mpAccessToken !== '' && $mpPublicKey !== '') || ($psToken !== '')) {
                     $paymentsConfigured = true;
