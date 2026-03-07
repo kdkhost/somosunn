@@ -42,12 +42,13 @@ class EventReservationController extends Controller
 
             // Verificar gateways configurados pelo vendedor (tabela gateway_accounts)
             $gateways = $seller ? \App\Models\GatewayAccount::resolveForSeller((int) $seller->id)
-                : ['mpEnabled' => false, 'psEnabled' => false, 'preferredGateway' => null];
+                : ['mpEnabled' => false, 'psEnabled' => false, 'preferredGateway' => null, 'useGlobalCredentials' => false];
             $mpEnabled        = $gateways['mpEnabled'];
             $psEnabled        = $gateways['psEnabled'];
             $preferredGateway = $gateways['preferredGateway'];
 
-            if (!$mpEnabled && !$psEnabled) {
+            // Corrige: só bloqueia se realmente não houver NENHUM gateway (nem global)
+            if (!$mpEnabled && !$psEnabled && empty($gateways['useGlobalCredentials'])) {
                 \Illuminate\Support\Facades\Log::warning('EventCheckout: organizador sem gateway configurado', [
                     'event_id'    => $event->id,
                     'event_user_id' => $event->user_id,
@@ -55,6 +56,7 @@ class EventReservationController extends Controller
                     'seller_found' => $seller !== null,
                     'mp_enabled'  => $mpEnabled,
                     'ps_enabled'  => $psEnabled,
+                    'use_global'  => $gateways['useGlobalCredentials'] ?? false,
                 ]);
                 return redirect()
                     ->route('events.show', $event)
