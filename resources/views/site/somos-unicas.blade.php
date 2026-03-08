@@ -51,9 +51,18 @@
                                 @endif
                                 @php
                                     $courseThum = $course->thumbnail;
-                                    $courseImage = $courseThum 
-                                        ? (Str::startsWith($courseThum, ['http://', 'https://']) ? $courseThum : asset('storage/'.$courseThum)) 
-                                        : asset('img/placeholder-course.jpg');
+                                    $courseImage = asset('img/placeholder-course.jpg');
+
+                                    if ($courseThum) {
+                                        if (Str::startsWith($courseThum, ['http://', 'https://'])) {
+                                            $courseImage = $courseThum;
+                                        } else {
+                                            $normalizedCourseThumb = ltrim(str_replace('\\', '/', $courseThum), '/');
+                                            $courseImage = Str::startsWith($normalizedCourseThumb, ['uploads/', 'img/'])
+                                                ? asset($normalizedCourseThumb)
+                                                : asset('storage/' . $normalizedCourseThumb);
+                                        }
+                                    }
                                 @endphp
                                 <img src="{{ $courseImage }}" alt="{{ $course->title }}"
                                     class="w-full h-40 object-cover rounded-xl mb-4 border border-pink-50"
