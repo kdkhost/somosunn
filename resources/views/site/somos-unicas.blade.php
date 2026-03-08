@@ -3,7 +3,7 @@
 @section('title', 'Somos Únicas - UNN')
 
 @section('content')
-    <div class="min-h-screen pb-16" style="background-color: {{ ($pageData['theme_color'] ?? '#db2777') }}08;">
+    <div class="min-h-screen pb-16" style="background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 50%, #f5f3ff 100%);">
         <!-- Hero Section -->
         <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">

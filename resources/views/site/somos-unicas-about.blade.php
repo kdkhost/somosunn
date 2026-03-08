@@ -3,7 +3,7 @@
 @section('title', 'Sobre a Comunidade Somos Únicas | UNN')
 
 @section('content')
-    <div class="min-h-screen pb-16" style="background-color: {{ ($pageData['theme_color'] ?? '#db2777') }}08;">
+    <div class="min-h-screen pb-16" style="background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 50%, #f5f3ff 100%);">
         {{-- Hero Section --}}
         <div class="relative bg-unicas-gradient text-white overflow-hidden">
             <div class="absolute inset-x-0 bottom-0 bg-white"
