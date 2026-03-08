@@ -3,7 +3,7 @@
 @section('title', 'Sobre a Comunidade Somos Únicas | UNN')
 
 @section('content')
-    <div class="min-h-screen pb-16" style="background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 50%, #f5f3ff 100%);">
+    <div class="min-h-screen pb-16" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
         {{-- Hero Section --}}
         <div class="relative bg-unicas-gradient text-white overflow-hidden shadow-inner">
             <div class="absolute inset-x-0 bottom-0 bg-white"
@@ -12,17 +12,17 @@
                 class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32 relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
                 <div class="md:w-1/2 mb-10 md:mb-0">
                     <span
-                        class="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-sm text-white font-semibold text-sm mb-4">
+                        class="inline-block py-1 px-4 rounded-full bg-white/10 backdrop-blur-sm text-white font-bold text-sm mb-4 uppercase tracking-wider">
                         Comunidade Feminina
                     </span>
-                    <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
+                    <h1 class="text-4xl md:text-6xl font-black leading-tight mb-6 text-white">
                         {{ $pageData['hero_title'] ?? 'Somos Únicas: o seu espaço seguro para crescer' }}
                     </h1>
-                    <div class="text-lg md:text-xl text-white/90 mb-8 max-w-lg summernote-content">
+                    <div class="text-lg md:text-xl text-purple-50 mb-8 max-w-lg summernote-content leading-relaxed">
                         {!! $pageData['hero_subtitle'] ?? 'Um ambiente exclusivo para mulheres, focado no desenvolvimento humano, networking estratégico e apoio mútuo.' !!}
                     </div>
                     <a href="{{ route('somos-unicas') }}"
-                        class="inline-block bg-white text-unicas-main font-bold py-3 px-8 rounded-full shadow-lg hover:bg-white/90 transition transform hover:-translate-y-1">
+                        class="inline-block bg-white text-purple-900 font-bold py-4 px-10 rounded-full shadow-xl hover:bg-purple-50 transition transform hover:-translate-y-1">
                         Acessar a Plataforma
                     </a>
                 </div>

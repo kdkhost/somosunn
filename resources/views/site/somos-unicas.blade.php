@@ -3,16 +3,18 @@
 @section('title', 'Somos Únicas - UNN')
 
 @section('content')
-    <div class="min-h-screen pb-16" style="background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 50%, #f5f3ff 100%);">
+    <div class="min-h-screen pb-16" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
         <!-- Hero Section -->
-        <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
+        <section class="pt-10 md:pt-24 pb-20 px-4 md:px-12 lg:px-24 mb-12 shadow-lg" style="background: linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%); border-radius: 0 0 50px 50px;">
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
-                <div class="flex-1 text-center md:text-left">
-                    <h1
-                        class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unicas-title-gradient">
+                <div class="flex-1 text-center md:text-left text-white">
+                    <span class="inline-block px-4 py-1 rounded-full text-sm font-bold mb-4 bg-white/10 uppercase tracking-wider backdrop-blur-md">
+                        Comunidade Feminina
+                    </span>
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 text-white">
                         {{ $pageData['hero_title'] ?? 'Somos Únicas' }}
                     </h1>
-                    <div class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto md:mx-0 leading-relaxed summernote-content">
+                    <div class="text-lg sm:text-xl text-purple-50 max-w-3xl mx-auto md:mx-0 leading-relaxed summernote-content">
                         {!! $pageData['hero_subtitle'] ?? 'Um espaço dedicado a mulheres empreendedoras. Acesse palestras, mentorias exclusivas, eventos e recursos focados no protagonismo feminino.' !!}
                     </div>
                 </div>
@@ -20,7 +22,7 @@
                 <div class="flex-1 flex justify-center">
                     <img src="{{ Str::startsWith($pageData['hero_image'], ['http://', 'https://']) ? $pageData['hero_image'] : asset('storage/' . $pageData['hero_image']) }}" 
                          alt="{{ $pageData['hero_title'] ?? 'Somos Únicas' }}"
-                         class="rounded-3xl shadow-2xl max-h-[500px] object-cover border-4 border-white/50">
+                         class="rounded-3xl shadow-2xl max-h-[500px] object-cover border-4 border-white/30 transform rotate-2 hover:rotate-0 transition duration-500">
                 </div>
                 @endif
             </div>
