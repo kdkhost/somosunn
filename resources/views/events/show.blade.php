@@ -433,7 +433,8 @@
 
 <!-- TICKET MODAL -->
 <div id="ticketModal"
-    class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/50 backdrop-blur-sm px-4">
+    class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/50 backdrop-blur-sm px-4"
+    style="display: none;" aria-hidden="true">
     <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden relative"
         onclick="event.stopPropagation()">
         <!-- Close button -->
@@ -521,10 +522,14 @@
                 correctLevel: QRCode.CorrectLevel.H
             });
 
+            modal.setAttribute('aria-hidden', 'false');
+            modal.style.display = 'flex';
             modal.classList.remove('hidden');
         };
 
         window.closeTicketModal = function () {
+            modal.setAttribute('aria-hidden', 'true');
+            modal.style.display = 'none';
             modal.classList.add('hidden');
         };
 
