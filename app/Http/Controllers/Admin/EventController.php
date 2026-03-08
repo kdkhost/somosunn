@@ -47,8 +47,13 @@ class EventController extends Controller
         $query = Event::where(function ($query) use ($start, $end) {
             $query->where('start_at', '<', $end)
                 ->where(function ($q) use ($start) {
-                    $q->where('end_at', '>', $start)
-                        ->orWhereNull('end_at');
+                    $q->where(function ($rangeQuery) use ($start) {
+                        $rangeQuery->whereNotNull('end_at')
+                            ->where('end_at', '>', $start);
+                    })->orWhere(function ($singleDayQuery) use ($start) {
+                        $singleDayQuery->whereNull('end_at')
+                            ->where('start_at', '>=', $start);
+                    });
                 });
         });
 

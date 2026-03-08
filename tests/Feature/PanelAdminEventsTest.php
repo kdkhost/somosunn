@@ -174,6 +174,49 @@ class PanelAdminEventsTest extends TestCase
             ]);
     }
 
+    public function test_panel_admin_events_feed_excludes_past_single_day_events_outside_requested_range(): void
+    {
+        $user = User::create([
+            'name' => 'Admin de Calendario',
+            'email' => 'admin-calendario@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+        ]);
+
+        Event::create([
+            'user_id' => $user->id,
+            'title' => 'Evento antigo sem fim',
+            'start_at' => now()->subMonths(2),
+            'end_at' => null,
+            'published' => true,
+            'image' => 'event-images/antigo.png',
+        ]);
+
+        $currentEvent = Event::create([
+            'user_id' => $user->id,
+            'title' => 'Evento atual sem fim',
+            'start_at' => now()->addDays(3),
+            'end_at' => null,
+            'published' => true,
+            'image' => 'event-images/atual.png',
+        ]);
+
+        $start = now()->startOfMonth()->toIso8601String();
+        $end = now()->endOfMonth()->addMonth()->toIso8601String();
+
+        $this->withoutMiddleware()
+            ->actingAs($user)
+            ->getJson(route('panel.admin.events.feed', ['start' => $start, 'end' => $end]))
+            ->assertOk()
+            ->assertJsonFragment([
+                'id' => $currentEvent->id,
+                'title' => $currentEvent->title,
+            ])
+            ->assertJsonMissing([
+                'title' => 'Evento antigo sem fim',
+            ]);
+    }
+
     public function test_panel_admin_events_update_persists_event_data_from_new_form(): void
     {
         $user = User::create([

@@ -104,14 +104,16 @@
                         @foreach($events as $event)
                             @php
                                 $isEventClosed = method_exists($event, 'isClosedForPublic') && $event->isClosedForPublic();
-                                $eventDate = \Carbon\Carbon::parse($event->date);
+                                $eventDate = $event->start_at instanceof \Carbon\CarbonInterface
+                                    ? $event->start_at
+                                    : ($event->start_at ? \Carbon\Carbon::parse($event->start_at) : null);
                             @endphp
                             <article
                                 class="bg-white rounded-2xl p-5 border border-pink-100 flex flex-col shadow-sm relative transition-all duration-300 hover:shadow-md hover:border-pink-300">
                                 <div
                                     class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-center px-3 py-1.5 rounded-xl shadow-sm border border-pink-50">
-                                    <p class="text-xs font-bold text-pink-600 uppercase">{{ $eventDate->translatedFormat('M') }}</p>
-                                    <p class="text-xl font-black text-gray-900 leading-none">{{ $eventDate->format('d') }}</p>
+                                    <p class="text-xs font-bold text-pink-600 uppercase">{{ $eventDate ? $eventDate->translatedFormat('M') : '--' }}</p>
+                                    <p class="text-xl font-black text-gray-900 leading-none">{{ $eventDate ? $eventDate->format('d') : '--' }}</p>
                                 </div>
                                 @php
                                     $eventImage = $event->image 
@@ -127,7 +129,7 @@
                                     {{ Str::limit(strip_tags((string) ($event->description ?? '')), 80) }}</p>
 
                                 <div class="mt-auto">
-                                    @if($isEventClosed || $eventDate->isPast())
+                                    @if($isEventClosed)
                                         <span
                                             class="bg-slate-100 text-slate-500 px-4 py-2.5 rounded-xl font-bold w-full block text-center mt-3 cursor-not-allowed border border-slate-200">
                                             Evento Encerrado
