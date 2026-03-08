@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\GatewayAccount;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Exception;
 
 class MercadoPagoService
@@ -347,7 +348,19 @@ class MercadoPagoService
 
     private function orderDescription(Order $order): string
     {
-        return 'UNN - Pedido #' . $order->id;
+        $order->loadMissing('items');
+
+        $firstItemTitle = trim((string) optional($order->items->first())->title);
+        if ($firstItemTitle === '') {
+            return 'UNN - Pedido #' . $order->id;
+        }
+
+        $extraItems = max(0, $order->items->count() - 1);
+        $description = $extraItems > 0
+            ? $firstItemTitle . ' + ' . $extraItems . ' item(ns)'
+            : $firstItemTitle;
+
+        return Str::limit($description . ' - Pedido #' . $order->id, 240, '');
     }
 
     private function buildPreferenceData(Order $order, array $options = [], array $calc = []): array
@@ -472,7 +485,7 @@ class MercadoPagoService
         ];
     }
 
-    public function refundPayment(Order $order): array
+    public function refundPayment(Order $order, ?float $amount = null): array
     {
         if (!$order->transaction_id) {
             throw new Exception('ID da transação de pagamento não encontrado para este pedido.');
@@ -488,9 +501,14 @@ class MercadoPagoService
         $token = $config['token'];
         $paymentId = $order->transaction_id;
 
+        $payload = [];
+        if ($amount !== null) {
+            $payload['amount'] = round($amount, 2);
+        }
+
         $response = Http::withToken($token)
-            ->withHeaders(['X-Idempotency-Key' => 'refund-' . $paymentId . '-' . time()])
-            ->post("{$this->baseUrl}/v1/payments/{$paymentId}/refunds");
+            ->withHeaders($this->commonHeaders('refund-' . $paymentId))
+            ->post("{$this->baseUrl}/v1/payments/{$paymentId}/refunds", $payload);
 
         if ($response->failed()) {
             throw new Exception('Falha ao processar reembolso no MercadoPago: ' . $response->body());

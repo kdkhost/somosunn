@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Panel\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\OrderRefundService;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -36,35 +37,36 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $order->load(['user', 'items', 'invoice']);
+
         return view('panel.admin.orders.show', compact('order'));
     }
 
-    public function refund(Order $order)
+    public function refund(Request $request, Order $order, OrderRefundService $orderRefundService)
     {
-        if ($order->status !== 'paid') {
-            return back()->with('error', 'Apenas pedidos pagos podem ser reembolsados.');
-        }
-
         try {
-            if ($order->gateway === 'mercadopago') {
-                $service = new \App\Services\Payment\MercadoPagoService();
-                $service->refundPayment($order);
-            } elseif ($order->gateway === 'pagseguro') {
-                $service = new \App\Services\Payment\PagSeguroService();
-                $service->refundPayment($order);
-            } else {
-                return back()->with('error', 'Gateway não suportado para reembolso automático.');
-            }
+            $amount = $this->parseRefundAmount($request);
+            $order = $orderRefundService->refund($order, $amount);
 
-            $order->update([
-                'status' => 'refunded',
-                'refunded_at' => now()
-            ]);
-
-            return back()->with('success', 'Reembolso processado com sucesso.');
-
+            return back()->with('success', $order->is_fully_refunded
+                ? 'Estorno total processado com sucesso.'
+                : 'Estorno parcial processado com sucesso.');
         } catch (\Exception $e) {
             return back()->with('error', 'Erro ao processar reembolso: ' . $e->getMessage());
         }
+    }
+
+    private function parseRefundAmount(Request $request): ?float
+    {
+        $rawAmount = trim((string) $request->input('amount', ''));
+        if ($rawAmount === '') {
+            return null;
+        }
+
+        $normalizedAmount = str_replace(',', '.', $rawAmount);
+        if (!is_numeric($normalizedAmount)) {
+            throw new \InvalidArgumentException('Valor de estorno invalido.');
+        }
+
+        return round((float) $normalizedAmount, 2);
     }
 }

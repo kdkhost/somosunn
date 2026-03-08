@@ -70,8 +70,11 @@ class CheckoutTest extends TestCase
         ]);
 
         // Verifica envio do header de Integrator ID dinâmico
-        Http::assertSent(function (\Illuminate\Http\Client\Request $request) {
-            return $request->hasHeader('X-Integrator-Id', 'DEV_123');
+        Http::assertSent(function (\Illuminate\Http\Client\Request $request) use ($order) {
+            $payload = $request->data();
+
+            return $request->hasHeader('X-Integrator-Id', 'DEV_123')
+                && ($payload['description'] ?? null) === 'Test Course - Pedido #' . $order->id;
         });
 
         $this->assertTrue(true); // O assert foi feito pelo assertSent Acima
