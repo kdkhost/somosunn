@@ -266,6 +266,24 @@ class User extends Authenticatable
             ->exists();
     }
 
+    public function hasPendingConnectionWith($userId)
+    {
+        $targetUserId = (int) $userId;
+
+        return Connection::query()
+            ->where('status', 'pending')
+            ->where(function ($query) use ($targetUserId) {
+                $query->where(function ($pending) use ($targetUserId) {
+                    $pending->where('requester_id', $this->id)
+                        ->where('requested_id', $targetUserId);
+                })->orWhere(function ($pending) use ($targetUserId) {
+                    $pending->where('requester_id', $targetUserId)
+                        ->where('requested_id', $this->id);
+                });
+            })
+            ->first();
+    }
+
     public function courses()
     {
         try {

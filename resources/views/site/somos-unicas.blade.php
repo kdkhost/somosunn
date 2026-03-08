@@ -6,14 +6,23 @@
     <div class="min-h-screen bg-gradient-to-br from-pink-50 to-white pb-16">
         <!-- Hero Section -->
         <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
-            <div class="max-w-7xl mx-auto text-center">
-                <h1
-                    class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unicas-title-gradient">
-                    {{ $pageData['hero_title'] ?? 'Somos Únicas' }}
-                </h1>
-                <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                    {{ $pageData['hero_subtitle'] ?? 'Um espaço dedicado a mulheres empreendedoras. Acesse palestras, mentorias exclusivas, eventos e recursos focados no protagonismo feminino.' }}
-                </p>
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+                <div class="flex-1 text-center md:text-left">
+                    <h1
+                        class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unicas-title-gradient">
+                        {{ $pageData['hero_title'] ?? 'Somos Únicas' }}
+                    </h1>
+                    <div class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto md:mx-0 leading-relaxed summernote-content">
+                        {!! $pageData['hero_subtitle'] ?? 'Um espaço dedicado a mulheres empreendedoras. Acesse palestras, mentorias exclusivas, eventos e recursos focados no protagonismo feminino.' !!}
+                    </div>
+                </div>
+                @if(isset($pageData['hero_image']))
+                <div class="flex-1 flex justify-center">
+                    <img src="{{ asset('storage/' . $pageData['hero_image']) }}" 
+                         alt="{{ $pageData['hero_title'] ?? 'Somos Únicas' }}"
+                         class="rounded-3xl shadow-2xl max-h-[500px] object-cover border-4 border-white/50">
+                </div>
+                @endif
             </div>
         </section>
 
@@ -213,8 +222,8 @@
         :root {
             --unicas-theme-color: {{ $pageData['theme_color'] ?? '#db2777' }};
             --unicas-rosa-forte: var(--unicas-theme-color);
-            --unicas-rosa-medio: {{ $pageData['theme_color'] ?? '#ec4899' }};
-            --unicas-rosa-claro: {{ $pageData['theme_color'] ?? '#f472b6' }};
+            --unicas-rosa-medio: {{ $pageData['theme_color'] ?? '#db2777' }}ee;
+            --unicas-rosa-claro: {{ $pageData['theme_color'] ?? '#db2777' }}cc;
         }
 
         .unicas-title-gradient {
@@ -223,21 +232,23 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             color: transparent;
+            display: inline-block;
         }
 
         .btn-unicas {
-            background: linear-gradient(90deg, var(--unicas-rosa-forte) 0%, var(--unicas-rosa-medio) 100%);
-            box-shadow: 0 4px 14px 0 rgba(236, 72, 153, 0.39);
-            transition: transform 0.2s, box-shadow 0.2s;
+            background: linear-gradient(135deg, var(--unicas-rosa-forte) 0%, var(--unicas-rosa-medio) 100%);
+            box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
 
         .btn-unicas:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px 0 rgba(236, 72, 153, 0.5);
+            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.15);
+            filter: brightness(1.1);
         }
 
-        .btn-unicas:active {
-            transform: translateY(0);
+        .summernote-content p {
+            margin-bottom: 1rem;
         }
     </style>
 @endsection
