@@ -3,7 +3,7 @@
 @section('title', 'Somos Únicas - UNN')
 
 @section('content')
-    <div class="min-h-screen bg-gradient-to-br from-pink-50 to-white pb-16">
+    <div class="min-h-screen pb-16" style="background-color: {{ ($pageData['theme_color'] ?? '#db2777') }}08;">
         <!-- Hero Section -->
         <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
@@ -48,12 +48,14 @@
                                         class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Grátis</span>
                                 @endif
                                 @php
-                                    $courseImage = $course->thumbnail 
-                                        ? (Str::startsWith($course->thumbnail, ['http://', 'https://']) ? $course->thumbnail : asset('storage/'.$course->thumbnail)) 
+                                    $courseThum = $course->thumbnail;
+                                    $courseImage = $courseThum 
+                                        ? (Str::startsWith($courseThum, ['http://', 'https://']) ? $courseThum : asset('storage/'.$courseThum)) 
                                         : asset('img/placeholder-course.jpg');
                                 @endphp
                                 <img src="{{ $courseImage }}" alt="{{ $course->title }}"
-                                    class="w-full h-40 object-cover rounded-xl mb-4 border border-pink-50">
+                                    class="w-full h-40 object-cover rounded-xl mb-4 border border-pink-50"
+                                    onerror="this.onerror=null;this.src='{{ asset('img/placeholder-course.jpg') }}';">
                                 <h3 class="text-lg font-bold text-gray-900 mb-1 line-clamp-2">{{ $course->title }}</h3>
                                 <p class="text-xs text-pink-500 font-semibold mb-2">Por
                                     {{ $course->author_name ?? 'Especialista UNN' }}</p>

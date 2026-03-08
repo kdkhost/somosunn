@@ -3,7 +3,7 @@
 @section('title', 'Sobre a Comunidade Somos Únicas | UNN')
 
 @section('content')
-    <div class="bg-pink-50 min-h-screen pb-16">
+    <div class="min-h-screen pb-16" style="background-color: {{ ($pageData['theme_color'] ?? '#db2777') }}08;">
         {{-- Hero Section --}}
         <div class="relative bg-unicas-gradient text-white overflow-hidden">
             <div class="absolute inset-x-0 bottom-0 bg-white"
@@ -94,7 +94,7 @@
                 <div class="md:w-1/2">
                     <div class="relative">
                         <div class="absolute -inset-4 bg-unicas-main/10 rounded-3xl transform -rotate-2"></div>
-                        <img src="https://placehold.co/600x500/fdf2f8/{{ str_replace('#', '', ($pageData['theme_color'] ?? '#db2777')) }}?text=Networking+e+Apoio"
+                        <img src="https://placehold.co/600x500/{{ str_replace('#', '', ($pageData['theme_color'] ?? '#db2777')) }}11/{{ str_replace('#', '', ($pageData['theme_color'] ?? '#db2777')) }}?text=Networking+e+Apoio"
                             alt="Networking Feminino" class="relative rounded-2xl shadow-lg w-full object-cover">
                     </div>
                 </div>
