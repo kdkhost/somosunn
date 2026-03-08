@@ -227,8 +227,16 @@ class MailTemplateController extends Controller
             'mentorship' => ['title' => 'Mentoria Premium'],
             'abandoned_cart' => [
                 'link' => url('/checkout/recuperar/PED-12345'),
-                'items' => 'Curso de Laravel, Mentoria Elite'
-            ]
+                'items' => 'Curso de Networking, Mentoria Elite'
+            ],
+            // Variáveis de Candidatura (Jobs)
+            'owner_name' => 'Marcello Dono da Vaga',
+            'candidate' => 'João Candidato Silva',
+            'vacancy_title' => 'Desenvolvedor Full Stack PHP',
+            'company' => 'UNN Tecnologias',
+            'location' => 'Rio de Janeiro, RJ (Híbrido)',
+            'candidates_url' => url('/painel/admin/my-jobs/1/candidates'),
+            'name' => 'Usuário Exemplo'
         ];
     }
 

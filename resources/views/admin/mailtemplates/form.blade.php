@@ -84,7 +84,11 @@
                             ['{{event.date}}','Data do evento'],
                             ['{{event.link}}','Link do evento'],
                             ['{{course.title}}','Título do curso'],
-                            ['{{mentorship.title}}','Título da mentoria']
+                            ['{{mentorship.title}}','Título da mentoria'],
+                            ['{owner_name}', 'Nome do dono da vaga'],
+                            ['{candidate}', 'Nome do candidato'],
+                            ['{vacancy_title}', 'Título da vaga'],
+                            ['{candidates_url}', 'Link para ver candidatos']
                         ];
                     @endphp
                     <div class="row">
@@ -232,12 +236,16 @@ $(function(){
     renderPreview();
     $('#bodyEditor').on('summernote.change', renderPreview);
 
-    // Sincronizar editor antes de enviar via AJAX
-    $(document).on('submit', '.ajax-form', function() {
-        if ($('#bodyEditor').summernote('isEmpty')) {
-            $('#bodyEditor').val('');
-        } else {
-            $('#bodyEditor').val($('#bodyEditor').summernote('code'));
+    // Sincronizar editor ANTES da submissão AJAX global
+    $(document).on('submit', '.ajax-form', function(e) {
+        // Se este formulário contiver o editor Summernote, sincronizamos
+        const editor = $('#bodyEditor');
+        if (editor.length) {
+            if (editor.summernote('isEmpty')) {
+                editor.val('');
+            } else {
+                editor.val(editor.summernote('code'));
+            }
         }
     });
 });

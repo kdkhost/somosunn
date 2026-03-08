@@ -71,13 +71,13 @@ class SystemMailTemplateService
                     if (is_array($subValue)) {
                         continue;
                     }
-                    $pattern = '/\\{\\{\\s*' . preg_quote((string) $key . '.' . (string) $subKey, '/') . '\\s*\\}\\}/';
+                    $pattern = '/(?:\\{\\{|\\{)\\s*' . preg_quote((string) $key . '.' . (string) $subKey, '/') . '\\s*(?:\\}\\}|\\})/';
                     $rendered = preg_replace($pattern, (string) $subValue, $rendered);
                 }
                 continue;
             }
 
-            $pattern = '/\\{\\{\\s*' . preg_quote((string) $key, '/') . '\\s*\\}\\}/';
+            $pattern = '/(?:\\{\\{|\\{)\\s*' . preg_quote((string) $key, '/') . '\\s*(?:\\}\\}|\\})/';
             $rendered = preg_replace($pattern, (string) $value, $rendered);
         }
 
