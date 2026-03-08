@@ -702,7 +702,7 @@
                     ? leaders.map((leader) => `
                         <tr>
                             <td>${leader.name}</td>
-                            <td class="text-muted">C ${leader.curso} • E ${leader.evento} • M ${leader.mentoria}</td>
+                            <td class="text-muted">Cursos: ${leader.curso} • Eventos: ${leader.evento} • Mentorias: ${leader.mentoria}</td>
                             <td class="text-right font-weight-bold">${leader.total}</td>
                         </tr>
                     `).join('')
