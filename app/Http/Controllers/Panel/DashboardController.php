@@ -9,6 +9,7 @@ use App\Models\RedeemableItem;
 use App\Models\Redemption;
 use App\Models\User;
 use App\Services\DashboardMetricsService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 
@@ -18,10 +19,14 @@ class DashboardController extends Controller
     {
     }
 
-    public function stats()
+    public function stats(Request $request)
     {
+        if (!$request->expectsJson() && !$request->ajax() && !$request->wantsJson()) {
+            return redirect()->route('panel.dashboard');
+        }
+
         $user = Auth::user();
-        $payload = $user ? $this->metrics->panelStats($user, request()->boolean('fresh')) : ['plan' => null, 'stats' => [], 'sales_chart' => null];
+        $payload = $user ? $this->metrics->panelStats($user, $request->boolean('fresh')) : ['plan' => null, 'stats' => [], 'sales_chart' => null];
 
         return response()->json(['success' => true] + $payload);
     }

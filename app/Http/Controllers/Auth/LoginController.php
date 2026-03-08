@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Auth\Concerns\SanitizesIntendedRedirect;
 use App\Http\Controllers\Controller;
 use App\Services\PointsService;
 use Illuminate\Http\Request;
@@ -9,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
+    use SanitizesIntendedRedirect;
+
     public function authenticate(Request $request)
     {
         $credentials = $request->validate(['email'=>'required|email','password'=>'required']);
@@ -48,7 +51,7 @@ class LoginController extends Controller
                 ? route('panel.admin.dashboard')
                 : route('panel.dashboard');
 
-            return redirect()->intended($defaultRoute);
+            return $this->redirectToSafeIntended($request, $defaultRoute);
         }
         return back()->withErrors(['email' => 'Credenciais inválidas']);
     }

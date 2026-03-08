@@ -442,6 +442,13 @@
 @push('scripts')
     @include('partials.service-visits-realtime')
     <script>
+        const dashboardJsonFetchOptions = {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        };
+
         function renderOwnerVisitMetrics(visitMetrics) {
             if (!visitMetrics || !document.getElementById('owner-visit-radar')) {
                 return;
@@ -534,7 +541,7 @@
         }
 
         function updateDashboardWidgets() {
-            fetch('{{ route('panel.dashboard.stats') }}')
+            fetch('{{ route('panel.dashboard.stats') }}', dashboardJsonFetchOptions)
                 .then(r => r.json())
                 .then(data => {
                     if (data.success && data.stats) {
@@ -589,7 +596,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function updateSalesChart(chart) {
-            fetch('{{ route('panel.dashboard.stats') }}?chart=1')
+            fetch('{{ route('panel.dashboard.stats') }}?chart=1', dashboardJsonFetchOptions)
                 .then(r => r.json())
                 .then(data => {
                     if (data.success && data.sales_chart) {

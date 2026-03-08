@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Auth\Concerns\SanitizesIntendedRedirect;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use App\Models\Setting;
@@ -19,6 +20,8 @@ use Laravel\Socialite\Two\InvalidStateException;
 
 class SocialAuthController extends Controller
 {
+    use SanitizesIntendedRedirect;
+
     private array $providers = ['google', 'facebook', 'linkedin'];
 
     public function redirect(Request $request, string $provider, AffiliateTrackingService $tracking)
@@ -179,7 +182,10 @@ class SocialAuthController extends Controller
                     }
                     $this->trySaveSocialAvatar($existing, $socialUser->getAvatar());
                     Auth::login($existing, true);
-                    return redirect()->intended(route($existing->isAdmin() ? 'panel.admin.dashboard' : 'panel.dashboard'));
+                    return $this->redirectToSafeIntended(
+                        $request,
+                        route($existing->isAdmin() ? 'panel.admin.dashboard' : 'panel.dashboard')
+                    );
                 }
             }
             Log::error('Social login user save failed.', ['provider' => $provider, 'email' => $email, 'error' => $e->getMessage()]);
@@ -221,7 +227,7 @@ class SocialAuthController extends Controller
 
         $redirectRoute = $user->isAdmin() ? 'panel.admin.dashboard' : 'panel.dashboard';
 
-        return redirect()->intended(route($redirectRoute));
+        return $this->redirectToSafeIntended($request, route($redirectRoute));
     }
 
     private function resolveDefaultPlan(): ?Plan
