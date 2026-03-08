@@ -250,7 +250,7 @@ class EventReservationController extends Controller
                             'status' => EventRegistration::STATUS_CONFIRMED,
                             'price' => 0,
                             'quantity' => $quantity,
-                            'ticket_code' => clone $event->is_ticket_enabled ? Str::uuid()->toString() : null,
+                            'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
                         ]);
                     } else {
                         $registration->fill([
@@ -410,7 +410,7 @@ class EventReservationController extends Controller
                         'status' => EventRegistration::STATUS_PENDING,
                         'price' => $currentPrice,
                         'quantity' => $quantity,
-                        'ticket_code' => clone $event->is_ticket_enabled ? Str::uuid()->toString() : null,
+                        'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
                     ]);
                 } else {
                     $registration->fill([
