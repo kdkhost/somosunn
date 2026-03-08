@@ -95,10 +95,10 @@
                     <div class="relative">
                         <div class="absolute -inset-4 bg-unicas-main/10 rounded-3xl transform -rotate-2"></div>
                         @php
-                            $netImg = $pageData['networking_image'] ?? null;
-                            $networkingImageUrl = $netImg
-                                ? (Str::startsWith($netImg, ['http://', 'https://']) ? $netImg : asset('storage/' . $netImg))
-                                : "https://placehold.co/600x500/" . str_replace('#', '', ($pageData['theme_color'] ?? '#6d28d9')) . "11/" . str_replace('#', '', ($pageData['theme_color'] ?? '#6d28d9')) . "?text=Networking+e+Apoio";
+                            $networkingImage = $pageData['networking_image'] ?? null;
+                            $networkingImageUrl = $networkingImage
+                                ? (Str::startsWith($networkingImage, ['http://', 'https://']) ? $networkingImage : asset('storage/' . $networkingImage))
+                                : "https://placehold.co/600x500/4c1d95/ffffff?text=Networking+e+Apoio";
                         @endphp
                         <img src="{{ $networkingImageUrl }}" alt="Networking Feminino"
                             class="relative rounded-2xl shadow-lg w-full object-cover border-4 border-white">
