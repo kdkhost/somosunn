@@ -12,7 +12,7 @@ class SomosUnicasAboutController extends Controller
      */
     public function index()
     {
-        // Buscar conteúdo SEO se existir
+        // Buscar conteúdo SEO e dados dinâmicos da página
         $pageData = Page::dataBySlug('somos-unicas-sobre');
         return view('site.somos-unicas-about', compact('pageData'));
     }

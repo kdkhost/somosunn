@@ -370,6 +370,38 @@ class CmsPageCatalog
                     'seo_description' => 'Conecte-se com outros empreendedores, compartilhe experiências e cresça junto na comunidade UNN.',
                 ],
             ],
+            [
+                'slug' => 'somos-unicas',
+                'title' => 'Somos Únicas (Home)',
+                'data' => [
+                    'hero_title' => 'Somos Únicas',
+                    'hero_subtitle' => 'Um espaço dedicado a mulheres empreendedoras. Acesse palestras, mentorias exclusivas, eventos e recursos focados no protagonismo feminino.',
+                    'theme_color' => '#db2777',
+                    'courses_title' => 'Cursos & Capacitação',
+                    'courses_subtitle' => 'Aperfeiçoe suas habilidades',
+                    'events_title' => 'Eventos & Palestras',
+                    'events_subtitle' => 'Encontros especiais para mulheres incríveis',
+                    'mentorships_title' => 'Mentorias Exclusivas',
+                    'mentorships_subtitle' => 'Aconselhamento direto com grandes líderes',
+                    'empty_title' => 'Em breve!',
+                    'empty_description' => 'Estamos preparando conteúdos, eventos e mentorias incríveis exclusivamente para a área Somos Únicas. Volte logo para conferir as novidades.',
+                    'seo_title' => 'Somos Únicas - UNN',
+                    'seo_description' => 'Comunidade feminina de networking e crescimento empresarial.',
+                ],
+            ],
+            [
+                'slug' => 'somos-unicas-sobre',
+                'title' => 'Somos Únicas (Sobre)',
+                'data' => [
+                    'hero_title' => 'Nossa História & Missão',
+                    'hero_subtitle' => 'Conheça o movimento que está transformando o empreendedorismo feminino.',
+                    'theme_color' => '#db2777',
+                    'content_title' => 'Sobre o Projeto',
+                    'content_body' => 'O Somos Únicas nasceu da necessidade de criar um ambiente seguro e acelerador para mulheres. Aqui, compartilhamos não apenas negócios, mas as vivências que tornam cada jornada única.',
+                    'seo_title' => 'Sobre a Comunidade Somos Únicas | UNN',
+                    'seo_description' => 'Descubra a missão e os valores por trás do movimento Somos Únicas.',
+                ],
+            ],
         ];
     }
 

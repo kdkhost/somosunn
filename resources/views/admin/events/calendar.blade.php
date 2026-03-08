@@ -79,6 +79,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/timegrid/main.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs4.min.css">
     <style>
         .getError {
             color: #dc3545;
@@ -363,7 +364,8 @@
                         </div>
                         <div class="form-group">
                             <label>Descrição</label>
-                            <textarea class="form-control" name="description" id="description" rows="3"></textarea>
+                            <textarea class="form-control summernote" name="description" id="description"
+                                rows="3"></textarea>
                         </div>
 
                         <div class="form-group">
@@ -574,7 +576,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/timegrid/main.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/locales/pt-br.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-pt-BR.min.js"></script>
 
     <script>
         (function () {
@@ -682,6 +687,32 @@
                     }
                 });
                 calendar.render();
+
+                // Initialize Summernote for description on modal show
+                $(document).on('shown.bs.modal', '#eventModal', function () {
+                    const $desc = $('#description');
+                    if ($.fn.summernote && !$desc.next().hasClass('note-editor')) {
+                        $desc.summernote({
+                            height: 250,
+                            placeholder: 'Descreva os detalhes do evento...',
+                            toolbar: [
+                                ['style', ['bold', 'italic', 'underline', 'clear']],
+                                ['font', ['strikethrough', 'superscript', 'subscript']],
+                                ['fontsize', ['fontsize']],
+                                ['color', ['color']],
+                                ['para', ['ul', 'ol', 'paragraph']],
+                                ['insert', ['link', 'picture', 'video', 'table']],
+                                ['view', ['fullscreen', 'codeview', 'help']]
+                            ]
+                        });
+                    }
+                });
+
+                $(document).on('hidden.bs.modal', '#eventModal', function () {
+                    if ($.fn.summernote) {
+                        $('#description').summernote('destroy');
+                    }
+                });
 
                 // Recent events list
                 loadRecentEvents();

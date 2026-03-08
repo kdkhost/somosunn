@@ -9,11 +9,10 @@
             <div class="max-w-7xl mx-auto text-center">
                 <h1
                     class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unicas-title-gradient">
-                    Somos Únicas
+                    {{ $pageData['hero_title'] ?? 'Somos Únicas' }}
                 </h1>
                 <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                    Um espaço dedicado a mulheres empreendedoras. Acesse palestras, mentorias exclusivas, eventos e recursos
-                    focados no protagonismo feminino.
+                    {{ $pageData['hero_subtitle'] ?? 'Um espaço dedicado a mulheres empreendedoras. Acesse palestras, mentorias exclusivas, eventos e recursos focados no protagonismo feminino.' }}
                 </p>
             </div>
         </section>
@@ -24,8 +23,8 @@
                 <div class="max-w-7xl mx-auto">
                     <div class="flex justify-between items-center mb-6">
                         <div>
-                            <h2 class="text-2xl md:text-3xl font-black unicas-title-gradient">Cursos & Capacitação</h2>
-                            <p class="text-gray-500 text-sm md:text-base">Aperfeiçoe suas habilidades</p>
+                            <h2 class="text-2xl md:text-3xl font-black unicas-title-gradient">{{ $pageData['courses_title'] ?? 'Cursos & Capacitação' }}</h2>
+                            <p class="text-gray-500 text-sm md:text-base">{{ $pageData['courses_subtitle'] ?? 'Aperfeiçoe suas habilidades' }}</p>
                         </div>
                     </div>
                     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -84,8 +83,8 @@
                 <div class="max-w-7xl mx-auto">
                     <div class="flex justify-between items-center mb-6">
                         <div>
-                            <h2 class="text-2xl md:text-3xl font-black unicas-title-gradient">Eventos & Palestras</h2>
-                            <p class="text-gray-500 text-sm md:text-base">Encontros especiais para mulheres incríveis</p>
+                            <h2 class="text-2xl md:text-3xl font-black unicas-title-gradient">{{ $pageData['events_title'] ?? 'Eventos & Palestras' }}</h2>
+                            <p class="text-gray-500 text-sm md:text-base">{{ $pageData['events_subtitle'] ?? 'Encontros especiais para mulheres incríveis' }}</p>
                         </div>
                     </div>
                     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -140,8 +139,8 @@
                 <div class="max-w-7xl mx-auto">
                     <div class="flex justify-between items-center mb-6">
                         <div>
-                            <h2 class="text-2xl md:text-3xl font-black unicas-title-gradient">Mentorias Exclusivas</h2>
-                            <p class="text-gray-500 text-sm md:text-base">Aconselhamento direto com grandes líderes</p>
+                            <h2 class="text-2xl md:text-3xl font-black unicas-title-gradient">{{ $pageData['mentorships_title'] ?? 'Mentorias Exclusivas' }}</h2>
+                            <p class="text-gray-500 text-sm md:text-base">{{ $pageData['mentorships_subtitle'] ?? 'Aconselhamento direto com grandes líderes' }}</p>
                         </div>
                     </div>
 
@@ -201,10 +200,9 @@
                 <div class="w-24 h-24 mx-auto bg-pink-50 rounded-full flex items-center justify-center mb-6">
                     <i class="fas fa-spa text-4xl text-pink-300"></i>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">Em breve!</h3>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ $pageData['empty_title'] ?? 'Em breve!' }}</h3>
                 <p class="text-gray-500 max-w-lg mx-auto">
-                    Estamos preparando conteúdos, eventos e mentorias incríveis exclusivamente para a área Somos Únicas. Volte
-                    logo para conferir as novidades.
+                    {{ $pageData['empty_description'] ?? 'Estamos preparando conteúdos, eventos e mentorias incríveis exclusivamente para a área Somos Únicas.' }}
                 </p>
             </section>
         @endif
@@ -213,12 +211,10 @@
 
     <style>
         :root {
-            --unicas-rosa-forte: #db2777;
-            /* pink-600 */
-            --unicas-rosa-medio: #ec4899;
-            /* pink-500 */
-            --unicas-rosa-claro: #f472b6;
-            /* pink-400 */
+            --unicas-theme-color: {{ $pageData['theme_color'] ?? '#db2777' }};
+            --unicas-rosa-forte: var(--unicas-theme-color);
+            --unicas-rosa-medio: {{ $pageData['theme_color'] ?? '#ec4899' }};
+            --unicas-rosa-claro: {{ $pageData['theme_color'] ?? '#f472b6' }};
         }
 
         .unicas-title-gradient {

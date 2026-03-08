@@ -42,6 +42,8 @@ class SomosUnicasController extends Controller
             ->take(6)
             ->get();
 
-        return view('site.somos-unicas', compact('courses', 'events', 'mentorships'));
+        $pageData = \App\Models\Page::dataBySlug('somos-unicas');
+
+        return view('site.somos-unicas', compact('courses', 'events', 'mentorships', 'pageData'));
     }
 }
