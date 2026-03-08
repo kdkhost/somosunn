@@ -40,9 +40,16 @@ class DashboardController extends Controller
                 'balance' => $balance,
             ]);
         } catch (\Throwable $e) {
+            $message = $e->getMessage();
+
+            // Se for erro de permissão (403), exibe uma mensagem mais amigável
+            if (str_contains($message, '403') || str_contains(strtolower($message), 'forbidden')) {
+                $message = 'Acesso ao saldo restrito pelo Mercado Pago (Verifique permissões do token).';
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => $message,
                 'balance' => [
                     'total_amount' => 0,
                     'available_balance' => 0,
