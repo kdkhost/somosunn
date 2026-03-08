@@ -5,7 +5,7 @@
 @section('content')
     <div class="min-h-screen pb-16" style="background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 50%, #f5f3ff 100%);">
         {{-- Hero Section --}}
-        <div class="relative bg-unicas-gradient text-white overflow-hidden">
+        <div class="relative bg-unicas-gradient text-white overflow-hidden shadow-inner">
             <div class="absolute inset-x-0 bottom-0 bg-white"
                 style="height: 15%; clip-path: polygon(0 100%, 100% 0, 100% 100%);"></div>
             <div
@@ -94,8 +94,14 @@
                 <div class="md:w-1/2">
                     <div class="relative">
                         <div class="absolute -inset-4 bg-unicas-main/10 rounded-3xl transform -rotate-2"></div>
-                        <img src="https://placehold.co/600x500/{{ str_replace('#', '', ($pageData['theme_color'] ?? '#db2777')) }}11/{{ str_replace('#', '', ($pageData['theme_color'] ?? '#db2777')) }}?text=Networking+e+Apoio"
-                            alt="Networking Feminino" class="relative rounded-2xl shadow-lg w-full object-cover">
+                        @php
+                            $netImg = $pageData['networking_image'] ?? null;
+                            $networkingImageUrl = $netImg
+                                ? (Str::startsWith($netImg, ['http://', 'https://']) ? $netImg : asset('storage/' . $netImg))
+                                : "https://placehold.co/600x500/" . str_replace('#', '', ($pageData['theme_color'] ?? '#6d28d9')) . "11/" . str_replace('#', '', ($pageData['theme_color'] ?? '#6d28d9')) . "?text=Networking+e+Apoio";
+                        @endphp
+                        <img src="{{ $networkingImageUrl }}" alt="Networking Feminino"
+                            class="relative rounded-2xl shadow-lg w-full object-cover border-4 border-white">
                     </div>
                 </div>
                 <div class="md:w-1/2">
@@ -172,7 +178,7 @@
         }
 
         .bg-unicas-gradient {
-            background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%);
+            background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%);
         }
 
         .summernote-content p {
