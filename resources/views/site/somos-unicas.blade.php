@@ -16,9 +16,9 @@
                         {!! $pageData['hero_subtitle'] ?? 'Um espaço dedicado a mulheres empreendedoras. Acesse palestras, mentorias exclusivas, eventos e recursos focados no protagonismo feminino.' !!}
                     </div>
                 </div>
-                @if(isset($pageData['hero_image']))
+                @if(isset($pageData['hero_image']) && !empty($pageData['hero_image']))
                 <div class="flex-1 flex justify-center">
-                    <img src="{{ asset('storage/' . $pageData['hero_image']) }}" 
+                    <img src="{{ Str::startsWith($pageData['hero_image'], ['http://', 'https://']) ? $pageData['hero_image'] : asset('storage/' . $pageData['hero_image']) }}" 
                          alt="{{ $pageData['hero_title'] ?? 'Somos Únicas' }}"
                          class="rounded-3xl shadow-2xl max-h-[500px] object-cover border-4 border-white/50">
                 </div>

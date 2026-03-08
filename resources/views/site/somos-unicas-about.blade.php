@@ -27,8 +27,8 @@
                     </a>
                 </div>
                 <div class="md:w-1/2 flex justify-center">
-                    @if(isset($pageData['hero_image']))
-                        <img src="{{ asset('storage/' . $pageData['hero_image']) }}"
+                    @if(isset($pageData['hero_image']) && !empty($pageData['hero_image']))
+                        <img src="{{ Str::startsWith($pageData['hero_image'], ['http://', 'https://']) ? $pageData['hero_image'] : asset('storage/' . $pageData['hero_image']) }}"
                             alt="{{ $pageData['hero_title'] ?? 'Somos Únicas' }}"
                             class="rounded-3xl shadow-2xl transform rotate-3 hover:rotate-0 transition duration-500 max-h-[450px] object-cover border-4 border-white/30">
                     @else
