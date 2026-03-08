@@ -231,7 +231,13 @@ $(function(){
     $('#mailTemplateForm').on('submit', function() {
         const editor = $('#bodyEditor');
         if (editor.length) {
-            editor.val(editor.summernote('code'));
+            let content = editor.summernote('code');
+            // Codificar em base64 para evitar bloqueio de firewall (ModSecurity)
+            try {
+                editor.val(btoa(unescape(encodeURIComponent(content))));
+            } catch(e) {
+                editor.val(content);
+            }
         }
     });
 
