@@ -223,65 +223,167 @@
             }
 
             .swal2-popup.mp-event-popup {
-                width: min(540px, 92vw) !important;
-                border-radius: 18px !important;
-                padding: 1.25rem 1.25rem 1rem !important;
+                position: relative;
+                width: min(600px, 92vw) !important;
+                min-height: 360px;
+                border-radius: 28px !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+                background: #0f172a !important;
+                box-shadow: 0 28px 90px -28px rgba(15, 23, 42, 0.85) !important;
             }
 
-            .swal2-popup.mp-event-popup .swal2-title {
-                margin: 0 0 .5rem !important;
-                text-align: left !important;
-                font-size: 1.8rem !important;
-                line-height: 1.2 !important;
+            .swal2-popup.mp-event-popup::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background-image: var(--mp-event-popup-bg, linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%));
+                background-size: cover;
+                background-position: center;
+                transform: scale(1.04);
+            }
+
+            .swal2-popup.mp-event-popup::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background:
+                    linear-gradient(180deg, rgba(15, 23, 42, 0.18) 0%, rgba(15, 23, 42, 0.54) 38%, rgba(15, 23, 42, 0.88) 100%),
+                    linear-gradient(120deg, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.26) 48%, rgba(15, 23, 42, 0.7) 100%);
+            }
+
+            .swal2-popup.mp-event-popup .swal2-title,
+            .swal2-popup.mp-event-popup .swal2-icon {
+                display: none !important;
+            }
+
+            .swal2-popup.mp-event-popup .swal2-close {
+                position: absolute;
+                top: 14px;
+                right: 14px;
+                z-index: 4;
+                width: 42px;
+                height: 42px;
+                border-radius: 999px;
+                color: #fff !important;
+                background: rgba(15, 23, 42, 0.42) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                backdrop-filter: blur(10px);
             }
 
             .swal2-popup.mp-event-popup .swal2-html-container {
+                position: relative;
+                z-index: 2;
                 margin: 0 !important;
+                padding: 1.5rem 1.5rem 0 !important;
                 overflow: visible !important;
                 max-height: none !important;
             }
 
             .swal2-popup.mp-event-popup .swal2-actions {
-                margin-top: .9rem !important;
+                position: relative;
+                z-index: 2;
+                margin: 1rem 1.5rem 1.5rem !important;
                 justify-content: flex-start !important;
             }
 
             .swal2-popup.mp-event-popup .swal2-confirm {
-                border-radius: 12px !important;
-                font-weight: 800 !important;
+                min-width: 190px;
+                border-radius: 14px !important;
+                padding: .95rem 1.4rem !important;
+                font-weight: 900 !important;
                 letter-spacing: .02em !important;
+                box-shadow: 0 20px 40px -20px rgba(37, 99, 235, 0.75) !important;
             }
 
-            .mp-event-card {
+            .mp-event-popup-panel {
+                min-height: 280px;
                 display: flex;
-                align-items: center;
-                gap: .75rem;
+                flex-direction: column;
+                justify-content: flex-end;
                 text-align: left;
+                color: #fff;
             }
 
-            .mp-event-card img {
-                width: 56px;
-                height: 56px;
-                object-fit: cover;
-                border-radius: 12px;
-                border: 1px solid rgba(148, 163, 184, .35);
-                flex-shrink: 0;
+            .mp-event-popup-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: .5rem;
+                align-self: flex-start;
+                margin-bottom: auto;
+                padding: .55rem .95rem;
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.14);
+                border: 1px solid rgba(255, 255, 255, 0.18);
+                backdrop-filter: blur(10px);
+                font-size: .74rem;
+                font-weight: 900;
+                letter-spacing: .08em;
+                text-transform: uppercase;
             }
 
-            .mp-event-card-title {
+            .mp-event-popup-copy {
+                margin: 0 0 .8rem;
+                max-width: 26rem;
+                font-size: .98rem;
+                line-height: 1.55;
+                color: rgba(255, 255, 255, 0.82);
+            }
+
+            .mp-event-popup-title {
                 margin: 0;
-                font-size: 1.1rem;
-                font-weight: 800;
-                line-height: 1.2;
-                color: #1f2937;
+                font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+                font-weight: 900;
+                line-height: 1.02;
+                letter-spacing: -0.03em;
+                color: #fff;
+                text-wrap: balance;
                 word-break: break-word;
             }
 
-            .mp-event-card-date {
-                margin: .2rem 0 0;
-                font-size: .92rem;
-                color: #475569;
-                line-height: 1.2;
+            .mp-event-popup-meta {
+                display: flex;
+                flex-wrap: wrap;
+                gap: .65rem;
+                margin: 1rem 0 0;
+            }
+
+            .mp-event-popup-chip {
+                display: inline-flex;
+                align-items: center;
+                gap: .45rem;
+                padding: .65rem .95rem;
+                border-radius: 999px;
+                background: rgba(15, 23, 42, 0.42);
+                border: 1px solid rgba(255, 255, 255, 0.14);
+                backdrop-filter: blur(12px);
+                font-size: .9rem;
+                font-weight: 700;
+                color: #fff;
+            }
+
+            @media (max-width: 640px) {
+                .swal2-popup.mp-event-popup {
+                    min-height: 330px;
+                    width: min(92vw, 480px) !important;
+                }
+
+                .swal2-popup.mp-event-popup .swal2-html-container {
+                    padding: 1.1rem 1.1rem 0 !important;
+                }
+
+                .swal2-popup.mp-event-popup .swal2-actions {
+                    margin: .85rem 1.1rem 1.1rem !important;
+                }
+
+                .swal2-popup.mp-event-popup .swal2-confirm {
+                    width: 100%;
+                    min-width: 0;
+                }
+
+                .mp-event-popup-panel {
+                    min-height: 250px;
+                }
             }
         </style>
     @endpush
@@ -1819,21 +1921,17 @@
                     const popupEvento = window.Swal.mixin({
                         toast: false,
                         position: 'center',
-                        width: 540,
+                        width: 600,
                         heightAuto: false,
                         customClass: {
                             popup: 'mp-event-popup',
                         },
                         showConfirmButton: true,
-                        confirmButtonText: 'APROVEITAR',
+                        confirmButtonText: 'VER EVENTO',
                         confirmButtonColor: '#2563eb',
                         showCloseButton: true,
                         timer: 12000,
                         timerProgressBar: true,
-                        didOpen: (el) => {
-                            el.addEventListener('mouseenter', window.Swal.stopTimer);
-                            el.addEventListener('mouseleave', window.Swal.resumeTimer);
-                        },
                     });
 
                     let state = loadState();
@@ -1866,6 +1964,7 @@
                         const title = escapeHtml(ev.title || 'Novo evento');
                         const date = escapeHtml(ev.date || '');
                         const image = String(ev.image_url || '').trim();
+                        const popupBackground = image ? `url(${JSON.stringify(image)})` : 'linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%)';
 
                         shownIds.add(ev.id);
                         shownCount += 1;
@@ -1874,19 +1973,29 @@
                         saveState(state);
 
                         const html = `
-                            <div class="mp-event-card">
-                                ${image ? `<img src="${escapeHtml(image)}" alt="" />` : ''}
-                                <div style="min-width:0">
-                                    <p class="mp-event-card-title">${title}</p>
-                                    ${date ? `<p class="mp-event-card-date">Data: ${date}</p>` : ''}
+                            <div class="mp-event-popup-panel">
+                                <span class="mp-event-popup-badge">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Evento em destaque
+                                </span>
+                                <div>
+                                    <p class="mp-event-popup-copy">Uma nova oportunidade da comunidade UNN acabou de entrar na vitrine.</p>
+                                    <h3 class="mp-event-popup-title">${title}</h3>
+                                    <div class="mp-event-popup-meta">
+                                        ${date ? `<span class="mp-event-popup-chip"><i class="far fa-calendar"></i> ${date}</span>` : ''}
+                                        <span class="mp-event-popup-chip"><i class="fas fa-bolt"></i> Vagas abertas agora</span>
+                                    </div>
                                 </div>
                             </div>
                         `;
 
                         popupEvento.fire({
-                            icon: 'info',
-                            title: 'Novo evento na comunidade',
                             html,
+                            didOpen: (el) => {
+                                el.style.setProperty('--mp-event-popup-bg', popupBackground);
+                                el.addEventListener('mouseenter', window.Swal.stopTimer);
+                                el.addEventListener('mouseleave', window.Swal.resumeTimer);
+                            },
                         }).then((result) => {
                             if (result.isConfirmed && ev.url) {
                                 window.location.href = ev.url;
