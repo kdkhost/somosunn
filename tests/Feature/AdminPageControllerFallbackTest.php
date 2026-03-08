@@ -7,8 +7,10 @@ use App\Models\Page;
 use App\Support\CmsPageCatalog;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\TestCase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\ViewErrorBag;
 
 class AdminPageControllerFallbackTest extends TestCase
 {
@@ -92,10 +94,99 @@ class AdminPageControllerFallbackTest extends TestCase
         $view = app(PageController::class)->index();
         $data = $view->getData();
 
+        $expectedCount = count(CmsPageCatalog::definitions());
+
         $this->assertTrue($data['pageTableAvailable']);
-        $this->assertSame(13, Page::query()->count());
+        $this->assertSame($expectedCount, Page::query()->count());
         $this->assertNotNull(Page::query()->where('slug', 'premium')->first());
         $this->assertNotNull(Page::query()->where('slug', 'eventos')->first());
-        $this->assertCount(13, $data['pages']);
+        $this->assertCount($expectedCount, $data['pages']);
+    }
+
+    public function test_premium_editor_uses_top_level_field_names_expected_by_controller(): void
+    {
+        Schema::create('pages', function (Blueprint $table) {
+            $table->id();
+            $table->string('slug', 120)->unique();
+            $table->string('title', 255)->nullable();
+            $table->json('data')->nullable();
+            $table->timestamps();
+        });
+
+        $page = Page::query()->create([
+            'slug' => 'premium',
+            'title' => 'Planos Premium',
+            'data' => [
+                'hero_image' => 'pages/premium/hero-atual.jpg',
+            ],
+        ]);
+
+        $html = view('admin.pages.partials.premium', [
+            'data' => $page->data ?? [],
+            'errors' => new ViewErrorBag(),
+        ])->render();
+
+        $this->assertStringContainsString('name="hero_badge"', $html);
+        $this->assertStringContainsString('name="hero_title"', $html);
+        $this->assertStringContainsString('name="hero_subtitle"', $html);
+        $this->assertStringContainsString('name="hero_trust_1"', $html);
+        $this->assertStringContainsString('name="hero_trust_2"', $html);
+        $this->assertStringContainsString('name="hero_image"', $html);
+        $this->assertStringContainsString('name="remove_hero_image"', $html);
+        $this->assertStringContainsString('name="plans_title"', $html);
+        $this->assertStringContainsString('name="plans_subtitle"', $html);
+
+        $this->assertStringNotContainsString('name="data[hero_title]"', $html);
+        $this->assertStringNotContainsString("name='data[hero_title]'", $html);
+        $this->assertStringNotContainsString('name="images[hero_image]"', $html);
+        $this->assertStringNotContainsString('name="remove_image[hero_image]"', $html);
+    }
+
+    public function test_update_persists_premium_scalar_fields(): void
+    {
+        Schema::create('pages', function (Blueprint $table) {
+            $table->id();
+            $table->string('slug', 120)->unique();
+            $table->string('title', 255)->nullable();
+            $table->json('data')->nullable();
+            $table->timestamps();
+        });
+
+        $page = Page::query()->create([
+            'slug' => 'premium',
+            'title' => 'Planos Premium',
+            'data' => [],
+        ]);
+
+        $request = Request::create('/admin/pages/' . $page->id, 'PUT', [
+            'title' => 'Planos Premium Atualizados',
+            'hero_badge' => 'Associacao Premium',
+            'hero_title' => 'Novo titulo',
+            'hero_subtitle' => 'Novo subtitulo',
+            'hero_trust_1' => 'Sem fidelidade',
+            'hero_trust_2' => 'Cancele quando quiser',
+            'plans_title' => 'Escolha seu plano',
+            'plans_subtitle' => 'Invista no seu crescimento',
+            'seo_title' => 'SEO premium',
+            'seo_description' => 'Descricao premium',
+        ]);
+
+        $request->setLaravelSession(app('session.store'));
+
+        $response = app(PageController::class)->update($request, $page);
+
+        $page->refresh();
+
+        $this->assertSame('Planos Premium Atualizados', $page->title);
+        $this->assertSame('Associacao Premium', $page->data['hero_badge'] ?? null);
+        $this->assertSame('Novo titulo', $page->data['hero_title'] ?? null);
+        $this->assertSame('Novo subtitulo', $page->data['hero_subtitle'] ?? null);
+        $this->assertSame('Sem fidelidade', $page->data['hero_trust_1'] ?? null);
+        $this->assertSame('Cancele quando quiser', $page->data['hero_trust_2'] ?? null);
+        $this->assertSame('Escolha seu plano', $page->data['plans_title'] ?? null);
+        $this->assertSame('Invista no seu crescimento', $page->data['plans_subtitle'] ?? null);
+        $this->assertSame('SEO premium', $page->data['seo_title'] ?? null);
+        $this->assertSame('Descricao premium', $page->data['seo_description'] ?? null);
+        $this->assertSame(302, $response->getStatusCode());
     }
 }
