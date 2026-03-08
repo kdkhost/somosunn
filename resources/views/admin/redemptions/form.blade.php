@@ -8,8 +8,8 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card card-primary">
+        <div class="col-md-10 mx-auto">
+            <div class="card card-primary card-outline">
                 <div class="card-header">
                     <h3 class="card-title font-weight-bold"><i
                             class="fas fa-gift mr-2"></i>{{ $item->exists ? 'Editar' : 'Cadastrar' }} Item para Resgate</h3>
@@ -51,17 +51,21 @@
                                 rows="5">{{ old('description', $item->description) }}</textarea>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group mb-2">
                             <label for="image">Imagem do Item</label>
-                            @if($item->image)
-                                <div class="mb-2">
-                                    <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}"
-                                        class="img-thumbnail" style="max-height: 150px">
+                            <input type="hidden" name="remove_image" value="0">
+                            <div class="upload-box" data-max-size="5242880"
+                                data-existing-url="{{ $item->image ? asset('storage/' . $item->image) : '' }}"
+                                data-remove-input="[name='remove_image']">
+                                <input type="file" name="image" id="image" accept="image/*" class="d-none">
+                                <div class="upload-preview mb-2"></div>
+                                <div class="upload-meta text-muted"></div>
+                                <small class="text-muted upload-help"></small>
+                                <div class="progress upload-progress progress-sm d-none mt-2">
+                                    <div class="progress-bar bg-primary" style="width:0%"></div>
                                 </div>
-                            @endif
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="image" name="image">
-                                <label class="custom-file-label" for="image">Escolher imagem</label>
+                                <button type="button"
+                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
                             </div>
                         </div>
 
@@ -92,14 +96,11 @@
 @endpush
 
 @push('scripts')
-    <!-- bs-custom-file-input -->
-    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
     <!-- Summernote -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-pt-BR.min.js"></script>
     <script>
         $(function () {
-            bsCustomFileInput.init();
             $('.summernote').summernote({
                 height: 200,
                 lang: 'pt-BR',
