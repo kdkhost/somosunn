@@ -176,6 +176,12 @@
                         @php
                             $isRecommendedForFeature = in_array($plan->id, $recommendedPlanIds, true);
                             $periods = $planPriceData[$plan->id] ?? ['mensal' => (float)$plan->price];
+                            $planDescription = method_exists($plan, 'marketingDescription')
+                                ? $plan->marketingDescription()
+                                : (string) ($plan->description ?? '');
+                            $benefits = method_exists($plan, 'resolvedBenefits')
+                                ? $plan->resolvedBenefits()
+                                : (is_array($plan->benefits) ? $plan->benefits : (json_decode($plan->benefits ?? '[]', true) ?: []));
                         @endphp
 
                         <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg {{ $plan->highlight ? 'shadow-2xl ring-2 -mt-4' : '' }} relative"
@@ -206,14 +212,13 @@
                                 @endif
                             </div>
 
-                            @if($plan->description)
-                                <p class="text-gray-500 mb-6 text-sm">{{ $plan->description }}</p>
+                            @if($planDescription !== '')
+                                <p class="text-gray-500 mb-6 text-sm">{{ $planDescription }}</p>
                             @else
                                 <p class="text-gray-500 mb-6">&nbsp;</p>
                             @endif
 
                             <ul class="space-y-3 mb-8">
-                                @php $benefits = is_array($plan->benefits) ? $plan->benefits : json_decode($plan->benefits ?? '[]', true); @endphp
                                 @foreach($benefits as $benefit)
                                     <li class="flex items-center gap-3 text-gray-600 text-sm">
                                         <i class="fas fa-check text-green-500 flex-shrink-0"></i>

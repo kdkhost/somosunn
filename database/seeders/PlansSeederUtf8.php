@@ -16,17 +16,15 @@ class PlansSeederUtf8 extends Seeder
             'starter' => [
                 'name' => 'Starter',
                 'slug' => 'starter',
-                'description' => 'Entrada na comunidade: eventos gratuitos, cursos básicos e acesso ao ranking.',
+                'description' => Plan::DEFAULT_FREE_PLAN_DESCRIPTION,
                 'price' => 0,
                 'is_featured' => 0,
                 'billing_cycle' => 'monthly',
                 'prorata' => false,
+                'benefits' => Plan::DEFAULT_FREE_PLAN_BENEFITS,
                 'features' => [
                     'community',
-                    'courses',
-                    'events',
                     'rankings',
-                    'marketplace.buy',
                 ],
             ],
             'pro' => [
@@ -67,24 +65,25 @@ class PlansSeederUtf8 extends Seeder
             ],
         ];
 
-        foreach($plans as $slug => $plan){
+        foreach ($plans as $slug => $plan) {
             DB::table('plans')->updateOrInsert(
-                ['slug'=>$slug],
+                ['slug' => $slug],
                 [
-                    'name'=>$plan['name'],
-                    'slug'=>$plan['slug'],
-                    'price'=>$plan['price'],
-                    'description'=>$plan['description'],
-                    'is_featured'=>$plan['is_featured'],
-                    'billing_cycle'=>$plan['billing_cycle'],
-                    'prorata'=>$plan['prorata'],
-                    'permissions'=>json_encode(Plan::normalizeCommercialPermissions(
+                    'name' => $plan['name'],
+                    'slug' => $plan['slug'],
+                    'price' => $plan['price'],
+                    'description' => $plan['description'],
+                    'is_featured' => $plan['is_featured'],
+                    'billing_cycle' => $plan['billing_cycle'],
+                    'prorata' => $plan['prorata'],
+                    'benefits' => json_encode($plan['benefits'] ?? []),
+                    'permissions' => json_encode(Plan::normalizeCommercialPermissions(
                         $plan['features'] ?? [],
                         ((float) ($plan['price'] ?? 0)) <= 0,
                         (float) ($plan['price'] ?? 0)
                     )),
-                    'created_at'=>$now,
-                    'updated_at'=>$now
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ]
             );
         }

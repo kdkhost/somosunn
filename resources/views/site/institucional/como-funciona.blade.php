@@ -21,10 +21,10 @@
         <div class="max-w-5xl mx-auto">
             @php
                 $steps = $page->get('steps', [
-                    ['direction' => 'row',         'title' => 'Cadastre-se na Plataforma',      'text' => 'Crie sua conta gratuitamente e preencha seu perfil completo. Quanto mais informações você compartilhar, melhores serão as conexões que a plataforma irá sugerir para você.',                                  'li' => ['Cadastro rápido em menos de 2 minutos', 'Perfil personalizado com suas especialidades', 'Integração com LinkedIn']],
-                    ['direction' => 'row-reverse',  'title' => 'Conecte-se com Outros Membros', 'text' => 'Navegue pela comunidade, encontre empreendedores com interesses similares e inicie conversas. Nossa plataforma facilita o primeiro contato e incentiva conexões genuínas.',                                 'li' => ['Sistema de match inteligente', 'Chat integrado na plataforma', 'Grupos temáticos por setor']],
-                    ['direction' => 'row',         'title' => 'Participe de Eventos',           'text' => 'Compareça aos nossos eventos presenciais e online. Networking acontece de verdade quando olhamos nos olhos um do outro. Nossos eventos são cuidadosamente planejados para maximizar conexões.',            'li' => ['Eventos presenciais em todo Brasil', 'Webinars semanais com especialistas', 'Mentorias em grupo']],
-                    ['direction' => 'row-reverse',  'title' => 'Feche Negócios',                 'text' => 'Transforme conexões em parcerias e negócios reais. Membros da UNN já geraram mais de R$ 50 milhões em negócios entre si. Sua próxima grande oportunidade pode estar a uma conexão de distância.',        'li' => ['Sistema de indicações entre membros', 'Acompanhamento de deals fechados', 'Cases de sucesso da comunidade']],
+                    ['direction' => 'row', 'title' => 'Cadastre-se na Plataforma', 'text' => 'Crie sua conta gratuitamente e preencha seu perfil completo. Quanto mais informações você compartilhar, melhores serão as conexões que a plataforma irá sugerir para você.', 'li' => ['Cadastro rápido em menos de 2 minutos', 'Perfil personalizado com suas especialidades', 'Integração com LinkedIn']],
+                    ['direction' => 'row-reverse', 'title' => 'Conecte-se com Outros Membros', 'text' => 'Navegue pela comunidade, encontre empreendedores com interesses similares e inicie conversas. Nossa plataforma facilita o primeiro contato e incentiva conexões genuínas.', 'li' => ['Sistema de match inteligente', 'Chat integrado na plataforma', 'Grupos temáticos por setor']],
+                    ['direction' => 'row', 'title' => 'Participe de Eventos', 'text' => 'Compareça aos nossos eventos presenciais e online. Networking acontece de verdade quando olhamos nos olhos um do outro. Nossos eventos são cuidadosamente planejados para maximizar conexões.', 'li' => ['Eventos presenciais em todo Brasil', 'Webinars semanais com especialistas', 'Mentorias em grupo']],
+                    ['direction' => 'row-reverse', 'title' => 'Feche Negócios', 'text' => 'Transforme conexões em parcerias e negócios reais. Membros da UNN já geraram mais de R$ 50 milhões em negócios entre si. Sua próxima grande oportunidade pode estar a uma conexão de distância.', 'li' => ['Sistema de indicações entre membros', 'Acompanhamento de deals fechados', 'Cases de sucesso da comunidade']],
                 ]);
             @endphp
 
@@ -65,13 +65,16 @@
                     <p class="text-gray-500 mb-6">Para começar</p>
                     <ul class="text-left space-y-3 mb-8">
                         <li class="flex items-center gap-2 text-gray-600">
-                            <i class="fas fa-check text-green-500"></i> Perfil na comunidade
+                            <i class="fas fa-check text-green-500"></i> Acesso à comunidade do Somos UNN
                         </li>
                         <li class="flex items-center gap-2 text-gray-600">
-                            <i class="fas fa-check text-green-500"></i> Feed social
+                            <i class="fas fa-check text-green-500"></i> Participação nos eventos presenciais e gratuitos
                         </li>
                         <li class="flex items-center gap-2 text-gray-600">
-                            <i class="fas fa-check text-green-500"></i> 5 conexões/mês
+                            <i class="fas fa-check text-green-500"></i> Visualização do ranking de membros
+                        </li>
+                        <li class="flex items-center gap-2 text-gray-600">
+                            <i class="fas fa-check text-green-500"></i> Acesso aos cursos gratuitos
                         </li>
                     </ul>
                     <a href="{{ route('register') }}" class="block w-full py-3 border-2 rounded-xl font-semibold transition hover:bg-gray-100" style="border-color: var(--unn-azul-1); color: var(--unn-azul-1)">

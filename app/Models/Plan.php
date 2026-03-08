@@ -9,6 +9,20 @@ class Plan extends Model
 {
     use HasFactory;
 
+    public const DEFAULT_FREE_PLAN_PERMISSIONS = [
+        'community',
+        'rankings',
+    ];
+
+    public const DEFAULT_FREE_PLAN_BENEFITS = [
+        'Acesso à comunidade do Somos UNN',
+        'Participação nos eventos presenciais e gratuitos',
+        'Visualização do ranking de membros',
+        'Acesso aos cursos gratuitos',
+    ];
+
+    public const DEFAULT_FREE_PLAN_DESCRIPTION = 'Acesso à comunidade do Somos UNN, participação nos eventos presenciais e gratuitos, visualização do ranking de membros e acesso aos cursos gratuitos.';
+
     public const PAID_CREATOR_SELLER_FEATURES = [
         'courses',
         'courses.create',
@@ -27,6 +41,22 @@ class Plan extends Model
         'marketplace.buy',
         'marketplace.sales',
         'marketplace.sell',
+    ];
+
+    public const FREE_PLAN_RESTRICTED_FEATURES = [
+        'courses',
+        'courses_access',
+        'courses_lessons_access',
+        'courses.downloads',
+        'courses.certificates',
+        'events',
+        'events_access',
+        'events.recordings',
+        'events.vip',
+        'mentorships',
+        'mentorships_access',
+        'mentorships.group',
+        'mentorships.individual',
     ];
 
     protected $fillable = [
@@ -87,6 +117,35 @@ class Plan extends Model
         }
 
         return asset('storage/' . ltrim($path, '/'));
+    }
+
+    public function isFreeAccessPlan(): bool
+    {
+        return (bool) $this->is_free || (float) ($this->price ?? 0) <= 0;
+    }
+
+    public function marketingDescription(): string
+    {
+        if ($this->isFreeAccessPlan()) {
+            return self::DEFAULT_FREE_PLAN_DESCRIPTION;
+        }
+
+        return trim((string) ($this->description ?? ''));
+    }
+
+    public function resolvedBenefits(): array
+    {
+        if ($this->isFreeAccessPlan()) {
+            return self::DEFAULT_FREE_PLAN_BENEFITS;
+        }
+
+        $benefits = $this->benefits ?? [];
+
+        if (!is_array($benefits)) {
+            $benefits = [];
+        }
+
+        return array_values(array_filter($benefits, static fn ($value) => is_string($value) && trim($value) !== ''));
     }
 
     /**
@@ -242,7 +301,12 @@ class Plan extends Model
         $permissions = array_values(array_unique(array_filter($permissions, static fn ($value) => is_string($value) && trim($value) !== '')));
 
         if ($isFree || $price <= 0) {
-            return array_values(array_diff($permissions, self::PAID_CREATOR_SELLER_FEATURES));
+            $permissions = array_values(array_diff(
+                $permissions,
+                array_merge(self::PAID_CREATOR_SELLER_FEATURES, self::FREE_PLAN_RESTRICTED_FEATURES)
+            ));
+
+            return array_values(array_unique(array_merge($permissions, self::DEFAULT_FREE_PLAN_PERMISSIONS)));
         }
 
         return array_values(array_unique(array_merge($permissions, self::PAID_CREATOR_SELLER_FEATURES)));

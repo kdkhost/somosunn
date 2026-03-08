@@ -16,15 +16,15 @@ class PlansSeeder extends Seeder
             'starter' => [
                 'name' => 'Starter',
                 'slug' => 'starter',
-                'description' => 'Entrada na comunidade: eventos gratuitos, cursos básicos e acesso ao ranking.',
+                'description' => Plan::DEFAULT_FREE_PLAN_DESCRIPTION,
                 'price' => 0,
                 'is_featured' => 0,
                 'billing_cycle' => 'monthly',
                 'prorata' => false,
+                'benefits' => Plan::DEFAULT_FREE_PLAN_BENEFITS,
                 'features' => [
                     'community',
-                    'courses',
-                    'events',
+                    'rankings',
                 ],
             ],
             'pro' => [
@@ -72,6 +72,7 @@ class PlansSeeder extends Seeder
                     'is_featured'=>$plan['is_featured'],
                     'billing_cycle'=>$plan['billing_cycle'],
                     'prorata'=>$plan['prorata'],
+                    'benefits'=>json_encode($plan['benefits'] ?? []),
                     'permissions'=>json_encode(Plan::normalizeCommercialPermissions(
                         $plan['features'] ?? [],
                         ((float) ($plan['price'] ?? 0)) <= 0,

@@ -18,13 +18,19 @@ class PlanResource extends JsonResource
             'period' => $this->period,
             'billing_cycle' => $this->billing_cycle,
             'prorata' => (bool) $this->prorata,
-            'description' => $this->description,
+            'description' => method_exists($this->resource, 'marketingDescription')
+                ? $this->marketingDescription()
+                : $this->description,
             'image_url' => ApiMedia::url($this->image),
             'is_featured' => (bool) $this->is_featured,
             'highlight' => (bool) $this->highlight,
             'coupons_enabled' => (bool) $this->coupons_enabled,
-            'benefits' => $this->benefits,
-            'permissions' => $this->permissions,
+            'benefits' => method_exists($this->resource, 'resolvedBenefits')
+                ? $this->resolvedBenefits()
+                : $this->benefits,
+            'permissions' => method_exists($this->resource, 'resolvedPermissions')
+                ? $this->resolvedPermissions()
+                : $this->permissions,
             'comparison' => $this->comparison,
             'is_active' => (bool) $this->is_active,
             'created_at' => optional($this->created_at)->toIso8601String(),

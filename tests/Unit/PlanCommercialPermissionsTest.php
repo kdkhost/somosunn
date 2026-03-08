@@ -31,12 +31,20 @@ class PlanCommercialPermissionsTest extends TestCase
     {
         $permissions = Plan::normalizeCommercialPermissions([
             'community',
+            'courses',
+            'events',
+            'mentorships',
             'marketplace.sell',
             'events.create',
             'courses.certificates',
         ], true, 0);
 
-        $this->assertSame(['community'], $permissions);
+        $this->assertContains('community', $permissions);
+        $this->assertContains('rankings', $permissions);
+        $this->assertNotContains('courses', $permissions);
+        $this->assertNotContains('events', $permissions);
+        $this->assertNotContains('mentorships', $permissions);
+        $this->assertNotContains('marketplace.sell', $permissions);
     }
 
     public function test_free_plan_does_not_grant_runtime_access_to_commercial_features(): void
@@ -44,11 +52,28 @@ class PlanCommercialPermissionsTest extends TestCase
         $plan = new Plan([
             'price' => 0,
             'is_free' => true,
-            'permissions' => ['community', 'marketplace.sell', 'events.create'],
+            'permissions' => ['community', 'rankings', 'courses', 'events', 'marketplace.sell', 'events.create'],
         ]);
 
         $this->assertFalse($plan->hasFeature('marketplace.sell'));
         $this->assertFalse($plan->hasFeature('events.create'));
+        $this->assertFalse($plan->hasFeature('courses'));
+        $this->assertFalse($plan->hasFeature('courses_access'));
+        $this->assertFalse($plan->hasFeature('events'));
         $this->assertTrue($plan->hasFeature('community'));
+        $this->assertTrue($plan->hasFeature('rankings'));
+    }
+
+    public function test_free_plan_uses_canonical_benefits_and_description(): void
+    {
+        $plan = new Plan([
+            'price' => 0,
+            'is_free' => true,
+            'description' => 'Descricao antiga',
+            'benefits' => ['Beneficio antigo'],
+        ]);
+
+        $this->assertSame(Plan::DEFAULT_FREE_PLAN_DESCRIPTION, $plan->marketingDescription());
+        $this->assertSame(Plan::DEFAULT_FREE_PLAN_BENEFITS, $plan->resolvedBenefits());
     }
 }

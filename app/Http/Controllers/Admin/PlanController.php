@@ -60,7 +60,7 @@ class PlanController extends Controller
         'marketplace.sell' => 'Vender no marketplace',
 
         // Extras
-        'rankings' => 'Participar do ranking',
+        'rankings' => 'Visualizar ranking de membros',
         'support.priority' => 'Suporte prioritário',
         'early.access' => 'Acesso antecipado a novidades',
 
