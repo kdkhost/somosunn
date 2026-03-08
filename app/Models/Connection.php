@@ -56,4 +56,28 @@ class Connection extends Model
     {
         return $query->where('status', 'blocked');
     }
+
+    public static function getPendingBetween($userA, $userB)
+    {
+        return self::where('status', 'pending')
+            ->where(function ($q) use ($userA, $userB) {
+                $q->where(function ($sq) use ($userA, $userB) {
+                    $sq->where('requester_id', $userA)->where('requested_id', $userB);
+                })->orWhere(function ($sq) use ($userA, $userB) {
+                    $sq->where('requester_id', $userB)->where('requested_id', $userA);
+                });
+            })->first();
+    }
+
+    public static function isAcceptedBetween($userA, $userB)
+    {
+        return self::where('status', 'accepted')
+            ->where(function ($q) use ($userA, $userB) {
+                $q->where(function ($sq) use ($userA, $userB) {
+                    $sq->where('requester_id', $userA)->where('requested_id', $userB);
+                })->orWhere(function ($sq) use ($userA, $userB) {
+                    $sq->where('requester_id', $userB)->where('requested_id', $userA);
+                });
+            })->exists();
+    }
 }

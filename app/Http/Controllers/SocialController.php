@@ -298,8 +298,8 @@ class SocialController extends Controller
         // Or based on the Connection's hide_profile if we want that specifically per-connection?
         // Usually it's a global user setting.
         if (Auth::check() && Auth::id() !== $user->id) {
-            $connection = Auth::user()->hasPendingConnectionWith($user->id);
-            $isConnected = Auth::user()->isConnectedWith($user->id);
+            $connection = Connection::getPendingBetween(Auth::id(), $user->id);
+            $isConnected = Connection::isAcceptedBetween(Auth::id(), $user->id);
 
             // If user has a global setting to hide profile from non-friends
             $hideFromPublic = $user->hide_profile ?? false; // Assuming column in users
@@ -643,20 +643,20 @@ class SocialController extends Controller
 
         // Cria solicitação ao invés de postar diretamente (require consent)
         ShareRequest::create([
-            'post_id'      => $post->id,
+            'post_id' => $post->id,
             'from_user_id' => Auth::id(),
-            'to_user_id'   => $targetUserId,
-            'message'      => $message ?: null,
-            'status'       => 'pending',
-            'expires_at'   => now()->addDays(7),
+            'to_user_id' => $targetUserId,
+            'message' => $message ?: null,
+            'status' => 'pending',
+            'expires_at' => now()->addDays(7),
         ]);
 
         $targetUser = User::find($targetUserId);
         if ($targetUser) {
             $targetUser->notify(new \App\Notifications\AppNotification([
-                'message'      => Auth::user()->name . ' quer compartilhar uma publicação com você. Aprove ou recuse.',
-                'type'         => 'ShareRequest',
-                'action_url'   => route('social.share-requests.index'),
+                'message' => Auth::user()->name . ' quer compartilhar uma publicação com você. Aprove ou recuse.',
+                'type' => 'ShareRequest',
+                'action_url' => route('social.share-requests.index'),
                 'action_label' => 'Ver solicitações',
             ]));
         }
@@ -664,9 +664,9 @@ class SocialController extends Controller
         // Notificar o autor original
         if ($post->user_id && $post->user_id !== Auth::id()) {
             $post->user->notify(new \App\Notifications\AppNotification([
-                'message'      => Auth::user()->name . ' está compartilhando sua publicação com um amigo.',
-                'type'         => 'PostShared',
-                'action_url'   => route('social.feed'),
+                'message' => Auth::user()->name . ' está compartilhando sua publicação com um amigo.',
+                'type' => 'PostShared',
+                'action_url' => route('social.feed'),
                 'action_label' => 'Ver detalhes',
             ]));
         }
