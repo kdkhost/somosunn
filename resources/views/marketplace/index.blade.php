@@ -368,11 +368,19 @@
                 flex-direction: column;
                 background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 252, 0.98) 100%);
                 box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+                border-radius: 0 !important;
             }
 
             .mp-selling-media {
                 display: block;
                 width: 100%;
+                border-radius: 0 !important;
+                overflow: hidden;
+            }
+
+            .mp-selling-media img,
+            .mp-selling-media > div {
+                border-radius: 0 !important;
             }
 
             .mp-selling-header {
@@ -418,6 +426,12 @@
                 align-items: center;
                 justify-content: center;
                 text-align: center;
+                border-radius: 0 !important;
+            }
+
+            .mp-selling-card .rounded-2xl,
+            .mp-selling-card .rounded-3xl {
+                border-radius: 0 !important;
             }
 
             @media (max-width: 640px) {
