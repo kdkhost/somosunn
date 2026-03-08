@@ -39,7 +39,12 @@
                                     <span
                                         class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Grátis</span>
                                 @endif
-                                <img src="{{ $course->thumbnail ?? asset('img/course-default.png') }}" alt="{{ $course->title }}"
+                                @php
+                                    $courseImage = $course->thumbnail 
+                                        ? (Str::startsWith($course->thumbnail, ['http://', 'https://']) ? $course->thumbnail : asset('storage/'.$course->thumbnail)) 
+                                        : asset('img/placeholder-course.jpg');
+                                @endphp
+                                <img src="{{ $courseImage }}" alt="{{ $course->title }}"
                                     class="w-full h-40 object-cover rounded-xl mb-4 border border-pink-50">
                                 <h3 class="text-lg font-bold text-gray-900 mb-1 line-clamp-2">{{ $course->title }}</h3>
                                 <p class="text-xs text-pink-500 font-semibold mb-2">Por
@@ -96,7 +101,12 @@
                                     <p class="text-xs font-bold text-pink-600 uppercase">{{ $eventDate->translatedFormat('M') }}</p>
                                     <p class="text-xl font-black text-gray-900 leading-none">{{ $eventDate->format('d') }}</p>
                                 </div>
-                                <img src="{{ $event->thumbnail ?? asset('img/event-default.png') }}" alt="{{ $event->title }}"
+                                @php
+                                    $eventImage = $event->image 
+                                        ? (Str::startsWith($event->image, ['http://', 'https://']) ? $event->image : asset('storage/'.$event->image)) 
+                                        : asset('img/placeholder-event.jpg');
+                                @endphp
+                                <img src="{{ $eventImage }}" alt="{{ $event->title }}"
                                     class="w-full h-36 object-cover rounded-xl mb-4">
                                 <h3 class="text-lg font-bold text-gray-900 mb-1 line-clamp-2">{{ $event->title }}</h3>
                                 <p class="text-xs text-pink-500 font-semibold mb-2"><i class="fas fa-microphone-alt mr-1"></i>

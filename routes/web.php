@@ -107,13 +107,11 @@ Route::get('/run-migrations', function () {
 // Rota Temporária para criar conteúdo Demo (apagar depois)
 Route::get('/demo-somos-unicas', function () {
     try {
-        $admin = \App\Models\User::where('role', 'superadmin')->first() ?? \App\Models\User::first();
-        if (!$admin)
-            return "Nenhum usuário encontrado para ser o autor.";
+        $ownerId = auth()->check() ? auth()->id() : (\App\Models\User::where('role', 'superadmin')->first()->id ?? 1);
 
         // Palestra 1
         \App\Models\Event::create([
-            'user_id' => $admin->id,
+            'user_id' => $ownerId,
             'title' => 'Palestra: Protagonismo Feminino nos Negócios',
             'speaker' => 'Dra. Luiza Helena',
             'description' => '<p>Descubra como mulheres estão transformando o mercado corporativo e assumindo a linha de frente nos grandes negócios.</p>',
@@ -125,11 +123,12 @@ Route::get('/demo-somos-unicas', function () {
             'published' => true,
             'is_somos_unicas' => true,
             'color' => '#ec4899',
+            'image' => 'https://placehold.co/800x600/fdf2f8/ec4899?text=Protagonismo+Feminino',
         ]);
 
         // Palestra 2
         \App\Models\Event::create([
-            'user_id' => $admin->id,
+            'user_id' => $ownerId,
             'title' => 'Workshop: Liderança Feminina Na Prática',
             'speaker' => 'Camila Farani',
             'description' => '<p>Um workshop 100% focado em técnicas de negociação, networking e empoderamento feminino.</p>',
@@ -141,11 +140,12 @@ Route::get('/demo-somos-unicas', function () {
             'published' => true,
             'is_somos_unicas' => true,
             'color' => '#db2777',
+            'image' => 'https://placehold.co/800x600/fdf2f8/db2777?text=Lideranca+na+Pratica',
         ]);
 
         // Curso
         \App\Models\Course::create([
-            'user_id' => $admin->id,
+            'user_id' => $ownerId,
             'title' => 'Empreendedorismo Feminino de A a Z',
             'short_description' => 'Aprenda do zero como tirar sua ideia do papel e criar um negócio rentável.',
             'full_description' => '<p>Este curso abrange todos os passos para mulheres criarem negócios prósperos desde a ideação até as vendas avançadas.</p>',
@@ -153,18 +153,20 @@ Route::get('/demo-somos-unicas', function () {
             'author_name' => 'Equipe Somos Únicas',
             'status' => 'published',
             'is_somos_unicas' => true,
+            'thumbnail' => 'https://placehold.co/800x600/fce7f3/be185d?text=Empreendedorismo+A-Z',
         ]);
 
         // Mentoria
         \App\Models\Mentorship::create([
             'title' => 'Mentoria VIP: Decolando sua Carreira',
-            'mentor_id' => $admin->id,
+            'mentor_id' => $ownerId,
             'description' => '<p>Sessões individuais de mentoria exclusivas para mulheres buscando o próximo nível profissional.</p>',
             'price' => 997.00,
             'slots' => 10,
             'type' => 'online',
             'video_platform' => 'Zoom',
             'is_somos_unicas' => true,
+            'image' => 'https://placehold.co/800x600/fecdd3/e11d48?text=Mentoria+VIP',
         ]);
 
         return "<h1>Conteúdo Demo criado com sucesso!</h1><p><a href='/somos-unicas'>Clique aqui para ver a página Somos Únicas</a></p>";
