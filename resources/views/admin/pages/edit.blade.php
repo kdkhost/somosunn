@@ -22,7 +22,7 @@
         'portal' => 'portal',
         'premium' => 'premium',
         'feed' => 'social.feed',
-        'somos-unicas' => 'site.somos-unicas.index',
+        'somos-unicas' => 'somos-unicas',
         'somos-unicas-sobre' => 'site.somos-unicas.sobre',
     ];
     $siteUrl = isset($slugRoutes[$page->slug]) ? route($slugRoutes[$page->slug]) : null;
