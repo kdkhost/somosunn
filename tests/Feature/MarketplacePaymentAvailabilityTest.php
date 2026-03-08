@@ -227,4 +227,38 @@ class MarketplacePaymentAvailabilityTest extends TestCase
         $response->assertDontSee('Organizador indispon');
         $response->assertDontSee('Pagamento indispon');
     }
+
+    public function test_marketplace_keeps_future_event_buy_action_enabled_even_when_organizer_has_no_sell_permission(): void
+    {
+        $seller = User::create([
+            'name' => 'Organizador sem permissao',
+            'email' => 'organizador-sem-permissao@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'member',
+            'level' => 'iniciante',
+        ]);
+
+        GatewayAccount::create([
+            'user_id' => $seller->id,
+            'provider' => 'pagseguro',
+            'access_token' => 'PAGSEGURO-TOKEN-456',
+            'enabled' => true,
+        ]);
+
+        $event = Event::create([
+            'user_id' => $seller->id,
+            'title' => 'Evento com organizador sem permissao',
+            'description' => 'Evento publicado e com gateway configurado',
+            'start_at' => now()->addDays(5)->setTime(18, 0),
+            'published' => true,
+            'price' => 120,
+        ]);
+
+        $response = $this->get(route('marketplace.index'));
+
+        $response->assertOk();
+        $response->assertSee('Evento com organizador sem permissao');
+        $response->assertSee(route('events.checkout', $event), false);
+        $response->assertDontSee('Organizador indispon');
+    }
 }

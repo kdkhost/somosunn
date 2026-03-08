@@ -68,9 +68,27 @@ class MercadoPagoService
             $preferenceData['marketplace_fee'] = $calc['application_fee'];
         }
 
+        $headers = $this->commonHeaders('pref-' . $order->id);
+
         $response = Http::withToken($token)
-            ->withHeaders($this->commonHeaders('pref-' . $order->id))
+            ->withHeaders($headers)
             ->post("{$this->baseUrl}/checkout/preferences", $preferenceData);
+
+        if ($this->shouldRetryWithoutPolicyHeaders($response, $headers)) {
+            $fallbackHeaders = $this->stripPolicyHeaders($headers);
+
+            \Log::warning('MercadoPago Preference Error - retry sem headers opcionais', [
+                'order_id' => $order->id,
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'had_integrator_id' => array_key_exists('X-Integrator-Id', $headers),
+                'had_platform_id' => array_key_exists('X-Platform-Id', $headers),
+            ]);
+
+            $response = Http::withToken($token)
+                ->withHeaders($fallbackHeaders)
+                ->post("{$this->baseUrl}/checkout/preferences", $preferenceData);
+        }
 
         if ($response->failed()) {
             \Log::error('MercadoPago Preference Error', [
@@ -665,6 +683,33 @@ class MercadoPagoService
     private function calculateApplicationFee(Order $order): ?float
     {
         return null;
+    }
+
+    private function shouldRetryWithoutPolicyHeaders($response, array $headers): bool
+    {
+        if ($response->status() !== 403) {
+            return false;
+        }
+
+        if (!array_key_exists('X-Integrator-Id', $headers) && !array_key_exists('X-Platform-Id', $headers)) {
+            return false;
+        }
+
+        $body = (string) $response->body();
+        $code = (string) ($response->json('code') ?? '');
+        $message = (string) ($response->json('message') ?? '');
+
+        return str_contains($body, 'PA_UNAUTHORIZED_RESULT_FROM_POLICIES')
+            || str_contains($body, 'PolicyAgent')
+            || str_contains($code, 'PA_UNAUTHORIZED_RESULT_FROM_POLICIES')
+            || str_contains($message, 'UNAUTHORIZED');
+    }
+
+    private function stripPolicyHeaders(array $headers): array
+    {
+        unset($headers['X-Integrator-Id'], $headers['X-Platform-Id']);
+
+        return $headers;
     }
 
     /**

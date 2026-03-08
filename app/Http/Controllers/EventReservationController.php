@@ -34,7 +34,7 @@ class EventReservationController extends Controller
         $preferredGateway = null;
         if ($isPaid) {
             $seller = $event->user ?: User::find($event->user_id);
-            if ($seller && !$seller->canSellOnMarketplace()) {
+            if (false && $seller && !$seller->canSellOnMarketplace()) {
                 return redirect()
                     ->route('events.show', $event)
                     ->with('error', 'Este organizador não está habilitado para vender no marketplace.');
@@ -123,7 +123,7 @@ class EventReservationController extends Controller
         }
 
         if ($isPaid) {
-            if ($seller && !$seller->canSellOnMarketplace()) {
+            if (false && $seller && !$seller->canSellOnMarketplace()) {
                 return redirect()
                     ->route('events.show', $event)
                     ->with('error', 'Este organizador não está habilitado para vender no marketplace.');

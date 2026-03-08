@@ -1312,6 +1312,10 @@
                             $disabledBuyLabel = !$organizerAvailable
                                 ? 'Organizador indisponivel'
                                 : (!$sellerPaymentsEnabled ? 'Pagamento indisponivel' : 'Indisponivel');
+                            $buyEnabled = !$isEventClosed && ($price <= 0 ? true : ($canBuy && $sellerPaymentsEnabled));
+                            $disabledBuyLabel = !$isEventClosed && !$sellerPaymentsEnabled
+                                ? 'Pagamento indisponivel'
+                                : 'Encerrado';
                             $sellerName = optional($event->user)->name ?? 'Organizador';
                             $shareCode = \App\Support\ShortLink::encodeProduct('event', (int) $event->id);
                             $shareUrl = $shareCode ? route('share.product', ['code' => $shareCode]) : '';
