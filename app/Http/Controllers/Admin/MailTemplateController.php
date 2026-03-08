@@ -9,6 +9,7 @@ use App\Http\Controllers\MailTestController;
 use App\Services\Mail\SystemMailLayoutData;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
+use App\Services\Mail\SystemMailTemplateService;
 
 class MailTemplateController extends Controller
 {

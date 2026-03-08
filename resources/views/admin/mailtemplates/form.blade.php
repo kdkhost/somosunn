@@ -148,7 +148,7 @@ $(function(){
                 allowOutsideClick: () => !Swal.isLoading(),
                 preConfirm: (value) => {
                     const email = (value || '').toString().trim();
-                    const isValid = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
+                    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
                     if (!isValid) {
                         Swal.showValidationMessage('Informe um e-mail válido.');
                         return false;
