@@ -1825,6 +1825,9 @@
     <!-- Toastr JS -->
     <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
     <script>
+        @php
+            $suppressFlashErrorToast = (bool) ($suppressFlashErrorToast ?? false);
+        @endphp
         toastr.options = { positionClass: 'toast-top-right', timeOut: 4000, progressBar: true };
         @if(session('success'))
             toastr.success(@json(session('success')));
@@ -1832,7 +1835,7 @@
         @if(session('status'))
             toastr.success(@json(session('status')));
         @endif
-        @if(session('error'))
+        @if(session('error') && !$suppressFlashErrorToast)
             toastr.error(@json(session('error')));
         @endif
         @if(session('warning'))

@@ -4,6 +4,7 @@
 
 @section('content')
     @php
+        $suppressFlashErrorToast = true;
         $isDemo = $event->is_demo ?? false;
         $startDate = is_string($event->start_at) ? \Carbon\Carbon::parse($event->start_at) : $event->start_at;
         $endDate = null;
