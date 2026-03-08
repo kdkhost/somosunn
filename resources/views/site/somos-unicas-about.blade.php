@@ -162,10 +162,17 @@
                 1a !important;
         }
 
+        .unicas-title-gradient {
+            background: linear-gradient(90deg, #6d28d9 0%, #7c3aed 60%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
         .bg-unicas-gradient {
-            background: linear-gradient(135deg, var(--unicas-main) 0%,
-                    {{ ($pageData['theme_color'] ?? '#db2777') }}
-                    dd 100%);
+            background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%);
         }
 
         .summernote-content p {
