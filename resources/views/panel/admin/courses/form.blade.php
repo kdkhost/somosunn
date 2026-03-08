@@ -237,6 +237,14 @@
                                 </select>
                             </div>
 
+                            <div class="pt-4 border-t border-slate-50 dark:border-slate-800">
+                                @include('panel.admin.partials.content-visibility-selector', [
+                                    'selected' => $course->visibility ?: ($course->is_somos_unicas ? 'somos_unicas' : 'ambos'),
+                                    'title' => 'Onde vender',
+                                    'description' => 'Defina se este curso aparece na UNN, no Somos Unnicas ou nos dois ambientes.',
+                                ])
+                            </div>
+
                             <div class="space-y-4 pt-4 border-t border-slate-50 dark:border-slate-800">
                                 <label
                                     class="flex items-center justify-between cursor-pointer group p-3 rounded-2xl border border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30">

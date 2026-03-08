@@ -100,6 +100,8 @@ class PanelAdminEventsTest extends TestCase
             $table->boolean('all_day')->default(false);
             $table->boolean('is_certificate_enabled')->default(false);
             $table->json('certificate_settings')->nullable();
+            $table->boolean('is_somos_unicas')->default(false);
+            $table->string('visibility')->default('ambos');
             $table->timestamps();
         });
     }

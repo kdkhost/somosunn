@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Panel\Admin;
 
+use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Mentorship;
 use App\Models\User;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Schema;
 
 class MentorshipController extends Controller
 {
+    use ManagesContentVisibility;
+
     public function index(Request $request)
     {
         $this->ensurePermission('mentorships.view');
@@ -54,6 +57,7 @@ class MentorshipController extends Controller
         $data['mentor_id'] = $this->resolveMentorId($request, $data['mentor_id'] ?? null);
         $data['schedule'] = $this->parseSchedule($request->input('schedule_json'));
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+        $data = $this->applyVisibilityData($request, $data);
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -100,6 +104,12 @@ class MentorshipController extends Controller
         $data['mentor_id'] = $this->resolveMentorId($request, $data['mentor_id'] ?? null);
         $data['schedule'] = $this->parseSchedule($request->input('schedule_json'));
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+        $data = $this->applyVisibilityData(
+            $request,
+            $data,
+            $mentorship->visibility,
+            (bool) $mentorship->is_somos_unicas
+        );
 
         if ($request->boolean('remove_image')) {
             $this->deletePublicImageIfExists($mentorship->image);
@@ -150,6 +160,7 @@ class MentorshipController extends Controller
             'video_platform' => 'nullable|string|max:255',
             'video_link' => 'nullable|string|max:2000',
             'demo_link' => 'nullable|string|max:2000',
+            'visibility' => $this->visibilityRule(),
         ]);
     }
 

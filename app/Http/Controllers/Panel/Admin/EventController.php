@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Panel\Admin;
 
+use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
+    use ManagesContentVisibility;
+
     public function index(Request $request)
     {
         $this->ensurePermission('events.view');
@@ -108,6 +111,7 @@ class EventController extends Controller
         $data['all_day'] = $request->boolean('all_day');
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         $data['user_id'] = Auth::id();
+        $data = $this->applyVisibilityData($request, $data);
 
         Event::create($data);
 
@@ -140,6 +144,12 @@ class EventController extends Controller
         $data['published'] = $request->boolean('published');
         $data['all_day'] = $request->boolean('all_day');
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+        $data = $this->applyVisibilityData(
+            $request,
+            $data,
+            $event->visibility,
+            (bool) $event->is_somos_unicas
+        );
 
         $event->update($data);
 
@@ -219,6 +229,7 @@ class EventController extends Controller
             'published' => 'nullable|boolean',
             'all_day' => 'nullable|boolean',
             'is_certificate_enabled' => 'nullable|boolean',
+            'visibility' => $this->visibilityRule(),
             'certificate_settings' => 'nullable|json',
         ]);
     }

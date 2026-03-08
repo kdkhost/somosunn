@@ -139,6 +139,15 @@
                             @endforeach
                         </select>
                     </div>
+
+                    <div
+                        class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
+                        @include('panel.admin.partials.content-visibility-selector', [
+                            'selected' => $mentorship->visibility ?: ($mentorship->is_somos_unicas ? 'somos_unicas' : 'ambos'),
+                            'title' => 'Onde vender',
+                            'description' => 'Defina se esta mentoria aparece na UNN, no Somos Unnicas ou nos dois ambientes.',
+                        ])
+                    </div>
                 </div>
             </div>
 

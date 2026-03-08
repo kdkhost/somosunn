@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Panel\Admin;
 
+use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\User;
@@ -16,6 +17,8 @@ use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
+    use ManagesContentVisibility;
+
     /**
      * Display a listing of courses.
      */
@@ -84,6 +87,7 @@ class CourseController extends Controller
         // Legacy support
         $data['published'] = ($data['status'] === 'published');
         $data['user_id'] = Auth::id();
+        $data = $this->applyVisibilityData($request, $data);
         if (Schema::hasColumn('courses', 'created_by')) {
             $data['created_by'] = Auth::id();
         }
@@ -138,6 +142,12 @@ class CourseController extends Controller
 
         // Legacy support
         $data['published'] = ($data['status'] === 'published');
+        $data = $this->applyVisibilityData(
+            $request,
+            $data,
+            $course->visibility,
+            (bool) $course->is_somos_unicas
+        );
         if (Schema::hasColumn('courses', 'created_by') && empty($course->created_by)) {
             $data['created_by'] = Auth::id();
         }
@@ -209,6 +219,7 @@ class CourseController extends Controller
             'flash_sale_ends_at' => 'nullable|date',
             'author_name' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published,archived,paused',
+            'visibility' => $this->visibilityRule(),
             'video_floating_width' => 'nullable|integer|min:260|max:960',
             'video_floating_height' => 'nullable|integer|min:160|max:720',
             'certificate_settings' => 'nullable|json',
