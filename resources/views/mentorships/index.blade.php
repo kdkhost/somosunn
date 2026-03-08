@@ -48,11 +48,35 @@
             border-color: rgba(59, 130, 246, 0.35);
         }
 
+        .mentorship-media {
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+        }
+
+        .mentorship-media img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .mentorship-card-body {
+            min-width: 0;
+        }
+
+        .mentorship-card-header {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 1rem;
+            align-items: start;
+        }
+
         .mentorship-title {
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            word-break: break-word;
         }
 
         .mentorship-excerpt {
@@ -90,6 +114,23 @@
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             padding: 0.9rem;
+        }
+
+        .mentorship-actions {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.75rem;
+        }
+
+        .mentorship-actions>* {
+            width: 100%;
+            min-width: 0;
+        }
+
+        @media (min-width: 1400px) {
+            .mentorship-actions {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
     </style>
 @endpush
@@ -183,11 +224,11 @@
                                         <img src="{{ $mentorshipImageUrl }}" alt="{{ $mentorship->title ?? 'Mentoria' }}">
                                     @endif
                                 </div>
-                                <div class="p-8 flex flex-col h-full">
-                                    <div class="flex items-start justify-between gap-4">
-                                        <div>
+                                <div class="mentorship-card-body p-6 md:p-8 flex flex-col h-full">
+                                    <div class="mentorship-card-header">
+                                        <div class="min-w-0">
                                             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">{{ $mentorName }}</p>
-                                            <h3 class="mt-2 text-xl font-black text-slate-900 leading-tight">
+                                            <h3 class="mentorship-title mt-2 text-xl font-black text-slate-900 leading-tight">
                                                 {{ $mentorship->title ?? 'Mentoria' }}
                                             </h3>
                                         </div>
@@ -220,7 +261,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="mt-auto pt-6 flex flex-col sm:flex-row gap-3">
+                                    <div class="mentorship-actions mt-auto pt-6">
                                         @if($isClosed)
                                             <span
                                                 class="px-8 py-4 rounded-xl font-bold border-2 border-slate-100 bg-slate-50 text-slate-400 inline-flex items-center justify-center cursor-not-allowed">
@@ -232,17 +273,17 @@
                                             </span>
                                         @else
                                             <a href="{{ $showUrl }}"
-                                                class="px-8 py-4 rounded-xl font-bold border-2 border-slate-100 text-slate-600 hover:bg-slate-50 transition-all duration-300 inline-flex items-center justify-center">
+                                                class="px-6 py-4 rounded-xl font-bold border-2 border-slate-100 text-slate-600 hover:bg-slate-50 transition-all duration-300 inline-flex items-center justify-center text-center">
                                                 Saiba mais
                                             </a>
                                             @if($price > 0)
                                                 <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
-                                                    class="btn-primary text-white px-8 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_12px_24px_-8px_rgba(31,94,219,0.35)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
+                                                    class="btn-primary text-white px-6 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_12px_24px_-8px_rgba(31,94,219,0.35)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 text-center">
                                                     Comprar <i class="fas fa-lock"></i>
                                                 </a>
                                             @else
                                                 <a href="{{ $showUrl }}"
-                                                    class="btn-primary text-white px-8 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_12px_24px_-8px_rgba(31,94,219,0.35)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
+                                                    class="btn-primary text-white px-6 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-[0_12px_24px_-8px_rgba(31,94,219,0.35)] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 text-center">
                                                     Acessar <i class="fas fa-play"></i>
                                                 </a>
                                             @endif
