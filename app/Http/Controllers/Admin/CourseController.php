@@ -110,6 +110,7 @@ class CourseController extends Controller
             'period' => 'nullable|string|max:50',
             'billing_cycle' => 'nullable|integer|min:1',
             'is_somos_unicas' => 'nullable|boolean',
+            'visibility' => 'nullable|string|in:ambos,somos_unn,somos_unicas',
         ]);
 
         $data['is_featured'] = $request->has('is_featured');
@@ -206,6 +207,7 @@ class CourseController extends Controller
             'period' => 'nullable|string|max:50',
             'billing_cycle' => 'nullable|integer|min:1',
             'is_somos_unicas' => 'nullable|boolean',
+            'visibility' => 'nullable|string|in:ambos,somos_unn,somos_unicas',
         ]);
 
         $data['is_featured'] = $request->has('is_featured');

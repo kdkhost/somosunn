@@ -19,7 +19,10 @@ class MarketplaceController extends Controller
         $q = trim((string) $request->query('q', ''));
 
         $coursesQuery = Course::with('creator')
-            ->whereIn('status', $publicStatuses);
+            ->whereIn('status', $publicStatuses)
+            ->where(function ($query) {
+                $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
+            });
 
         if ($q !== '') {
             $coursesQuery->where(function ($query) use ($q) {
@@ -34,7 +37,10 @@ class MarketplaceController extends Controller
             ->limit(12)
             ->get();
 
-        $mentorshipsQuery = Mentorship::with('mentor');
+        $mentorshipsQuery = Mentorship::with('mentor')
+            ->where(function ($query) {
+                $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
+            });
 
         if ($q !== '') {
             $mentorshipsQuery->where(function ($query) use ($q) {
@@ -47,13 +53,16 @@ class MarketplaceController extends Controller
             ->orderByDesc('id')
             ->limit(36)
             ->get()
-            ->filter(fn (Mentorship $mentorship) => $mentorship->hasPublicAction())
+            ->filter(fn(Mentorship $mentorship) => $mentorship->hasPublicAction())
             ->take(12)
             ->values();
 
         $eventsQuery = Event::query()
             ->with('user')
             ->where('published', true)
+            ->where(function ($query) {
+                $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
+            })
             ->publicUpcoming()
             ->orderBy('start_at', 'asc');
 

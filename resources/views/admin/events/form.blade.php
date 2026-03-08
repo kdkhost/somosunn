@@ -79,10 +79,13 @@
                                     <input type="checkbox" name="published" value="1" class="form-check-input" {{ old('published', $event->published) ? 'checked' : '' }}>
                                     <label class="form-check-label">Publicado</label>
                                 </div>
-                                <input type="hidden" name="is_somos_unicas" value="0">
-                                <div class="form-check mb-2">
-                                    <input type="checkbox" name="is_somos_unicas" value="1" class="form-check-input" {{ old('is_somos_unicas', $event->is_somos_unicas) ? 'checked' : '' }}>
-                                    <label class="form-check-label font-weight-bold text-pink" style="color: #ec4899;"><i class="fas fa-venus mr-1"></i> Exibir na área Somos Únicas</label>
+                                <div class="form-group mb-3">
+                                    <label class="font-weight-bold"><i class="fas fa-eye mr-1"></i> Onde Exibir?</label>
+                                    <select name="visibility" class="form-control" style="border-radius: 8px;">
+                                        <option value="ambos" {{ old('visibility', $event->visibility ?? 'ambos') == 'ambos' ? 'selected' : '' }}>Plataforma Principal e Somos Únicas</option>
+                                        <option value="somos_unn" {{ old('visibility', $event->visibility ?? 'ambos') == 'somos_unn' ? 'selected' : '' }}>Apenas Plataforma Principal (UNN)</option>
+                                        <option value="somos_unicas" {{ old('visibility', $event->visibility ?? 'ambos') == 'somos_unicas' ? 'selected' : '' }} style="color: #ec4899; font-weight: bold;">Exclusivo Somos Únicas</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-6">

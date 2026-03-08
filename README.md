@@ -2,6 +2,8 @@
 
 ## Novidades Recentes (mar/2026)
 
+- **Controle de Visibilidade "Somos Únicas":** Administradores agora podem definir se Cursos, Eventos e Mentorias são exibidos em "Ambas as plataformas", "Apenas UNN" ou "Exclusivo Somos Únicas". O frontend foi atualizado para filtrar o conteúdo automaticamente com base nessa configuração.
+- **Página "Sobre a Comunidade":** Foi criada uma nova landing page dedicada e otimizada (em `/somos-unicas/sobre`) para explicar a missão e os benefícios da comunidade feminina "Somos Únicas", acessível via dropdown no menu de navegação.
 - **Área Temática "Somos Únicas":** Nova seção pública e exclusiva para mulheres empreendedoras, agregando cursos, palestras e mentorias com a temática rosa (`/somos-unicas`). O gerenciamento é feito no painel Admin, com um checklist marcante para definir o conteúdo que pertence à área.
 - **Página Pública de Ranking:** A comunidade ganhou uma página oficial (`/ranking`) para o Ranking de Membros, reutilizando o layout de pódio da página inicial (Top 3) e estendendo a listagem para todo o público, além de corrigir o redirecionamento para o perfil dos membros.- **Reconciliacao historica de pontos:** O comando `points:reconcile-legacy-members` e as migrations de marco agora recalculam pontos antigos com base em registros reais de **cadastro, perfil completo, primeiro curso, mentor, curso concluido, certificado, evento, mentoria e avaliacoes**.
 - **Programa de indicacao com rastreio completo:** O painel de indicacoes passou a mostrar **cliques, visitas unicas, pageviews, cadastros atribuidos, checkouts iniciados, compras confirmadas, receita rastreada, copias, compartilhamentos e recompartilhamentos** do link de afiliado.

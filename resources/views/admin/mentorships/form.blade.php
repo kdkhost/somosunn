@@ -69,13 +69,13 @@
                         </div>
 
                         <div class="form-group mb-4">
-                            <div class="custom-control custom-switch">
-                                <input type="hidden" name="is_somos_unicas" value="0">
-                                <input type="checkbox" class="custom-control-input"
-                                    name="is_somos_unicas" id="is_somos_unicas" value="1" {{ old('is_somos_unicas', $mentorship->is_somos_unicas) ? 'checked' : '' }}>
-                                <label class="custom-control-label font-weight-bold text-pink"
-                                    for="is_somos_unicas" style="color: #ec4899;"><i class="fas fa-venus mr-1"></i> Exibir na área Somos Únicas</label>
-                            </div>
+                            <label class="font-weight-bold"><i class="fas fa-eye mr-1"></i> Onde Exibir?</label>
+                            <select name="visibility" class="form-control" style="border-radius: 8px;">
+                                <option value="ambos" {{ old('visibility', $mentorship->visibility ?? 'ambos') == 'ambos' ? 'selected' : '' }}>Plataforma Principal e Somos Únicas</option>
+                                <option value="somos_unn" {{ old('visibility', $mentorship->visibility ?? 'ambos') == 'somos_unn' ? 'selected' : '' }}>Apenas Plataforma Principal (UNN)</option>
+                                <option value="somos_unicas" {{ old('visibility', $mentorship->visibility ?? 'ambos') == 'somos_unicas' ? 'selected' : '' }} style="color: #ec4899; font-weight: bold;">Exclusivo Somos Únicas</option>
+                            </select>
+                            <small class="text-muted">Selecione onde esta mentoria deve ser exibida.</small>
                         </div>
 
                         <div class="form-row">

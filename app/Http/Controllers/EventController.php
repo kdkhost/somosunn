@@ -23,6 +23,9 @@ class EventController extends Controller
         $events = Event::query()
             ->where('published', true)
             ->whereNotNull('start_at')
+            ->where(function ($query) {
+                $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
+            })
             ->publicUpcoming()
             ->orderBy('start_at')
             ->get();
@@ -33,6 +36,9 @@ class EventController extends Controller
         $pastEvents = Event::query()
             ->where('published', true)
             ->whereNotNull('start_at')
+            ->where(function ($query) {
+                $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
+            })
             ->publicPast()
             ->orderByDesc('start_at')
             ->limit(6)

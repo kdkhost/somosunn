@@ -21,14 +21,14 @@ class SomosUnicasController extends Controller
 
         // 1) Cursos Somos Únicas (Publicados)
         $courses = Course::with(['creator'])
-            ->where('is_somos_unicas', true)
+            ->whereIn('visibility', ['somos_unicas', 'ambos'])
             ->where('status', 'published')
             ->orderBy('id', 'desc')
             ->take(6)
             ->get();
 
         // 2) Eventos Somos Únicas (Futuros ou recentes, limitando)
-        $events = Event::where('is_somos_unicas', true)
+        $events = Event::whereIn('visibility', ['somos_unicas', 'ambos'])
             ->where('published', true)
             ->where('start_at', '>=', $now->subDays(1)) // Hoje em diante
             ->orderBy('start_at', 'asc')
@@ -37,7 +37,7 @@ class SomosUnicasController extends Controller
 
         // 3) Mentorias Somos Únicas
         $mentorships = Mentorship::with(['mentor'])
-            ->where('is_somos_unicas', true)
+            ->whereIn('visibility', ['somos_unicas', 'ambos'])
             ->orderBy('id', 'desc')
             ->take(6)
             ->get();

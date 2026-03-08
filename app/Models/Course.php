@@ -93,6 +93,7 @@ class Course extends Model
         'period',
         'billing_cycle',
         'is_somos_unicas',
+        'visibility',
     ];
 
     protected $casts = [

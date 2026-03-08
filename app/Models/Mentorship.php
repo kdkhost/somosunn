@@ -30,6 +30,7 @@ class Mentorship extends Model
         'certificate_settings',
         'demo_link',
         'is_somos_unicas',
+        'visibility',
     ];
 
     const TYPE_ONLINE = 'online';

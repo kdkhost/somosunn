@@ -24,6 +24,9 @@ class HomeController extends Controller
             try {
                 $freeEvents = Event::query()
                     ->where('published', true)
+                    ->where(function ($query) {
+                        $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
+                    })
                     ->publicUpcoming()
                     ->orderBy('start_at')
                     ->limit(6)
@@ -31,10 +34,13 @@ class HomeController extends Controller
 
                 $paidMentorings = Mentorship::query()
                     ->where('slots', '>', 0)
+                    ->where(function ($query) {
+                        $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
+                    })
                     ->orderByDesc('price')
                     ->limit(24)
                     ->get()
-                    ->filter(fn (Mentorship $mentorship) => $mentorship->hasPublicAction())
+                    ->filter(fn(Mentorship $mentorship) => $mentorship->hasPublicAction())
                     ->take(3)
                     ->values();
             } catch (\Throwable $e) {
@@ -81,14 +87,14 @@ class HomeController extends Controller
         }
 
         return view('site.index', [
-            'freeEvents'       => $freeEvents,
-            'paidMentorings'   => $paidMentorings,
-            'levelSummary'     => $levelSummary,
-            'topRankings'      => $topRankings,
+            'freeEvents' => $freeEvents,
+            'paidMentorings' => $paidMentorings,
+            'levelSummary' => $levelSummary,
+            'topRankings' => $topRankings,
             'showNoRankingMsg' => $showNoRankingMsg,
-            'isDemo'           => false,
-            'homePage'         => $homePage,
-            'dbTestimonials'   => $dbTestimonials,
+            'isDemo' => false,
+            'homePage' => $homePage,
+            'dbTestimonials' => $dbTestimonials,
         ]);
     }
 
@@ -100,16 +106,22 @@ class HomeController extends Controller
             try {
                 $mentorings = Mentorship::query()
                     ->where('slots', '>', 0)
+                    ->where(function ($query) {
+                        $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
+                    })
                     ->orderBy('schedule')
                     ->limit(24)
                     ->get()
-                    ->filter(fn (Mentorship $mentorship) => $mentorship->hasPublicAction())
+                    ->filter(fn(Mentorship $mentorship) => $mentorship->hasPublicAction())
                     ->take(6)
                     ->values();
 
                 // Cursos em destaque: status published OU paused, is_featured = true
                 $featuredCourses = \App\Models\Course::where('is_featured', true)
                     ->whereIn('status', ['published', 'paused'])
+                    ->where(function ($query) {
+                        $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
+                    })
                     ->inRandomOrder()
                     ->limit(6)
                     ->get();
@@ -155,7 +167,7 @@ class HomeController extends Controller
         $allPeriods = ['mensal' => 'Mensal'];
         foreach ($plans as $plan) {
             foreach (($plan->price_periods ?? []) as $pk => $pv) {
-                if ($pv > 0 && in_array($pk, ['trimestral','semestral','anual'], true)) {
+                if ($pv > 0 && in_array($pk, ['trimestral', 'semestral', 'anual'], true)) {
                     $allPeriods[$pk] = ucfirst($pk);
                 }
             }
@@ -205,11 +217,11 @@ class HomeController extends Controller
         }
 
         $others = $plans->filter(fn($p) => $p->id !== $highlighted->id)->values();
-        $total  = $others->count() + 1;
+        $total = $others->count() + 1;
         $center = (int) floor($total / 2);
 
         $before = $others->slice(0, $center)->values();
-        $after  = $others->slice($center)->values();
+        $after = $others->slice($center)->values();
 
         return $before->push($highlighted)->merge($after)->values();
     }
@@ -274,12 +286,12 @@ class HomeController extends Controller
                     ->orderByDesc('points')
                     ->take(3)
                     ->get()
-                    ->map(fn ($u) => (object) [
-                        'user'               => $u,
-                        'score'              => $u->points ?? 0,
-                        'level'              => $u->level ?? 'iniciante',
+                    ->map(fn($u) => (object) [
+                        'user' => $u,
+                        'score' => $u->points ?? 0,
+                        'level' => $u->level ?? 'iniciante',
                         'interactions_count' => 0,
-                        'average_rating'     => null,
+                        'average_rating' => null,
                         'is_points_fallback' => true,
                     ])
                     ->values();

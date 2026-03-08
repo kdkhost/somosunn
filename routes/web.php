@@ -93,6 +93,7 @@ Route::get('/ranking', [\App\Http\Controllers\RankingPublicController::class, 'i
 
 // Somos Únicas
 Route::get('/somos-unicas', [\App\Http\Controllers\SomosUnicasController::class, 'index'])->name('somos-unicas');
+Route::get('/somos-unicas/sobre', [\App\Http\Controllers\SomosUnicasAboutController::class, 'index'])->name('site.somos-unicas.sobre');
 
 // Rota Temporária para executar as migrações (apagar depois)
 Route::get('/run-migrations', function () {

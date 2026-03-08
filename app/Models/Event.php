@@ -41,7 +41,8 @@ class Event extends Model
         'certificate_bg',
         'instructor_signature',
         'certificate_settings',
-        'is_somos_unicas'
+        'is_somos_unicas',
+        'visibility'
     ];
 
     protected $casts = [

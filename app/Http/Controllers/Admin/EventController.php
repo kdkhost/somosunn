@@ -156,6 +156,7 @@ class EventController extends Controller
             'certificate_bg' => 'nullable|image|max:5120',
             'instructor_signature' => 'nullable|image|max:5120',
             'is_somos_unicas' => 'nullable|boolean',
+            'visibility' => 'nullable|string|in:ambos,somos_unn,somos_unicas',
         ]);
 
         $validated['published'] = $request->has('published')
@@ -265,6 +266,7 @@ class EventController extends Controller
             'certificate_bg' => 'nullable|image|max:5120',
             'instructor_signature' => 'nullable|image|max:5120',
             'is_somos_unicas' => 'nullable|boolean',
+            'visibility' => 'nullable|string|in:ambos,somos_unn,somos_unicas',
         ]);
 
         if ($request->has('published')) {

@@ -36,6 +36,9 @@ class CourseController extends Controller
                 }
             ])
             ->whereIn('status', $publicStatuses)
+            ->where(function ($query) {
+                $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
+            })
             ->orderByDesc('is_featured')
             ->orderByDesc('id')
             ->first();
@@ -47,6 +50,9 @@ class CourseController extends Controller
                 }
             ])
             ->whereIn('status', $publicStatuses)
+            ->where(function ($query) {
+                $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
+            })
             ->orderByDesc('is_featured')
             ->orderByDesc('id')
             ->paginate(\App\Models\Setting::get('frontend_item_limit', 9));
