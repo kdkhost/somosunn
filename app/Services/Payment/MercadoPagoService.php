@@ -607,12 +607,17 @@ class MercadoPagoService
         ];
 
         if ($order->seller_id) {
+            // Se o vendedor for o administrador da plataforma, não deve haver split (application_fee para si mesmo falha no MP)
+            // Também verificamos se o vendedor tem uma conta configurada
             $sellerAccount = GatewayAccount::where('user_id', $order->seller_id)
                 ->where('provider', 'mercadopago')
                 ->where('enabled', true)
                 ->first();
 
-            if ($sellerAccount && !empty($sellerAccount->access_token)) {
+            // ID do administrador (que é o dono da plataforma)
+            $platformOwnerId = Setting::get('platform_owner_id', 2); // Fallback para 2 conforme diagnóstico
+
+            if ($sellerAccount && !empty($sellerAccount->access_token) && (int) $order->seller_id !== (int) $platformOwnerId) {
                 $passFee = null;
                 if (is_array($sellerAccount->extra) && isset($sellerAccount->extra['pass_fee'])) {
                     $passFee = (bool) $sellerAccount->extra['pass_fee'];
