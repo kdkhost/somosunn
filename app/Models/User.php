@@ -283,14 +283,16 @@ class User extends Authenticatable
             ->first();
     }
 
-    public function canMessageUser($userId): bool
+    public function canMessageUser($userOrId): bool
     {
+        $targetId = ($userOrId instanceof \App\Models\User) ? $userOrId->id : $userOrId;
+
         // Allowed if connected or if they are the same person (self)
-        if ((int) $this->id === (int) $userId) {
+        if ((int) $this->id === (int) $targetId) {
             return true;
         }
 
-        return $this->isConnectedWith($userId);
+        return $this->isConnectedWith($targetId);
     }
 
     public function courses()
