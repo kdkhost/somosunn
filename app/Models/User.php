@@ -270,8 +270,7 @@ class User extends Authenticatable
     {
         $targetUserId = (int) $userId;
 
-        return Connection::query()
-            ->where('status', 'pending')
+        return Connection::where('status', 'pending')
             ->where(function ($query) use ($targetUserId) {
                 $query->where(function ($pending) use ($targetUserId) {
                     $pending->where('requester_id', $this->id)
@@ -282,6 +281,16 @@ class User extends Authenticatable
                 });
             })
             ->first();
+    }
+
+    public function canMessageUser($userId): bool
+    {
+        // Allowed if connected or if they are the same person (self)
+        if ((int) $this->id === (int) $userId) {
+            return true;
+        }
+
+        return $this->isConnectedWith($userId);
     }
 
     public function courses()
