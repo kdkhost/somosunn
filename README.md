@@ -3,6 +3,7 @@
 ## Novidades Recentes (mar/2026)
 
 - **Controle de Visibilidade "Somos Únicas":** Administradores agora podem definir se Cursos, Eventos e Mentorias são exibidos em "Ambas as plataformas", "Apenas UNN" ou "Exclusivo Somos Únicas". O frontend foi atualizado para filtrar o conteúdo automaticamente com base nessa configuração.
+- **Unificação de E-mails do Sistema:** Todos os templates de e-mail foram refatorados para utilizar o layout padrão da UNN de forma automática, eliminando aninhamentos e inconsistências visuais. O editor Summernote agora sincroniza corretamente antes de salvar, e a funcionalidade de "Enviar Teste" no painel administrativo foi corrigida.
 - **Integração CMS "Somos Únicas":** As páginas de conteúdo institucional da "Somos Únicas" (Home e Sobre) foram integradas ao CMS administrativo. Agora podem ser editadas de forma facilitada através de formulários padronizados com suporte a imagens via `upload-box` e textos ricos via `Summernote`, eliminando a necessidade de edição direta em JSON.
 - **Melhoria no Editor de Eventos:** O editor Summernote foi corrigido para inicializar corretamente dentro do modal do calendário de eventos, garantindo que descrições ricas possam ser editadas sem erros de carregamento.
 - **Página "Sobre a Comunidade":** Foi criada uma nova landing page dedicada e otimizada (em `/somos-unicas/sobre`) para explicar a missão e os benefícios da comunidade feminina "Somos Únicas", acessível via dropdown no menu de navegação.

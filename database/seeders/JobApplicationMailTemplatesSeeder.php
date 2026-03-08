@@ -10,7 +10,7 @@ class JobApplicationMailTemplatesSeeder extends Seeder
   public function run(): void
   {
     // Template para o CANDIDATO: confirmação de candidatura
-    MailTemplate::firstOrCreate(
+    MailTemplate::updateOrCreate(
       ['slug' => 'job_apply_candidate'],
       [
         'name' => 'Confirmação de Candidatura (Candidato)',
@@ -32,7 +32,7 @@ HTML,
     );
 
     // Template para o DONO da vaga: nova candidatura recebida
-    MailTemplate::firstOrCreate(
+    MailTemplate::updateOrCreate(
       ['slug' => 'job_apply_owner'],
       [
         'name' => 'Nova Candidatura Recebida (Dono da Vaga)',

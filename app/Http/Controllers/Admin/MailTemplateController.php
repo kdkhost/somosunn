@@ -64,6 +64,11 @@ class MailTemplateController extends Controller
         $data['category'] = $data['category'] ?? 'sistema';
         $data['locale'] = $data['locale'] ?? 'pt-BR';
         $data['is_active'] = $request->boolean('is_active', true);
+
+        if (isset($data['body'])) {
+            $data['body'] = app(\App\Services\Mail\SystemMailTemplateService::class)->stripBoilerplate($data['body']);
+        }
+
         $template = MailTemplate::create($data);
 
         if ($request->routeIs('panel.*')) {
@@ -104,6 +109,11 @@ class MailTemplateController extends Controller
         $data['category'] = $data['category'] ?? 'sistema';
         $data['locale'] = $data['locale'] ?? 'pt-BR';
         $data['is_active'] = $request->boolean('is_active', true);
+
+        if (isset($data['body'])) {
+            $data['body'] = app(\App\Services\Mail\SystemMailTemplateService::class)->stripBoilerplate($data['body']);
+        }
+
         $mailtemplate->update($data);
 
         if ($request->routeIs('panel.*')) {

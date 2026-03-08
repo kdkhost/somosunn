@@ -91,6 +91,25 @@ class SystemMailTemplateService
     }
 
     /**
+     * Aggressively strips HTML boilerplate (html, head, body, style)
+     */
+    public function stripBoilerplate(string $html): string
+    {
+        // Extract body content if present
+        if (preg_match('/<body[^>]*>(.*?)<\/body>/is', $html, $matches)) {
+            $html = $matches[1];
+        }
+
+        // Strip global tags but keep content inside
+        $html = preg_replace('/<html.*?>|<\/html>|<head.*?>.*?<\/head>|<body.*?>|<\/body>/is', '', $html);
+
+        // Strip style blocks entirely as they belong to the layout
+        $html = preg_replace('/<style.*?>.*?<\/style>/is', '', $html);
+
+        return trim($html);
+    }
+
+    /**
      * Renders the template and wraps it in the system layout.
      */
     public function renderFullHtml(string $slug, array $data): ?array
