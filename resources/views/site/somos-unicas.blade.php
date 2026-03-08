@@ -38,10 +38,10 @@
                             <p class="text-gray-500 text-sm md:text-base">{{ $pageData['courses_subtitle'] ?? 'Aperfeiçoe suas habilidades' }}</p>
                         </div>
                     </div>
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="grid auto-rows-fr md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($courses as $course)
                             <article
-                                class="bg-white rounded-2xl p-6 border border-pink-100 flex flex-col shadow-sm relative transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+                                class="unicas-selling-card bg-white rounded-2xl p-6 border border-pink-100 flex h-full flex-col shadow-sm relative transition-all duration-300 hover:shadow-md hover:-translate-y-1">
                                 @if($course->price > 0)
                                     <span
                                         class="absolute top-4 right-4 bg-pink-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Premium</span>
@@ -65,14 +65,14 @@
                                     }
                                 @endphp
                                 <img src="{{ $courseImage }}" alt="{{ $course->title }}"
-                                    class="w-full h-40 object-cover rounded-xl mb-4 border border-pink-50"
+                                    class="unicas-selling-media w-full h-40 object-cover rounded-xl mb-4 border border-pink-50"
                                     onerror="this.onerror=null;this.src='{{ asset('img/placeholder-course.jpg') }}';">
-                                <h3 class="text-lg font-bold text-gray-900 mb-1 line-clamp-2">{{ $course->title }}</h3>
-                                <p class="text-xs text-pink-500 font-semibold mb-2">Por
+                                <h3 class="unicas-selling-title text-lg font-bold text-gray-900 mb-1 line-clamp-2">{{ $course->title }}</h3>
+                                <p class="unicas-selling-eyebrow text-xs text-pink-500 font-semibold mb-2">Por
                                     {{ $course->author_name ?? 'Especialista UNN' }}</p>
-                                <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                                <p class="unicas-selling-copy text-gray-600 text-sm mb-4 line-clamp-3">
                                     {{ Str::limit(strip_tags((string) ($course->short_description ?? '')), 100) }}</p>
-                                <div class="mt-auto flex flex-col gap-2 pt-4 border-t border-pink-50">
+                                <div class="unicas-selling-footer mt-auto flex flex-col gap-2 pt-4 border-t border-pink-50">
                                     @if($course->price > 0)
                                         <span class="text-lg font-black text-pink-600">R$
                                             {{ number_format($course->price, 2, ',', '.') }}</span>
@@ -80,7 +80,7 @@
                                         <span class="text-lg font-black text-green-600">GRÁTIS</span>
                                     @endif
                                     <a href="{{ route('courses.show', $course->slug ?? $course->id) }}"
-                                        class="btn-unicas text-white px-6 py-2.5 rounded-xl font-bold w-full block text-center mt-2 shadow-sm">
+                                        class="btn-unicas unicas-selling-action text-white px-6 py-2.5 rounded-xl font-bold w-full text-center mt-2 shadow-sm">
                                         Acessar Curso
                                     </a>
                                 </div>
@@ -109,7 +109,7 @@
                             <p class="text-gray-500 text-sm md:text-base">{{ $pageData['events_subtitle'] ?? 'Encontros especiais para mulheres incríveis' }}</p>
                         </div>
                     </div>
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="grid auto-rows-fr md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($events as $event)
                             @php
                                 $isEventClosed = method_exists($event, 'isClosedForPublic') && $event->isClosedForPublic();
@@ -118,7 +118,7 @@
                                     : ($event->start_at ? \Carbon\Carbon::parse($event->start_at) : null);
                             @endphp
                             <article
-                                class="bg-white rounded-2xl p-5 border border-pink-100 flex flex-col shadow-sm relative transition-all duration-300 hover:shadow-md hover:border-pink-300">
+                                class="unicas-selling-card bg-white rounded-2xl p-5 border border-pink-100 flex h-full flex-col shadow-sm relative transition-all duration-300 hover:shadow-md hover:border-pink-300">
                                 <div
                                     class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-center px-3 py-1.5 rounded-xl shadow-sm border border-pink-50">
                                     <p class="text-xs font-bold text-pink-600 uppercase">{{ $eventDate ? $eventDate->translatedFormat('M') : '--' }}</p>
@@ -130,22 +130,22 @@
                                         : asset('img/placeholder-event.jpg');
                                 @endphp
                                 <img src="{{ $eventImage }}" alt="{{ $event->title }}"
-                                    class="w-full h-36 object-cover rounded-xl mb-4">
-                                <h3 class="text-lg font-bold text-gray-900 mb-1 line-clamp-2">{{ $event->title }}</h3>
-                                <p class="text-xs text-pink-500 font-semibold mb-2"><i class="fas fa-microphone-alt mr-1"></i>
+                                    class="unicas-selling-media w-full h-36 object-cover rounded-xl mb-4">
+                                <h3 class="unicas-selling-title text-lg font-bold text-gray-900 mb-1 line-clamp-2">{{ $event->title }}</h3>
+                                <p class="unicas-selling-eyebrow text-xs text-pink-500 font-semibold mb-2"><i class="fas fa-microphone-alt mr-1"></i>
                                     {{ $event->speaker ?? $event->author_name ?? 'Palestrante UNN' }}</p>
-                                <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                                <p class="unicas-selling-copy text-gray-600 text-sm mb-4 line-clamp-2">
                                     {{ Str::limit(strip_tags((string) ($event->description ?? '')), 80) }}</p>
 
-                                <div class="mt-auto">
+                                <div class="unicas-selling-footer mt-auto pt-4 border-t border-pink-50">
                                     @if($isEventClosed)
                                         <span
-                                            class="bg-slate-100 text-slate-500 px-4 py-2.5 rounded-xl font-bold w-full block text-center mt-3 cursor-not-allowed border border-slate-200">
+                                            class="unicas-selling-action bg-slate-100 text-slate-500 px-4 py-2.5 rounded-xl font-bold w-full text-center mt-3 cursor-not-allowed border border-slate-200">
                                             Evento Encerrado
                                         </span>
                                     @else
                                         <a href="{{ route('events.show', $event->id) }}"
-                                            class="btn-unicas-outline text-pink-600 border-2 border-pink-500 hover:bg-pink-50 px-4 py-2 rounded-xl font-bold w-full block text-center mt-3 transition text-sm">
+                                            class="btn-unicas-outline unicas-selling-action text-pink-600 border-2 border-pink-500 hover:bg-pink-50 px-4 py-2 rounded-xl font-bold w-full text-center mt-3 transition text-sm">
                                             Garantir Vaga
                                         </a>
                                     @endif
@@ -168,14 +168,14 @@
                         </div>
                     </div>
 
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="grid auto-rows-fr md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($mentorships as $mentorship)
                             @php
                                 $isMentorshipClosed = method_exists($mentorship, 'isClosedForPublic') && $mentorship->isClosedForPublic();
                             @endphp
                             <article
-                                class="bg-white rounded-3xl p-6 md:p-8 border border-pink-100 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                                <div class="flex justify-between items-center mb-4">
+                                class="unicas-selling-card bg-white rounded-3xl p-6 md:p-8 border border-pink-100 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 h-full flex flex-col">
+                                <div class="unicas-selling-header flex justify-between items-center gap-4 mb-4">
                                     <div class="flex items-center gap-3">
                                         <div
                                             class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 font-bold overflow-hidden">
@@ -192,22 +192,22 @@
                                     <span class="font-black text-pink-600 bg-pink-50 px-3 py-1 rounded-lg">R$
                                         {{ number_format($mentorship->price, 2, ',', '.') }}</span>
                                 </div>
-                                <h3 class="text-xl font-black text-gray-900 mb-2 line-clamp-2">{{ $mentorship->title }}</h3>
-                                <p class="text-gray-600 text-sm mb-5 line-clamp-3">
+                                <h3 class="unicas-selling-title text-xl font-black text-gray-900 mb-2 line-clamp-2">{{ $mentorship->title }}</h3>
+                                <p class="unicas-selling-copy text-gray-600 text-sm mb-5 line-clamp-3">
                                     {{ Str::limit(strip_tags((string) ($mentorship->description ?? '')), 120) }}</p>
-                                <div class="mt-auto">
-                                    <p class="text-xs text-gray-500 font-semibold mb-3"><i
+                                <div class="unicas-selling-footer mt-auto pt-4 border-t border-pink-50">
+                                    <p class="unicas-selling-meta text-xs text-gray-500 font-semibold mb-3"><i
                                             class="fas fa-users text-pink-400 mr-1"></i> Vagas: {{ $mentorship->slots }} disponíveis
                                     </p>
 
                                     @if(!$isMentorshipClosed)
                                         <a href="{{ route('mentorships.show', $mentorship->id) }}"
-                                            class="btn-unicas text-white px-6 py-3 rounded-xl font-bold w-full block text-center shadow-md">
+                                            class="btn-unicas unicas-selling-action text-white px-6 py-3 rounded-xl font-bold w-full text-center shadow-md">
                                             Ver Detalhes
                                         </a>
                                     @else
                                         <span
-                                            class="bg-slate-100 text-slate-500 px-6 py-3 rounded-xl font-bold w-full block text-center cursor-not-allowed border border-slate-200">
+                                            class="unicas-selling-action bg-slate-100 text-slate-500 px-6 py-3 rounded-xl font-bold w-full text-center cursor-not-allowed border border-slate-200">
                                             Vagas Esgotadas
                                         </span>
                                     @endif
@@ -264,6 +264,55 @@
 
         .summernote-content p {
             margin-bottom: 1rem;
+        }
+
+        .unicas-selling-card {
+            height: 100%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.95) 100%);
+            box-shadow: 0 18px 42px rgba(91, 33, 182, 0.08);
+        }
+
+        .unicas-selling-media {
+            display: block;
+            width: 100%;
+        }
+
+        .unicas-selling-title {
+            min-height: 3.6rem;
+        }
+
+        .unicas-selling-copy {
+            min-height: 4.8rem;
+        }
+
+        .unicas-selling-header {
+            min-height: 3.5rem;
+            align-items: center;
+        }
+
+        .unicas-selling-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .unicas-selling-meta {
+            min-height: 1.5rem;
+        }
+
+        .unicas-selling-action {
+            min-height: 3.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 767.98px) {
+            .unicas-selling-title,
+            .unicas-selling-copy,
+            .unicas-selling-header {
+                min-height: auto;
+            }
         }
     </style>
 @endsection
