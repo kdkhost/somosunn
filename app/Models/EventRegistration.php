@@ -26,11 +26,14 @@ class EventRegistration extends Model
         'status',
         'price',
         'quantity',
+        'ticket_code',
+        'check_in_at',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'quantity' => 'integer',
+        'check_in_at' => 'datetime',
     ];
 
     public function event()

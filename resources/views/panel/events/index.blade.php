@@ -17,6 +17,10 @@
                     <div class="text-gray-600 mb-2">{{ $event->short_description }}</div>
                     <div class="flex-1"></div>
                     <div class="flex gap-2 mt-4">
+                        @if($event->is_ticket_enabled)
+                            <a href="{{ route('panel.events.scanner', $event) }}" class="text-green-600 hover:underline"><i
+                                    class="fas fa-qrcode"></i> Ler Ingressos</a>
+                        @endif
                         <a href="{{ route('panel.events.edit', $event) }}" class="text-blue-700 hover:underline">Editar</a>
                         <form action="{{ route('panel.events.destroy', $event) }}" method="POST"
                             onsubmit="return confirmAction(event, 'Excluir evento?', 'Tem certeza que deseja excluir este evento?')">

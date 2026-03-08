@@ -392,8 +392,12 @@
                     <input type="hidden" id="event_latitude" name="latitude">
                     <input type="hidden" id="event_longitude" name="longitude">
                     <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-danger" id="btnDelete" style="display:none;">Excluir</button>
-                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <a href="#" id="modalEventEdit" class="btn btn-warning"><i class="fas fa-edit mr-1"></i> Editar</a>
+                        <a href="#" id="modalEventScanner" class="btn btn-primary d-none"><i class="fas fa-qrcode mr-1"></i>
+                            Ler Ingressos</a>
+                        <button type="button" class="btn btn-danger" id="modalEventDelete"><i class="fas fa-trash mr-1"></i>
+                            Excluir</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                     </div>
                 </form>
             </div>
@@ -753,10 +757,10 @@
                     });
                 }
 
-                    // Modal Handling
-                    function openModal(event) {
-                        $('#eventForm')[0].reset();
-                        $('#event_id').val('');
+                // Modal Handling
+                function openModal(event) {
+                    $('#eventForm')[0].reset();
+                    $('#event_id').val('');
                     $('#published').prop('checked', true);
                     $('#all_day').prop('checked', false);
                     $('#event_latitude').val('');
@@ -819,12 +823,20 @@
                             showMap(event.extendedProps.latitude, event.extendedProps.longitude, event.extendedProps.address);
                         }
 
+                        $('#modalEventEdit').attr('href', '/admin/events/' + event.id + '/edit');
+
+                        if (event.extendedProps.is_ticket_enabled) {
+                            $('#modalEventScanner').removeClass('d-none').attr('href', '/admin/events/' + event.id + '/scanner');
+                        } else {
+                            $('#modalEventScanner').addClass('d-none').attr('href', '#');
+                        }
+
                         if (canEditEvents) {
-                            $('#btnDelete').show().off('click').on('click', function () {
+                            $('#modalEventDelete').show().off('click').on('click', function () {
                                 deleteEvent(event.id);
                             });
                         } else {
-                            $('#btnDelete').hide().off('click');
+                            $('#modalEventDelete').hide().off('click');
                         }
                     } else {
                         if (event && event.start) $('#start_at').val(formatDate(new Date(event.start)));

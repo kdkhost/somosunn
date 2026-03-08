@@ -86,6 +86,7 @@ class EventController extends Controller
                     'batch_2_deadline' => $event->batch_2_deadline ? \Carbon\Carbon::parse($event->batch_2_deadline)->toIso8601String() : null,
                     'batch_3_price' => $event->batch_3_price,
                     'batch_3_deadline' => $event->batch_3_deadline ? \Carbon\Carbon::parse($event->batch_3_deadline)->toIso8601String() : null,
+                    'is_ticket_enabled' => (bool) $event->is_ticket_enabled,
                 ],
             ];
         });
@@ -157,6 +158,8 @@ class EventController extends Controller
             'instructor_signature' => 'nullable|image|max:5120',
             'is_somos_unicas' => 'nullable|boolean',
             'visibility' => 'nullable|string|in:ambos,somos_unn,somos_unicas',
+            'event_url' => 'nullable|url|max:255',
+            'is_ticket_enabled' => 'nullable|boolean',
         ]);
 
         $validated['published'] = $request->has('published')
@@ -189,6 +192,7 @@ class EventController extends Controller
         $data = $validated;
         $data['user_id'] = Auth::id();
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+        $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
 
         if ($request->hasFile('certificate_bg')) {
             $file = $request->file('certificate_bg');
@@ -267,6 +271,8 @@ class EventController extends Controller
             'instructor_signature' => 'nullable|image|max:5120',
             'is_somos_unicas' => 'nullable|boolean',
             'visibility' => 'nullable|string|in:ambos,somos_unn,somos_unicas',
+            'event_url' => 'nullable|url|max:255',
+            'is_ticket_enabled' => 'nullable|boolean',
         ]);
 
         if ($request->has('published')) {

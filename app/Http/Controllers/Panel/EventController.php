@@ -31,6 +31,7 @@ class EventController extends Controller
             'start_at' => 'nullable|date',
             'status' => 'required|in:draft,published,archived,paused',
             'image' => 'nullable|image|max:10240',
+            'is_ticket_enabled' => 'nullable|boolean',
         ], [], [
             'title' => 'Título',
             'short_description' => 'Descrição curta',
@@ -48,6 +49,7 @@ class EventController extends Controller
         }
 
         $data['user_id'] = Auth::id();
+        $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
         Event::create($data);
 
         return redirect()->route('panel.events.index')->with('success', 'Evento criado com sucesso!');
@@ -69,6 +71,7 @@ class EventController extends Controller
             'start_at' => 'nullable|date',
             'status' => 'required|in:draft,published,archived,paused',
             'image' => 'nullable|image|max:10240',
+            'is_ticket_enabled' => 'nullable|boolean',
         ], [], [
             'title' => 'Título',
             'short_description' => 'Descrição curta',
@@ -85,6 +88,7 @@ class EventController extends Controller
             $data['image'] = 'uploads/event-images/' . $fileName;
         }
 
+        $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
         $event->update($data);
         return redirect()->route('panel.events.index')->with('success', 'Evento atualizado com sucesso!');
     }

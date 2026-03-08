@@ -42,10 +42,12 @@ class Event extends Model
         'instructor_signature',
         'certificate_settings',
         'is_somos_unicas',
-        'visibility'
+        'visibility',
+        'is_ticket_enabled',
     ];
 
     protected $casts = [
+        'is_ticket_enabled' => 'boolean',
         'start_at' => 'datetime',
         'end_at' => 'datetime',
         'batch_1_deadline' => 'datetime',
@@ -228,6 +230,11 @@ class Event extends Model
     public function registrations()
     {
         return $this->hasMany(EventRegistration::class);
+    }
+
+    public function media()
+    {
+        return $this->hasMany(EventMedia::class);
     }
 
     public function user()

@@ -114,6 +114,26 @@ class PointsRulesSeeder extends Seeder
                 'active' => true,
                 'repeatable' => true,
             ],
+            [
+                'key' => 'event_scan_participant',
+                'label' => 'Participante Check-in via Ingresso',
+                'description' => 'Participar de um evento com Ingresso verificado (QR Code)',
+                'category' => 'aprendizado',
+                'points' => 30, // Pontuação solicitada provisoriamente
+                'icon' => 'fas fa-ticket-alt',
+                'active' => true,
+                'repeatable' => true,
+            ],
+            [
+                'key' => 'event_scan_organizer',
+                'label' => 'Organizador Validou Ingresso',
+                'description' => 'Bônus para o organizador por validar a entrada de um participante',
+                'category' => 'ensino',
+                'points' => 15, // Pontuação solicitada provisoriamente
+                'icon' => 'fas fa-qrcode',
+                'active' => true,
+                'repeatable' => true,
+            ],
 
             // Comunidade
             [

@@ -539,6 +539,15 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         // Events Management
         Route::get('events/feed', [\App\Http\Controllers\Panel\Admin\EventController::class, 'feed'])->name('events.feed');
         Route::post('events/{event}/toggle-published', [\App\Http\Controllers\Panel\Admin\EventController::class, 'togglePublished'])->name('events.toggle-published');
+
+        // Event QR Code Scanner (Panel)
+        Route::get('events/{event}/scanner', [\App\Http\Controllers\Panel\EventScannerController::class, 'index'])->name('events.scanner');
+        Route::post('events/{event}/scanner/validate', [\App\Http\Controllers\Panel\EventScannerController::class, 'validateTicket'])->name('events.scanner.validate');
+
+        // Event Media Gallery (Panel)
+        Route::post('events/{event}/media', [\App\Http\Controllers\Panel\EventMediaController::class, 'store'])->name('events.media.store');
+        Route::delete('events/{event}/media/{media}', [\App\Http\Controllers\Panel\EventMediaController::class, 'destroy'])->name('events.media.destroy');
+
         Route::resource('events', \App\Http\Controllers\Panel\Admin\EventController::class);
 
         // Certificates Management
@@ -846,6 +855,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             ->middleware('check.feature:events_access')->name('events.feed');
         Route::post('events/calendar/settings', [\App\Http\Controllers\Admin\EventController::class, 'updateCalendarSettings'])
             ->middleware('check.feature:events_edit')->name('events.calendar.settings');
+
+        // Event QR Code Scanner (Admin)
+        Route::get('events/{event}/scanner', [\App\Http\Controllers\Admin\EventScannerController::class, 'index'])
+            ->middleware('check.feature:events_access')->name('events.scanner');
+        Route::post('events/{event}/scanner/validate', [\App\Http\Controllers\Admin\EventScannerController::class, 'validateTicket'])
+            ->middleware('check.feature:events_edit')->name('events.scanner.validate');
+
+        // Event Media Gallery (Admin)
+        Route::post('events/{event}/media', [\App\Http\Controllers\Admin\EventMediaController::class, 'store'])
+            ->middleware('check.feature:events_edit')->name('events.media.store');
+        Route::delete('events/{event}/media/{media}', [\App\Http\Controllers\Admin\EventMediaController::class, 'destroy'])
+            ->middleware('check.feature:events_edit')->name('events.media.destroy');
+
         Route::resource('events', \App\Http\Controllers\Admin\EventController::class)
             ->middleware('check.feature:events_access')->names('events');
 

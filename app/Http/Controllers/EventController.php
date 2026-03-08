@@ -65,6 +65,14 @@ class EventController extends Controller
             abort(404);
         }
 
-        return view('events.show', compact('event'));
+        $userRegistration = null;
+        if (auth()->check()) {
+            $userRegistration = \App\Models\EventRegistration::where('event_id', $event->id)
+                ->where('user_id', auth()->id())
+                ->whereIn('status', \App\Models\EventRegistration::COUNTED_STATUSES)
+                ->first();
+        }
+
+        return view('events.show', compact('event', 'userRegistration'));
     }
 }

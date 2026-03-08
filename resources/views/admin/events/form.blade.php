@@ -14,6 +14,12 @@
                     <a class="nav-link" id="cert-tab" data-toggle="pill" href="#certificate" role="tab"
                         aria-controls="certificate" aria-selected="false">Certificado</a>
                 </li>
+                @if($event->exists)
+                <li class="nav-item">
+                    <a class="nav-link" id="gallery-tab" data-toggle="pill" href="#gallery" role="tab"
+                        aria-controls="gallery" aria-selected="false">Galeria de Fotos</a>
+                </li>
+                @endif
             </ul>
         </div>
         <div class="card-body">
@@ -78,6 +84,11 @@
                                 <div class="form-check mb-2">
                                     <input type="checkbox" name="published" value="1" class="form-check-input" {{ old('published', $event->published) ? 'checked' : '' }}>
                                     <label class="form-check-label">Publicado</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="is_ticket_enabled" value="1" class="form-check-input" {{ old('is_ticket_enabled', $event->is_ticket_enabled) ? 'checked' : '' }}>
+                                    <label class="form-check-label font-weight-bold" style="color:#007bff;"><i class="fas fa-qrcode mr-1"></i> Habilitar Validação de Entrada por QR Code</label>
+                                    <small class="d-block text-muted">Quando ativo, o sistema criará um ingresso com QR Code e pontuará organizador e participante após validação.</small>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label class="font-weight-bold"><i class="fas fa-eye mr-1"></i> Onde Exibir?</label>
@@ -411,6 +422,54 @@
                         </form>
                     @endif
                 </div>
+
+                <!-- TAB GALERIA -->
+                @if($event->exists)
+                <div class="tab-pane fade" id="gallery" role="tabpanel" aria-labelledby="gallery-tab">
+                    <div class="card shadow-sm border-0 mt-3">
+                        <div class="card-body">
+                            <h4 class="mb-3">Galeria de Fotos e Vídeos do Evento</h4>
+                            <p class="text-muted mb-4">Faça o upload de fotos ou vídeos do evento. As imagens receberão uma marca d'água automaticamente com o nome da plataforma e do organizador.</p>
+                            
+                            <div class="mb-4 d-flex gap-3 align-items-center">
+                                <input type="file" id="adminGalleryInput" multiple accept="image/*,video/*" class="form-control-file w-auto">
+                                <button type="button" onclick="uploadAdminGallery()" id="btnUploadAdminGallery" class="btn btn-success ml-3">
+                                    <i class="fas fa-upload mr-1"></i> Enviar Arquivos
+                                </button>
+                            </div>
+
+                            <hr>
+
+                            <!-- Existing Media -->
+                            <div class="row mt-4" id="adminGalleryContainer">
+                                @forelse($event->media as $media)
+                                <div class="col-6 col-md-4 col-lg-3 mb-4" id="admin-media-{{ $media->id }}">
+                                    <div class="card h-100 position-relative group">
+                                        @if($media->type === 'image')
+                                            <a href="{{ asset('storage/'.$media->file_path) }}" data-fancybox="gallery">
+                                                <img src="{{ asset('storage/'.$media->file_path) }}" class="card-img-top object-cover" style="height: 150px; object-fit: cover;">
+                                            </a>
+                                        @else
+                                            <div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 150px;">
+                                                <i class="fas fa-video text-white fa-3x"></i>
+                                            </div>
+                                        @endif
+                                        <button type="button" onclick="deleteAdminMedia({{ $media->id }})" class="btn btn-danger btn-sm position-absolute" style="top: 5px; right: 5px;">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                @empty
+                                    <div class="col-12" id="noMediaMessage">
+                                        <div class="alert alert-light text-center border">Nenhuma mídia enviada ainda.</div>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
             </div>
         </div>
     </div>
@@ -438,6 +497,79 @@
 @endpush
 
 @push('scripts')
+@if($event->exists)
+<script>
+async function uploadAdminGallery() {
+    const input = document.getElementById('adminGalleryInput');
+    if (!input.files || input.files.length === 0) {
+        Swal.fire('Aviso', 'Selecione pelo menos um arquivo.', 'warning');
+        return;
+    }
+
+    const formData = new FormData();
+    for(let i=0; i < input.files.length; i++) {
+        formData.append('files[]', input.files[i]);
+    }
+
+    const btn = document.getElementById('btnUploadAdminGallery');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Enviando...';
+    btn.disabled = true;
+
+    try {
+        const response = await fetch('{{ route("admin.events.media.store", $event) }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            Swal.fire('Sucesso!', data.message, 'success').then(() => {
+                location.reload(); 
+            });
+        } else {
+            Swal.fire('Erro', data.message || 'Erro ao enviar arquivos.', 'error');
+        }
+    } catch (e) {
+        console.error(e);
+        Swal.fire('Erro', 'Ocorreu um erro na requisição.', 'error');
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        input.value = '';
+    }
+}
+
+async function deleteAdminMedia(id) {
+    if (!confirm('Tem certeza que deseja apagar esta mídia?')) return;
+
+    try {
+        const response = await fetch(`/admin/events/{{ $event->id }}/media/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            document.getElementById(`admin-media-${id}`).remove();
+        } else {
+            Swal.fire('Erro', data.message || 'Erro ao excluir mídia.', 'error');
+        }
+    } catch (e) {
+        console.error(e);
+        Swal.fire('Erro', 'Ocorreu um erro na requisição.', 'error');
+    }
+}
+</script>
+@endif
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
