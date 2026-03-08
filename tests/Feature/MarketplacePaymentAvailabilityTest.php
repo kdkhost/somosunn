@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Event;
 use App\Models\GatewayAccount;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,7 @@ class MarketplacePaymentAvailabilityTest extends TestCase
     {
         parent::setUp();
 
+        Setting::flushRuntimeCache();
         $this->originalDefaultConnection = (string) config('database.default');
         $this->originalSqliteDatabase = (string) config('database.connections.sqlite.database');
         $this->sqlitePath = database_path('testing-marketplace-payment-availability.sqlite');
@@ -150,6 +152,7 @@ class MarketplacePaymentAvailabilityTest extends TestCase
             $table->id();
             $table->string('key')->unique();
             $table->text('value')->nullable();
+            $table->string('group')->nullable();
             $table->timestamps();
         });
     }
@@ -157,6 +160,7 @@ class MarketplacePaymentAvailabilityTest extends TestCase
     protected function tearDown(): void
     {
         DB::disconnect('sqlite');
+        Setting::flushRuntimeCache();
         config()->set('database.default', $this->originalDefaultConnection);
         config()->set('database.connections.sqlite.database', $this->originalSqliteDatabase);
 
@@ -199,5 +203,28 @@ class MarketplacePaymentAvailabilityTest extends TestCase
         $response->assertSee('Evento futuro com PagSeguro');
         $response->assertSee(route('events.checkout', $event), false);
         $response->assertDontSee('Compras pagas indisponíveis no momento');
+    }
+    public function test_marketplace_keeps_future_event_buy_action_enabled_with_global_gateway_and_legacy_null_owner(): void
+    {
+        Setting::set('mercadopago_env', 'production');
+        Setting::set('mercadopago_prod_public_key', 'APP_USR-TEST-PUBLIC');
+        Setting::set('mercadopago_prod_access_token', 'APP_USR-TEST-TOKEN');
+
+        $event = Event::create([
+            'user_id' => null,
+            'title' => 'Evento legado com gateway global',
+            'description' => 'Evento disponivel para compra com fallback global',
+            'start_at' => now()->addDays(2)->setTime(19, 0),
+            'published' => true,
+            'price' => 180,
+        ]);
+
+        $response = $this->get(route('marketplace.index'));
+
+        $response->assertOk();
+        $response->assertSee('Evento legado com gateway global');
+        $response->assertSee(route('events.checkout', $event), false);
+        $response->assertDontSee('Organizador indispon');
+        $response->assertDontSee('Pagamento indispon');
     }
 }

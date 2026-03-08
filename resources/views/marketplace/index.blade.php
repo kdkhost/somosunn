@@ -9,6 +9,7 @@
         $events = $events ?? collect();
         $testimonials = $testimonials ?? collect();
         $paymentsConfigured = (bool) ($paymentsConfigured ?? false);
+        $platformPaymentsEnabled = (bool) ($platformPaymentsEnabled ?? false);
         $canSellByUserId = $canSellByUserId ?? [];
         $paymentsEnabledByUserId = $paymentsEnabledByUserId ?? [];
 
@@ -1200,6 +1201,15 @@
                             $disabledBuyLabel = !$sellerCanSell($sellerId)
                                 ? 'Organizador indisponível'
                                 : (!$sellerPaymentsEnabled ? 'Pagamento indisponível' : 'Indisponível');
+                            $organizerAvailable = $sellerId > 0 ? $sellerCanSell($sellerId) : true;
+                            $sellerPaymentsEnabled = $sellerId > 0 ? $sellerPaymentsEnabled : $platformPaymentsEnabled;
+                            $buyEnabled = $price <= 0 ? true : ($canBuy && $sellerPaymentsEnabled && $organizerAvailable);
+                            $disabledBuyLabel = !$organizerAvailable
+                                ? 'Organizador indisponÃ­vel'
+                                : (!$sellerPaymentsEnabled ? 'Pagamento indisponÃ­vel' : 'IndisponÃ­vel');
+                            $disabledBuyLabel = !$organizerAvailable
+                                ? 'Organizador indisponivel'
+                                : (!$sellerPaymentsEnabled ? 'Pagamento indisponivel' : 'Indisponivel');
                             $sellerName = optional($event->user)->name ?? 'Organizador';
                             $shareCode = \App\Support\ShortLink::encodeProduct('event', (int) $event->id);
                             $shareUrl = $shareCode ? route('share.product', ['code' => $shareCode]) : '';

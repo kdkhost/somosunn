@@ -85,10 +85,9 @@ class MarketplaceController extends Controller
             ->limit(8)
             ->get();
 
-        $mpAccessToken = trim((string) config('payments.mercadopago.access_token'));
-        $mpPublicKey = trim((string) config('payments.mercadopago.public_key'));
-        $psToken = trim((string) config('payments.pagseguro.token'));
-        $paymentsConfigured = ($mpAccessToken !== '' && $mpPublicKey !== '') || $psToken !== '';
+        $platformGateways = GatewayAccount::resolveForSeller(0);
+        $platformPaymentsEnabled = (bool) ($platformGateways['mpEnabled'] || $platformGateways['psEnabled']);
+        $paymentsConfigured = $platformPaymentsEnabled;
 
         $canSellByUserId = [];
         $paymentsEnabledByUserId = [];
@@ -118,6 +117,7 @@ class MarketplaceController extends Controller
             'events',
             'testimonials',
             'paymentsConfigured',
+            'platformPaymentsEnabled',
             'canSellByUserId',
             'paymentsEnabledByUserId',
         ));
