@@ -9,7 +9,7 @@
 @section('content')
 <div class="card">
     <div class="card-body">
-        <form method="POST" action="{{ $template->id ? route('admin.mailtemplates.update', $template) : route('admin.mailtemplates.store') }}" class="ajax-form">
+        <form method="POST" id="mailTemplateForm" action="{{ $template->id ? route('admin.mailtemplates.update', $template) : route('admin.mailtemplates.store') }}" class="ajax-form">
             @csrf
             @if($template->id)
                 @method('PUT')
@@ -123,11 +123,21 @@
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
 <script>
 $(function(){
-    $('#bodyEditor').summernote({height:420});
+    $('#bodyEditor').summernote({
+        height: 420,
+        callbacks: {
+            onChange: function(contents) {
+                $('#bodyEditor').val(contents);
+            }
+        }
+    });
+
     $('.insert-var').on('click', function(){
         const v = $(this).data('var');
         $('#bodyEditor').summernote('pasteHTML', v);
+        $('#bodyEditor').val($('#bodyEditor').summernote('code'));
     });
+
     $(document)
         .off('click.mailtpl', '#btnSendTest')
         .on('click.mailtpl', '#btnSendTest', function () {
@@ -180,25 +190,12 @@ $(function(){
             });
         });
 
-    // auto slug (somente quando não existe)
-    @if(!$template->id)
-    $('#tpl_name').on('keyup change', function(){
-        if($('#tpl_slug').val().trim() !== '') return;
-        const slug = $(this).val().toString()
-            .normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')
-            .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-        $('#tpl_slug').val(slug);
-    });
-    @endif
-
     function renderPreview(){
         @php
-            // Fetch dynamic settings for JS preview
             $logo = \App\Models\Setting::where('key', 'logo_admin')->value('value');
             if(!$logo) $logo = \App\Models\Setting::where('key', 'logo_front')->value('value');
             if(!$logo) $logo = \App\Models\Setting::where('key', 'logo_image')->value('value');
             $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
-            
             $primaryColor = \App\Models\Setting::where('key', 'site_color_primary')->value('value') ?? '#007bff';
             $secondaryColor = \App\Models\Setting::where('key', 'site_color_secondary')->value('value') ?? '#6c757d';
         @endphp
@@ -210,22 +207,16 @@ $(function(){
         const siteUrl = '{{ url('/') }}';
         const year = '{{ date('Y') }}';
         
-        const body = $('#bodyEditor').summernote('code');
+        const bodyContent = $('#bodyEditor').summernote('code');
         
-        // Use the same layout structure as the backend, but scaled for sidebar
         $('#tpl_preview').html(`
         <div style="background-color: #ffffff; width: 100%; font-family: sans-serif; box-sizing: border-box; display: flex; flex-direction: column;">
-            <!-- Header -->
             <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); padding: 25px 20px; text-align: center; flex-shrink: 0;">
                 <img src="${logo}" alt="${siteName}" style="max-height: 50px; max-width: 100%; height: auto;">
             </div>
-            
-            <!-- Body -->
             <div style="padding: 25px 20px; color: #333333; line-height: 1.6; word-wrap: break-word; font-size: 14px;">
-                ${body}
+                ${bodyContent}
             </div>
-            
-            <!-- Footer -->
             <div style="background-color: #f8f9fa; padding: 15px; text-align: center; color: #777777; font-size: 11px; border-top: 1px solid #eeeeee; flex-shrink: 0;">
                 <p style="margin: 2px 0;">&copy; ${year} ${siteName}.</p>
                 <p style="margin: 2px 0;"><a href="${siteUrl}" style="color: ${primaryColor}; text-decoration: none;">Visite nosso site</a></p>
@@ -236,18 +227,23 @@ $(function(){
     renderPreview();
     $('#bodyEditor').on('summernote.change', renderPreview);
 
-    // Sincronizar editor ANTES da submissão AJAX global
-    $(document).on('submit', '.ajax-form', function(e) {
-        // Se este formulário contiver o editor Summernote, sincronizamos
+    // Sincronizar via ID do form garante execução antes da delegação no document.ajax-form
+    $('#mailTemplateForm').on('submit', function() {
         const editor = $('#bodyEditor');
         if (editor.length) {
-            if (editor.summernote('isEmpty')) {
-                editor.val('');
-            } else {
-                editor.val(editor.summernote('code'));
-            }
+            editor.val(editor.summernote('code'));
         }
     });
+
+    @if(!$template->id)
+    $('#tpl_name').on('keyup change', function(){
+        if($('#tpl_slug').val().trim() !== '') return;
+        const slugStr = $(this).val().toString()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+            .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+        $('#tpl_slug').val(slugStr);
+    });
+    @endif
 });
 </script>
 @endpush

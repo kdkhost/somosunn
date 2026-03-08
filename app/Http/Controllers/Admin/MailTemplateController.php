@@ -72,14 +72,15 @@ class MailTemplateController extends Controller
 
         $template = MailTemplate::create($data);
 
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Template criado com sucesso!',
+                'redirect' => $request->routeIs('panel.*') ? route('panel.admin.mailtemplates.index') : route('admin.mailtemplates.index')
+            ]);
+        }
+
         if ($request->routeIs('panel.*')) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Template criado com sucesso!',
-                    'redirect' => route('panel.admin.mailtemplates.index')
-                ]);
-            }
             return redirect()->route('panel.admin.mailtemplates.index')->with('success', 'Template salvo');
         }
         return redirect()->route('admin.mailtemplates.index')->with('success', 'Template salvo');
@@ -117,14 +118,15 @@ class MailTemplateController extends Controller
 
         $mailtemplate->update($data);
 
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Template atualizado com sucesso!',
+                'redirect' => $request->routeIs('panel.*') ? route('panel.admin.mailtemplates.index') : route('admin.mailtemplates.index')
+            ]);
+        }
+
         if ($request->routeIs('panel.*')) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Template atualizado com sucesso!',
-                    'redirect' => route('panel.admin.mailtemplates.index')
-                ]);
-            }
             return redirect()->route('panel.admin.mailtemplates.index')->with('success', 'Template atualizado');
         }
         return redirect()->route('admin.mailtemplates.index')->with('success', 'Template atualizado');
