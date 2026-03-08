@@ -124,16 +124,24 @@ class JobApplicationService
     private function sendTemplateEmail(string $slug, string $to, array $vars): void
     {
         try {
-            $template = MailTemplate::where('slug', $slug)->where('is_active', true)->first();
-            if (!$template) {
+            // Transformar chaves {var} para {{var}} se necessário para Blade, 
+            // ou garantir que o serviço trate ambos. O serviço SystemMailTemplateService
+            // usa {{var}}. Vamos ajustar as variáveis para o padrão Blade.
+            $bladeVars = [];
+            foreach ($vars as $k => $v) {
+                $cleanKey = trim($k, '{}');
+                $bladeVars[$cleanKey] = $v;
+            }
+
+            $rendered = app(\App\Services\Mail\SystemMailTemplateService::class)->renderFullHtml($slug, $bladeVars);
+
+            if (!$rendered) {
+                Log::warning("sendTemplateEmail[$slug]: Template nao encontrado ou inativo.");
                 return;
             }
 
-            $body = str_replace(array_keys($vars), array_values($vars), $template->body);
-            $subject = str_replace(array_keys($vars), array_values($vars), $template->subject);
-
-            Mail::html($body, function ($m) use ($to, $subject) {
-                $m->to($to)->subject($subject);
+            Mail::html($rendered['html'], function ($m) use ($to, $rendered) {
+                $m->to($to)->subject($rendered['subject']);
             });
         } catch (\Throwable $e) {
             Log::error("sendTemplateEmail[$slug] error: " . $e->getMessage());

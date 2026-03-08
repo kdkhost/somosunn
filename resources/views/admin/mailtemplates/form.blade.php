@@ -231,6 +231,15 @@ $(function(){
     }
     renderPreview();
     $('#bodyEditor').on('summernote.change', renderPreview);
+
+    // Sincronizar editor antes de enviar via AJAX
+    $(document).on('submit', '.ajax-form', function() {
+        if ($('#bodyEditor').summernote('isEmpty')) {
+            $('#bodyEditor').val('');
+        } else {
+            $('#bodyEditor').val($('#bodyEditor').summernote('code'));
+        }
+    });
 });
 </script>
 @endpush

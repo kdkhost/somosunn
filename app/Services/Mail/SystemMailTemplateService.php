@@ -89,5 +89,36 @@ class SystemMailTemplateService
         $allowed = '<p><a><strong><em><ul><ol><li><br><img><table><tr><td><th><tbody><thead><h1><h2><h3><h4><h5><span><div><style><center>';
         return strip_tags($html, $allowed);
     }
+
+    /**
+     * Renders the template and wraps it in the system layout.
+     */
+    public function renderFullHtml(string $slug, array $data): ?array
+    {
+        $rendered = $this->renderBySlug($slug, $data);
+        if (!$rendered) {
+            return null;
+        }
+
+        $layoutData = app(\App\Services\Mail\SystemMailLayoutData::class)->make();
+
+        // Merge site data if available in the input $data
+        if (!empty($data['site']['name'])) {
+            $layoutData['siteName'] = (string) $data['site']['name'];
+        }
+        if (!empty($data['site']['logo'])) {
+            $layoutData['logoUrl'] = (string) $data['site']['logo'];
+        }
+
+        $fullHtml = view('emails.system', array_merge($layoutData, [
+            'content' => $rendered['content'],
+        ]))->render();
+
+        return [
+            'subject' => $rendered['subject'],
+            'html' => $fullHtml,
+            'template' => $rendered['template']
+        ];
+    }
 }
 

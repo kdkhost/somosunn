@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\MailTemplate;
 use App\Http\Controllers\MailTestController;
 use App\Services\Mail\SystemMailLayoutData;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Mail;
 
 class MailTemplateController extends Controller
 {
@@ -129,7 +131,13 @@ class MailTemplateController extends Controller
     public function preview(MailTemplate $mailtemplate)
     {
         $data = $this->sampleData();
-        $html = $this->renderVariables($mailtemplate->body, $data);
+        $rendered = app(\App\Services\Mail\SystemMailTemplateService::class)->renderTemplate($mailtemplate, $data);
+
+        $layoutData = app(\App\Services\Mail\SystemMailLayoutData::class)->make();
+        $html = view('emails.system', array_merge($layoutData, [
+            'content' => app(\App\Services\Mail\SystemMailTemplateService::class)->sanitizeHtml($rendered[1]),
+        ]))->render();
+
         return response()->json(['html' => $html]);
     }
 
@@ -137,12 +145,26 @@ class MailTemplateController extends Controller
     {
         $request->validate(['email' => 'required|email']);
         $data = $this->sampleData($request->input('email'));
-        $html = $this->renderVariables($mailtemplate->body, $data);
+
+        $rendered = app(\App\Services\Mail\SystemMailTemplateService::class)->renderFullHtml($mailtemplate->slug, $data);
+
+        if (!$rendered) {
+            // Em caso de template novo ou inativo, renderizamos manualmente para o teste
+            $tplRendered = app(\App\Services\Mail\SystemMailTemplateService::class)->renderTemplate($mailtemplate, $data);
+            $layoutData = app(\App\Services\Mail\SystemMailLayoutData::class)->make();
+            $html = view('emails.system', array_merge($layoutData, [
+                'content' => app(\App\Services\Mail\SystemMailTemplateService::class)->sanitizeHtml($tplRendered[1]),
+            ]))->render();
+            $subject = $tplRendered[0];
+        } else {
+            $html = $rendered['html'];
+            $subject = $rendered['subject'];
+        }
 
         try {
-            \Mail::html($html, function ($message) use ($request, $mailtemplate) {
+            \Mail::html($html, function ($message) use ($request, $subject) {
                 $message->to($request->input('email'))
-                    ->subject($mailtemplate->subject);
+                    ->subject($subject);
             });
 
             return response()->json(['success' => true, 'message' => 'E-mail de teste enviado com sucesso!']);
@@ -201,34 +223,12 @@ class MailTemplateController extends Controller
 
     protected function renderVariables($body, $data)
     {
-        try {
-            $rendered = \Blade::render($body, $data);
-        } catch (\Throwable $e) {
-            $rendered = $body;
-            foreach ($data as $k => $v) {
-                if (is_array($v)) {
-                    foreach ($v as $subk => $subv) {
-                        $rendered = str_replace('{{' . $k . '.' . $subk . '}}', $subv, $rendered);
-                    }
-                } else {
-                    $rendered = str_replace('{{' . $k . '}}', $v, $rendered);
-                }
-            }
-        }
+        // Este método foi mantido por compatibilidade interna, mas agora delega ao serviço
+        $layoutData = app(\App\Services\Mail\SystemMailLayoutData::class)->make();
+        $rendered = Blade::render($body, $data);
 
-        // Allowed tags
-        $allowed = '<p><a><strong><em><ul><ol><li><br><img><table><tr><td><th><tbody><thead><h1><h2><h3><h4><h5><span><div><style><center>';
-        $content = strip_tags($rendered, $allowed);
-        $layout = app(SystemMailLayoutData::class)->make();
-        if (!empty($data['site']['name'])) {
-            $layout['siteName'] = (string) $data['site']['name'];
-        }
-        if (!empty($data['site']['logo'])) {
-            $layout['logoUrl'] = (string) $data['site']['logo'];
-        }
-
-        return view('emails.system', array_merge($layout, [
-            'content' => $content,
+        return view('emails.system', array_merge($layoutData, [
+            'content' => app(\App\Services\Mail\SystemMailTemplateService::class)->sanitizeHtml($rendered),
         ]))->render();
     }
 }
