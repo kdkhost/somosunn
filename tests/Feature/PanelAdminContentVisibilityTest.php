@@ -179,6 +179,28 @@ class PanelAdminContentVisibilityTest extends TestCase
         $this->assertTrue((bool) $course->published);
     }
 
+    public function test_panel_admin_courses_show_route_redirects_to_edit(): void
+    {
+        $user = $this->createAdminUser('curso-show-admin@example.com');
+
+        $course = Course::create([
+            'user_id' => $user->id,
+            'created_by' => $user->id,
+            'title' => 'Curso para redirecionar',
+            'status' => 'draft',
+            'thumbnail' => 'uploads/course-thumbs/existente.png',
+        ]);
+
+        $response = $this->withoutMiddleware([
+                EnsureUserHasActivePlan::class,
+                EnsureUserIsAdmin::class,
+            ])
+            ->actingAs($user)
+            ->get(route('panel.admin.courses.show', $course));
+
+        $response->assertRedirect(route('panel.admin.courses.edit', $course));
+    }
+
     public function test_panel_admin_events_update_persists_visibility_selection(): void
     {
         $user = $this->createAdminUser('evento-admin@example.com');

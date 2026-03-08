@@ -67,6 +67,17 @@ class CourseController extends Controller
     }
 
     /**
+     * Redirect the resource show route to the edit form.
+     */
+    public function show(Course $course)
+    {
+        $this->ensurePermission('courses.edit');
+        $this->ensureCanManage($course);
+
+        return redirect()->route('panel.admin.courses.edit', $course);
+    }
+
+    /**
      * Store a newly created course in storage.
      */
     public function store(Request $request)

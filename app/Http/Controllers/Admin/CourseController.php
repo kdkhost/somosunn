@@ -76,6 +76,14 @@ class CourseController extends Controller
         return view('admin.courses.form');
     }
 
+    public function show(Course $course)
+    {
+        $this->ensurePermission('courses.edit');
+        $this->ensureCanManage($course);
+
+        return redirect()->route('admin.courses.edit', $course);
+    }
+
     public function store(Request $request)
     {
         $this->ensurePermission('courses.create');
