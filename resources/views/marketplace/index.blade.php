@@ -362,6 +362,64 @@
                 color: #fff;
             }
 
+            .mp-selling-card {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 252, 0.98) 100%);
+                box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+            }
+
+            .mp-selling-media {
+                display: block;
+                width: 100%;
+            }
+
+            .mp-selling-header {
+                min-height: 3.5rem;
+                align-items: center;
+            }
+
+            .mp-selling-title {
+                min-height: 3.6rem;
+            }
+
+            .mp-selling-eyebrow {
+                min-height: 2.5rem;
+            }
+
+            .mp-selling-copy {
+                min-height: 4.8rem;
+            }
+
+            .mp-selling-meta {
+                min-height: 1.75rem;
+            }
+
+            .mp-selling-footer {
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .mp-selling-actions {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.75rem;
+            }
+
+            .mp-selling-actions--single {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .mp-selling-action {
+                min-height: 3.5rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+            }
+
             @media (max-width: 640px) {
                 .swal2-popup.mp-event-popup {
                     min-height: 330px;
@@ -383,6 +441,16 @@
 
                 .mp-event-popup-panel {
                     min-height: 250px;
+                }
+            }
+
+            @media (max-width: 767.98px) {
+                .mp-selling-title,
+                .mp-selling-eyebrow,
+                .mp-selling-copy,
+                .mp-selling-meta,
+                .mp-selling-header {
+                    min-height: auto;
                 }
             }
         </style>
@@ -925,10 +993,11 @@
                         <div class="mp-hscroll flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 px-1"
                             data-hscroll-container>
                             @foreach($flashDeals->take(8) as $deal)
-                                <div class="snap-start shrink-0 w-72 sm:w-80 group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
+                                <article
+                                    class="snap-start shrink-0 w-72 sm:w-80 group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
                                     data-product-card>
-                                    <a href="{{ $deal['url'] }}" class="block">
-                                        <div class="aspect-[16/9] bg-slate-100 relative">
+                                    <a href="{{ $deal['url'] }}" class="block flex flex-1 flex-col">
+                                        <div class="mp-selling-media aspect-[16/9] bg-slate-100 relative">
                                             @if(($deal['image_url'] ?? '') !== '')
                                                 <img src="{{ $deal['image_url'] }}" alt="{{ $deal['title'] }}"
                                                     class="w-full h-full object-cover">
@@ -943,33 +1012,49 @@
                                                 {{ $deal['type'] }}
                                             </div>
                                         </div>
+
+                                        <div class="p-4 flex flex-1 flex-col">
+                                            <div class="mp-selling-eyebrow text-xs font-black uppercase tracking-[0.22em] text-blue-700/80">
+                                                Oferta ativa
+                                            </div>
+                                            <div class="mp-selling-title mt-2 font-black text-slate-900 leading-snug line-clamp-2">
+                                                {{ $deal['title'] }}
+                                            </div>
+
+                                            <div class="mp-selling-copy mt-3 text-sm text-slate-600 line-clamp-3">
+                                                Desconto por tempo limitado para compra direta dentro do marketplace.
+                                            </div>
+
+                                            <div class="mp-selling-footer mt-auto pt-4 border-t border-slate-100">
+                                                <div class="flex items-end justify-between gap-2">
+                                                    <div class="text-lg font-black text-slate-900" data-price-current>
+                                                        {{ $deal['sale'] > 0 ? 'R$ ' . number_format($deal['sale'], 2, ',', '.') : 'Gratuito' }}
+                                                    </div>
+                                                    @if(($deal['original'] ?? 0) > ($deal['sale'] ?? 0))
+                                                        <div class="text-sm font-bold text-slate-400 line-through" data-price-original>
+                                                            R$ {{ number_format((float) $deal['original'], 2, ',', '.') }}
+                                                        </div>
+                                                    @endif
+                                                </div>
+
+                                                <div class="inline-flex items-center gap-2 rounded-full bg-slate-900 text-white px-3 py-1 text-xs font-black"
+                                                    data-flash-sale data-ends-at-ms="{{ (int) ($deal['ends_at_ms'] ?? 0) }}"
+                                                    data-original="{{ (float) ($deal['original'] ?? 0) }}"
+                                                    data-sale="{{ (float) ($deal['sale'] ?? 0) }}">
+                                                    <i class="{{ $deal['icon'] }}"></i>
+                                                    <span data-flash-countdown>00:00:00</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </a>
 
-                                    <div class="p-4">
-                                        <div class="font-black text-slate-900 leading-snug line-clamp-2">
-                                            {{ $deal['title'] }}
-                                        </div>
-
-                                        <div class="mt-2 flex items-center justify-between gap-2">
-                                            <div class="text-lg font-black text-slate-900" data-price-current>
-                                                {{ $deal['sale'] > 0 ? 'R$ ' . number_format($deal['sale'], 2, ',', '.') : 'Gratuito' }}
-                                            </div>
-                                            @if(($deal['original'] ?? 0) > ($deal['sale'] ?? 0))
-                                                <div class="text-sm font-bold text-slate-400 line-through" data-price-original>
-                                                    R$ {{ number_format((float) $deal['original'], 2, ',', '.') }}
-                                                </div>
-                                            @endif
-                                        </div>
-
-                                        <div class="mt-3 inline-flex items-center gap-2 rounded-full bg-slate-900 text-white px-3 py-1 text-xs font-black"
-                                            data-flash-sale data-ends-at-ms="{{ (int) ($deal['ends_at_ms'] ?? 0) }}"
-                                            data-original="{{ (float) ($deal['original'] ?? 0) }}"
-                                            data-sale="{{ (float) ($deal['sale'] ?? 0) }}">
-                                            <i class="{{ $deal['icon'] }}"></i>
-                                            <span data-flash-countdown>00:00:00</span>
-                                        </div>
+                                    <div class="px-4 pb-4">
+                                        <a href="{{ $deal['url'] }}"
+                                            class="mp-selling-action w-full rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
+                                            Ver oferta
+                                        </a>
                                     </div>
-                                </div>
+                                </article>
                             @endforeach
                         </div>
 
@@ -995,7 +1080,7 @@
                         todos</a>
                 </div>
 
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid auto-rows-fr sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     @forelse($courses as $course)
                         @php
                             $showParam = $course->slug ?: $course->id;
@@ -1016,12 +1101,14 @@
                             $badge = ($course->is_featured ?? false) ? 'DESTAQUE' : 'CURSO';
                             $shareCode = \App\Support\ShortLink::encodeProduct('course', (int) $course->id);
                             $shareUrl = $shareCode ? route('share.product', ['code' => $shareCode]) : '';
+                            $courseDesc = \Illuminate\Support\Str::limit(strip_tags((string) ($course->short_description ?? '')), 90);
                         @endphp
 
-                        <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
+                        <article
+                            class="group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
                             data-product-card>
-                            <a href="{{ route('courses.show', $showParam) }}" class="block">
-                                <div class="aspect-[16/9] bg-slate-100 relative">
+                            <a href="{{ route('courses.show', $showParam) }}" class="block flex flex-1 flex-col">
+                                <div class="mp-selling-media aspect-[16/9] bg-slate-100 relative">
                                     @if($thumbUrl !== '')
                                         <img src="{{ $thumbUrl }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
                                     @else
@@ -1044,22 +1131,21 @@
                                     @endif
                                 </div>
 
-                                <div class="p-4">
-                                    <div class="font-black text-slate-900 leading-snug truncate">
+                                <div class="p-4 flex flex-1 flex-col">
+                                    <div class="mp-selling-title font-black text-slate-900 leading-snug line-clamp-2">
                                         {{ $course->title }}
                                     </div>
-                                    <div class="text-xs text-slate-500 truncate mt-1">
+                                    <div class="mp-selling-eyebrow text-xs text-slate-500 mt-1 line-clamp-2">
                                         Produzido e comercializado por: {{ $sellerName }}
                                     </div>
 
-                                    @if(!empty($course->short_description))
-                                        <div class="text-sm text-slate-600 mt-2">
-                                            {{ \Illuminate\Support\Str::limit(strip_tags((string) $course->short_description), 90) }}
-                                        </div>
-                                    @endif
+                                    <div class="mp-selling-copy text-sm text-slate-600 mt-3 line-clamp-3">
+                                        {{ $courseDesc }}
+                                    </div>
 
-                                    <div class="mt-3 flex items-end justify-between gap-3">
-                                        <div>
+                                    <div class="mp-selling-footer mt-auto pt-4 border-t border-slate-100">
+                                        <div class="flex items-end justify-between gap-3">
+                                            <div>
                                             <div class="text-xs text-slate-500">Preço</div>
                                             <div class="flex items-end gap-2">
                                                 <div class="text-lg font-black text-slate-900" data-price-current>
@@ -1072,7 +1158,9 @@
                                                 @endif
                                             </div>
 
-                                            @if($flashActive && $flashEndsAtMs > 0)
+                                            </div>
+
+                                        @if($flashActive && $flashEndsAtMs > 0)
                                                 <div class="mt-2 inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-black text-rose-800"
                                                     data-flash-sale data-ends-at-ms="{{ $flashEndsAtMs }}"
                                                     data-original="{{ number_format($regularPrice, 2, '.', '') }}"
@@ -1087,30 +1175,30 @@
                                 </div>
                             </a>
 
-                            <div class="px-4 pb-4 flex gap-2">
+                            <div class="mp-selling-actions px-4 pb-4">
                                 <a href="{{ route('courses.show', $showParam) }}"
-                                    class="flex-1 inline-flex items-center justify-center rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                    class="mp-selling-action rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
                                     Ver
                                 </a>
 
                                 @if($hasAccess)
                                     <a href="{{ route('courses.show', $showParam) }}"
-                                        class="flex-1 inline-flex items-center justify-center rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
+                                        class="mp-selling-action rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
                                         Acessar
                                     </a>
                                 @elseif($buyEnabled)
                                     <a href="{{ route('checkout.show', $course->id) }}"
-                                        class="flex-1 inline-flex items-center justify-center rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
+                                        class="mp-selling-action rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
                                         Comprar
                                     </a>
                                 @else
                                     <span
-                                        class="flex-1 inline-flex items-center justify-center rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                        class="mp-selling-action rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
                                         {{ $disabledBuyLabel }}
                                     </span>
                                 @endif
                             </div>
-                        </div>
+                        </article>
                     @empty
                         <div class="col-span-full bg-white rounded-3xl border border-slate-100 p-6 text-slate-600">
                             Nenhum curso encontrado no momento.
@@ -1132,7 +1220,7 @@
                         class="text-sm font-black text-blue-700 hover:text-blue-800">Ver todos</a>
                 </div>
 
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid auto-rows-fr sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     @forelse($mentorships as $mentorship)
                         @php
                             $sellerId = (int) ($mentorship->mentor_id ?? 0);
@@ -1153,16 +1241,20 @@
                             $shareCode = \App\Support\ShortLink::encodeProduct('mentorship', (int) $mentorship->id);
                             $shareUrl = $shareCode ? route('share.product', ['code' => $shareCode]) : '';
                             $mentorshipShowUrl = $isMentorshipClosed ? null : route('mentorships.show', $mentorship);
+                            $mentorshipMeta = !is_null($mentorship->slots ?? null)
+                                ? 'Vagas: ' . (int) $mentorship->slots . ' disponiveis'
+                                : 'Mentoria individual';
                         @endphp
 
-                        <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
+                        <article
+                            class="group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
                             data-product-card>
                             @if($mentorshipShowUrl)
-                            <a href="{{ $mentorshipShowUrl }}" class="block">
+                            <a href="{{ $mentorshipShowUrl }}" class="block flex flex-1 flex-col">
                             @else
-                            <div class="block opacity-80">
+                            <div class="block opacity-80 flex flex-1 flex-col">
                             @endif
-                                <div class="aspect-[16/9] bg-slate-100 relative">
+                                <div class="mp-selling-media aspect-[16/9] bg-slate-100 relative">
                                     @if($imageUrl !== '')
                                         <img src="{{ $imageUrl }}" alt="{{ $mentorship->title }}"
                                             class="w-full h-full object-cover">
@@ -1192,22 +1284,21 @@
                                     @endif
                                 </div>
 
-                                <div class="p-4">
-                                    <div class="font-black text-slate-900 leading-snug truncate">
+                                <div class="p-4 flex flex-1 flex-col">
+                                    <div class="mp-selling-title font-black text-slate-900 leading-snug line-clamp-2">
                                         {{ $mentorship->title }}
                                     </div>
-                                    <div class="text-xs text-slate-500 truncate mt-1">
+                                    <div class="mp-selling-eyebrow text-xs text-slate-500 mt-1 line-clamp-2">
                                         Produzido e comercializado por: {{ $mentorName }}
                                     </div>
 
-                                    @if($desc !== '')
-                                        <div class="text-sm text-slate-600 mt-2">
-                                            {{ $desc }}
-                                        </div>
-                                    @endif
+                                    <div class="mp-selling-copy text-sm text-slate-600 mt-3 line-clamp-3">
+                                        {{ $desc }}
+                                    </div>
 
-                                    <div class="mt-3 flex items-end justify-between gap-3">
-                                        <div>
+                                    <div class="mp-selling-footer mt-auto pt-4 border-t border-slate-100">
+                                        <div class="flex items-end justify-between gap-3">
+                                            <div>
                                             <div class="text-xs text-slate-500">Preço</div>
                                             <div class="flex items-end gap-2">
                                                 <div class="text-lg font-black text-slate-900" data-price-current>
@@ -1220,7 +1311,13 @@
                                                 @endif
                                             </div>
 
-                                            @if($flashActive && $flashEndsAtMs > 0)
+                                            </div>
+
+                                        <div class="mp-selling-meta text-sm font-semibold text-slate-600">
+                                            <i class="fas fa-users text-blue-600/70 mr-2"></i>{{ $mentorshipMeta }}
+                                        </div>
+
+                                        @if($flashActive && $flashEndsAtMs > 0)
                                                 <div class="mt-2 inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-black text-rose-800"
                                                     data-flash-sale data-ends-at-ms="{{ $flashEndsAtMs }}"
                                                     data-original="{{ number_format($regularPrice, 2, '.', '') }}"
@@ -1239,32 +1336,32 @@
                             </div>
                             @endif
 
-                            <div class="px-4 pb-4 flex gap-2">
+                            <div class="mp-selling-actions px-4 pb-4">
                                 @if($mentorshipShowUrl)
                                     <a href="{{ $mentorshipShowUrl }}"
-                                        class="flex-1 inline-flex items-center justify-center rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                        class="mp-selling-action rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
                                         Ver
                                     </a>
                                 @else
                                     <span
-                                        class="flex-1 inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                        class="mp-selling-action rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
                                         Encerrada
                                     </span>
                                 @endif
 
                                 @if($buyEnabled && !$isMentorshipClosed)
                                     <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
-                                        class="flex-1 inline-flex items-center justify-center rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
+                                        class="mp-selling-action rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
                                         Comprar
                                     </a>
                                 @else
                                     <span
-                                        class="flex-1 inline-flex items-center justify-center rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                        class="mp-selling-action rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
                                         {{ $disabledBuyLabel }}
                                     </span>
                                 @endif
                             </div>
-                        </div>
+                        </article>
                     @empty
                         <div class="col-span-full bg-white rounded-3xl border border-slate-100 p-6 text-slate-600">
                             Nenhuma mentoria encontrada no momento.
@@ -1286,7 +1383,7 @@
                         todos</a>
                 </div>
 
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid auto-rows-fr sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     @forelse($events as $event)
                         @php
                             $sellerId = (int) ($event->user_id ?? 0);
@@ -1320,16 +1417,18 @@
                             $shareCode = \App\Support\ShortLink::encodeProduct('event', (int) $event->id);
                             $shareUrl = $shareCode ? route('share.product', ['code' => $shareCode]) : '';
                             $eventShowUrl = $isEventClosed ? null : route('events.show', $event);
+                            $eventDesc = \Illuminate\Support\Str::limit(strip_tags((string) ($event->description ?? $event->location ?? '')), 90);
                         @endphp
 
-                        <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
+                        <article
+                            class="group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
                             data-product-card>
                             @if($eventShowUrl)
-                            <a href="{{ $eventShowUrl }}" class="block">
+                            <a href="{{ $eventShowUrl }}" class="block flex flex-1 flex-col">
                             @else
-                            <div class="block opacity-80">
+                            <div class="block opacity-80 flex flex-1 flex-col">
                             @endif
-                                <div class="aspect-[16/9] bg-slate-100 relative">
+                                <div class="mp-selling-media aspect-[16/9] bg-slate-100 relative">
                                     @if($imageUrl !== '')
                                         <img src="{{ $imageUrl }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
                                     @else
@@ -1352,19 +1451,24 @@
                                     @endif
                                 </div>
 
-                                <div class="p-4">
-                                    <div class="font-black text-slate-900 leading-snug truncate">
+                                <div class="p-4 flex flex-1 flex-col">
+                                    <div class="mp-selling-title font-black text-slate-900 leading-snug line-clamp-2">
                                         {{ $event->title }}
                                     </div>
-                                    <div class="text-xs text-slate-500 truncate mt-1">
+                                    <div class="mp-selling-eyebrow text-xs text-slate-500 mt-1 line-clamp-2">
                                         {{ $dateLabel ? ('Data: ' . $dateLabel) : ($event->location ?? 'Evento') }}
                                     </div>
-                                    <div class="text-xs text-slate-500 truncate mt-1">
+                                    <div class="text-xs text-slate-500 mt-1 line-clamp-2">
                                         Produzido e comercializado por: {{ $sellerName }}
                                     </div>
 
-                                    <div class="mt-3 flex items-end justify-between gap-3">
-                                        <div>
+                                    <div class="mp-selling-copy text-sm text-slate-600 mt-3 line-clamp-3">
+                                        {{ $eventDesc }}
+                                    </div>
+
+                                    <div class="mp-selling-footer mt-auto pt-4 border-t border-slate-100">
+                                        <div class="flex items-end justify-between gap-3">
+                                            <div>
                                             <div class="text-xs text-slate-500">Preço</div>
                                             <div class="flex items-end gap-2">
                                                 <div class="text-lg font-black text-slate-900" data-price-current>
@@ -1377,7 +1481,9 @@
                                                 @endif
                                             </div>
 
-                                            @if($flashActive && $flashEndsAtMs > 0)
+                                            </div>
+
+                                        @if($flashActive && $flashEndsAtMs > 0)
                                                 <div class="mt-2 inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-black text-rose-800"
                                                     data-flash-sale data-ends-at-ms="{{ $flashEndsAtMs }}"
                                                     data-original="{{ number_format($regularPrice, 2, '.', '') }}"
@@ -1396,32 +1502,32 @@
                             </div>
                             @endif
 
-                            <div class="px-4 pb-4 flex gap-2">
+                            <div class="mp-selling-actions px-4 pb-4">
                                 @if($eventShowUrl)
                                     <a href="{{ $eventShowUrl }}"
-                                        class="flex-1 inline-flex items-center justify-center rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                        class="mp-selling-action rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
                                         Ver
                                     </a>
                                 @else
                                     <span
-                                        class="flex-1 inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                        class="mp-selling-action rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
                                         Encerrado
                                     </span>
                                 @endif
 
                                 @if($buyEnabled && !$isEventClosed)
                                     <a href="{{ route('events.checkout', $event) }}"
-                                        class="flex-1 inline-flex items-center justify-center rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
+                                        class="mp-selling-action rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
                                         {{ $price > 0 ? 'Comprar' : 'Reservar' }}
                                     </a>
                                 @else
                                     <span
-                                        class="flex-1 inline-flex items-center justify-center rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                        class="mp-selling-action rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
                                         {{ $isEventClosed ? 'Encerrado' : $disabledBuyLabel }}
                                     </span>
                                 @endif
                             </div>
-                        </div>
+                        </article>
                     @empty
                         <div class="col-span-full bg-white rounded-3xl border border-slate-100 p-6 text-slate-600">
                             Nenhum evento encontrado no momento.
