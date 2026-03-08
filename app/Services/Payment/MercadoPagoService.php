@@ -74,8 +74,8 @@ class MercadoPagoService
         if ($response->failed()) {
             \Log::error('MercadoPago Preference Error', [
                 'order_id' => $order->id,
-                'status'   => $response->status(),
-                'body'     => $response->body(),
+                'status' => $response->status(),
+                'body' => $response->body(),
             ]);
             throw new Exception('MercadoPago Preference Error: ' . $response->body());
         }
@@ -559,8 +559,13 @@ class MercadoPagoService
             $token = $account->access_token ?? null;
         }
 
+        // Fallback para o token da plataforma se for admin (sellerId nulo) ou se o vendedor não tiver token
         if (empty($token)) {
-            throw new Exception('Token do Mercado Pago não encontrado.');
+            try {
+                $token = $this->accessToken();
+            } catch (\Exception $e) {
+                throw new Exception('Token do Mercado Pago não encontrado (Plataforma ou Vendedor).');
+            }
         }
 
         $response = Http::withToken($token)
