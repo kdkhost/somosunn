@@ -58,7 +58,7 @@ class MercadoPagoService
     public function createPreference(Order $order, array $options = []): array
     {
         $config = $this->getSellerConfig($order);
-        $token = $config['token'];
+        $token = trim((string) $config['token']);
 
         $calc = $this->calculateTotalAndFee($order, $config);
 
@@ -70,9 +70,7 @@ class MercadoPagoService
 
         $headers = $this->commonHeaders('pref-' . $order->id);
 
-        $response = Http::withToken($token)
-            ->withHeaders($headers)
-            ->post("{$this->baseUrl}/checkout/preferences", $preferenceData);
+        $response = $this->postPreference($token, $headers, $preferenceData);
 
         if ($this->shouldRetryWithoutPolicyHeaders($response, $headers)) {
             $fallbackHeaders = $this->stripPolicyHeaders($headers);
@@ -85,9 +83,23 @@ class MercadoPagoService
                 'had_platform_id' => array_key_exists('X-Platform-Id', $headers),
             ]);
 
-            $response = Http::withToken($token)
-                ->withHeaders($fallbackHeaders)
-                ->post("{$this->baseUrl}/checkout/preferences", $preferenceData);
+            $response = $this->postPreference($token, $fallbackHeaders, $preferenceData);
+
+            if ($response->failed() && $config['is_platform']) {
+                foreach ($this->platformTokenCandidates($token) as $candidateToken) {
+                    \Log::warning('MercadoPago Preference Error - retry com token alternativo da plataforma', [
+                        'order_id' => $order->id,
+                        'status' => $response->status(),
+                        'body' => $response->body(),
+                        'token_prefix' => substr($candidateToken, 0, 12),
+                    ]);
+
+                    $response = $this->postPreference($candidateToken, $fallbackHeaders, $preferenceData);
+                    if ($response->successful()) {
+                        break;
+                    }
+                }
+            }
         }
 
         if ($response->failed()) {
@@ -685,6 +697,13 @@ class MercadoPagoService
         return null;
     }
 
+    private function postPreference(string $token, array $headers, array $payload)
+    {
+        return Http::withToken($token)
+            ->withHeaders($headers)
+            ->post("{$this->baseUrl}/checkout/preferences", $payload);
+    }
+
     private function shouldRetryWithoutPolicyHeaders($response, array $headers): bool
     {
         if ($response->status() !== 403) {
@@ -710,6 +729,27 @@ class MercadoPagoService
         unset($headers['X-Integrator-Id'], $headers['X-Platform-Id']);
 
         return $headers;
+    }
+
+    private function platformTokenCandidates(string $currentToken): array
+    {
+        $tokens = [
+            trim((string) Setting::get('mercadopago_access_token', '')),
+            trim((string) Setting::get('mercadopago_prod_access_token', '')),
+            trim((string) Setting::get('mercadopago_sandbox_access_token', '')),
+            trim((string) config('payments.mercadopago.access_token', '')),
+        ];
+
+        $candidates = [];
+        foreach ($tokens as $token) {
+            if ($token === '' || $token === $currentToken || in_array($token, $candidates, true)) {
+                continue;
+            }
+
+            $candidates[] = $token;
+        }
+
+        return $candidates;
     }
 
     /**

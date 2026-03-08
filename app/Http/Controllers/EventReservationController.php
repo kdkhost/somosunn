@@ -440,7 +440,25 @@ class EventReservationController extends Controller
 
             return redirect()->away($initPoint);
         } catch (\Exception $e) {
-            return back()->with('error', 'Erro ao iniciar pagamento: ' . $e->getMessage());
+            \Log::error('Falha ao iniciar pagamento de evento', [
+                'event_id' => $event->id,
+                'order_id' => $order?->id,
+                'gateway_provider' => $gatewayProvider,
+                'message' => $e->getMessage(),
+            ]);
+
+            $friendlyMessage = 'Nao foi possivel iniciar o pagamento agora.';
+            $rawMessage = (string) $e->getMessage();
+
+            if (str_contains($rawMessage, 'PA_UNAUTHORIZED_RESULT_FROM_POLICIES') || str_contains($rawMessage, 'PolicyAgent')) {
+                $friendlyMessage = !empty($gateways['psEnabled'])
+                    ? 'Mercado Pago indisponivel no momento. Selecione PagSeguro para concluir o pagamento.'
+                    : 'Mercado Pago indisponivel no momento. Tente novamente em instantes.';
+            } elseif (str_contains($rawMessage, 'MercadoPago Preference Error')) {
+                $friendlyMessage = 'Nao foi possivel gerar a sessao de pagamento no Mercado Pago.';
+            }
+
+            return back()->with('error', $friendlyMessage);
         }
     }
 
