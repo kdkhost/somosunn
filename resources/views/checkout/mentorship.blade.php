@@ -6,7 +6,7 @@
     @php
         $selectedGateway = old('gateway_provider');
         if (!$selectedGateway) {
-            $selectedGateway = ($mpEnabled ?? true) ? 'mercadopago' : 'pagseguro';
+            $selectedGateway = ($preferredGateway ?? null) ?: (($mpEnabled ?? true) ? 'mercadopago' : 'pagseguro');
         }
 
         $selectedGatewaySummary = $selectedGateway === 'pagseguro'

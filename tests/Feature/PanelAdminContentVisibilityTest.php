@@ -18,11 +18,15 @@ use Tests\TestCase;
 class PanelAdminContentVisibilityTest extends TestCase
 {
     private string $sqlitePath;
+    private string $originalDefaultConnection;
+    private string $originalSqliteDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->originalDefaultConnection = (string) config('database.default');
+        $this->originalSqliteDatabase = (string) config('database.connections.sqlite.database');
         $this->sqlitePath = database_path('testing-panel-admin-content-visibility.sqlite');
 
         if (file_exists($this->sqlitePath)) {
@@ -129,6 +133,8 @@ class PanelAdminContentVisibilityTest extends TestCase
     protected function tearDown(): void
     {
         DB::disconnect('sqlite');
+        config()->set('database.default', $this->originalDefaultConnection);
+        config()->set('database.connections.sqlite.database', $this->originalSqliteDatabase);
 
         if (isset($this->sqlitePath) && file_exists($this->sqlitePath)) {
             @unlink($this->sqlitePath);
@@ -214,6 +220,7 @@ class PanelAdminContentVisibilityTest extends TestCase
     public function test_panel_admin_mentorships_update_persists_visibility_selection(): void
     {
         $user = $this->createAdminUser('mentoria-admin@example.com');
+        $flashSaleEndsAt = now()->addDays(3)->setSecond(0);
 
         $mentorship = Mentorship::create([
             'mentor_id' => $user->id,
@@ -234,7 +241,9 @@ class PanelAdminContentVisibilityTest extends TestCase
                 'title' => 'Mentoria Atualizada',
                 'mentor_id' => $user->id,
                 'type' => 'online',
-                'price' => '199.90',
+                'price' => '1.999,90',
+                'flash_sale_price' => '999,50',
+                'flash_sale_ends_at' => $flashSaleEndsAt->format('Y-m-d\TH:i'),
                 'visibility' => 'somos_unn',
             ]);
 
@@ -244,6 +253,9 @@ class PanelAdminContentVisibilityTest extends TestCase
 
         $this->assertSame('somos_unn', $mentorship->visibility);
         $this->assertFalse((bool) $mentorship->is_somos_unicas);
+        $this->assertSame('1999.90', $mentorship->price);
+        $this->assertSame('999.50', $mentorship->flash_sale_price);
+        $this->assertSame($flashSaleEndsAt->format('Y-m-d H:i:s'), $mentorship->flash_sale_ends_at?->format('Y-m-d H:i:s'));
     }
 
     private function createAdminUser(string $email): User

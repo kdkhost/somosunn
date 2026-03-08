@@ -2,15 +2,18 @@
 
 namespace Tests\Feature;
 
-use App\Models\Event;
+use App\Models\Course;
 use App\Models\GatewayAccount;
+use App\Models\Mentorship;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
-class MarketplacePaymentAvailabilityTest extends TestCase
+class CheckoutGatewayAvailabilityTest extends TestCase
 {
     private string $sqlitePath;
     private string $originalDefaultConnection;
@@ -20,9 +23,10 @@ class MarketplacePaymentAvailabilityTest extends TestCase
     {
         parent::setUp();
 
+        Setting::flushRuntimeCache();
         $this->originalDefaultConnection = (string) config('database.default');
         $this->originalSqliteDatabase = (string) config('database.connections.sqlite.database');
-        $this->sqlitePath = database_path('testing-marketplace-payment-availability.sqlite');
+        $this->sqlitePath = database_path('testing-checkout-gateway-availability.sqlite');
 
         if (file_exists($this->sqlitePath)) {
             @unlink($this->sqlitePath);
@@ -40,23 +44,20 @@ class MarketplacePaymentAvailabilityTest extends TestCase
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('password')->nullable();
+            $table->string('password');
             $table->string('role')->nullable();
             $table->string('level')->nullable();
-            $table->string('referral_code')->nullable();
+            $table->string('referral_code')->nullable()->unique();
             $table->json('extra_features')->nullable();
-            $table->unsignedBigInteger('plan_id')->nullable();
-            $table->timestamp('plan_expires_at')->nullable();
             $table->rememberToken()->nullable();
             $table->timestamps();
         });
 
-        Schema::create('subscriptions', function (Blueprint $table) {
+        Schema::create('settings', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('plan_id')->nullable();
-            $table->string('status')->nullable();
-            $table->timestamp('ends_at')->nullable();
+            $table->string('key')->unique();
+            $table->text('value')->nullable();
+            $table->string('group')->nullable();
             $table->timestamps();
         });
 
@@ -75,40 +76,25 @@ class MarketplacePaymentAvailabilityTest extends TestCase
             $table->timestamps();
         });
 
-        Schema::create('events', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->string('title');
-            $table->text('description')->nullable();
-            $table->string('speaker')->nullable();
-            $table->string('image')->nullable();
-            $table->timestamp('start_at')->nullable();
-            $table->timestamp('end_at')->nullable();
-            $table->string('location')->nullable();
-            $table->string('address')->nullable();
-            $table->decimal('price', 10, 2)->default(0);
-            $table->decimal('flash_sale_price', 10, 2)->nullable();
-            $table->timestamp('flash_sale_ends_at')->nullable();
-            $table->decimal('batch_1_price', 10, 2)->nullable();
-            $table->timestamp('batch_1_deadline')->nullable();
-            $table->decimal('batch_2_price', 10, 2)->nullable();
-            $table->timestamp('batch_2_deadline')->nullable();
-            $table->decimal('batch_3_price', 10, 2)->nullable();
-            $table->timestamp('batch_3_deadline')->nullable();
-            $table->boolean('published')->default(false);
-            $table->boolean('all_day')->default(false);
-            $table->timestamps();
-        });
-
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('title');
+            $table->string('slug')->nullable();
             $table->text('short_description')->nullable();
-            $table->string('thumbnail')->nullable();
+            $table->longText('full_description')->nullable();
             $table->decimal('price', 10, 2)->default(0);
+            $table->decimal('flash_sale_price', 10, 2)->nullable();
+            $table->dateTime('flash_sale_ends_at')->nullable();
+            $table->string('author_name')->nullable();
             $table->string('status')->default('draft');
+            $table->boolean('published')->default(false);
             $table->boolean('is_featured')->default(false);
+            $table->boolean('is_certificate_enabled')->default(false);
+            $table->boolean('video_block_download')->default(false);
+            $table->boolean('video_floating_enabled')->default(false);
+            $table->integer('video_floating_width')->nullable();
+            $table->integer('video_floating_height')->nullable();
             $table->timestamps();
         });
 
@@ -120,16 +106,13 @@ class MarketplacePaymentAvailabilityTest extends TestCase
             $table->string('image')->nullable();
             $table->decimal('price', 10, 2)->default(0);
             $table->decimal('flash_sale_price', 10, 2)->nullable();
-            $table->timestamp('flash_sale_ends_at')->nullable();
+            $table->dateTime('flash_sale_ends_at')->nullable();
             $table->json('schedule')->nullable();
-            $table->integer('slots')->default(0);
-            $table->timestamps();
-        });
-
-        Schema::create('testimonials', function (Blueprint $table) {
-            $table->id();
-            $table->string('status')->nullable();
-            $table->boolean('is_featured')->default(false);
+            $table->integer('slots')->nullable();
+            $table->string('type')->nullable();
+            $table->string('video_platform')->nullable();
+            $table->string('video_link')->nullable();
+            $table->string('demo_link')->nullable();
             $table->timestamps();
         });
 
@@ -146,10 +129,10 @@ class MarketplacePaymentAvailabilityTest extends TestCase
             $table->timestamps();
         });
 
-        Schema::create('settings', function (Blueprint $table) {
+        Schema::create('testimonials', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->unique();
-            $table->text('value')->nullable();
+            $table->string('status')->nullable();
+            $table->boolean('is_featured')->default(false);
             $table->timestamps();
         });
     }
@@ -157,47 +140,80 @@ class MarketplacePaymentAvailabilityTest extends TestCase
     protected function tearDown(): void
     {
         DB::disconnect('sqlite');
+        Setting::flushRuntimeCache();
         config()->set('database.default', $this->originalDefaultConnection);
         config()->set('database.connections.sqlite.database', $this->originalSqliteDatabase);
 
-        if (file_exists($this->sqlitePath)) {
+        if (isset($this->sqlitePath) && file_exists($this->sqlitePath)) {
             @unlink($this->sqlitePath);
         }
 
         parent::tearDown();
     }
 
-    public function test_marketplace_keeps_future_event_buy_action_enabled_with_pagseguro_seller_gateway(): void
+    public function test_course_checkout_accepts_global_database_gateway_when_seller_has_incomplete_account(): void
     {
-        $seller = User::create([
-            'name' => 'Organizador Teste',
-            'email' => 'organizador@test.com',
-            'password' => bcrypt('password'),
-            'role' => 'admin',
-            'level' => 'iniciante',
-        ]);
+        Setting::set('mercadopago_env', 'production');
+        Setting::set('mercadopago_prod_public_key', 'APP_USR-TEST-PUBLIC');
+        Setting::set('mercadopago_prod_access_token', 'APP_USR-TEST-TOKEN');
+
+        $seller = $this->createAdminUser('seller-course@test.com');
+        $buyer = $this->createAdminUser('buyer-course@test.com');
 
         GatewayAccount::create([
             'user_id' => $seller->id,
-            'provider' => 'pagseguro',
-            'access_token' => 'PAGSEGURO-TOKEN-123',
+            'provider' => 'mercadopago',
             'enabled' => true,
+            'public_key' => null,
+            'access_token' => null,
         ]);
 
-        $event = Event::create([
+        $course = Course::create([
             'user_id' => $seller->id,
-            'title' => 'Evento futuro com PagSeguro',
-            'description' => 'Evento disponível para compra',
-            'start_at' => now()->addDays(4)->setTime(13, 0),
+            'title' => 'Curso com gateway global',
+            'slug' => 'curso-com-gateway-global',
+            'price' => 149.90,
+            'status' => 'published',
             'published' => true,
-            'price' => 150,
         ]);
 
-        $response = $this->get(route('marketplace.index'));
+        $this->actingAs($buyer)
+            ->get(route('checkout.show', $course))
+            ->assertOk()
+            ->assertSee('Finalizar compra')
+            ->assertDontSee('ainda não configurou um método de pagamento');
+    }
 
-        $response->assertOk();
-        $response->assertSee('Evento futuro com PagSeguro');
-        $response->assertSee(route('events.checkout', $event), false);
-        $response->assertDontSee('Compras pagas indisponíveis no momento');
+    public function test_mentorship_checkout_accepts_global_database_gateway_when_seller_has_no_account(): void
+    {
+        Setting::set('mercadopago_env', 'production');
+        Setting::set('mercadopago_prod_public_key', 'APP_USR-TEST-PUBLIC');
+        Setting::set('mercadopago_prod_access_token', 'APP_USR-TEST-TOKEN');
+
+        $seller = $this->createAdminUser('seller-mentorship@test.com');
+        $buyer = $this->createAdminUser('buyer-mentorship@test.com');
+
+        $mentorship = Mentorship::create([
+            'mentor_id' => $seller->id,
+            'title' => 'Mentoria com gateway global',
+            'price' => 299.90,
+            'type' => 'online',
+        ]);
+
+        $this->actingAs($buyer)
+            ->get(route('mentorships.checkout.show', $mentorship))
+            ->assertOk()
+            ->assertSee('Finalizar compra')
+            ->assertDontSee('ainda não configurou um método de pagamento');
+    }
+
+    private function createAdminUser(string $email): User
+    {
+        return User::create([
+            'name' => 'Usuario Teste',
+            'email' => $email,
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+        ]);
     }
 }

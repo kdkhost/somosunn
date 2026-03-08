@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class GatewayAccount extends Model
 {
@@ -11,7 +12,7 @@ class GatewayAccount extends Model
 
     protected $fillable = [
         'user_id',
-        'provider', // mercadopago, pagseguro
+        'provider',
         'public_key',
         'access_token',
         'client_id',
@@ -33,65 +34,138 @@ class GatewayAccount extends Model
     }
 
     /**
-     * Resolve os gateways disponíveis para um vendedor.
+     * Resolve os gateways disponiveis para um vendedor.
      *
-     * Regras:
-     * - Retorna apenas contas ativas com access_token preenchido.
-     * - Se o vendedor marcou um gateway como preferido (extra.is_preferred = true),
-     *   apenas esse é retornado (o cliente não tem escolha).
-     * - Se apenas um gateway estiver configurado, ele é o "preferido" implícito.
+     * Prioridade:
+     * 1. Credenciais conectadas do vendedor em gateway_accounts.
+     * 2. Credenciais globais da plataforma salvas na tabela settings.
      *
-     * @return array{mpEnabled: bool, psEnabled: bool, preferredGateway: string|null}
+     * O fallback global so acontece quando o vendedor nao tem nenhum gateway
+     * realmente utilizavel para o checkout atual.
+     *
+     * @return array{
+     *   mpEnabled: bool,
+     *   psEnabled: bool,
+     *   preferredGateway: string|null,
+     *   mpPublicKey: string,
+     *   psPublicKey: string,
+     *   useGlobalCredentials: bool,
+     *   source: string
+     * }
      */
     public static function resolveForSeller(int $sellerId): array
     {
-        $accounts = self::where('user_id', $sellerId)
-            ->where('enabled', true)
-            ->whereNotNull('access_token')
-            ->where('access_token', '!=', '')
-            ->get()
-            ->keyBy('provider');
+        $accounts = collect();
 
-        if ($accounts->isEmpty()) {
-            // Log para diagnóstico — mostra o que existe na tabela para esse seller
-            $allAccounts = self::where('user_id', $sellerId)->get();
-            \Illuminate\Support\Facades\Log::warning('GatewayAccount::resolveForSeller — nenhuma conta ativa encontrada', [
-                'seller_id' => $sellerId,
-                'total_records' => $allAccounts->count(),
-                'records' => $allAccounts->map(fn($a) => [
-                    'id' => $a->id,
-                    'provider' => $a->provider,
-                    'enabled' => $a->enabled,
-                    'has_token' => !empty($a->getAttributes()['access_token']),
-                    'token_length' => strlen((string) $a->getAttributes()['access_token']),
-                ])->toArray(),
-            ]);
-
-            // Não existe fallback para config/payments.php: credenciais devem estar no banco de dados.
-            return [
-                'mpEnabled' => false,
-                'psEnabled' => false,
-                'preferredGateway' => null,
-                'useGlobalCredentials' => false,
-            ];
+        if ($sellerId > 0) {
+            $accounts = self::query()
+                ->where('user_id', $sellerId)
+                ->where('enabled', true)
+                ->get()
+                ->keyBy('provider');
         }
 
-        // Verificar se algum gateway está marcado como preferido
+        $sellerGateways = static::resolveSellerAccounts($accounts);
+        if ($sellerGateways['mpEnabled'] || $sellerGateways['psEnabled']) {
+            return $sellerGateways;
+        }
+
+        if ($sellerId > 0 && $accounts->isNotEmpty()) {
+            \Illuminate\Support\Facades\Log::warning('GatewayAccount::resolveForSeller - fallback para credenciais globais', [
+                'seller_id' => $sellerId,
+                'records' => $accounts->map(fn (GatewayAccount $account) => [
+                    'id' => $account->id,
+                    'provider' => $account->provider,
+                    'enabled' => (bool) $account->enabled,
+                    'has_public_key' => trim((string) ($account->public_key ?? '')) !== '',
+                    'has_token' => trim((string) ($account->access_token ?? '')) !== '',
+                ])->values()->toArray(),
+            ]);
+        }
+
+        return static::resolveGlobalSettings();
+    }
+
+    private static function resolveSellerAccounts(Collection $accounts): array
+    {
+        /** @var GatewayAccount|null $mercadoPago */
+        $mercadoPago = $accounts->get('mercadopago');
+        /** @var GatewayAccount|null $pagSeguro */
+        $pagSeguro = $accounts->get('pagseguro');
+
+        $mpPublicKey = trim((string) ($mercadoPago->public_key ?? ''));
+        $mpToken = trim((string) ($mercadoPago->access_token ?? ''));
+        $psToken = trim((string) ($pagSeguro->access_token ?? ''));
+
+        $mpEnabled = $mpPublicKey !== '' && $mpToken !== '';
+        $psEnabled = $psToken !== '';
+
         $preferred = null;
-        foreach ($accounts as $provider => $account) {
+        foreach (['mercadopago' => $mercadoPago, 'pagseguro' => $pagSeguro] as $provider => $account) {
+            if (!$account) {
+                continue;
+            }
+
+            if (($provider === 'mercadopago' && !$mpEnabled) || ($provider === 'pagseguro' && !$psEnabled)) {
+                continue;
+            }
+
             if (!empty($account->extra['is_preferred'])) {
                 $preferred = $provider;
                 break;
             }
         }
 
-        // Preferido implícito: único gateway configurado
-        $impliedPreferred = ($accounts->count() === 1) ? $accounts->keys()->first() : null;
+        if ($preferred === null) {
+            $enabledProviders = array_values(array_filter([
+                $mpEnabled ? 'mercadopago' : null,
+                $psEnabled ? 'pagseguro' : null,
+            ]));
+
+            if (count($enabledProviders) === 1) {
+                $preferred = $enabledProviders[0];
+            }
+        }
 
         return [
-            'mpEnabled' => $accounts->has('mercadopago'),
-            'psEnabled' => $accounts->has('pagseguro'),
-            'preferredGateway' => $preferred ?? $impliedPreferred,
+            'mpEnabled' => $mpEnabled,
+            'psEnabled' => $psEnabled,
+            'preferredGateway' => $preferred,
+            'mpPublicKey' => $mpEnabled ? $mpPublicKey : '',
+            'psPublicKey' => '',
+            'useGlobalCredentials' => false,
+            'source' => 'seller',
+        ];
+    }
+
+    private static function resolveGlobalSettings(): array
+    {
+        $mpEnv = (string) Setting::get('mercadopago_env', 'sandbox');
+        $mpPrefix = $mpEnv === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
+
+        $mpPublicKey = trim((string) (Setting::get($mpPrefix . 'public_key') ?: Setting::get('mercadopago_public_key', '')));
+        $mpToken = trim((string) (Setting::get($mpPrefix . 'access_token') ?: Setting::get('mercadopago_access_token', '')));
+
+        $psEnv = (string) Setting::get('pagseguro_env', 'sandbox');
+        $psPrefix = $psEnv === 'production' ? 'pagseguro_prod_' : 'pagseguro_sandbox_';
+        $psToken = trim((string) (Setting::get($psPrefix . 'token') ?: Setting::get('pagseguro_token', '')));
+
+        $mpEnabled = $mpPublicKey !== '' && $mpToken !== '';
+        $psEnabled = $psToken !== '';
+
+        $preferred = null;
+        if ($mpEnabled xor $psEnabled) {
+            $preferred = $mpEnabled ? 'mercadopago' : 'pagseguro';
+        }
+
+        return [
+            'mpEnabled' => $mpEnabled,
+            'psEnabled' => $psEnabled,
+            'preferredGateway' => $preferred,
+            'mpPublicKey' => $mpEnabled ? $mpPublicKey : '',
+            'psPublicKey' => '',
+            'useGlobalCredentials' => true,
+            'source' => 'global',
         ];
     }
 }

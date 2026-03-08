@@ -74,10 +74,10 @@ class MentorshipCheckoutController extends Controller
             'gateway_provider' => 'nullable|string|in:mercadopago,pagseguro',
         ]);
 
-        $gatewayProvider = $request->input('gateway_provider', 'mercadopago');
+        $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
+        $gatewayProvider = $request->input('gateway_provider', $gateways['preferredGateway'] ?? 'mercadopago');
 
         // Validar que o vendedor/mentor tem o gateway selecionado configurado
-        $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $mentorship->mentor_id);
         if (($gatewayProvider === 'mercadopago' && !$gateways['mpEnabled'])
             || ($gatewayProvider === 'pagseguro' && !$gateways['psEnabled'])) {
             if ($gateways['mpEnabled']) {
@@ -179,7 +179,7 @@ class MentorshipCheckoutController extends Controller
             if ($gatewayProvider === 'pagseguro') {
                 return view('checkout.pagseguro_transparent', [
                     'order' => $order,
-                    'publicKey' => config('payments.pagseguro.public_key'),
+                    'publicKey' => $gateways['psPublicKey'] ?? config('payments.pagseguro.public_key'),
                     'pixAvailable' => $psService->isPixAvailable($order),
                 ]);
             } else {
@@ -198,7 +198,7 @@ class MentorshipCheckoutController extends Controller
                 return view('checkout.transparent', [
                     'order' => $order,
                     'preferenceId' => $preference['id'] ?? '',
-                    'publicKey' => config('payments.mercadopago.public_key'),
+                    'publicKey' => $gateways['mpPublicKey'] ?: config('payments.mercadopago.public_key'),
                 ]);
             }
 

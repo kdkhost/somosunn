@@ -18,10 +18,11 @@ class CheckoutTest extends TestCase
         $this->withoutExceptionHandling();
 
         // Fake dynamic settings for the gateway
-        Setting::updateOrCreate(['key' => 'mercadopago_env'], ['value' => 'sandbox']);
-        Setting::updateOrCreate(['key' => 'mercadopago_sandbox_access_token'], ['value' => 'TEST-12345']);
-        Setting::updateOrCreate(['key' => 'mercadopago_sandbox_public_key'], ['value' => 'TEST-PUB-123']);
-        Setting::updateOrCreate(['key' => 'mercadopago_integrator_id'], ['value' => 'DEV_123']);
+        Setting::flushRuntimeCache();
+        Setting::set('mercadopago_env', 'sandbox');
+        Setting::set('mercadopago_sandbox_access_token', 'TEST-12345');
+        Setting::set('mercadopago_sandbox_public_key', 'TEST-PUB-123');
+        Setting::set('mercadopago_integrator_id', 'DEV_123');
 
         $user = User::create([
             'name' => 'Tester Checkout',

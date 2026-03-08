@@ -64,10 +64,10 @@ class CheckoutController extends Controller
             'gateway_provider' => 'nullable|string|in:mercadopago,pagseguro',
         ]);
 
-        $gatewayProvider = $request->input('gateway_provider', 'mercadopago');
+        $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
+        $gatewayProvider = $request->input('gateway_provider', $gateways['preferredGateway'] ?? 'mercadopago');
 
         // Validar que o vendedor tem o gateway selecionado configurado
-        $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $course->user_id);
         if (($gatewayProvider === 'mercadopago' && !$gateways['mpEnabled'])
             || ($gatewayProvider === 'pagseguro' && !$gateways['psEnabled'])) {
             // Fallback automático para o gateway disponível
@@ -180,7 +180,7 @@ class CheckoutController extends Controller
                 // Better: 
                 return view('checkout.pagseguro_transparent', [
                     'order' => $order,
-                    'publicKey' => config('payments.pagseguro.public_key'), // Using Platform Key for now as encryption key? 
+                    'publicKey' => $gateways['psPublicKey'] ?? config('payments.pagseguro.public_key'),
                     'pixAvailable' => $psService->isPixAvailable($order),
                     // Note: If using Split, we should encrypt with Seller's Key? 
                     // V4 Split usually uses Platform Key for encryption and `charges` param to distribute.
@@ -224,7 +224,7 @@ class CheckoutController extends Controller
                 return view('checkout.transparent', [
                     'order' => $order,
                     'preferenceId' => $preference['id'] ?? '',
-                    'publicKey' => config('payments.mercadopago.public_key'),
+                    'publicKey' => $gateways['mpPublicKey'] ?: config('payments.mercadopago.public_key'),
                 ]);
             }
 

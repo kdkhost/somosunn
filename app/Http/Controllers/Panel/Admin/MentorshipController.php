@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Services\PointsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
 
 class MentorshipController extends Controller
 {
@@ -52,6 +51,9 @@ class MentorshipController extends Controller
     public function store(Request $request)
     {
         $this->ensurePermission('mentorships.create');
+
+        $this->normalizeMoneyFields($request);
+        $this->sanitizeDates($request);
 
         $data = $this->validatedData($request, true);
         $data['mentor_id'] = $this->resolveMentorId($request, $data['mentor_id'] ?? null);
@@ -99,6 +101,9 @@ class MentorshipController extends Controller
     {
         $this->ensurePermission('mentorships.edit');
         $this->ensureOwnership($mentorship);
+
+        $this->normalizeMoneyFields($request);
+        $this->sanitizeDates($request);
 
         $data = $this->validatedData($request);
         $data['mentor_id'] = $this->resolveMentorId($request, $data['mentor_id'] ?? null);
@@ -148,8 +153,8 @@ class MentorshipController extends Controller
         return $request->validate([
             'title' => 'required|string|max:255',
             'mentor_id' => 'nullable|exists:users,id',
-            'price' => 'nullable|string', // Will normalize in logic if needed
-            'flash_sale_price' => 'nullable|string',
+            'price' => 'nullable|numeric|min:0',
+            'flash_sale_price' => 'nullable|numeric|min:0',
             'flash_sale_ends_at' => 'nullable|date',
             'slots' => 'nullable|integer|min:1',
             'description' => 'nullable|string',
@@ -162,6 +167,43 @@ class MentorshipController extends Controller
             'demo_link' => 'nullable|string|max:2000',
             'visibility' => $this->visibilityRule(),
         ]);
+    }
+
+    private function normalizeMoneyFields(Request $request): void
+    {
+        foreach (['price', 'flash_sale_price'] as $field) {
+            if (!$request->has($field)) {
+                continue;
+            }
+
+            $value = trim((string) $request->input($field));
+            if ($value === '') {
+                $request->merge([$field => $field === 'price' ? '0' : null]);
+                continue;
+            }
+
+            $value = str_replace(['R$', ' ', "\u{00A0}"], '', $value);
+            if ($value === '') {
+                $request->merge([$field => $field === 'price' ? '0' : null]);
+                continue;
+            }
+
+            if (str_contains($value, ',')) {
+                $value = str_replace('.', '', $value);
+                $value = str_replace(',', '.', $value);
+            }
+
+            $request->merge([$field => $value]);
+        }
+    }
+
+    private function sanitizeDates(Request $request): void
+    {
+        if ($request->has('flash_sale_ends_at') && $request->filled('flash_sale_ends_at')) {
+            $request->merge([
+                'flash_sale_ends_at' => str_replace('T', ' ', (string) $request->input('flash_sale_ends_at')),
+            ]);
+        }
     }
 
     private function deletePublicImageIfExists(?string $path): void
