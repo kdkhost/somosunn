@@ -78,6 +78,11 @@
                     <i class="fas fa-info-circle"></i>
                     <p>Posicione o QR Code no centro da moldura.</p>
                 </div>
+                <div
+                    class="flex items-center gap-2 p-4 bg-slate-50 dark:bg-slate-900/70 text-slate-700 dark:text-slate-300 rounded-2xl text-sm font-semibold border border-slate-200 dark:border-slate-800">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <p>Para eventos com localizacao configurada, a validacao aceita ate 50m do ponto do evento. Toda leitura fica registrada no sistema.</p>
+                </div>
             </div>
         </div>
 

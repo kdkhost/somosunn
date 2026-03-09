@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
-use App\Models\EventRegistration;
 use App\Services\PointsService;
+use App\Services\EventTicketScannerService;
 use Illuminate\Http\Request;
 
 class EventScannerController extends Controller
@@ -23,65 +23,29 @@ class EventScannerController extends Controller
         return view('admin.events.scanner', compact('event', 'scannerOpen', 'scannerStatusMessage'));
     }
 
-    public function validateTicket(Request $request, Event $event, PointsService $pointsService)
+    public function validateTicket(
+        Request $request,
+        Event $event,
+        PointsService $pointsService,
+        EventTicketScannerService $scannerService
+    )
     {
         $request->validate([
             'ticket_code' => 'required|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
-        $now = now();
-        if (!$event->isScannerOpen($now)) {
-            return response()->json([
-                'success' => false,
-                'message' => $event->scannerStatusMessage($now),
-            ]);
-        }
-
-        $ticketCode = $request->input('ticket_code');
-
-        $registration = EventRegistration::where('event_id', $event->id)
-            ->where('ticket_code', $ticketCode)
-            ->whereIn('status', EventRegistration::COUNTED_STATUSES)
-            ->first();
-
-        if (!$registration) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ingresso nao encontrado ou invalido para este evento.',
-            ]);
-        }
-
-        if ($registration->check_in_at) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Este ingresso ja foi validado em ' . $registration->check_in_at->format('d/m/Y H:i'),
-            ]);
-        }
-
-        $registration->update([
-            'check_in_at' => $now,
-        ]);
-
-        try {
-            if ($registration->user_id) {
-                $user = \App\Models\User::find($registration->user_id);
-                if ($user) {
-                    $pointsService->award($user, 'event_scan_participant');
-                }
-            }
-
-            $organizer = \App\Models\User::find($event->user_id);
-            if ($organizer) {
-                $pointsService->award($organizer, 'event_scan_organizer');
-            }
-        } catch (\Exception $e) {
-            \Log::error('Erro ao atribuir pontos no check-in do evento (Admin): ' . $e->getMessage());
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Ingresso validado com sucesso! Check-in realizado.',
-            'participant_name' => $registration->user ? $registration->user->name : $registration->name,
-        ]);
+        return response()->json(
+            $scannerService->validateForEvent(
+                $event,
+                (string) $request->input('ticket_code'),
+                $request->input('latitude') !== null ? (float) $request->input('latitude') : null,
+                $request->input('longitude') !== null ? (float) $request->input('longitude') : null,
+                auth()->user(),
+                $pointsService,
+                'admin_event'
+            )
+        );
     }
 }

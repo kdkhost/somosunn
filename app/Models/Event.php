@@ -13,6 +13,8 @@ class Event extends Model
 {
     use HasFactory;
 
+    public const SCANNER_LOCATION_RADIUS_METERS = 50;
+
     protected $fillable = [
         'user_id',
         'title',
@@ -242,6 +244,53 @@ class Event extends Model
         }
 
         return $start->copy()->endOfDay();
+    }
+
+    public function hasScannerLocationConstraint(): bool
+    {
+        return $this->latitude !== null && $this->longitude !== null;
+    }
+
+    public function scannerLocationRadiusMeters(): int
+    {
+        return self::SCANNER_LOCATION_RADIUS_METERS;
+    }
+
+    public function scannerLocationMessage(): string
+    {
+        if (!$this->hasScannerLocationConstraint()) {
+            return 'Este evento nao exige validacao por localizacao.';
+        }
+
+        return 'Validacao por localizacao ativa: o scanner deve estar em ate '
+            . $this->scannerLocationRadiusMeters()
+            . 'm do ponto configurado para o evento.';
+    }
+
+    public function distanceToScannerLocationMeters(?float $latitude, ?float $longitude): ?float
+    {
+        if (!$this->hasScannerLocationConstraint() || $latitude === null || $longitude === null) {
+            return null;
+        }
+
+        $earthRadiusMeters = 6371000;
+        $dLat = deg2rad((float) $this->latitude - $latitude);
+        $dLon = deg2rad((float) $this->longitude - $longitude);
+        $originLat = deg2rad($latitude);
+        $eventLat = deg2rad((float) $this->latitude);
+
+        $a = sin($dLat / 2) * sin($dLat / 2)
+            + cos($originLat) * cos($eventLat) * sin($dLon / 2) * sin($dLon / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadiusMeters * $c;
+    }
+
+    public function isWithinScannerLocationRadius(?float $latitude, ?float $longitude): bool
+    {
+        $distance = $this->distanceToScannerLocationMeters($latitude, $longitude);
+
+        return $distance !== null && $distance <= $this->scannerLocationRadiusMeters();
     }
 
     public function isScannerOpen(?CarbonInterface $reference = null): bool
