@@ -366,21 +366,62 @@
                 height: 100%;
                 display: flex;
                 flex-direction: column;
-                background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 252, 0.98) 100%);
-                box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-                border-radius: 0 !important;
+                position: relative;
+                padding: 1.5rem;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.95) 100%);
+                box-shadow: 0 18px 42px rgba(30, 64, 175, 0.08);
+                border-radius: 1.5rem !important;
+                border-color: rgba(191, 219, 254, 0.9) !important;
+                overflow: visible !important;
+                transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+            }
+
+            .mp-selling-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 24px 48px rgba(30, 64, 175, 0.14);
+                border-color: rgba(96, 165, 250, 0.7) !important;
             }
 
             .mp-selling-media {
                 display: block;
                 width: 100%;
-                border-radius: 0 !important;
+                margin-bottom: 1rem;
+                border-radius: 1rem !important;
                 overflow: hidden;
+                border: 1px solid rgba(191, 219, 254, 0.75);
+                box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
             }
 
             .mp-selling-media img,
             .mp-selling-media > div {
-                border-radius: 0 !important;
+                border-radius: 1rem !important;
+                transition: transform .45s ease;
+            }
+
+            .mp-selling-card:hover .mp-selling-media img {
+                transform: scale(1.04);
+            }
+
+            .mp-selling-badge {
+                border-radius: 999px !important;
+                box-shadow: 0 10px 24px rgba(30, 64, 175, 0.25);
+                transition: transform .3s ease, box-shadow .3s ease;
+            }
+
+            .mp-selling-card:hover .mp-selling-badge {
+                transform: translateY(-2px);
+                box-shadow: 0 14px 28px rgba(30, 64, 175, 0.3);
+            }
+
+            .mp-selling-share {
+                border-radius: 999px !important;
+                box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+                transition: transform .25s ease, box-shadow .25s ease, background-color .25s ease;
+            }
+
+            .mp-selling-share:hover {
+                transform: translateY(-1px) scale(1.03);
+                box-shadow: 0 14px 24px rgba(15, 23, 42, 0.16);
             }
 
             .mp-selling-header {
@@ -390,6 +431,8 @@
 
             .mp-selling-title {
                 min-height: 3.6rem;
+                font-size: 1.05rem;
+                line-height: 1.28;
             }
 
             .mp-selling-eyebrow {
@@ -410,10 +453,18 @@
                 gap: 0.75rem;
             }
 
+            .mp-selling-content {
+                display: flex;
+                flex: 1;
+                flex-direction: column;
+            }
+
             .mp-selling-actions {
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 0.75rem;
+                margin-top: auto;
+                padding-top: 1rem;
             }
 
             .mp-selling-actions--single {
@@ -426,12 +477,52 @@
                 align-items: center;
                 justify-content: center;
                 text-align: center;
-                border-radius: 0 !important;
+                border-radius: 0.85rem !important;
+                transition: transform .3s ease, box-shadow .3s ease, background-color .3s ease, border-color .3s ease, color .3s ease, filter .3s ease;
+            }
+
+            .mp-selling-action:hover {
+                transform: translateY(-2px);
+            }
+
+            .mp-selling-action-primary {
+                background: linear-gradient(135deg, var(--unn-azul-1) 0%, var(--unn-azul-2) 50%, var(--unn-azul-3) 100%);
+                color: #fff !important;
+                box-shadow: 0 10px 26px rgba(37, 99, 235, 0.22);
+            }
+
+            .mp-selling-action-primary:hover {
+                filter: brightness(1.08);
+                box-shadow: 0 16px 30px rgba(37, 99, 235, 0.26);
+            }
+
+            .mp-selling-action-secondary {
+                border: 2px solid rgba(191, 219, 254, 0.95) !important;
+                color: #1e3a8a !important;
+                background: rgba(255, 255, 255, 0.9) !important;
+            }
+
+            .mp-selling-action-secondary:hover {
+                background: rgba(239, 246, 255, 1) !important;
+                border-color: rgba(96, 165, 250, 0.9) !important;
+            }
+
+            .mp-selling-action-disabled {
+                background: #f1f5f9 !important;
+                border: 1px solid #e2e8f0 !important;
+                color: #94a3b8 !important;
+                cursor: not-allowed;
+                box-shadow: none !important;
+            }
+
+            .mp-selling-action-disabled:hover {
+                transform: none;
+                filter: none;
             }
 
             .mp-selling-card .rounded-2xl,
             .mp-selling-card .rounded-3xl {
-                border-radius: 0 !important;
+                border-radius: inherit;
             }
 
             @media (max-width: 640px) {
@@ -465,6 +556,15 @@
                 .mp-selling-meta,
                 .mp-selling-header {
                     min-height: auto;
+                }
+
+                .mp-selling-card {
+                    padding: 1rem;
+                    border-radius: 1.35rem !important;
+                }
+
+                .mp-selling-actions {
+                    grid-template-columns: minmax(0, 1fr);
                 }
             }
         </style>
@@ -1008,7 +1108,7 @@
                             data-hscroll-container>
                             @foreach($flashDeals->take(8) as $deal)
                                 <article
-                                    class="snap-start shrink-0 w-72 sm:w-80 group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
+                                    class="snap-start shrink-0 w-72 sm:w-80 group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition"
                                     data-product-card>
                                     <a href="{{ $deal['url'] }}" class="block flex flex-1 flex-col">
                                         <div class="mp-selling-media aspect-[16/9] bg-slate-100 relative">
@@ -1021,13 +1121,13 @@
                                                 </div>
                                             @endif
 
-                                            <div class="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black text-white shadow"
+                                            <div class="mp-selling-badge absolute top-3 left-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black text-white shadow"
                                                 style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3));">
                                                 {{ $deal['type'] }}
                                             </div>
                                         </div>
 
-                                        <div class="p-4 flex flex-1 flex-col">
+                                        <div class="mp-selling-content">
                                             <div class="mp-selling-eyebrow text-xs font-black uppercase tracking-[0.22em] text-blue-700/80">
                                                 Oferta ativa
                                             </div>
@@ -1062,9 +1162,9 @@
                                         </div>
                                     </a>
 
-                                    <div class="px-4 pb-4">
+                                    <div class="mp-selling-actions mp-selling-actions--single">
                                         <a href="{{ $deal['url'] }}"
-                                            class="mp-selling-action w-full rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
+                                            class="mp-selling-action mp-selling-action-primary w-full rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
                                             Ver oferta
                                         </a>
                                     </div>
@@ -1119,7 +1219,7 @@
                         @endphp
 
                         <article
-                            class="group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
+                            class="group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition"
                             data-product-card>
                             <a href="{{ route('courses.show', $showParam) }}" class="block flex flex-1 flex-col">
                                 <div class="mp-selling-media aspect-[16/9] bg-slate-100 relative">
@@ -1131,21 +1231,21 @@
                                         </div>
                                     @endif
 
-                                    <div class="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black text-white shadow"
+                                    <div class="mp-selling-badge absolute top-3 left-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black text-white shadow"
                                         style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3));">
                                         {{ $badge }}
                                     </div>
 
                                     @if($shareUrl !== '')
                                         <button type="button"
-                                            class="absolute top-3 right-3 inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 border border-slate-200 text-slate-700 hover:bg-white shadow"
+                                            class="mp-selling-share absolute top-3 right-3 inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 border border-slate-200 text-slate-700 hover:bg-white shadow"
                                             onclick="event.preventDefault(); event.stopPropagation(); navigator.clipboard.writeText(@json($shareUrl)); toastr.success('Link copiado!');">
                                             <i class="fas fa-link text-sm"></i>
                                         </button>
                                     @endif
                                 </div>
 
-                                <div class="p-4 flex flex-1 flex-col">
+                                <div class="mp-selling-content">
                                     <div class="mp-selling-title font-black text-slate-900 leading-snug line-clamp-2">
                                         {{ $course->title }}
                                     </div>
@@ -1189,25 +1289,25 @@
                                 </div>
                             </a>
 
-                            <div class="mp-selling-actions px-4 pb-4">
+                            <div class="mp-selling-actions">
                                 <a href="{{ route('courses.show', $showParam) }}"
-                                    class="mp-selling-action rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                    class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
                                     Ver
                                 </a>
 
                                 @if($hasAccess)
                                     <a href="{{ route('courses.show', $showParam) }}"
-                                        class="mp-selling-action rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
+                                        class="mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
                                         Acessar
                                     </a>
                                 @elseif($buyEnabled)
                                     <a href="{{ route('checkout.show', $course->id) }}"
-                                        class="mp-selling-action rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
+                                        class="mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
                                         Comprar
                                     </a>
                                 @else
                                     <span
-                                        class="mp-selling-action rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                        class="mp-selling-action mp-selling-action-disabled rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
                                         {{ $disabledBuyLabel }}
                                     </span>
                                 @endif
@@ -1261,7 +1361,7 @@
                         @endphp
 
                         <article
-                            class="group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
+                            class="group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition"
                             data-product-card>
                             @if($mentorshipShowUrl)
                             <a href="{{ $mentorshipShowUrl }}" class="block flex flex-1 flex-col">
@@ -1284,21 +1384,21 @@
                                         </div>
                                     @endif
 
-                                    <div class="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black text-white shadow"
+                                    <div class="mp-selling-badge absolute top-3 left-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black text-white shadow"
                                         style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3));">
                                         MENTORIA
                                     </div>
 
                                     @if($shareUrl !== '')
                                         <button type="button"
-                                            class="absolute top-3 right-3 inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 border border-slate-200 text-slate-700 hover:bg-white shadow"
+                                            class="mp-selling-share absolute top-3 right-3 inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 border border-slate-200 text-slate-700 hover:bg-white shadow"
                                             onclick="event.preventDefault(); event.stopPropagation(); navigator.clipboard.writeText(@json($shareUrl)); toastr.success('Link copiado!');">
                                             <i class="fas fa-link text-sm"></i>
                                         </button>
                                     @endif
                                 </div>
 
-                                <div class="p-4 flex flex-1 flex-col">
+                                <div class="mp-selling-content">
                                     <div class="mp-selling-title font-black text-slate-900 leading-snug line-clamp-2">
                                         {{ $mentorship->title }}
                                     </div>
@@ -1350,27 +1450,27 @@
                             </div>
                             @endif
 
-                            <div class="mp-selling-actions px-4 pb-4">
+                            <div class="mp-selling-actions">
                                 @if($mentorshipShowUrl)
                                     <a href="{{ $mentorshipShowUrl }}"
-                                        class="mp-selling-action rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                        class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
                                         Ver
                                     </a>
                                 @else
                                     <span
-                                        class="mp-selling-action rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                        class="mp-selling-action mp-selling-action-disabled rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
                                         Encerrada
                                     </span>
                                 @endif
 
                                 @if($buyEnabled && !$isMentorshipClosed)
                                     <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
-                                        class="mp-selling-action rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
+                                        class="mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
                                         Comprar
                                     </a>
                                 @else
                                     <span
-                                        class="mp-selling-action rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                        class="mp-selling-action mp-selling-action-disabled rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
                                         {{ $disabledBuyLabel }}
                                     </span>
                                 @endif
@@ -1435,7 +1535,7 @@
                         @endphp
 
                         <article
-                            class="group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden"
+                            class="group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition"
                             data-product-card>
                             @if($eventShowUrl)
                             <a href="{{ $eventShowUrl }}" class="block flex flex-1 flex-col">
@@ -1451,21 +1551,21 @@
                                         </div>
                                     @endif
 
-                                    <div class="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black text-white shadow"
+                                    <div class="mp-selling-badge absolute top-3 left-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black text-white shadow"
                                         style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3));">
                                         EVENTO
                                     </div>
 
                                     @if($shareUrl !== '')
                                         <button type="button"
-                                            class="absolute top-3 right-3 inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 border border-slate-200 text-slate-700 hover:bg-white shadow"
+                                            class="mp-selling-share absolute top-3 right-3 inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 border border-slate-200 text-slate-700 hover:bg-white shadow"
                                             onclick="event.preventDefault(); event.stopPropagation(); navigator.clipboard.writeText(@json($shareUrl)); toastr.success('Link copiado!');">
                                             <i class="fas fa-link text-sm"></i>
                                         </button>
                                     @endif
                                 </div>
 
-                                <div class="p-4 flex flex-1 flex-col">
+                                <div class="mp-selling-content">
                                     <div class="mp-selling-title font-black text-slate-900 leading-snug line-clamp-2">
                                         {{ $event->title }}
                                     </div>
@@ -1516,27 +1616,27 @@
                             </div>
                             @endif
 
-                            <div class="mp-selling-actions px-4 pb-4">
+                            <div class="mp-selling-actions">
                                 @if($eventShowUrl)
                                     <a href="{{ $eventShowUrl }}"
-                                        class="mp-selling-action rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                        class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
                                         Ver
                                     </a>
                                 @else
                                     <span
-                                        class="mp-selling-action rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                        class="mp-selling-action mp-selling-action-disabled rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
                                         Encerrado
                                     </span>
                                 @endif
 
                                 @if($buyEnabled && !$isEventClosed)
                                     <a href="{{ route('events.checkout', $event) }}"
-                                        class="mp-selling-action rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
+                                        class="mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
                                         {{ $price > 0 ? 'Comprar' : 'Reservar' }}
                                     </a>
                                 @else
                                     <span
-                                        class="mp-selling-action rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                        class="mp-selling-action mp-selling-action-disabled rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
                                         {{ $isEventClosed ? 'Encerrado' : $disabledBuyLabel }}
                                     </span>
                                 @endif
