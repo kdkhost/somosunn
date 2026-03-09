@@ -51,7 +51,7 @@ class WatermarkService
         $imgWidth = imagesx($img);
         $imgHeight = imagesy($img);
 
-        // 1. Add Watermark Logo (Bottom Right)
+        // 1. Add Watermark Logo
         $logoPath = $this->getWatermarkLogo();
         if ($logoPath && file_exists($logoPath)) {
             $logoMime = mime_content_type($logoPath);
@@ -67,8 +67,8 @@ class WatermarkService
                 $logoWidth = imagesx($logo);
                 $logoHeight = imagesy($logo);
 
-                // Resize logo to max 150px width
-                $newLogoWidth = 150;
+                // Resize logo to max 150px width (or proportional to image)
+                $newLogoWidth = min(150, $imgWidth * 0.2);
                 $newLogoHeight = ($logoHeight / $logoWidth) * $newLogoWidth;
 
                 $resizedLogo = imagecreatetruecolor($newLogoWidth, $newLogoHeight);
@@ -79,19 +79,50 @@ class WatermarkService
 
                 imagecopyresampled($resizedLogo, $logo, 0, 0, 0, 0, $newLogoWidth, $newLogoHeight, $logoWidth, $logoHeight);
 
-                $destX = $imgWidth - $newLogoWidth - 20;
-                $destY = $imgHeight - $newLogoHeight - 20;
+                // Calculate position based on settings
+                $pos = \App\Models\Setting::get('watermark_position', 'bottom-right');
+                $margin = 20;
 
-                // Fix transparent PNG blending onto JPEG
+                switch ($pos) {
+                    case 'top-left':
+                        $destX = $margin;
+                        $destY = $margin;
+                        break;
+                    case 'top-right':
+                        $destX = $imgWidth - $newLogoWidth - $margin;
+                        $destY = $margin;
+                        break;
+                    case 'bottom-left':
+                        $destX = $margin;
+                        $destY = $imgHeight - $newLogoHeight - $margin;
+                        break;
+                    case 'center':
+                        $destX = ($imgWidth / 2) - ($newLogoWidth / 2);
+                        $destY = ($imgHeight / 2) - ($newLogoHeight / 2);
+                        break;
+                    case 'bottom-right':
+                    default:
+                        $destX = $imgWidth - $newLogoWidth - $margin;
+                        $destY = $imgHeight - $newLogoHeight - $margin;
+                        break;
+                }
+
+                $opacity = (int) \App\Models\Setting::get('watermark_opacity', 50);
+
+                // For a more robust opacity control with GD
                 imagealphablending($img, true);
-                imagecopy($img, $resizedLogo, $destX, $destY, 0, 0, $newLogoWidth, $newLogoHeight);
+                $this->imagecopymerge_alpha($img, $resizedLogo, $destX, $destY, 0, 0, $newLogoWidth, $newLogoHeight, $opacity);
 
                 imagedestroy($logo);
                 imagedestroy($resizedLogo);
             }
         }
 
-        // 2. Add Text (Bottom Left)
+        // 2. Add Text (Bottom Right or opposite to logo)
+        // ... (texto pode ficar fixo ou seguir uma lógica oposta)
+        // Mantendo o texto como estava mas com opacidade dinâmica se desejar, 
+        // mas o foco principal do usuário era a marca d'água (logo/imagem).
+
         $text = sprintf(
             "%s | %s\nOrg: %s",
             $event->title,
@@ -102,16 +133,17 @@ class WatermarkService
         $fontPath = public_path('fonts/Roboto-Bold.ttf');
         if (file_exists($fontPath)) {
             $fontSize = 24;
-            $color = imagecolorallocatealpha($img, 255, 255, 255, 20); // White with some transparency
-            $shadowColor = imagecolorallocatealpha($img, 0, 0, 0, 50); // Black shadow
+            $opacity = (int) \App\Models\Setting::get('watermark_opacity', 50);
+            $alpha = 127 - (int) ($opacity * 1.27); // Convert 0-100 to 127-0
+
+            $color = imagecolorallocatealpha($img, 255, 255, 255, max(0, min(127, $alpha)));
+            $shadowColor = imagecolorallocatealpha($img, 0, 0, 0, 100);
 
             $lines = explode("\n", $text);
             $y = $imgHeight - 40 - (count($lines) * ($fontSize + 5));
 
             foreach ($lines as $line) {
-                // Drop shadow
                 imagettftext($img, $fontSize, 0, 22, $y + 2, $shadowColor, $fontPath, $line);
-                // Text
                 imagettftext($img, $fontSize, 0, 20, $y, $color, $fontPath, $line);
                 $y += $fontSize + 10;
             }
@@ -119,7 +151,7 @@ class WatermarkService
 
         // 3. Save Image
         $fullPath = storage_path('app/public/' . $path);
-        imagejpeg($img, $fullPath, 85); // Save as JPG with 85% quality
+        imagejpeg($img, $fullPath, 85);
 
         // Cleanup
         imagedestroy($img);
@@ -127,8 +159,35 @@ class WatermarkService
         return $path;
     }
 
+    /**
+     * Helper to merge images with alpha channel and opacity
+     */
+    private function imagecopymerge_alpha($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $pct)
+    {
+        if ($pct >= 100) {
+            imagecopy($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h);
+            return;
+        }
+
+        $cut = imagecreatetruecolor($src_w, $src_h);
+        imagecopy($cut, $dst_im, 0, 0, $dst_x, $dst_y, $src_w, $src_h);
+        imagecopy($cut, $src_im, 0, 0, $src_x, $src_y, $src_w, $src_h);
+        imagecopymerge($dst_im, $cut, $dst_x, $dst_y, 0, 0, $src_w, $src_h, $pct);
+        imagedestroy($cut);
+    }
+
     private function getWatermarkLogo(): ?string
     {
+        // Tenta primeiro a logo específica da marca d'água
+        $setting = \App\Models\Setting::where('key', 'watermark_image')->first();
+        if ($setting && $setting->value) {
+            $path = storage_path('app/public/' . $setting->value);
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+
+        // Fallback para a logo do site light
         $setting = \App\Models\Setting::where('key', 'site_logo_light')->first();
         if ($setting && $setting->value) {
             $path = storage_path('app/public/' . $setting->value);

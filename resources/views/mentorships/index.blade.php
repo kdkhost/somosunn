@@ -307,7 +307,7 @@
                             <p class="mt-2 text-slate-600">No momento não temos mentorias abertas. Volte em breve.</p>
 
                             <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-                                <a href="{{ route('premium') }}"
+                                <a href="{{ route('planos') }}"
                                     class="btn-primary text-white px-8 py-4 rounded-xl font-bold inline-flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition">
                                     Ver planos Premium <i class="fas fa-crown"></i>
                                 </a>

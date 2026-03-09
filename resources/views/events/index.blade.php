@@ -356,7 +356,7 @@
                         </p>
                     </div>
 
-                    <a href="{{ route('premium') }}"
+                    <a href="{{ route('planos') }}"
                         class="events-top-cta inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-bold bg-white border hover:bg-slate-50 transition whitespace-nowrap"
                         style="border-color: var(--unn-azul-1); color: var(--unn-azul-1)">
                         <i class="fas fa-crown"></i> Ver planos Premium
@@ -702,7 +702,7 @@
                                     <span class="sm:hidden">Começar grátis</span>
                                     <span class="hidden sm:inline">Começar agora - É grátis</span>
                                 </a>
-                                <a href="{{ route('premium') }}"
+                                <a href="{{ route('planos') }}"
                                     class="inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-10 sm:py-4 rounded-full font-black border-2 border-white text-white bg-white/10 hover:bg-white/15 transition whitespace-nowrap">
                                     <i class="fas fa-crown"></i> Ver planos Premium
                                 </a>
@@ -736,7 +736,7 @@
                                                 <i class="fas fa-ticket-alt"></i>
                                                 Quero meu ingresso
                                             </a>
-                                            <a href="{{ route('premium') }}"
+                                            <a href="{{ route('planos') }}"
                                                 class="inline-flex items-center justify-center gap-3 px-5 py-3 md:px-7 md:py-3.5 rounded-2xl font-black text-sm md:text-base border-2 border-white text-white bg-white/10 hover:bg-white/20 transition">
                                                 <i class="fas fa-crown"></i> Upgrade Premium
                                             </a>

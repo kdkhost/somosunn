@@ -131,7 +131,7 @@ class NotificationHubController extends Controller
                     'icon' => 'fas fa-exclamation-triangle',
                     'color' => 'text-red-500',
                     'bg' => 'bg-red-50',
-                    'route' => route('premium')
+                    'route' => route('planos')
                 ],
                 [
                     'type' => 'jobs',

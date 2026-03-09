@@ -397,7 +397,7 @@
                             </p>
 
                             <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                                <a href="{{ route('premium') }}"
+                                <a href="{{ route('planos') }}"
                                     class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-black text-sm sm:text-base bg-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
                                     style="color: var(--unn-azul-1)">
                                     <i class="fas fa-crown"></i>

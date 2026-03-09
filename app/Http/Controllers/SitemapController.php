@@ -16,7 +16,7 @@ class SitemapController extends Controller
         $urls = [
             route('home'),
             route('portal'),
-            route('premium'),
+            route('planos'),
             route('sobre'),
             route('manifesto'),
             route('quem-somos'),

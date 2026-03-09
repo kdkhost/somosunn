@@ -222,7 +222,7 @@ class SocialAuthController extends Controller
 
         // Novo usuário → encaminhar para escolha de plano
         if ($isNewUser) {
-            return redirect()->route('premium')->with('success', 'Conta criada com sucesso! Escolha um plano para aproveitar ao máximo a plataforma.');
+            return redirect()->route('planos')->with('success', 'Conta criada com sucesso! Escolha um plano para aproveitar ao máximo a plataforma.');
         }
 
         $redirectRoute = $user->isAdmin() ? 'panel.admin.dashboard' : 'panel.dashboard';

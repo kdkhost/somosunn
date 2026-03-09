@@ -23,7 +23,7 @@ class DashboardMetricsService
     {
         return $this->remember(
             $this->panelStatsCacheKey($user),
-            fn () => $this->buildPanelStats($user),
+            fn() => $this->buildPanelStats($user),
             $fresh
         );
     }
@@ -32,7 +32,7 @@ class DashboardMetricsService
     {
         return $this->remember(
             $this->adminPayloadCacheKey($user),
-            fn () => $this->buildAdminPayload($user),
+            fn() => $this->buildAdminPayload($user),
             $fresh
         );
     }
@@ -77,7 +77,7 @@ class DashboardMetricsService
             'orders_paid_total' => 0.0,
             'seller_paid_count' => 0,
             'seller_net_total' => 0.0,
-            'community_count' => $this->safeInt(fn () => User::count()),
+            'community_count' => $this->safeInt(fn() => User::count()),
             'mp_balance' => null,
         ];
         $salesChart = null;
@@ -145,7 +145,7 @@ class DashboardMetricsService
     {
         $isAdmin = $user->isAdmin();
         $months = collect(range(0, 5))
-            ->map(fn (int $i) => now()->subMonths($i)->format('M/Y'))
+            ->map(fn(int $i) => now()->subMonths($i)->format('M/Y'))
             ->reverse()
             ->values()
             ->toArray();
@@ -178,6 +178,7 @@ class DashboardMetricsService
             'serviceVisitTopItems' => [],
             'serviceVisitOwnerLeaders' => [],
         ];
+
 
         try {
             if ($isAdmin) {
@@ -221,23 +222,42 @@ class DashboardMetricsService
                     $payload['ordersByStatus'][$statusMap[$status] ?? ucfirst((string) $status)] = $count;
                 }
 
+                // Otimização: Pegar totais por mês de uma vez
+                $sixMonthsAgo = now()->subMonths(5)->startOfMonth();
+
+                $salesByMonth = Order::financialPaid()
+                    ->where('created_at', '>=', $sixMonthsAgo)
+                    ->selectRaw("DATE_FORMAT(created_at, '%m/%Y') as month, SUM(total_amount) as total")
+                    ->groupBy('month')
+                    ->pluck('total', 'month')
+                    ->toArray();
+
+                $newUsersByMonth = User::where('created_at', '>=', $sixMonthsAgo)
+                    ->selectRaw("DATE_FORMAT(created_at, '%m/%Y') as month, COUNT(*) as total")
+                    ->groupBy('month')
+                    ->pluck('total', 'month')
+                    ->toArray();
+
+                $certsByMonth = $this->tableExists('certificates')
+                    ? Certificate::where('issued_at', '>=', $sixMonthsAgo)
+                        ->selectRaw("DATE_FORMAT(issued_at, '%m/%Y') as month, COUNT(*) as total")
+                        ->groupBy('month')
+                        ->pluck('total', 'month')
+                        ->toArray()
+                    : [];
+
                 $salesChartData = [];
                 $usersByMonth = [];
                 $certificatesByMonth = [];
 
                 for ($i = 5; $i >= 0; $i--) {
                     $date = now()->subMonths($i);
-                    $label = $date->format('M/Y');
-                    $salesChartData[] = (float) Order::financialPaid()
-                        ->whereMonth('created_at', $date->month)
-                        ->whereYear('created_at', $date->year)
-                        ->sum('total_amount');
-                    $usersByMonth[$label] = (int) User::whereMonth('created_at', $date->month)
-                        ->whereYear('created_at', $date->year)
-                        ->count();
-                    $certificatesByMonth[$label] = $this->tableExists('certificates')
-                        ? (int) Certificate::whereMonth('issued_at', $date->month)->whereYear('issued_at', $date->year)->count()
-                        : 0;
+                    $label = $date->format('m/Y'); // Formato consistente com a query
+                    $displayLabel = $date->format('M/Y');
+
+                    $salesChartData[] = (float) ($salesByMonth[$label] ?? 0);
+                    $usersByMonth[$displayLabel] = (int) ($newUsersByMonth[$label] ?? 0);
+                    $certificatesByMonth[$displayLabel] = (int) ($certsByMonth[$label] ?? 0);
                 }
 
                 $payload['salesChartData'] = $salesChartData;
@@ -314,7 +334,7 @@ class DashboardMetricsService
         }
 
         $ownedScopes = $this->ownedServiceScopes($user);
-        $ownedProductsCount = collect($ownedScopes)->sum(static fn (array $ids): int => count($ids));
+        $ownedProductsCount = collect($ownedScopes)->sum(static fn(array $ids): int => count($ids));
 
         if ($ownedProductsCount === 0) {
             return $this->emptyOwnerVisitMetrics(true);
@@ -400,7 +420,7 @@ class DashboardMetricsService
     {
         return [
             'labels' => collect(range(6, 0))
-                ->map(fn (int $days) => now()->subDays($days)->translatedFormat('d/m'))
+                ->map(fn(int $days) => now()->subDays($days)->translatedFormat('d/m'))
                 ->values()
                 ->all(),
             'data' => array_fill(0, 7, 0),
@@ -420,9 +440,9 @@ class DashboardMetricsService
 
     private function countMonitoredProducts(): int
     {
-        return $this->safeInt(fn () => Course::count())
-            + ($this->tableExists('events') ? $this->safeInt(fn () => Event::count()) : 0)
-            + ($this->tableExists('mentorships') ? $this->safeInt(fn () => Mentorship::count()) : 0);
+        return $this->safeInt(fn() => Course::count())
+            + ($this->tableExists('events') ? $this->safeInt(fn() => Event::count()) : 0)
+            + ($this->tableExists('mentorships') ? $this->safeInt(fn() => Mentorship::count()) : 0);
     }
 
     private function supportsServiceVisits(): bool
@@ -434,20 +454,20 @@ class DashboardMetricsService
     {
         return [
             'curso' => $this->tableExists('courses')
-                ? Course::query()->where('user_id', $user->id)->pluck('id')->map(static fn ($id) => (int) $id)->all()
+                ? Course::query()->where('user_id', $user->id)->pluck('id')->map(static fn($id) => (int) $id)->all()
                 : [],
             'evento' => $this->tableExists('events')
-                ? Event::query()->where('user_id', $user->id)->pluck('id')->map(static fn ($id) => (int) $id)->all()
+                ? Event::query()->where('user_id', $user->id)->pluck('id')->map(static fn($id) => (int) $id)->all()
                 : [],
             'mentoria' => $this->tableExists('mentorships')
-                ? Mentorship::query()->where('mentor_id', $user->id)->pluck('id')->map(static fn ($id) => (int) $id)->all()
+                ? Mentorship::query()->where('mentor_id', $user->id)->pluck('id')->map(static fn($id) => (int) $id)->all()
                 : [],
         ];
     }
 
     private function applyVisitScope($query, array $scopes)
     {
-        $filledScopes = array_filter($scopes, static fn (array $ids): bool => $ids !== []);
+        $filledScopes = array_filter($scopes, static fn(array $ids): bool => $ids !== []);
 
         if ($filledScopes === []) {
             return $query->whereRaw('1 = 0');
@@ -575,7 +595,7 @@ class DashboardMetricsService
             }
         }
 
-        usort($leaders, static fn (array $left, array $right): int => $right['total'] <=> $left['total']);
+        usort($leaders, static fn(array $left, array $right): int => $right['total'] <=> $left['total']);
 
         return array_slice(array_values($leaders), 0, 6);
     }
@@ -679,10 +699,10 @@ class DashboardMetricsService
 
     private function buildSalesChart(callable $resolver): array
     {
-        $months = collect(range(0, 5))->map(fn (int $index) => now()->subMonths(5 - $index)->format('m/Y'));
+        $months = collect(range(0, 5))->map(fn(int $index) => now()->subMonths(5 - $index)->format('m/Y'));
 
         return [
-            'labels' => $months->map(fn (string $month) => Carbon::createFromFormat('m/Y', $month)->translatedFormat('M/Y'))->values()->all(),
+            'labels' => $months->map(fn(string $month) => Carbon::createFromFormat('m/Y', $month)->translatedFormat('M/Y'))->values()->all(),
             'data' => $months->map(function (string $month) use ($resolver) {
                 [$monthNumber, $year] = explode('/', $month);
                 return $resolver((int) $monthNumber, (int) $year);

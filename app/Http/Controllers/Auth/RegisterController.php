@@ -67,7 +67,7 @@ class RegisterController extends Controller
         }
 
         Auth::login($user);
-        return redirect()->route('premium')
+        return redirect()->route('planos')
             ->with('success', 'Conta criada com sucesso! Escolha um plano para aproveitar ao máximo a plataforma.');
     }
 }

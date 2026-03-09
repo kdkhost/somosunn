@@ -47,7 +47,7 @@
                         <i class="fas fa-layer-group text-blue-300"></i> Meu Perfil
                     </span>
                 </a>
-                <a href="{{ route('premium') }}"
+                <a href="{{ route('planos') }}"
                     class="group/btn relative px-8 py-4 bg-white text-blue-900 rounded-2xl font-black shadow-2xl shadow-blue-950/20 hover:shadow-white/10 hover:-translate-y-1.5 transition-all flex items-center gap-3">
                     <i class="fas fa-crown text-amber-500 group-hover/btn:rotate-12 transition-transform"></i>
                     <span>UPGRADE PREMIUM</span>

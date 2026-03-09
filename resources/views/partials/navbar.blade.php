@@ -29,7 +29,7 @@
                 ['label' => 'Vagas Abertas', 'href' => route('jobs.public.index')],
             ],
         ],
-        ['label' => 'Premium', 'href' => route('premium'), 'setting_key' => 'feature_premium'],
+        ['label' => 'Premium', 'href' => route('planos'), 'setting_key' => 'feature_premium'],
         [
             'label' => 'Somos Únicas',
             'href' => route('somos-unicas'),
@@ -37,6 +37,10 @@
                 ['label' => 'Plataforma', 'href' => route('somos-unicas')],
                 ['label' => 'Quem Somos', 'href' => route('site.somos-unicas.sobre')],
             ],
+        ],
+        [
+            'label' => 'Galeria',
+            'href' => route('gallery.index'),
         ],
     ];
 
@@ -120,24 +124,25 @@
             <div class="flex items-center gap-2 sm:gap-4">
                 @if($isLogged)
                     <div class="relative" x-data="{
-                                            open: false,
-                                            total: 0,
-                                            items: [],
-                                            loading: true,
-                                            async fetchNotifications() {
-                                                try {
-                                                    const r = await fetch('{{ route('notifications.hub') }}');
-                                                    if (!r.ok) return;
-                                                    const data = await r.json();
-                                                    this.total = data.total || 0;
-                                                    this.items = (data.items || []).filter(i => i.count > 0);
-                                                } catch(e) {
-                                                    console.error('Notification hub failed:', e);
-                                                } finally {
-                                                    this.loading = false;
-                                                }
-                                            }
-                                        }" x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
+                                                    open: false,
+                                                    total: 0,
+                                                    items: [],
+                                                    loading: true,
+                                                    async fetchNotifications() {
+                                                        try {
+                                                            const r = await fetch('{{ route('notifications.hub') }}');
+                                                            if (!r.ok) return;
+                                                            const data = await r.json();
+                                                            this.total = data.total || 0;
+                                                            this.items = (data.items || []).filter(i => i.count > 0);
+                                                        } catch(e) {
+                                                            console.error('Notification hub failed:', e);
+                                                        } finally {
+                                                            this.loading = false;
+                                                        }
+                                                    }
+                                                }"
+                        x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
 
                         <button @click="open = !open; fetchNotifications()"
                             class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition relative p-2 focus:outline-none">

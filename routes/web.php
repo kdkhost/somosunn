@@ -32,7 +32,9 @@ Route::get('/uploads/{path}', [\App\Http\Controllers\PublicStorageProxyControlle
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portal', [HomeController::class, 'portal'])->name('portal');
-Route::get('/premium', [HomeController::class, 'premium'])->name('premium');
+Route::get('/planos', [HomeController::class, 'premium'])->name('planos');
+Route::get('/galeria', [\App\Http\Controllers\GalleryController::class, 'index'])->name('gallery.index');
+Route::get('/galeria/{event}', [\App\Http\Controllers\GalleryController::class, 'show'])->name('gallery.show');
 Route::post('/depoimentos', [\App\Http\Controllers\TestimonialController::class, 'store'])->middleware('auth')->name('testimonials.store');
 
 // Rota de Emergência para Diagnóstico (Protegida)

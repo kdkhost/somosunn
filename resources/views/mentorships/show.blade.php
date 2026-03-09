@@ -380,7 +380,7 @@
                                 @endif
                             @endif
 
-                            <a href="{{ route('premium') }}"
+                            <a href="{{ route('planos') }}"
                                 class="px-8 py-4 rounded-2xl font-bold border-2 border-slate-100 text-slate-700 hover:bg-slate-50 hover:border-slate-200 transition-all duration-300 inline-flex items-center justify-center whitespace-nowrap">
                                 Ver planos Premium <i class="fas fa-crown ml-2"></i>
                             </a>

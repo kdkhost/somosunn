@@ -216,8 +216,10 @@
                                             </span>
                                             <p class="text-slate-600 font-semibold">{{ $currentStatusMeta['text'] }}</p>
                                             <div class="rounded-2xl bg-slate-50 border border-slate-100 p-5 space-y-2">
-                                                <p class="text-xs font-black uppercase tracking-widest text-slate-400">Data de envio</p>
-                                                <p class="text-sm font-bold text-slate-700">{{ $application->created_at->format('d/m/Y H:i') }}</p>
+                                                <p class="text-xs font-black uppercase tracking-widest text-slate-400">Data de envio
+                                                </p>
+                                                <p class="text-sm font-bold text-slate-700">
+                                                    {{ $application->created_at->format('d/m/Y H:i') }}</p>
                                             </div>
                                             <a href="{{ route('panel.jobs.show', $job) }}"
                                                 class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-slate-900 hover:bg-black text-white font-black transition-all">
@@ -241,8 +243,7 @@
                                                     <input id="resume_file" name="resume_file" type="file" accept=".pdf,.doc,.docx"
                                                         required class="sr-only">
 
-                                                    <div id="resume-dropzone" tabindex="0" role="button"
-                                                        aria-controls="resume_file"
+                                                    <div id="resume-dropzone" tabindex="0" role="button" aria-controls="resume_file"
                                                         class="group relative rounded-[2rem] border-2 border-dashed border-slate-300 bg-slate-50/80 px-6 py-8 md:px-8 md:py-10 transition-all duration-200 cursor-pointer hover:border-blue-400 hover:bg-blue-50/60 focus:outline-none focus:ring-4 focus:ring-blue-200">
                                                         <div class="flex flex-col items-center text-center">
                                                             <div
@@ -259,7 +260,8 @@
                                                                 class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-sm font-black transition-all">
                                                                 <i class="fas fa-folder-open text-xs"></i> Escolher arquivo
                                                             </button>
-                                                            <p class="mt-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                                            <p
+                                                                class="mt-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
                                                                 Formatos aceitos: PDF, DOC e DOCX
                                                             </p>
                                                         </div>
@@ -279,8 +281,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div
-                                                    class="rounded-[2rem] border border-slate-200 bg-slate-50 p-5 space-y-4">
+                                                <div class="rounded-[2rem] border border-slate-200 bg-slate-50 p-5 space-y-4">
                                                     <p class="text-xs font-black uppercase tracking-widest text-slate-500">
                                                         Dicas para se destacar
                                                     </p>
@@ -323,7 +324,8 @@
                                     @endif
                                 @else
                                     <p class="text-slate-600 font-semibold mb-6">
-                                        Faca login para enviar seu curriculo diretamente no frontend e acompanhar o andamento da candidatura.
+                                        Faca login para enviar seu curriculo diretamente no frontend e acompanhar o andamento da
+                                        candidatura.
                                     </p>
                                     <a href="{{ route('login') }}"
                                         class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-slate-900 hover:bg-black text-white font-black transition-all">
@@ -342,7 +344,7 @@
                                             mentorias e cursos exclusivos.
                                         </p>
                                     </div>
-                                    <a href="{{ route('premium') }}"
+                                    <a href="{{ route('planos') }}"
                                         class="px-8 py-4 bg-white text-unn-azul-3 rounded-2xl font-black shadow-2xl hover:bg-blue-50 transition-all">
                                         Conhecer Planos
                                     </a>
@@ -414,7 +416,8 @@
                                                 class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-tight mb-1">
                                                 Nível</p>
                                             <p class="font-extrabold text-slate-900 leading-tight">
-                                                {{ $job->level ?? 'Não Informado' }}</p>
+                                                {{ $job->level ?? 'Não Informado' }}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -458,7 +461,7 @@
 
 @push('scripts')
     <script>
-        (function() {
+        (function () {
             const form = document.getElementById('frontend-apply-form');
             if (!form) return;
             if (form.dataset.uploadInit === '1') return;
@@ -584,12 +587,12 @@
             }
 
             function readFileAsDataURL(file) {
-                return new Promise(function(resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     const reader = new FileReader();
-                    reader.onload = function() {
+                    reader.onload = function () {
                         resolve(reader.result);
                     };
-                    reader.onerror = function() {
+                    reader.onerror = function () {
                         reject(new Error('Falha ao ler o arquivo.'));
                     };
                     reader.readAsDataURL(file);
@@ -597,7 +600,7 @@
             }
 
             if (dropzone && fileInput) {
-                dropzone.addEventListener('click', function(event) {
+                dropzone.addEventListener('click', function (event) {
                     event.preventDefault();
                     if (event.target.closest('#resume-select-trigger')) {
                         return;
@@ -605,30 +608,30 @@
                     openFilePicker();
                 });
 
-                dropzone.addEventListener('keydown', function(event) {
+                dropzone.addEventListener('keydown', function (event) {
                     if (event.key === 'Enter' || event.key === ' ') {
                         event.preventDefault();
                         openFilePicker();
                     }
                 });
 
-                ['dragenter', 'dragover'].forEach(function(eventName) {
-                    dropzone.addEventListener(eventName, function(event) {
+                ['dragenter', 'dragover'].forEach(function (eventName) {
+                    dropzone.addEventListener(eventName, function (event) {
                         event.preventDefault();
                         event.stopPropagation();
                         setDropzoneDragging(true);
                     });
                 });
 
-                ['dragleave', 'dragend'].forEach(function(eventName) {
-                    dropzone.addEventListener(eventName, function(event) {
+                ['dragleave', 'dragend'].forEach(function (eventName) {
+                    dropzone.addEventListener(eventName, function (event) {
                         event.preventDefault();
                         event.stopPropagation();
                         setDropzoneDragging(false);
                     });
                 });
 
-                dropzone.addEventListener('drop', function(event) {
+                dropzone.addEventListener('drop', function (event) {
                     event.preventDefault();
                     event.stopPropagation();
                     setDropzoneDragging(false);
@@ -645,7 +648,7 @@
             }
 
             if (selectTrigger && fileInput) {
-                selectTrigger.addEventListener('click', function(event) {
+                selectTrigger.addEventListener('click', function (event) {
                     event.preventDefault();
                     event.stopPropagation();
                     openFilePicker();
@@ -653,7 +656,7 @@
             }
 
             if (fileInput) {
-                fileInput.addEventListener('change', function() {
+                fileInput.addEventListener('change', function () {
                     const file = fileInput.files && fileInput.files.length ? fileInput.files[0] : null;
                     stagedFile = file;
                     renderSelectedFile(file);
@@ -672,7 +675,7 @@
                 });
             }
 
-            form.addEventListener('submit', async function(event) {
+            form.addEventListener('submit', async function (event) {
                 event.preventDefault();
 
                 const file = (fileInput.files && fileInput.files.length ? fileInput.files[0] : null) || stagedFile;
@@ -711,7 +714,7 @@
                         form.reset();
                         stagedFile = null;
                         renderSelectedFile(null);
-                        setTimeout(function() {
+                        setTimeout(function () {
                             window.location.reload();
                         }, 1200);
                         return;

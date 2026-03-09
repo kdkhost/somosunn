@@ -70,7 +70,7 @@ class EnsureUserHasActivePlan
                 return response()->json(['message' => 'Selecione um plano para continuar.'], 402);
             }
 
-            return redirect()->route('premium')
+            return redirect()->route('planos')
                 ->with('warning', 'Escolha um plano para liberar o acesso total à comunidade SOMOS UNN.');
         }
 

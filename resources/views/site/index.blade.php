@@ -520,7 +520,7 @@
                         <i class="fas fa-rocket"></i>
                         {{ $homePage->get('cta_section_btn_primary', 'Começar agora - É grátis') }}
                     </a>
-                    <a href="{{ route('premium') }}"
+                    <a href="{{ route('planos') }}"
                         class="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold hover:bg-white/10 transition">
                         {{ $homePage->get('cta_section_btn_secondary', 'Ver planos Premium') }}
                     </a>
