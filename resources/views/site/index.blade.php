@@ -157,7 +157,7 @@
                     @endif
                 </div>
 
-                <div class="grid md:grid-cols-3 gap-8">
+                <div class="grid auto-rows-fr md:grid-cols-3 gap-8">
                     @foreach($freeEvents as $event)
                         @php
                             $isEventClosed = !($event->is_demo ?? false)
@@ -165,40 +165,40 @@
                                 && $event->isClosedForPublic();
                         @endphp
                         <article
-                            class="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition flex flex-col justify-between {{ ($event->is_demo ?? false) ? 'ring-2 ring-yellow-400' : '' }}" style="height: 100%">
-                            <div>
+                            class="home-selling-card bg-white rounded-3xl p-8 shadow-lg border border-blue-50 hover:shadow-xl transition flex h-full flex-col {{ ($event->is_demo ?? false) ? 'ring-2 ring-yellow-400' : '' }}">
+                            <div class="home-selling-body">
                                 <span class="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4"
                                     style="background: var(--unn-azul-1); color: white">
                                     GRATUITA
                                 </span>
-                                <h3 class="text-xl font-bold unn-title-gradient mb-3">{{ $event->title }}</h3>
-                                <p class="text-gray-600 text-sm mb-4">{{ Str::limit(strip_tags((string) ($event->description ?? '')), 100) }}</p>
-                                <div class="flex items-center gap-4 text-sm text-gray-500 mb-6">
+                                <h3 class="home-selling-title text-xl font-bold unn-title-gradient mb-3 line-clamp-2">{{ $event->title }}</h3>
+                                <p class="home-selling-copy text-gray-600 text-sm mb-4 line-clamp-3">{{ Str::limit(strip_tags((string) ($event->description ?? '')), 100) }}</p>
+                                <div class="home-selling-meta flex items-center gap-4 text-sm text-gray-500 mb-3">
                                     <span><i class="fas fa-calendar mr-1"></i>
                                         {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y H:i') }}</span>
                                 </div>
-                                <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+                                <div class="home-selling-meta flex items-center gap-2 text-sm text-gray-500 mb-6">
                                     <i class="fas fa-map-marker-alt"></i> {{ $event->location }}
                                 </div>
                             </div>
-                            <div class="mt-auto">
+                            <div class="home-selling-footer mt-auto pt-4 border-t border-blue-50">
                                 @if($event->is_demo ?? false)
                                     <button onclick="Swal.fire({
                                         title: 'Evento Demo',
                                         text: 'Este é um evento de demonstração.',
                                         icon: 'info',
                                         confirmButtonColor: '#1F5EDB'
-                                    })" class="w-full btn-primary text-white py-3 rounded-xl font-semibold opacity-75">
+                                    })" class="home-selling-action w-full btn-primary text-white py-3 rounded-xl font-semibold opacity-75">
                                     Quero participar
                                 </button>
                                 @elseif($isEventClosed)
                                     <span
-                                        class="block w-full bg-slate-100 text-slate-400 py-3 rounded-xl font-semibold text-center cursor-not-allowed">
+                                        class="home-selling-action block w-full bg-slate-100 text-slate-400 py-3 rounded-xl font-semibold text-center cursor-not-allowed border border-slate-200">
                                         Evento encerrado
                                     </span>
                                 @else
                                     <a href="{{ route('events.show', $event->id) }}"
-                                        class="block w-full btn-primary text-white py-3 rounded-xl font-semibold text-center">
+                                        class="home-selling-action block w-full btn-primary text-white py-3 rounded-xl font-semibold text-center">
                                     Quero participar
                                 </a>
                                 @endif
@@ -231,7 +231,7 @@
                     </a>
                 </div>
 
-                <div class="grid md:grid-cols-3 gap-8">
+                <div class="grid auto-rows-fr md:grid-cols-3 gap-8">
                     @foreach($paidMentorings as $mentorship)
                         @php
                             $isMentorshipClosed = !($mentorship->is_demo ?? false)
@@ -239,36 +239,52 @@
                                 && $mentorship->isClosedForPublic();
                         @endphp
                         <article
-                            class="bg-slate-50 rounded-3xl p-8 border border-gray-100 {{ ($mentorship->is_demo ?? false) ? 'ring-2 ring-yellow-400' : '' }}">
-                            <div class="flex items-center justify-between mb-4">
-                                <span
-                                    class="text-xs uppercase tracking-wide text-gray-500">{{ optional($mentorship->mentor)->name ?? 'Mentor UNN' }}</span>
-                                <span class="text-lg font-bold" style="color: var(--unn-azul-1)">R$
+                            class="home-selling-card bg-slate-50 rounded-3xl p-8 border border-blue-100 shadow-sm h-full flex flex-col transition-all duration-300 hover:shadow-lg hover:-translate-y-1 {{ ($mentorship->is_demo ?? false) ? 'ring-2 ring-yellow-400' : '' }}">
+                            <div class="home-selling-header flex items-center justify-between gap-4 mb-4">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div
+                                        class="w-11 h-11 rounded-full bg-white border border-blue-100 flex items-center justify-center text-blue-600 font-bold overflow-hidden shrink-0">
+                                        @if(optional($mentorship->mentor)->profile_photo_url)
+                                            <img src="{{ $mentorship->mentor->profile_photo_url }}"
+                                                alt="{{ optional($mentorship->mentor)->name ?? 'Mentor UNN' }}"
+                                                class="w-full h-full object-cover">
+                                        @else
+                                            {{ strtoupper(substr(optional($mentorship->mentor)->name ?? 'M', 0, 1)) }}
+                                        @endif
+                                    </div>
+                                    <span
+                                        class="text-xs uppercase tracking-wide text-gray-500 font-semibold line-clamp-2">{{ optional($mentorship->mentor)->name ?? 'Mentor UNN' }}</span>
+                                </div>
+                                <span class="shrink-0 text-lg font-black px-4 py-2 rounded-2xl bg-white shadow-sm"
+                                    style="color: var(--unn-azul-1)">R$
                                     {{ number_format($mentorship->price, 2, ',', '.') }}</span>
                             </div>
-                            <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $mentorship->title }}</h3>
-                            <p class="text-gray-600 text-sm mb-4">{{ Str::limit(strip_tags((string) ($mentorship->description ?? '')), 100) }}</p>
-                            <p class="text-sm text-gray-500 mb-6">Vagas: <strong>{{ $mentorship->slots }}</strong></p>
+                            <h3 class="home-selling-title text-xl font-black text-gray-900 mb-3 line-clamp-3">{{ $mentorship->title }}</h3>
+                            <p class="home-selling-copy text-gray-600 text-sm mb-5 line-clamp-3">{{ Str::limit(strip_tags((string) ($mentorship->description ?? '')), 110) }}</p>
+                            <div class="home-selling-footer mt-auto pt-4 border-t border-blue-100">
+                                <p class="home-selling-meta text-sm text-gray-500 mb-4"><i class="fas fa-users mr-1 text-blue-400"></i> Vagas:
+                                    <strong>{{ $mentorship->slots }}</strong></p>
                             @if(!($mentorship->is_demo ?? false) && isset($mentorship->id) && !$isMentorshipClosed)
                                 <a href="{{ route('mentorships.show', $mentorship->id) }}"
-                                    class="w-full btn-primary text-white py-3 rounded-xl font-semibold inline-flex items-center justify-center">
+                                    class="home-selling-action w-full btn-primary text-white py-3 rounded-xl font-semibold inline-flex items-center justify-center">
                                     Garantir vaga
                                 </a>
                             @elseif($isMentorshipClosed)
                                 <span
-                                    class="w-full bg-slate-200 text-slate-500 py-3 rounded-xl font-semibold inline-flex items-center justify-center cursor-not-allowed">
+                                    class="home-selling-action w-full bg-slate-200 text-slate-500 py-3 rounded-xl font-semibold inline-flex items-center justify-center cursor-not-allowed border border-slate-300">
                                     Mentoria encerrada
                                 </span>
                             @else
                                 <button onclick="Swal.fire({
                                     title: 'Mentoria Demo',
                                     text: 'Esta é uma mentoria de demonstração.',
-                                    icon: 'info',
-                                    confirmButtonColor: '#1F5EDB'
-                                })" class="w-full btn-primary text-white py-3 rounded-xl font-semibold opacity-75">
+                                        icon: 'info',
+                                        confirmButtonColor: '#1F5EDB'
+                                })" class="home-selling-action w-full btn-primary text-white py-3 rounded-xl font-semibold opacity-75">
                                     Garantir vaga (Demo)
                                 </button>
                             @endif
+                            </div>
                         </article>
                     @endforeach
                 </div>
@@ -554,6 +570,48 @@
             .unn-title-hero {
                 font-size: 1.5rem;
                 max-width: 98vw;
+            }
+        }
+
+        .home-selling-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
+        }
+
+        .home-selling-header {
+            min-height: 4rem;
+            align-items: center;
+        }
+
+        .home-selling-title {
+            min-height: 5.6rem;
+        }
+
+        .home-selling-copy {
+            min-height: 5.4rem;
+        }
+
+        .home-selling-meta {
+            min-height: 1.5rem;
+        }
+
+        .home-selling-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .home-selling-action {
+            min-height: 3.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 767.98px) {
+            .home-selling-header,
+            .home-selling-title,
+            .home-selling-copy {
+                min-height: auto;
             }
         }
     </style>
