@@ -217,6 +217,95 @@ class Event extends Model
         return !$this->isClosedForPublic();
     }
 
+    public function scannerStartsAt(): ?Carbon
+    {
+        if (!$this->start_at) {
+            return null;
+        }
+
+        return $this->start_at instanceof CarbonInterface
+            ? Carbon::instance($this->start_at)
+            : Carbon::parse($this->start_at);
+    }
+
+    public function scannerDeadlineAt(): ?Carbon
+    {
+        if ($this->end_at) {
+            return $this->end_at instanceof CarbonInterface
+                ? Carbon::instance($this->end_at)
+                : Carbon::parse($this->end_at);
+        }
+
+        $start = $this->scannerStartsAt();
+        if (!$start) {
+            return null;
+        }
+
+        return $start->copy()->endOfDay();
+    }
+
+    public function isScannerOpen(?CarbonInterface $reference = null): bool
+    {
+        $startsAt = $this->scannerStartsAt();
+        $deadlineAt = $this->scannerDeadlineAt();
+
+        if (!$startsAt || !$deadlineAt) {
+            return false;
+        }
+
+        $comparison = $reference
+            ? Carbon::instance($reference)
+            : now();
+
+        return $comparison->betweenIncluded($startsAt, $deadlineAt);
+    }
+
+    public function isScannerExpired(?CarbonInterface $reference = null): bool
+    {
+        $deadlineAt = $this->scannerDeadlineAt();
+
+        if (!$deadlineAt) {
+            return false;
+        }
+
+        $comparison = $reference
+            ? Carbon::instance($reference)
+            : now();
+
+        return $comparison->gt($deadlineAt);
+    }
+
+    public function scannerStatusMessage(?CarbonInterface $reference = null): string
+    {
+        $startsAt = $this->scannerStartsAt();
+        $deadlineAt = $this->scannerDeadlineAt();
+        $comparison = $reference
+            ? Carbon::instance($reference)
+            : now();
+
+        if (!$startsAt || !$deadlineAt) {
+            return 'Este evento ainda nao possui uma janela valida de check-in configurada.';
+        }
+
+        if ($comparison->lt($startsAt)) {
+            return 'A validacao do QR Code abre em ' . $startsAt->format('d/m/Y H:i') . '.';
+        }
+
+        if ($comparison->gt($deadlineAt)) {
+            if ($this->end_at) {
+                return 'QR Code expirado. A validacao encerrou em ' . $deadlineAt->format('d/m/Y H:i') . '.';
+            }
+
+            return 'QR Code expirado. A validacao encerrou as 23:59 do dia ' . $startsAt->format('d/m/Y') . '.';
+        }
+
+        if ($this->end_at) {
+            return 'Validacao disponivel ate ' . $deadlineAt->format('d/m/Y H:i') . '.';
+        }
+
+        return 'Validacao disponivel ate 23:59 do dia ' . $startsAt->format('d/m/Y') . '.';
+    }
+
     public function scopePublicUpcoming(Builder $query): Builder
     {
         $now = now();

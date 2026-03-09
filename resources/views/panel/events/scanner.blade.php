@@ -19,6 +19,11 @@
             </a>
         </div>
 
+        <div
+            class="mb-4 rounded-2xl border px-4 py-3 text-sm font-semibold {{ $scannerOpen ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-700' }}">
+            <i class="fas {{ $scannerOpen ? 'fa-check-circle' : 'fa-ban' }} mr-2"></i>{{ $scannerStatusMessage }}
+        </div>
+
         <div class="bg-white shadow rounded-2xl overflow-hidden relative border border-gray-100 p-6">
 
             <div class="max-w-lg mx-auto">
@@ -37,8 +42,10 @@
                             Clique abaixo para habilitar a **Câmera**, **GPS** e os **Alertas Sonoros**.
                         </p>
                         <button onclick="initializeScanner()"
-                            class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
-                            <i class="fas fa-play"></i> INICIAR SCANNER
+                            {{ $scannerOpen ? '' : 'disabled' }}
+                            class="w-full py-3 {{ $scannerOpen ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-300 cursor-not-allowed' }} text-white font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fas {{ $scannerOpen ? 'fa-play' : 'fa-ban' }}"></i>
+                            {{ $scannerOpen ? 'INICIAR SCANNER' : 'SCANNER EXPIRADO' }}
                         </button>
                     </div>
 
@@ -97,12 +104,23 @@
         let html5QrCode = null;
         let isProcessing = false;
         let userCoords = { lat: null, lng: null };
+        const scannerOpen = @json($scannerOpen);
+        const scannerStatusMessage = @json($scannerStatusMessage);
 
         document.addEventListener('DOMContentLoaded', function () {
             // Aguarda clique para iniciar
         });
 
         async function initializeScanner() {
+            if (!scannerOpen) {
+                Swal.fire({
+                    title: 'Scanner indisponivel',
+                    text: scannerStatusMessage,
+                    icon: 'error',
+                    confirmButtonColor: '#1F5EDB'
+                });
+                return;
+            }
             // 1. Notificações
             if ("Notification" in window) {
                 await Notification.requestPermission();

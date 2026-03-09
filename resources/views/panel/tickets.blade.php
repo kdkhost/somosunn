@@ -61,12 +61,27 @@
                                 </div>
                             </div>
 
+                            @php
+                                $ticketExpired = $reg->event && $reg->event->isScannerExpired();
+                                $ticketStatusMessage = $reg->event ? $reg->event->scannerStatusMessage() : 'QR Code expirado.';
+                                $ticketPayload = [
+                                    'code' => $reg->ticket_code,
+                                    'title' => $reg->event->title,
+                                    'date' => \Carbon\Carbon::parse($reg->event->start_at)->format('d/m/Y - H:i'),
+                                    'expired' => $ticketExpired,
+                                    'statusMessage' => $ticketStatusMessage,
+                                ];
+                            @endphp
                             <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
                                 <div class="flex flex-col">
                                     <span class="text-[10px] uppercase font-bold text-slate-400">Status</span>
                                     @if($reg->check_in_at)
                                         <span class="text-xs font-bold text-green-600 flex items-center gap-1">
                                             <i class="fas fa-check-circle"></i> Lido
+                                        </span>
+                                    @elseif($ticketExpired)
+                                        <span class="text-xs font-bold text-red-600 flex items-center gap-1">
+                                            <i class="fas fa-ban"></i> Expirado
                                         </span>
                                     @else
                                         <span class="text-xs font-bold text-blue-600 flex items-center gap-1">
@@ -76,7 +91,7 @@
                                 </div>
 
                                 <button
-                                    onclick="showTicketModal('{{ $reg->ticket_code }}', '{{ addslashes($reg->event->title) }}', '{{ \Carbon\Carbon::parse($reg->event->start_at)->format('d/m/Y - H:i') }}')"
+                                    onclick='showTicketModal({!! json_encode($ticketPayload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!})'
                                     class="bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-300 p-2 rounded-xl transition-all shadow-sm flex items-center gap-2 text-xs font-bold group/btn">
                                     <i class="fas fa-qrcode"></i> Ver QR Code
                                 </button>
@@ -114,9 +129,22 @@
                     do Evento</h3>
                 <p class="text-sm text-slate-500 dark:text-slate-400 mb-8" id="modalTicketDate">00/00/0000 - 00:00</p>
 
-                <div class="bg-white p-6 rounded-3xl shadow-inner border-4 border-dashed border-slate-100 dark:border-slate-800 mb-8 flex justify-center qrcode-wrapper"
-                    id="qrcode-container">
-                    <!-- QR Code vai aqui via JS -->
+                <div id="ticketExpiredAlert"
+                    class="hidden mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300">
+                </div>
+
+                <div class="relative inline-flex mb-8">
+                    <div class="bg-white p-6 rounded-3xl shadow-inner border-4 border-dashed border-slate-100 dark:border-slate-800 flex justify-center qrcode-wrapper"
+                        id="qrcode-container">
+                        <!-- QR Code vai aqui via JS -->
+                    </div>
+                    <div id="ticketExpiredOverlay"
+                        class="hidden absolute inset-0 rounded-3xl bg-white/90 dark:bg-slate-950/90 backdrop-blur-[1px] border-2 border-red-300 dark:border-red-700 flex items-center justify-center">
+                        <span
+                            class="rotate-[-10deg] rounded-xl border-2 border-red-600 bg-red-600/10 px-4 py-2 text-xl font-black uppercase tracking-[0.2em] text-red-700 dark:text-red-300">
+                            Expirado
+                        </span>
+                    </div>
                 </div>
 
                 <div class="space-y-4">
@@ -138,23 +166,36 @@
         const modal = document.getElementById('ticketModal');
         let qrcodeInstance = null;
 
-        window.showTicketModal = function (code, title, date) {
-            document.getElementById('modalTicketTitle').innerText = title;
-            document.getElementById('modalTicketDate').innerText = date;
-            document.getElementById('modalTicketCodeString').innerText = code;
+        window.showTicketModal = function (payload) {
+            const expiredAlert = document.getElementById('ticketExpiredAlert');
+            const expiredOverlay = document.getElementById('ticketExpiredOverlay');
+
+            document.getElementById('modalTicketTitle').innerText = payload.title;
+            document.getElementById('modalTicketDate').innerText = payload.date;
+            document.getElementById('modalTicketCodeString').innerText = payload.code;
 
             const qrContainer = document.getElementById('qrcode-container');
             qrContainer.innerHTML = '';
 
             // Generate QR Code
             qrcodeInstance = new QRCode(qrContainer, {
-                text: code,
+                text: payload.code,
                 width: 220,
                 height: 220,
                 colorDark: "#0f172a", // slate-900
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
+
+            if (payload.expired) {
+                expiredAlert.textContent = payload.statusMessage || 'QR Code expirado.';
+                expiredAlert.classList.remove('hidden');
+                expiredOverlay.classList.remove('hidden');
+            } else {
+                expiredAlert.textContent = '';
+                expiredAlert.classList.add('hidden');
+                expiredOverlay.classList.add('hidden');
+            }
 
             modal.setAttribute('aria-hidden', 'false');
             modal.style.display = 'flex';

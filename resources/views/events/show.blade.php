@@ -239,6 +239,17 @@
                                 @endif
 
                                 @if(isset($userRegistration) && $userRegistration)
+                                    @php
+                                        $ticketExpired = $event->isScannerExpired();
+                                        $ticketStatusMessage = $event->scannerStatusMessage();
+                                        $ticketPayload = [
+                                            'code' => $userRegistration->ticket_code,
+                                            'title' => $event->title,
+                                            'date' => $startDate->translatedFormat('d M Y, \à\s H:i'),
+                                            'expired' => $ticketExpired,
+                                            'statusMessage' => $ticketStatusMessage,
+                                        ];
+                                    @endphp
                                     <div class="text-center">
                                         <div
                                             class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-xl font-bold mb-4 w-full justify-center">
@@ -246,10 +257,15 @@
                                         </div>
                                         @if($event->is_ticket_enabled && $userRegistration->ticket_code)
                                             <button type="button"
-                                                onclick="showTicketModal('{{ $userRegistration->ticket_code }}', '{{ $event->title }}', '{{ $startDate->translatedFormat('d M Y, \à\s H:i') }}')"
+                                                onclick='showTicketModal({!! json_encode($ticketPayload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!})'
                                                 class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2">
                                                 <i class="fas fa-qrcode"></i> Ver Ingresso Digital
                                             </button>
+                                            @if($ticketExpired)
+                                                <p class="mt-3 text-sm font-bold text-red-600 flex items-center justify-center gap-2">
+                                                    <i class="fas fa-ban"></i> {{ $ticketStatusMessage }}
+                                                </p>
+                                            @endif
                                         @endif
                                     </div>
                                 @elseif($isClosed)
@@ -446,9 +462,22 @@
             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Apresente este código na entrada
             </p>
 
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 inline-block mb-6"
-                id="qrcode-container">
-                <!-- QR Code vai aqui via JS -->
+            <div id="ticketExpiredAlert"
+                class="hidden mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+            </div>
+
+            <div class="relative inline-block mb-6">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 inline-block"
+                    id="qrcode-container">
+                    <!-- QR Code vai aqui via JS -->
+                </div>
+                <div id="ticketExpiredOverlay"
+                    class="hidden absolute inset-0 rounded-xl bg-white/90 backdrop-blur-[1px] border-2 border-red-300 flex items-center justify-center">
+                    <span
+                        class="rotate-[-10deg] rounded-xl border-2 border-red-600 bg-red-600/10 px-4 py-2 text-xl font-black uppercase tracking-[0.2em] text-red-700">
+                        Expirado
+                    </span>
+                </div>
             </div>
 
             <p class="font-mono text-sm text-slate-600 tracking-widest bg-slate-100 py-2 px-4 rounded-lg select-all"
@@ -486,23 +515,36 @@
         const modal = document.getElementById('ticketModal');
         let qrcodeInstance = null;
 
-        window.showTicketModal = function (code, title, date) {
-            document.getElementById('modalTicketTitle').innerText = title;
-            document.getElementById('modalTicketDate').innerText = date;
-            document.getElementById('modalTicketCodeString').innerText = code;
+        window.showTicketModal = function (payload) {
+            const expiredAlert = document.getElementById('ticketExpiredAlert');
+            const expiredOverlay = document.getElementById('ticketExpiredOverlay');
+
+            document.getElementById('modalTicketTitle').innerText = payload.title;
+            document.getElementById('modalTicketDate').innerText = payload.date;
+            document.getElementById('modalTicketCodeString').innerText = payload.code;
 
             const qrContainer = document.getElementById('qrcode-container');
             qrContainer.innerHTML = '';
 
             // Generate QR Code
             qrcodeInstance = new QRCode(qrContainer, {
-                text: code,
+                text: payload.code,
                 width: 220,
                 height: 220,
                 colorDark: "#1e293b", // slate-800
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
+
+            if (payload.expired) {
+                expiredAlert.textContent = payload.statusMessage || 'QR Code expirado.';
+                expiredAlert.classList.remove('hidden');
+                expiredOverlay.classList.remove('hidden');
+            } else {
+                expiredAlert.textContent = '';
+                expiredAlert.classList.add('hidden');
+                expiredOverlay.classList.add('hidden');
+            }
 
             modal.setAttribute('aria-hidden', 'false');
             modal.style.display = 'flex';

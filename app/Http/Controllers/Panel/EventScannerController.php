@@ -12,22 +12,23 @@ class EventScannerController extends Controller
 {
     public function index(Event $event)
     {
-        // Verifica permissão (Admin vê tudo, Instrutor vê apenas o seu)
         if (!auth()->user()->isAdmin() && $event->user_id !== auth()->id()) {
             abort(403, 'Apenas o organizador pode acessar o scanner deste evento.');
         }
 
         if (!$event->is_ticket_enabled) {
             return redirect()->route('panel.events.show', $event)
-                ->with('error', 'A validação por QR Code não está habilitada para este evento.');
+                ->with('error', 'A validacao por QR Code nao esta habilitada para este evento.');
         }
 
-        return view('panel.events.scanner', compact('event'));
+        $scannerOpen = $event->isScannerOpen();
+        $scannerStatusMessage = $event->scannerStatusMessage();
+
+        return view('panel.events.scanner', compact('event', 'scannerOpen', 'scannerStatusMessage'));
     }
 
     public function validateTicket(Request $request, Event $event, PointsService $pointsService)
     {
-        // Verifica permissão (Admin pode tudo, Instrutor apenas o seu)
         if (!auth()->user()->isAdmin() && $event->user_id !== auth()->id()) {
             return response()->json(['success' => false, 'message' => 'Acesso negado.'], 403);
         }
@@ -35,7 +36,7 @@ class EventScannerController extends Controller
         $request->validate([
             'ticket_code' => 'required|string',
             'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric'
+            'longitude' => 'nullable|numeric',
         ]);
 
         $ticketCode = $request->input('ticket_code');
@@ -43,47 +44,31 @@ class EventScannerController extends Controller
         $userLng = $request->input('longitude');
         $now = now();
 
-        // 1. Validação de Data (Apenas no dia do evento)
-        $eventDay = \Carbon\Carbon::parse($event->start_at)->startOfDay();
-        if (!$now->isSameDay($eventDay)) {
+        if (!$event->isScannerOpen($now)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Este evento não é hoje (Agendado para: ' . $eventDay->format('d/m/Y') . ').'
+                'message' => $event->scannerStatusMessage($now),
             ]);
         }
 
-        // 2. Validação de Horário (Não permitir se o evento já terminou a mais de 4 horas)
-        if ($event->end_at) {
-            $endLimit = \Carbon\Carbon::parse($event->end_at)->addHours(4);
-            if ($now->gt($endLimit)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Este evento já foi encerrado.'
-                ]);
-            }
-        }
-
-        // 3. Validação de GPS (Obrigatória se o evento tiver coordenadas)
         if ($event->latitude && $event->longitude) {
             if (!$userLat || !$userLng) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'É necessário permitir o acesso ao GPS para validar neste local.'
+                    'message' => 'E necessario permitir o acesso ao GPS para validar neste local.',
                 ]);
             }
 
             $distance = $this->calculateDistance($userLat, $userLng, $event->latitude, $event->longitude);
 
-            // Tolerância de 10 metros (0.01 km)
             if ($distance > 0.01) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Você não está no local configurado para este evento (Distância: ' . round($distance * 1000) . 'm).'
+                    'message' => 'Voce nao esta no local configurado para este evento (Distancia: ' . round($distance * 1000) . 'm).',
                 ]);
             }
         }
 
-        // Busca o ingresso
         $registration = EventRegistration::where('event_id', $event->id)
             ->where('ticket_code', $ticketCode)
             ->whereIn('status', EventRegistration::COUNTED_STATUSES)
@@ -91,32 +76,35 @@ class EventScannerController extends Controller
             ->first();
 
         if (!$registration) {
-            return response()->json(['success' => false, 'message' => 'Ingresso não encontrado ou inválido para este evento.']);
+            return response()->json([
+                'success' => false,
+                'message' => 'Ingresso nao encontrado ou invalido para este evento.',
+            ]);
         }
 
         if ($registration->check_in_at) {
             return response()->json([
                 'success' => false,
-                'message' => 'Este ingresso já foi validado em ' . $registration->check_in_at->format('H:i')
+                'message' => 'Este ingresso ja foi validado em ' . $registration->check_in_at->format('H:i'),
             ]);
         }
 
-        // Realiza o check-in
         $registration->update([
-            'check_in_at' => $now
+            'check_in_at' => $now,
         ]);
 
-        // Atribui pontos
         try {
             if ($registration->user_id) {
                 $user = $registration->user;
-                if ($user)
+                if ($user) {
                     $pointsService->award($user, 'event_scan_participant');
+                }
             }
 
             $organizer = \App\Models\User::find($event->user_id);
-            if ($organizer)
+            if ($organizer) {
                 $pointsService->award($organizer, 'event_scan_organizer');
+            }
         } catch (\Exception $e) {
             \Log::error('Erro ao atribuir pontos no check-in do evento: ' . $e->getMessage());
         }
@@ -130,11 +118,13 @@ class EventScannerController extends Controller
 
     private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
-        $earthRadius = 6371; // km
+        $earthRadius = 6371;
         $dLat = deg2rad($lat2 - $lat1);
         $dLon = deg2rad($lon2 - $lon1);
-        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
+        $a = sin($dLat / 2) * sin($dLat / 2)
+            + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
         return $earthRadius * $c;
     }
 }

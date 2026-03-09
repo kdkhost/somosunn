@@ -23,6 +23,11 @@
                                 {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y H:i') }}</p>
                         </div>
 
+                        <div class="alert {{ $scannerOpen ? 'alert-success' : 'alert-danger' }} text-center">
+                            <i class="fas {{ $scannerOpen ? 'fa-check-circle' : 'fa-ban' }} mr-1"></i>
+                            {{ $scannerStatusMessage }}
+                        </div>
+
                         <div class="row justify-content-center">
                             <div class="col-md-8 col-lg-6">
                                 <!-- Scanner Wrapper -->
@@ -66,12 +71,21 @@
         let html5QrcodeScanner = null;
         let isProcessing = false;
         let scanTimeout = null;
+        const scannerOpen = @json($scannerOpen);
+        const scannerStatusMessage = @json($scannerStatusMessage);
 
         document.addEventListener('DOMContentLoaded', function () {
-            startScanner();
+            if (scannerOpen) {
+                startScanner();
+            }
         });
 
         function startScanner() {
+            if (!scannerOpen) {
+                toastr.error(scannerStatusMessage);
+                return;
+            }
+
             if (html5QrcodeScanner) {
                 html5QrcodeScanner.clear();
             }
