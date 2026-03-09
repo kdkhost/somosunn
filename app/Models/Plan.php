@@ -9,31 +9,78 @@ class Plan extends Model
 {
     use HasFactory;
 
+    public const PERIOD_KEYS = [
+        'mensal',
+        'trimestral',
+        'semestral',
+        'anual',
+    ];
+
+    public const PERIOD_LABELS = [
+        'mensal' => 'Mensal',
+        'trimestral' => 'Trimestral',
+        'semestral' => 'Semestral',
+        'anual' => 'Anual',
+    ];
+
+    public const PERIOD_MULTIPLIERS = [
+        'mensal' => 1,
+        'trimestral' => 3,
+        'semestral' => 6,
+        'anual' => 12,
+    ];
+
     public const DEFAULT_FREE_PLAN_PERMISSIONS = [
         'community',
         'rankings',
     ];
 
     public const DEFAULT_FREE_PLAN_BENEFITS = [
-        'Acesso à comunidade do Somos UNN',
-        'Participação nos eventos presenciais e gratuitos',
-        'Visualização do ranking de membros',
+        'Acesso a comunidade do Somos UNN',
+        'Participacao nos eventos presenciais e gratuitos',
+        'Visualizacao do ranking de membros',
         'Acesso aos cursos gratuitos',
     ];
 
-    public const DEFAULT_FREE_PLAN_DESCRIPTION = 'Acesso à comunidade do Somos UNN, participação nos eventos presenciais e gratuitos, visualização do ranking de membros e acesso aos cursos gratuitos.';
+    public const DEFAULT_FREE_PLAN_DESCRIPTION = 'Acesso a comunidade do Somos UNN, participacao nos eventos presenciais e gratuitos, visualizacao do ranking de membros e acesso aos cursos gratuitos.';
 
-    public const PAID_CREATOR_SELLER_FEATURES = [
+    public const PRO_PLAN_PERMISSIONS = [
+        'community',
+        'chat',
+        'connections',
+        'connections.unlimited',
         'courses',
+        'courses.certificates',
+        'courses.downloads',
+        'events',
+        'mentorships',
+        'mentorships.group',
+        'mentorships.individual',
+        'benefits.club.access',
+        'events.pitch.priority',
+        'events.keynote.annual',
+        'events.first_lot',
+        'rankings',
+    ];
+
+    public const ELITE_PLAN_PERMISSIONS = [
+        'community',
+        'chat',
+        'connections',
+        'connections.unlimited',
+        'courses',
+        'courses.certificates',
+        'courses.downloads',
         'courses.create',
         'courses.edit',
         'courses.delete',
-        'courses.certificates',
         'events',
         'events.create',
         'events.edit',
         'events.delete',
         'mentorships',
+        'mentorships.group',
+        'mentorships.individual',
         'mentorships.create',
         'mentorships.edit',
         'mentorships.delete',
@@ -41,6 +88,13 @@ class Plan extends Model
         'marketplace.buy',
         'marketplace.sales',
         'marketplace.sell',
+        'benefits.club.access',
+        'benefits.club.partner',
+        'events.pitch.priority',
+        'events.keynote.annual',
+        'events.first_lot',
+        'events.mentor',
+        'rankings',
     ];
 
     public const FREE_PLAN_RESTRICTED_FEATURES = [
@@ -53,10 +107,179 @@ class Plan extends Model
         'events_access',
         'events.recordings',
         'events.vip',
+        'events.pitch.priority',
+        'events.keynote.annual',
+        'events.first_lot',
+        'events.mentor',
         'mentorships',
         'mentorships_access',
         'mentorships.group',
         'mentorships.individual',
+        'benefits.club.access',
+        'benefits.club.partner',
+    ];
+
+    public const FEATURE_LABELS = [
+        'community' => 'Comunidade e perfil interno',
+        'chat' => 'Chat entre membros',
+        'connections' => 'Networking entre membros',
+        'connections.unlimited' => 'Networking sem limite',
+        'courses' => 'Consumir cursos completos',
+        'courses.create' => 'Publicar cursos',
+        'courses.edit' => 'Editar cursos publicados',
+        'courses.delete' => 'Remover cursos publicados',
+        'courses.certificates' => 'Certificados de cursos',
+        'courses.downloads' => 'Downloads de materiais',
+        'events' => 'Participar dos eventos',
+        'events.create' => 'Criar e divulgar eventos',
+        'events.edit' => 'Editar eventos publicados',
+        'events.delete' => 'Remover eventos publicados',
+        'events.recordings' => 'Acesso a gravacoes de eventos',
+        'events.vip' => 'Eventos VIP/exclusivos',
+        'events.pitch.priority' => 'Pitch diferenciado nos eventos',
+        'events.keynote.annual' => 'Apresentacao principal anual (15+5)',
+        'events.first_lot' => 'Compra prioritaria com primeiro lote',
+        'events.mentor' => 'Mentoria nas dinamicas dos eventos',
+        'mentorships' => 'Consumir mentorias',
+        'mentorships.create' => 'Publicar mentorias',
+        'mentorships.edit' => 'Editar mentorias publicadas',
+        'mentorships.delete' => 'Remover mentorias publicadas',
+        'mentorships.group' => 'Mentorias em grupo',
+        'mentorships.individual' => 'Mentorias individuais',
+        'marketplace' => 'Acesso ao marketplace',
+        'marketplace.sales' => 'Historico de vendas',
+        'marketplace.buy' => 'Compras no marketplace',
+        'marketplace.sell' => 'Vendas no marketplace',
+        'benefits.club.access' => 'Consumir o clube de beneficios',
+        'benefits.club.partner' => 'Perfil no clube de beneficios e cupons',
+        'rankings' => 'Ranking de membros',
+        'support.priority' => 'Suporte prioritario',
+        'early.access' => 'Acesso antecipado a novidades',
+        'admin.panel' => 'Acesso ao painel admin',
+    ];
+
+    public const FEATURE_GROUPS = [
+        'Experiencia do membro' => [
+            'community',
+            'chat',
+            'connections',
+            'connections.unlimited',
+            'rankings',
+            'benefits.club.access',
+        ],
+        'Conteudo e mentorias' => [
+            'courses',
+            'courses.certificates',
+            'courses.downloads',
+            'mentorships',
+            'mentorships.group',
+            'mentorships.individual',
+        ],
+        'Eventos e visibilidade' => [
+            'events',
+            'events.recordings',
+            'events.vip',
+            'events.pitch.priority',
+            'events.keynote.annual',
+            'events.first_lot',
+            'events.mentor',
+        ],
+        'Criacao e vendas' => [
+            'marketplace',
+            'marketplace.buy',
+            'marketplace.sales',
+            'marketplace.sell',
+            'courses.create',
+            'courses.edit',
+            'courses.delete',
+            'events.create',
+            'events.edit',
+            'events.delete',
+            'mentorships.create',
+            'mentorships.edit',
+            'mentorships.delete',
+            'benefits.club.partner',
+        ],
+        'Administracao' => [
+            'support.priority',
+            'early.access',
+            'admin.panel',
+        ],
+    ];
+
+    public const PREMIUM_COMPARISON_ROWS = [
+        ['label' => 'Comunidade e perfil interno', 'permission' => 'community'],
+        ['label' => 'Ranking de membros', 'permission' => 'rankings'],
+        ['label' => 'Eventos de networking', 'permission' => 'events'],
+        ['label' => 'Cursos completos', 'permission' => 'courses'],
+        ['label' => 'Mentorias', 'permission' => 'mentorships'],
+        ['label' => 'Clube de beneficios', 'permission' => 'benefits.club.access'],
+        ['label' => 'Pitch diferenciado em eventos', 'permission' => 'events.pitch.priority'],
+        ['label' => 'Apresentacao principal anual', 'permission' => 'events.keynote.annual'],
+        ['label' => 'Primeiro lote garantido', 'permission' => 'events.first_lot'],
+        ['label' => 'Publicar cursos', 'permission' => 'courses.create'],
+        ['label' => 'Publicar mentorias', 'permission' => 'mentorships.create'],
+        ['label' => 'Criar e divulgar eventos', 'permission' => 'events.create'],
+        ['label' => 'Mentoria nas dinamicas dos eventos', 'permission' => 'events.mentor'],
+        ['label' => 'Perfil parceiro e cupons', 'permission' => 'benefits.club.partner'],
+    ];
+
+    public const COMMERCIAL_BLUEPRINTS = [
+        'free' => [
+            'description' => self::DEFAULT_FREE_PLAN_DESCRIPTION,
+            'benefits' => self::DEFAULT_FREE_PLAN_BENEFITS,
+            'permissions' => self::DEFAULT_FREE_PLAN_PERMISSIONS,
+            'period' => 'mensal',
+            'period_settings' => [
+                'mensal' => ['enabled' => true],
+                'trimestral' => ['enabled' => false],
+                'semestral' => ['enabled' => false],
+                'anual' => ['enabled' => false],
+            ],
+        ],
+        'pro' => [
+            'description' => 'Plano voltado para membros que desejam consumir cursos e mentorias, participar dos eventos de networking e ganhar prioridade comercial nos encontros da comunidade.',
+            'benefits' => [
+                'Acesso a comunidade de membros do Somos UNN',
+                'Consumo completo de cursos e mentorias',
+                'Consumo do clube de beneficios',
+                'Participacao nos eventos de networking',
+                'Pitch diferenciado em todos os eventos do grupo',
+                '1 apresentacao principal de 15 min + 5 min de perguntas por ano',
+                'Compra prioritaria com valor de primeiro lote em todos os eventos',
+                'Perfil na rede social interna e participacao no ranking',
+            ],
+            'permissions' => self::PRO_PLAN_PERMISSIONS,
+            'period' => 'trimestral',
+            'period_settings' => [
+                'mensal' => ['enabled' => false],
+                'trimestral' => ['enabled' => true],
+                'semestral' => ['enabled' => true],
+                'anual' => ['enabled' => true],
+            ],
+        ],
+        'elite' => [
+            'description' => 'Plano para especialistas e criadores que querem publicar cursos, mentorias e eventos, atuar nas dinamicas da comunidade e converter networking em vendas dentro da plataforma.',
+            'benefits' => [
+                'Publicacao de cursos e mentorias',
+                'Criacao e divulgacao dos seus eventos dentro da plataforma',
+                'Mentoria nas dinamicas dos eventos do grupo',
+                'Perfil no clube de beneficios com geracao de cupons',
+                'Consumo do clube de beneficios e eventos de networking',
+                'Pitch diferenciado em todos os eventos do grupo',
+                '1 apresentacao principal de 15 min + 5 min de perguntas por ano',
+                'Compra prioritaria com valor de primeiro lote em todos os eventos',
+                'Perfil na rede social interna e participacao no ranking',
+            ],
+            'permissions' => self::ELITE_PLAN_PERMISSIONS,
+            'period' => 'trimestral',
+            'period_settings' => [
+                'mensal' => ['enabled' => false],
+                'trimestral' => ['enabled' => true],
+                'semestral' => ['enabled' => true],
+                'anual' => ['enabled' => true],
+            ],
+        ],
     ];
 
     protected $fillable = [
@@ -81,6 +304,7 @@ class Plan extends Model
         'is_recurring',
         'sort_order',
         'price_periods',
+        'period_settings',
     ];
 
     protected $casts = [
@@ -97,6 +321,7 @@ class Plan extends Model
         'comparison' => 'array',
         'price' => 'decimal:2',
         'price_periods' => 'array',
+        'period_settings' => 'array',
         'sort_order' => 'integer',
     ];
 
@@ -130,7 +355,13 @@ class Plan extends Model
             return self::DEFAULT_FREE_PLAN_DESCRIPTION;
         }
 
-        return trim((string) ($this->description ?? ''));
+        $description = trim((string) ($this->description ?? ''));
+        if ($description !== '') {
+            return $description;
+        }
+
+        $blueprint = self::blueprintForPlan((string) ($this->slug ?? ''), false);
+        return trim((string) ($blueprint['description'] ?? ''));
     }
 
     public function resolvedBenefits(): array
@@ -145,13 +376,19 @@ class Plan extends Model
             $benefits = [];
         }
 
-        return array_values(array_filter($benefits, static fn ($value) => is_string($value) && trim($value) !== ''));
+        $benefits = array_values(array_filter($benefits, static fn ($value) => is_string($value) && trim($value) !== ''));
+        if ($benefits !== []) {
+            return $benefits;
+        }
+
+        $blueprint = self::blueprintForPlan((string) ($this->slug ?? ''), false);
+        $fallback = $blueprint['benefits'] ?? [];
+
+        return is_array($fallback)
+            ? array_values(array_filter($fallback, static fn ($value) => is_string($value) && trim($value) !== ''))
+            : [];
     }
 
-    /**
-     * Retorna o plano gratuito padrão da plataforma.
-     * Prioridade: is_free=true → slug 'cliente' → menor preço.
-     */
     public static function getFreePlan(): ?self
     {
         try {
@@ -164,59 +401,124 @@ class Plan extends Model
         }
     }
 
-    /**
-     * Retorna o preço para um período específico.
-     * Usa price_periods se disponível, caso contrário retorna o preço base.
-     *
-     * @param string|null $period mensal|trimestral|semestral|anual
-     */
-    public function getPriceForPeriod(?string $period = null): float
+    public function resolvedPricePeriods(): array
     {
-        $period = $period ? strtolower(trim($period)) : 'mensal';
-        $periods = $this->price_periods;
-        if (is_array($periods) && isset($periods[$period]) && $periods[$period] > 0) {
-            return (float) $periods[$period];
-        }
-        return (float) $this->price;
-    }
-
-    /**
-     * Retorna todos os períodos disponíveis com seus preços.
-     * Sempre inclui pelo menos 'mensal' com o preço base.
-     */
-    public function getAvailablePeriods(): array
-    {
-        $base = [
-            'mensal'     => (float) $this->price,
+        $basePrice = round((float) ($this->price ?? 0), 2);
+        $prices = [
+            'mensal' => $basePrice,
             'trimestral' => null,
-            'semestral'  => null,
-            'anual'      => null,
+            'semestral' => null,
+            'anual' => null,
         ];
 
-        $periods = $this->price_periods;
-        if (is_array($periods)) {
-            foreach ($periods as $key => $value) {
-                if (array_key_exists($key, $base) && $value > 0) {
-                    $base[$key] = (float) $value;
+        $stored = $this->price_periods;
+        if (is_array($stored)) {
+            foreach (self::PERIOD_KEYS as $period) {
+                if (!array_key_exists($period, $stored)) {
+                    continue;
                 }
+
+                $value = self::parseMoneyValue($stored[$period]);
+                if ($value === null) {
+                    continue;
+                }
+
+                $prices[$period] = round($value, 2);
             }
         }
 
-        // Remove períodos sem preço definido (exceto mensal)
-        return array_filter($base, fn($v, $k) => $k === 'mensal' || $v !== null, ARRAY_FILTER_USE_BOTH);
+        if ($this->isFreeAccessPlan()) {
+            $prices['mensal'] = 0.0;
+        }
+
+        return $prices;
     }
 
-    /**
-     * Calcula prorrata para upgrade de plano:
-     * dias restantes no plano atual × (novo_preço_diário − preço_diário_atual).
-     */
+    public function resolvedPeriodSettings(): array
+    {
+        $prices = $this->resolvedPricePeriods();
+        $settings = self::normalizePeriodSettings($this->period_settings ?? [], $prices, $this->isFreeAccessPlan());
+
+        if ($this->isFreeAccessPlan()) {
+            return $settings;
+        }
+
+        foreach (self::PERIOD_KEYS as $period) {
+            if (($settings[$period]['enabled'] ?? false) && !array_key_exists($period, $prices)) {
+                $settings[$period]['enabled'] = false;
+            }
+        }
+
+        if (!self::hasEnabledPeriod($settings)) {
+            $fallback = self::firstEnabledPeriodFromPrices($prices);
+            $settings[$fallback]['enabled'] = true;
+        }
+
+        return $settings;
+    }
+
+    public function firstAvailablePeriod(): string
+    {
+        $available = $this->getAvailablePeriods();
+        $first = array_key_first($available);
+
+        return is_string($first) ? $first : 'mensal';
+    }
+
+    public function getPriceForPeriod(?string $period = null): float
+    {
+        $available = $this->getAvailablePeriods();
+        $period = self::sanitizePeriod($period);
+
+        if (!array_key_exists($period, $available)) {
+            $period = $this->firstAvailablePeriod();
+        }
+
+        return round((float) ($available[$period] ?? 0), 2);
+    }
+
+    public function getAvailablePeriods(): array
+    {
+        $prices = $this->resolvedPricePeriods();
+        $settings = $this->resolvedPeriodSettings();
+        $available = [];
+
+        foreach (self::PERIOD_KEYS as $period) {
+            if (!(bool) ($settings[$period]['enabled'] ?? false)) {
+                continue;
+            }
+
+            $price = $prices[$period] ?? null;
+            if ($price === null) {
+                continue;
+            }
+
+            if (!$this->isFreeAccessPlan() && (float) $price <= 0) {
+                continue;
+            }
+
+            $available[$period] = round((float) $price, 2);
+        }
+
+        if ($available !== []) {
+            return $available;
+        }
+
+        if ($this->isFreeAccessPlan()) {
+            return ['mensal' => 0.0];
+        }
+
+        return ['mensal' => round((float) ($this->price ?? 0), 2)];
+    }
+
     public static function calculateProrata(self $currentPlan, self $newPlan, string $period = 'mensal'): float
     {
+        $period = self::sanitizePeriod($period);
         $daysInPeriod = match ($period) {
             'trimestral' => 90,
-            'semestral'  => 180,
-            'anual'      => 365,
-            default      => 30,
+            'semestral' => 180,
+            'anual' => 365,
+            default => 30,
         };
 
         /** @var \App\Models\User $user */
@@ -229,7 +531,7 @@ class Plan extends Model
         }
 
         $dailyCurrent = $currentPlan->getPriceForPeriod($period) / $daysInPeriod;
-        $dailyNew     = $newPlan->getPriceForPeriod($period) / $daysInPeriod;
+        $dailyNew = $newPlan->getPriceForPeriod($period) / $daysInPeriod;
         $diff = ($dailyNew - $dailyCurrent) * $daysRemaining;
 
         return max(0, round($diff, 2));
@@ -237,8 +539,7 @@ class Plan extends Model
 
     public function hasFeature($feature)
     {
-        $feature = (string) $feature;
-        $feature = trim($feature);
+        $feature = trim((string) $feature);
         if ($feature === '') {
             return false;
         }
@@ -256,7 +557,6 @@ class Plan extends Model
             }
         }
 
-        // Compatibilidade: versões antigas gravavam permissões "admin-like" (ex.: courses.view)
         $legacyPrefixes = [
             'courses' => 'courses.',
             'events' => 'events.',
@@ -289,6 +589,11 @@ class Plan extends Model
             $features = [];
         }
 
+        if ($features === []) {
+            $blueprint = self::blueprintForPlan((string) ($this->slug ?? ''), $this->isFreeAccessPlan());
+            $features = is_array($blueprint['permissions'] ?? null) ? $blueprint['permissions'] : [];
+        }
+
         return self::normalizeCommercialPermissions(
             $features,
             (bool) $this->is_free,
@@ -298,28 +603,199 @@ class Plan extends Model
 
     public static function normalizeCommercialPermissions(array $permissions, bool $isFree, float $price = 0): array
     {
-        $permissions = array_values(array_unique(array_filter($permissions, static fn ($value) => is_string($value) && trim($value) !== '')));
+        $permissions = array_values(array_unique(array_filter(
+            $permissions,
+            static fn ($value) => is_string($value) && trim($value) !== ''
+        )));
 
         if ($isFree || $price <= 0) {
             $permissions = array_values(array_diff(
                 $permissions,
-                array_merge(self::PAID_CREATOR_SELLER_FEATURES, self::FREE_PLAN_RESTRICTED_FEATURES)
+                array_merge(self::PRO_PLAN_PERMISSIONS, self::ELITE_PLAN_PERMISSIONS, self::FREE_PLAN_RESTRICTED_FEATURES)
             ));
 
             return array_values(array_unique(array_merge($permissions, self::DEFAULT_FREE_PLAN_PERMISSIONS)));
         }
 
-        return array_values(array_unique(array_merge($permissions, self::PAID_CREATOR_SELLER_FEATURES)));
+        return $permissions;
     }
 
-    /**
-     * Resolve aliases de features para manter compatibilidade entre:
-     * - Chaves em rotas/middlewares (ex.: courses_access, events_create)
-     * - Chaves em planos/telas antigas (ex.: courses, events.create)
-     *
-     * @param string $feature
-     * @return array<string>
-     */
+    public static function parseMoneyValue(mixed $value): ?float
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return round((float) $value, 2);
+        }
+
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        $value = str_replace(['R$', ' ', "\u{00A0}"], '', $value);
+        $value = preg_replace('/[^0-9,.\-]/', '', $value) ?? '';
+        if ($value === '' || $value === '-') {
+            return null;
+        }
+
+        $hasComma = str_contains($value, ',');
+        $hasDot = str_contains($value, '.');
+
+        if ($hasComma && $hasDot) {
+            $lastComma = strrpos($value, ',');
+            $lastDot = strrpos($value, '.');
+
+            if ($lastComma !== false && $lastDot !== false && $lastComma > $lastDot) {
+                $value = str_replace('.', '', $value);
+                $value = str_replace(',', '.', $value);
+            } else {
+                $value = str_replace(',', '', $value);
+            }
+        } elseif ($hasComma) {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        }
+
+        if (!is_numeric($value)) {
+            return null;
+        }
+
+        return round((float) $value, 2);
+    }
+
+    public static function normalizePricePeriods(array $rawPeriods, float $basePrice, bool $isFree = false): array
+    {
+        $normalized = [];
+
+        foreach (self::PERIOD_KEYS as $period) {
+            if ($period === 'mensal') {
+                $normalized[$period] = $isFree ? 0.0 : round($basePrice, 2);
+                continue;
+            }
+
+            if (!array_key_exists($period, $rawPeriods)) {
+                continue;
+            }
+
+            $value = self::parseMoneyValue($rawPeriods[$period]);
+            if ($value === null) {
+                continue;
+            }
+
+            $normalized[$period] = round($value, 2);
+        }
+
+        if ($isFree) {
+            return ['mensal' => 0.0];
+        }
+
+        return $normalized;
+    }
+
+    public static function normalizePeriodSettings(array $rawSettings, array $pricePeriods, bool $isFree = false): array
+    {
+        $settings = [];
+
+        foreach (self::PERIOD_KEYS as $period) {
+            $enabled = $period === 'mensal';
+
+            if ($period !== 'mensal') {
+                $enabled = array_key_exists($period, $pricePeriods) && (float) ($pricePeriods[$period] ?? 0) > 0;
+            }
+
+            if (array_key_exists($period, $rawSettings)) {
+                $rawValue = $rawSettings[$period];
+
+                if (is_array($rawValue) && array_key_exists('enabled', $rawValue)) {
+                    $enabled = self::toBoolean($rawValue['enabled']);
+                } else {
+                    $enabled = self::toBoolean($rawValue);
+                }
+            }
+
+            $settings[$period] = ['enabled' => $enabled];
+        }
+
+        if ($isFree) {
+            foreach (self::PERIOD_KEYS as $period) {
+                $settings[$period]['enabled'] = $period === 'mensal';
+            }
+
+            return $settings;
+        }
+
+        if (!self::hasEnabledPeriod($settings)) {
+            $settings[self::firstEnabledPeriodFromPrices($pricePeriods)]['enabled'] = true;
+        }
+
+        return $settings;
+    }
+
+    public static function ensureEnabledPeriodPrices(array $pricePeriods, array $periodSettings, float $basePrice): array
+    {
+        $pricePeriods['mensal'] = round($basePrice, 2);
+
+        foreach (self::PERIOD_KEYS as $period) {
+            $enabled = (bool) ($periodSettings[$period]['enabled'] ?? false);
+            if (!$enabled) {
+                continue;
+            }
+
+            if (array_key_exists($period, $pricePeriods) && $pricePeriods[$period] !== null) {
+                continue;
+            }
+
+            $multiplier = self::PERIOD_MULTIPLIERS[$period] ?? 1;
+            $pricePeriods[$period] = round($basePrice * $multiplier, 2);
+        }
+
+        return $pricePeriods;
+    }
+
+    public static function sanitizePeriod(?string $period): string
+    {
+        $period = strtolower(trim((string) $period));
+
+        return in_array($period, self::PERIOD_KEYS, true) ? $period : 'mensal';
+    }
+
+    public static function periodLabels(): array
+    {
+        return self::PERIOD_LABELS;
+    }
+
+    public static function siteFeatureLabels(): array
+    {
+        return self::FEATURE_LABELS;
+    }
+
+    public static function siteFeatureGroups(): array
+    {
+        return self::FEATURE_GROUPS;
+    }
+
+    public static function premiumComparisonRows(): array
+    {
+        return self::PREMIUM_COMPARISON_ROWS;
+    }
+
+    public static function blueprintForPlan(?string $slug, bool $isFree = false): ?array
+    {
+        if ($isFree) {
+            return self::COMMERCIAL_BLUEPRINTS['free'];
+        }
+
+        $slug = strtolower(trim((string) $slug));
+        if ($slug === '') {
+            return null;
+        }
+
+        return self::COMMERCIAL_BLUEPRINTS[$slug] ?? null;
+    }
+
     public static function aliasesForFeature(string $feature): array
     {
         $feature = trim($feature);
@@ -329,14 +805,12 @@ class Plan extends Model
 
         $aliases = [];
 
-        // Navbar/legado: admin_panel vs admin.panel
         if ($feature === 'admin_panel') {
             $aliases[] = 'admin.panel';
         } elseif ($feature === 'admin.panel') {
             $aliases[] = 'admin_panel';
         }
 
-        // Access pairs (site/painel)
         $accessPairs = [
             'community' => 'community_access',
             'chat' => 'chat_access',
@@ -355,21 +829,18 @@ class Plan extends Model
             }
         }
 
-        // Pontuação costuma andar junto com rankings
         if ($feature === 'rankings') {
             $aliases[] = 'points_access';
         } elseif ($feature === 'points_access') {
             $aliases[] = 'rankings';
         }
 
-        // CRUD patterns: courses_create <-> courses.create (idem events/mentorships)
         if (preg_match('/^(courses|events|mentorships)_(create|edit|delete)$/', $feature, $m)) {
             $aliases[] = $m[1] . '.' . $m[2];
-        } elseif (preg_match('/^(courses|events|mentorships)\\.(create|edit|delete)$/', $feature, $m)) {
+        } elseif (preg_match('/^(courses|events|mentorships)\.(create|edit|delete)$/', $feature, $m)) {
             $aliases[] = $m[1] . '_' . $m[2];
         }
 
-        // Reviews (granular) -> editor/gestão
         if ($feature === 'courses_review') {
             $aliases[] = 'courses.edit';
             $aliases[] = 'courses_edit';
@@ -378,13 +849,11 @@ class Plan extends Model
             $aliases[] = 'mentorships_edit';
         }
 
-        // Event reserve (granular) -> acesso a eventos
         if ($feature === 'events_reserve') {
             $aliases[] = 'events';
             $aliases[] = 'events_access';
         }
 
-        // Lessons access/granular -> acesso a cursos
         if ($feature === 'courses_lessons_access') {
             $aliases[] = 'courses';
             $aliases[] = 'courses_access';
@@ -399,7 +868,6 @@ class Plan extends Model
             $aliases[] = 'courses_delete';
         }
 
-        // Attachments granular -> downloads/edição de curso
         if ($feature === 'courses_lessons_attachments_download') {
             $aliases[] = 'courses.downloads';
         } elseif ($feature === 'courses.downloads') {
@@ -419,7 +887,6 @@ class Plan extends Model
             $aliases[] = 'courses_delete';
         }
 
-        // Certificados granular -> cursos.certificates (site)
         if (str_starts_with($feature, 'certificates_')) {
             $aliases[] = 'courses.certificates';
         } elseif ($feature === 'courses.certificates') {
@@ -429,14 +896,60 @@ class Plan extends Model
             $aliases[] = 'certificates_delete';
         }
 
-        // marketplace.buy <-> marketplace (acesso genérico)
         if ($feature === 'marketplace.buy') {
             $aliases[] = 'marketplace';
         } elseif ($feature === 'marketplace') {
             $aliases[] = 'marketplace.buy';
         }
 
-        $aliases = array_values(array_unique(array_filter($aliases, static fn($v) => is_string($v) && trim($v) !== '' && $v !== $feature)));
-        return $aliases;
+        return array_values(array_unique(array_filter(
+            $aliases,
+            static fn ($value) => is_string($value) && trim($value) !== '' && $value !== $feature
+        )));
+    }
+
+    private static function toBoolean(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return (bool) $value;
+        }
+
+        $normalized = strtolower(trim((string) $value));
+
+        return in_array($normalized, ['1', 'true', 'on', 'yes'], true);
+    }
+
+    private static function hasEnabledPeriod(array $settings): bool
+    {
+        foreach (self::PERIOD_KEYS as $period) {
+            if ((bool) ($settings[$period]['enabled'] ?? false)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function firstEnabledPeriodFromPrices(array $pricePeriods): string
+    {
+        foreach (self::PERIOD_KEYS as $period) {
+            if (!array_key_exists($period, $pricePeriods)) {
+                continue;
+            }
+
+            if ($period === 'mensal') {
+                return $period;
+            }
+
+            if ((float) ($pricePeriods[$period] ?? 0) > 0) {
+                return $period;
+            }
+        }
+
+        return 'mensal';
     }
 }

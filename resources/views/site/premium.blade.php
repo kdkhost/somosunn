@@ -149,6 +149,7 @@
                 @php
                     $recommendedPlanIds = ($recommendedPlans ?? collect())->pluck('id')->all();
                     $allPeriods = $allPeriods ?? ['mensal' => 'Mensal'];
+                    $defaultPeriod = $defaultPeriod ?? array_key_first($allPeriods) ?? 'mensal';
                     $planPriceData = $planPriceData ?? [];
                 @endphp
 
@@ -159,7 +160,7 @@
                         @foreach($allPeriods as $pk => $pl)
                             <button type="button"
                                 class="period-btn px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none
-                                    {{ $pk === 'mensal' ? 'bg-white text-blue-700 shadow-sm font-bold' : 'text-gray-500 hover:text-gray-700' }}"
+                                    {{ $pk === $defaultPeriod ? 'bg-white text-blue-700 shadow-sm font-bold' : 'text-gray-500 hover:text-gray-700' }}"
                                 data-period="{{ $pk }}">
                                 {{ $pl }}
                                 @if($pk !== 'mensal')
@@ -176,6 +177,10 @@
                         @php
                             $isRecommendedForFeature = in_array($plan->id, $recommendedPlanIds, true);
                             $periods = $planPriceData[$plan->id] ?? ['mensal' => (float)$plan->price];
+                            $initialPeriod = (float) ($plan->price ?? 0) > 0 && array_key_exists($defaultPeriod, $periods)
+                                ? $defaultPeriod
+                                : (array_key_first($periods) ?: 'mensal');
+                            $initialPrice = $periods[$initialPeriod] ?? ((float) ($plan->price ?? 0));
                             $planDescription = method_exists($plan, 'marketingDescription')
                                 ? $plan->marketingDescription()
                                 : (string) ($plan->description ?? '');
@@ -204,8 +209,8 @@
                             <div class="mb-1 plan-price-wrap" data-plan="{{ $plan->id }}">
                                 @if($plan->price > 0)
                                     <span class="text-5xl font-black plan-price-amount" data-prices="{{ json_encode($periods) }}" style="color: var(--unn-azul-1)">
-                                        R$ {{ number_format($plan->price, 0, ',', '.') }}</span>
-                                    <span class="text-gray-500 plan-period-label">/mensal</span>
+                                        R$ {{ number_format((float) $initialPrice, 2, ',', '.') }}</span>
+                                    <span class="text-gray-500 plan-period-label">/{{ strtolower($allPeriods[$initialPeriod] ?? $initialPeriod) }}</span>
                                     <div class="text-xs text-emerald-600 font-semibold plan-period-note mt-1" style="min-height:18px"></div>
                                 @else
                                     <span class="text-5xl font-black text-gray-900">Grátis</span>
@@ -232,7 +237,8 @@
                                 style="{{ !$plan->highlight ? 'border-color: var(--unn-azul-1); color: var(--unn-azul-1)' : '' }}"
                                 data-plan="{{ $plan->id }}"
                                 data-base-url="{{ $plan->price > 0 ? route('subscription.checkout', ['plan' => $plan->id]) : route('register') }}"
-                                data-free="{{ $plan->price > 0 ? '0' : '1' }}">
+                                data-free="{{ $plan->price > 0 ? '0' : '1' }}"
+                                data-initial-period="{{ $initialPeriod }}">
                                 {{ $plan->price > 0 ? 'Assinar ' . $plan->name : 'Começar grátis' }}
                             </a>
                         </div>
@@ -259,7 +265,8 @@
         <script>
         (function () {
             var planPriceData = @json($planPriceData ?? []);
-            var currentPeriod = 'mensal';
+            var defaultPeriod = @json($defaultPeriod ?? 'mensal');
+            var currentPeriod = defaultPeriod;
 
             var periodLabels = {
                 mensal: '/mensal',
@@ -303,11 +310,14 @@
                     try { prices = JSON.parse(el.getAttribute('data-prices')); } catch(e) {}
                     if (!prices) return;
 
-                    var price = prices[period] !== undefined ? prices[period] : prices['mensal'];
+                    var price = prices[period] !== undefined ? prices[period] : prices[Object.keys(prices)[0]];
                     if (!price) return;
 
                     // Format
-                    el.textContent = 'R$ ' + Math.round(price).toLocaleString('pt-BR');
+                    el.textContent = 'R$ ' + Number(price).toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
 
                     // Period label
                     var card = el.closest('[data-plan-id]');
@@ -350,47 +360,38 @@
             }
 
             // Init discounts on buttons
-            updatePrices('mensal');
+            updatePrices(defaultPeriod);
         })();
         </script>
         @endpush
-
-        <!-- Benefícios -->
+        <!-- Beneficios -->
         <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
             <div class="max-w-7xl mx-auto">
-                <h2 class="text-3xl font-black text-gray-900 mb-12 text-center">O que você recebe como Premium</h2>
+                <h2 class="text-3xl font-black text-gray-900 mb-4 text-center">O que cada plano libera na pratica</h2>
+                <p class="text-gray-600 text-center max-w-3xl mx-auto mb-12">
+                    A estrutura abaixo resume os pilares que organizam a experiencia comercial da UNN, mantendo o plano gratuito focado em comunidade e acesso aberto, o Pro focado em consumo e visibilidade, e o Elite focado em criacao e vendas.
+                </p>
 
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    @php
-                        $benefits = [
-                            ['icon' => 'users', 'title' => 'Conexões Ilimitadas', 'desc' => 'Conecte-se com quantos membros quiser, sem limites mensais.'],
-                            ['icon' => 'graduation-cap', 'title' => 'Biblioteca de Cursos', 'desc' => 'Acesso a mais de 50 cursos exclusivos sobre negócios e gestão.'],
-                            ['icon' => 'video', 'title' => 'Lives Exclusivas', 'desc' => 'Participe de transmissões ao vivo com mentores de sucesso.'],
-                            ['icon' => 'calendar-check', 'title' => 'Eventos Premium', 'desc' => 'Acesso VIP a eventos presenciais em todo o Brasil.'],
-                            ['icon' => 'comments', 'title' => 'Grupos Privados', 'desc' => 'Participe de grupos segmentados por setor e interesse.'],
-                            ['icon' => 'certificate', 'title' => 'Certificados', 'desc' => 'Receba certificados de conclusão de cursos e eventos.'],
-                        ];
-                    @endphp
-
-                    @foreach($benefits as $benefit)
-                        <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center shrink-0">
+                    @foreach(($premiumPillars ?? []) as $benefit)
+                        <div class="rounded-3xl border border-slate-100 bg-slate-50 p-6 shadow-sm">
+                            <div class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center shrink-0 mb-4">
                                 <i class="fas fa-{{ $benefit['icon'] }} text-white"></i>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-gray-900 mb-1">{{ $benefit['title'] }}</h3>
-                                <p class="text-sm text-gray-600">{{ $benefit['desc'] }}</p>
-                            </div>
+                            <h3 class="font-bold text-gray-900 mb-2">{{ $benefit['title'] }}</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">{{ $benefit['desc'] }}</p>
                         </div>
                     @endforeach
                 </div>
             </div>
         </section>
-
         <!-- Comparativo -->
         <section class="py-16 px-6 md:px-12 lg:px-24">
-            <div class="max-w-5xl mx-auto">
-                <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">Compare os planos</h2>
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl font-black text-gray-900 mb-4 text-center">Compare os planos</h2>
+                <p class="text-gray-600 text-center max-w-3xl mx-auto mb-8">
+                    A tabela abaixo espelha as permissoes reais do sistema. O gratuito fica focado em comunidade e acesso aberto; o Pro libera consumo premium; o Elite libera operacao comercial e criacao dentro da plataforma.
+                </p>
 
                 @php
                     $plansCollection = ($plans ?? collect())->values();
@@ -408,92 +409,54 @@
                         if ($comparePlans->count() >= min(3, $plansCollection->count())) {
                             break;
                         }
+
                         if (!$comparePlans->contains('id', $candidate->id)) {
                             $comparePlans->push($candidate);
                         }
                     }
-
-                    $comparisonRows = [
-                        ['type' => 'permission', 'label' => 'Perfil na comunidade', 'permission' => 'community'],
-                        ['type' => 'text', 'label' => 'Conexões por mês', 'field' => 'connections_per_month'],
-                        ['type' => 'permission', 'label' => 'Acesso a cursos', 'permission' => 'courses'],
-                        ['type' => 'permission', 'label' => 'Eventos exclusivos', 'permission' => 'events'],
-                        ['type' => 'mentorship_group', 'label' => 'Mentoria em grupo', 'field' => 'group_mentorship'],
-                        ['type' => 'text', 'label' => 'Mentoria individual', 'field' => 'individual_mentorship'],
-                        ['type' => 'boolean', 'label' => 'Suporte prioritário', 'field' => 'priority_support'],
-                    ];
                 @endphp
 
-                <div class="bg-white rounded-3xl shadow-lg overflow-hidden">
+                <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100">
                     <div class="overflow-x-auto">
                         <table class="w-full min-w-[760px]">
                             <thead>
                                 <tr class="border-b border-gray-100">
                                     <th class="text-left p-6 text-gray-900 font-bold">Recurso</th>
                                     @foreach($comparePlans as $plan)
+                                        @php
+                                            $comparePeriod = method_exists($plan, 'firstAvailablePeriod') ? $plan->firstAvailablePeriod() : 'mensal';
+                                            $comparePrice = method_exists($plan, 'getPriceForPeriod') ? $plan->getPriceForPeriod($comparePeriod) : (float) ($plan->price ?? 0);
+                                        @endphp
                                         <th class="text-center p-6 {{ $plan->highlight ? 'font-black' : 'text-gray-500 font-bold' }}"
                                             style="{{ $plan->highlight ? 'background: var(--unn-azul-1); color: white' : '' }}">
-                                            {{ $plan->name }}
+                                            <div class="text-base font-black">{{ $plan->name }}</div>
+                                            <div class="mt-1 text-xs {{ $plan->highlight ? 'text-white/80' : 'text-gray-400' }}">
+                                                @if($comparePrice > 0)
+                                                    R$ {{ number_format($comparePrice, 2, ',', '.') }}/{{ strtolower($allPeriods[$comparePeriod] ?? $comparePeriod) }}
+                                                @else
+                                                    Gratis
+                                                @endif
+                                            </div>
                                         </th>
                                     @endforeach
                                 </tr>
                             </thead>
                             <tbody class="text-sm">
-                                @foreach($comparisonRows as $row)
-                                    <tr class="border-b border-gray-50">
-                                        <td class="p-4 text-gray-700">{{ $row['label'] }}</td>
+                                @foreach(($comparisonRows ?? []) as $row)
+                                    <tr class="border-b border-gray-50 last:border-b-0">
+                                        <td class="p-4 text-gray-700 font-medium">{{ $row['label'] }}</td>
                                         @foreach($comparePlans as $plan)
                                             @php
                                                 $isHighlighted = (bool) ($plan->highlight ?? false);
                                                 $cellStyle = $isHighlighted ? 'background: var(--unn-azul-1)10' : '';
+                                                $perm = $row['permission'] ?? null;
+                                                $has = $perm ? (method_exists($plan, 'hasFeature') ? $plan->hasFeature($perm) : in_array($perm, (array) ($plan->permissions ?? []))) : false;
                                             @endphp
                                             <td class="text-center p-4" style="{{ $cellStyle }}">
-                                                @if($row['type'] === 'permission')
-                                                    @php
-                                                        $perm = $row['permission'] ?? null;
-                                                        $has = $perm ? (method_exists($plan, 'hasFeature') ? $plan->hasFeature($perm) : in_array($perm, (array) ($plan->permissions ?? []))) : false;
-                                                    @endphp
-                                                    @if($has)
-                                                        <i class="fas fa-check text-green-500"></i>
-                                                    @else
-                                                        <i class="fas fa-times text-gray-300"></i>
-                                                    @endif
-                                                @elseif($row['type'] === 'boolean')
-                                                    @php
-                                                        $flag = (bool) data_get($plan->comparison, $row['field'] ?? '', false);
-                                                    @endphp
-                                                    @if($flag)
-                                                        <i class="fas fa-check text-green-500"></i>
-                                                    @else
-                                                        <i class="fas fa-times text-gray-300"></i>
-                                                    @endif
-                                                @elseif($row['type'] === 'mentorship_group')
-                                                    @php
-                                                        $val = trim((string) data_get($plan->comparison, $row['field'] ?? ''));
-                                                        $hasMentorships = method_exists($plan, 'hasFeature') ? $plan->hasFeature('mentorships') : in_array('mentorships', (array) ($plan->permissions ?? []));
-                                                        if ($val === '' && $hasMentorships) {
-                                                            $val = 'Ilimitada';
-                                                        }
-                                                    @endphp
-                                                    @if($val !== '')
-                                                        <span class="{{ $isHighlighted ? 'font-bold text-slate-900' : 'text-gray-700' }}">{{ $val }}</span>
-                                                    @else
-                                                        <i class="fas fa-times text-gray-300"></i>
-                                                    @endif
+                                                @if($has)
+                                                    <i class="fas fa-check text-green-500"></i>
                                                 @else
-                                                    @php
-                                                        $field = $row['field'] ?? null;
-                                                        $val = $field ? trim((string) data_get($plan->comparison, $field)) : '';
-
-                                                        if ($field === 'connections_per_month' && $val === '') {
-                                                            $val = (float) $plan->price <= 0 ? '5' : 'Ilimitadas';
-                                                        }
-                                                    @endphp
-                                                    @if($val !== '')
-                                                        <span class="{{ $isHighlighted ? 'font-bold text-slate-900' : 'text-gray-700' }}">{{ $val }}</span>
-                                                    @else
-                                                        <i class="fas fa-times text-gray-300"></i>
-                                                    @endif
+                                                    <i class="fas fa-times text-gray-300"></i>
                                                 @endif
                                             </td>
                                         @endforeach
@@ -505,11 +468,10 @@
                 </div>
 
                 <p class="text-xs text-gray-500 mt-4 text-center">
-                    Itens marcados com ✓ são derivados das permissões do plano. Valores como conexões/mentorias e suporte são configuráveis no Admin.
+                    Os indicadores acima usam as permissoes canonicas do plano e acompanham a mesma regra aplicada no painel, no marketplace e nos bloqueios internos do sistema.
                 </p>
             </div>
         </section>
-
         <!-- Depoimentos -->
         <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
             <div class="max-w-7xl mx-auto">
@@ -782,12 +744,20 @@
                 </p>
 
                 @php
-                    $ctaPlan = ($plans ?? collect())->firstWhere('highlight', true)
+                                        $ctaPlan = ($plans ?? collect())->firstWhere('highlight', true)
                         ?? ($plans ?? collect())->first(fn($p) => (float) $p->price > 0)
                         ?? ($plans ?? collect())->first();
 
-                    $ctaHref = $ctaPlan && (float) $ctaPlan->price > 0
-                        ? route('subscription.checkout', ['plan' => $ctaPlan->id])
+                    $ctaPeriod = $ctaPlan && method_exists($ctaPlan, 'firstAvailablePeriod')
+                        ? $ctaPlan->firstAvailablePeriod()
+                        : 'mensal';
+
+                    $ctaPrice = $ctaPlan && method_exists($ctaPlan, 'getPriceForPeriod')
+                        ? $ctaPlan->getPriceForPeriod($ctaPeriod)
+                        : (float) ($ctaPlan->price ?? 0);
+
+                    $ctaHref = $ctaPlan && (float) $ctaPrice > 0
+                        ? route('subscription.checkout', ['plan' => $ctaPlan->id, 'period' => $ctaPeriod])
                         : route('register');
                 @endphp
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -796,8 +766,8 @@
                         style="color: var(--unn-azul-1)">
                         <i class="fas fa-crown"></i>
                         @if($ctaPlan)
-                            @if((float) $ctaPlan->price > 0)
-                                Assinar {{ $ctaPlan->name }} - R$ {{ number_format($ctaPlan->price, 0, ',', '.') }}/{{ $ctaPlan->period }}
+                            @if((float) $ctaPrice > 0)
+                                Assinar {{ $ctaPlan->name }} - R$ {{ number_format($ctaPrice, 2, ',', '.') }}/{{ strtolower($allPeriods[$ctaPeriod] ?? $ctaPeriod) }}
                             @else
                                 Começar grátis
                             @endif

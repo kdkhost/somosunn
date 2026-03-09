@@ -66,37 +66,25 @@ class Event extends Model
 
     public function getStartAttribute()
     {
-        return $this->start_at instanceof \DateTime ? $this->start_at->toIso8601String() : \Carbon\Carbon::parse($this->start_at)->toIso8601String();
+        return $this->start_at instanceof \DateTime
+            ? $this->start_at->toIso8601String()
+            : Carbon::parse($this->start_at)->toIso8601String();
     }
 
     public function getEndAttribute()
     {
-        if (!$this->end_at)
+        if (!$this->end_at) {
             return null;
-        return $this->end_at instanceof \DateTime ? $this->end_at->toIso8601String() : \Carbon\Carbon::parse($this->end_at)->toIso8601String();
+        }
+
+        return $this->end_at instanceof \DateTime
+            ? $this->end_at->toIso8601String()
+            : Carbon::parse($this->end_at)->toIso8601String();
     }
 
     public function getCurrentPriceAttribute()
     {
-        $now = now();
-
-        // If Batch 1 is valid (no deadline OR deadline is future) AND it has a price
-        if ($this->batch_1_price && (!$this->batch_1_deadline || $now->lte($this->batch_1_deadline))) {
-            return $this->batch_1_price;
-        }
-
-        // If Batch 1 expired, check Batch 2
-        if ($this->batch_2_price && (!$this->batch_2_deadline || $now->lte($this->batch_2_deadline))) {
-            return $this->batch_2_price;
-        }
-
-        // If Batch 2 expired, check Batch 3
-        if ($this->batch_3_price) {
-            return $this->batch_3_price;
-        }
-
-        // Fallback to legacy price or 0
-        return $this->price ?? 0;
+        return $this->currentPriceFor(auth()->user());
     }
 
     public function isFlashSaleActive(): bool
@@ -117,22 +105,65 @@ class Event extends Model
 
     public function getEffectivePriceAttribute(): float
     {
-        if ($this->isFlashSaleActive()) {
-            return (float) $this->flash_sale_price;
-        }
-
-        return (float) ($this->current_price ?? 0);
+        return $this->effectivePriceFor(auth()->user());
     }
 
     public function getCurrentBatchLabelAttribute()
     {
+        return $this->currentBatchLabelFor(auth()->user());
+    }
+
+    public function currentPriceFor(?User $user = null): float
+    {
+        if ($this->hasFirstLotPriority($user) && $this->batch_1_price !== null) {
+            return round((float) $this->batch_1_price, 2);
+        }
+
         $now = now();
-        if ($this->batch_1_price && (!$this->batch_1_deadline || $now->lte($this->batch_1_deadline)))
-            return '1º Lote';
-        if ($this->batch_2_price && (!$this->batch_2_deadline || $now->lte($this->batch_2_deadline)))
-            return '2º Lote';
-        if ($this->batch_3_price)
-            return '3º Lote';
+
+        if ($this->batch_1_price && (!$this->batch_1_deadline || $now->lte($this->batch_1_deadline))) {
+            return round((float) $this->batch_1_price, 2);
+        }
+
+        if ($this->batch_2_price && (!$this->batch_2_deadline || $now->lte($this->batch_2_deadline))) {
+            return round((float) $this->batch_2_price, 2);
+        }
+
+        if ($this->batch_3_price) {
+            return round((float) $this->batch_3_price, 2);
+        }
+
+        return round((float) ($this->price ?? 0), 2);
+    }
+
+    public function effectivePriceFor(?User $user = null): float
+    {
+        $currentPrice = $this->currentPriceFor($user);
+
+        if ($this->isFlashSaleActive()) {
+            return round(min($currentPrice, (float) $this->flash_sale_price), 2);
+        }
+
+        return $currentPrice;
+    }
+
+    public function currentBatchLabelFor(?User $user = null): string
+    {
+        if ($this->hasFirstLotPriority($user) && $this->batch_1_price !== null) {
+            return '1o Lote';
+        }
+
+        $now = now();
+        if ($this->batch_1_price && (!$this->batch_1_deadline || $now->lte($this->batch_1_deadline))) {
+            return '1o Lote';
+        }
+        if ($this->batch_2_price && (!$this->batch_2_deadline || $now->lte($this->batch_2_deadline))) {
+            return '2o Lote';
+        }
+        if ($this->batch_3_price) {
+            return '3o Lote';
+        }
+
         return 'Entrada';
     }
 
@@ -278,5 +309,18 @@ class Event extends Model
     public function certificates()
     {
         return $this->hasMany(Certificate::class);
+    }
+
+    private function hasFirstLotPriority(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
+            return true;
+        }
+
+        return method_exists($user, 'canAccessFeature') && $user->canAccessFeature('events.first_lot');
     }
 }

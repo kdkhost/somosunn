@@ -260,7 +260,8 @@ class WebhookController extends Controller
                     $user->plan_id = $item->item_id;
 
                     $plan = \App\Models\Plan::find($item->item_id);
-                    $months = $this->getPlanDurationInMonths($plan);
+                    $period = $this->resolveOrderPlanPeriod($order, $item);
+                    $months = $this->getPlanDurationInMonths($plan, $period);
 
                     $user->plan_expires_at = now()->addMonths($months);
                     $user->save();
@@ -293,12 +294,12 @@ class WebhookController extends Controller
         }
     }
 
-    private function getPlanDurationInMonths($plan)
+    private function getPlanDurationInMonths($plan, ?string $period = null)
     {
         if (!$plan)
             return 1;
 
-        $period = strtolower($plan->period ?? '');
+        $period = strtolower(trim((string) ($period ?: $plan->period ?: '')));
 
         if (str_contains($period, 'month') || str_contains($period, 'mensal'))
             return 1;
@@ -310,5 +311,20 @@ class WebhookController extends Controller
             return 12;
 
         return 1;
+    }
+
+    private function resolveOrderPlanPeriod(Order $order, $item): string
+    {
+        $itemPeriod = trim((string) data_get($item, 'data.period', ''));
+        if ($itemPeriod !== '') {
+            return \App\Models\Plan::sanitizePeriod($itemPeriod);
+        }
+
+        $metadataPeriod = trim((string) data_get($order->metadata, 'period', ''));
+        if ($metadataPeriod !== '') {
+            return \App\Models\Plan::sanitizePeriod($metadataPeriod);
+        }
+
+        return \App\Models\Plan::sanitizePeriod((string) ($order->period ?? ''));
     }
 }

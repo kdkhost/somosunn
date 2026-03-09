@@ -205,6 +205,10 @@ class User extends Authenticatable
     protected static function booted(): void
     {
         static::creating(function (self $user) {
+            if (!Schema::hasColumn($user->getTable(), 'referral_code')) {
+                return;
+            }
+
             if (empty($user->referral_code)) {
                 do {
                     $code = 'UNN' . strtoupper(\Illuminate\Support\Str::random(7));

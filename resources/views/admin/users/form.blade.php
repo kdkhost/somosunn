@@ -107,14 +107,7 @@
                     </p>
                     
                     @php
-                        // Agrupar features por categoria
-                        $featureGroups = [
-                            'Acesso Básico' => ['community', 'chat', 'connections', 'connections.unlimited'],
-                            'Cursos' => ['courses', 'courses.certificates', 'courses.downloads'],
-                            'Eventos' => ['events', 'events.recordings', 'events.vip'],
-                            'Mentorias' => ['mentorships', 'mentorships.group', 'mentorships.individual'],
-                            'Extras' => ['rankings', 'support.priority', 'early.access'],
-                        ];
+                        $featureGroups = \App\Models\Plan::siteFeatureGroups();
                     @endphp
 
                     @foreach($featureGroups as $groupName => $groupKeys)

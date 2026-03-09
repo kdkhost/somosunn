@@ -7,10 +7,6 @@ use App\Models\PartnerCoupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-/**
- * Área do membro que é vinculado a um Parceiro (user_id na tabela partners).
- * Permite que o próprio parceiro gerencie seus cupons exclusivos.
- */
 class MemberPartnerController extends Controller
 {
     public function __construct()
@@ -18,13 +14,13 @@ class MemberPartnerController extends Controller
         $this->middleware('auth');
     }
 
-    /** Painel do parceiro — lista seus cupons */
     public function index()
     {
-        $partner = Partner::where('user_id', Auth::id())->first();
+        $this->abortUnlessPartnerFeatureEnabled();
 
+        $partner = Partner::where('user_id', Auth::id())->first();
         if (!$partner) {
-            abort(403, 'Você não tem um perfil de parceiro vinculado à sua conta.');
+            abort(403, 'Voce nao tem um perfil de parceiro vinculado a sua conta.');
         }
 
         $coupons = $partner->coupons()->latest()->get();
@@ -32,9 +28,10 @@ class MemberPartnerController extends Controller
         return view('member.partner.index', compact('partner', 'coupons'));
     }
 
-    /** Salva novo cupom */
     public function store(Request $request)
     {
+        $this->abortUnlessPartnerFeatureEnabled();
+
         $partner = Partner::where('user_id', Auth::id())->firstOrFail();
 
         $validated = $request->validate([
@@ -56,9 +53,10 @@ class MemberPartnerController extends Controller
         return response()->json(['success' => true, 'message' => 'Cupom criado com sucesso!']);
     }
 
-    /** Atualiza cupom */
     public function update(Request $request, PartnerCoupon $coupon)
     {
+        $this->abortUnlessPartnerFeatureEnabled();
+
         $partner = Partner::where('user_id', Auth::id())->firstOrFail();
         abort_unless($coupon->partner_id === $partner->id, 403);
 
@@ -79,14 +77,31 @@ class MemberPartnerController extends Controller
         return response()->json(['success' => true, 'message' => 'Cupom atualizado!']);
     }
 
-    /** Remove cupom */
     public function destroy(PartnerCoupon $coupon)
     {
+        $this->abortUnlessPartnerFeatureEnabled();
+
         $partner = Partner::where('user_id', Auth::id())->firstOrFail();
         abort_unless($coupon->partner_id === $partner->id, 403);
 
         $coupon->delete();
 
         return response()->json(['success' => true, 'message' => 'Cupom removido.']);
+    }
+
+    private function abortUnlessPartnerFeatureEnabled(): void
+    {
+        $user = Auth::user();
+        abort_unless($user, 403);
+
+        if ($user->isAdmin()) {
+            return;
+        }
+
+        abort_unless(
+            method_exists($user, 'canAccessFeature') && $user->canAccessFeature('benefits.club.partner'),
+            403,
+            'Seu plano atual nao libera perfil parceiro e gestao de cupons.'
+        );
     }
 }

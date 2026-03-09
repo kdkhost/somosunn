@@ -282,10 +282,9 @@
                                         <p class="text-sm text-gray-600">{{ Auth::user()->email }}</p>
                                     </div>
                                 </div>
-                                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                                    class="text-sm text-red-500 hover:text-red-700 font-medium">Trocar conta</a>
+                                <button type="button" onclick="document.getElementById('logout-form').submit();"
+                                    class="text-sm text-red-500 hover:text-red-700 font-medium">Trocar conta</button>
                             </div>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
                         @endguest
 
                         {{-- CPF para usuários logados que não preencheram ainda --}}
@@ -345,7 +344,7 @@
                                 <input type="hidden" name="issuer_id" id="issuer_id">
                                 <input type="hidden" name="payment_method_id" id="payment_method_id">
                                 <input type="hidden" name="transaction_amount" id="transaction_amount"
-                                    value="{{ $plan->price }}">
+                                    value="{{ $effectivePrice }}">
                                 <input type="hidden" name="installments" id="installments">
                                 <!-- CPF preenchido no campo Documento do Brick -->
                                 <input type="hidden" name="cpf" id="cpf_hidden" value="{{ Auth::user()?->doc ?? '' }}">
@@ -369,6 +368,7 @@
                             </button>
                         </div>
                     </form>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
                 </div>
             </div>
         </div>
@@ -392,6 +392,21 @@
                 const cardForm = document.getElementById('creditCardForm');
                 const pixInfo = document.getElementById('pixInfo');
                 const submitBtn = document.querySelector('button[type="submit"]');
+                const amountInput = document.getElementById('transaction_amount');
+
+                function selectedTransactionAmount() {
+                    var selectedPeriod = document.querySelector('.period-radio:checked');
+                    if (!selectedPeriod) {
+                        return parseFloat(@json((float) $effectivePrice));
+                    }
+
+                    var selectedOption = document.querySelector('[data-period-opt=\"' + selectedPeriod.value + '\"]');
+                    if (!selectedOption) {
+                        return parseFloat(@json((float) $effectivePrice));
+                    }
+
+                    return parseFloat(selectedOption.dataset.price || @json((float) $effectivePrice));
+                }
 
                 function syncPaymentMethod(value) {
                     hiddenMethod.value = value;
@@ -418,9 +433,14 @@
                     const bricksBuilder = mp.bricks();
 
                     const renderCardPaymentBrick = async (bricksBuilder) => {
+                        const amount = selectedTransactionAmount();
+                        if (amountInput) {
+                            amountInput.value = amount.toFixed(2);
+                        }
+
                         const settings = {
                             initialization: {
-                                amount: {{ $plan->price }},
+                                amount: amount,
                                 payer: {
                                     email: "{{ Auth::check() ? Auth::user()->email : 'test@test.com' }}",
                                 },
@@ -479,7 +499,25 @@
                         );
                     };
 
+                    const rebuildCardPaymentBrick = async () => {
+                        if (window.cardPaymentBrickController) {
+                            try {
+                                await window.cardPaymentBrickController.unmount();
+                            } catch (_) {
+                                // noop
+                            }
+                        }
+
+                        return renderCardPaymentBrick(bricksBuilder);
+                    };
+
                     renderCardPaymentBrick(bricksBuilder);
+
+                    document.querySelectorAll('.period-radio').forEach(function (radio) {
+                        radio.addEventListener('change', function () {
+                            rebuildCardPaymentBrick();
+                        });
+                    });
                 } else if ("{{ config('app.debug') }}") {
                     console.log("Modo Simulação Ativo.");
                     document.getElementById('cardPaymentBrick_container').innerHTML = `
@@ -550,6 +588,7 @@
 
         var subtotalEl = document.getElementById('checkout-subtotal');
         var totalEl    = document.getElementById('checkout-total');
+        var amountEl   = document.getElementById('transaction_amount');
 
         function fmt(val) {
             return 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -574,6 +613,7 @@
 
                 if (subtotalEl) subtotalEl.textContent = fmt(price);
                 if (totalEl)    totalEl.textContent    = fmt(price);
+                if (amountEl)   amountEl.value         = price.toFixed(2);
             });
         });
     })();

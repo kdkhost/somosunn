@@ -3,77 +3,28 @@
 namespace App\Http\Controllers\Panel\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Plan;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    /**
-     * Recursos disponíveis para liberar individualmente para usuários.
-     * Esses controlam o que o MEMBRO pode acessar no site.
-     */
-    private const USER_FEATURES = [
-        // Acesso básico
-        'community' => 'Comunidade (perfil/feed)',
-        'chat' => 'Chat (mensagens)',
-        'connections' => 'Networking (conexões)',
-        'connections.unlimited' => 'Conexões ilimitadas',
-
-        // Cursos
-        'courses' => 'Acesso a cursos',
-        'courses.create' => 'Criar cursos',
-        'courses.edit' => 'Editar cursos',
-        'courses.delete' => 'Excluir cursos',
-        'courses.certificates' => 'Certificados de cursos',
-        'courses.downloads' => 'Downloads de materiais',
-
-        // Eventos
-        'events' => 'Acesso a eventos',
-        'events.create' => 'Criar eventos',
-        'events.edit' => 'Editar eventos',
-        'events.delete' => 'Excluir eventos',
-        'events.recordings' => 'Gravações de eventos',
-        'events.vip' => 'Eventos VIP/exclusivos',
-
-        // Mentorias
-        'mentorships' => 'Acesso a mentorias',
-        'mentorships.create' => 'Criar mentorias',
-        'mentorships.edit' => 'Editar mentorias',
-        'mentorships.delete' => 'Excluir mentorias',
-        'mentorships.group' => 'Mentorias em grupo',
-        'mentorships.individual' => 'Mentorias individuais',
-
-        // Marketplace
-        'marketplace' => 'Acesso ao marketplace',
-        'marketplace.sales' => 'Ver histórico de vendas',
-        'marketplace.buy' => 'Comprar produtos/serviços',
-        'marketplace.sell' => 'Vender no marketplace',
-
-        // Extras
-        'rankings' => 'Visualizar ranking de membros',
-        'support.priority' => 'Suporte prioritário',
-        'early.access' => 'Acesso antecipado a novidades',
-
-        // Admin
-        'admin.panel' => 'Acesso ao painel admin',
-    ];
-
-    /**
-     * Check if current user is superadmin.
-     */
     private function isSuperadmin(): bool
     {
         return auth()->check() && auth()->user()->role === 'superadmin';
+    }
+
+    private function userFeatures(): array
+    {
+        return Plan::siteFeatureLabels();
     }
 
     public function index()
     {
         $query = User::with('plan')->latest();
 
-        // Search
         if (request()->has('search') && request('search')) {
             $search = request('search');
             $query->where(function ($q) use ($search) {
@@ -82,12 +33,10 @@ class UserController extends Controller
             });
         }
 
-        // Filter by Role
         if (request()->has('role') && request('role') !== 'todos') {
             $query->where('role', request('role'));
         }
 
-        // Admin não pode ver superadmins
         if (!$this->isSuperadmin()) {
             $query->where('role', '!=', 'superadmin');
         }
@@ -105,13 +54,15 @@ class UserController extends Controller
         return view('panel.admin.users.form', [
             'user' => $user,
             'plans' => $plans,
-            'userFeatures' => self::USER_FEATURES,
+            'userFeatures' => $this->userFeatures(),
             'canSetSuperadmin' => $this->isSuperadmin(),
         ]);
     }
 
     public function store(Request $request)
     {
+        $featureKeys = array_keys($this->userFeatures());
+
         $data = $request->validate([
             'name' => 'required|string|max:120',
             'email' => 'required|email|unique:users,email',
@@ -121,16 +72,16 @@ class UserController extends Controller
             'plan_id' => 'nullable|exists:plans,id',
             'plan_expires_at' => 'nullable|date',
             'extra_features' => 'nullable|array',
-            'extra_features.*' => 'string|in:' . implode(',', array_keys(self::USER_FEATURES)),
+            'extra_features.*' => 'string|in:' . implode(',', $featureKeys),
         ]);
 
-        // Admin não pode criar superadmin (role ou level)
         if (!$this->isSuperadmin()) {
             if (($data['role'] ?? '') === 'superadmin') {
-                return back()->withInput()->with('error', 'Você não tem permissão para criar um Super Admin.');
+                return back()->withInput()->with('error', 'Voce nao tem permissao para criar um Super Admin.');
             }
+
             if (($data['level'] ?? '') === 'superadmin') {
-                $data['level'] = 'sucesso'; // Fallback
+                $data['level'] = 'sucesso';
             }
         }
 
@@ -139,14 +90,13 @@ class UserController extends Controller
 
         User::create($data);
 
-        return redirect()->route('panel.admin.users.index')->with('success', 'Usuário criado com sucesso.');
+        return redirect()->route('panel.admin.users.index')->with('success', 'Usuario criado com sucesso.');
     }
 
     public function edit(User $user)
     {
-        // Admin não pode editar superadmin
         if (!$this->isSuperadmin() && $user->role === 'superadmin') {
-            return redirect()->route('panel.admin.users.index')->with('error', 'Você não tem permissão para editar este usuário.');
+            return redirect()->route('panel.admin.users.index')->with('error', 'Voce nao tem permissao para editar este usuario.');
         }
 
         $plans = Plan::where('is_active', true)->get();
@@ -154,17 +104,18 @@ class UserController extends Controller
         return view('panel.admin.users.form', [
             'user' => $user,
             'plans' => $plans,
-            'userFeatures' => self::USER_FEATURES,
+            'userFeatures' => $this->userFeatures(),
             'canSetSuperadmin' => $this->isSuperadmin(),
         ]);
     }
 
     public function update(Request $request, User $user)
     {
-        // Admin não pode editar superadmin
         if (!$this->isSuperadmin() && $user->role === 'superadmin') {
-            return redirect()->route('panel.admin.users.index')->with('error', 'Você não tem permissão para editar este usuário.');
+            return redirect()->route('panel.admin.users.index')->with('error', 'Voce nao tem permissao para editar este usuario.');
         }
+
+        $featureKeys = array_keys($this->userFeatures());
 
         $data = $request->validate([
             'name' => 'required|string|max:120',
@@ -175,16 +126,16 @@ class UserController extends Controller
             'plan_id' => 'nullable|exists:plans,id',
             'plan_expires_at' => 'nullable|date',
             'extra_features' => 'nullable|array',
-            'extra_features.*' => 'string|in:' . implode(',', array_keys(self::USER_FEATURES)),
+            'extra_features.*' => 'string|in:' . implode(',', $featureKeys),
         ]);
 
-        // Admin não pode promover alguém a superadmin (role ou level)
         if (!$this->isSuperadmin()) {
             if (($data['role'] ?? '') === 'superadmin') {
-                return back()->withInput()->with('error', 'Você não tem permissão para definir este papel.');
+                return back()->withInput()->with('error', 'Voce nao tem permissao para definir este papel.');
             }
+
             if (($data['level'] ?? '') === 'superadmin') {
-                $data['level'] = 'sucesso'; // Fallback
+                $data['level'] = 'sucesso';
             }
         }
 
@@ -198,22 +149,21 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('panel.admin.users.index')->with('success', 'Usuário atualizado com sucesso.');
+        return redirect()->route('panel.admin.users.index')->with('success', 'Usuario atualizado com sucesso.');
     }
 
     public function destroy(User $user)
     {
-        // Admin não pode excluir superadmin
         if (!$this->isSuperadmin() && $user->role === 'superadmin') {
-            return back()->with('error', 'Você não pode excluir um Super Admin.');
+            return back()->with('error', 'Voce nao pode excluir um Super Admin.');
         }
 
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'Você não pode excluir sua própria conta.');
+            return back()->with('error', 'Voce nao pode excluir sua propria conta.');
         }
 
         $user->delete();
 
-        return redirect()->route('panel.admin.users.index')->with('success', 'Usuário removido com sucesso.');
+        return redirect()->route('panel.admin.users.index')->with('success', 'Usuario removido com sucesso.');
     }
 }

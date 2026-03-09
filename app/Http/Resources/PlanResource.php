@@ -16,6 +16,15 @@ class PlanResource extends JsonResource
             'slug' => $this->slug,
             'price' => $this->price,
             'period' => $this->period,
+            'price_periods' => method_exists($this->resource, 'resolvedPricePeriods')
+                ? $this->resolvedPricePeriods()
+                : $this->price_periods,
+            'period_settings' => method_exists($this->resource, 'resolvedPeriodSettings')
+                ? $this->resolvedPeriodSettings()
+                : $this->period_settings,
+            'available_periods' => method_exists($this->resource, 'getAvailablePeriods')
+                ? $this->getAvailablePeriods()
+                : [],
             'billing_cycle' => $this->billing_cycle,
             'prorata' => (bool) $this->prorata,
             'description' => method_exists($this->resource, 'marketingDescription')

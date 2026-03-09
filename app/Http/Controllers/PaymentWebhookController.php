@@ -415,7 +415,7 @@ class PaymentWebhookController extends Controller
 
         $user->update([
             'plan_id' => $plan->id,
-            'plan_expires_at' => $this->planExpiresAt($plan),
+            'plan_expires_at' => $this->planExpiresAt($plan, $this->resolveOrderPlanPeriod($order, $item)),
         ]);
 
         // Gamificação: pontos de referral para o indicador
@@ -499,9 +499,9 @@ class PaymentWebhookController extends Controller
         }
     }
 
-    private function planExpiresAt(Plan $plan): ?\Carbon\Carbon
+    private function planExpiresAt(Plan $plan, ?string $period = null): ?\Carbon\Carbon
     {
-        $period = trim((string) ($plan->period ?? ''));
+        $period = trim((string) ($period ?: $plan->period ?: ''));
         $periodLower = Str::lower($period);
 
         if ($periodLower === 'vitalício' || $periodLower === 'vitalicio') {
@@ -519,5 +519,20 @@ class PaymentWebhookController extends Controller
             'anual' => now()->addYear(),
             default => now()->addMonth(),
         };
+    }
+
+    private function resolveOrderPlanPeriod(Order $order, mixed $item): string
+    {
+        $itemPeriod = trim((string) data_get($item, 'data.period', ''));
+        if ($itemPeriod !== '') {
+            return Plan::sanitizePeriod($itemPeriod);
+        }
+
+        $metadataPeriod = trim((string) data_get($order->metadata, 'period', ''));
+        if ($metadataPeriod !== '') {
+            return Plan::sanitizePeriod($metadataPeriod);
+        }
+
+        return Plan::sanitizePeriod((string) ($order->period ?? ''));
     }
 }

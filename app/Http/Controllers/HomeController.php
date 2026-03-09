@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Models\Event;
 use App\Models\Mentorship;
 use App\Models\Page;
 use App\Models\Ranking;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
@@ -40,7 +39,7 @@ class HomeController extends Controller
                     ->orderByDesc('price')
                     ->limit(24)
                     ->get()
-                    ->filter(fn(Mentorship $mentorship) => $mentorship->hasPublicAction())
+                    ->filter(fn (Mentorship $mentorship) => $mentorship->hasPublicAction())
                     ->take(3)
                     ->values();
             } catch (\Throwable $e) {
@@ -48,13 +47,12 @@ class HomeController extends Controller
             }
         }
 
-        // Demo data fallback for mentorships (Only if demo_mode is true and no data exists)
         if ($demoMode && $paidMentorings->isEmpty()) {
             $paidMentorings = collect([
                 (object) [
                     'id' => 1,
-                    'title' => 'Conexão Elite: Mentoria de Negócios (DEMO)',
-                    'description' => 'ESTE É UM DADO DE EXEMPLO. Aprenda estratégias de escala e networking de alto nível.',
+                    'title' => 'Conexao Elite: Mentoria de Negocios (DEMO)',
+                    'description' => 'ESTE E UM DADO DE EXEMPLO. Aprenda estrategias de escala e networking de alto nivel.',
                     'mentor' => (object) ['name' => 'Carlos Mendes'],
                     'price' => 997,
                     'slots' => 5,
@@ -65,8 +63,6 @@ class HomeController extends Controller
 
         $overview = $this->networkingOverview();
         $levelSummary = $overview['levelSummary'];
-
-        // Se não houver dados reais, exibe mensagem no ranking
         $topRankings = $overview['leaderboard'];
         $showNoRankingMsg = $topRankings->isEmpty();
 
@@ -82,7 +78,7 @@ class HomeController extends Controller
                     ->limit(6)
                     ->get();
             } catch (\Throwable $e) {
-                \Log::warning('Falha ao carregar depoimentos: ' . $e->getMessage());
+                Log::warning('Falha ao carregar depoimentos: ' . $e->getMessage());
             }
         }
 
@@ -112,11 +108,10 @@ class HomeController extends Controller
                     ->orderBy('schedule')
                     ->limit(24)
                     ->get()
-                    ->filter(fn(Mentorship $mentorship) => $mentorship->hasPublicAction())
+                    ->filter(fn (Mentorship $mentorship) => $mentorship->hasPublicAction())
                     ->take(6)
                     ->values();
 
-                // Cursos em destaque: status published OU paused, is_featured = true
                 $featuredCourses = \App\Models\Course::where('is_featured', true)
                     ->whereIn('status', ['published', 'paused'])
                     ->where(function ($query) {
@@ -156,28 +151,74 @@ class HomeController extends Controller
         $recommendedPlans = collect();
         if ($requiredFeature !== '') {
             $recommendedPlans = $allActive
-                ->filter(fn($plan) => method_exists($plan, 'hasFeature') && (bool) $plan->hasFeature($requiredFeature))
+                ->filter(fn ($plan) => method_exists($plan, 'hasFeature') && (bool) $plan->hasFeature($requiredFeature))
                 ->values();
         }
 
-        // Reposicionamento: plano destacado sempre no centro
         $plans = $this->centerHighlightedPlan($allActive);
 
-        // Períodos disponíveis entre todos os planos (para o toggle de período)
-        $allPeriods = ['mensal' => 'Mensal'];
-        foreach ($plans as $plan) {
-            foreach (($plan->price_periods ?? []) as $pk => $pv) {
-                if ($pv > 0 && in_array($pk, ['trimestral', 'semestral', 'anual'], true)) {
-                    $allPeriods[$pk] = ucfirst($pk);
+        $paidPlans = $plans->filter(fn ($plan) => (float) ($plan->price ?? 0) > 0)->values();
+        $allPeriods = [];
+        foreach ($paidPlans as $plan) {
+            foreach ($plan->getAvailablePeriods() as $periodKey => $periodPrice) {
+                if ($periodPrice <= 0) {
+                    continue;
                 }
+
+                $allPeriods[$periodKey] = \App\Models\Plan::periodLabels()[$periodKey] ?? ucfirst($periodKey);
             }
         }
-        ksort($allPeriods);
 
-        // Dados de preços por período para o JS (keyed por plan id)
-        $planPriceData = $plans->mapWithKeys(fn($plan) => [
+        if ($allPeriods === []) {
+            $allPeriods = ['mensal' => 'Mensal'];
+        }
+
+        $orderedPeriods = [];
+        foreach (\App\Models\Plan::PERIOD_KEYS as $periodKey) {
+            if (isset($allPeriods[$periodKey])) {
+                $orderedPeriods[$periodKey] = $allPeriods[$periodKey];
+            }
+        }
+        $allPeriods = $orderedPeriods;
+        $defaultPeriod = array_key_first($allPeriods) ?: 'mensal';
+
+        $planPriceData = $plans->mapWithKeys(fn ($plan) => [
             $plan->id => $plan->getAvailablePeriods(),
         ])->all();
+
+        $comparisonRows = \App\Models\Plan::premiumComparisonRows();
+        $premiumPillars = [
+            [
+                'icon' => 'users',
+                'title' => 'Comunidade e networking',
+                'desc' => 'Perfil interno, conexoes de alto valor e encontros que geram relacionamento real.',
+            ],
+            [
+                'icon' => 'graduation-cap',
+                'title' => 'Cursos e mentorias',
+                'desc' => 'Consuma conhecimento pronto ou publique sua propria expertise, conforme o plano.',
+            ],
+            [
+                'icon' => 'handshake',
+                'title' => 'Clube de beneficios',
+                'desc' => 'Acesse beneficios exclusivos e, no Elite, ative perfil parceiro com cupons.',
+            ],
+            [
+                'icon' => 'microphone-lines',
+                'title' => 'Visibilidade em eventos',
+                'desc' => 'Pitch diferenciado, apresentacao anual e prioridade comercial nos eventos do grupo.',
+            ],
+            [
+                'icon' => 'calendar-check',
+                'title' => 'Eventos e networking',
+                'desc' => 'Entre na agenda dos eventos da comunidade e, no Elite, publique os seus.',
+            ],
+            [
+                'icon' => 'store',
+                'title' => 'Escala comercial',
+                'desc' => 'O Elite abre area de criador, historico de vendas e operacao comercial na plataforma.',
+            ],
+        ];
 
         $testimonials = collect();
         if (view()->shared('unnDbAvailable')) {
@@ -188,7 +229,7 @@ class HomeController extends Controller
                     ->limit(6)
                     ->get();
             } catch (\Throwable $e) {
-                \Log::warning('Falha ao carregar depoimentos: ' . $e->getMessage());
+                Log::warning('Falha ao carregar depoimentos: ' . $e->getMessage());
             }
         }
 
@@ -201,14 +242,14 @@ class HomeController extends Controller
             'requiredFeatureLabel',
             'recommendedPlans',
             'allPeriods',
+            'defaultPeriod',
             'planPriceData',
+            'comparisonRows',
+            'premiumPillars',
             'pageData'
         ));
     }
 
-    /**
-     * Reposiciona o plano com highlight=true para o centro da coleção.
-     */
     private function centerHighlightedPlan(\Illuminate\Support\Collection $plans): \Illuminate\Support\Collection
     {
         $highlighted = $plans->firstWhere('highlight', true);
@@ -216,7 +257,7 @@ class HomeController extends Controller
             return $plans;
         }
 
-        $others = $plans->filter(fn($p) => $p->id !== $highlighted->id)->values();
+        $others = $plans->filter(fn ($plan) => $plan->id !== $highlighted->id)->values();
         $total = $others->count() + 1;
         $center = (int) floor($total / 2);
 
@@ -226,18 +267,17 @@ class HomeController extends Controller
         return $before->push($highlighted)->merge($after)->values();
     }
 
-    // Webhook placeholders
     public function webhookMercadoPago(Request $request)
     {
-        // TODO: validar assinatura e processar pagamento
-        \Log::info('MercadoPago webhook', $request->all());
+        Log::info('MercadoPago webhook', $request->all());
+
         return response()->json(['status' => 'ok']);
     }
 
     public function webhookPagSeguro(Request $request)
     {
-        // TODO: validar notificacao e processar
-        \Log::info('PagSeguro webhook', $request->all());
+        Log::info('PagSeguro webhook', $request->all());
+
         return response()->json(['status' => 'ok']);
     }
 
@@ -251,25 +291,24 @@ class HomeController extends Controller
         }
 
         try {
-            // Contagem explícita para agrupar roles/levels
             $inicianteCount = User::where('level', 'iniciante')
                 ->whereNotIn('role', ['admin', 'superadmin', 'mentor'])
                 ->count();
 
-            $sucessoCount = User::where(function ($q) {
-                $q->where('level', 'sucesso')
+            $sucessoCount = User::where(function ($query) {
+                $query->where('level', 'sucesso')
                     ->orWhereIn('role', ['mentor', 'admin', 'superadmin']);
             })->count();
 
             $levels = collect([
                 'iniciante' => $inicianteCount,
-                'sucesso' => $sucessoCount
+                'sucesso' => $sucessoCount,
             ]);
 
             $leaderboard = Ranking::with([
-                'user' => function ($q) {
-                    $q->whereNotIn('role', ['admin', 'superadmin']);
-                }
+                'user' => function ($query) {
+                    $query->whereNotIn('role', ['admin', 'superadmin']);
+                },
             ])
                 ->orderByDesc('score')
                 ->get()
@@ -279,17 +318,16 @@ class HomeController extends Controller
                 ->take(3)
                 ->values();
 
-            // Fallback: se não há entradas no Ranking, usa os 3 usuários com mais pontos
             if ($leaderboard->isEmpty()) {
                 $leaderboard = User::whereNotIn('role', ['admin', 'superadmin'])
                     ->where('points', '>', 0)
                     ->orderByDesc('points')
                     ->take(3)
                     ->get()
-                    ->map(fn($u) => (object) [
-                        'user' => $u,
-                        'score' => $u->points ?? 0,
-                        'level' => $u->level ?? 'iniciante',
+                    ->map(fn ($user) => (object) [
+                        'user' => $user,
+                        'score' => $user->points ?? 0,
+                        'level' => $user->level ?? 'iniciante',
                         'interactions_count' => 0,
                         'average_rating' => null,
                         'is_points_fallback' => true,
@@ -309,10 +347,19 @@ class HomeController extends Controller
 
         return match ($feature) {
             'courses_access', 'courses', 'courses_lessons_access' => 'Acesso a cursos e aulas',
+            'courses.create' => 'Publicacao de cursos',
             'mentorships_access', 'mentorships' => 'Acesso a mentorias',
+            'mentorships.create' => 'Publicacao de mentorias',
             'events_access', 'events' => 'Acesso a eventos',
+            'events.create' => 'Criacao de eventos',
+            'events.pitch.priority' => 'Pitch diferenciado nos eventos',
+            'events.keynote.annual' => 'Apresentacao principal anual',
+            'events.first_lot' => 'Compra prioritaria com primeiro lote',
+            'events.mentor' => 'Mentoria nas dinamicas dos eventos',
             'chat', 'chat_access' => 'Acesso ao chat',
             'community', 'community_access' => 'Acesso a comunidade',
+            'benefits.club.access' => 'Acesso ao clube de beneficios',
+            'benefits.club.partner' => 'Perfil parceiro no clube de beneficios',
             'marketplace.buy', 'marketplace' => 'Acesso ao marketplace',
             default => 'Acesso a recurso premium',
         };
