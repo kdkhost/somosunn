@@ -107,7 +107,7 @@
                         <div class="relative">
                             <div class="absolute inset-0 btn-primary rounded-3xl opacity-20 blur-3xl"></div>
                             <img src="{{ (!empty($pageData['hero_image'])) ? asset('storage/'.$pageData['hero_image']) : 'https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800' }}"
-                                alt="Networking" class="relative w-full rounded-3xl shadow-2xl">
+                                alt="Networking" class="relative w-full rounded-3xl shadow-2xl transform rotate-2 hover:rotate-0 transition duration-500">
                         </div>
                     </div>
                 </div>
@@ -189,7 +189,7 @@
                                 : (is_array($plan->benefits) ? $plan->benefits : (json_decode($plan->benefits ?? '[]', true) ?: []));
                         @endphp
 
-                        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg {{ $plan->highlight ? 'shadow-2xl ring-2 -mt-4' : '' }} relative"
+                        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg {{ $plan->highlight ? 'shadow-2xl ring-2 -mt-4' : '' }} relative hover:-translate-y-2 transition-all duration-300"
                             style="{{ $plan->highlight ? '--tw-ring-color: var(--unn-azul-1)' : '' }}"
                             data-plan-id="{{ $plan->id }}">
 
@@ -233,7 +233,7 @@
                             </ul>
 
                             <a href="{{ $plan->price > 0 ? route('subscription.checkout', ['plan' => $plan->id]) : route('register') }}"
-                                class="plan-checkout-link block w-full text-center py-4 rounded-xl font-bold transition {{ $plan->highlight ? 'btn-primary text-white shadow-lg hover:shadow-xl' : 'border-2 hover:bg-slate-50' }}"
+                                class="plan-checkout-link block w-full text-center py-4 rounded-xl font-bold transition {{ $plan->highlight ? 'btn-primary text-white shadow-lg hover:shadow-xl hover:translate-y-[-2px]' : 'border-2 hover:bg-slate-50 hover:border-blue-600 hover:text-blue-700' }}"
                                 style="{{ !$plan->highlight ? 'border-color: var(--unn-azul-1); color: var(--unn-azul-1)' : '' }}"
                                 data-plan="{{ $plan->id }}"
                                 data-base-url="{{ $plan->price > 0 ? route('subscription.checkout', ['plan' => $plan->id]) : route('register') }}"
@@ -374,7 +374,7 @@
 
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     @foreach(($premiumPillars ?? []) as $benefit)
-                        <div class="rounded-3xl border border-slate-100 bg-slate-50 p-6 shadow-sm">
+                        <div class="rounded-3xl border border-slate-100 bg-slate-50 p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                             <div class="w-12 h-12 btn-primary rounded-xl flex items-center justify-center shrink-0 mb-4">
                                 <i class="fas fa-{{ $benefit['icon'] }} text-white"></i>
                             </div>
@@ -575,7 +575,7 @@
                                 @endphp
 
                                 <div class="swiper-slide">
-                                    <div class="bg-slate-50 rounded-3xl p-8 relative h-full flex flex-col">
+                                    <div class="bg-slate-50 rounded-3xl p-8 relative h-full flex flex-col hover:shadow-lg transition-all duration-300">
                                         @if($isFeatured)
                                             <span class="absolute top-5 right-5 text-xs font-bold px-3 py-1 rounded-full text-white"
                                                 style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
@@ -628,7 +628,7 @@
                                     $rating = max(1, min(5, $rating));
                                 }
                             @endphp
-                            <div class="bg-slate-50 rounded-3xl p-8 relative">
+                            <div class="bg-slate-50 rounded-3xl p-8 relative hover:shadow-lg transition-all duration-300">
                                 @if($isFeatured)
                                     <span class="absolute top-5 right-5 text-xs font-bold px-3 py-1 rounded-full text-white"
                                         style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
