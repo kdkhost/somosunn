@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -177,31 +178,72 @@ class EventReservationController extends Controller
 
         $registration = null;
         $order = null;
+        $alreadyRegistered = false;
         $regularUnitPrice = (float) $event->current_price;
         $currentPrice = (float) $event->effective_price;
         $couponCode = $isPaid ? $couponService->normalizeCode($request->input('coupon_code')) : '';
+        $usesSingleRegistrationPerUser = $this->usesSingleEventRegistrationPerUser();
 
         try {
-            DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $regularUnitPrice, $currentPrice, $couponCode, $couponService, &$registration, &$order, $gatewayProvider) {
+            DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $regularUnitPrice, $currentPrice, $couponCode, $couponService, &$registration, &$order, &$alreadyRegistered, $gatewayProvider, $usesSingleRegistrationPerUser) {
+                $existingCountedRegistration = EventRegistration::where('event_id', $event->id)
+                    ->where('user_id', $user->id)
+                    ->whereIn('status', EventRegistration::COUNTED_STATUSES)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($usesSingleRegistrationPerUser && $existingCountedRegistration) {
+                    $registration = $existingCountedRegistration;
+                    $order = $existingCountedRegistration->order;
+                    $alreadyRegistered = true;
+                    return;
+                }
                 // Permitir múltiplas reservas mesmo se já houver uma confirmada/paga.
                 // A restrição única de (event_id, user_id) foi removida do banco.
 
                 if (!$isPaid) {
-                    // Remove any existing pending/failed registrations for this user/event to avoid confusion
-                    EventRegistration::where('event_id', $event->id)
-                        ->where('user_id', $user->id)
-                        ->whereNotIn('status', EventRegistration::COUNTED_STATUSES)
-                        ->delete();
+                    if ($usesSingleRegistrationPerUser) {
+                        $legacyRegistration = EventRegistration::where('event_id', $event->id)
+                            ->where('user_id', $user->id)
+                            ->lockForUpdate()
+                            ->first();
 
-                    for ($i = 0; $i < $quantity; $i++) {
-                        EventRegistration::create([
-                            'event_id' => $event->id,
-                            'user_id' => $user->id,
-                            'status' => EventRegistration::STATUS_CONFIRMED,
-                            'price' => 0,
-                            'quantity' => 1,
-                            'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
-                        ]);
+                        if ($legacyRegistration) {
+                            $legacyRegistration->update([
+                                'order_id' => null,
+                                'status' => EventRegistration::STATUS_CONFIRMED,
+                                'price' => 0,
+                                'quantity' => $quantity,
+                                'ticket_code' => $event->is_ticket_enabled
+                                    ? ($legacyRegistration->ticket_code ?: Str::uuid()->toString())
+                                    : null,
+                            ]);
+                        } else {
+                            EventRegistration::create([
+                                'event_id' => $event->id,
+                                'user_id' => $user->id,
+                                'status' => EventRegistration::STATUS_CONFIRMED,
+                                'price' => 0,
+                                'quantity' => $quantity,
+                                'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
+                            ]);
+                        }
+                    } else {
+                        EventRegistration::where('event_id', $event->id)
+                            ->where('user_id', $user->id)
+                            ->whereNotIn('status', EventRegistration::COUNTED_STATUSES)
+                            ->delete();
+
+                        for ($i = 0; $i < $quantity; $i++) {
+                            EventRegistration::create([
+                                'event_id' => $event->id,
+                                'user_id' => $user->id,
+                                'status' => EventRegistration::STATUS_CONFIRMED,
+                                'price' => 0,
+                                'quantity' => 1,
+                                'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
+                            ]);
+                        }
                     }
 
                     // Notificar confirmação da vaga (Evento Gratuito)
@@ -219,8 +261,15 @@ class EventReservationController extends Controller
                     throw new \RuntimeException('Evento lotado no momento.');
                 }
 
-                if ($registration && $registration->order_id) {
-                    $existingOrder = Order::whereKey($registration->order_id)->lockForUpdate()->first();
+                $existingPendingRegistration = EventRegistration::where('event_id', $event->id)
+                    ->where('user_id', $user->id)
+                    ->whereNotIn('status', EventRegistration::COUNTED_STATUSES)
+                    ->lockForUpdate()
+                    ->orderBy('id')
+                    ->first();
+
+                if ($existingPendingRegistration && $existingPendingRegistration->order_id) {
+                    $existingOrder = Order::whereKey($existingPendingRegistration->order_id)->lockForUpdate()->first();
                     if ($existingOrder && $existingOrder->status !== 'paid') {
                         $order = $existingOrder;
                     }
@@ -344,24 +393,54 @@ class EventReservationController extends Controller
                     }
                 }
 
-                // Remove any existing pending/failed registrations for this user/event
-                EventRegistration::where('event_id', $event->id)
-                    ->where('user_id', $user->id)
-                    ->whereNotIn('status', EventRegistration::COUNTED_STATUSES)
-                    ->delete();
-
                 $unitPrice = $discountAmount > 0 ? (float) ($finalTotal / $quantity) : (float) $currentPrice;
 
-                for ($i = 0; $i < $quantity; $i++) {
-                    $registration = EventRegistration::create([
-                        'event_id' => $event->id,
-                        'user_id' => $user->id,
-                        'order_id' => $order->id,
-                        'status' => EventRegistration::STATUS_PENDING,
-                        'price' => $unitPrice,
-                        'quantity' => 1,
-                        'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
-                    ]);
+                if ($usesSingleRegistrationPerUser) {
+                    $legacyRegistration = $existingPendingRegistration
+                        ?: EventRegistration::where('event_id', $event->id)
+                            ->where('user_id', $user->id)
+                            ->lockForUpdate()
+                            ->first();
+
+                    if ($legacyRegistration) {
+                        $legacyRegistration->update([
+                            'order_id' => $order->id,
+                            'status' => EventRegistration::STATUS_PENDING,
+                            'price' => $unitPrice,
+                            'quantity' => $quantity,
+                            'ticket_code' => $event->is_ticket_enabled
+                                ? ($legacyRegistration->ticket_code ?: Str::uuid()->toString())
+                                : null,
+                        ]);
+                        $registration = $legacyRegistration->fresh();
+                    } else {
+                        $registration = EventRegistration::create([
+                            'event_id' => $event->id,
+                            'user_id' => $user->id,
+                            'order_id' => $order->id,
+                            'status' => EventRegistration::STATUS_PENDING,
+                            'price' => $unitPrice,
+                            'quantity' => $quantity,
+                            'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
+                        ]);
+                    }
+                } else {
+                    EventRegistration::where('event_id', $event->id)
+                        ->where('user_id', $user->id)
+                        ->whereNotIn('status', EventRegistration::COUNTED_STATUSES)
+                        ->delete();
+
+                    for ($i = 0; $i < $quantity; $i++) {
+                        $registration = EventRegistration::create([
+                            'event_id' => $event->id,
+                            'user_id' => $user->id,
+                            'order_id' => $order->id,
+                            'status' => EventRegistration::STATUS_PENDING,
+                            'price' => $unitPrice,
+                            'quantity' => 1,
+                            'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
+                        ]);
+                    }
                 }
             });
         } catch (ValidationException $e) {
@@ -369,6 +448,10 @@ class EventReservationController extends Controller
             return back()->with('error', $msg)->withInput();
         } catch (\RuntimeException $e) {
             return back()->with('error', $e->getMessage())->withInput();
+        }
+
+        if ($alreadyRegistered) {
+            return redirect()->route('events.show', $event)->with('success', 'Sua vaga jÃ¡ estÃ¡ confirmada.');
         }
 
         if ($registration && in_array($registration->status, EventRegistration::COUNTED_STATUSES, true)) {
@@ -530,5 +613,58 @@ class EventReservationController extends Controller
         }
 
         return Event::find($item->item_id);
+    }
+
+    private function usesSingleEventRegistrationPerUser(): bool
+    {
+        static $usesSingleRegistration = null;
+
+        if ($usesSingleRegistration !== null) {
+            return $usesSingleRegistration;
+        }
+
+        if (!Schema::hasTable('event_registrations')) {
+            return $usesSingleRegistration = false;
+        }
+
+        $connection = DB::connection();
+        $driver = $connection->getDriverName();
+
+        try {
+            if ($driver === 'mysql') {
+                $index = $connection->selectOne(
+                    "SHOW INDEX FROM event_registrations WHERE Key_name = 'event_registrations_event_id_user_id_unique'"
+                );
+
+                return $usesSingleRegistration = $index !== null;
+            }
+
+            if ($driver === 'sqlite') {
+                $indexes = $connection->select("PRAGMA index_list('event_registrations')");
+
+                foreach ($indexes as $index) {
+                    if (($index->name ?? null) === 'event_registrations_event_id_user_id_unique') {
+                        return $usesSingleRegistration = true;
+                    }
+                }
+
+                return $usesSingleRegistration = false;
+            }
+
+            if ($driver === 'pgsql') {
+                $index = $connection->selectOne(
+                    "SELECT indexname FROM pg_indexes WHERE schemaname = current_schema() AND tablename = 'event_registrations' AND indexname = 'event_registrations_event_id_user_id_unique'"
+                );
+
+                return $usesSingleRegistration = $index !== null;
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao detectar indice unico legado de inscricoes de evento', [
+                'driver' => $driver,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        return $usesSingleRegistration = false;
     }
 }
