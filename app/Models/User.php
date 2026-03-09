@@ -61,6 +61,7 @@
 
 namespace App\Models;
 
+use App\Support\BrazilPhone;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -219,6 +220,16 @@ class User extends Authenticatable
     ];
 
     protected $appends = ['profile_photo_url'];
+
+    public function getPhoneAttribute($value): ?string
+    {
+        return BrazilPhone::format($value);
+    }
+
+    public function setPhoneAttribute($value): void
+    {
+        $this->attributes['phone'] = BrazilPhone::normalize($value);
+    }
 
     /**
      * Auto-gera um código de referência único ao criar o usuário.

@@ -29,7 +29,7 @@
                 <i class="fas fa-phone text-slate-400 dark:text-slate-500 transition-colors"></i>
             </div>
             <input type="text" name="company_phone" value="{{ $settings['company_phone'] ?? '' }}"
-                data-inputmask="'mask': ['(99) 9999-9999', '(99) 99999-9999']"
+                data-inputmask="'mask': ['(99) 99999-9999', '(99) 9999-9999']"
                 class="pl-10 px-4 py-3 w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
         </div>
     </div>

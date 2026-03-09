@@ -542,7 +542,7 @@
                 // Verifica se Inputmask carregou
                 if (typeof Inputmask !== 'undefined') {
                     // Telefone
-                    Inputmask({ mask: ['(99) 9999-9999', '(99) 99999-9999'], keepStatic: true }).mask(document.querySelectorAll('[data-mask-phone]'));
+                    Inputmask({ mask: ['(99) 99999-9999', '(99) 9999-9999'], keepStatic: true }).mask(document.querySelectorAll('[data-mask-phone]'));
 
                     // CPF/CNPJ Mask Logic
                     const docInput = document.getElementById('profile_doc');
