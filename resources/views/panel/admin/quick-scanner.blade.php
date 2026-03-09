@@ -109,58 +109,106 @@
             // Não inicia mais sozinho para respeitar políticas de Audio/Câmera
         });
 
-        function initializeScanner() {
-            // Inicializa AudioContext no primeiro clique para permitir beeps
+        async function initializeScanner() {
+            // 1. Solicita Notificações (para áudio/texto)
+            if ("Notification" in window) {
+                const permission = await Notification.requestPermission();
+                if (permission !== "granted") {
+                    console.warn("Notificações não permitidas.");
+                    // Não bloqueia totalmente por causa das notificações de áudio serem via AudioContext,
+                    // mas avisa.
+                }
+            }
+
+            // 2. Inicializa AudioContext (Gesto do Usuário necessário)
             try {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
+                    await audioCtx.resume();
                 }
             } catch (e) {
                 console.error("Erro ao iniciar Áudio:", e);
             }
 
-            // Esconde tela inicial
-            document.getElementById('start-screen').classList.add('hidden');
+            // 3. Solicita GPS e só inicia scanner se tiver retorno
+            const startBtn = document.querySelector('#start-screen button');
+            const originalText = startBtn.innerHTML;
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AUTORIZANDO...';
 
-            requestGPS();
-            startScanner();
-
-            // Beep de teste para confirmar áudio
-            setTimeout(() => playBeep('scan'), 100);
-        }
-
-        function requestGPS() {
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         userCoords.lat = position.coords.latitude;
                         userCoords.lng = position.coords.longitude;
                         console.log("GPS capturado:", userCoords);
+
+                        // Esconde tela inicial e inicia scanner
+                        document.getElementById('start-screen').classList.add('hidden');
+                        startScanner();
+                        setTimeout(() => playBeep('scan'), 100);
                     },
                     (error) => {
                         console.error("Erro ao obter GPS:", error);
+                        startBtn.disabled = false;
+                        startBtn.innerHTML = originalText;
+
+                        let msg = 'Para validar os ingressos, você PRECISA permitir o acesso à localização.';
+                        if (error.code === error.PERMISSION_DENIED) {
+                            msg = 'Você negou o acesso ao GPS. Por favor, habilite nas configurações do seu navegador/celular para continuar.';
+                        }
+
                         Swal.fire({
-                            title: 'GPS Necessário',
-                            text: 'Para validar os ingressos, você precisa permitir o acesso à localização.',
-                            icon: 'warning'
+                            title: 'GPS OBRIGATÓRIO',
+                            text: msg,
+                            icon: 'error',
+                            confirmButtonText: 'Tentar Novamente',
+                            confirmButtonColor: '#1F5EDB'
                         });
-                    }
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
                 );
+            } else {
+                Swal.fire({
+                    title: 'Dispositivo Incompatível',
+                    text: 'Seu dispositivo não suporta GPS, que é obrigatório para este scanner.',
+                    icon: 'error'
+                });
+                startBtn.disabled = false;
+                startBtn.innerHTML = originalText;
             }
+        }
+
+        function requestGPS() {
+            // Função legada removida, agora tratada no fluxo de inicialização obrigatória
         }
 
         function startScanner() {
             html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader",
                 {
-                    fps: 10,
+                    fps: 15,
                     qrbox: { width: 250, height: 250 },
-                    aspectRatio: 1.0
+                    aspectRatio: 1.0,
+                    showTorchButtonIfSupported: true,
+                    showZoomSliderIfSupported: true,
+                    defaultZoomValueIfSupported: 2
                 },
                         /* verbose= */ false
             );
-            html5QrcodeScanner.render(onScanSuccess);
+            html5QrcodeScanner.render(onScanSuccess, (errorMessage) => {
+                // Erros de leitura ignorados silenciosamente
+            });
+
+            // Tratamento de erro de permissão da câmera
+            setTimeout(() => {
+                const cameraSelection = document.getElementById('html5-qrcode-button-camera-permission');
+                if (cameraSelection) {
+                    cameraSelection.addEventListener('click', () => {
+                        // O navegador vai pedir a câmera aqui
+                    });
+                }
+            }, 500);
         }
 
         function onScanSuccess(decodedText) {
@@ -206,14 +254,17 @@
                     if (data.success) {
                         showOverlay('success', 'Acesso Liberado!', data.participant_name + '<br><span class="text-[10px]">' + data.event_title + '</span>');
                         playBeep('success');
+                        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
                     } else {
                         showOverlay('error', 'Acesso Negado', data.message);
                         playBeep('error');
+                        if (navigator.vibrate) navigator.vibrate(500);
                     }
                 })
                 .catch(error => {
                     showOverlay('error', 'Erro de Conexão', 'Não foi possível validar o código.');
                     playBeep('error');
+                    if (navigator.vibrate) navigator.vibrate(500);
                 });
         }
 

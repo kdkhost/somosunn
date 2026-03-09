@@ -102,22 +102,68 @@
             // Aguarda clique para iniciar
         });
 
-        function initializeScanner() {
+        async function initializeScanner() {
+            // 1. Notificações
+            if ("Notification" in window) {
+                await Notification.requestPermission();
+            }
+
+            // 2. Áudio
             try {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
+                    await audioCtx.resume();
                 }
             } catch (e) {
                 console.error("Erro Áudio:", e);
             }
 
-            document.getElementById('start-screen').classList.add('hidden');
+            // 3. GPS Obrigatório
+            const startBtn = document.querySelector('#start-screen button');
+            const originalText = startBtn.innerHTML;
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AUTORIZANDO...';
 
-            requestGPS();
-            startScanner();
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userCoords.lat = position.coords.latitude;
+                        userCoords.lng = position.coords.longitude;
+                        console.log("GPS capturado:", userCoords);
 
-            setTimeout(() => playBeep(true), 100);
+                        document.getElementById('start-screen').classList.add('hidden');
+                        startScanner();
+                        setTimeout(() => playBeep(true), 100);
+                    },
+                    (error) => {
+                        console.error("Erro GPS:", error);
+                        startBtn.disabled = false;
+                        startBtn.innerHTML = originalText;
+
+                        let msg = 'Para validar os ingressos, você PRECISA permitir o acesso à localização.';
+                        if (error.code === error.PERMISSION_DENIED) {
+                            msg = 'Você negou o acesso ao GPS. Habilite nas configurações para continuar.';
+                        }
+
+                        Swal.fire({
+                            title: 'GPS OBRIGATÓRIO',
+                            text: msg,
+                            icon: 'error',
+                            confirmButtonText: 'Tentar Novamente',
+                            confirmButtonColor: '#1F5EDB'
+                        });
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                Swal.fire({
+                    title: 'Erro',
+                    text: 'Dispositivo sem suporte a GPS.',
+                    icon: 'error'
+                });
+                startBtn.disabled = false;
+                startBtn.innerHTML = originalText;
+            }
         }
 
         document.getElementById('manual-ticket-form').addEventListener('submit', function (e) {
@@ -129,7 +175,7 @@
                 processTicket(code);
             }
         });
-            });
+                    });
 
         function requestGPS() {
             if ("geolocation" in navigator) {
@@ -153,14 +199,19 @@
             html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader",
                 {
-                    fps: 10,
+                    fps: 15,
                     qrbox: { width: 250, height: 250 },
                     aspectRatio: 1.0,
+                    showTorchButtonIfSupported: true,
+                    showZoomSliderIfSupported: true,
+                    defaultZoomValueIfSupported: 2
                 },
-                        /* verbose= */ false
+                    /* verbose= */ false
             );
 
-            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            html5QrcodeScanner.render(onScanSuccess, (errorMessage) => {
+                // Ignore silent errors
+            });
         }
 
         function onScanSuccess(decodedText) {
@@ -209,16 +260,19 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        showOverlay('success', 'Entrada Liberada!', data.participant_name ? 'Participante: ' + data.participant_name : data.message);
+                        showOverlay('success', 'Entrada Liberada!', data.participant_name);
                         playBeep(true);
+                        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
                     } else {
-                        showOverlay('error', 'Ingresso Inválido', data.message);
+                        showOverlay('error', 'Entrada Negada', data.message);
                         playBeep(false);
+                        if (navigator.vibrate) navigator.vibrate(500);
                     }
                 })
                 .catch(error => {
-                    showOverlay('error', 'Erro no Sistema', 'Verifique a conexão de internet e tente novamente.');
+                    showOverlay('error', 'Erro técnico', 'Não foi possível validar o ingresso.');
                     playBeep(false);
+                    if (navigator.vibrate) navigator.vibrate(500);
                 });
         }
 
