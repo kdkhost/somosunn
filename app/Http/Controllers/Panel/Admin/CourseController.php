@@ -98,7 +98,7 @@ class CourseController extends Controller
         // Legacy support
         $data['published'] = ($data['status'] === 'published');
         $data['user_id'] = Auth::id();
-        $data = $this->applyVisibilityData($request, $data);
+        $data = $this->applyVisibilityData($request, $data, null, false, 'courses');
         if (Schema::hasColumn('courses', 'created_by')) {
             $data['created_by'] = Auth::id();
         }
@@ -157,7 +157,8 @@ class CourseController extends Controller
             $request,
             $data,
             $course->visibility,
-            (bool) $course->is_somos_unicas
+            (bool) $course->is_somos_unicas,
+            'courses'
         );
         if (Schema::hasColumn('courses', 'created_by') && empty($course->created_by)) {
             $data['created_by'] = Auth::id();

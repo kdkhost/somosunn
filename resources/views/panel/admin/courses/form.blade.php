@@ -241,7 +241,7 @@
                                 @include('panel.admin.partials.content-visibility-selector', [
                                     'selected' => $course->visibility ?: ($course->is_somos_unicas ? 'somos_unicas' : 'ambos'),
                                     'title' => 'Onde vender',
-                                    'description' => 'Defina se este curso aparece na UNN, no Somos Unnicas ou nos dois ambientes.',
+                                    'description' => 'Defina se este curso aparece na Somos UNN, na Somos Unicas ou nos dois ambientes.',
                                 ])
                             </div>
 

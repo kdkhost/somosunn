@@ -71,9 +71,9 @@
                         <div class="form-group mb-4">
                             <label class="font-weight-bold"><i class="fas fa-eye mr-1"></i> Onde Exibir?</label>
                             <select name="visibility" class="form-control" style="border-radius: 8px;">
-                                <option value="ambos" {{ old('visibility', $mentorship->visibility ?? 'ambos') == 'ambos' ? 'selected' : '' }}>Plataforma Principal e Somos Únicas</option>
-                                <option value="somos_unn" {{ old('visibility', $mentorship->visibility ?? 'ambos') == 'somos_unn' ? 'selected' : '' }}>Apenas Plataforma Principal (UNN)</option>
-                                <option value="somos_unicas" {{ old('visibility', $mentorship->visibility ?? 'ambos') == 'somos_unicas' ? 'selected' : '' }} style="color: #ec4899; font-weight: bold;">Exclusivo Somos Únicas</option>
+                                <option value="ambos" {{ old('visibility', $mentorship->visibility ?? 'ambos') == 'ambos' ? 'selected' : '' }}>Ambos os locais</option>
+                                <option value="somos_unn" {{ old('visibility', $mentorship->visibility ?? 'ambos') == 'somos_unn' ? 'selected' : '' }}>Somente Somos UNN</option>
+                                <option value="somos_unicas" {{ old('visibility', $mentorship->visibility ?? 'ambos') == 'somos_unicas' ? 'selected' : '' }} style="color: #ec4899; font-weight: bold;">Somente Somos Únicas</option>
                             </select>
                             <small class="text-muted">Selecione onde esta mentoria deve ser exibida.</small>
                         </div>

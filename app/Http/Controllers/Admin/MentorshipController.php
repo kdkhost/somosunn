@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Models\Mentorship;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,6 +12,8 @@ use Illuminate\Support\Facades\Schema;
 
 class MentorshipController extends Controller
 {
+    use ManagesContentVisibility;
+
     public function index(Request $request)
     {
         $this->ensurePermission('mentorships.view');
@@ -77,6 +80,7 @@ class MentorshipController extends Controller
         $data['mentor_id'] = $this->resolveMentorId($request, $data['mentor_id'] ?? null);
         $data['schedule'] = $this->parseSchedule($request->input('schedule_json'));
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+        $data = $this->applyVisibilityData($request, $data, null, false, 'mentorships');
 
         if ($request->hasFile('image') && !Schema::hasColumn('mentorships', 'image')) {
             return back()->with('error', 'Seu banco de dados está desatualizado: falta a coluna mentorships.image. Atualize o código e rode: php artisan migrate')->withInput();
@@ -145,6 +149,13 @@ class MentorshipController extends Controller
         $data['mentor_id'] = $this->resolveMentorId($request, $data['mentor_id'] ?? null);
         $data['schedule'] = $this->parseSchedule($request->input('schedule_json'));
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+        $data = $this->applyVisibilityData(
+            $request,
+            $data,
+            $mentorship->visibility,
+            (bool) $mentorship->is_somos_unicas,
+            'mentorships'
+        );
 
         if (($request->hasFile('image') || $request->boolean('remove_image')) && !Schema::hasColumn('mentorships', 'image')) {
             $message = 'Seu banco de dados está desatualizado: falta a coluna mentorships.image. Atualize o código e rode: php artisan migrate';

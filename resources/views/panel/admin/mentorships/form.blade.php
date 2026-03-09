@@ -145,7 +145,7 @@
                         @include('panel.admin.partials.content-visibility-selector', [
                             'selected' => $mentorship->visibility ?: ($mentorship->is_somos_unicas ? 'somos_unicas' : 'ambos'),
                             'title' => 'Onde vender',
-                            'description' => 'Defina se esta mentoria aparece na UNN, no Somos Unnicas ou nos dois ambientes.',
+                            'description' => 'Defina se esta mentoria aparece na Somos UNN, na Somos Unicas ou nos dois ambientes.',
                         ])
                     </div>
                 </div>

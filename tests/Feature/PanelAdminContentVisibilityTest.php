@@ -73,6 +73,9 @@ class PanelAdminContentVisibilityTest extends TestCase
             $table->boolean('video_floating_enabled')->default(false);
             $table->integer('video_floating_width')->nullable();
             $table->integer('video_floating_height')->nullable();
+            $table->boolean('is_recurring')->default(false);
+            $table->string('period')->nullable();
+            $table->integer('billing_cycle')->nullable();
             $table->boolean('is_somos_unicas')->default(false);
             $table->string('visibility')->default('ambos');
             $table->json('certificate_settings')->nullable();
@@ -278,6 +281,108 @@ class PanelAdminContentVisibilityTest extends TestCase
         $this->assertSame('1999.90', $mentorship->price);
         $this->assertSame('999.50', $mentorship->flash_sale_price);
         $this->assertSame($flashSaleEndsAt->format('Y-m-d H:i:s'), $mentorship->flash_sale_ends_at?->format('Y-m-d H:i:s'));
+    }
+
+    public function test_legacy_admin_courses_update_syncs_visibility_flag(): void
+    {
+        $user = $this->createAdminUser('legacy-curso-admin@example.com');
+
+        $course = Course::create([
+            'user_id' => $user->id,
+            'title' => 'Curso Legado',
+            'status' => 'draft',
+            'visibility' => 'ambos',
+            'is_somos_unicas' => false,
+        ]);
+
+        $response = $this->withoutMiddleware([
+                EnsureUserHasActivePlan::class,
+                EnsureUserIsAdmin::class,
+                VerifyCsrfToken::class,
+            ])
+            ->actingAs($user)
+            ->put(route('admin.courses.update', $course), [
+                'title' => 'Curso Legado Atualizado',
+                'status' => 'published',
+                'price' => '120,00',
+                'visibility' => 'somos_unicas',
+            ]);
+
+        $response->assertOk()
+            ->assertJson(['success' => true]);
+
+        $course = $course->fresh();
+
+        $this->assertSame('somos_unicas', $course->visibility);
+        $this->assertTrue((bool) $course->is_somos_unicas);
+    }
+
+    public function test_legacy_admin_events_update_syncs_visibility_flag(): void
+    {
+        $user = $this->createAdminUser('legacy-evento-admin@example.com');
+
+        $event = Event::create([
+            'user_id' => $user->id,
+            'title' => 'Evento Legado',
+            'start_at' => now()->addDay(),
+            'image' => 'event-images/existente.png',
+            'visibility' => 'somos_unicas',
+            'is_somos_unicas' => true,
+        ]);
+
+        $response = $this->withoutMiddleware([
+                EnsureUserHasActivePlan::class,
+                EnsureUserIsAdmin::class,
+                VerifyCsrfToken::class,
+            ])
+            ->actingAs($user)
+            ->put(route('admin.events.update', $event), [
+                'title' => 'Evento Legado Atualizado',
+                'start_at' => now()->addDays(5)->format('Y-m-d\TH:i'),
+                'price' => '80,00',
+                'visibility' => 'somos_unn',
+                'published' => '1',
+            ]);
+
+        $response->assertRedirect(route('admin.events.index'));
+
+        $event = $event->fresh();
+
+        $this->assertSame('somos_unn', $event->visibility);
+        $this->assertFalse((bool) $event->is_somos_unicas);
+    }
+
+    public function test_legacy_admin_mentorships_update_syncs_visibility_flag(): void
+    {
+        $user = $this->createAdminUser('legacy-mentoria-admin@example.com');
+
+        $mentorship = Mentorship::create([
+            'mentor_id' => $user->id,
+            'title' => 'Mentoria Legada',
+            'type' => 'online',
+            'visibility' => 'somos_unicas',
+            'is_somos_unicas' => true,
+        ]);
+
+        $response = $this->withoutMiddleware([
+                EnsureUserHasActivePlan::class,
+                EnsureUserIsAdmin::class,
+                VerifyCsrfToken::class,
+            ])
+            ->actingAs($user)
+            ->put(route('admin.mentorships.update', $mentorship), [
+                'title' => 'Mentoria Legada Atualizada',
+                'mentor_id' => $user->id,
+                'type' => 'online',
+                'visibility' => 'ambos',
+            ]);
+
+        $response->assertRedirect(route('admin.mentorships.index'));
+
+        $mentorship = $mentorship->fresh();
+
+        $this->assertSame('ambos', $mentorship->visibility);
+        $this->assertFalse((bool) $mentorship->is_somos_unicas);
     }
 
     private function createAdminUser(string $email): User

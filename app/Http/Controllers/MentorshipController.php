@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ItemReview;
 use Illuminate\Http\Request;
 use App\Models\Mentorship;
+use App\Support\ContentVisibility;
 use Illuminate\Support\Facades\Auth;
 
 class MentorshipController extends Controller
@@ -14,8 +15,13 @@ class MentorshipController extends Controller
      */
     public function index()
     {
-        // Pega mentorias disponíveis
-        $mentorships = Mentorship::latest()->paginate(12);
+        $mentorships = ContentVisibility::applyPublicFilter(
+            Mentorship::query(),
+            'mentorships'
+        )
+            ->latest()
+            ->paginate(12);
+
         return view('mentorships.index', compact('mentorships'));
     }
 

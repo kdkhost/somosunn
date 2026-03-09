@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Panel\Admin\Concerns;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 trait ManagesContentVisibility
 {
@@ -15,12 +16,22 @@ trait ManagesContentVisibility
         Request $request,
         array $data,
         ?string $currentVisibility = null,
-        bool $currentSomosUnicas = false
+        bool $currentSomosUnicas = false,
+        ?string $table = null
     ): array {
         $visibility = $this->resolveVisibilityValue($request, $currentVisibility, $currentSomosUnicas);
 
-        $data['visibility'] = $visibility;
-        $data['is_somos_unicas'] = $visibility === 'somos_unicas';
+        if ($table === null || $this->supportsColumn($table, 'visibility')) {
+            $data['visibility'] = $visibility;
+        } else {
+            unset($data['visibility']);
+        }
+
+        if ($table === null || $this->supportsColumn($table, 'is_somos_unicas')) {
+            $data['is_somos_unicas'] = $visibility === 'somos_unicas';
+        } else {
+            unset($data['is_somos_unicas']);
+        }
 
         return $data;
     }
@@ -42,5 +53,14 @@ trait ManagesContentVisibility
         }
 
         return $currentSomosUnicas ? 'somos_unicas' : 'ambos';
+    }
+
+    protected function supportsColumn(string $table, string $column): bool
+    {
+        try {
+            return Schema::hasTable($table) && Schema::hasColumn($table, $column);
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 }

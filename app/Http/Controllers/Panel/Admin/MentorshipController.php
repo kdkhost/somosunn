@@ -59,7 +59,7 @@ class MentorshipController extends Controller
         $data['mentor_id'] = $this->resolveMentorId($request, $data['mentor_id'] ?? null);
         $data['schedule'] = $this->parseSchedule($request->input('schedule_json'));
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
-        $data = $this->applyVisibilityData($request, $data);
+        $data = $this->applyVisibilityData($request, $data, null, false, 'mentorships');
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -113,7 +113,8 @@ class MentorshipController extends Controller
             $request,
             $data,
             $mentorship->visibility,
-            (bool) $mentorship->is_somos_unicas
+            (bool) $mentorship->is_somos_unicas,
+            'mentorships'
         );
 
         if ($request->boolean('remove_image')) {

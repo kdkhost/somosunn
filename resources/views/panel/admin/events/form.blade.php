@@ -203,7 +203,7 @@
                         @include('panel.admin.partials.content-visibility-selector', [
                             'selected' => $event->visibility ?: ($event->is_somos_unicas ? 'somos_unicas' : 'ambos'),
                             'title' => 'Onde vender',
-                            'description' => 'Defina se este evento aparece na UNN, no Somos Unnicas ou nos dois ambientes.',
+                            'description' => 'Defina se este evento ou palestra aparece na Somos UNN, na Somos Unicas ou nos dois ambientes.',
                         ])
                     </div>
 

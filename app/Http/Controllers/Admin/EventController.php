@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Models\Event;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
+    use ManagesContentVisibility;
+
     public function index(Request $request)
     {
         // Todos os membros podem visualizar o calendário
@@ -198,6 +201,7 @@ class EventController extends Controller
         $data['user_id'] = Auth::id();
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
+        $data = $this->applyVisibilityData($request, $data, null, false, 'events');
 
         if ($request->hasFile('certificate_bg')) {
             $file = $request->file('certificate_bg');
@@ -317,6 +321,13 @@ class EventController extends Controller
         if ($request->has('is_certificate_enabled')) {
             $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         }
+        $data = $this->applyVisibilityData(
+            $request,
+            $data,
+            $event->visibility,
+            (bool) $event->is_somos_unicas,
+            'events'
+        );
 
         if ($request->hasFile('certificate_bg')) {
             $file = $request->file('certificate_bg');

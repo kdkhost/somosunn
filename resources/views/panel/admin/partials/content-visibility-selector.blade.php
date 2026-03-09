@@ -6,8 +6,8 @@
     $options = [
         'ambos' => [
             'label' => 'Ambos os locais',
-            'hint' => 'Disponivel na plataforma principal e no Somos Unnicas.',
-            'badge' => 'UNN + Somos Unnicas',
+            'hint' => 'Disponivel na plataforma principal e no Somos Unicas.',
+            'badge' => 'UNN + Somos Unicas',
         ],
         'somos_unn' => [
             'label' => 'Somente Somos UNN',
@@ -15,8 +15,8 @@
             'badge' => 'Somente UNN',
         ],
         'somos_unicas' => [
-            'label' => 'Exclusivo Somos Unnicas',
-            'hint' => 'Fica visivel apenas no ambiente Somos Unnicas.',
+            'label' => 'Exclusivo Somos Unicas',
+            'hint' => 'Fica visivel apenas no ambiente Somos Unicas.',
             'badge' => 'Exclusivo',
         ],
     ];

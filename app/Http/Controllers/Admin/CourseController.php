@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Models\Enrollment;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
@@ -11,6 +12,8 @@ use App\Models\Course;
 
 class CourseController extends Controller
 {
+    use ManagesContentVisibility;
+
     protected $mpService;
 
     public function __construct(\App\Services\Payment\MercadoPagoService $mpService)
@@ -137,6 +140,7 @@ class CourseController extends Controller
         // Legacy support automation
         $data['published'] = ($data['status'] === 'published');
         $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
+        $data = $this->applyVisibilityData($request, $data, null, false, 'courses');
 
         // Validation for new fields
         $request->validate([
@@ -239,6 +243,13 @@ class CourseController extends Controller
         // Legacy support automation - Use null coalescing to prevent undefined key errors
         $data['published'] = (isset($data['status']) && $data['status'] === 'published');
         $data['price'] = (!isset($data['price']) || $data['price'] === null || $data['price'] === '') ? 0 : $data['price'];
+        $data = $this->applyVisibilityData(
+            $request,
+            $data,
+            $course->visibility,
+            (bool) $course->is_somos_unicas,
+            'courses'
+        );
 
 
 

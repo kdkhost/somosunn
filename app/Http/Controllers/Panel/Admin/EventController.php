@@ -116,7 +116,7 @@ class EventController extends Controller
         $data['all_day'] = $request->boolean('all_day');
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         $data['user_id'] = Auth::id();
-        $data = $this->applyVisibilityData($request, $data);
+        $data = $this->applyVisibilityData($request, $data, null, false, 'events');
 
         Event::create($data);
 
@@ -153,7 +153,8 @@ class EventController extends Controller
             $request,
             $data,
             $event->visibility,
-            (bool) $event->is_somos_unicas
+            (bool) $event->is_somos_unicas,
+            'events'
         );
 
         $event->update($data);
