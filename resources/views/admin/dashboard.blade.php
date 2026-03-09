@@ -104,23 +104,23 @@
                 </div>
 
                 {{-- QUICK ACTIONS --}}
-                <div class="row mb-3">
+                <div class="row mb-3 mx-0">
                     <div class="col-12">
                         <div class="card shadow-sm border-0">
-                            <div class="card-body p-2 d-flex flex-wrap gap-2 justify-content-center">
-                                <a href="{{ route('admin.courses.create') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                            <div class="card-body p-2 d-flex flex-wrap justify-content-center">
+                                <a href="{{ route('admin.courses.create') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 m-1">
                                     <i class="fas fa-plus mr-1"></i> Novo Curso
                                 </a>
-                                <a href="{{ route('admin.events.create') }}" class="btn btn-outline-success btn-sm rounded-pill px-3">
+                                <a href="{{ route('admin.events.create') }}" class="btn btn-outline-success btn-sm rounded-pill px-3 m-1">
                                     <i class="fas fa-calendar-plus mr-1"></i> Novo Evento
                                 </a>
-                                <a href="{{ route('admin.users.create') }}" class="btn btn-outline-warning btn-sm rounded-pill px-3">
+                                <a href="{{ route('admin.users.create') }}" class="btn btn-outline-warning btn-sm rounded-pill px-3 m-1">
                                     <i class="fas fa-user-plus mr-1"></i> Novo Usuário
                                 </a>
-                                <a href="{{ route('admin.settings') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                                <a href="{{ route('admin.settings') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 m-1">
                                     <i class="fas fa-cog mr-1"></i> Configurações
                                 </a>
-                                <a href="{{ route('admin.activity_logs.index') }}" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                                <a href="{{ route('admin.activity_logs.index') }}" class="btn btn-outline-info btn-sm rounded-pill px-3 m-1">
                                     <i class="fas fa-history mr-1"></i> Logs do Sistema
                                 </a>
                             </div>
@@ -733,6 +733,13 @@
                     : '<tr><td colspan="3" class="text-center text-muted">Ainda não há responsáveis ranqueados.</td></tr>';
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            renderLegacyAdminServiceVisits({!! json_encode([
+                'serviceVisitSummary' => $serviceVisitSummary,
+                'serviceVisitTopItems' => $serviceVisitTopItems ?? [],
+                'serviceVisitOwnerLeaders' => $serviceVisitOwnerLeaders ?? [],
+            ]) !!});
 
             window.UNNServiceVisitsRealtime.start({
                 statsUrl: @json(route('admin.dashboard.stats')),
