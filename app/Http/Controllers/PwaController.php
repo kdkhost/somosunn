@@ -36,15 +36,15 @@ class PwaController extends Controller
         }
 
         $icons = [];
-        if($icon192) {
+        if ($icon192) {
             $icons[] = ['src' => asset(ltrim($icon192, '/')), 'sizes' => '192x192', 'type' => 'image/png'];
         } else {
             // Fallback: usar PNG copiado para garantir compatibilidade Chrome
             $icons[] = ['src' => asset('img/pwa-icon-512.png'), 'sizes' => '512x512', 'type' => 'image/png'];
-            $icons[] = ['src' => asset('img/pwa-icon-512.png'), 'sizes' => '192x192', 'type' => 'image/png']; 
+            $icons[] = ['src' => asset('img/pwa-icon-512.png'), 'sizes' => '192x192', 'type' => 'image/png'];
         }
 
-        if($icon512) {
+        if ($icon512) {
             $icons[] = ['src' => asset(ltrim($icon512, '/')), 'sizes' => '512x512', 'type' => 'image/png'];
         }
 
@@ -53,12 +53,20 @@ class PwaController extends Controller
             'short_name' => $short,
             'description' => $desc,
             'start_url' => url('/'),
+            'scope' => url('/'),
             'display' => 'standalone',
             'background_color' => $bg,
             'theme_color' => $theme,
             'icons' => $icons,
+            'orientation' => 'any',
+            'categories' => ['business', 'productivity', 'utilities'],
+            'permissions' => [
+                ['name' => 'camera', 'description' => 'Necessário para escanear QR Codes de ingressos.'],
+                ['name' => 'geolocation', 'description' => 'Necessário para validar o local do check-in.'],
+                ['name' => 'notifications', 'description' => 'Alertas de sucesso ou erro na validação.']
+            ]
         ];
 
-        return response()->json($manifest)->header('Content-Type','application/manifest+json');
+        return response()->json($manifest)->header('Content-Type', 'application/manifest+json');
     }
 }
