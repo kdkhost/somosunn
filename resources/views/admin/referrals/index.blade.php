@@ -30,13 +30,58 @@
         .dataTables_wrapper .dataTables_filter label, .dataTables_wrapper .dataTables_length label { font-weight: 600; }
         .dataTables_wrapper .dataTables_filter input, .dataTables_wrapper .dataTables_length select { margin-left: .35rem; }
         
-        /* Ajustes de responsividade para os cartões de rastreio */
-        @media (max-width: 575.98px) {
-            .referral-stat-card .info-box-text { font-size: 0.75rem; }
-            .referral-stat-card .info-box-number { font-size: 1.1rem; }
+        /* Novo Design de Cartão de Rastreio (Flexível e Vertical) */
+        .referral-tracking-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 1.5rem;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            transition: transform 0.2s;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.05);
         }
-        .referral-stat-card .info-box-content { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .referral-stat-card .info-box-text, .referral-stat-card .info-box-number, .referral-stat-card small { display: block; overflow: hidden; text-overflow: ellipsis; }
+        .referral-tracking-card:hover { transform: translateY(-3px); box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08); }
+        .referral-tracking-icon {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 1rem;
+            box-shadow: 0 0.5rem 1.25rem -0.25rem rgba(0,0,0,0.1);
+        }
+        .referral-tracking-value {
+            font-size: 1.75rem;
+            font-weight: 900;
+            line-height: 1.2;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+            word-break: break-all;
+        }
+        .referral-tracking-label {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+        .referral-tracking-sub {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #9ca3af;
+        }
+        @media (max-width: 575.98px) {
+            .referral-tracking-icon { width: 3.5rem; height: 3.5rem; font-size: 1.25rem; }
+            .referral-tracking-value { font-size: 1.5rem; }
+        }
     </style>
 @endpush
 
@@ -285,13 +330,55 @@
                             @if($selectedReferrer)
                                 <div class="referral-mini-card mb-4"><div class="d-flex align-items-center"><img src="{{ $selectedReferrer->photo ? asset($selectedReferrer->photo) : asset('img/user.png') }}" alt="{{ $selectedReferrer->name }}" class="referral-avatar-lg mr-3"><div><div class="font-weight-bold">{{ $selectedReferrer->name }}</div><div class="text-muted">{{ $selectedReferrer->email }}</div><span class="badge badge-info mt-2">{{ $selectedReferrer->referral_code ?: 'Sem código' }}</span></div></div></div>
                             @endif
-                            <div class="row">
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-2 mb-3"><div class="info-box bg-light border referral-stat-card shadow-sm mb-0"><span class="info-box-icon bg-primary"><i class="fas fa-mouse-pointer"></i></span><div class="info-box-content"><span class="info-box-text">Cliques</span><span class="info-box-number">{{ number_format($trackingSummary['clicks'] ?? 0) }}</span><small class="text-muted">{{ number_format($trackingSummary['visits'] ?? 0) }} visitas</small></div></div></div>
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-2 mb-3"><div class="info-box bg-light border referral-stat-card shadow-sm mb-0"><span class="info-box-icon bg-success"><i class="fas fa-user-check"></i></span><div class="info-box-content"><span class="info-box-text">Cadastros</span><span class="info-box-number">{{ number_format($trackingSummary['registrations'] ?? 0) }}</span><small class="text-muted">{{ number_format($trackingSummary['registration_conversion'] ?? 0) }}% conv.</small></div></div></div>
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-2 mb-3"><div class="info-box bg-light border referral-stat-card shadow-sm mb-0"><span class="info-box-icon bg-warning"><i class="fas fa-cash-register"></i></span><div class="info-box-content"><span class="info-box-text">Checkouts</span><span class="info-box-number">{{ number_format($trackingSummary['checkout_starts'] ?? 0) }}</span><small class="text-muted">Inícios atribuídos</small></div></div></div>
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-2 mb-3"><div class="info-box bg-light border referral-stat-card shadow-sm mb-0"><span class="info-box-icon bg-purple"><i class="fas fa-bag-shopping"></i></span><div class="info-box-content"><span class="info-box-text">Compras</span><span class="info-box-number">{{ number_format($trackingSummary['purchases'] ?? 0) }}</span><small class="text-muted">{{ number_format($trackingSummary['purchase_conversion'] ?? 0) }}% conv.</small></div></div></div>
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-2 mb-3"><div class="info-box bg-light border referral-stat-card shadow-sm mb-0"><span class="info-box-icon bg-info"><i class="fas fa-share-alt"></i></span><div class="info-box-content"><span class="info-box-text">Compart.</span><span class="info-box-number">{{ number_format(($trackingSummary['shares'] ?? 0) + ($trackingSummary['reshares'] ?? 0) + ($trackingSummary['copies'] ?? 0)) }}</span><small class="text-muted">{{ number_format($trackingSummary['copies'] ?? 0) }} cópias</small></div></div></div>
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-2 mb-3"><div class="info-box bg-light border referral-stat-card shadow-sm mb-0"><span class="info-box-icon bg-dark"><i class="fas fa-wallet"></i></span><div class="info-box-content"><span class="info-box-text">Receita</span><span class="info-box-number">R$ {{ number_format((float) ($trackingSummary['revenue'] ?? 0), 2, ',', '.') }}</span><small class="text-muted">Atualizado às {{ $trackingUpdatedAtLabel }}</small></div></div></div>
+                            <div class="row" style="row-gap: 1.25rem;">
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="referral-tracking-card h-100">
+                                        <div class="referral-tracking-icon bg-primary shadow-primary-sm"><i class="fas fa-mouse-pointer"></i></div>
+                                        <div class="referral-tracking-label">Cliques</div>
+                                        <div class="referral-tracking-value">{{ number_format($trackingSummary['clicks'] ?? 0) }}</div>
+                                        <div class="referral-tracking-sub">{{ number_format($trackingSummary['visits'] ?? 0) }} visitas únicas</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="referral-tracking-card h-100">
+                                        <div class="referral-tracking-icon bg-success shadow-success-sm"><i class="fas fa-user-check"></i></div>
+                                        <div class="referral-tracking-label">Cadastros</div>
+                                        <div class="referral-tracking-value">{{ number_format($trackingSummary['registrations'] ?? 0) }}</div>
+                                        <div class="referral-tracking-sub">{{ number_format($trackingSummary['registration_conversion'] ?? 0) }}% conversão</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="referral-tracking-card h-100">
+                                        <div class="referral-tracking-icon bg-warning shadow-warning-sm"><i class="fas fa-cash-register text-white"></i></div>
+                                        <div class="referral-tracking-label">Checkouts</div>
+                                        <div class="referral-tracking-value">{{ number_format($trackingSummary['checkout_starts'] ?? 0) }}</div>
+                                        <div class="referral-tracking-sub">Inícios atribuídos</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="referral-tracking-card h-100">
+                                        <div class="referral-tracking-icon bg-purple shadow-purple-sm"><i class="fas fa-shopping-bag"></i></div>
+                                        <div class="referral-tracking-label">Compras</div>
+                                        <div class="referral-tracking-value">{{ number_format($trackingSummary['purchases'] ?? 0) }}</div>
+                                        <div class="referral-tracking-sub">{{ number_format($trackingSummary['purchase_conversion'] ?? 0) }}% conversão</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="referral-tracking-card h-100">
+                                        <div class="referral-tracking-icon bg-info shadow-info-sm"><i class="fas fa-share-alt"></i></div>
+                                        <div class="referral-tracking-label">Compart.</div>
+                                        <div class="referral-tracking-value">{{ number_format(($trackingSummary['shares'] ?? 0) + ($trackingSummary['reshares'] ?? 0) + ($trackingSummary['copies'] ?? 0)) }}</div>
+                                        <div class="referral-tracking-sub">{{ number_format($trackingSummary['copies'] ?? 0) }} cópias e envios</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="referral-tracking-card h-100">
+                                        <div class="referral-tracking-icon bg-dark shadow-dark-sm"><i class="fas fa-wallet"></i></div>
+                                        <div class="referral-tracking-label">Receita</div>
+                                        <div class="referral-tracking-value" style="font-size: 1.25rem;">R$ {{ number_format((float) ($trackingSummary['revenue'] ?? 0), 2, ',', '.') }}</div>
+                                        <div class="referral-tracking-sub">Atualizado recentemente</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
