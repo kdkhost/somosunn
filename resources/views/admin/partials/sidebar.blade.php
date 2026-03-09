@@ -162,9 +162,8 @@
                                         class="fas fa-calendar-alt nav-icon"></i>
                                     <p>Calendário</p>
                                 </a></li>
-                            <li class="nav-item"><a href="{{ route('panel.admin.events.list') }}"
-                                    class="nav-link {{ $is('panel.admin.events.list') }}"><i
-                                        class="fas fa-list nav-icon"></i>
+                            <li class="nav-item"><a href="{{ route('admin.events.list') }}"
+                                    class="nav-link {{ $is('admin.events.list') }}"><i class="fas fa-list nav-icon"></i>
                                     <p>Gerenciar</p>
                                 </a></li>
                             <li class="nav-item"><a href="{{ route('admin.events.create') }}"

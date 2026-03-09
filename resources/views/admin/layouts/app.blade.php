@@ -369,14 +369,7 @@
     @stack('styles')
 </head>
 
-<body
-    @if($preloaderEnabled)
-        <!-- Preloader -->
-        <div class="preloader flex-column justify-content-center align-items-center">
-            <img class="animation__shake" src="{{ $preloaderImage }}" alt="UNN" height="60" width="60">
-        </div>
-    @endif
-    class="{{ $isAdmin ? 'hold-transition sidebar-mini layout-fixed layout-navbar-fixed' : 'bg-slate-50 min-h-screen' }} {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}">
+<body class="{{ $isAdmin ? 'hold-transition sidebar-mini layout-fixed layout-navbar-fixed' : 'bg-slate-50 min-h-screen' }} {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}">
     {{-- Badge de Impersonation - Flutuante discreto --}}
     @if(session()->has('impersonator_id'))
         <div id="impersonation-badge"

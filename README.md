@@ -2,6 +2,8 @@
 
 ## Novidades Recentes (mar/2026)
 
+- **Acesso Dual à Listagem de Eventos:** Implementada a funcionalidade de listagem de eventos no painel legado (AdminLTE 3.2), permitindo que SuperAdmins e administradores gerenciem eventos de forma tabular em ambos os painéis (moderno e legado). O menu lateral do AdminLTE foi atualizado para manter o contexto do usuário, e a nova listagem conta com busca, paginação e ações rápidas integradas.
+- **Correção do Preloader do Sistema:** O preloader foi ajustado para ser exibido exclusivamente no site público, conforme o comportamento original, removendo exibições indesejadas dentro do painel administrativo que causavam sobreposição visual na navegação entre menus.
 - **Controle de Visibilidade "Somos Únicas":** Administradores agora podem definir se Cursos, Eventos e Mentorias são exibidos em "Ambas as plataformas", "Apenas UNN" ou "Exclusivo Somos Únicas". O frontend foi atualizado para filtrar o conteúdo automaticamente com base nessa configuração.
 - **Unificação de E-mails do Sistema:** Todos os templates de e-mail foram refatorados para utilizar o layout padrão da UNN de forma automática, eliminando aninhamentos e inconsistências visuais. O editor Summernote agora sincroniza corretamente antes de salvar, e a funcionalidade de "Enviar Teste" no painel administrativo foi corrigida.
 - **Flexibilidade de Variáveis e Gestão de Vagas:** Implementado suporte a chaves simples `{var}` e duplas `{{var}}` nos templates, com inclusão de dados reais de exemplo para testes. O editor de e-mail agora conta com botões rápidos para inserção de variáveis de candidatura (candidato, vaga, links de gestão), facilitando a personalização das notificações de emprego.

@@ -585,11 +585,44 @@ class EventController extends Controller
     }
 
     /**
+     * Verifica se o usuário pode gerenciar todos os eventos.
+     */
+    private function canManageAllEvents(): bool
+    {
+        $user = Auth::user();
+        return $user && $user->isAdmin();
+    }
+
+    /**
+     * Lista os eventos no layout AdminLTE.
+     */
+    public function list(Request $request)
+    {
+        $this->ensurePermission('events.view');
+
+        $query = Event::query()->latest();
+
+        if (!$this->canManageAllEvents()) {
+            $query->where('user_id', Auth::id());
+        }
+
+        $search = trim((string) $request->query('q', ''));
+        if ($search !== '') {
+            $query->where('title', 'like', '%' . $search . '%');
+        }
+
+        $events = $query->paginate(15);
+        $events->appends($request->all());
+
+        return view('admin.events.list', compact('events', 'search'));
+    }
+
+    /**
      * Verifica se o usuário pode gerenciar o evento (é dono ou admin).
      */
     protected function ensureCanManage(Event $event): void
     {
-        if (Auth::user()->isAdmin()) {
+        if ($this->canManageAllEvents()) {
             return;
         }
 

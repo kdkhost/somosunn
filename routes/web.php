@@ -859,6 +859,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             ->name('activity_logs.clear');
 
         // Events CRUD
+        Route::get('events/list', [\App\Http\Controllers\Admin\EventController::class, 'list'])->middleware('check.feature:events_access')->name('events.list');
         Route::get('events/feed', [\App\Http\Controllers\Admin\EventController::class, 'feed'])
             ->middleware('check.feature:events_access')->name('events.feed');
         Route::post('events/calendar/settings', [\App\Http\Controllers\Admin\EventController::class, 'updateCalendarSettings'])
