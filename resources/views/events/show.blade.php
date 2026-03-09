@@ -69,25 +69,7 @@
         $siteSecondary28 = $hexToRgba($siteSecondary, $filmAlpha(0.28)) ?: ('rgba(29,63,196,' . $filmAlpha(0.28) . ')');
         $siteSecondary18 = $hexToRgba($siteSecondary, $filmAlpha(0.18)) ?: ('rgba(29,63,196,' . $filmAlpha(0.18) . ')');
 
-        $resolveImageUrl = function (?string $path): ?string {
-            $path = trim((string) $path);
-            if ($path === '') {
-                return null;
-            }
-            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-                return $path;
-            }
-            if (str_starts_with($path, 'storage/')) {
-                return asset($path);
-            }
-            if (str_starts_with($path, 'uploads/')) {
-                return asset($path);
-            }
-
-            return asset('storage/' . ltrim($path, '/'));
-        };
-
-        $eventImageUrl = $resolveImageUrl($event->image ?? null);
+        $eventImageUrl = $event->image_url;
         $mapQuery = urlencode($event->address);
         $confirmedSeats = $event->confirmed_seats;
         $remainingSeats = $event->remaining_seats;

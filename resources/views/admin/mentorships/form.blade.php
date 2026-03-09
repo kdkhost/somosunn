@@ -142,7 +142,7 @@
                                 <div class="row align-items-center">
                                     <div class="col-md-4">
                                         @if($mentorship->image)
-                                            <img src="{{ asset($mentorship->image) }}" class="img-fluid rounded shadow-sm" alt="Capa da mentoria">
+                                            <img src="{{ $mentorship->image_url }}" class="img-fluid rounded shadow-sm" alt="Capa da mentoria">
                                         @else
                                             <div class="bg-white rounded mb-2 d-flex align-items-center justify-content-center border"
                                                 style="height: 120px;">

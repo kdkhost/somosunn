@@ -23,6 +23,7 @@
                         <th>E-mail</th>
                         <th>Papel</th>
                         <th>Nível</th>
+                        <th>Ingressos</th>
                         <th class="text-right" style="width:140px;">Ações</th>
                     </tr>
                 </thead>
@@ -41,6 +42,11 @@
                                 @endif
                             </td>
                             <td>{{ ucfirst($user->level ?? 'Iniciante') }}</td>
+                            <td>
+                                <span class="badge badge-info shadow-sm">
+                                    {{ $user->getCheckedInTicketsCount() }} / {{ $user->getTotalTicketsCount() }}
+                                </span>
+                            </td>
                             <td class="text-right">
                                 @if(auth()->user()->isAdmin() && $user->id !== auth()->id() && !session()->has('impersonator_id'))
                                     {{-- Admin pode impersonate membros, Superadmin pode impersonate todos --}}

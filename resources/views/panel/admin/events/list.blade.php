@@ -54,8 +54,8 @@
                                     <div class="flex items-center gap-4">
                                         <div
                                             class="w-16 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
-                                            @if($event->image)
-                                                <img src="{{ asset($event->image) }}" alt="{{ $event->title }}"
+                                            @if($event->image_url)
+                                                <img src="{{ $event->image_url }}" alt="{{ $event->title }}"
                                                     class="w-full h-full object-cover">
                                             @else
                                                 <div class="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 transition-colors">

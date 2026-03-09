@@ -54,8 +54,8 @@
                                     <div class="flex items-center gap-4">
                                         <div
                                             class="w-16 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
-                                            @if($course->thumbnail)
-                                                <img src="{{ asset($course->thumbnail) }}" alt="{{ $course->title }}"
+                                            @if($course->thumbnail_url)
+                                                <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}"
                                                     class="w-full h-full object-cover">
                                             @else
                                                 <div class="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 transition-colors">

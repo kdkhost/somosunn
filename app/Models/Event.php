@@ -7,6 +7,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\UploadStorage;
 
 class Event extends Model
 {
@@ -62,7 +63,17 @@ class Event extends Model
         'flash_sale_ends_at' => 'datetime',
     ];
 
-    protected $appends = ['start', 'end'];
+    protected $appends = ['start', 'end', 'image_url', 'thumbnail_url'];
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return UploadStorage::url($this->image);
+    }
+
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        return $this->image_url;
+    }
 
     public function getStartAttribute()
     {

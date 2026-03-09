@@ -110,7 +110,7 @@
                             <div
                                 class="aspect-video w-full rounded-2xl bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 relative group transition-colors">
                                 @if($mentorship->image)
-                                    <img src="{{ asset($mentorship->image) }}" class="w-full h-full object-cover">
+                                    <img src="{{ $mentorship->image_url }}" class="w-full h-full object-cover">
                                 @else
                                     <div
                                         class="w-full h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">

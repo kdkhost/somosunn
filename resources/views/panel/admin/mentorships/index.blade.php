@@ -97,7 +97,7 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-4">
                                         @if($mentorship->image)
-                                            <img src="{{ asset($mentorship->image) }}"
+                                            <img src="{{ $mentorship->image_url }}"
                                                 class="w-12 h-12 rounded-lg object-cover border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
                                         @else
                                             <div

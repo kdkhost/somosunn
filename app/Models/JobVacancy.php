@@ -9,6 +9,8 @@ class JobVacancy extends Model
 {
     use HasFactory;
 
+    protected $appends = ['image_url'];
+
     protected $fillable = [
         'user_id',
         'title',
@@ -42,5 +44,9 @@ class JobVacancy extends Model
     public function applications()
     {
         return $this->hasMany(JobApplication::class);
+    }
+    public function getImageUrlAttribute(): string
+    {
+        return \App\Support\UploadStorage::url($this->image);
     }
 }

@@ -286,7 +286,7 @@
                             <h3 class="font-bold text-slate-800 dark:text-white transition-colors">Capa do Curso</h3>
                         </div>
 
-                        <div x-data="{ photoPreview: '{{ $course->thumbnail ? asset($course->thumbnail) : '' }}' }"
+                        <div x-data="{ photoPreview: '{{ $course->thumbnail ? $course->thumbnail_url : '' }}' }"
                             class="space-y-4">
                             <div
                                 class="relative group aspect-video w-full rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden transition-all group-hover:border-blue-300 dark:group-hover:border-blue-500 shadow-inner">

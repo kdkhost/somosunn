@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use App\Support\UploadStorage;
 
 class Course extends Model
 {
@@ -95,6 +96,13 @@ class Course extends Model
         'is_somos_unicas',
         'visibility',
     ];
+
+    protected $appends = ['thumbnail_url'];
+
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        return UploadStorage::url($this->thumbnail);
+    }
 
     protected $casts = [
         'is_certificate_enabled' => 'boolean',

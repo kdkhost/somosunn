@@ -12,9 +12,9 @@
             <h3 class="card-title">Listagem de Cursos</h3>
             <div class="card-tools">
                 @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('courses.create'))
-                <a href="{{ route('admin.courses.create') }}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> Novo curso
-                </a>
+                    <a href="{{ route('admin.courses.create') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Novo curso
+                    </a>
                 @endif
             </div>
         </div>
@@ -34,7 +34,7 @@
                         <tr>
                             <td>
                                 @if($c->thumbnail)
-                                    <img src="{{ asset($c->thumbnail) }}" alt="Capa" class="img-circle elevation-2"
+                                    <img src="{{ $c->thumbnail_url }}" alt="Capa" class="img-circle elevation-2"
                                         style="width: 50px; height: 50px; object-fit: cover;">
                                 @else
                                     <div class="img-circle elevation-2 d-flex align-items-center justify-content-center bg-secondary"
@@ -56,19 +56,19 @@
                             </td>
                             <td>
                                 @if(auth()->user()->isAdmin() || (auth()->user()->hasPermission('courses.edit') && $c->user_id === auth()->id()))
-                                <a href="{{ route('admin.courses.edit', $c) }}" class="btn btn-sm btn-info" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
+                                    <a href="{{ route('admin.courses.edit', $c) }}" class="btn btn-sm btn-info" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 @endif
                                 @if(auth()->user()->isAdmin() || (auth()->user()->hasPermission('courses.delete') && $c->user_id === auth()->id()))
-                                <form method="POST" action="{{ route('admin.courses.destroy', $c) }}" style="display:inline"
-                                    class="delete-course-form">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Excluir">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                    <form method="POST" action="{{ route('admin.courses.destroy', $c) }}" style="display:inline"
+                                        class="delete-course-form">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Excluir">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 @endif
                             </td>
                         </tr>

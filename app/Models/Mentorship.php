@@ -11,6 +11,8 @@ class Mentorship extends Model
 {
     use HasFactory;
 
+    protected $appends = ['image_url'];
+
     protected $fillable = [
         'title',
         'mentor_id',
@@ -202,5 +204,9 @@ class Mentorship extends Model
         }
 
         return $fallback;
+    }
+    public function getImageUrlAttribute(): string
+    {
+        return \App\Support\UploadStorage::url($this->image);
     }
 }

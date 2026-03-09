@@ -69,10 +69,31 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\Traits\HasRoles;
 use App\Services\ProfilePhotoService;
 use Illuminate\Support\Facades\Schema;
+use App\Models\EventRegistration;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, Traits\HasFeatureAccess;
+
+    /**
+     * Retorna o total de inscrições pagas/confirmadas.
+     */
+    public function getTotalTicketsCount(): int
+    {
+        return $this->eventRegistrations()
+            ->whereIn('status', [EventRegistration::STATUS_PAID, EventRegistration::STATUS_CONFIRMED])
+            ->count();
+    }
+
+    /**
+     * Retorna o total de inscrições onde check_in_at não é nulo.
+     */
+    public function getCheckedInTicketsCount(): int
+    {
+        return $this->eventRegistrations()
+            ->whereNotNull('check_in_at')
+            ->count();
+    }
 
     public function isAdmin()
     {

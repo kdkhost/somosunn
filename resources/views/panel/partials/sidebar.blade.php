@@ -54,6 +54,13 @@
             'visible' => true,
         ],
         [
+            'label' => 'Meus Ingressos',
+            'route' => route('panel.tickets.index'),
+            'icon' => 'fas fa-ticket-alt',
+            'active' => request()->routeIs('panel.tickets.*'),
+            'visible' => true,
+        ],
+        [
             'label' => 'Minha Lista',
             'route' => route('panel.wishlist.index'),
             'icon' => 'fas fa-heart',
@@ -270,7 +277,7 @@
         display: none;
     }
 
-    .panel-sidebar details[open] > summary .submenu-chevron {
+    .panel-sidebar details[open]>summary .submenu-chevron {
         transform: rotate(180deg);
     }
 </style>
@@ -366,7 +373,8 @@
                     <i class="fas fa-chevron-down submenu-chevron text-[10px] transition-transform"></i>
                 </summary>
                 <div class="mt-2 ml-4 pl-3 border-l border-slate-100 dark:border-slate-800 space-y-2">
-                    <a href="{{ $adminDashboardItem['route'] }}" class="{{ $submenuItemClass($adminDashboardItem['active']) }}">
+                    <a href="{{ $adminDashboardItem['route'] }}"
+                        class="{{ $submenuItemClass($adminDashboardItem['active']) }}">
                         <i class="{{ $adminDashboardItem['icon'] }} w-4 opacity-80"></i>
                         <span>{{ $adminDashboardItem['label'] }}</span>
                     </a>

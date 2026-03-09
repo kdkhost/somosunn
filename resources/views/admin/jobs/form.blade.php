@@ -111,7 +111,7 @@
                                     <label for="image">Imagem da Vaga / Logo da Empresa</label>
                                     @if($vacancy->image)
                                         <div class="mb-2">
-                                            <img src="{{ asset($vacancy->image) }}" class="img-thumbnail"
+                                            <img src="{{ $vacancy->image_url }}" class="img-thumbnail"
                                                 style="max-height: 100px;">
                                         </div>
                                     @endif

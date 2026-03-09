@@ -13,7 +13,8 @@
     <div class="container-fluid">
         <div class="row mb-3">
             <div class="col-12">
-                <a href="{{ route('admin.events.create') }}" class="btn btn-primary shadow-sm hover:translate-y-[-2px] transition-all">
+                <a href="{{ route('admin.events.create') }}"
+                    class="btn btn-primary shadow-sm hover:translate-y-[-2px] transition-all">
                     <i class="fas fa-plus mr-2"></i> Novo Evento
                 </a>
             </div>
@@ -57,7 +58,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 @if($event->image)
-                                                    <img src="{{ asset($event->image) }}" alt="{{ $event->title }}"
+                                                    <img src="{{ $event->image_url }}" alt="{{ $event->title }}"
                                                         class="img-size-50 mr-3 img-rounded shadow-sm"
                                                         style="object-fit: cover; width: 50px; height: 35px;">
                                                 @else

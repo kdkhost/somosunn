@@ -122,7 +122,7 @@
                                     <span
                                         class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">Grátis</span>
                                 @endif
-                                <img src="{{ $course->thumbnail ?? asset('img/course-default.png') }}" alt="{{ $course->title }}"
+                                <img src="{{ $course->thumbnail_url ?? asset('img/course-default.png') }}" alt="{{ $course->title }}"
                                     class="w-full h-40 object-cover rounded-xl mb-4">
                                 <div class="mb-2 flex items-center gap-2">
                                     <span class="text-xs font-bold text-blue-600">{{ $course->category ?? 'Categoria' }}</span>
@@ -172,7 +172,7 @@
                             <article class="bg-white rounded-2xl p-5 border border-gray-100 flex flex-col shadow-sm relative">
                                 <span
                                     class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">Gratuito</span>
-                                <img src="{{ $event->thumbnail ?? asset('img/event-default.png') }}" alt="{{ $event->title }}"
+                                <img src="{{ $event->thumbnail_url ?? asset('img/event-default.png') }}" alt="{{ $event->title }}"
                                     class="w-full h-28 object-cover rounded-xl mb-3">
                                 <h3 class="text-base font-bold text-gray-900 mb-1">{{ $event->title }}</h3>
                                 <p class="text-xs text-gray-500 mb-1">
@@ -215,7 +215,7 @@
                         @foreach($featuredCourses as $course)
                             <article class="bg-slate-50 rounded-3xl p-8 border border-gray-100 flex flex-col">
                                 <div class="mb-3">
-                                    <img src="{{ $course->thumbnail ?? asset('img/course-default.png') }}"
+                                    <img src="{{ $course->thumbnail_url ?? asset('img/course-default.png') }}"
                                         alt="{{ $course->title }}" class="w-full h-40 object-cover rounded-xl mb-2">
                                     <h3 class="text-xl font-bold text-gray-900 mb-1">{{ $course->title }}</h3>
                                     <p class="text-gray-600 text-sm mb-2">

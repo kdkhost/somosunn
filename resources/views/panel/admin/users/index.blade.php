@@ -68,6 +68,7 @@
                         <tr>
                             <th class="px-6 py-4">Usuário</th>
                             <th class="px-6 py-4">Função / Nível</th>
+                            <th class="px-6 py-4">Ingressos</th>
                             <th class="px-6 py-4">Plano Atual</th>
                             <th class="px-6 py-4 text-center">Status do Plano</th>
                             <th class="px-6 py-4 text-right">Ações</th>
@@ -103,6 +104,14 @@
                                         @if($u->level)
                                             <span class="text-xs text-slate-400 dark:text-slate-500 capitalize">Nível: {{ $u->level }}</span>
                                         @endif
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col gap-1 items-start">
+                                        <span class="text-sm font-bold text-slate-700 dark:text-slate-300">
+                                            {{ $u->getCheckedInTicketsCount() }} / {{ $u->getTotalTicketsCount() }}
+                                        </span>
+                                        <span class="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-bold tracking-wider">Check-ins</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-slate-700 dark:text-slate-300">

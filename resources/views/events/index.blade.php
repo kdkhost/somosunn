@@ -185,8 +185,8 @@
             ? asset(ltrim($featuredImageSetting, '/'))
             : 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1400';
 
-        $featuredEventImage = $featuredEvent && $featuredEvent->image
-            ? asset('storage/' . $featuredEvent->image)
+        $featuredEventImage = $featuredEvent
+            ? $featuredEvent->image_url
             : $featuredImage;
     @endphp
 
@@ -407,16 +407,7 @@
                                                 ? 'Amanhã'
                                                 : ($startDate ? ucfirst($startDate->translatedFormat('D')) : ''));
 
-                                        $imageValue = trim((string) ($event->image ?? ''));
-                                        $eventImageUrl = '';
-                                        if ($imageValue !== '') {
-                                            if (\Illuminate\Support\Str::startsWith($imageValue, ['http://', 'https://'])) {
-                                                $eventImageUrl = $imageValue;
-                                            } else {
-                                                $normalized = ltrim(str_replace('\\', '/', $imageValue), '/');
-                                                $eventImageUrl = asset($normalized);
-                                            }
-                                        }
+                                        $eventImageUrl = $event->image_url;
 
                                         $hasPrice = ((float) ($event->current_price ?: $event->price) > 0);
                                     @endphp

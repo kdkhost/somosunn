@@ -232,7 +232,7 @@
                                                 <div class="row align-items-center">
                                                     <div class="col-md-4">
                                                         @if($course->thumbnail)
-                                                            <img src="{{ asset($course->thumbnail) }}"
+                                                            <img src="{{ $course->thumbnail_url }}"
                                                                 class="img-fluid rounded shadow-sm">
                                                         @else
                                                             <div class="bg-white rounded mb-2 d-flex align-items-center justify-content-center border"

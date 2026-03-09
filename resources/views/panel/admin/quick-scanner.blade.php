@@ -46,17 +46,35 @@
 
                 {{-- Overlay Feedback --}}
                 <div id="scanner-overlay"
-                    class="absolute inset-0 z-10 hidden flex-col items-center justify-center bg-white/95 dark:bg-slate-900/95 transition-all">
-                    <div id="overlay-icon-wrapper"
-                        class="w-20 h-20 rounded-full flex items-center justify-center mb-4 transition-transform scale-0 duration-300">
-                        <i id="overlay-icon" class="fas fa-check text-3xl"></i>
-                    </div>
-                    <h2 id="overlay-status" class="text-lg font-black text-center px-6">Processando...</h2>
-                    <p id="overlay-detail" class="text-sm text-slate-500 mt-1 text-center px-8"></p>
+                    class="absolute inset-0 z-50 hidden flex-col items-center justify-center bg-white/95 dark:bg-slate-900/95 transition-all overflow-hidden border-4 border-slate-50 dark:border-slate-800 rounded-2xl sm:rounded-3xl">
 
-                    <button onclick="resumeScanning()"
-                        class="mt-8 px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg transition-all active:scale-95">
-                        Próximo Escaneamento
+                    {{-- Faixa "VALIDADO" --}}
+                    <div id="validation-stripe"
+                        class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center bg-emerald-600 py-6 shadow-2xl -rotate-12 scale-150 opacity-0 transition-all duration-500 z-20 pointer-events-none">
+                        <span
+                            class="text-white text-4xl sm:text-5xl font-black tracking-[0.2em] whitespace-nowrap">VALIDADO</span>
+                    </div>
+
+                    {{-- Faixa "INVÁLIDO" --}}
+                    <div id="error-stripe"
+                        class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center bg-rose-600 py-6 shadow-2xl rotate-12 scale-150 opacity-0 transition-all duration-500 z-20 pointer-events-none">
+                        <span id="error-stripe-text"
+                            class="text-white text-xl sm:text-2xl font-black text-center px-4 uppercase tracking-tighter whitespace-nowrap">INVÁLIDO</span>
+                    </div>
+
+                    <div id="overlay-content" class="relative z-10 flex flex-col items-center justify-center">
+                        <div id="overlay-icon-wrapper"
+                            class="w-24 h-24 rounded-full flex items-center justify-center mb-6 transition-transform scale-0 duration-300">
+                            <i id="overlay-icon" class="fas fa-check text-4xl"></i>
+                        </div>
+                        <h2 id="overlay-status" class="text-xl sm:text-2xl font-black text-center px-6">Processando...</h2>
+                        <p id="overlay-detail" class="text-sm sm:text-base text-slate-500 mt-2 text-center px-8 font-bold">
+                        </p>
+                    </div>
+
+                    <button id="resume-btn" onclick="resumeScanning()"
+                        class="mt-10 px-10 py-4 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-extrabold rounded-2xl shadow-xl transition-all active:scale-95 z-30 hidden opacity-0">
+                        CONTINUAR ESCANEANDO
                     </button>
                 </div>
             </div>
@@ -256,11 +274,22 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        showOverlay('success', 'Acesso Liberado!', data.participant_name + '<br><span class="text-[10px]">' + data.event_title + '</span>');
+                        showOverlay('success', 'Acesso Liberado!', (data.participant_name || 'Participante') + '<br><span class="text-[10px]">' + (data.event_title || '') + '</span>');
                         playBeep('success');
                         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+
+                        // Fecha automaticamente em 1.8s
+                        setTimeout(() => {
+                            resumeScanning();
+                        }, 1800);
                     } else {
-                        showOverlay('error', 'Acesso Negado', data.message);
+                        let errorMsg = data.message;
+                        // Personaliza msg de fraude/outro evento se necessário
+                        if (errorMsg.includes('não encontrado')) {
+                            errorMsg = 'Ingresso inválido para este evento.<br><small>Possível fraude ou ingresso de outro evento.</small>';
+                        }
+
+                        showOverlay('error', 'Acesso Negado', errorMsg);
                         playBeep('error');
                         if (navigator.vibrate) navigator.vibrate(500);
                     }
@@ -278,6 +307,9 @@
             const icon = document.getElementById('overlay-icon');
             const statusEl = document.getElementById('overlay-status');
             const detailEl = document.getElementById('overlay-detail');
+            const validationStripe = document.getElementById('validation-stripe');
+            const errorStripe = document.getElementById('error-stripe');
+            const resumeBtn = document.getElementById('resume-btn');
 
             overlay.classList.remove('hidden');
             overlay.classList.add('flex');
@@ -286,22 +318,67 @@
             iconWrapper.classList.remove('scale-0');
             iconWrapper.classList.add('scale-100');
 
+            // Reset effects
+            validationStripe.classList.add('opacity-0');
+            validationStripe.classList.add('scale-150');
+            errorStripe.classList.add('opacity-0');
+            errorStripe.classList.add('scale-150');
+            resumeBtn.classList.add('hidden');
+            resumeBtn.classList.add('opacity-0');
+
             if (type === 'loading') {
-                iconWrapper.className = 'w-20 h-20 rounded-full flex items-center justify-center mb-4 bg-blue-100 dark:bg-blue-900/30 text-blue-600';
-                icon.className = 'fas fa-spinner fa-spin text-3xl';
+                iconWrapper.className = 'w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-blue-100 dark:bg-blue-900/30 text-blue-600';
+                icon.className = 'fas fa-spinner fa-spin text-4xl';
             } else if (type === 'success') {
-                iconWrapper.className = 'w-20 h-20 rounded-full flex items-center justify-center mb-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600';
-                icon.className = 'fas fa-check text-3xl';
+                iconWrapper.className = 'w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600';
+                icon.className = 'fas fa-check text-4xl';
+
+                // Animate Stripe
+                setTimeout(() => {
+                    validationStripe.classList.remove('opacity-0', 'scale-150');
+                    validationStripe.classList.add('opacity-100', 'scale-100', 'rotate-[-12deg]');
+                }, 50);
+
             } else {
-                iconWrapper.className = 'w-20 h-20 rounded-full flex items-center justify-center mb-4 bg-rose-100 dark:bg-rose-900/30 text-rose-600';
-                icon.className = 'fas fa-times text-3xl';
+                iconWrapper.className = 'w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-rose-100 dark:bg-rose-900/30 text-rose-600';
+                icon.className = 'fas fa-times text-4xl';
+                resumeBtn.classList.remove('hidden');
+                setTimeout(() => {
+                    resumeBtn.classList.remove('opacity-0');
+                    resumeBtn.classList.add('opacity-100');
+                }, 100);
+
+                // Animate Error Stripe
+                setTimeout(() => {
+                    const errorTextEl = document.getElementById('error-stripe-text');
+                    if (detail.toLowerCase().includes('evento') || detail.toLowerCase().includes('encontrado') || detail.toLowerCase().includes('inválido')) {
+                        errorTextEl.innerText = 'INGRESSO INVÁLIDO';
+                    } else {
+                        errorTextEl.innerText = 'ACESSO NEGADO';
+                    }
+                    errorStripe.classList.remove('opacity-0', 'scale-150');
+                    errorStripe.classList.add('opacity-100', 'scale-100', 'rotate-[12deg]');
+                }, 50);
             }
         }
 
         function resumeScanning() {
             const overlay = document.getElementById('scanner-overlay');
+            const validationStripe = document.getElementById('validation-stripe');
+            const errorStripe = document.getElementById('error-stripe');
+            const resumeBtn = document.getElementById('resume-btn');
+
             overlay.classList.add('hidden');
             overlay.classList.remove('flex');
+
+            validationStripe.classList.remove('opacity-100', 'scale-100');
+            validationStripe.classList.add('opacity-0', 'scale-150');
+
+            errorStripe.classList.remove('opacity-100', 'scale-100');
+            errorStripe.classList.add('opacity-0', 'scale-150');
+
+            resumeBtn.classList.add('hidden', 'opacity-0');
+
             isProcessing = false;
         }
 

@@ -31,7 +31,7 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     @if($vacancy->image)
-                                        <img src="{{ asset($vacancy->image) }}" class="img-circle img-size-32 mr-2"
+                                        <img src="{{ $vacancy->image_url }}" class="img-circle img-size-32 mr-2"
                                             style="object-fit: contain; background: #f8f9fa; border: 1px solid #dee2e6;">
                                     @else
                                         <div class="img-circle img-size-32 mr-2 bg-light d-flex align-items-center justify-center text-muted"

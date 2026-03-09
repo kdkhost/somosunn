@@ -112,52 +112,53 @@
                         </p>
 
                         <!-- Search/Filter Bar -->
-                        <div
-                            class="max-w-4xl mx-auto bg-white/10 border border-white/20 backdrop-blur-md p-3 md:p-4 rounded-3xl"
+                        <div class="max-w-4xl mx-auto bg-white/10 border border-white/20 backdrop-blur-md p-3 md:p-4 rounded-3xl"
                             role="search" aria-label="Filtros de vagas">
                             <form method="GET" action="" class="flex flex-col gap-3">
                                 {{-- Linha 1: Busca principal + Local + Buscar --}}
                                 <div class="flex flex-col md:flex-row gap-3 md:gap-2">
-                                    <div class="flex-1 filter-input relative flex items-center h-14 bg-white rounded-full px-5">
+                                    <div
+                                        class="flex-1 filter-input relative flex items-center h-14 bg-white rounded-full px-5">
                                         <i class="fas fa-search text-slate-400 mr-2" aria-hidden="true"></i>
                                         <input type="text" name="area" id="filtro-area"
                                             placeholder="Cargo, tecnologia ou palavra-chave..."
-                                            value="{{ request('area') }}"
-                                            aria-label="Buscar por cargo ou palavra-chave"
+                                            value="{{ request('area') }}" aria-label="Buscar por cargo ou palavra-chave"
                                             class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 font-medium placeholder:text-slate-400">
                                     </div>
-                                    <div class="w-full md:w-56 filter-input relative flex items-center h-14 bg-white rounded-full px-5">
+                                    <div
+                                        class="w-full md:w-56 filter-input relative flex items-center h-14 bg-white rounded-full px-5">
                                         <i class="fas fa-map-marker-alt text-slate-400 mr-2" aria-hidden="true"></i>
                                         <input type="text" name="local" id="filtro-local"
-                                            placeholder="Ex: São Paulo, Remoto"
-                                            value="{{ request('local') }}"
+                                            placeholder="Ex: São Paulo, Remoto" value="{{ request('local') }}"
                                             aria-label="Filtrar por localidade"
                                             class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 font-medium placeholder:text-slate-400">
                                     </div>
                                     <button type="submit"
                                         class="h-14 px-8 rounded-full btn-primary font-bold flex items-center justify-center gap-2 shrink-0 shadow-lg group"
                                         aria-label="Buscar vagas">
-                                        Buscar <i class="fas fa-search text-sm group-hover:scale-110 transition-transform" aria-hidden="true"></i>
+                                        Buscar <i class="fas fa-search text-sm group-hover:scale-110 transition-transform"
+                                            aria-hidden="true"></i>
                                     </button>
                                 </div>
                                 {{-- Linha 2: Filtros avançados (empresa + tipo) --}}
                                 <div class="flex flex-col md:flex-row gap-3 md:gap-2">
-                                    <div class="flex-1 filter-input relative flex items-center h-12 bg-white/90 rounded-full px-5">
+                                    <div
+                                        class="flex-1 filter-input relative flex items-center h-12 bg-white/90 rounded-full px-5">
                                         <i class="fas fa-building text-slate-400 mr-2" aria-hidden="true"></i>
                                         <input type="text" name="empresa" id="filtro-empresa"
-                                            placeholder="empresa (ex: Acme, Google…)"
-                                            value="{{ request('empresa') }}"
+                                            placeholder="empresa (ex: Acme, Google…)" value="{{ request('empresa') }}"
                                             aria-label="Filtrar por empresa"
                                             class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 text-sm font-medium placeholder:text-slate-400">
                                     </div>
-                                    <div class="w-full md:w-56 filter-input relative flex items-center h-12 bg-white/90 rounded-full px-5">
+                                    <div
+                                        class="w-full md:w-56 filter-input relative flex items-center h-12 bg-white/90 rounded-full px-5">
                                         <i class="fas fa-layer-group text-slate-400 mr-2" aria-hidden="true"></i>
-                                        <select name="tipo" id="filtro-tipo"
-                                            aria-label="Filtrar por tipo de vaga"
+                                        <select name="tipo" id="filtro-tipo" aria-label="Filtrar por tipo de vaga"
                                             class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-sm font-medium {{ request('tipo') ? 'text-slate-700' : 'text-slate-400' }} cursor-pointer appearance-none">
                                             <option value="">Tipo de vaga</option>
                                             @foreach($tiposDisponiveis as $tipo)
-                                                <option value="{{ $tipo }}" {{ request('tipo') == $tipo ? 'selected' : '' }}>{{ $tipo }}</option>
+                                                <option value="{{ $tipo }}" {{ request('tipo') == $tipo ? 'selected' : '' }}>
+                                                    {{ $tipo }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -209,7 +210,7 @@
                             <div
                                 class="w-24 h-24 md:w-32 md:h-32 bg-white rounded-[1.5rem] p-4 flex items-center justify-center mx-auto mb-6 transform group-hover:scale-105 transition-transform duration-500 border border-slate-100 overflow-hidden shadow-sm">
                                 @if($featuredJob->image)
-                                    <img src="{{ asset($featuredJob->image) }}" alt="{{ $featuredJob->company_name }}"
+                                    <img src="{{ $featuredJob->image_url }}" alt="{{ $featuredJob->company_name }}"
                                         class="w-full h-full object-contain">
                                 @else
                                     <i class="fas fa-briefcase text-4xl text-blue-500/30"></i>
@@ -240,7 +241,7 @@
                                         <i class="fas fa-flask" aria-hidden="true"></i> Modo Demo
                                     </span>
                                 @endif
-                                @if(isset($partnerNames) && in_array(mb_strtolower(trim((string)$featuredJob->company_name)), $partnerNames))
+                                @if(isset($partnerNames) && in_array(mb_strtolower(trim((string) $featuredJob->company_name)), $partnerNames))
                                     <span
                                         class="px-3 py-1 bg-violet-50 text-violet-700 rounded-full text-xs font-bold border border-violet-100 flex items-center gap-1"
                                         title="Empresa parceira UNN">
@@ -303,7 +304,8 @@
                         </a>
                     </div>
                 @else
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative" role="list" aria-label="Lista de vagas disponíveis">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative" role="list"
+                        aria-label="Lista de vagas disponíveis">
                         <!-- BG Light Pattern -->
                         <div class="absolute inset-0 bg-grid-pattern opacity-50 z-0 pointer-events-none rounded-3xl"></div>
 
@@ -319,7 +321,7 @@
                                         <div
                                             class="w-14 h-14 bg-white rounded-xl shadow-md border border-slate-100 flex flex-shrink-0 items-center justify-center overflow-hidden p-2 relative z-10 group-hover:scale-110 transition-transform duration-500">
                                             @if($vaga->image)
-                                                <img src="{{ asset($vaga->image) }}" alt="Logo" class="w-full h-full object-contain">
+                                                <img src="{{ $vaga->image_url }}" alt="Logo" class="w-full h-full object-contain">
                                             @else
                                                 <i class="fas fa-building text-xl text-slate-300"></i>
                                             @endif
@@ -336,7 +338,7 @@
                                                     <i class="fas fa-flask" aria-hidden="true"></i> DEMO
                                                 </span>
                                             @endif
-                                            @if(isset($partnerNames) && in_array(mb_strtolower(trim((string)$vaga->company_name)), $partnerNames))
+                                            @if(isset($partnerNames) && in_array(mb_strtolower(trim((string) $vaga->company_name)), $partnerNames))
                                                 <span
                                                     class="bg-violet-100 text-violet-700 text-[9px] px-2 py-0.5 rounded-full font-bold border border-violet-200 flex items-center gap-1"
                                                     title="Empresa parceira UNN">
