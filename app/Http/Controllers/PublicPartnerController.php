@@ -9,7 +9,17 @@ class PublicPartnerController extends Controller
 {
     public function index()
     {
-        $partners = Partner::active()->withCount('activeCoupons')->get();
+        if (!Partner::tableExists()) {
+            return view('partners.index', ['partners' => collect()]);
+        }
+
+        $partnersQuery = Partner::active();
+
+        if (Partner::couponsTableExists()) {
+            $partnersQuery->withCount('activeCoupons');
+        }
+
+        $partners = $partnersQuery->get();
 
         return view('partners.index', compact('partners'));
     }
@@ -33,7 +43,7 @@ class PublicPartnerController extends Controller
             }
         }
 
-        $coupons = $hasBenefitAccess
+        $coupons = ($hasBenefitAccess && Partner::couponsTableExists())
             ? $partner->activeCoupons()->get()
             : collect();
 

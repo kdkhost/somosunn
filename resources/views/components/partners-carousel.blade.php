@@ -1,5 +1,22 @@
 @php
-    $carouselPartners = \App\Models\Partner::active()->get();
+    $carouselPartners = collect();
+    $supportsCoupons = false;
+
+    try {
+        if (\App\Models\Partner::tableExists()) {
+            $supportsCoupons = \App\Models\Partner::couponsTableExists();
+            $carouselPartnersQuery = \App\Models\Partner::active();
+
+            if ($supportsCoupons) {
+                $carouselPartnersQuery->withCount('activeCoupons');
+            }
+
+            $carouselPartners = $carouselPartnersQuery->get();
+        }
+    } catch (\Throwable $e) {
+        $carouselPartners = collect();
+        $supportsCoupons = false;
+    }
 @endphp
 
 @if($carouselPartners->isNotEmpty())
@@ -30,10 +47,9 @@
                             </div>
                             <div class="partner-logo-tooltip">
                                 <span>{{ $p->name }}</span>
-                                @php $cnt = $p->activeCoupons()->count(); @endphp
-                                @if($cnt > 0)
+                                @if($supportsCoupons && (int) ($p->active_coupons_count ?? 0) > 0)
                                     <span class="partner-coupon-badge">
-                                        <i class="fas fa-ticket-alt"></i> {{ $cnt }} cupom(s)
+                                        <i class="fas fa-ticket-alt"></i> {{ (int) $p->active_coupons_count }} cupom(s)
                                     </span>
                                 @endif
                             </div>

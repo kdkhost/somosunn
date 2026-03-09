@@ -7,6 +7,7 @@ use App\Models\Mentorship;
 use App\Models\Page;
 use App\Models\Ranking;
 use App\Models\User;
+use App\Support\ContentVisibility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -21,21 +22,19 @@ class HomeController extends Controller
 
         if (view()->shared('unnDbAvailable')) {
             try {
-                $freeEvents = Event::query()
-                    ->where('published', true)
-                    ->where(function ($query) {
-                        $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
-                    })
+                $freeEvents = ContentVisibility::applyPublicFilter(
+                    Event::query()->where('published', true),
+                    'events'
+                )
                     ->publicUpcoming()
                     ->orderBy('start_at')
                     ->limit(6)
                     ->get();
 
-                $paidMentorings = Mentorship::query()
-                    ->where('slots', '>', 0)
-                    ->where(function ($query) {
-                        $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
-                    })
+                $paidMentorings = ContentVisibility::applyPublicFilter(
+                    Mentorship::query()->where('slots', '>', 0),
+                    'mentorships'
+                )
                     ->orderByDesc('price')
                     ->limit(24)
                     ->get()
@@ -100,11 +99,10 @@ class HomeController extends Controller
         $featuredCourses = collect();
         if (view()->shared('unnDbAvailable')) {
             try {
-                $mentorings = Mentorship::query()
-                    ->where('slots', '>', 0)
-                    ->where(function ($query) {
-                        $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
-                    })
+                $mentorings = ContentVisibility::applyPublicFilter(
+                    Mentorship::query()->where('slots', '>', 0),
+                    'mentorships'
+                )
                     ->orderBy('schedule')
                     ->limit(24)
                     ->get()
@@ -112,11 +110,11 @@ class HomeController extends Controller
                     ->take(6)
                     ->values();
 
-                $featuredCourses = \App\Models\Course::where('is_featured', true)
-                    ->whereIn('status', ['published', 'paused'])
-                    ->where(function ($query) {
-                        $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
-                    })
+                $featuredCourses = ContentVisibility::applyPublicFilter(
+                    \App\Models\Course::where('is_featured', true)
+                        ->whereIn('status', ['published', 'paused']),
+                    'courses'
+                )
                     ->inRandomOrder()
                     ->limit(6)
                     ->get();

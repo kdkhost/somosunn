@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Page;
+use App\Support\ContentVisibility;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -20,12 +21,12 @@ class EventController extends Controller
             abort(404, 'Eventos temporariamente indisponível');
         }
 
-        $events = Event::query()
-            ->where('published', true)
-            ->whereNotNull('start_at')
-            ->where(function ($query) {
-                $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
-            })
+        $events = ContentVisibility::applyPublicFilter(
+            Event::query()
+                ->where('published', true)
+                ->whereNotNull('start_at'),
+            'events'
+        )
             ->publicUpcoming()
             ->orderBy('start_at')
             ->get();
@@ -33,12 +34,12 @@ class EventController extends Controller
         $featuredEvent = $events->first();
         $otherEvents = $featuredEvent ? $events->slice(1)->values() : collect();
 
-        $pastEvents = Event::query()
-            ->where('published', true)
-            ->whereNotNull('start_at')
-            ->where(function ($query) {
-                $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
-            })
+        $pastEvents = ContentVisibility::applyPublicFilter(
+            Event::query()
+                ->where('published', true)
+                ->whereNotNull('start_at'),
+            'events'
+        )
             ->publicPast()
             ->orderByDesc('start_at')
             ->limit(6)

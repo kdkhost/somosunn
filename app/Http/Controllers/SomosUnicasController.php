@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Event;
 use App\Models\Mentorship;
+use App\Support\ContentVisibility;
 
 class SomosUnicasController extends Controller
 {
@@ -14,24 +15,30 @@ class SomosUnicasController extends Controller
      */
     public function index()
     {
-        $courses = Course::with(['creator'])
-            ->whereIn('visibility', ['somos_unicas', 'ambos'])
-            ->where('status', 'published')
+        $courses = ContentVisibility::applySomosUnicasFilter(
+            Course::with(['creator'])
+                ->where('status', 'published'),
+            'courses'
+        )
             ->orderBy('id', 'desc')
             ->take(6)
             ->get();
 
-        $events = Event::query()
-            ->whereNotNull('start_at')
-            ->where('published', true)
-            ->whereIn('visibility', ['somos_unicas', 'ambos'])
+        $events = ContentVisibility::applySomosUnicasFilter(
+            Event::query()
+                ->whereNotNull('start_at')
+                ->where('published', true),
+            'events'
+        )
             ->publicUpcoming()
             ->orderBy('start_at', 'asc')
             ->take(6)
             ->get();
 
-        $mentorships = Mentorship::with(['mentor'])
-            ->whereIn('visibility', ['somos_unicas', 'ambos'])
+        $mentorships = ContentVisibility::applySomosUnicasFilter(
+            Mentorship::with(['mentor']),
+            'mentorships'
+        )
             ->orderBy('id', 'desc')
             ->take(6)
             ->get();

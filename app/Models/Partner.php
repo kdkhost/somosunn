@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Support\UploadStorage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class Partner extends Model
@@ -26,6 +27,8 @@ class Partner extends Model
         'active' => 'boolean',
         'order' => 'integer',
     ];
+
+    protected static array $tableExistsCache = [];
 
     // ── Relações ────────────────────────────────────────────────────────────────
     /** Usuário membro responsável pelo parceiro */
@@ -60,6 +63,25 @@ class Partner extends Model
         return (string) UploadStorage::url($this->logo, '');
     }
 
+    public static function tableExists(): bool
+    {
+        return static::schemaTableExists((new static())->getTable());
+    }
+
+    public static function couponsTableExists(): bool
+    {
+        return static::schemaTableExists((new PartnerCoupon())->getTable());
+    }
+
+    public function resolveRouteBinding($value, $field = null)
+    {
+        if (!static::tableExists()) {
+            return null;
+        }
+
+        return parent::resolveRouteBinding($value, $field);
+    }
+
     // ── Boot ─────────────────────────────────────────────────────────────────────
     protected static function boot()
     {
@@ -74,5 +96,18 @@ class Partner extends Model
                 $partner->slug = Str::slug($partner->name);
             }
         });
+    }
+
+    protected static function schemaTableExists(string $table): bool
+    {
+        if (array_key_exists($table, static::$tableExistsCache)) {
+            return static::$tableExistsCache[$table];
+        }
+
+        try {
+            return static::$tableExistsCache[$table] = Schema::hasTable($table);
+        } catch (\Throwable $e) {
+            return static::$tableExistsCache[$table] = false;
+        }
     }
 }

@@ -8,6 +8,7 @@ use App\Models\GatewayAccount;
 use App\Models\Mentorship;
 use App\Models\Order;
 use App\Models\Testimonial;
+use App\Support\ContentVisibility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,11 +19,11 @@ class MarketplaceController extends Controller
         $publicStatuses = ['published', 'paused'];
         $q = trim((string) $request->query('q', ''));
 
-        $coursesQuery = Course::with('creator')
-            ->whereIn('status', $publicStatuses)
-            ->where(function ($query) {
-                $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
-            });
+        $coursesQuery = ContentVisibility::applyPublicFilter(
+            Course::with('creator')
+                ->whereIn('status', $publicStatuses),
+            'courses'
+        );
 
         if ($q !== '') {
             $coursesQuery->where(function ($query) use ($q) {
@@ -37,10 +38,10 @@ class MarketplaceController extends Controller
             ->limit(12)
             ->get();
 
-        $mentorshipsQuery = Mentorship::with('mentor')
-            ->where(function ($query) {
-                $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
-            });
+        $mentorshipsQuery = ContentVisibility::applyPublicFilter(
+            Mentorship::with('mentor'),
+            'mentorships'
+        );
 
         if ($q !== '') {
             $mentorshipsQuery->where(function ($query) use ($q) {
@@ -57,12 +58,12 @@ class MarketplaceController extends Controller
             ->take(12)
             ->values();
 
-        $eventsQuery = Event::query()
-            ->with('user')
-            ->where('published', true)
-            ->where(function ($query) {
-                $query->where('visibility', '!=', 'somos_unicas')->orWhereNull('visibility');
-            })
+        $eventsQuery = ContentVisibility::applyPublicFilter(
+            Event::query()
+                ->with('user')
+                ->where('published', true),
+            'events'
+        )
             ->publicUpcoming()
             ->orderBy('start_at', 'asc');
 
