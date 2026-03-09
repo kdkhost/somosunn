@@ -94,7 +94,7 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script>
         let audioCtx = null;
-        let html5QrcodeScanner = null;
+        let html5QrCode = null;
         let isProcessing = false;
         let userCoords = { lat: null, lng: null };
 
@@ -171,47 +171,42 @@
             const input = document.getElementById('manual-ticket-input');
             const code = input.value.trim();
             if (code) {
-                input.value = '';
                 processTicket(code);
             }
         });
-                    });
 
         function requestGPS() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        userCoords.lat = position.coords.latitude;
-                        userCoords.lng = position.coords.longitude;
-                    },
-                    (error) => {
-                        console.error("Erro GPS:", error);
-                    }
-                );
-            }
+            // Tratado no initializeScanner
         }
 
-        function startScanner() {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear();
+        async function startScanner() {
+            if (html5QrCode) {
+                try { await html5QrCode.stop(); } catch (e) { }
             }
 
-            html5QrcodeScanner = new Html5QrcodeScanner(
-                "reader",
-                {
-                    fps: 15,
-                    qrbox: { width: 250, height: 250 },
-                    aspectRatio: 1.0,
-                    showTorchButtonIfSupported: true,
-                    showZoomSliderIfSupported: true,
-                    defaultZoomValueIfSupported: 2
-                },
-                    /* verbose= */ false
-            );
+            html5QrCode = new Html5Qrcode("reader");
 
-            html5QrcodeScanner.render(onScanSuccess, (errorMessage) => {
-                // Ignore silent errors
-            });
+            const config = {
+                fps: 15,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0
+            };
+
+            try {
+                await html5QrCode.start(
+                    { facingMode: "environment" },
+                    config,
+                    onScanSuccess
+                );
+                playBeep(true);
+            } catch (err) {
+                console.error("Erro Câmera:", err);
+                Swal.fire({
+                    title: 'Erro na Câmera',
+                    text: 'Não conseguimos acessar a câmera. Verifique as permissões.',
+                    icon: 'error'
+                });
+            }
         }
 
         function onScanSuccess(decodedText) {
@@ -220,12 +215,7 @@
         }
 
         function processTicket(code) {
-            if (isProcessing) return;
-
             isProcessing = true;
-            if (html5QrcodeScanner && html5QrcodeScanner.getState() === 2) { // 2 = SCANNING
-                html5QrcodeScanner.pause(true);
-            }
 
             showOverlay('process', 'Processando...', 'Validando ingresso no sistema...');
 
@@ -331,12 +321,7 @@
             const overlay = document.getElementById('scanner-overlay');
             overlay.classList.add('hidden');
             overlay.classList.remove('flex');
-
             isProcessing = false;
-
-            if (html5QrcodeScanner && html5QrcodeScanner.getState() === 3) { // 3 = PAUSED
-                html5QrcodeScanner.resume();
-            }
         }
 
         function playBeep(success) {
@@ -355,20 +340,20 @@
 
                 if (success) {
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(800, ctx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
-                    gain.gain.setValueAtTime(0.5, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-                    osc.start(ctx.currentTime);
-                    osc.stop(ctx.currentTime + 0.2);
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                    osc.start(audioCtx.currentTime);
+                    osc.stop(audioCtx.currentTime + 0.2);
                 } else {
                     osc.type = 'square';
-                    osc.frequency.setValueAtTime(300, ctx.currentTime);
-                    osc.frequency.setValueAtTime(300, ctx.currentTime + 0.3);
-                    gain.gain.setValueAtTime(0.5, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-                    osc.start(ctx.currentTime);
-                    osc.stop(ctx.currentTime + 0.3);
+                    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(300, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start(audioCtx.currentTime);
+                    osc.stop(audioCtx.currentTime + 0.3);
                 }
             } catch (e) {
                 console.log("Audio not supported or disabled");

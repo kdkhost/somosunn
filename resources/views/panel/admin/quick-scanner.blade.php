@@ -99,7 +99,7 @@
 @push('scripts')
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script>
-        let html5QrcodeScanner = null;
+        let html5QrCode = null;
         let isProcessing = false;
         let userCoords = { lat: null, lng: null };
 
@@ -146,7 +146,6 @@
                         // Esconde tela inicial e inicia scanner
                         document.getElementById('start-screen').classList.add('hidden');
                         startScanner();
-                        setTimeout(() => playBeep('scan'), 100);
                     },
                     (error) => {
                         console.error("Erro ao obter GPS:", error);
@@ -183,40 +182,45 @@
             // Função legada removida, agora tratada no fluxo de inicialização obrigatória
         }
 
-        function startScanner() {
-            html5QrcodeScanner = new Html5QrcodeScanner(
-                "reader",
-                {
-                    fps: 15,
-                    qrbox: { width: 250, height: 250 },
-                    aspectRatio: 1.0,
-                    showTorchButtonIfSupported: true,
-                    showZoomSliderIfSupported: true,
-                    defaultZoomValueIfSupported: 2
-                },
-                        /* verbose= */ false
-            );
-            html5QrcodeScanner.render(onScanSuccess, (errorMessage) => {
-                // Erros de leitura ignorados silenciosamente
-            });
+        async function startScanner() {
+            if (html5QrCode) {
+                try {
+                    await html5QrCode.stop();
+                } catch (e) { }
+            }
 
-            // Tratamento de erro de permissão da câmera
-            setTimeout(() => {
-                const cameraSelection = document.getElementById('html5-qrcode-button-camera-permission');
-                if (cameraSelection) {
-                    cameraSelection.addEventListener('click', () => {
-                        // O navegador vai pedir a câmera aqui
-                    });
-                }
-            }, 500);
+            html5QrCode = new Html5Qrcode("reader");
+
+            const config = {
+                fps: 15,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0
+            };
+
+            try {
+                await html5QrCode.start(
+                    { facingMode: "environment" },
+                    config,
+                    onScanSuccess
+                );
+                playBeep('scan');
+            } catch (err) {
+                console.error("Erro ao iniciar câmera:", err);
+                Swal.fire({
+                    title: 'Erro na Câmera',
+                    text: 'Não conseguimos acessar sua câmera. Verifique se você deu permissão e se não há outro app usando a câmera.',
+                    icon: 'error',
+                    confirmButtonText: 'Tentar Novamente',
+                    confirmButtonColor: '#1F5EDB'
+                }).then(() => {
+                    location.reload();
+                });
+            }
         }
 
         function onScanSuccess(decodedText) {
             if (isProcessing) return;
             isProcessing = true;
-
-            // Pausa a câmera
-            html5QrcodeScanner.pause(true);
 
             showOverlay('loading', 'Validando ingressos...');
             playBeep('scan');
@@ -299,7 +303,6 @@
             overlay.classList.add('hidden');
             overlay.classList.remove('flex');
             isProcessing = false;
-            html5QrcodeScanner.resume();
         }
 
         function playBeep(type) {
@@ -316,19 +319,19 @@
                 gain.connect(audioCtx.destination);
 
                 if (type === 'scan') {
-                    osc.frequency.setValueAtTime(600, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                    osc.start(); osc.stop(ctx.currentTime + 0.05);
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.05);
                 } else if (type === 'success') {
-                    osc.frequency.setValueAtTime(800, ctx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
-                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
-                    osc.start(); osc.stop(ctx.currentTime + 0.2);
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.2);
                 } else if (type === 'error') {
                     osc.type = 'square';
-                    osc.frequency.setValueAtTime(150, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
-                    osc.start(); osc.stop(ctx.currentTime + 0.3);
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.3);
                 }
             } catch (e) { }
         }
