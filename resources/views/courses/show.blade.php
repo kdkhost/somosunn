@@ -239,7 +239,7 @@
                 </div>
 
                 <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                    <a href="{{ route('premium', ['feature' => 'courses_access']) }}"
+                    <a href="{{ route('planos', ['feature' => 'courses_access']) }}"
                         class="flex-1 px-6 py-3 rounded-xl font-bold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 text-center">
                         Fazer upgrade
                     </a>

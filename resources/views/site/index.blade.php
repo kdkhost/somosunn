@@ -35,6 +35,27 @@
         if ($heroImageUrl === '') {
             $heroImageUrl = 'https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800';
         }
+
+        $journeyCards = collect([
+            [
+                'icon' => 'fas fa-handshake',
+                'title' => $p('journey_card_1_title', 'Parcerias que viram negócio'),
+                'result' => $p('journey_card_1_result', 'Novos contratos e clientes recorrentes'),
+                'text' => $p('journey_card_1_text', 'Conexões bem feitas encurtam o caminho entre uma conversa e uma oportunidade real de faturamento.'),
+            ],
+            [
+                'icon' => 'fas fa-microphone-lines',
+                'title' => $p('journey_card_2_title', 'Autoridade e visibilidade'),
+                'result' => $p('journey_card_2_result', 'Convites para palestrar, ensinar e liderar'),
+                'text' => $p('journey_card_2_text', 'O networking certo posiciona sua marca em novos palcos e acelera o reconhecimento do seu trabalho.'),
+            ],
+            [
+                'icon' => 'fas fa-chart-line',
+                'title' => $p('journey_card_3_title', 'Expansão com direção'),
+                'result' => $p('journey_card_3_result', 'Crescimento em novos mercados e frentes'),
+                'text' => $p('journey_card_3_text', 'Relacionamentos estratégicos ajudam a abrir portas, validar decisões e crescer com menos tentativa e erro.'),
+            ],
+        ]);
     @endphp
 
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
@@ -137,6 +158,64 @@
                         </div>
                         <h3 class="text-lg font-bold unn-title-gradient mb-2">{{ $homePage->get('about_card_4_title', 'Oportunidades') }}</h3>
                         <p class="text-sm text-gray-600">{{ $homePage->get('about_card_4_text', 'Parcerias estratégicas que geram resultados concretos') }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Onde o network me levou -->
+        <section class="py-16 px-6 md:px-12 lg:px-24">
+            <div class="max-w-7xl mx-auto">
+                <div class="home-journey-shell rounded-[2rem] border border-blue-100/80 bg-white p-6 md:p-8 lg:p-10 shadow-xl shadow-blue-100/40">
+                    <div class="grid xl:grid-cols-[0.92fr_1.4fr] gap-6 md:gap-8 items-stretch">
+                        <div class="home-journey-lead rounded-[1.75rem] p-6 md:p-8 text-white overflow-hidden relative">
+                            <div class="relative z-10">
+                                <span class="inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/20 px-4 py-2 text-xs font-black tracking-[0.18em] uppercase text-white/90">
+                                    <i class="fas fa-route"></i> Resultados reais
+                                </span>
+                                <h2 class="mt-5 text-3xl md:text-4xl font-black leading-tight">
+                                    {{ $homePage->get('journey_title', 'Onde o network me levou') }}
+                                </h2>
+                                <p class="mt-4 text-base md:text-lg text-white/80 leading-relaxed max-w-xl">
+                                    {{ $homePage->get('journey_subtitle', 'Conexões que começaram em uma conversa e terminaram em contratos, convites, expansão e crescimento com direção.') }}
+                                </p>
+
+                                <div class="mt-6 rounded-[1.5rem] bg-white/10 border border-white/15 p-5 backdrop-blur-sm">
+                                    <p class="text-sm uppercase tracking-[0.22em] text-white/65 font-bold">
+                                        {{ $homePage->get('journey_highlight_label', 'O que a rede certa acelera') }}
+                                    </p>
+                                    <p class="mt-3 text-2xl md:text-3xl font-black leading-tight">
+                                        {{ $homePage->get('journey_highlight_value', 'Mais visibilidade, mais negócios e mais acesso') }}
+                                    </p>
+                                </div>
+
+                                <a href="{{ route('register') }}"
+                                    class="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black transition hover:-translate-y-0.5 hover:shadow-xl"
+                                    style="color: var(--unn-azul-1);">
+                                    {{ $homePage->get('journey_cta_text', 'Quero viver isso também') }}
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-5">
+                            @foreach($journeyCards as $card)
+                                <article class="home-journey-card rounded-[1.75rem] border border-slate-200/80 bg-slate-50 p-6 md:p-7 h-full">
+                                    <div class="w-14 h-14 rounded-2xl btn-primary flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                                        <i class="{{ $card['icon'] }} text-xl"></i>
+                                    </div>
+                                    <p class="mt-5 text-xs font-black uppercase tracking-[0.22em] text-slate-400">
+                                        {{ $card['title'] }}
+                                    </p>
+                                    <h3 class="mt-3 text-xl font-black leading-tight text-slate-900 min-h-[4.5rem]">
+                                        {{ $card['result'] }}
+                                    </h3>
+                                    <p class="mt-4 text-sm md:text-[0.95rem] text-slate-600 leading-7">
+                                        {{ $card['text'] }}
+                                    </p>
+                                </article>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>
@@ -607,10 +686,47 @@
             justify-content: center;
         }
 
+        .home-journey-shell {
+            background:
+                radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 38%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
+        }
+
+        .home-journey-lead {
+            background:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.18), transparent 36%),
+                linear-gradient(135deg, #123f9b 0%, #1f5edb 55%, #2d8cff 100%);
+            box-shadow: 0 28px 45px -28px rgba(31, 94, 219, 0.65);
+        }
+
+        .home-journey-lead::before {
+            content: '';
+            position: absolute;
+            inset: auto -6rem -6rem auto;
+            width: 16rem;
+            height: 16rem;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 68%);
+            pointer-events: none;
+        }
+
+        .home-journey-card {
+            box-shadow: 0 16px 35px -26px rgba(15, 23, 42, 0.35);
+            transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, background-color 220ms ease;
+        }
+
+        .home-journey-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 44px -28px rgba(31, 94, 219, 0.32);
+            border-color: rgba(59, 130, 246, 0.25);
+            background: #ffffff;
+        }
+
         @media (max-width: 767.98px) {
             .home-selling-header,
             .home-selling-title,
-            .home-selling-copy {
+            .home-selling-copy,
+            .home-journey-card h3 {
                 min-height: auto;
             }
         }

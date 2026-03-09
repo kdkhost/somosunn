@@ -90,6 +90,54 @@
     </div>
 </div>
 
+{{-- Onde o network me levou --}}
+<div id="sec-journey" class="card card-outline card-primary">
+    <div class="card-header"><h3 class="card-title"><i class="fas fa-route mr-1"></i> Seção "Onde o network me levou"</h3></div>
+    <div class="card-body">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>Título da seção</label>
+                <input type="text" name="journey_title" class="form-control" value="{{ old('journey_title', $data['journey_title'] ?? '') }}" placeholder="Onde o network me levou">
+            </div>
+            <div class="form-group col-md-6">
+                <label>Subtítulo</label>
+                <input type="text" name="journey_subtitle" class="form-control" value="{{ old('journey_subtitle', $data['journey_subtitle'] ?? '') }}" placeholder="Conexões que viraram negócios, palcos e expansão.">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>Destaque principal — Legenda</label>
+                <input type="text" name="journey_highlight_label" class="form-control" value="{{ old('journey_highlight_label', $data['journey_highlight_label'] ?? '') }}" placeholder="O que a rede certa acelera">
+            </div>
+            <div class="form-group col-md-6">
+                <label>Destaque principal — Texto</label>
+                <input type="text" name="journey_highlight_value" class="form-control" value="{{ old('journey_highlight_value', $data['journey_highlight_value'] ?? '') }}" placeholder="Mais visibilidade, mais negócios e mais acesso">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Texto do botão</label>
+            <input type="text" name="journey_cta_text" class="form-control" value="{{ old('journey_cta_text', $data['journey_cta_text'] ?? '') }}" placeholder="Quero viver isso também">
+        </div>
+        <hr>
+        @foreach ([1,2,3] as $i)
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label>Card {{ $i }} — Chamada</label>
+                <input type="text" name="journey_card_{{ $i }}_title" class="form-control" value="{{ old('journey_card_'.$i.'_title', $data['journey_card_'.$i.'_title'] ?? '') }}" placeholder="Parcerias que viram negócio">
+            </div>
+            <div class="form-group col-md-4">
+                <label>Card {{ $i }} — Resultado</label>
+                <input type="text" name="journey_card_{{ $i }}_result" class="form-control" value="{{ old('journey_card_'.$i.'_result', $data['journey_card_'.$i.'_result'] ?? '') }}" placeholder="Novos contratos e clientes recorrentes">
+            </div>
+            <div class="form-group col-md-5">
+                <label>Card {{ $i }} — Texto</label>
+                <input type="text" name="journey_card_{{ $i }}_text" class="form-control" value="{{ old('journey_card_'.$i.'_text', $data['journey_card_'.$i.'_text'] ?? '') }}" placeholder="Explique o tipo de resultado gerado pelo networking.">
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+
 {{-- Eventos & Mentorias --}}
 <div id="sec-events" class="card card-outline card-secondary">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-calendar mr-1"></i> Eventos & Mentorias</h3></div>
