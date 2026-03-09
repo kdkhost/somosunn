@@ -469,6 +469,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/maps/jquery.vmap.world.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/lang/summernote-pt-BR.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
@@ -521,6 +522,95 @@
                 height: 40px;
             }
         }
+
+        .admin-upload-progress {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1070;
+            width: min(26rem, calc(100vw - 2rem));
+            display: none;
+        }
+
+        .admin-upload-progress.is-visible {
+            display: block;
+        }
+
+        .admin-upload-progress__card {
+            padding: 1rem 1.05rem;
+            border-radius: 1rem;
+            background: rgba(15, 23, 42, 0.95);
+            color: #e2e8f0;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.32);
+            backdrop-filter: blur(18px);
+        }
+
+        .admin-upload-progress__header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .admin-upload-progress__eyebrow {
+            margin: 0 0 .3rem;
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: #7dd3fc;
+        }
+
+        .admin-upload-progress__title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .admin-upload-progress__metrics {
+            text-align: right;
+        }
+
+        .admin-upload-progress__percent {
+            font-size: .95rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .admin-upload-progress__size {
+            font-size: .72rem;
+            color: #cbd5e1;
+        }
+
+        .admin-upload-progress__bar {
+            width: 100%;
+            height: .62rem;
+            margin-top: .95rem;
+            border-radius: 999px;
+            overflow: hidden;
+            background: rgba(148, 163, 184, 0.18);
+        }
+
+        .admin-upload-progress__fill {
+            display: block;
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #38bdf8, #2563eb);
+            transition: width .18s ease;
+        }
+
+        .admin-upload-progress__footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .8rem;
+            margin-top: .75rem;
+            font-size: .72rem;
+            color: #cbd5e1;
+        }
     </style>
     <button type="button" id="adminBackToTop" class="admin-back-to-top" aria-label="Voltar ao topo"
         title="Voltar ao topo">
@@ -551,6 +641,7 @@
     @include('partials.global-placeholder-fix')
 
     @stack('scripts')
+    @include('partials.form-draft-autosave')
     <script>
         window.showSuccess = function (msg) {
             toastr.success(msg || 'Sucesso');
@@ -611,21 +702,29 @@
                 $a.attr('data-pjax', 'true');
             });
             $(document).on('pjax:end', function () {
-                $('.summernote').summernote({ height: 180 });
+                $('.summernote').summernote({ height: 180, lang: 'pt-BR' });
                 initUploadWidgets();
+                initFormUploadProgress(document);
                 initMasks();
                 initColorPickers();
                 initDateTimePickers();
                 initCouponFormEnhancements();
                 initTooltips();
+                if (typeof window.initializeFormDraftAutosave === 'function') {
+                    window.initializeFormDraftAutosave(document);
+                }
             });
-            $('.summernote').summernote({ height: 180 });
+            $('.summernote').summernote({ height: 180, lang: 'pt-BR' });
             initUploadWidgets();
+            initFormUploadProgress(document);
             initMasks();
             initColorPickers();
             initDateTimePickers();
             initCouponFormEnhancements();
             initTooltips();
+            if (typeof window.initializeFormDraftAutosave === 'function') {
+                window.initializeFormDraftAutosave(document);
+            }
         });
 
         function initTooltips() {
@@ -636,6 +735,264 @@
                 $el.attr('data-tooltip', text);
                 $el.addClass('ui-tooltip');
                 $el.removeAttr('title');
+            });
+        }
+
+        function ensureAdminUploadProgressCard() {
+            let card = document.getElementById('admin-upload-progress');
+
+            if (card) {
+                return card;
+            }
+
+            card = document.createElement('div');
+            card.id = 'admin-upload-progress';
+            card.className = 'admin-upload-progress';
+            card.innerHTML = '' +
+                '<div class="admin-upload-progress__card">' +
+                '   <div class="admin-upload-progress__header">' +
+                '       <div>' +
+                '           <p class="admin-upload-progress__eyebrow">Upload</p>' +
+                '           <h3 class="admin-upload-progress__title">Enviando arquivos</h3>' +
+                '       </div>' +
+                '       <div class="admin-upload-progress__metrics">' +
+                '           <div class="admin-upload-progress__percent" data-upload-percent>0%</div>' +
+                '           <div class="admin-upload-progress__size" data-upload-size>0 B / 0 B</div>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="admin-upload-progress__bar"><span class="admin-upload-progress__fill" data-upload-fill></span></div>' +
+                '   <div class="admin-upload-progress__footer">' +
+                '       <span data-upload-status>Preparando envio...</span>' +
+                '       <span data-upload-remaining>calculando tempo restante...</span>' +
+                '   </div>' +
+                '</div>';
+
+            document.body.appendChild(card);
+            return card;
+        }
+
+        function setAdminUploadProgressVisible(isVisible) {
+            const card = ensureAdminUploadProgressCard();
+            card.classList.toggle('is-visible', !!isVisible);
+        }
+
+        function updateAdminUploadProgressCard(state) {
+            const card = ensureAdminUploadProgressCard();
+            const percent = card.querySelector('[data-upload-percent]');
+            const size = card.querySelector('[data-upload-size]');
+            const fill = card.querySelector('[data-upload-fill]');
+            const status = card.querySelector('[data-upload-status]');
+            const remaining = card.querySelector('[data-upload-remaining]');
+
+            if (typeof state.percent === 'number') {
+                const safePercent = Math.max(0, Math.min(100, state.percent));
+                percent.textContent = Math.round(safePercent) + '%';
+                fill.style.width = safePercent + '%';
+            }
+
+            if (state.loaded !== undefined && state.total !== undefined) {
+                size.textContent = formatUploadBytes(state.loaded) + ' / ' + formatUploadBytes(state.total);
+            }
+
+            if (state.status) {
+                status.textContent = state.status;
+            }
+
+            if (state.remaining) {
+                remaining.textContent = state.remaining;
+            }
+        }
+
+        function formatUploadBytes(bytes) {
+            if (!bytes || bytes <= 0) {
+                return '0 B';
+            }
+
+            const units = ['B', 'KB', 'MB', 'GB'];
+            const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+            const value = bytes / Math.pow(1024, exponent);
+
+            return value.toFixed(value >= 100 || exponent === 0 ? 0 : 1) + ' ' + units[exponent];
+        }
+
+        function formatUploadRemainingTime(seconds) {
+            if (!Number.isFinite(seconds) || seconds <= 0) {
+                return 'calculando tempo restante...';
+            }
+
+            const rounded = Math.round(seconds);
+
+            if (rounded < 60) {
+                return rounded + 's restantes';
+            }
+
+            const minutes = Math.floor(rounded / 60);
+            const remainingSeconds = rounded % 60;
+
+            if (minutes < 60) {
+                return minutes + 'min ' + remainingSeconds + 's restantes';
+            }
+
+            const hours = Math.floor(minutes / 60);
+            const remainingMinutes = minutes % 60;
+
+            return hours + 'h ' + remainingMinutes + 'min restantes';
+        }
+
+        function normalizeUploadUrl(url) {
+            try {
+                return new URL(url, window.location.href).href.replace(/\/$/, '');
+            } catch (error) {
+                return url;
+            }
+        }
+
+        function formHasFilesSelected(form) {
+            return Array.from(form.querySelectorAll('input[type="file"]')).some(function (input) {
+                return !!(input.files && input.files.length);
+            });
+        }
+
+        function initFormUploadProgress(root) {
+            const scope = root || document;
+
+            scope.querySelectorAll('form').forEach(function (form) {
+                if (form.dataset.uploadProgressBound === 'true' || form.dataset.uploadProgress === 'false') {
+                    return;
+                }
+
+                if (!form.querySelector('input[type="file"]')) {
+                    return;
+                }
+
+                form.dataset.uploadProgressBound = 'true';
+
+                form.addEventListener('submit', function (event) {
+                    if (form.dataset.uploadSubmitting === 'true' || !formHasFilesSelected(form)) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    form.dataset.uploadSubmitting = 'true';
+
+                    const startedAt = Date.now();
+                    updateAdminUploadProgressCard({
+                        percent: 0,
+                        loaded: 0,
+                        total: 0,
+                        status: 'Preparando envio...',
+                        remaining: 'calculando tempo restante...'
+                    });
+                    setAdminUploadProgressVisible(true);
+
+                    const formData = new FormData(form);
+                    const submitter = event.submitter;
+
+                    if (submitter && submitter.name && !formData.has(submitter.name)) {
+                        formData.append(submitter.name, submitter.value || '1');
+                    }
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open((form.getAttribute('method') || 'POST').toUpperCase(), form.getAttribute('action') || window.location.href, true);
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                    xhr.upload.addEventListener('progress', function (uploadEvent) {
+                        if (!uploadEvent.lengthComputable) {
+                            return;
+                        }
+
+                        const percent = (uploadEvent.loaded / uploadEvent.total) * 100;
+                        const elapsedSeconds = Math.max((Date.now() - startedAt) / 1000, 0.2);
+                        const speed = uploadEvent.loaded / elapsedSeconds;
+                        const remainingSeconds = speed > 0 ? (uploadEvent.total - uploadEvent.loaded) / speed : 0;
+
+                        updateAdminUploadProgressCard({
+                            percent: percent,
+                            loaded: uploadEvent.loaded,
+                            total: uploadEvent.total,
+                            status: 'Enviando arquivos do formulario...',
+                            remaining: formatUploadRemainingTime(remainingSeconds)
+                        });
+                    });
+
+                    xhr.addEventListener('load', function () {
+                        form.dataset.uploadSubmitting = 'false';
+
+                        const contentType = xhr.getResponseHeader('Content-Type') || '';
+                        const currentUrl = normalizeUploadUrl(window.location.href);
+                        const responseUrl = normalizeUploadUrl(xhr.responseURL || form.action || window.location.href);
+
+                        if (xhr.status >= 200 && xhr.status < 400) {
+                            updateAdminUploadProgressCard({
+                                percent: 100,
+                                status: 'Finalizando resposta do servidor...',
+                                remaining: 'quase pronto'
+                            });
+
+                            if (responseUrl && responseUrl !== currentUrl) {
+                                window.location.assign(responseUrl);
+                                return;
+                            }
+
+                            if (contentType.includes('text/html') && xhr.responseText) {
+                                document.open();
+                                document.write(xhr.responseText);
+                                document.close();
+                                return;
+                            }
+
+                            window.location.reload();
+                            return;
+                        }
+
+                        setAdminUploadProgressVisible(false);
+
+                        let errorMessage = 'Falha ao enviar arquivo. Verifique o tamanho ou o formato e tente novamente.';
+                        if (contentType.includes('application/json')) {
+                            try {
+                                const json = JSON.parse(xhr.responseText);
+                                errorMessage = json.message || errorMessage;
+
+                                if (json.errors) {
+                                    const details = Object.values(json.errors).flat().join('<br>');
+                                    errorMessage += '<br><br><span class="text-sm rounded">' + details + '</span>';
+                                }
+                            } catch (e) {}
+                        }
+
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Upload recusado',
+                                html: errorMessage,
+                                confirmButtonText: 'Entendi'
+                            });
+                        } else {
+                            alert('Erro no upload: ' + errorMessage.replace(/<br>/g, '\n').replace(/<[^>]+>/g, ''));
+                        }
+                    });
+
+                    xhr.addEventListener('error', function () {
+                        form.dataset.uploadSubmitting = 'false';
+                        setAdminUploadProgressVisible(false);
+
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro de conexao',
+                                text: 'O upload falhou devido a um problema de rede.',
+                                confirmButtonText: 'Tentar novamente'
+                            });
+                        }
+                    });
+
+                    xhr.addEventListener('abort', function () {
+                        form.dataset.uploadSubmitting = 'false';
+                        setAdminUploadProgressVisible(false);
+                    });
+
+                    xhr.send(formData);
+                });
             });
         }
 

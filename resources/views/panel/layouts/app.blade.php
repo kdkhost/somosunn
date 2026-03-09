@@ -584,5 +584,6 @@
                 });
             })();
         </script>
+        @include('partials.form-draft-autosave')
     @endprepend
 @endsection

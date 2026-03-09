@@ -129,7 +129,7 @@
                         <div class="form-group">
                             <label for="description">Descricao</label>
                             <textarea id="description" name="description" rows="5"
-                                class="form-control @error('description') is-invalid @enderror"
+                                class="form-control summernote @error('description') is-invalid @enderror"
                                 placeholder="Explique objetivo, publico e formato da mentoria">{{ old('description', $mentorship->description) }}</textarea>
                             @error('description')
                                 <div class="invalid-feedback">{{ $message }}</div>
