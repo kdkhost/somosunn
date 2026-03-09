@@ -21,24 +21,14 @@
                             </small>
                         </div>
                     </div>
-                    <div class="col-md-8">
-                        <div class="form-group mb-0">
-                            <label class="font-weight-bold">Imagem da Seção 'Comunidade' (Networking)</label>
-                            <div class="upload-box border rounded p-2 bg-light text-center" id="networkingImageBox"
-                                style="min-height: 120px;" data-max-size="4194304"
-                                data-existing-url="{{ isset($data['networking_image']) ? asset('storage/' . $data['networking_image']) : '' }}"
-                                data-remove-input="[name='remove_networking_image']">
-                                <input type="file" name="networking_image" id="networking_image" accept="image/*"
-                                    class="d-none">
-                                <input type="hidden" name="remove_networking_image" value="0">
-                                <div class="upload-preview mb-1 mx-auto"
-                                    style="max-width: 150px; height: 80px; overflow: hidden; border-radius: 8px;"></div>
-                                <button type="button" class="btn btn-xs btn-primary upload-trigger">
-                                    <i class="fas fa-upload mr-1"></i> Trocar Imagem de Networking
-                                </button>
-                                <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                    <div class="col-md-8 d-flex align-items-center">
+                        <div class="alert alert-light border mb-0 w-100">
+                            <div class="font-weight-bold text-purple mb-1">
+                                <i class="fas fa-info-circle mr-1"></i> Imagem da seção "Comunidade"
+                            </div>
+                            <div class="text-muted small mb-0">
+                                A imagem usada na página <strong>/somos-unicas/sobre</strong> é editada somente na
+                                manutenção da própria página "Somos Únicas Sobre".
                             </div>
                         </div>
                     </div>

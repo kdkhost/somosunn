@@ -142,6 +142,29 @@ class AdminPageControllerFallbackTest extends TestCase
         $this->assertStringNotContainsString('name="remove_image[hero_image]"', $html);
     }
 
+    public function test_somos_unicas_about_networking_image_is_owned_only_by_about_editor(): void
+    {
+        $homeHtml = view('admin.pages.partials.somos-unicas', [
+            'data' => [],
+            'errors' => new ViewErrorBag(),
+        ])->render();
+
+        $aboutHtml = view('admin.pages.partials.somos-unicas-sobre', [
+            'data' => [
+                'networking_image' => 'pages/somos-unicas-sobre/networking.jpg',
+            ],
+            'errors' => new ViewErrorBag(),
+        ])->render();
+
+        $controllerConstants = (new \ReflectionClass(PageController::class))->getConstant('SLUG_IMAGE_FIELDS');
+
+        $this->assertStringNotContainsString('name="networking_image"', $homeHtml);
+        $this->assertStringContainsString('/somos-unicas/sobre', $homeHtml);
+        $this->assertStringContainsString('name="networking_image"', $aboutHtml);
+        $this->assertSame(['hero_image'], $controllerConstants['somos-unicas']);
+        $this->assertSame(['hero_image', 'networking_image'], $controllerConstants['somos-unicas-sobre']);
+    }
+
     public function test_update_persists_premium_scalar_fields(): void
     {
         Schema::create('pages', function (Blueprint $table) {

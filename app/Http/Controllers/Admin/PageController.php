@@ -255,7 +255,7 @@ class PageController extends Controller
         'cursos' => ['hero_image'],
         'portal' => ['hero_image'],
         'premium' => ['hero_image'],
-        'somos-unicas' => ['hero_image', 'networking_image'],
+        'somos-unicas' => ['hero_image'],
         'somos-unicas-sobre' => ['hero_image', 'networking_image'],
     ];
 

@@ -23,7 +23,7 @@
                     </div>
                     <div class="col-md-8">
                         <div class="form-group mb-0">
-                            <label class="font-weight-bold">Imagem da Seção 'Comunidade' (Networking)</label>
+                            <label class="font-weight-bold">Imagem da Seção "Comunidade" desta página</label>
                             <div class="upload-box border rounded p-2 bg-light text-center" id="networkingImageBox"
                                 style="min-height: 120px;" data-max-size="4194304"
                                 data-existing-url="{{ isset($data['networking_image']) ? asset('storage/' . $data['networking_image']) : '' }}"
@@ -34,7 +34,7 @@
                                 <div class="upload-preview mb-1 mx-auto"
                                     style="max-width: 150px; height: 80px; overflow: hidden; border-radius: 8px;"></div>
                                 <button type="button" class="btn btn-xs btn-primary upload-trigger">
-                                    <i class="fas fa-upload mr-1"></i> Trocar Imagem de Networking
+                                    <i class="fas fa-upload mr-1"></i> Trocar Imagem da Seção
                                 </button>
                                 <button type="button" class="btn btn-xs btn-outline-danger upload-remove d-none">
                                     <i class="fas fa-trash"></i>
