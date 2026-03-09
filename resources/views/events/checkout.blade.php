@@ -117,16 +117,13 @@
                     @endif
 
                     @if($alreadyConfirmed)
-                        <div class="rounded-2xl bg-white p-8 shadow-lg">
-                            <h2 class="mb-2 text-2xl font-black text-gray-900">Vaga confirmada</h2>
-                            <p class="mb-6 text-gray-600">Você já possui inscrição confirmada para este evento.</p>
-                            <a href="{{ route('events.show', $event) }}"
-                                class="btn-primary inline-flex items-center gap-2 rounded-xl px-6 py-3 font-bold">
-                                <i class="fas fa-ticket-alt"></i> Ver detalhes do evento
-                            </a>
+                        <div class="mb-6 rounded-2xl border border-blue-100 bg-blue-50 p-6">
+                            <h2 class="text-lg font-bold text-blue-900">Você já possui ingresso(s)</h2>
+                            <p class="text-sm text-blue-700">Sua vaga já está garantida, mas você pode reservar ingressos adicionais abaixo se desejar.</p>
                         </div>
-                    @else
-                        <div class="rounded-2xl bg-white p-6 shadow-lg md:p-8">
+                    @endif
+
+                    <div class="rounded-2xl bg-white p-6 shadow-lg md:p-8">
                             <h2 class="mb-6 text-2xl font-black text-gray-900">Finalizar Reserva</h2>
 
                             @if($isDemo)
@@ -330,8 +327,7 @@
                                 </p>
                             </form>
                         </div>
-                    @endif
-                </div>
+                    </div>
             </div>
         </div>
     </div>

@@ -183,14 +183,8 @@ class EventReservationController extends Controller
 
         try {
             DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $regularUnitPrice, $currentPrice, $couponCode, $couponService, &$registration, &$order, $gatewayProvider) {
-                $registration = EventRegistration::where('event_id', $event->id)
-                    ->where('user_id', $user->id)
-                    ->lockForUpdate()
-                    ->first();
-
-                if ($registration && in_array($registration->status, EventRegistration::COUNTED_STATUSES, true)) {
-                    return;
-                }
+                // Permitir múltiplas reservas mesmo se já houver uma confirmada/paga.
+                // A restrição única de (event_id, user_id) foi removida do banco.
 
                 if (!$isPaid) {
                     // Remove any existing pending/failed registrations for this user/event to avoid confusion
