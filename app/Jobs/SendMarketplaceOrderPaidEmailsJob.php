@@ -88,10 +88,10 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
             $this->sendTemplateIfExists('marketplace_order_paid_seller', (string) $order->seller->email, $sellerData, $layout);
         }
 
-        $this->sendIndividualTicketEmails($order, $layout);
+        $this->sendGroupedTicketEmails($order, $layout);
     }
 
-    private function sendIndividualTicketEmails(Order $order, array $layout): void
+    private function sendGroupedTicketEmails(Order $order, array $layout): void
     {
         $registrations = \App\Models\EventRegistration::where('order_id', $order->id)
             ->with('event')
@@ -101,35 +101,30 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
             return;
         }
 
-        foreach ($registrations as $index => $registration) {
-            $ticketData = $this->buildTicketTemplateData($order, $registration, $layout);
-            $ticketData['ticket_number'] = $index + 1;
-            $ticketData['total_tickets'] = $registrations->count();
+        $tickets = [];
+        foreach ($registrations as $registration) {
+            $event = $registration->event;
+            $ticketCode = (string) $registration->ticket_code;
+            $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . urlencode($ticketCode);
 
-            $this->sendTemplateIfExists('event_ticket_buyer', (string) $order->user->email, $ticketData, $layout);
+            $tickets[] = [
+                'code' => $ticketCode,
+                'qr_code_url' => $qrCodeUrl,
+                'event' => [
+                    'id' => $event->id ?? 0,
+                    'title' => (string) ($event->title ?? 'Evento'),
+                    'date' => $event->start_at ? $event->start_at->format('d/m/Y H:i') : '',
+                    'location' => (string) ($event->location ?? ''),
+                    'address' => (string) ($event->address ?? ''),
+                ]
+            ];
         }
-    }
-
-    private function buildTicketTemplateData(Order $order, \App\Models\EventRegistration $registration, array $layout): array
-    {
-        $event = $registration->event;
-        $ticketCode = (string) $registration->ticket_code;
-        $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . urlencode($ticketCode);
 
         $data = $this->buildTemplateData($order, $layout);
-        $data['event'] = [
-            'id' => $event->id ?? 0,
-            'title' => (string) ($event->title ?? 'Evento'),
-            'date' => $event->start_at ? $event->start_at->format('d/m/Y H:i') : '',
-            'location' => (string) ($event->location ?? ''),
-            'address' => (string) ($event->address ?? ''),
-        ];
-        $data['ticket'] = [
-            'code' => $ticketCode,
-            'qr_code_url' => $qrCodeUrl,
-        ];
+        $data['tickets'] = $tickets;
+        $data['total_tickets'] = count($tickets);
 
-        return $data;
+        $this->sendTemplateIfExists('event_ticket_buyer', (string) $order->user->email, $data, $layout);
     }
 
     private function markAsSentOnce(int $orderId): bool
@@ -356,30 +351,31 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
                 'name' => 'Evento: Ingresso Digital (Cliente)',
                 'category' => 'event',
                 'locale' => 'pt-BR',
-                'subject' => 'Seu Ingresso: {{ $event[\'title\'] ?? \'\' }} ({{ $ticket_number ?? 1 }}/{{ $total_tickets ?? 1 }})',
-                'body' => '<h2 style="margin: 0 0 14px 0; font-size: 22px; line-height: 1.2; color: #111827;">Aqui está seu ingresso!</h2>
+                'subject' => 'Seu(s) Ingresso(s): Pedido #{{ $order[\'id\'] ?? \'\' }} - {{ $site[\'name\'] ?? \'\' }}',
+                'body' => '<h2 style="margin: 0 0 14px 0; font-size: 22px; line-height: 1.2; color: #111827;">Sua participação está garantida!</h2>
 <p style="margin: 0 0 14px 0;">Olá, <strong>{{ $user[\'name\'] ?? \'Cliente\' }}</strong>.</p>
-<p style="margin: 0 0 22px 0;">Sua vaga para o evento <strong>{{ $event[\'title\'] ?? \'\' }}</strong> está garantida.</p>
+<p style="margin: 0 0 22px 0;">Abaixo estão os detalhes e QR Codes dos seus {{ $total_tickets ?? 1 }} ingresso(s) para o evento:</p>
 
+@foreach($tickets as $ticket)
 <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin: 0 0 22px 0; text-align: center;">
-  <p style="margin: 0 0 12px 0; font-size: 14px; font-bold; text-transform: uppercase; color: #64748b; letter-spacing: 0.1em;">Apresente este código na entrada</p>
+  <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: bold; text-transform: uppercase; color: #1e293b; letter-spacing: 0.1em;">{{ $ticket[\'event\'][\'title\'] ?? \'Evento\' }}</p>
+  <p style="margin: 0 0 12px 0; font-size: 12px; color: #64748b;">{{ $ticket[\'event\'][\'date\'] ?? \'\' }}</p>
   
   <div style="background: #ffffff; padding: 15px; border-radius: 10px; display: inline-block; margin-bottom: 12px; border: 1px solid #f1f5f9;">
     <img src="{{ $ticket[\'qr_code_url\'] ?? \'\' }}" alt="QR Code" style="display: block; width: 150px; height: 150px;">
   </div>
   
   <p style="margin: 0; font-family: monospace; font-size: 16px; font-weight: bold; color: #1e293b; letter-spacing: 0.2em;">{{ $ticket[\'code\'] ?? \'\' }}</p>
+  
+  <div style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed #e2e8f0; text-align: left; font-size: 13px; color: #475569;">
+    <p style="margin: 0 0 4px 0;"><strong>Local:</strong> {{ $ticket[\'event\'][\'location\'] ?? \'\' }}</p>
+    <p style="margin: 0;">{{ $ticket[\'event\'][\'address\'] ?? \'\' }}</p>
+  </div>
 </div>
-
-<div style="margin: 0 0 24px 0;">
-  <p style="margin: 0 0 6px 0;"><strong>Evento:</strong> {{ $event[\'title\'] ?? \'\' }}</p>
-  <p style="margin: 0 0 6px 0;"><strong>Data/Hora:</strong> {{ $event[\'date\'] ?? \'\' }}</p>
-  <p style="margin: 0 0 6px 0;"><strong>Local:</strong> {{ $event[\'location\'] ?? \'\' }}</p>
-  <p style="margin: 0;">{{ $event[\'address\'] ?? \'\' }}</p>
-</div>
+@endforeach
 
 <p style="text-align: center; margin: 24px 0 26px 0;">
-  <a href="{{ route(\'events.show\', $event[\'id\'] ?? 0) }}" style="display: inline-block; background-color: {{ $site[\'primary_color\'] ?? \'#1F5EDB\' }}; color: #ffffff; padding: 12px 22px; text-decoration: none; border-radius: 8px; font-weight: 700;">Ver detalhes do evento</a>
+  <a href="{{ route(\'login\') }}" style="display: inline-block; background-color: {{ $site[\'primary_color\'] ?? \'#1F5EDB\' }}; color: #ffffff; padding: 12px 22px; text-decoration: none; border-radius: 8px; font-weight: 700;">Acessar minha conta</a>
 </p>
 
 <p style="margin: 0;">Até lá!<br>{{ $site[\'name\'] ?? \'UNN\' }}</p>',
