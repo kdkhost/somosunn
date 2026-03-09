@@ -50,7 +50,7 @@
                 {{-- KPI ROW 1: REVENUE & USERS --}}
                 <div class="row">
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-success">
+                        <div class="small-box bg-success shadow-sm">
                             <div class="inner">
                                 <h3>R$ {{ number_format($totalRevenue ?? 0, 2, ',', '.') }}</h3>
                                 <p>Receita Total</p>
@@ -58,29 +58,28 @@
                             <div class="icon">
                                 <i class="fas fa-wallet"></i>
                             </div>
-                            <a href="{{ route('admin.orders.index') }}" class="small-box-footer">Ver Pedidos <i
+                            <a href="{{ route('admin.orders.index') }}" class="small-box-footer">Ver Vendas <i
                                     class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
-                    {{-- MP BALANCE WIDGET --}}
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-primary" id="mp-balance-widget">
+                        <div class="small-box bg-maroon shadow-sm">
                             <div class="inner">
-                                <h3 id="mp-balance-value"><i class="fas fa-spinner fa-spin text-sm"></i></h3>
-                                <p>Saldo Mercado Pago</p>
+                                <h3>R$ {{ number_format($revenueToday ?? 0, 2, ',', '.') }}</h3>
+                                <p>Receita de Hoje</p>
                             </div>
                             <div class="icon">
-                                <i class="fas fa-university"></i>
+                                <i class="fas fa-chart-line"></i>
                             </div>
-                            <a href="#" onclick="fetchMpBalance(); return false;" class="small-box-footer">Atualizar <i
-                                    class="fas fa-sync"></i></a>
+                            <a href="{{ route('admin.orders.index', ['date' => now()->format('Y-m-d')]) }}" class="small-box-footer">Ver Hoje <i
+                                    class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-warning">
+                        <div class="small-box bg-warning shadow-sm">
                             <div class="inner">
                                 <h3>{{ $totalUsers ?? 0 }}</h3>
-                                <p>Usuários Cadastrados</p>
+                                <p>Usuários Totais</p>
                             </div>
                             <div class="icon">
                                 <i class="fas fa-users"></i>
@@ -90,16 +89,41 @@
                         </div>
                     </div>
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-info">
+                        <div class="small-box bg-info shadow-sm">
                             <div class="inner">
-                                <h3>{{ $totalOrders ?? 0 }}</h3>
-                                <p>Total de Pedidos</p>
+                                <h3>{{ $usersToday ?? 0 }}</h3>
+                                <p>Novos Hoje</p>
                             </div>
                             <div class="icon">
-                                <i class="fas fa-shopping-bag"></i>
+                                <i class="fas fa-user-plus"></i>
                             </div>
-                            <a href="{{ route('admin.orders.index') }}" class="small-box-footer">Todos Pedidos <i
+                            <a href="{{ route('admin.users.index', ['created_at' => now()->format('Y-m-d')]) }}" class="small-box-footer">Ver Novos <i
                                     class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- QUICK ACTIONS --}}
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-2 d-flex flex-wrap gap-2 justify-content-center">
+                                <a href="{{ route('admin.courses.create') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                    <i class="fas fa-plus mr-1"></i> Novo Curso
+                                </a>
+                                <a href="{{ route('admin.events.create') }}" class="btn btn-outline-success btn-sm rounded-pill px-3">
+                                    <i class="fas fa-calendar-plus mr-1"></i> Novo Evento
+                                </a>
+                                <a href="{{ route('admin.users.create') }}" class="btn btn-outline-warning btn-sm rounded-pill px-3">
+                                    <i class="fas fa-user-plus mr-1"></i> Novo Usuário
+                                </a>
+                                <a href="{{ route('admin.settings') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                                    <i class="fas fa-cog mr-1"></i> Configurações
+                                </a>
+                                <a href="{{ route('admin.activity_logs.index') }}" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                                    <i class="fas fa-history mr-1"></i> Logs do Sistema
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -710,47 +734,13 @@
             }
         }
 
-        function fetchMpBalance() {
-            const el = document.getElementById('mp-balance-value');
-            if (!el) return;
-
-            el.innerHTML = '<i class="fas fa-spinner fa-spin text-sm"></i>';
-
-            fetch('{{ route('admin.dashboard.balance') }}')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const total = data.balance.total_amount || 0;
-                        el.innerText = 'R$ ' + parseFloat(total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                    } else {
-                        el.innerHTML = '<span class="text-xs">Erro</span>';
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    el.innerHTML = '<span class="text-xs">Erro</span>';
-                });
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            renderLegacyAdminServiceVisits({!! json_encode([
-                'serviceVisitSummary' => $serviceVisitSummary,
-                'serviceVisitTopItems' => $serviceVisitTopItems ?? [],
-                'serviceVisitOwnerLeaders' => $serviceVisitOwnerLeaders ?? [],
-            ]) !!});
-
             window.UNNServiceVisitsRealtime.start({
                 statsUrl: @json(route('admin.dashboard.stats')),
                 refreshMs: @json(max(3000, (int) config('dashboard.refresh_interval_ms', 10000))),
                 onPayload: renderLegacyAdminServiceVisits,
             });
 
-            // Fetch Balance immediately
-            @if(isset($isAdmin) && $isAdmin)
-                fetchMpBalance();
-            @endif
-
-                                // --- 1. Init FullCalendar ---
+            // --- 1. Init FullCalendar ---
                                 var calendarEl = document.getElementById('calendar');
             if (calendarEl) {
                 var calendar = new FullCalendar.Calendar(calendarEl, {
