@@ -9,6 +9,7 @@ use App\Models\CouponRedemption;
 use App\Models\Plan;
 use App\Models\User;
 use App\Services\CouponService;
+use App\Services\OrderSettlementService;
 use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -75,7 +76,7 @@ class EventReservationController extends Controller
         return view('events.checkout', compact('event', 'registration', 'mpEnabled', 'psEnabled', 'preferredGateway'));
     }
 
-    public function reserve(Request $request, Event $event, CouponService $couponService, \App\Services\Payment\MercadoPagoService $mpService, \App\Services\Payment\PagSeguroService $psService)
+    public function reserve(Request $request, Event $event, CouponService $couponService, \App\Services\Payment\MercadoPagoService $mpService, \App\Services\Payment\PagSeguroService $psService, OrderSettlementService $orderSettlementService)
     {
         $this->abortIfDisabledOrUnpublished($event);
 
@@ -185,7 +186,7 @@ class EventReservationController extends Controller
         $usesSingleRegistrationPerUser = $this->usesSingleEventRegistrationPerUser();
 
         try {
-            DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $regularUnitPrice, $currentPrice, $couponCode, $couponService, &$registration, &$order, &$alreadyRegistered, $gatewayProvider, $usesSingleRegistrationPerUser) {
+            DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $regularUnitPrice, $currentPrice, $couponCode, $couponService, $orderSettlementService, &$registration, &$order, &$alreadyRegistered, $gatewayProvider, $usesSingleRegistrationPerUser) {
                 $existingCountedRegistration = EventRegistration::where('event_id', $event->id)
                     ->where('user_id', $user->id)
                     ->whereIn('status', EventRegistration::COUNTED_STATUSES)
@@ -194,7 +195,45 @@ class EventReservationController extends Controller
 
                 if ($usesSingleRegistrationPerUser && $existingCountedRegistration) {
                     $registration = $existingCountedRegistration;
-                    $order = $existingCountedRegistration->order;
+                    $order = $existingCountedRegistration->order_id
+                        ? Order::whereKey($existingCountedRegistration->order_id)->lockForUpdate()->first()
+                        : null;
+
+                    if (!$isPaid && !$order) {
+                        $legacyQuantity = max(1, (int) ($existingCountedRegistration->quantity ?: $quantity));
+                        $order = $this->createFreeEventOrder(
+                            $event,
+                            (int) $user->id,
+                            $sellerId,
+                            $legacyQuantity,
+                            $regularUnitPrice,
+                            $currentPrice
+                        );
+
+                        $existingCountedRegistration->update([
+                            'order_id' => $order->id,
+                            'status' => EventRegistration::STATUS_PENDING,
+                            'price' => 0,
+                            'quantity' => $legacyQuantity,
+                            'ticket_code' => $event->is_ticket_enabled
+                                ? ($existingCountedRegistration->ticket_code ?: Str::uuid()->toString())
+                                : null,
+                        ]);
+
+                        $registration = $existingCountedRegistration->fresh();
+                        $orderSettlementService->settleAsPaid($order, [
+                            'transaction_id' => 'FREE-EVENT-' . $order->id . '-' . now()->format('YmdHis'),
+                            'payment_method' => 'free_checkout',
+                            'queue_invoice_email' => false,
+                            'send_notifications' => false,
+                            'gateway_data' => [
+                                'source' => 'free_event_checkout',
+                                'automatic' => true,
+                            ],
+                        ]);
+                        return;
+                    }
+
                     $alreadyRegistered = true;
                     return;
                 }
@@ -202,6 +241,15 @@ class EventReservationController extends Controller
                 // A restrição única de (event_id, user_id) foi removida do banco.
 
                 if (!$isPaid) {
+                    $order = $this->createFreeEventOrder(
+                        $event,
+                        (int) $user->id,
+                        $sellerId,
+                        $quantity,
+                        $regularUnitPrice,
+                        $currentPrice
+                    );
+
                     if ($usesSingleRegistrationPerUser) {
                         $legacyRegistration = EventRegistration::where('event_id', $event->id)
                             ->where('user_id', $user->id)
@@ -210,8 +258,8 @@ class EventReservationController extends Controller
 
                         if ($legacyRegistration) {
                             $legacyRegistration->update([
-                                'order_id' => null,
-                                'status' => EventRegistration::STATUS_CONFIRMED,
+                                'order_id' => $order->id,
+                                'status' => EventRegistration::STATUS_PENDING,
                                 'price' => 0,
                                 'quantity' => $quantity,
                                 'ticket_code' => $event->is_ticket_enabled
@@ -222,7 +270,8 @@ class EventReservationController extends Controller
                             EventRegistration::create([
                                 'event_id' => $event->id,
                                 'user_id' => $user->id,
-                                'status' => EventRegistration::STATUS_CONFIRMED,
+                                'order_id' => $order->id,
+                                'status' => EventRegistration::STATUS_PENDING,
                                 'price' => 0,
                                 'quantity' => $quantity,
                                 'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
@@ -238,7 +287,8 @@ class EventReservationController extends Controller
                             EventRegistration::create([
                                 'event_id' => $event->id,
                                 'user_id' => $user->id,
-                                'status' => EventRegistration::STATUS_CONFIRMED,
+                                'order_id' => $order->id,
+                                'status' => EventRegistration::STATUS_PENDING,
                                 'price' => 0,
                                 'quantity' => 1,
                                 'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
@@ -253,6 +303,23 @@ class EventReservationController extends Controller
                         'action_url' => route('events.show', $event),
                         'action_label' => 'Ver detalhes'
                     ]));
+
+                    $orderSettlementService->settleAsPaid($order, [
+                        'transaction_id' => 'FREE-EVENT-' . $order->id . '-' . now()->format('YmdHis'),
+                        'payment_method' => 'free_checkout',
+                        'queue_invoice_email' => false,
+                        'send_notifications' => false,
+                        'gateway_data' => [
+                            'source' => 'free_event_checkout',
+                            'automatic' => true,
+                        ],
+                    ]);
+
+                    try {
+                        (new \App\Services\PointsService())->award($user, 'attend_event', ['event_id' => $event->id]);
+                    } catch (\Throwable $e) {
+                        \Log::warning('Falha ao pontuar attend_event: ' . $e->getMessage());
+                    }
 
                     return;
                 }
@@ -448,10 +515,18 @@ class EventReservationController extends Controller
             return back()->with('error', $msg)->withInput();
         } catch (\RuntimeException $e) {
             return back()->with('error', $e->getMessage())->withInput();
+        } catch (\Throwable $e) {
+            \Log::error('Falha ao registrar reserva de evento', [
+                'event_id' => $event->id,
+                'user_id' => $user?->id,
+                'message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Nao foi possivel concluir a reserva agora. Tente novamente em instantes.')->withInput();
         }
 
         if ($alreadyRegistered) {
-            return redirect()->route('events.show', $event)->with('success', 'Sua vaga jÃ¡ estÃ¡ confirmada.');
+            return redirect()->route('events.show', $event)->with('success', 'Sua vaga ja esta confirmada.');
         }
 
         if ($registration && in_array($registration->status, EventRegistration::COUNTED_STATUSES, true)) {
@@ -666,5 +741,51 @@ class EventReservationController extends Controller
         }
 
         return $usesSingleRegistration = false;
+    }
+
+    private function createFreeEventOrder(Event $event, int $userId, int $sellerId, int $quantity, float $regularUnitPrice, float $effectiveUnitPrice): Order
+    {
+        $platformFeePercent = MarketplaceFee::percent();
+
+        $order = Order::create([
+            'user_id' => $userId,
+            'seller_id' => $sellerId > 0 ? $sellerId : null,
+            'status' => 'pending',
+            'total_amount' => 0,
+            'fee_amount' => 0,
+            'platform_fee_amount' => 0,
+            'currency' => 'BRL',
+            'gateway' => 'free',
+            'gateway_account_id' => null,
+            'metadata' => [
+                'context' => 'event',
+                'sale_type' => 'event',
+                'public_token' => Str::random(40),
+                'original_total_amount' => 0,
+                'regular_total_amount' => round($regularUnitPrice * $quantity, 2),
+                'platform_fee_percent' => $platformFeePercent,
+                'is_free_checkout' => true,
+            ],
+        ]);
+
+        $order->items()->create([
+            'item_type' => 'event',
+            'item_id' => $event->id,
+            'title' => $event->title,
+            'price' => 0,
+            'quantity' => max(1, $quantity),
+            'data' => [
+                'event_start_at' => optional($event->start_at)->toIso8601String(),
+                'event_end_at' => optional($event->end_at)->toIso8601String(),
+                'batch_label' => $event->current_batch_label,
+                'original_unit_price' => $effectiveUnitPrice,
+                'regular_unit_price' => $regularUnitPrice,
+                'flash_sale_price' => $event->flash_sale_price !== null ? (float) $event->flash_sale_price : null,
+                'flash_sale_ends_at' => $event->flash_sale_ends_at ? $event->flash_sale_ends_at->toIso8601String() : null,
+                'discount_amount' => round(max(0, $effectiveUnitPrice) * max(1, $quantity), 2),
+            ],
+        ]);
+
+        return $order;
     }
 }

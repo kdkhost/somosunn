@@ -155,6 +155,13 @@
             'visible' => method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace(),
         ],
         [
+            'label' => 'Contabilidade',
+            'route' => route('panel.marketplace.accounting'),
+            'icon' => 'fas fa-file-invoice-dollar',
+            'active' => request()->routeIs('panel.marketplace.accounting*'),
+            'visible' => method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace(),
+        ],
+        [
             'label' => 'Meus recebimentos',
             'route' => route('panel.splits.index'),
             'icon' => 'fas fa-money-bill-wave',

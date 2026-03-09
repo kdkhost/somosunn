@@ -5,13 +5,18 @@
 @section('content')
     @php
         $selectedGateway = old('gateway_provider');
+        $regularTotal = (float) ($mentorship->price ?? 0);
+        $effectiveTotal = (float) ($mentorship->effective_price ?? $regularTotal);
+        $flashActive = method_exists($mentorship, 'isFlashSaleActive') ? (bool) $mentorship->isFlashSaleActive() : false;
+        $isFreeCheckout = $effectiveTotal <= 0;
+
         if (!$selectedGateway) {
             $selectedGateway = ($preferredGateway ?? null) ?: (($mpEnabled ?? true) ? 'mercadopago' : 'pagseguro');
         }
 
-        $selectedGatewaySummary = $selectedGateway === 'pagseguro'
-            ? 'Pagamento via PagSeguro.'
-            : 'Pagamento via Mercado Pago.';
+        $selectedGatewaySummary = $isFreeCheckout
+            ? 'Liberacao imediata sem pagamento.'
+            : ($selectedGateway === 'pagseguro' ? 'Pagamento via PagSeguro.' : 'Pagamento via Mercado Pago.');
     @endphp
     <div class="min-h-screen bg-slate-50 pt-28 pb-20 px-4">
         <div class="max-w-4xl mx-auto">
@@ -37,11 +42,6 @@
                         </p>
 
                         <div class="border-t border-gray-100 mt-6 pt-6">
-                            @php
-                                $regularTotal = (float) ($mentorship->price ?? 0);
-                                $effectiveTotal = (float) ($mentorship->effective_price ?? $regularTotal);
-                                $flashActive = method_exists($mentorship, 'isFlashSaleActive') ? (bool) $mentorship->isFlashSaleActive() : false;
-                            @endphp
                             <p class="text-sm text-gray-500">Total</p>
                             <div class="flex items-end gap-3">
                                 <p class="text-3xl font-black text-gray-900">
@@ -75,7 +75,8 @@
                                 <p class="text-xs text-gray-500 mt-2">Se tiver um cupom, aplique antes de continuar.</p>
                             </div>
 
-                            <div class="pt-4 border-t border-gray-100">
+                            @if(!$isFreeCheckout)
+                                <div class="pt-4 border-t border-gray-100">
                                 <label class="block text-sm font-medium text-gray-700 mb-3">Forma de Pagamento</label>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     @if($mpEnabled ?? true)
@@ -120,11 +121,13 @@
                                         </label>
                                     @endif
                                 </div>
-                            </div>
+                                </div>
+                            @endif
 
                             <button type="submit"
                                 class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
-                                <i class="fas fa-lock"></i> Continuar para pagamento
+                                <i class="fas {{ $isFreeCheckout ? 'fa-check-circle' : 'fa-lock' }}"></i>
+                                {{ $isFreeCheckout ? 'Concluir pedido gratuito' : 'Continuar para pagamento' }}
                             </button>
 
                             <p class="text-xs text-gray-500 text-center">

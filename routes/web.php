@@ -643,6 +643,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::get('/pagamentos/configurar', [\App\Http\Controllers\Panel\MarketplaceController::class, 'editPayment'])->name('payments.edit');
         Route::post('/pagamentos/testar', [\App\Http\Controllers\Panel\MarketplaceController::class, 'testCredentials'])->name('payments.test');
         Route::get('/vendas', [\App\Http\Controllers\Panel\MarketplaceController::class, 'sales'])->name('sales');
+        Route::get('/contabilidade', [\App\Http\Controllers\Panel\MarketplaceAccountingController::class, 'index'])->name('accounting');
+        Route::get('/contabilidade/exportar', [\App\Http\Controllers\Panel\MarketplaceAccountingController::class, 'export'])->name('accounting.export');
+        Route::get('/contabilidade/imprimir', [\App\Http\Controllers\Panel\MarketplaceAccountingController::class, 'print'])->name('accounting.print');
     });
 
     // Portal de Vagas (Usuário)

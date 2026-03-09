@@ -6,6 +6,7 @@ use App\Models\Mentorship;
 use App\Models\Order;
 use App\Models\User;
 use App\Services\CouponService;
+use App\Services\OrderSettlementService;
 use App\Services\Payment\MercadoPagoService;
 use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
@@ -19,54 +20,68 @@ class MentorshipCheckoutController extends Controller
     public function show(Mentorship $mentorship)
     {
         if (!Auth::check()) {
-            return redirect()->guest(route('login'))->with('error', 'Faça login para finalizar a compra da mentoria.');
+            return redirect()->guest(route('login'))->with('error', 'Faca login para finalizar a compra da mentoria.');
         }
 
         if ($mentorship->isClosedForPublic()) {
             return redirect()
                 ->route('mentorships.show', $mentorship)
-                ->with('error', 'Esta mentoria já encerrou.');
+                ->with('error', 'Esta mentoria ja encerrou.');
         }
 
         $seller = $mentorship->mentor ?: User::find($mentorship->mentor_id);
         if (!$seller || !$seller->canSellOnMarketplace()) {
             return redirect()
                 ->route('mentorships.show', $mentorship)
-                ->with('error', 'Este criador não está habilitado para vender no marketplace.');
+                ->with('error', 'Este criador nao esta habilitado para vender no marketplace.');
         }
 
-        // Verificar gateways configurados pelo vendedor (tabela gateway_accounts)
+        $effectiveTotal = round((float) ($mentorship->effective_price ?? ($mentorship->price ?? 0)), 2);
+        if ($effectiveTotal <= 0) {
+            $mpEnabled = false;
+            $psEnabled = false;
+            $preferredGateway = null;
+
+            return view('checkout.mentorship', compact('mentorship', 'mpEnabled', 'psEnabled', 'preferredGateway'));
+        }
+
         $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
-        $mpEnabled        = $gateways['mpEnabled'];
-        $psEnabled        = $gateways['psEnabled'];
+        $mpEnabled = $gateways['mpEnabled'];
+        $psEnabled = $gateways['psEnabled'];
         $preferredGateway = $gateways['preferredGateway'];
 
         if (!$mpEnabled && !$psEnabled) {
             return redirect()
                 ->route('mentorships.show', $mentorship)
-                ->with('error', 'Esta mentoria não está disponível para compra: o mentor ainda não configurou um método de pagamento.');
+                ->with('error', 'Esta mentoria nao esta disponivel para compra: o mentor ainda nao configurou um metodo de pagamento.');
         }
 
         return view('checkout.mentorship', compact('mentorship', 'mpEnabled', 'psEnabled', 'preferredGateway'));
     }
 
-    public function process(Request $request, Mentorship $mentorship, MercadoPagoService $mpService, \App\Services\Payment\PagSeguroService $psService, CouponService $couponService)
-    {
+    public function process(
+        Request $request,
+        Mentorship $mentorship,
+        MercadoPagoService $mpService,
+        \App\Services\Payment\PagSeguroService $psService,
+        CouponService $couponService,
+        OrderSettlementService $orderSettlementService
+    ) {
         if (!Auth::check()) {
-            return redirect()->guest(route('login'))->with('error', 'Faça login para finalizar a compra da mentoria.');
+            return redirect()->guest(route('login'))->with('error', 'Faca login para finalizar a compra da mentoria.');
         }
 
         if ($mentorship->isClosedForPublic()) {
             return redirect()
                 ->route('mentorships.show', $mentorship)
-                ->with('error', 'Esta mentoria já encerrou.');
+                ->with('error', 'Esta mentoria ja encerrou.');
         }
 
         $seller = $mentorship->mentor ?: User::find($mentorship->mentor_id);
         if (!$seller || !$seller->canSellOnMarketplace()) {
             return redirect()
                 ->route('mentorships.show', $mentorship)
-                ->with('error', 'Este criador não está habilitado para vender no marketplace.');
+                ->with('error', 'Este criador nao esta habilitado para vender no marketplace.');
         }
 
         $request->validate([
@@ -74,18 +89,36 @@ class MentorshipCheckoutController extends Controller
             'gateway_provider' => 'nullable|string|in:mercadopago,pagseguro',
         ]);
 
-        $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
-        $gatewayProvider = $request->input('gateway_provider', $gateways['preferredGateway'] ?? 'mercadopago');
+        $effectiveTotal = round((float) ($mentorship->effective_price ?? ($mentorship->price ?? 0)), 2);
+        $gateways = [
+            'mpEnabled' => false,
+            'psEnabled' => false,
+            'preferredGateway' => null,
+            'mpPublicKey' => '',
+            'psPublicKey' => '',
+        ];
+        $gatewayProvider = 'free';
 
-        // Validar que o vendedor/mentor tem o gateway selecionado configurado
-        if (($gatewayProvider === 'mercadopago' && !$gateways['mpEnabled'])
-            || ($gatewayProvider === 'pagseguro' && !$gateways['psEnabled'])) {
-            if ($gateways['mpEnabled']) {
-                $gatewayProvider = 'mercadopago';
-            } elseif ($gateways['psEnabled']) {
-                $gatewayProvider = 'pagseguro';
-            } else {
-                return back()->with('error', 'Método de pagamento não disponível para esta mentoria. O mentor ainda não configurou um gateway.');
+        if ($effectiveTotal > 0) {
+            $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
+            $gatewayProvider = $request->input('gateway_provider', $gateways['preferredGateway'] ?? 'mercadopago');
+
+            if (($gatewayProvider === 'mercadopago' && !$gateways['mpEnabled'])
+                || ($gatewayProvider === 'pagseguro' && !$gateways['psEnabled'])) {
+                if ($gateways['mpEnabled']) {
+                    $gatewayProvider = 'mercadopago';
+                } elseif ($gateways['psEnabled']) {
+                    $gatewayProvider = 'pagseguro';
+                } else {
+                    return back()->with('error', 'Metodo de pagamento nao disponivel para esta mentoria. O mentor ainda nao configurou um gateway.');
+                }
+            }
+        } else {
+            $existingFreeOrder = $this->findExistingFreeOrder((int) Auth::id(), 'mentorship', (int) $mentorship->id);
+            if ($existingFreeOrder) {
+                return redirect()
+                    ->route('mentorships.show', $mentorship)
+                    ->with('success', 'Mentoria liberada com sucesso.');
             }
         }
 
@@ -125,7 +158,7 @@ class MentorshipCheckoutController extends Controller
                     'fee_amount' => 0,
                     'platform_fee_amount' => $platformFeeAmount,
                     'currency' => 'BRL',
-                    'gateway' => $gatewayProvider,
+                    'gateway' => $finalTotal <= 0 ? 'free' : $gatewayProvider,
                     'gateway_account_id' => null,
                     'metadata' => [
                         'context' => 'mentorship',
@@ -134,6 +167,7 @@ class MentorshipCheckoutController extends Controller
                         'original_total_amount' => $originalTotal,
                         'regular_total_amount' => $regularUnitPrice,
                         'platform_fee_percent' => $platformFeePercent,
+                        'is_free_checkout' => $finalTotal <= 0,
                     ],
                 ]);
 
@@ -169,8 +203,29 @@ class MentorshipCheckoutController extends Controller
                 }
             });
         } catch (ValidationException $e) {
-            $msg = collect($e->errors())->flatten()->first() ?? 'Não foi possível aplicar o cupom.';
+            $msg = collect($e->errors())->flatten()->first() ?? 'Nao foi possivel aplicar o cupom.';
             return back()->with('error', $msg)->withInput();
+        }
+
+        if ((float) ($order->total_amount ?? 0) <= 0) {
+            try {
+                $orderSettlementService->settleAsPaid($order, [
+                    'transaction_id' => 'FREE-MENTORSHIP-' . $order->id . '-' . now()->format('YmdHis'),
+                    'payment_method' => 'free_checkout',
+                    'queue_invoice_email' => false,
+                    'send_notifications' => false,
+                    'gateway_data' => [
+                        'source' => 'free_mentorship_checkout',
+                        'automatic' => true,
+                    ],
+                ]);
+            } catch (\Throwable $e) {
+                return back()->with('error', 'Erro ao liberar mentoria gratuita: ' . $e->getMessage());
+            }
+
+            return redirect()
+                ->route('mentorships.show', $mentorship)
+                ->with('success', 'Mentoria liberada com sucesso.');
         }
 
         try {
@@ -182,28 +237,41 @@ class MentorshipCheckoutController extends Controller
                     'publicKey' => $gateways['psPublicKey'] ?? config('payments.pagseguro.public_key'),
                     'pixAvailable' => $psService->isPixAvailable($order),
                 ]);
-            } else {
-                $preference = $mpService->createPreference($order, [
-                    'statement_descriptor' => 'UNN MENTORIAS',
-                ]);
-
-                $order->update([
-                    'metadata' => array_merge($order->metadata ?? [], [
-                        'mercadopago_preference_id' => $preference['id'] ?? null,
-                        'mercadopago_init_point' => $preference['init_point'] ?? null,
-                        'mercadopago_sandbox_init_point' => $preference['sandbox_init_point'] ?? null,
-                    ]),
-                ]);
-
-                return view('checkout.transparent', [
-                    'order' => $order,
-                    'preferenceId' => $preference['id'] ?? '',
-                    'publicKey' => $gateways['mpPublicKey'] ?: config('payments.mercadopago.public_key'),
-                ]);
             }
 
+            $preference = $mpService->createPreference($order, [
+                'statement_descriptor' => 'UNN MENTORIAS',
+            ]);
+
+            $order->update([
+                'metadata' => array_merge($order->metadata ?? [], [
+                    'mercadopago_preference_id' => $preference['id'] ?? null,
+                    'mercadopago_init_point' => $preference['init_point'] ?? null,
+                    'mercadopago_sandbox_init_point' => $preference['sandbox_init_point'] ?? null,
+                ]),
+            ]);
+
+            return view('checkout.transparent', [
+                'order' => $order,
+                'preferenceId' => $preference['id'] ?? '',
+                'publicKey' => $gateways['mpPublicKey'] ?: config('payments.mercadopago.public_key'),
+            ]);
         } catch (\Exception $e) {
             return back()->with('error', 'Erro ao processar pagamento: ' . $e->getMessage());
         }
+    }
+
+    private function findExistingFreeOrder(int $userId, string $itemType, int $itemId): ?Order
+    {
+        return Order::query()
+            ->where('user_id', $userId)
+            ->where('status', 'paid')
+            ->where('total_amount', '<=', 0)
+            ->whereHas('items', function ($query) use ($itemType, $itemId) {
+                $query->where('item_type', $itemType)
+                    ->where('item_id', $itemId);
+            })
+            ->latest('id')
+            ->first();
     }
 }

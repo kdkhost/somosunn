@@ -20,10 +20,16 @@
                 <p class="text-slate-600 dark:text-slate-400 mt-1 transition-colors">Pedidos do marketplace vinculados ao
                     seu usuário.</p>
             </div>
-            <a href="{{ route('panel.marketplace.index') }}"
-                class="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                <i class="fas fa-arrow-left mr-2"></i> Voltar
-            </a>
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ route('panel.marketplace.accounting') }}"
+                    class="inline-flex items-center justify-center rounded-full border border-blue-600 dark:border-blue-500 px-5 py-2.5 text-sm font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-600/10 transition-all">
+                    <i class="fas fa-file-invoice-dollar mr-2"></i> Contabilidade
+                </a>
+                <a href="{{ route('panel.marketplace.index') }}"
+                    class="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar
+                </a>
+            </div>
         </div>
     </div>
 
