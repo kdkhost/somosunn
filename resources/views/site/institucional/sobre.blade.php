@@ -3,53 +3,108 @@
 @section('title', $page->get('seo_title', 'Sobre a UNN - União Nacional de Networking'))
 
 @section('content')
-<div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
-    <!-- Hero Section -->
-    <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+@php
+    $stats = [
+        [
+            'value' => $page->get('stat_1_value', '5k+'),
+            'label' => $page->get('stat_1_label', 'Empreendedores'),
+            'icon' => 'fa-users',
+        ],
+        [
+            'value' => $page->get('stat_3_value', 'R$ 50M+'),
+            'label' => $page->get('stat_3_label', 'Negócios gerados'),
+            'icon' => 'fa-chart-line',
+        ],
+        [
+            'value' => $page->get('stat_4_value', '200+'),
+            'label' => $page->get('stat_4_label', 'Eventos realizados'),
+            'icon' => 'fa-calendar-check',
+        ],
+        [
+            'value' => $page->get('stat_2_value', '27'),
+            'label' => $page->get('stat_2_label', 'Estados'),
+            'icon' => 'fa-map-marked-alt',
+        ],
+    ];
+@endphp
+
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+    <section class="px-4 pt-10 pb-12 md:px-12 md:pt-24 lg:px-24">
+        <div class="mx-auto max-w-7xl">
+            <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
                 <div>
-                    <!-- HERO TITLE -->
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient unn-title-max">
+                    <h1 class="unn-title-gradient unn-title-max mb-4 text-3xl font-black leading-tight sm:text-4xl md:mb-6 md:text-5xl lg:text-6xl">
                         {{ $page->get('hero_title', 'Conheça a') }} <span class="unn-title-gradient">UNN</span>
                     </h1>
-                    <p class="text-xl text-gray-600 leading-relaxed mb-8">
+
+                    <p class="mb-8 text-xl leading-relaxed text-gray-600">
                         {{ $page->get('vision', 'A União Nacional de Networking é a maior comunidade de empreendedores do Brasil, conectando pessoas que querem crescer juntas através de parcerias estratégicas e negócios colaborativos.') }}
                     </p>
+
                     <div class="flex flex-wrap gap-4">
-                        <a href="{{ route('register') }}" class="btn-primary text-white px-8 py-4 rounded-full font-bold inline-flex items-center gap-2 shadow-lg hover:shadow-xl transition">
-                            <i class="fas fa-rocket"></i> {{ $page->get('cta_btn_primary', 'Fazer parte') }}
+                        <a href="{{ route('register') }}" class="btn-primary inline-flex items-center gap-2 rounded-full px-8 py-4 font-bold text-white shadow-lg transition hover:shadow-xl">
+                            <i class="fas fa-rocket"></i>
+                            {{ $page->get('cta_btn_primary', 'Fazer parte') }}
                         </a>
-                        <a href="{{ route('manifesto') }}" class="bg-white text-gray-700 px-8 py-4 rounded-full font-bold inline-flex items-center gap-2 shadow-lg hover:shadow-xl transition">
-                            <i class="fas fa-book-open"></i> {{ $page->get('cta_btn_secondary', 'Nosso Manifesto') }}
+
+                        <a href="{{ route('manifesto') }}" class="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-bold text-gray-700 shadow-lg transition hover:shadow-xl">
+                            <i class="fas fa-book-open"></i>
+                            {{ $page->get('cta_btn_secondary', 'Nosso Manifesto') }}
                         </a>
                     </div>
                 </div>
+
                 <div class="relative mt-8 lg:mt-0">
-                    @if($page->get('hero_image'))
-                        <img src="{{ asset('storage/' . $page->get('hero_image')) }}"
-                             alt="{{ $page->get('hero_title', 'Sobre a UNN') }}"
-                             class="w-full rounded-3xl shadow-2xl mb-6 object-cover"
-                             style="max-height: 260px;">
+                    <div class="absolute inset-5 rounded-[2rem] bg-gradient-to-br from-blue-200/40 via-white/20 to-cyan-200/30 blur-3xl"></div>
+
+                    @if ($page->get('hero_image'))
+                        <div class="relative mb-6 overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-white/70">
+                            <img
+                                src="{{ asset('storage/' . $page->get('hero_image')) }}"
+                                alt="{{ $page->get('hero_title', 'Sobre a UNN') }}"
+                                class="w-full object-cover"
+                                style="max-height: 260px;"
+                            >
+                            <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/40 to-transparent"></div>
+                        </div>
                     @endif
-                    <div class="bg-white rounded-3xl shadow-2xl p-4 md:p-8">
-                        <div class="grid grid-cols-2 gap-3 md:gap-6">
-                            <div class="text-center p-3 md:p-6 bg-slate-50 rounded-2xl">
-                                <p class="text-2xl sm:text-3xl lg:text-4xl font-black" style="color: var(--unn-azul-1)">{{ $page->get('stat_1_value', '5k+') }}</p>
-                                <p class="text-xs md:text-sm text-gray-500 mt-1">{{ $page->get('stat_1_label', 'Empreendedores') }}</p>
+
+                    <div class="relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/85 p-5 shadow-[0_30px_70px_-35px_rgba(15,23,42,0.45)] backdrop-blur md:p-8">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(41,171,226,0.16),_transparent_38%),radial-gradient(circle_at_bottom_left,_rgba(46,49,146,0.12),_transparent_34%)]"></div>
+
+                        <div class="relative mb-6 flex items-start justify-between gap-4">
+                            <div>
+                                <p class="text-xs font-black uppercase tracking-[0.28em] text-sky-500">UNN em números</p>
+                                <h2 class="mt-2 text-2xl font-black text-slate-900 md:text-3xl">Crescimento real em escala nacional</h2>
+                                <p class="mt-2 max-w-xl text-sm leading-relaxed text-slate-500 md:text-base">
+                                    Uma comunidade construída para transformar relacionamento em oportunidade, presença e resultado.
+                                </p>
                             </div>
-                            <div class="text-center p-3 md:p-6 bg-slate-50 rounded-2xl">
-                                <p class="text-2xl sm:text-3xl lg:text-4xl font-black" style="color: var(--unn-azul-1)">{{ $page->get('stat_2_value', '27') }}</p>
-                                <p class="text-xs md:text-sm text-gray-500 mt-1">{{ $page->get('stat_2_label', 'Estados') }}</p>
+
+                            <div class="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2E3192] to-[#29ABE2] text-white shadow-lg md:flex">
+                                <i class="fas fa-chart-pie text-lg"></i>
                             </div>
-                            <div class="text-center p-3 md:p-6 bg-slate-50 rounded-2xl">
-                                <p class="text-2xl sm:text-3xl lg:text-4xl font-black break-words" style="color: var(--unn-azul-1)">{{ $page->get('stat_3_value', 'R$ 50M+') }}</p>
-                                <p class="text-xs md:text-sm text-gray-500 mt-1">{{ $page->get('stat_3_label', 'Negócios gerados') }}</p>
-                            </div>
-                            <div class="text-center p-3 md:p-6 bg-slate-50 rounded-2xl">
-                                <p class="text-2xl sm:text-3xl lg:text-4xl font-black" style="color: var(--unn-azul-1)">{{ $page->get('stat_4_value', '200+') }}</p>
-                                <p class="text-xs md:text-sm text-gray-500 mt-1">{{ $page->get('stat_4_label', 'Eventos realizados') }}</p>
-                            </div>
+                        </div>
+
+                        <div class="relative grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            @foreach ($stats as $stat)
+                                <div class="group rounded-[1.6rem] border border-slate-200/80 bg-slate-50/90 p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-sky-200 hover:bg-white hover:shadow-xl md:p-6">
+                                    <div class="mb-5 flex items-center justify-between gap-3">
+                                        <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2E3192] to-[#29ABE2] text-white shadow-lg shadow-sky-200/60">
+                                            <i class="fas {{ $stat['icon'] }} text-sm"></i>
+                                        </span>
+                                        <span class="h-px flex-1 bg-gradient-to-r from-sky-200 via-slate-200 to-transparent"></span>
+                                    </div>
+
+                                    <p class="break-words text-3xl font-black leading-none tracking-tight sm:text-4xl" style="color: var(--unn-azul-1)">
+                                        {{ $stat['value'] }}
+                                    </p>
+
+                                    <p class="mt-3 text-sm font-medium leading-snug text-slate-600 md:text-base">
+                                        {{ $stat['label'] }}
+                                    </p>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -57,13 +112,14 @@
         </div>
     </section>
 
-    <!-- Nossa História -->
-    <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl lg:text-4xl font-black text-gray-900 mb-8 text-center">{{ $page->get('history_title', 'Nossa História') }}</h2>
-            
+    <section class="bg-white px-6 py-16 md:px-12 lg:px-24">
+        <div class="mx-auto max-w-4xl">
+            <h2 class="mb-8 text-center text-3xl font-black text-gray-900 lg:text-4xl">
+                {{ $page->get('history_title', 'Nossa História') }}
+            </h2>
+
             <div class="prose prose-lg max-w-none text-gray-600">
-                <p class="lead text-xl mb-6">
+                <p class="lead mb-6 text-xl">
                     {{ $page->get('history_lead', 'A UNN nasceu em 2020 com uma missão clara: democratizar o acesso ao networking de qualidade no Brasil.') }}
                 </p>
                 <p class="mb-6">
@@ -76,43 +132,61 @@
         </div>
     </section>
 
-    <!-- O que nos diferencia -->
-    <section class="py-16 px-6 md:px-12 lg:px-24">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl lg:text-4xl font-black text-gray-900 mb-12 text-center">{{ $page->get('diff_title', 'O que nos diferencia') }}</h2>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-white rounded-3xl p-8 shadow-lg text-center">
-                    <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-users text-white text-2xl"></i>
+    <section class="px-6 py-16 md:px-12 lg:px-24">
+        <div class="mx-auto max-w-7xl">
+            <h2 class="mb-12 text-center text-3xl font-black text-gray-900 lg:text-4xl">
+                {{ $page->get('diff_title', 'O que nos diferencia') }}
+            </h2>
+
+            <div class="grid gap-8 md:grid-cols-3">
+                <div class="rounded-3xl bg-white p-8 text-center shadow-lg">
+                    <div class="btn-primary mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl text-white">
+                        <i class="fas fa-users text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $page->get('diff_card_1_title', 'Comunidade Selecionada') }}</h3>
-                    <p class="text-gray-600">{{ $page->get('diff_card_1_text', 'Todos os membros passam por uma curadoria para garantir a qualidade das conexões.') }}</p>
+                    <h3 class="mb-3 text-xl font-bold text-gray-900">
+                        {{ $page->get('diff_card_1_title', 'Comunidade Selecionada') }}
+                    </h3>
+                    <p class="text-gray-600">
+                        {{ $page->get('diff_card_1_text', 'Todos os membros passam por uma curadoria para garantir a qualidade das conexões.') }}
+                    </p>
                 </div>
-                <div class="bg-white rounded-3xl p-8 shadow-lg text-center">
-                    <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-handshake text-white text-2xl"></i>
+
+                <div class="rounded-3xl bg-white p-8 text-center shadow-lg">
+                    <div class="btn-primary mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl text-white">
+                        <i class="fas fa-handshake text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $page->get('diff_card_2_title', 'Conexões Reais') }}</h3>
-                    <p class="text-gray-600">{{ $page->get('diff_card_2_text', 'Eventos presenciais e online que geram relacionamentos genuínos e duradouros.') }}</p>
+                    <h3 class="mb-3 text-xl font-bold text-gray-900">
+                        {{ $page->get('diff_card_2_title', 'Conexões Reais') }}
+                    </h3>
+                    <p class="text-gray-600">
+                        {{ $page->get('diff_card_2_text', 'Eventos presenciais e online que geram relacionamentos genuínos e duradouros.') }}
+                    </p>
                 </div>
-                <div class="bg-white rounded-3xl p-8 shadow-lg text-center">
-                    <div class="w-16 h-16 btn-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-chart-line text-white text-2xl"></i>
+
+                <div class="rounded-3xl bg-white p-8 text-center shadow-lg">
+                    <div class="btn-primary mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl text-white">
+                        <i class="fas fa-chart-line text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $page->get('diff_card_3_title', 'Resultados Mensuráveis') }}</h3>
-                    <p class="text-gray-600">{{ $page->get('diff_card_3_text', 'Acompanhamos e celebramos cada negócio fechado entre nossos membros.') }}</p>
+                    <h3 class="mb-3 text-xl font-bold text-gray-900">
+                        {{ $page->get('diff_card_3_title', 'Resultados Mensuráveis') }}
+                    </h3>
+                    <p class="text-gray-600">
+                        {{ $page->get('diff_card_3_text', 'Acompanhamos e celebramos cada negócio fechado entre nossos membros.') }}
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA -->
-    <section class="py-16 px-6 md:px-12 lg:px-24" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
-        <div class="max-w-4xl mx-auto text-center text-white">
-            <h2 class="text-3xl lg:text-4xl font-black mb-4">{{ $page->get('cta_title', 'Pronto para crescer com a gente?') }}</h2>
-            <p class="text-lg opacity-90 mb-8">{{ $page->get('cta_subtitle', 'Junte-se a milhares de empreendedores que já transformaram suas carreiras.') }}</p>
-            <a href="{{ route('register') }}" class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition" style="color: var(--unn-azul-1)">
+    <section class="px-6 py-16 md:px-12 lg:px-24" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
+        <div class="mx-auto max-w-4xl text-center text-white">
+            <h2 class="mb-4 text-3xl font-black lg:text-4xl">
+                {{ $page->get('cta_title', 'Pronto para crescer com a gente?') }}
+            </h2>
+            <p class="mb-8 text-lg opacity-90">
+                {{ $page->get('cta_subtitle', 'Junte-se a milhares de empreendedores que já transformaram suas carreiras.') }}
+            </p>
+            <a href="{{ route('register') }}" class="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-bold transition hover:bg-blue-50" style="color: var(--unn-azul-1)">
                 <i class="fas fa-user-plus"></i>
                 {{ $page->get('cta_btn', 'Começar agora') }}
             </a>
@@ -128,12 +202,14 @@
     background-clip: text;
     color: transparent;
 }
+
 .unn-title-max {
     max-width: 700px;
     word-break: break-word;
     margin-left: auto;
     margin-right: auto;
 }
+
 @media (max-width: 640px) {
     .unn-title-max {
         font-size: 2.2rem !important;
