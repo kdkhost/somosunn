@@ -87,6 +87,49 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
 
             $this->sendTemplateIfExists('marketplace_order_paid_seller', (string) $order->seller->email, $sellerData, $layout);
         }
+
+        $this->sendIndividualTicketEmails($order, $layout);
+    }
+
+    private function sendIndividualTicketEmails(Order $order, array $layout): void
+    {
+        $registrations = \App\Models\EventRegistration::where('order_id', $order->id)
+            ->with('event')
+            ->get();
+
+        if ($registrations->isEmpty()) {
+            return;
+        }
+
+        foreach ($registrations as $index => $registration) {
+            $ticketData = $this->buildTicketTemplateData($order, $registration, $layout);
+            $ticketData['ticket_number'] = $index + 1;
+            $ticketData['total_tickets'] = $registrations->count();
+
+            $this->sendTemplateIfExists('event_ticket_buyer', (string) $order->user->email, $ticketData, $layout);
+        }
+    }
+
+    private function buildTicketTemplateData(Order $order, \App\Models\EventRegistration $registration, array $layout): array
+    {
+        $event = $registration->event;
+        $ticketCode = (string) $registration->ticket_code;
+        $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . urlencode($ticketCode);
+
+        $data = $this->buildTemplateData($order, $layout);
+        $data['event'] = [
+            'id' => $event->id ?? 0,
+            'title' => (string) ($event->title ?? 'Evento'),
+            'date' => $event->start_at ? $event->start_at->format('d/m/Y H:i') : '',
+            'location' => (string) ($event->location ?? ''),
+            'address' => (string) ($event->address ?? ''),
+        ];
+        $data['ticket'] = [
+            'code' => $ticketCode,
+            'qr_code_url' => $qrCodeUrl,
+        ];
+
+        return $data;
     }
 
     private function markAsSentOnce(int $orderId): bool
@@ -307,6 +350,39 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
   <a href="{{ $links[\'seller_panel_url\'] ?? ($site[\'url\'] ?? \'#\') }}" style="display: inline-block; background-color: {{ $site[\'primary_color\'] ?? \'#1F5EDB\' }}; color: #ffffff; padding: 12px 22px; text-decoration: none; border-radius: 8px; font-weight: 700;">Ver vendas no painel</a>
 </p>
 <p style="margin: 0;">Obrigado,<br>{{ $site[\'name\'] ?? \'UNN\' }}</p>',
+                'is_active' => true,
+            ],
+            'event_ticket_buyer' => [
+                'name' => 'Evento: Ingresso Digital (Cliente)',
+                'category' => 'event',
+                'locale' => 'pt-BR',
+                'subject' => 'Seu Ingresso: {{ $event[\'title\'] ?? \'\' }} ({{ $ticket_number ?? 1 }}/{{ $total_tickets ?? 1 }})',
+                'body' => '<h2 style="margin: 0 0 14px 0; font-size: 22px; line-height: 1.2; color: #111827;">Aqui está seu ingresso!</h2>
+<p style="margin: 0 0 14px 0;">Olá, <strong>{{ $user[\'name\'] ?? \'Cliente\' }}</strong>.</p>
+<p style="margin: 0 0 22px 0;">Sua vaga para o evento <strong>{{ $event[\'title\'] ?? \'\' }}</strong> está garantida.</p>
+
+<div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin: 0 0 22px 0; text-align: center;">
+  <p style="margin: 0 0 12px 0; font-size: 14px; font-bold; text-transform: uppercase; color: #64748b; letter-spacing: 0.1em;">Apresente este código na entrada</p>
+  
+  <div style="background: #ffffff; padding: 15px; border-radius: 10px; display: inline-block; margin-bottom: 12px; border: 1px solid #f1f5f9;">
+    <img src="{{ $ticket[\'qr_code_url\'] ?? \'\' }}" alt="QR Code" style="display: block; width: 150px; height: 150px;">
+  </div>
+  
+  <p style="margin: 0; font-family: monospace; font-size: 16px; font-weight: bold; color: #1e293b; letter-spacing: 0.2em;">{{ $ticket[\'code\'] ?? \'\' }}</p>
+</div>
+
+<div style="margin: 0 0 24px 0;">
+  <p style="margin: 0 0 6px 0;"><strong>Evento:</strong> {{ $event[\'title\'] ?? \'\' }}</p>
+  <p style="margin: 0 0 6px 0;"><strong>Data/Hora:</strong> {{ $event[\'date\'] ?? \'\' }}</p>
+  <p style="margin: 0 0 6px 0;"><strong>Local:</strong> {{ $event[\'location\'] ?? \'\' }}</p>
+  <p style="margin: 0;">{{ $event[\'address\'] ?? \'\' }}</p>
+</div>
+
+<p style="text-align: center; margin: 24px 0 26px 0;">
+  <a href="{{ route(\'events.show\', $event[\'id\'] ?? 0) }}" style="display: inline-block; background-color: {{ $site[\'primary_color\'] ?? \'#1F5EDB\' }}; color: #ffffff; padding: 12px 22px; text-decoration: none; border-radius: 8px; font-weight: 700;">Ver detalhes do evento</a>
+</p>
+
+<p style="margin: 0;">Até lá!<br>{{ $site[\'name\'] ?? \'UNN\' }}</p>',
                 'is_active' => true,
             ],
         ];

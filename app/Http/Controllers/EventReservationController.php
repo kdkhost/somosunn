@@ -193,27 +193,21 @@ class EventReservationController extends Controller
                 }
 
                 if (!$isPaid) {
-                    if ($event->capacity && !$event->hasCapacityFor($quantity)) {
-                        throw new \RuntimeException('Evento lotado no momento.');
-                    }
+                    // Remove any existing pending/failed registrations for this user/event to avoid confusion
+                    EventRegistration::where('event_id', $event->id)
+                        ->where('user_id', $user->id)
+                        ->whereNotIn('status', EventRegistration::COUNTED_STATUSES)
+                        ->delete();
 
-                    if (!$registration) {
-                        $registration = EventRegistration::create([
+                    for ($i = 0; $i < $quantity; $i++) {
+                        EventRegistration::create([
                             'event_id' => $event->id,
                             'user_id' => $user->id,
                             'status' => EventRegistration::STATUS_CONFIRMED,
                             'price' => 0,
-                            'quantity' => $quantity,
+                            'quantity' => 1,
                             'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
                         ]);
-                    } else {
-                        $registration->fill([
-                            'status' => EventRegistration::STATUS_CONFIRMED,
-                            'price' => 0,
-                            'quantity' => $quantity,
-                            'order_id' => null,
-                            'ticket_code' => empty($registration->ticket_code) && $event->is_ticket_enabled ? Str::uuid()->toString() : $registration->ticket_code,
-                        ])->save();
                     }
 
                     // Notificar confirmação da vaga (Evento Gratuito)
@@ -356,24 +350,24 @@ class EventReservationController extends Controller
                     }
                 }
 
-                if (!$registration) {
+                // Remove any existing pending/failed registrations for this user/event
+                EventRegistration::where('event_id', $event->id)
+                    ->where('user_id', $user->id)
+                    ->whereNotIn('status', EventRegistration::COUNTED_STATUSES)
+                    ->delete();
+
+                $unitPrice = $discountAmount > 0 ? (float) ($finalTotal / $quantity) : (float) $currentPrice;
+
+                for ($i = 0; $i < $quantity; $i++) {
                     $registration = EventRegistration::create([
                         'event_id' => $event->id,
                         'user_id' => $user->id,
                         'order_id' => $order->id,
                         'status' => EventRegistration::STATUS_PENDING,
-                        'price' => $currentPrice,
-                        'quantity' => $quantity,
+                        'price' => $unitPrice,
+                        'quantity' => 1,
                         'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
                     ]);
-                } else {
-                    $registration->fill([
-                        'order_id' => $order->id,
-                        'status' => EventRegistration::STATUS_PENDING,
-                        'price' => $currentPrice,
-                        'quantity' => $quantity,
-                        'ticket_code' => empty($registration->ticket_code) && $event->is_ticket_enabled ? Str::uuid()->toString() : $registration->ticket_code,
-                    ])->save();
                 }
             });
         } catch (ValidationException $e) {

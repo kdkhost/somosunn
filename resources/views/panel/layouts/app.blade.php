@@ -173,7 +173,8 @@
 @endprepend
 
 @section('content')
-    <div class="panel-theme-shell bg-slate-50 dark:bg-slate-950 min-h-screen pb-10 transition-colors duration-300">
+    <div
+        class="panel-theme-shell bg-slate-50 dark:bg-slate-950 min-h-screen pt-24 md:pt-0 pb-10 transition-colors duration-300">
         <div class="w-full px-4 md:px-6 xl:px-8 2xl:px-10">
             <nav class="h-24 flex items-center justify-between gap-4" aria-label="breadcrumb">
                 <ol
@@ -289,26 +290,26 @@
                     card.id = 'panel-upload-progress';
                     card.className = 'panel-upload-progress';
                     card.innerHTML = `
-                                <div class="panel-upload-progress__card">
-                                    <div class="flex items-start justify-between gap-4">
-                                        <div>
-                                            <p class="text-xs font-black uppercase tracking-[0.25em] text-sky-300">Upload</p>
-                                            <h3 class="mt-1 text-base font-bold text-white">Enviando arquivos</h3>
+                                        <div class="panel-upload-progress__card">
+                                            <div class="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <p class="text-xs font-black uppercase tracking-[0.25em] text-sky-300">Upload</p>
+                                                    <h3 class="mt-1 text-base font-bold text-white">Enviando arquivos</h3>
+                                                </div>
+                                                <div class="text-right">
+                                                    <div class="text-sm font-black text-white" data-upload-percent>0%</div>
+                                                    <div class="text-[11px] text-slate-300" data-upload-size>0 B / 0 B</div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-4 panel-upload-progress__bar">
+                                                <span data-upload-fill></span>
+                                            </div>
+                                            <div class="mt-3 flex items-center justify-between gap-3 text-[11px] text-slate-300">
+                                                <span data-upload-status>Preparando envio...</span>
+                                                <span data-upload-remaining>calculando tempo restante...</span>
+                                            </div>
                                         </div>
-                                        <div class="text-right">
-                                            <div class="text-sm font-black text-white" data-upload-percent>0%</div>
-                                            <div class="text-[11px] text-slate-300" data-upload-size>0 B / 0 B</div>
-                                        </div>
-                                    </div>
-                                    <div class="mt-4 panel-upload-progress__bar">
-                                        <span data-upload-fill></span>
-                                    </div>
-                                    <div class="mt-3 flex items-center justify-between gap-3 text-[11px] text-slate-300">
-                                        <span data-upload-status>Preparando envio...</span>
-                                        <span data-upload-remaining>calculando tempo restante...</span>
-                                    </div>
-                                </div>
-                            `;
+                                    `;
 
                     document.body.appendChild(card);
                     return card;

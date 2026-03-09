@@ -86,8 +86,8 @@
 
 <nav class="fixed inset-x-0 top-0 z-50 bg-white shadow-xl border-b border-slate-100">
     <div class="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-4 flex items-center justify-between gap-4">
-        <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0">
-            <div class="inline-flex h-12 md:h-16 w-auto items-center justify-center overflow-hidden">
+        <a href="{{ route('home') }}" class="flex items-center gap-2 sm:gap-3 shrink min-w-0">
+            <div class="inline-flex h-10 sm:h-12 md:h-16 w-auto items-center justify-center overflow-hidden shrink-0">
                 <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain"
                     onerror="this.style.display='none';">
             </div>
@@ -124,24 +124,24 @@
             <div class="flex items-center gap-2 sm:gap-4">
                 @if($isLogged)
                     <div class="relative" x-data="{
-                                                    open: false,
-                                                    total: 0,
-                                                    items: [],
-                                                    loading: true,
-                                                    async fetchNotifications() {
-                                                        try {
-                                                            const r = await fetch('{{ route('notifications.hub') }}');
-                                                            if (!r.ok) return;
-                                                            const data = await r.json();
-                                                            this.total = data.total || 0;
-                                                            this.items = (data.items || []).filter(i => i.count > 0);
-                                                        } catch(e) {
-                                                            console.error('Notification hub failed:', e);
-                                                        } finally {
-                                                            this.loading = false;
+                                                        open: false,
+                                                        total: 0,
+                                                        items: [],
+                                                        loading: true,
+                                                        async fetchNotifications() {
+                                                            try {
+                                                                const r = await fetch('{{ route('notifications.hub') }}');
+                                                                if (!r.ok) return;
+                                                                const data = await r.json();
+                                                                this.total = data.total || 0;
+                                                                this.items = (data.items || []).filter(i => i.count > 0);
+                                                            } catch(e) {
+                                                                console.error('Notification hub failed:', e);
+                                                            } finally {
+                                                                this.loading = false;
+                                                            }
                                                         }
-                                                    }
-                                                }"
+                                                    }"
                         x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
 
                         <button @click="open = !open; fetchNotifications()"
@@ -172,7 +172,7 @@
                                 </template>
 
                                 <template x-for="item in items" :key="item.type">
-                                    <a :href="item.route"
+                                    <a :href="item.route" @click="total = Math.max(0, total - item.count); item.count = 0"
                                         class="flex items-center gap-4 px-4 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border-b border-slate-50 dark:border-slate-800 last:border-0">
                                         <div :class="item.bg + ' ' + item.color"
                                             class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">

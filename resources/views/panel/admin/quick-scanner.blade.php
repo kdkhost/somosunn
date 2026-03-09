@@ -12,9 +12,9 @@
 
         {{-- Scanner Section --}}
         <div
-            class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-6 relative">
+            class="bg-white dark:bg-slate-900 rounded-[1.5rem] sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-4 sm:p-6 relative">
             <div id="reader-wrapper"
-                class="relative bg-slate-100 dark:bg-slate-950 rounded-3xl overflow-hidden aspect-square border-4 border-slate-50 dark:border-slate-800 shadow-inner flex items-center justify-center">
+                class="relative bg-slate-100 dark:bg-slate-950 rounded-2xl sm:rounded-3xl overflow-hidden border-4 border-slate-50 dark:border-slate-800 shadow-inner flex items-center justify-center">
 
                 {{-- Start Button (Required for Audio/GPS/Camera permissions in some browsers) --}}
                 <div id="start-screen"
