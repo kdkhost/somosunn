@@ -48,8 +48,8 @@ class MyJobController extends Controller
 
         $vacancy = JobVacancy::create($data);
 
-        if (($vacancy->visibility ?? 'public') === 'public') {
-            // Notificar toda a comunidade apenas para vagas publicas
+        if (in_array((string) ($vacancy->visibility ?? 'both'), ['external', 'both', 'public'], true)) {
+            // Notificar a comunidade quando a vaga tiver alcance publico
             $users = User::all();
             Notification::send($users, new JobVacancyPublished($vacancy));
             $message = 'Vaga publicada e comunidade notificada com sucesso!';
@@ -192,9 +192,10 @@ class MyJobController extends Controller
         $visibility = strtolower(trim($visibility));
 
         return match ($visibility) {
-            'internal' => 'private',
-            'external', 'both' => 'public',
-            default => in_array($visibility, ['public', 'private'], true) ? $visibility : 'public',
+            'public' => 'external',
+            'private' => 'internal',
+            'internal', 'external', 'both' => $visibility,
+            default => 'both',
         };
     }
 }

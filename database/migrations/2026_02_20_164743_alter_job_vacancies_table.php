@@ -1,30 +1,47 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up()
+    public function up(): void
     {
-        if (\Illuminate\Support\Facades\DB::getDriverName() === 'sqlite') {
-            Schema::table('job_vacancies', function (Blueprint $table) {
-                // SQLite não suporta bem alteração de colunas enum, então faremos uma string de fallback com validação em app logic
-                $table->dropColumn('visibility');
-            });
-            Schema::table('job_vacancies', function (Blueprint $table) {
-                $table->string('visibility')->default('public');
-            });
-        } else {
-            Schema::table('job_vacancies', function (Blueprint $table) {
-                $table->enum('visibility', ['public', 'private'])->default('public')->change();
-            });
+        if (!Schema::hasTable('job_vacancies') || !Schema::hasColumn('job_vacancies', 'visibility')) {
+            return;
         }
+
+        $driver = DB::getDriverName();
+
+        if ($driver === 'mysql') {
+            DB::statement("ALTER TABLE job_vacancies MODIFY visibility VARCHAR(20) NOT NULL DEFAULT 'both'");
+        }
+
+        DB::table('job_vacancies')->whereNull('visibility')->update(['visibility' => 'both']);
+        DB::table('job_vacancies')->where('visibility', '')->update(['visibility' => 'both']);
+        DB::table('job_vacancies')->where('visibility', 'public')->update(['visibility' => 'external']);
+        DB::table('job_vacancies')->where('visibility', 'private')->update(['visibility' => 'internal']);
+        DB::table('job_vacancies')
+            ->whereNotIn('visibility', ['internal', 'external', 'both'])
+            ->update(['visibility' => 'both']);
     }
 
-    public function down()
+    public function down(): void
     {
-        Schema::table('job_vacancies', function (Blueprint $table) {
-            $table->string('visibility')->default('public')->change();
-        });
+        if (!Schema::hasTable('job_vacancies') || !Schema::hasColumn('job_vacancies', 'visibility')) {
+            return;
+        }
+
+        $driver = DB::getDriverName();
+
+        DB::table('job_vacancies')->whereNull('visibility')->update(['visibility' => 'public']);
+        DB::table('job_vacancies')->where('visibility', '')->update(['visibility' => 'public']);
+        DB::table('job_vacancies')->where('visibility', 'external')->update(['visibility' => 'public']);
+        DB::table('job_vacancies')->where('visibility', 'both')->update(['visibility' => 'public']);
+        DB::table('job_vacancies')->where('visibility', 'internal')->update(['visibility' => 'private']);
+
+        if ($driver === 'mysql') {
+            DB::statement("ALTER TABLE job_vacancies MODIFY visibility VARCHAR(20) NOT NULL DEFAULT 'public'");
+        }
     }
 };
