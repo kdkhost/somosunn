@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\UploadStorage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class UploadController extends Controller
 {
@@ -41,7 +41,7 @@ class UploadController extends Controller
         $path = $file->storePublicly('uploads', $disk);
 
         return response()->json([
-            'url' => Storage::disk($disk)->url($path),
+            'url' => UploadStorage::url($path),
             'path' => $path,
         ]);
     }

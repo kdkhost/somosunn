@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\UploadStorage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -327,21 +328,7 @@ class Plan extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        $path = trim((string) ($this->image ?? ''));
-
-        if ($path === '') {
-            return null;
-        }
-
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-            return $path;
-        }
-
-        if (str_starts_with($path, 'storage/') || str_starts_with($path, 'uploads/')) {
-            return asset($path);
-        }
-
-        return asset('storage/' . ltrim($path, '/'));
+        return UploadStorage::url($this->image);
     }
 
     public function isFreeAccessPlan(): bool

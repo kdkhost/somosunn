@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Support\UploadStorage;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -53,8 +54,10 @@ class AppServiceProvider extends ServiceProvider
 
         if (App::runningInConsole()) {
             View::share('unnDbAvailable', false);
-            return;
+            UploadStorage::applyRuntimeConfig();
         }
+
+        UploadStorage::applyRuntimeConfig();
 
         try {
             DB::connection()->getPdo();
@@ -215,43 +218,10 @@ class AppServiceProvider extends ServiceProvider
 
                 $uploadsDisk = trim((string) ($extraSettings['uploads_storage_disk'] ?? ''));
                 if (in_array($uploadsDisk, ['public', 's3'], true)) {
-                    config(['uploads.disk' => $uploadsDisk]);
+                    config(['uploads.selected_disk' => $uploadsDisk]);
                 }
 
-                // S3 (sobrescreve config/filesystems.php)
-                $s3Key = trim((string) ($extraSettings['s3_key'] ?? ''));
-                if ($s3Key !== '') {
-                    config(['filesystems.disks.s3.key' => $s3Key]);
-                }
-
-                $s3Secret = trim((string) ($extraSettings['s3_secret'] ?? ''));
-                if ($s3Secret !== '') {
-                    config(['filesystems.disks.s3.secret' => $s3Secret]);
-                }
-
-                $s3Region = trim((string) ($extraSettings['s3_region'] ?? ''));
-                if ($s3Region !== '') {
-                    config(['filesystems.disks.s3.region' => $s3Region]);
-                }
-
-                $s3Bucket = trim((string) ($extraSettings['s3_bucket'] ?? ''));
-                if ($s3Bucket !== '') {
-                    config(['filesystems.disks.s3.bucket' => $s3Bucket]);
-                }
-
-                $s3Url = trim((string) ($extraSettings['s3_url'] ?? ''));
-                if ($s3Url !== '') {
-                    config(['filesystems.disks.s3.url' => $s3Url]);
-                }
-
-                $s3Endpoint = trim((string) ($extraSettings['s3_endpoint'] ?? ''));
-                if ($s3Endpoint !== '') {
-                    config(['filesystems.disks.s3.endpoint' => $s3Endpoint]);
-                }
-
-                if (array_key_exists('s3_path_style', $extraSettings)) {
-                    config(['filesystems.disks.s3.use_path_style_endpoint' => (bool) ((int) $extraSettings['s3_path_style'])]);
-                }
+                UploadStorage::applyRuntimeConfig($extraSettings);
             } catch (\Throwable $e) {
                 // Silently fail if table doesnt exist yet
             }
@@ -390,6 +360,7 @@ class AppServiceProvider extends ServiceProvider
         } catch (\Throwable $e) {
             Log::warning('Banco de dados indisponível: ' . $e->getMessage());
             View::share('unnDbAvailable', false);
+            UploadStorage::applyRuntimeConfig();
         }
     }
 }

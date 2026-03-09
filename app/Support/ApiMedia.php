@@ -2,8 +2,6 @@
 
 namespace App\Support;
 
-use Illuminate\Support\Facades\Storage;
-
 class ApiMedia
 {
     public static function url(?string $path): ?string
@@ -16,6 +14,6 @@ class ApiMedia
             return $path;
         }
 
-        return Storage::disk(config('filesystems.default'))->url($path);
+        return UploadStorage::url($path);
     }
 }

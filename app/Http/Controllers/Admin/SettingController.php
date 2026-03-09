@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Support\UploadStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -686,13 +687,10 @@ class SettingController extends Controller
 
         $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
         $name = uniqid('', true) . '.' . $ext;
-        $targetDir = public_path($relativeDir);
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0775, true);
-        }
+        $this->ensurePublicDir($relativeDir);
 
         try {
-            $file->move($targetDir, $name);
+            Storage::disk('public')->putFileAs($relativeDir, $file, $name, ['visibility' => 'public']);
         } catch (\Throwable $e) {
             throw new \RuntimeException('Não foi possível salvar a imagem em ' . $relativeDir . ': ' . $e->getMessage(), 0, $e);
         }
@@ -724,37 +722,7 @@ class SettingController extends Controller
             return;
         }
 
-        if (filter_var($old, FILTER_VALIDATE_URL)) {
-            $old = (string) parse_url($old, PHP_URL_PATH);
-        }
-
-        $old = str_replace('\\', '/', $old);
-        $old = preg_replace('/[?#].*$/', '', $old) ?? $old;
-
-        $publicRoot = str_replace('\\', '/', public_path());
-        if (Str::startsWith($old, $publicRoot)) {
-            $old = ltrim(substr($old, strlen($publicRoot)), '/');
-        }
-
-        $old = ltrim($old, '/');
-
-        if (Str::startsWith($old, 'public/')) {
-            $old = substr($old, strlen('public/'));
-        }
-
-        if (Str::startsWith($old, 'storage/app/public/')) {
-            $old = 'storage/' . substr($old, strlen('storage/app/public/'));
-        }
-
-        $paths = [
-            public_path($old),
-            public_path(ltrim(str_replace('storage/', '', $old), '/')),
-        ];
-        foreach (array_unique(array_filter($paths)) as $path) {
-            if ($path && file_exists($path)) {
-                @unlink($path);
-            }
-        }
+        UploadStorage::delete($old);
         if ($clearSetting) {
             Setting::updateOrCreate(['key' => $key], ['value' => '']);
         }
@@ -762,9 +730,8 @@ class SettingController extends Controller
 
     private function ensurePublicDir($dir)
     {
-        $full = public_path($dir);
-        if (!is_dir($full)) {
-            mkdir($full, 0775, true);
+        if (UploadStorage::isLocal()) {
+            Storage::disk('public')->makeDirectory($dir);
         }
     }
 
@@ -823,7 +790,7 @@ class SettingController extends Controller
                 $value = substr($value, strlen('public/'));
             }
 
-            if (file_exists(public_path($value))) {
+            if (UploadStorage::exists($value) || file_exists(public_path($value))) {
                 $settings[$key] = $value;
                 continue;
             }
@@ -1031,7 +998,9 @@ class SettingController extends Controller
             if (!$logo)
                 $logo = Setting::where('key', 'logo_image')->value('value');
 
-            $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
+            $logoUrl = $logo
+                ? Setting::getUrl('logo_admin', Setting::getUrl('logo_front', Setting::getUrl('logo_image', asset('img/logo.svg'))))
+                : asset('img/logo.svg');
 
             // Fetch Site Name from Database
             $siteName = Setting::where('key', 'app_name')->value('value');
@@ -1208,7 +1177,7 @@ class SettingController extends Controller
 
             return response()->json([
                 'success' => true,
-                'path' => asset($path),
+                'path' => UploadStorage::url($path),
                 'message' => 'Arquivo enviado com sucesso!'
             ]);
 

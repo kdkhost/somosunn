@@ -7,6 +7,7 @@ use App\Models\Lesson;
 use App\Models\LessonAttachment;
 use App\Models\LessonBookmark;
 use App\Models\LessonProgress;
+use App\Support\UploadStorage;
 use App\Models\PointsLog;
 use App\Services\LessonVideoService;
 use App\Services\PointsService;
@@ -296,7 +297,7 @@ class LessonController extends Controller
 
         return response()->json([
             'success' => true,
-            'url' => Storage::disk('public')->url($path),
+            'url' => UploadStorage::url($path),
             'path' => $path,
         ]);
     }

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Support\UploadStorage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Partner extends Model
@@ -57,13 +57,7 @@ class Partner extends Model
     // ── Accessors ───────────────────────────────────────────────────────────────
     public function getLogoUrlAttribute(): string
     {
-        if (!$this->logo) {
-            return '';
-        }
-        if (str_starts_with($this->logo, 'http')) {
-            return $this->logo;
-        }
-        return Storage::disk('public')->url($this->logo);
+        return (string) UploadStorage::url($this->logo, '');
     }
 
     // ── Boot ─────────────────────────────────────────────────────────────────────

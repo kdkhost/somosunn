@@ -61,6 +61,7 @@
 
 namespace App\Services;
 
+use App\Support\UploadStorage;
 use App\Models\User;
 
 class ProfilePhotoService
@@ -77,6 +78,6 @@ class ProfilePhotoService
             return $photo;
         }
 
-        return asset($photo);
+        return (string) UploadStorage::url($photo, asset('img/default-user.svg'));
     }
 }

@@ -1,28 +1,9 @@
 <?php
-/**
- * Sistema UNN - Configurações de arquivos
- *
- * Autor: George Marcelo (KDKHOST SOLUÇÕES)
- * Telefone: +55 (21) 98132-5441
- * Telegram: https://t.me/MARCELO_BRAD
- *
- * Copyright (c) 2026 Kdkhost Soluções. Todos os direitos reservados.
- *
- * AVISO LEGAL:
- * Este software e seu código-fonte são propriedade intelectual de kdkhost soluções.
- * É proibida a reprodução, distribuição, modificação, engenharia reversa ou uso não autorizado,
- * total ou parcial, sem autorização prévia e por escrito.
- *
- * Contato: contato@kdkhost.com.br
- * Licenciamento: Uso restrito conforme contrato/termos aplicáveis.
- */
-
-use Illuminate\Support\Str;
 
 return [
-    'default' => env('FILESYSTEM_DRIVER', 'public'),
+    'default' => 'public',
 
-    'cloud' => env('FILESYSTEM_CLOUD', 's3'),
+    'cloud' => 'public',
 
     'disks' => [
         'local' => [
@@ -31,28 +12,46 @@ return [
             'throw' => false,
         ],
 
-        'public' => [
+        'local_public' => [
             'driver' => 'local',
-            // Compatibilidade com hospedagem compartilhada (cPanel) sem depender de symlink:
-            // se existir public/storage (diretório real), gravamos direto nele.
-            // caso contrário, usamos o padrão do Laravel (storage/app/public) + storage:link.
             'root' => is_dir(public_path('storage'))
                 ? public_path('storage')
                 : storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => '/storage',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        'public' => [
+            'driver' => 'local',
+            'root' => is_dir(public_path('storage'))
+                ? public_path('storage')
+                : storage_path('app/public'),
+            'url' => '/storage',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        'uploads' => [
+            'driver' => 'local',
+            'root' => is_dir(public_path('storage'))
+                ? public_path('storage')
+                : storage_path('app/public'),
+            'url' => '/storage',
             'visibility' => 'public',
             'throw' => false,
         ],
 
         's3' => [
             'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'key' => '',
+            'secret' => '',
+            'region' => '',
+            'bucket' => '',
+            'url' => null,
+            'endpoint' => null,
+            'use_path_style_endpoint' => false,
+            'throw' => false,
         ],
     ],
 

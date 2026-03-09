@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
+use App\Support\UploadStorage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -116,7 +117,7 @@ class UploadChunkController extends Controller
             }
         }
 
-        $url = Storage::disk($finalDisk)->url($finalPath);
+        $url = UploadStorage::url($finalPath);
         return response()->json(['ok' => true, 'url' => $url, 'path' => $finalPath]);
     }
 }

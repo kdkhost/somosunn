@@ -23,6 +23,13 @@ use App\Http\Controllers\MailTestController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\SatisfactionController;
 
+Route::get('/storage/{path}', [\App\Http\Controllers\PublicStorageProxyController::class, 'storage'])
+    ->where('path', '.*')
+    ->name('public.storage');
+Route::get('/uploads/{path}', [\App\Http\Controllers\PublicStorageProxyController::class, 'uploads'])
+    ->where('path', '.*')
+    ->name('public.uploads');
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portal', [HomeController::class, 'portal'])->name('portal');
 Route::get('/premium', [HomeController::class, 'premium'])->name('premium');
