@@ -7,6 +7,13 @@ use Tests\TestCase;
 
 class UploadStorageUrlTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        config()->set('uploads.s3_driver_available', null);
+
+        parent::tearDown();
+    }
+
     public function test_it_uses_storage_proxy_for_relative_paths(): void
     {
         config()->set('uploads.effective_disk', 'public');
@@ -35,5 +42,22 @@ class UploadStorageUrlTest extends TestCase
             'https://cdn.somosunn.com.br/uploads/imagens/logo.png',
             UploadStorage::url('uploads/imagens/logo.png')
         );
+    }
+
+    public function test_it_falls_back_to_local_when_s3_driver_is_not_available(): void
+    {
+        config()->set('uploads.s3_driver_available', false);
+
+        UploadStorage::applyRuntimeConfig([
+            'uploads_storage_disk' => 's3',
+            's3_key' => 'test-key',
+            's3_secret' => 'test-secret',
+            's3_region' => 'ca-east-1',
+            's3_bucket' => 'somosunn',
+        ]);
+
+        $this->assertSame('s3', config('uploads.selected_disk'));
+        $this->assertSame('public', UploadStorage::effectiveDisk());
+        $this->assertSame('local', config('filesystems.disks.public.driver'));
     }
 }

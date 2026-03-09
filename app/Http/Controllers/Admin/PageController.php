@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Support\CmsPageCatalog;
+use App\Support\UploadStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -345,7 +345,7 @@ class PageController extends Controller
 
             if ($request->boolean($removeKey)) {
                 if ($currentPath) {
-                    Storage::disk('public')->delete($currentPath);
+                    UploadStorage::delete($currentPath);
                 }
 
                 $newData[$field] = null;
@@ -354,10 +354,10 @@ class PageController extends Controller
 
             if ($request->hasFile($field)) {
                 if ($currentPath) {
-                    Storage::disk('public')->delete($currentPath);
+                    UploadStorage::delete($currentPath);
                 }
 
-                $newData[$field] = $request->file($field)->store('pages/' . $slug, 'public');
+                $newData[$field] = UploadStorage::storeUploadedFile($request->file($field), 'pages/' . $slug);
             }
         }
 

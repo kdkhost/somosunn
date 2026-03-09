@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class UploadStorage
@@ -12,7 +14,7 @@ class UploadStorage
         $selectedDisk = self::selectedDisk($settings);
         $effectiveDisk = 'public';
 
-        if ($selectedDisk === 's3' && self::s3Configured($settings)) {
+        if ($selectedDisk === 's3' && self::s3Configured($settings) && self::s3DriverAvailable()) {
             $s3Config = self::s3DiskConfig($settings);
             $effectiveDisk = 's3';
 
@@ -32,6 +34,10 @@ class UploadStorage
                 'filesystems.disks.uploads' => $localConfig,
                 'filesystems.disks.local_public' => $localConfig,
             ]);
+
+            if ($selectedDisk === 's3' && self::s3Configured($settings) && !self::s3DriverAvailable()) {
+                Log::warning('S3 selecionado para uploads, mas o driver AwsS3V3 nao esta disponivel neste ambiente. Aplicando fallback para armazenamento local.');
+            }
         }
 
         config([
@@ -59,6 +65,18 @@ class UploadStorage
     public static function disk()
     {
         return Storage::disk('public');
+    }
+
+    public static function storeUploadedFile(UploadedFile $file, string $directory, ?string $filename = null): string
+    {
+        $directory = trim(str_replace('\\', '/', $directory), '/');
+        $options = ['visibility' => 'public'];
+
+        if ($filename !== null && $filename !== '') {
+            return (string) self::disk()->putFileAs($directory, $file, $filename, $options);
+        }
+
+        return (string) self::disk()->putFile($directory, $file, $options);
     }
 
     public static function isLocal(): bool
@@ -250,6 +268,18 @@ class UploadStorage
             && trim((string) ($settings['s3_secret'] ?? '')) !== ''
             && trim((string) ($settings['s3_region'] ?? '')) !== ''
             && trim((string) ($settings['s3_bucket'] ?? '')) !== '';
+    }
+
+    private static function s3DriverAvailable(): bool
+    {
+        $override = config('uploads.s3_driver_available');
+        if ($override !== null) {
+            return (bool) $override;
+        }
+
+        return class_exists(\Aws\S3\S3Client::class)
+            && class_exists(\League\Flysystem\AwsS3V3\AwsS3V3Adapter::class)
+            && class_exists(\League\Flysystem\AwsS3V3\PortableVisibilityConverter::class);
     }
 
     private static function s3DiskConfig(array $settings): array

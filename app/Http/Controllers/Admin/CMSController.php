@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SiteContent;
+use App\Support\UploadStorage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class CMSController extends Controller
 {
@@ -46,7 +46,7 @@ class CMSController extends Controller
 
                 if ($request->boolean($removeKey)) {
                     if ($currentPath) {
-                        Storage::disk('public')->delete($currentPath);
+                        UploadStorage::delete($currentPath);
                     }
                     SiteContent::putValue($slug, $field, null, 'image');
                     continue;
@@ -54,10 +54,10 @@ class CMSController extends Controller
 
                 if ($request->hasFile($field)) {
                     if ($currentPath) {
-                        Storage::disk('public')->delete($currentPath);
+                        UploadStorage::delete($currentPath);
                     }
 
-                    $path = $request->file($field)->store('site-content/' . $slug, 'public');
+                    $path = UploadStorage::storeUploadedFile($request->file($field), 'site-content/' . $slug);
                     SiteContent::putValue($slug, $field, $path, 'image');
                 }
 
