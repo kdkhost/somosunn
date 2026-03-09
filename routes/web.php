@@ -544,6 +544,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::resource('mentorships', \App\Http\Controllers\Panel\Admin\MentorshipController::class);
 
         // Events Management
+        Route::get('events/list', [\App\Http\Controllers\Panel\Admin\EventController::class, 'list'])->name('events.list');
         Route::get('events/feed', [\App\Http\Controllers\Panel\Admin\EventController::class, 'feed'])->name('events.feed');
         Route::post('events/{event}/toggle-published', [\App\Http\Controllers\Panel\Admin\EventController::class, 'togglePublished'])->name('events.toggle-published');
 

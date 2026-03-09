@@ -26,6 +26,27 @@ class EventController extends Controller
         return view('panel.admin.events.index', compact('calendarSettings'));
     }
 
+    public function list(Request $request)
+    {
+        $this->ensurePermission('events.view');
+
+        $query = Event::query()->latest();
+
+        if (!$this->canManageAllEvents()) {
+            $query->where('user_id', Auth::id());
+        }
+
+        $search = trim((string) $request->query('q', ''));
+        if ($search !== '') {
+            $query->where('title', 'like', '%' . $search . '%');
+        }
+
+        $events = $query->paginate(10);
+        $events->appends($request->all());
+
+        return view('panel.admin.events.list', compact('events', 'search'));
+    }
+
     public function feed(Request $request)
     {
         $startRaw = $request->query('start', $request->input('start'));
