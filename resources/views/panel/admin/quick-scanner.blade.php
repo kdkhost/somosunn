@@ -14,7 +14,34 @@
         <div
             class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-6 relative">
             <div id="reader-wrapper"
-                class="relative bg-slate-100 dark:bg-slate-950 rounded-3xl overflow-hidden aspect-square border-4 border-slate-50 dark:border-slate-800 shadow-inner">
+                class="relative bg-slate-100 dark:bg-slate-950 rounded-3xl overflow-hidden aspect-square border-4 border-slate-50 dark:border-slate-800 shadow-inner flex items-center justify-center">
+
+                {{-- Start Button (Required for Audio/GPS/Camera permissions in some browsers) --}}
+                <div id="start-screen"
+                    class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 p-8 text-center">
+                    <div
+                        class="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl mb-6 shadow-xl shadow-blue-600/20 animate-pulse">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">Permissões Necessárias</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-8">
+                        Para validar ingressos, precisamos acessar sua **Câmera**, **Localização** e habilitar o **Sinal
+                        Sonoro**.
+                    </p>
+                    <button onclick="initializeScanner()"
+                        class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3">
+                        <i class="fas fa-play"></i> ATIVAR E INICIAR
+                    </button>
+
+                    @if(!request()->secure() && config('app.env') !== 'local')
+                        <div
+                            class="mt-6 p-4 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-bold border border-rose-100 dark:border-rose-800/50">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> Acesso via HTTP detectado. Câmera e GPS exigem
+                            HTTPS para funcionar.
+                        </div>
+                    @endif
+                </div>
+
                 <div id="reader" class="w-full h-full"></div>
 
                 {{-- Overlay Feedback --}}
@@ -76,10 +103,32 @@
         let isProcessing = false;
         let userCoords = { lat: null, lng: null };
 
+        let audioCtx = null;
+
         document.addEventListener('DOMContentLoaded', function () {
+            // Não inicia mais sozinho para respeitar políticas de Audio/Câmera
+        });
+
+        function initializeScanner() {
+            // Inicializa AudioContext no primeiro clique para permitir beeps
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch (e) {
+                console.error("Erro ao iniciar Áudio:", e);
+            }
+
+            // Esconde tela inicial
+            document.getElementById('start-screen').classList.add('hidden');
+
             requestGPS();
             startScanner();
-        });
+
+            // Beep de teste para confirmar áudio
+            setTimeout(() => playBeep('scan'), 100);
+        }
 
         function requestGPS() {
             if ("geolocation" in navigator) {
@@ -109,7 +158,7 @@
                     qrbox: { width: 250, height: 250 },
                     aspectRatio: 1.0
                 },
-                    /* verbose= */ false
+                        /* verbose= */ false
             );
             html5QrcodeScanner.render(onScanSuccess);
         }
@@ -203,12 +252,17 @@
         }
 
         function playBeep(type) {
+            if (!audioCtx) return;
+
             try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
                 osc.connect(gain);
-                gain.connect(ctx.destination);
+                gain.connect(audioCtx.destination);
 
                 if (type === 'scan') {
                     osc.frequency.setValueAtTime(600, ctx.currentTime);

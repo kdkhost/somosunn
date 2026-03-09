@@ -22,8 +22,26 @@
         <div class="bg-white shadow rounded-2xl overflow-hidden relative border border-gray-100 p-6">
 
             <div class="max-w-lg mx-auto">
-                <div id="reader-container"
-                    class="relative rounded-xl overflow-hidden shadow-inner border border-gray-200 bg-gray-50 p-2">
+                <div id="reader-wrapper"
+                    class="relative rounded-xl overflow-hidden shadow-inner border border-gray-200 bg-gray-50 p-2 flex items-center justify-center min-h-[300px]">
+
+                    {{-- Start Screen for Permissions --}}
+                    <div id="start-screen"
+                        class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gray-50 p-8 text-center rounded-xl">
+                        <div
+                            class="w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl mb-4 shadow-lg shadow-blue-600/20">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <h3 class="text-lg font-black text-gray-900 mb-1">Permissões de Validação</h3>
+                        <p class="text-xs text-gray-500 mb-6">
+                            Clique abaixo para habilitar a **Câmera**, **GPS** e os **Alertas Sonoros**.
+                        </p>
+                        <button onclick="initializeScanner()"
+                            class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fas fa-play"></i> INICIAR SCANNER
+                        </button>
+                    </div>
+
                     <div id="reader" class="rounded-lg overflow-hidden w-full"></div>
 
                     <!-- Overlay -->
@@ -75,24 +93,43 @@
 @push('scripts')
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script>
+        let audioCtx = null;
         let html5QrcodeScanner = null;
         let isProcessing = false;
         let userCoords = { lat: null, lng: null };
 
         document.addEventListener('DOMContentLoaded', function () {
+            // Aguarda clique para iniciar
+        });
+
+        function initializeScanner() {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch (e) {
+                console.error("Erro Áudio:", e);
+            }
+
+            document.getElementById('start-screen').classList.add('hidden');
+
             requestGPS();
             startScanner();
 
-            document.getElementById('manual-ticket-form').addEventListener('submit', function (e) {
-                e.preventDefault();
-                const input = document.getElementById('manual-ticket-input');
-                const code = input.value.trim();
-                if (code) {
-                    input.value = '';
-                    processTicket(code);
-                }
-            });
+            setTimeout(() => playBeep(true), 100);
+        }
+
+        document.getElementById('manual-ticket-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const input = document.getElementById('manual-ticket-input');
+            const code = input.value.trim();
+            if (code) {
+                input.value = '';
+                processTicket(code);
+            }
         });
+            });
 
         function requestGPS() {
             if ("geolocation" in navigator) {
@@ -120,7 +157,7 @@
                     qrbox: { width: 250, height: 250 },
                     aspectRatio: 1.0,
                 },
-                    /* verbose= */ false
+                        /* verbose= */ false
             );
 
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
@@ -249,14 +286,18 @@
         }
 
         function playBeep(success) {
+            if (!audioCtx) return;
+
             try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                const ctx = new AudioContext();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
 
                 osc.connect(gain);
-                gain.connect(ctx.destination);
+                gain.connect(audioCtx.destination);
 
                 if (success) {
                     osc.type = 'sine';
