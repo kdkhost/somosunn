@@ -42,11 +42,19 @@
 
     <div class="space-y-8">
         <div class="bg-gradient-to-br from-blue-600 via-indigo-700 to-violet-800 rounded-[2.5rem] p-10 text-white shadow-2xl shadow-blue-500/20 relative overflow-hidden">
-            <div class="relative z-10">
-                <h2 class="text-3xl font-bold mb-3">Central de Administração</h2>
-                <p class="text-blue-100/90 max-w-2xl text-lg font-medium">
-                    Gerencie a plataforma em um único lugar, com indicadores globais, acompanhamento em tempo real e atalhos operacionais.
-                </p>
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="max-w-2xl">
+                    <h2 class="text-3xl font-bold mb-3">Central de Administração</h2>
+                    <p class="text-blue-100/90 text-lg font-medium">
+                        Gerencie a plataforma em um único lugar, com indicadores globais e atalhos operacionais.
+                    </p>
+                </div>
+                <div class="shrink-0">
+                    <a href="{{ route('panel.admin.quick-scanner') }}" class="inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-700 rounded-3xl font-black text-lg hover:bg-blue-50 hover:scale-105 transition-all shadow-xl shadow-black/20 group">
+                        <i class="fas fa-qrcode text-2xl group-hover:rotate-12 transition-transform"></i>
+                        Escanear Ingressos
+                    </a>
+                </div>
             </div>
             <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
             <div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-blue-400/20 rounded-full blur-2xl"></div>

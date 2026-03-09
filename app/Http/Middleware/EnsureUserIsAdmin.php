@@ -70,6 +70,7 @@ class EnsureUserIsAdmin
                 'panel.admin.mentorships.',
                 'panel.admin.events.',
                 'panel.admin.certificates.',
+                'panel.admin.quick-scanner',
             ]);
         }
 

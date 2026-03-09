@@ -10,7 +10,8 @@
                     <i class="fas fa-qrcode text-blue-600"></i> Validação de Ingressos
                 </h1>
                 <p class="text-gray-500 mt-1">{{ $event->title }} &bull;
-                    {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y H:i') }}</p>
+                    {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y H:i') }}
+                </p>
             </div>
             <a href="{{ route('panel.events.show', $event) }}"
                 class="bg-white border shadow-sm text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition font-medium">
@@ -76,8 +77,10 @@
     <script>
         let html5QrcodeScanner = null;
         let isProcessing = false;
+        let userCoords = { lat: null, lng: null };
 
         document.addEventListener('DOMContentLoaded', function () {
+            requestGPS();
             startScanner();
 
             document.getElementById('manual-ticket-form').addEventListener('submit', function (e) {
@@ -91,6 +94,20 @@
             });
         });
 
+        function requestGPS() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userCoords.lat = position.coords.latitude;
+                        userCoords.lng = position.coords.longitude;
+                    },
+                    (error) => {
+                        console.error("Erro GPS:", error);
+                    }
+                );
+            }
+        }
+
         function startScanner() {
             if (html5QrcodeScanner) {
                 html5QrcodeScanner.clear();
@@ -103,7 +120,7 @@
                     qrbox: { width: 250, height: 250 },
                     aspectRatio: 1.0,
                 },
-                /* verbose= */ false
+                    /* verbose= */ false
             );
 
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
@@ -124,6 +141,21 @@
 
             showOverlay('process', 'Processando...', 'Validando ingresso no sistema...');
 
+            // Tenta pegar o GPS mais atualizado antes de enviar
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    userCoords.lat = position.coords.latitude;
+                    userCoords.lng = position.coords.longitude;
+                    sendValidation(code);
+                }, () => {
+                    sendValidation(code);
+                }, { timeout: 3000 });
+            } else {
+                sendValidation(code);
+            }
+        }
+
+        function sendValidation(code) {
             fetch('{{ route('panel.events.scanner.validate', $event) }}', {
                 method: 'POST',
                 headers: {
@@ -131,42 +163,24 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ ticket_code: code })
+                body: JSON.stringify({
+                    ticket_code: code,
+                    latitude: userCoords.lat,
+                    longitude: userCoords.lng
+                })
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         showOverlay('success', 'Entrada Liberada!', data.participant_name ? 'Participante: ' + data.participant_name : data.message);
-
-                        if (typeof toastr !== 'undefined') toastr.success(data.message);
-                        if (typeof Swal !== 'undefined') {
-                            Swal.fire({
-                                title: 'Acesso Liberado!',
-                                text: data.participant_name ? 'Participante: ' + data.participant_name : data.message,
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                        }
                         playBeep(true);
                     } else {
                         showOverlay('error', 'Ingresso Inválido', data.message);
-
-                        if (typeof toastr !== 'undefined') toastr.error(data.message);
-                        if (typeof Swal !== 'undefined') {
-                            Swal.fire({
-                                title: 'Acesso Negado',
-                                text: data.message,
-                                icon: 'error'
-                            });
-                        }
                         playBeep(false);
                     }
                 })
                 .catch(error => {
-                    console.error('Erro na validação do ingresso:', error);
                     showOverlay('error', 'Erro no Sistema', 'Verifique a conexão de internet e tente novamente.');
-                    if (typeof toastr !== 'undefined') toastr.error('Erro de comunicação com o servidor');
                     playBeep(false);
                 });
         }

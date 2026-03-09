@@ -102,6 +102,12 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex items-center justify-end gap-2 text-slate-400 dark:text-slate-500 transition-opacity">
+                                        <a href="{{ route('panel.admin.events.scanner', $event) }}"
+                                            class="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-lg transition-colors border border-transparent hover:border-emerald-100 dark:hover:border-emerald-800/50"
+                                            title="Escanear Ingressos">
+                                            <i class="fas fa-qrcode"></i>
+                                        </a>
+
                                         <a href="{{ route('panel.admin.events.edit', $event) }}"
                                             class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors border border-transparent hover:border-blue-100 dark:hover:border-blue-800/50"
                                             title="Editar">

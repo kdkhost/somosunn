@@ -7,31 +7,32 @@ use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Services\PointsService;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
-class EventScannerController extends Controller
+class QuickScannerController extends Controller
 {
-    public function index(Event $event)
+    public function index()
     {
-        // Verifica permissão (Admin vê tudo, Instrutor vê apenas o seu)
-        if (!auth()->user()->isAdmin() && $event->user_id !== auth()->id()) {
-            abort(403, 'Apenas o organizador pode acessar o scanner deste evento.');
+        $user = auth()->user();
+
+        // Pega eventos de hoje e próximos dias
+        $query = Event::where('start_at', '>=', now()->startOfDay())
+            ->where('start_at', '<=', now()->addDays(3)->endOfDay())
+            ->where('published', true)
+            ->where('is_ticket_enabled', true);
+
+        // Se não for admin, vê apenas os seus
+        if (!$user->isAdmin()) {
+            $query->where('user_id', $user->id);
         }
 
-        if (!$event->is_ticket_enabled) {
-            return redirect()->route('panel.events.show', $event)
-                ->with('error', 'A validação por QR Code não está habilitada para este evento.');
-        }
+        $todayEvents = $query->orderBy('start_at')->get();
 
-        return view('panel.events.scanner', compact('event'));
+        return view('panel.admin.quick-scanner', compact('todayEvents'));
     }
 
-    public function validateTicket(Request $request, Event $event, PointsService $pointsService)
+    public function validateTicket(Request $request, PointsService $pointsService)
     {
-        // Verifica permissão (Admin pode tudo, Instrutor apenas o seu)
-        if (!auth()->user()->isAdmin() && $event->user_id !== auth()->id()) {
-            return response()->json(['success' => false, 'message' => 'Acesso negado.'], 403);
-        }
-
         $request->validate([
             'ticket_code' => 'required|string',
             'latitude' => 'nullable|numeric',
@@ -41,10 +42,35 @@ class EventScannerController extends Controller
         $ticketCode = $request->input('ticket_code');
         $userLat = $request->input('latitude');
         $userLng = $request->input('longitude');
+
+        // Busca o ingresso em qualquer evento ativo
+        $registration = EventRegistration::where('ticket_code', $ticketCode)
+            ->whereIn('status', EventRegistration::COUNTED_STATUSES)
+            ->with(['event', 'user'])
+            ->first();
+
+        if (!$registration) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ingresso não encontrado ou inválido.'
+            ]);
+        }
+
+        $event = $registration->event;
+        $authUser = auth()->user();
+
+        // 0. Verificação de Permissão (Instrutores só validam seus próprios eventos)
+        if (!$authUser->isAdmin() && $event->user_id !== $authUser->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Você não tem permissão para validar ingressos deste evento.'
+            ]);
+        }
+
         $now = now();
 
         // 1. Validação de Data (Apenas no dia do evento)
-        $eventDay = \Carbon\Carbon::parse($event->start_at)->startOfDay();
+        $eventDay = Carbon::parse($event->start_at)->startOfDay();
         if (!$now->isSameDay($eventDay)) {
             return response()->json([
                 'success' => false,
@@ -54,7 +80,7 @@ class EventScannerController extends Controller
 
         // 2. Validação de Horário (Não permitir se o evento já terminou a mais de 4 horas)
         if ($event->end_at) {
-            $endLimit = \Carbon\Carbon::parse($event->end_at)->addHours(4);
+            $endLimit = Carbon::parse($event->end_at)->addHours(4);
             if ($now->gt($endLimit)) {
                 return response()->json([
                     'success' => false,
@@ -83,21 +109,13 @@ class EventScannerController extends Controller
             }
         }
 
-        // Busca o ingresso
-        $registration = EventRegistration::where('event_id', $event->id)
-            ->where('ticket_code', $ticketCode)
-            ->whereIn('status', EventRegistration::COUNTED_STATUSES)
-            ->with('user')
-            ->first();
-
-        if (!$registration) {
-            return response()->json(['success' => false, 'message' => 'Ingresso não encontrado ou inválido para este evento.']);
-        }
-
+        // 4. Verifica se o ingresso já foi usado
         if ($registration->check_in_at) {
             return response()->json([
                 'success' => false,
-                'message' => 'Este ingresso já foi validado em ' . $registration->check_in_at->format('H:i')
+                'message' => 'Este ingresso já foi validado em ' . $registration->check_in_at->format('H:i'),
+                'participant_name' => $registration->user ? $registration->user->name : $registration->name,
+                'event_title' => $event->title
             ]);
         }
 
@@ -114,27 +132,38 @@ class EventScannerController extends Controller
                     $pointsService->award($user, 'event_scan_participant');
             }
 
-            $organizer = \App\Models\User::find($event->user_id);
+            $organizerId = $event->user_id;
+            $organizer = \App\Models\User::find($organizerId);
             if ($organizer)
                 $pointsService->award($organizer, 'event_scan_organizer');
         } catch (\Exception $e) {
-            \Log::error('Erro ao atribuir pontos no check-in do evento: ' . $e->getMessage());
+            \Log::error('Erro ao atribuir pontos no Quick Scanner: ' . $e->getMessage());
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Ingresso validado com sucesso! Check-in realizado.',
+            'message' => 'Entrada Liberada!',
             'participant_name' => $registration->user ? $registration->user->name : $registration->name,
+            'event_title' => $event->title
         ]);
     }
 
+    /**
+     * Calcula distância em KM usando a fórmula de Haversine
+     */
     private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
         $earthRadius = 6371; // km
+
         $dLat = deg2rad($lat2 - $lat1);
         $dLon = deg2rad($lon2 - $lon1);
-        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon / 2) * sin($dLon / 2);
+
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
         return $earthRadius * $c;
     }
 }

@@ -25,6 +25,22 @@
             </div>
         </div>
 
+        <!-- Scanner Quick Access -->
+        <div class="bg-white dark:bg-slate-900 rounded-[2rem] border-2 border-dashed border-blue-200 dark:border-blue-900/50 p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm hover:border-blue-400 transition-all">
+            <div class="flex items-center gap-5">
+                <div class="w-16 h-16 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-blue-600/20">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-black text-slate-900 dark:text-white">Scanner de Ingressos</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">Valide entradas de seus eventos hoje usando a câmera do celular.</p>
+                </div>
+            </div>
+            <a href="{{ route('panel.admin.quick-scanner') }}" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-2xl shadow-xl shadow-blue-600/20 transition-all text-center flex items-center justify-center gap-2">
+                <i class="fas fa-camera"></i> Abrir Scanner Agora
+            </a>
+        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
             <div
                 class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">

@@ -2,6 +2,7 @@
 
 ## Novidades Recentes (mar/2026)
 
+- **Scanner Universal com Antifraude (GPS 10m):** O Scanner Universal (`/panel/admin/quick-scanner`) agora conta com travas de geolocalização rigorosas (precisão de 10 metros), garantindo que o check-in ocorra apenas no local exato do evento. O acesso foi expandido para **Instrutores e Mentores**, que agora podem validar seus próprios eventos diretamente pelo celular, com feedback sonoro e visual instantâneo para agilizar filas e evitar fraudes de duplicidade ou localização.
 - **Galeria de Eventos e Palestras:** Criada nova página pública (`/galeria`) organizada por eventos para exibição de fotos e vídeos. A interface conta com animações premium ativadas por hover, paginação para performance e visualização em Lightbox, seguindo o padrão visual moderno da plataforma.
 - **Marca d'água Dinâmica e Configurável:** Implementado controle total sobre a marca d'água aplicada às fotos da galeria. Administradores podem agora configurar a **logo específica, opacidade e posição** no painel de Configurações de Imagem, garantindo proteção visual personalizada para o conteúdo da comunidade.
 - **Otimizações de Performance no Dashboard:** Realizada auditoria e refatoração do `DashboardMetricsService` para eliminar consultas redundantes. Múltiplas queries SQL em loops foram substituídas por agregação direta no banco de dados (`groupBy`), reduzindo o tempo de carregamento e o consumo de recursos do servidor.

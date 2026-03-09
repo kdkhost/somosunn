@@ -550,9 +550,13 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::get('events/feed', [\App\Http\Controllers\Panel\Admin\EventController::class, 'feed'])->name('events.feed');
         Route::post('events/{event}/toggle-published', [\App\Http\Controllers\Panel\Admin\EventController::class, 'togglePublished'])->name('events.toggle-published');
 
-        // Event QR Code Scanner (Panel)
+        // Event QR Code Scanner (Standard per-event)
         Route::get('events/{event}/scanner', [\App\Http\Controllers\Panel\EventScannerController::class, 'index'])->name('events.scanner');
         Route::post('events/{event}/scanner/validate', [\App\Http\Controllers\Panel\EventScannerController::class, 'validateTicket'])->name('events.scanner.validate');
+
+        // Quick Scanner (Universal)
+        Route::get('quick-scanner', [\App\Http\Controllers\Panel\QuickScannerController::class, 'index'])->name('quick-scanner');
+        Route::post('quick-scanner/validate', [\App\Http\Controllers\Panel\QuickScannerController::class, 'validateTicket'])->name('quick-scanner.validate');
 
         // Event Media Gallery (Panel)
         Route::post('events/{event}/media', [\App\Http\Controllers\Panel\EventMediaController::class, 'store'])->name('events.media.store');
