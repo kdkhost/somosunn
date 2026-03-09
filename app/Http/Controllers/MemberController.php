@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Page;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class MemberController extends Controller
 {
@@ -52,6 +53,8 @@ class MemberController extends Controller
         try {
             $query = User::where('role', '!=', 'superadmin')
                 ->whereNotIn('id', $blockedUserIds);
+
+            $this->applyPaidPlanFilter($query);
 
             // Hide private profiles if not connected and not admin
             if (!auth()->user()?->isAdmin()) {
@@ -189,5 +192,68 @@ class MemberController extends Controller
         $pageData = Page::dataBySlug('membros');
 
         return view('site.membros', compact('members', 'connectionMap', 'pageData'));
+    }
+
+    protected function applyPaidPlanFilter($query): void
+    {
+        $hasUsersPlan = Schema::hasColumn('users', 'plan_id');
+        $hasUsersPlanExpiry = Schema::hasColumn('users', 'plan_expires_at');
+        $hasPlansTable = Schema::hasTable('plans');
+        $hasSubscriptionsTable = Schema::hasTable('subscriptions');
+
+        $canFilterByDirectPlan = $hasUsersPlan && $hasPlansTable;
+        $canFilterBySubscription = $hasSubscriptionsTable && $hasPlansTable;
+
+        if (!$canFilterByDirectPlan && !$canFilterBySubscription) {
+            $query->whereRaw('1 = 0');
+
+            return;
+        }
+
+        $query->where(function ($membershipQuery) use (
+            $canFilterByDirectPlan,
+            $canFilterBySubscription,
+            $hasUsersPlanExpiry
+        ) {
+            if ($canFilterByDirectPlan) {
+                $membershipQuery->where(function ($directPlanQuery) use ($hasUsersPlanExpiry) {
+                    $directPlanQuery->whereNotNull('plan_id');
+
+                    if ($hasUsersPlanExpiry) {
+                        $directPlanQuery->where(function ($expiryQuery) {
+                            $expiryQuery->whereNull('plan_expires_at')
+                                ->orWhere('plan_expires_at', '>', now());
+                        });
+                    }
+
+                    $directPlanQuery->whereHas('plan', function ($planQuery) {
+                        $planQuery->where('is_active', true)
+                            ->where(function ($paidPlanQuery) {
+                                $paidPlanQuery->where('is_free', false)
+                                    ->orWhere('price', '>', 0);
+                            });
+                    });
+                });
+            }
+
+            if ($canFilterBySubscription) {
+                $method = $canFilterByDirectPlan ? 'orWhereHas' : 'whereHas';
+
+                $membershipQuery->{$method}('subscriptions', function ($subscriptionQuery) {
+                    $subscriptionQuery->where('status', 'active')
+                        ->where(function ($endsAtQuery) {
+                            $endsAtQuery->whereNull('ends_at')
+                                ->orWhere('ends_at', '>', now());
+                        })
+                        ->whereHas('plan', function ($planQuery) {
+                            $planQuery->where('is_active', true)
+                                ->where(function ($paidPlanQuery) {
+                                    $paidPlanQuery->where('is_free', false)
+                                        ->orWhere('price', '>', 0);
+                                });
+                        });
+                });
+            }
+        });
     }
 }
