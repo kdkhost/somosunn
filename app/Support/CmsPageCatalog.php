@@ -418,10 +418,54 @@ class CmsPageCatalog
     public static function upsertDefaults(): void
     {
         foreach (self::definitions() as $page) {
-            Page::query()->updateOrCreate(
-                ['slug' => $page['slug']],
-                ['title' => $page['title'], 'data' => $page['data']]
-            );
+            /** @var Page $record */
+            $record = Page::query()->firstOrNew(['slug' => $page['slug']]);
+            $existingData = is_array($record->data) ? $record->data : [];
+
+            $record->title = self::preferExistingScalar($record->title, $page['title']);
+            $record->data = self::mergeMissingData($existingData, $page['data']);
+
+            if (!$record->exists || $record->isDirty()) {
+                $record->save();
+            }
         }
+    }
+
+    private static function preferExistingScalar(mixed $existing, mixed $default): mixed
+    {
+        if ($existing === null) {
+            return $default;
+        }
+
+        if (is_string($existing) && trim($existing) === '') {
+            return $default;
+        }
+
+        return $existing;
+    }
+
+    private static function mergeMissingData(array $existing, array $defaults): array
+    {
+        foreach ($defaults as $key => $defaultValue) {
+            if (!array_key_exists($key, $existing) || $existing[$key] === null) {
+                $existing[$key] = $defaultValue;
+                continue;
+            }
+
+            if (is_array($defaultValue) && is_array($existing[$key]) && self::isAssociative($defaultValue) && self::isAssociative($existing[$key])) {
+                $existing[$key] = self::mergeMissingData($existing[$key], $defaultValue);
+            }
+        }
+
+        return $existing;
+    }
+
+    private static function isAssociative(array $value): bool
+    {
+        if ($value === []) {
+            return false;
+        }
+
+        return array_keys($value) !== range(0, count($value) - 1);
     }
 }

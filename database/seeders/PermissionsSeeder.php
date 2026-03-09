@@ -283,24 +283,31 @@ class PermissionsSeeder extends Seeder
             ]),
         ];
 
-        // limpa vínculos antigos
-        DB::table('permission_role')->truncate();
-        DB::table('role_user')->truncate();
-
         foreach ($rolePerms as $roleName => $permIdList) {
             $roleId = $roleIds[$roleName] ?? null;
-            if (!$roleId)
+            if (!$roleId) {
                 continue;
-            $rows = array_map(fn($pid) => ['role_id' => $roleId, 'permission_id' => $pid], $permIdList);
-            DB::table('permission_role')->insert($rows);
+            }
+
+            foreach ($permIdList as $permissionId) {
+                DB::table('permission_role')->updateOrInsert(
+                    ['role_id' => $roleId, 'permission_id' => $permissionId],
+                    ['role_id' => $roleId, 'permission_id' => $permissionId]
+                );
+            }
         }
 
-        // atribui superadmin ao primeiro usuário, se existir
+        // Atribui superadmin ao primeiro usuário apenas se ainda não existir nenhum vínculo desse papel.
         $userId = DB::table('users')->min('id');
-        if ($userId && isset($roleIds['superadmin'])) {
+        $superadminRoleId = $roleIds['superadmin'] ?? null;
+        $hasSuperadminAssignment = $superadminRoleId
+            ? DB::table('role_user')->where('role_id', $superadminRoleId)->exists()
+            : false;
+
+        if ($userId && $superadminRoleId && !$hasSuperadminAssignment) {
             DB::table('role_user')->updateOrInsert(
-                ['role_id' => $roleIds['superadmin'], 'user_id' => $userId],
-                ['role_id' => $roleIds['superadmin'], 'user_id' => $userId]
+                ['role_id' => $superadminRoleId, 'user_id' => $userId],
+                ['role_id' => $superadminRoleId, 'user_id' => $userId]
             );
         }
     }

@@ -43,34 +43,14 @@ class PlansSeeder extends Seeder
         ];
 
         foreach ($plans as $slug => $plan) {
-            DB::table('plans')->updateOrInsert(
-                ['slug' => $slug],
-                [
-                    'name' => $plan['name'],
-                    'slug' => $plan['slug'],
-                    'price' => $plan['price'],
-                    'description' => $plan['description'],
-                    'period' => $plan['period'],
-                    'billing_cycle' => $plan['billing_cycle'],
-                    'prorata' => $plan['prorata'],
-                    'is_active' => true,
-                    'is_free' => $plan['is_free'],
-                    'is_recurring' => !$plan['is_free'],
-                    'sort_order' => $plan['sort_order'],
-                    'highlight' => $plan['highlight'],
-                    'is_featured' => $plan['highlight'],
-                    'benefits' => json_encode($plan['benefits'] ?? []),
-                    'permissions' => json_encode(Plan::normalizeCommercialPermissions(
-                        $plan['permissions'] ?? [],
-                        (bool) ($plan['is_free'] ?? false),
-                        (float) ($plan['price'] ?? 0)
-                    )),
-                    'price_periods' => json_encode($plan['price_periods']),
-                    'period_settings' => json_encode($plan['period_settings']),
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]
-            );
+            $existing = DB::table('plans')->where('slug', $slug)->first();
+            $payload = $this->buildPayload($plan, $existing, $now);
+
+            if ($existing) {
+                DB::table('plans')->where('id', $existing->id)->update($payload);
+            } else {
+                DB::table('plans')->insert($payload + ['created_at' => $now]);
+            }
         }
     }
 
@@ -111,5 +91,86 @@ class PlansSeeder extends Seeder
             'price_periods' => $pricePeriods,
             'period_settings' => $periodSettings,
         ];
+    }
+
+    private function buildPayload(array $plan, object|null $existing, $now): array
+    {
+        $price = $existing && $existing->price !== null
+            ? round((float) $existing->price, 2)
+            : round((float) $plan['price'], 2);
+
+        $isFree = $existing && $existing->is_free !== null
+            ? (bool) $existing->is_free
+            : (bool) $plan['is_free'];
+
+        $existingBenefits = $this->decodeJsonArray($existing?->benefits);
+        $existingPermissions = $this->decodeJsonArray($existing?->permissions);
+        $existingPricePeriods = $this->decodeJsonArray($existing?->price_periods);
+        $existingPeriodSettings = $this->decodeJsonArray($existing?->period_settings);
+
+        $pricePeriods = $existingPricePeriods !== []
+            ? Plan::normalizePricePeriods($existingPricePeriods, $price, $isFree)
+            : $plan['price_periods'];
+
+        $periodSettings = $existingPeriodSettings !== []
+            ? Plan::normalizePeriodSettings($existingPeriodSettings, $pricePeriods, $isFree)
+            : Plan::normalizePeriodSettings($plan['period_settings'], $pricePeriods, $isFree);
+
+        if (!$isFree && $existingPricePeriods !== []) {
+            $pricePeriods = Plan::ensureEnabledPeriodPrices($pricePeriods, $periodSettings, $price);
+        }
+
+        $permissions = $existingPermissions !== []
+            ? Plan::normalizeCommercialPermissions($existingPermissions, $isFree, $price)
+            : Plan::normalizeCommercialPermissions(
+                $plan['permissions'] ?? [],
+                $isFree,
+                $price
+            );
+
+        return [
+            'name' => $this->preferExistingString($existing?->name, $plan['name']),
+            'slug' => $plan['slug'],
+            'price' => $price,
+            'description' => $this->preferExistingString($existing?->description, $plan['description']),
+            'period' => $this->preferExistingString($existing?->period, $plan['period']),
+            'billing_cycle' => $existing?->billing_cycle ?? $plan['billing_cycle'],
+            'prorata' => $existing?->prorata ?? $plan['prorata'],
+            'is_active' => $existing?->is_active ?? true,
+            'is_free' => $isFree,
+            'is_recurring' => $existing?->is_recurring ?? !$isFree,
+            'sort_order' => $existing?->sort_order ?? $plan['sort_order'],
+            'highlight' => $existing?->highlight ?? $plan['highlight'],
+            'is_featured' => $existing?->is_featured ?? $plan['highlight'],
+            'benefits' => json_encode($existingBenefits !== [] ? $existingBenefits : ($plan['benefits'] ?? [])),
+            'permissions' => json_encode($permissions),
+            'price_periods' => json_encode($pricePeriods),
+            'period_settings' => json_encode($periodSettings),
+            'updated_at' => $now,
+        ];
+    }
+
+    private function decodeJsonArray(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (!is_string($value) || trim($value) === '') {
+            return [];
+        }
+
+        $decoded = json_decode($value, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    private function preferExistingString(mixed $existing, string $default): string
+    {
+        if (is_string($existing) && trim($existing) !== '') {
+            return $existing;
+        }
+
+        return $default;
     }
 }

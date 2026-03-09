@@ -20,6 +20,7 @@ return new class extends Migration
         $plans = DB::table('plans')->get();
 
         $freePlanIds = [];
+        $hasExplicitFreePlan = DB::table('plans')->where('is_free', true)->exists();
 
         foreach ($plans as $row) {
             $slug = strtolower(trim((string) ($row->slug ?? '')));
@@ -30,11 +31,12 @@ return new class extends Migration
                 $freePlanIds[] = (int) $row->id;
             }
 
-            $pricePeriods = $this->decodeJsonArray($row->price_periods ?? null);
-            $pricePeriods = Plan::normalizePricePeriods($pricePeriods, $price, $isFree);
+            $existingPricePeriods = $this->decodeJsonArray($row->price_periods ?? null);
+            $pricePeriods = Plan::normalizePricePeriods($existingPricePeriods, $price, $isFree);
 
+            $existingPeriodSettings = $this->decodeJsonArray($row->period_settings ?? null);
             $periodSettings = Plan::normalizePeriodSettings(
-                $this->decodeJsonArray($row->period_settings ?? null),
+                $existingPeriodSettings,
                 $pricePeriods,
                 $isFree
             );
@@ -48,53 +50,81 @@ return new class extends Migration
             if ($isFree) {
                 $blueprint = Plan::blueprintForPlan($slug, true);
                 if ($blueprint) {
-                    $update['is_free'] = false;
-                    $update['description'] = $blueprint['description'];
-                    $update['benefits'] = json_encode($blueprint['benefits']);
-                    $update['permissions'] = json_encode(Plan::normalizeCommercialPermissions(
-                        $blueprint['permissions'],
-                        true,
-                        0
-                    ));
-                    $update['period'] = $blueprint['period'];
-                    $update['period_settings'] = json_encode($blueprint['period_settings']);
-                    $update['price_periods'] = json_encode(['mensal' => 0.0]);
+                    if (!$hasExplicitFreePlan) {
+                        $update['is_free'] = true;
+                        $hasExplicitFreePlan = true;
+                    }
+
+                    if (trim((string) ($row->description ?? '')) === '') {
+                        $update['description'] = $blueprint['description'];
+                    }
+
+                    if ($this->decodeJsonArray($row->benefits ?? null) === []) {
+                        $update['benefits'] = json_encode($blueprint['benefits']);
+                    }
+
+                    if ($this->decodeJsonArray($row->permissions ?? null) === []) {
+                        $update['permissions'] = json_encode(Plan::normalizeCommercialPermissions(
+                            $blueprint['permissions'],
+                            true,
+                            0
+                        ));
+                    }
+
+                    if (trim((string) ($row->period ?? '')) === '') {
+                        $update['period'] = $blueprint['period'];
+                    }
+
+                    if ($existingPeriodSettings === []) {
+                        $update['period_settings'] = json_encode($blueprint['period_settings']);
+                    }
+
+                    if ($existingPricePeriods === []) {
+                        $update['price_periods'] = json_encode(['mensal' => 0.0]);
+                    }
                 }
             } elseif (in_array($slug, ['pro', 'elite'], true)) {
                 $blueprint = Plan::blueprintForPlan($slug, false);
 
                 if ($blueprint) {
-                    $pricePeriods = Plan::ensureEnabledPeriodPrices(
-                        $pricePeriods,
-                        $blueprint['period_settings'],
-                        $price
-                    );
+                    if ($existingPeriodSettings === []) {
+                        $pricePeriods = Plan::ensureEnabledPeriodPrices(
+                            $pricePeriods,
+                            $blueprint['period_settings'],
+                            $price
+                        );
+                        $update['price_periods'] = json_encode($pricePeriods);
+                        $update['period_settings'] = json_encode($blueprint['period_settings']);
+                    }
 
-                    $update['description'] = $blueprint['description'];
-                    $update['benefits'] = json_encode($blueprint['benefits']);
-                    $update['permissions'] = json_encode(Plan::normalizeCommercialPermissions(
-                        $blueprint['permissions'],
-                        false,
-                        $price
-                    ));
-                    $update['period'] = $blueprint['period'];
-                    $update['price_periods'] = json_encode($pricePeriods);
-                    $update['period_settings'] = json_encode($blueprint['period_settings']);
+                    if (trim((string) ($row->description ?? '')) === '') {
+                        $update['description'] = $blueprint['description'];
+                    }
+
+                    if ($this->decodeJsonArray($row->benefits ?? null) === []) {
+                        $update['benefits'] = json_encode($blueprint['benefits']);
+                    }
+
+                    if ($this->decodeJsonArray($row->permissions ?? null) === []) {
+                        $update['permissions'] = json_encode(Plan::normalizeCommercialPermissions(
+                            $blueprint['permissions'],
+                            false,
+                            $price
+                        ));
+                    }
+
+                    if (trim((string) ($row->period ?? '')) === '') {
+                        $update['period'] = $blueprint['period'];
+                    }
                 }
             }
 
             DB::table('plans')->where('id', $row->id)->update($update);
         }
 
-        if ($freePlanIds !== []) {
-            $defaultFreePlanId = $freePlanIds[0];
-
+        if (!$hasExplicitFreePlan && $freePlanIds !== []) {
             DB::table('plans')
-                ->whereIn('id', $freePlanIds)
-                ->update(['is_free' => false, 'updated_at' => $now]);
-
-            DB::table('plans')
-                ->where('id', $defaultFreePlanId)
+                ->where('id', $freePlanIds[0])
                 ->update(['is_free' => true, 'updated_at' => $now]);
         }
     }
