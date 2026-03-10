@@ -169,6 +169,38 @@
             background: linear-gradient(90deg, #38bdf8, #2563eb);
             transition: width 0.18s ease;
         }
+
+        /* Estilos Premium para Upload Widgets (Consistência com Admin) */
+        .premium-upload-box {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .drop-zone-area {
+            border: 2px dashed #e2e8f0;
+            background: #f8fafc;
+            border-radius: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dark .drop-zone-area {
+            border-color: #334155;
+            background: #0f172a;
+        }
+
+        .drop-zone-area:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .premium-upload-box.dragover .drop-zone-area {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.05);
+            transform: scale(1.01);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
     </style>
 @endprepend
 
@@ -290,26 +322,26 @@
                     card.id = 'panel-upload-progress';
                     card.className = 'panel-upload-progress';
                     card.innerHTML = `
-                                        <div class="panel-upload-progress__card">
-                                            <div class="flex items-start justify-between gap-4">
-                                                <div>
-                                                    <p class="text-xs font-black uppercase tracking-[0.25em] text-sky-300">Upload</p>
-                                                    <h3 class="mt-1 text-base font-bold text-white">Enviando arquivos</h3>
+                                                <div class="panel-upload-progress__card">
+                                                    <div class="flex items-start justify-between gap-4">
+                                                        <div>
+                                                            <p class="text-xs font-black uppercase tracking-[0.25em] text-sky-300">Upload</p>
+                                                            <h3 class="mt-1 text-base font-bold text-white">Enviando arquivos</h3>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <div class="text-sm font-black text-white" data-upload-percent>0%</div>
+                                                            <div class="text-[11px] text-slate-300" data-upload-size>0 B / 0 B</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-4 panel-upload-progress__bar">
+                                                        <span data-upload-fill></span>
+                                                    </div>
+                                                    <div class="mt-3 flex items-center justify-between gap-3 text-[11px] text-slate-300">
+                                                        <span data-upload-status>Preparando envio...</span>
+                                                        <span data-upload-remaining>calculando tempo restante...</span>
+                                                    </div>
                                                 </div>
-                                                <div class="text-right">
-                                                    <div class="text-sm font-black text-white" data-upload-percent>0%</div>
-                                                    <div class="text-[11px] text-slate-300" data-upload-size>0 B / 0 B</div>
-                                                </div>
-                                            </div>
-                                            <div class="mt-4 panel-upload-progress__bar">
-                                                <span data-upload-fill></span>
-                                            </div>
-                                            <div class="mt-3 flex items-center justify-between gap-3 text-[11px] text-slate-300">
-                                                <span data-upload-status>Preparando envio...</span>
-                                                <span data-upload-remaining>calculando tempo restante...</span>
-                                            </div>
-                                        </div>
-                                    `;
+                                            `;
 
                     document.body.appendChild(card);
                     return card;

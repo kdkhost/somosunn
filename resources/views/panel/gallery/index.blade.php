@@ -157,7 +157,7 @@
                 </div>
 
                 <form action="{{ route('panel.gallery.upload') }}" method="POST" enctype="multipart/form-data"
-                    id="uploadForm">
+                    id="uploadForm" class="premium-upload-box">
                     @csrf
                     <div class="mb-8">
                         <label class="block text-sm font-black text-slate-800 mb-3 ml-1 uppercase tracking-wider">QUAL É O
@@ -177,38 +177,40 @@
                     </div>
 
                     <div class="mb-10">
-                        <label class="block text-sm font-black text-slate-800 mb-3 ml-1 uppercase tracking-wider">SELECIONE
+                        <label
+                            class="block text-sm font-black text-slate-800 mb-3 ml-1 uppercase tracking-wider text-center md:text-left">SELECIONE
                             AS FOTOS</label>
                         <div class="relative group">
                             <div id="dropzone"
-                                class="w-full h-56 border-3 border-dashed border-slate-200 rounded-[32px] flex flex-col items-center justify-center gap-4 bg-slate-50 group-hover:bg-blue-50 group-hover:border-blue-300 transition-all cursor-pointer overflow-hidden relative">
+                                class="drop-zone-area w-full h-64 flex flex-col items-center justify-center gap-4 transition-all">
                                 <div
-                                    class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg text-blue-500 text-2xl group-hover:scale-110 transition-all">
+                                    class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-xl text-blue-500 text-3xl group-hover:scale-110 group-hover:rotate-6 transition-all border border-slate-100">
                                     <i class="fas fa-images"></i>
                                 </div>
-                                <div class="text-center">
+                                <div class="text-center px-4">
                                     <p
-                                        class="text-base font-black text-slate-800 group-hover:text-blue-600 transition-colors">
-                                        Clique para selecionar fotos</p>
-                                    <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">OU ARRASTE E
-                                        SOLTE AQUI</p>
+                                        class="text-lg font-black text-slate-800 group-hover:text-blue-600 transition-colors">
+                                        Clique ou arraste suas fotos</p>
+                                    <p class="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-[0.2em]">
+                                        Formatos aceitos: JPG, PNG, WEBP (Máx 50MB)</p>
                                 </div>
                                 <span id="fileCount"
-                                    class="absolute bottom-4 bg-blue-600 text-white text-[10px] font-black px-4 py-2 rounded-full hidden animate-bounce"></span>
+                                    class="absolute top-4 right-4 bg-blue-600 text-white text-[10px] font-black px-4 py-2 rounded-full hidden animate-pulse shadow-lg"></span>
                             </div>
-                            <input type="file" name="files[]" multiple required accept="image/*"
-                                class="absolute inset-0 opacity-0 cursor-pointer" onchange="updateFileCount(this)">
+                            <input type="file" name="files[]" multiple required accept="image/*" id="fileInput"
+                                class="absolute inset-0 opacity-0 cursor-pointer">
                         </div>
                     </div>
 
                     <div class="flex flex-col gap-4">
-                        <button type="submit"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-[24px] font-black text-lg shadow-2xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-3">
-                            <i class="fas fa-paper-plane"></i>
-                            PUBLICAR AGORA
+                        <button type="submit" id="submitBtn"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-3xl font-black text-lg shadow-2xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-3">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            PUBLICAR NA GALERIA
                         </button>
-                        <p class="text-center text-[10px] font-bold text-slate-400 italic">Ao publicar, suas fotos passarão
-                            por um processamento para adição de marca d'água oficial.</p>
+                        <p class="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">
+                            <i class="fas fa-magic mr-1"></i> Marca d'água será aplicada automaticamente
+                        </p>
                     </div>
                 </form>
             </div>
@@ -229,29 +231,105 @@
 
     @push('scripts')
         <script>
+            const uploadModal = document.getElementById('uploadModal');
+            const uploadForm = document.getElementById('uploadForm');
+            const fileInput = document.getElementById('fileInput');
+            const dropzone = document.getElementById('dropzone');
+            const fileCountEl = document.getElementById('fileCount');
+            const submitBtn = document.getElementById('submitBtn');
+
             function openUploadModal() {
-                document.getElementById('uploadModal').classList.remove('hidden');
+                uploadModal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
             }
 
             function closeUploadModal() {
-                document.getElementById('uploadModal').classList.add('hidden');
+                uploadModal.classList.add('hidden');
                 document.body.style.overflow = '';
+                uploadForm.reset();
+                updateFileCount();
             }
 
-            function updateFileCount(input) {
-                const count = input.files.length;
-                const el = document.getElementById('fileCount');
-                const dz = document.getElementById('dropzone');
+            function updateFileCount() {
+                const count = fileInput.files.length;
                 if (count > 0) {
-                    el.textContent = `${count} ${count > 1 ? 'FOTOS SELECIONADAS' : 'FOTO SELECIONADA'}`;
-                    el.classList.remove('hidden');
-                    dz.classList.add('bg-blue-50', 'border-blue-400');
+                    fileCountEl.textContent = `${count} ${count > 1 ? 'FOTOS' : 'FOTO'}`;
+                    fileCountEl.classList.remove('hidden');
                 } else {
-                    el.classList.add('hidden');
-                    dz.classList.remove('bg-blue-50', 'border-blue-400');
+                    fileCountEl.classList.add('hidden');
                 }
             }
+
+            // Drag and Drop Logic
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            dropzone.addEventListener('dragover', () => uploadForm.classList.add('dragover'));
+            dropzone.addEventListener('dragleave', () => uploadForm.classList.remove('dragover'));
+            dropzone.addEventListener('drop', (e) => {
+                uploadForm.classList.remove('dragover');
+                fileInput.files = e.dataTransfer.files;
+                updateFileCount();
+            });
+
+            dropzone.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', updateFileCount);
+
+            // Form Submit with SweetAlert2
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (fileInput.files.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Nenhuma foto selecionada',
+                        text: 'Por favor, selecione ao menos uma foto para publicar.',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                    return;
+                }
+
+                const formData = new FormData(this);
+                const originalBtnContent = submitBtn.innerHTML;
+                
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> PUBLICANDO...';
+
+                axios.post(this.action, formData, {
+                    onUploadProgress: (progressEvent) => {
+                        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> ENVIANDO ${percentCompleted}%`;
+                    }
+                })
+                .then(response => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso!',
+                        text: 'Suas fotos foram enviadas e estão sendo processadas.',
+                        confirmButtonColor: '#3b82f6',
+                        timer: 3000,
+                        timerProgressBar: true
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                })
+                .catch(error => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnContent;
+                    
+                    const errorMsg = error.response?.data?.message || 'Ocorreu um erro ao enviar suas fotos. Tente novamente.';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Falha no Upload',
+                        text: errorMsg,
+                        confirmButtonColor: '#ef4444'
+                    });
+                });
+            });
 
             function openGalleryLightbox(url) {
                 const lb = document.getElementById('galleryLightbox');
@@ -264,7 +342,7 @@
                 }, 10);
             }
 
-            // Modal Animation
+            // Modal Escape Key
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') closeUploadModal();
             });
