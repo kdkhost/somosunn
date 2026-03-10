@@ -128,7 +128,7 @@
                                                         total: 0,
                                                         items: [],
                                                         loading: true,
-                                                        csrfToken: document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || '',
+                                                        csrfToken: document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || @json(csrf_token()),
                                                         syncState(data) {
                                                             this.total = Number(data?.total || 0);
                                                             this.items = (data?.items || []).filter(item => Number(item.count || 0) > 0);
@@ -136,8 +136,11 @@
                                                         async fetchNotifications() {
                                                             try {
                                                                 const r = await fetch('{{ route('notifications.hub') }}', {
+                                                                    credentials: 'same-origin',
+                                                                    cache: 'no-store',
                                                                     headers: {
-                                                                        'Accept': 'application/json'
+                                                                        'Accept': 'application/json',
+                                                                        'X-Requested-With': 'XMLHttpRequest'
                                                                     }
                                                                 });
                                                                 if (!r.ok) return;
@@ -158,13 +161,21 @@
                                                                 return;
                                                             }
 
+                                                            item.count = 0;
+                                                            this.recalculateTotal();
+                                                            this.open = false;
+
                                                             try {
                                                                 const response = await fetch('{{ route('notifications.hub.acknowledge') }}', {
                                                                     method: 'POST',
+                                                                    credentials: 'same-origin',
+                                                                    cache: 'no-store',
+                                                                    keepalive: true,
                                                                     headers: {
                                                                         'Accept': 'application/json',
                                                                         'Content-Type': 'application/json',
                                                                         'X-CSRF-TOKEN': this.csrfToken,
+                                                                        'X-Requested-With': 'XMLHttpRequest',
                                                                     },
                                                                     body: JSON.stringify({
                                                                         type: item.type,
@@ -175,13 +186,11 @@
                                                                     const data = await response.json();
                                                                     this.syncState(data);
                                                                 } else {
-                                                                    item.count = 0;
-                                                                    this.recalculateTotal();
+                                                                    await this.fetchNotifications();
                                                                 }
                                                             } catch (e) {
                                                                 console.error('Notification acknowledge failed:', e);
-                                                                item.count = 0;
-                                                                this.recalculateTotal();
+                                                                await this.fetchNotifications();
                                                             }
 
                                                             window.location.href = item.route;

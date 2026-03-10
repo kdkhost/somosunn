@@ -19,7 +19,7 @@ class NotificationHubController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json($this->buildPayload(Auth::user()));
+        return $this->noCacheJson($this->buildPayload(Auth::user()));
     }
 
     public function acknowledge(Request $request): JsonResponse
@@ -39,9 +39,18 @@ class NotificationHubController extends Controller
             $user->refresh();
         }
 
-        return response()->json([
+        return $this->noCacheJson([
             'success' => true,
         ] + $this->buildPayload($user));
+    }
+
+    protected function noCacheJson(array $payload): JsonResponse
+    {
+        return response()
+            ->json($payload)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
     }
 
     protected function buildPayload(User $user): array
