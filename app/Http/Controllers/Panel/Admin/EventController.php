@@ -43,8 +43,7 @@ class EventController extends Controller
             $query->where('title', 'like', '%' . $search . '%');
         }
 
-        $events = $query->paginate(10);
-        $events->appends($request->all());
+        $events = $query->get();
 
         return view('panel.admin.events.list', compact('events', 'search'));
     }

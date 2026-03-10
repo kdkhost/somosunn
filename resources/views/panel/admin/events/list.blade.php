@@ -16,14 +16,6 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
-                {{-- Search --}}
-                <form action="{{ route('panel.admin.events.list') }}" method="GET" class="relative group">
-                    <i
-                        class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors"></i>
-                    <input type="text" name="q" value="{{ $search }}" placeholder="Buscar eventos..."
-                        class="pl-10 pr-4 py-2 w-64 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm">
-                </form>
-
                 <a href="{{ route('panel.admin.events.create') }}"
                     class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 border border-transparent rounded-xl text-sm font-semibold text-white hover:bg-blue-700 transition-all shadow-sm shadow-blue-200">
                     <i class="fas fa-plus"></i>
@@ -39,8 +31,8 @@
 
         {{-- Table Card --}}
         <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+            <div class="p-4 sm:p-6">
+                <table id="panel-events-table" class="w-full text-left border-collapse display">
                     <thead>
                         <tr
                             class="bg-slate-50/50 dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold transition-colors">
@@ -55,7 +47,7 @@
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @forelse($events as $event)
                             <tr class="hover:bg-slate-50/50 transition-colors group">
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-6 py-4">
                                     <div class="flex items-center gap-4">
                                         <div
                                             class="w-16 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
@@ -68,12 +60,12 @@
                                                 </div>
                                             @endif
                                         </div>
-                                        <div class="max-w-xs truncate font-bold text-slate-900 dark:text-white transition-colors" title="{{ $event->title }}">
+                                        <div class="max-w-xs font-bold text-slate-900 dark:text-white transition-colors panel-events-table__title" title="{{ $event->title }}">
                                             {{ $event->title }}
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-6 py-4 whitespace-nowrap" data-order="{{ \Carbon\Carbon::parse($event->start_at)->timestamp }}">
                                     <div class="flex flex-col">
                                         <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors">
                                             {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y') }}
@@ -83,8 +75,8 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-slate-600 dark:text-slate-400 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-slate-600 dark:text-slate-400 transition-colors panel-events-table__location">
                                         <i class="fas fa-map-marker-alt mr-1 text-slate-400"></i>
                                         {{ $event->location ?: 'Online' }}
                                     </div>
@@ -155,12 +147,90 @@
                     </tbody>
                 </table>
             </div>
-
-            @if($events->hasPages())
-                <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-colors duration-300">
-                    {{ $events->links() }}
-                </div>
-            @endif
         </div>
     </div>
 @endsection
+
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+    <style>
+        #panel-events-table_wrapper .dataTables_length,
+        #panel-events-table_wrapper .dataTables_filter {
+            margin-bottom: 1rem;
+        }
+
+        #panel-events-table_wrapper .dataTables_filter input,
+        #panel-events-table_wrapper .dataTables_length select {
+            border-radius: 0.9rem;
+            border: 1px solid rgb(226 232 240);
+            background: rgb(248 250 252);
+            color: rgb(15 23 42);
+            padding: 0.55rem 0.85rem;
+        }
+
+        .dark #panel-events-table_wrapper .dataTables_filter input,
+        .dark #panel-events-table_wrapper .dataTables_length select {
+            border-color: rgb(51 65 85);
+            background: rgb(15 23 42);
+            color: rgb(248 250 252);
+        }
+
+        #panel-events-table_wrapper .dataTables_info,
+        #panel-events-table_wrapper .dataTables_paginate {
+            margin-top: 1rem;
+            color: rgb(100 116 139) !important;
+        }
+
+        .dark #panel-events-table_wrapper .dataTables_info,
+        .dark #panel-events-table_wrapper .dataTables_paginate {
+            color: rgb(148 163 184) !important;
+        }
+
+        #panel-events-table_wrapper .paginate_button {
+            border-radius: 0.85rem !important;
+        }
+
+        #panel-events-table_wrapper .paginate_button.current,
+        #panel-events-table_wrapper .paginate_button.current:hover {
+            background: rgb(37 99 235) !important;
+            border-color: rgb(37 99 235) !important;
+            color: #fff !important;
+        }
+
+        .panel-events-table__title,
+        .panel-events-table__location {
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        #panel-events-table td:last-child {
+            white-space: nowrap;
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script>
+        $(function () {
+            $('#panel-events-table').DataTable({
+                responsive: true,
+                autoWidth: false,
+                pageLength: 10,
+                order: [[1, 'desc']],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json'
+                },
+                columnDefs: [
+                    { targets: 5, orderable: false, searchable: false, responsivePriority: 1 },
+                    { targets: 0, responsivePriority: 2 },
+                    { targets: 1, responsivePriority: 3 },
+                    { targets: 2, responsivePriority: 4 }
+                ]
+            });
+        });
+    </script>
+@endpush
