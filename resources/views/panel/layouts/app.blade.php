@@ -322,26 +322,26 @@
                     card.id = 'panel-upload-progress';
                     card.className = 'panel-upload-progress';
                     card.innerHTML = `
-                                                <div class="panel-upload-progress__card">
-                                                    <div class="flex items-start justify-between gap-4">
-                                                        <div>
-                                                            <p class="text-xs font-black uppercase tracking-[0.25em] text-sky-300">Upload</p>
-                                                            <h3 class="mt-1 text-base font-bold text-white">Enviando arquivos</h3>
+                                                        <div class="panel-upload-progress__card">
+                                                            <div class="flex items-start justify-between gap-4">
+                                                                <div>
+                                                                    <p class="text-xs font-black uppercase tracking-[0.25em] text-sky-300">Upload</p>
+                                                                    <h3 class="mt-1 text-base font-bold text-white">Enviando arquivos</h3>
+                                                                </div>
+                                                                <div class="text-right">
+                                                                    <div class="text-sm font-black text-white" data-upload-percent>0%</div>
+                                                                    <div class="text-[11px] text-slate-300" data-upload-size>0 B / 0 B</div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-4 panel-upload-progress__bar">
+                                                                <span data-upload-fill></span>
+                                                            </div>
+                                                            <div class="mt-3 flex items-center justify-between gap-3 text-[11px] text-slate-300">
+                                                                <span data-upload-status>Preparando envio...</span>
+                                                                <span data-upload-remaining>calculando tempo restante...</span>
+                                                            </div>
                                                         </div>
-                                                        <div class="text-right">
-                                                            <div class="text-sm font-black text-white" data-upload-percent>0%</div>
-                                                            <div class="text-[11px] text-slate-300" data-upload-size>0 B / 0 B</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="mt-4 panel-upload-progress__bar">
-                                                        <span data-upload-fill></span>
-                                                    </div>
-                                                    <div class="mt-3 flex items-center justify-between gap-3 text-[11px] text-slate-300">
-                                                        <span data-upload-status>Preparando envio...</span>
-                                                        <span data-upload-remaining>calculando tempo restante...</span>
-                                                    </div>
-                                                </div>
-                                            `;
+                                                    `;
 
                     document.body.appendChild(card);
                     return card;
@@ -637,7 +637,40 @@
 
                 document.addEventListener('DOMContentLoaded', function () {
                     window.initializePanelFileUploads(document);
-                });
+
+                    // Notificações Globais SweetAlert2 (Laravel Flash Messages)
+                    @if(session('success'))
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: "{{ session('success') }}",
+                            confirmButtonColor: '#3b82f6',
+                            timer: 4000,
+                            timerProgressBar: true,
+                            popup: 'rounded-[32px]'
+                        });
+                    @endif
+
+                    @if(session('error'))
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Ops!',
+                            text: "{{ session('error') }}",
+                            confirmButtonColor: '#ef4444',
+                            popup: 'rounded-[32px]'
+                        });
+                    @endif
+
+                    @if(session('info'))
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Informação',
+                            text: "{{ session('info') }}",
+                            confirmButtonColor: '#3b82f6',
+                            popup: 'rounded-[32px]'
+                        });
+                    @endif
+                        });
             })();
         </script>
         @include('partials.form-draft-autosave')

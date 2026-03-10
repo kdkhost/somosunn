@@ -753,6 +753,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
 
     // Galeria Unificada (AdminLTE)
     Route::get('/galeria', [\App\Http\Controllers\Admin\GalleryController::class, 'index'])->name('gallery.index');
+    Route::post('/galeria/upload', [\App\Http\Controllers\Admin\GalleryController::class, 'upload'])->name('gallery.upload');
     Route::delete('/galeria/{media}', [\App\Http\Controllers\Admin\GalleryController::class, 'destroy'])->name('gallery.destroy');
 
     // Marketplace (Admin - visão interna)

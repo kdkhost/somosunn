@@ -17,14 +17,16 @@
             </button>
         </div>
 
-        <!-- Filtros -->
-        <div class="bg-white rounded-[40px] p-8 shadow-sm border border-slate-100 mb-10">
+        <!-- Filtros (Glassmorphism) -->
+        <div
+            class="bg-white/70 backdrop-blur-xl rounded-[40px] p-8 shadow-2xl shadow-slate-200/50 border border-white mb-10">
             <form action="{{ route('panel.gallery.index') }}" method="GET" class="flex flex-wrap items-end gap-6">
                 <div class="flex-1 min-w-[280px]">
-                    <label class="block text-sm font-black text-slate-800 mb-3 ml-1 uppercase tracking-wider">EVENTO</label>
-                    <div class="relative">
+                    <label class="block text-sm font-black text-slate-800 mb-3 ml-1 uppercase tracking-wider">Filtrar por
+                        Evento</label>
+                    <div class="relative group">
                         <select name="event_id"
-                            class="w-full bg-slate-50 border-slate-200 border-2 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-bold text-slate-700 appearance-none">
+                            class="w-full bg-white/50 border-slate-200 border-2 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-bold text-slate-700 appearance-none group-hover:border-blue-200">
                             <option value="">TODOS OS EVENTOS</option>
                             @foreach($events as $event)
                                 <option value="{{ $event->id }}" {{ request('event_id') == $event->id ? 'selected' : '' }}>
@@ -32,7 +34,8 @@
                                 </option>
                             @endforeach
                         </select>
-                        <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <div
+                            class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-blue-500 transition-colors">
                             <i class="fas fa-chevron-down"></i>
                         </div>
                     </div>
@@ -40,21 +43,24 @@
 
                 <div class="flex items-center gap-3">
                     <button type="submit"
-                        class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-black hover:bg-slate-800 transition-all shadow-lg active:scale-95">
+                        class="bg-blue-600 text-white px-12 py-4 rounded-2xl font-black hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-200 transition-all active:scale-95 flex items-center gap-2">
+                        <i class="fas fa-filter"></i>
                         FILTRAR
                     </button>
                     @if(request()->anyFilled(['event_id']))
                         <a href="{{ route('panel.gallery.index') }}"
-                            class="px-6 py-4 text-slate-500 font-black hover:text-red-500 transition-all text-sm uppercase">
-                            Limpar Filtros
+                            class="px-6 py-4 text-slate-500 font-black hover:text-red-500 transition-all text-xs uppercase tracking-widest bg-slate-100 rounded-2xl">
+                            Limpar
                         </a>
                     @endif
                 </div>
 
                 @if(auth()->user()->isAdmin())
-                    <div class="ml-auto flex items-center gap-2 px-6 py-3 bg-blue-50 border border-blue-100 rounded-2xl">
-                        <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                        <span class="text-blue-700 text-xs font-black uppercase tracking-tighter">Modo Admin Ativo</span>
+                    <div
+                        class="ml-auto flex items-center gap-2 px-6 py-3 bg-blue-50/50 backdrop-blur-sm border border-blue-100 rounded-2xl shadow-sm">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.5)]">
+                        </div>
+                        <span class="text-blue-700 text-[10px] font-black uppercase tracking-wider">Modo Admin Ativo</span>
                     </div>
                 @endif
             </form>
@@ -280,9 +286,9 @@
             fileInput.addEventListener('change', updateFileCount);
 
             // Form Submit with SweetAlert2
-            uploadForm.addEventListener('submit', function(e) {
+            uploadForm.addEventListener('submit', function (e) {
                 e.preventDefault();
-                
+
                 if (fileInput.files.length === 0) {
                     Swal.fire({
                         icon: 'warning',
@@ -295,7 +301,7 @@
 
                 const formData = new FormData(this);
                 const originalBtnContent = submitBtn.innerHTML;
-                
+
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> PUBLICANDO...';
 
@@ -305,30 +311,30 @@
                         submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> ENVIANDO ${percentCompleted}%`;
                     }
                 })
-                .then(response => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Sucesso!',
-                        text: 'Suas fotos foram enviadas e estão sendo processadas.',
-                        confirmButtonColor: '#3b82f6',
-                        timer: 3000,
-                        timerProgressBar: true
-                    }).then(() => {
-                        window.location.reload();
+                    .then(response => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: 'Suas fotos foram enviadas e estão sendo processadas.',
+                            confirmButtonColor: '#3b82f6',
+                            timer: 3000,
+                            timerProgressBar: true
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnContent;
+
+                        const errorMsg = error.response?.data?.message || 'Ocorreu um erro ao enviar suas fotos. Tente novamente.';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Falha no Upload',
+                            text: errorMsg,
+                            confirmButtonColor: '#ef4444'
+                        });
                     });
-                })
-                .catch(error => {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalBtnContent;
-                    
-                    const errorMsg = error.response?.data?.message || 'Ocorreu um erro ao enviar suas fotos. Tente novamente.';
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Falha no Upload',
-                        text: errorMsg,
-                        confirmButtonColor: '#ef4444'
-                    });
-                });
             });
 
             function openGalleryLightbox(url) {

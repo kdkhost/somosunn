@@ -81,6 +81,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js" defer></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -175,6 +176,58 @@
 
         /* Keep any cosmetic colors to AdminLTE CSS; minimal helpers only */
         /* Global Table Responsiveness Override */
+        /* Premium Upload Box & Drop Zone (AdminLTE Optimized) */
+        .premium-upload-box {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px dashed #d1d5db;
+            border-radius: 1.5rem;
+            background: #f9fafb;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .premium-upload-box:hover,
+        .premium-upload-box.dragover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1);
+        }
+
+        .drop-zone-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+        }
+
+        .upload-preview img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* SweetAlert2 Premium Customizations */
+        .swal2-popup.rounded-[32px] {
+            border-radius: 2rem !important;
+            padding: 1.5rem !important;
+        }
+
+        .swal2-title {
+            font-weight: 800 !important;
+            letter-spacing: -0.025em !important;
+        }
+
+        .swal2-confirm.rounded-pill {
+            border-radius: 9999px !important;
+            padding: 12px 30px !important;
+            font-weight: 700 !important;
+        }
+
         @media (max-width: 768px) {
             .table-responsive {
                 display: block;
@@ -363,22 +416,56 @@
         }
 
         /* Estilos Premium para Upload Widgets */
-        .premium-upload-box { transition: all 0.3s ease; position: relative; }
-        .drop-zone-area { 
-            border: 2px dashed #dee2e6; background: #f8f9fa; border-radius: 12px; 
-            transition: all 0.3s ease; cursor: pointer; overflow: hidden; position: relative;
+        .premium-upload-box {
+            transition: all 0.3s ease;
+            position: relative;
         }
-        .drop-zone-area:hover { border-color: #007bff; background: #f1f7ff; }
-        .premium-upload-box.dragover .drop-zone-area { 
-            border-color: #28a745; background: #e9f7ef; transform: scale(1.01); 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+
+        .drop-zone-area {
+            border: 2px dashed #dee2e6;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
         }
-        .gap-2 { gap: 0.5rem; }
-        .x-small { font-size: 10px; }
-        .opacity-50 { opacity: 0.5; }
-        .opacity-75 { opacity: 0.75; }
-        .rounded-pill { border-radius: 50rem !important; }
-        .border-2 { border-width: 2px !important; }
+
+        .drop-zone-area:hover {
+            border-color: #007bff;
+            background: #f1f7ff;
+        }
+
+        .premium-upload-box.dragover .drop-zone-area {
+            border-color: #28a745;
+            background: #e9f7ef;
+            transform: scale(1.01);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .x-small {
+            font-size: 10px;
+        }
+
+        .opacity-50 {
+            opacity: 0.5;
+        }
+
+        .opacity-75 {
+            opacity: 0.75;
+        }
+
+        .rounded-pill {
+            border-radius: 50rem !important;
+        }
+
+        .border-2 {
+            border-width: 2px !important;
+        }
     </style>
     @stack('styles')
 </head>
@@ -662,6 +749,41 @@
     @stack('scripts')
     @include('partials.form-draft-autosave')
     <script>
+        $(document).ready(function () {
+            // Notificações Globais SweetAlert2 (Laravel Flash Messages)
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso!',
+                    text: "{{ session('success') }}",
+                    confirmButtonColor: '#3b82f6',
+                    timer: 4000,
+                    timerProgressBar: true,
+                    customClass: { popup: 'rounded-[32px]' }
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ops!',
+                    text: "{{ session('error') }}",
+                    confirmButtonColor: '#ef4444',
+                    customClass: { popup: 'rounded-[32px]' }
+                });
+            @endif
+
+            @if(session('info'))
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Informação',
+                    text: "{{ session('info') }}",
+                    confirmButtonColor: '#3b82f6',
+                    customClass: { popup: 'rounded-[32px]' }
+                });
+            @endif
+        });
+
         window.showSuccess = function (msg) {
             toastr.success(msg || 'Sucesso');
         };
@@ -1003,39 +1125,39 @@
                         }
 
                         if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Upload recusado',
-                            html: errorMessage,
-                            confirmButtonText: 'Entendi'
-                        });
-                    } else {
-                        alert('Erro no upload: ' + errorMessage.replace(/<br>/g, '\n').replace(/<[^>]+>/g, ''));
-                    }
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Upload recusado',
+                                html: errorMessage,
+                                confirmButtonText: 'Entendi'
+                            });
+                        } else {
+                            alert('Erro no upload: ' + errorMessage.replace(/<br>/g, '\n').replace(/<[^>]+>/g, ''));
+                        }
+                    });
+
+                    xhr.addEventListener('error', function () {
+                        form.dataset.uploadSubmitting = 'false';
+                        setAdminUploadProgressVisible(false);
+
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro de conexao',
+                                text: 'O upload falhou devido a um problema de rede.',
+                                confirmButtonText: 'Tentar novamente'
+                            });
+                        }
+                    });
+
+                    xhr.addEventListener('abort', function () {
+                        form.dataset.uploadSubmitting = 'false';
+                        setAdminUploadProgressVisible(false);
+                    });
+
+                    xhr.send(formData);
                 });
-
-                xhr.addEventListener('error', function () {
-                    form.dataset.uploadSubmitting = 'false';
-                    setAdminUploadProgressVisible(false);
-
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Erro de conexao',
-                            text: 'O upload falhou devido a um problema de rede.',
-                            confirmButtonText: 'Tentar novamente'
-                        });
-                    }
-                });
-
-                xhr.addEventListener('abort', function () {
-                    form.dataset.uploadSubmitting = 'false';
-                    setAdminUploadProgressVisible(false);
-                });
-
-                xhr.send(formData);
             });
-        });
         }
 
         toastr.options = { positionClass: 'toast-top-right', timeOut: 3500, progressBar: true };
@@ -1244,20 +1366,27 @@
                 const targetNumber = $input.data('target-number');
                 const targetComplement = $input.data('target-complement');
                 const targetDistrict = $input.data('target-district');
-                toastr.info('Buscando CEP...');
+                Swal.fire({ icon: 'info', title: 'Buscando CEP...', showConfirmButton: false, timer: 1500 });
                 fetch('https://viacep.com.br/ws/' + cep + '/json/')
                     .then(r => r.json())
                     .then(data => {
-                        if (data.erro) { toastr.error('CEP não encontrado'); return; }
+                        if (data.erro) {
+                            Swal.fire({ icon: 'error', title: 'Erro', text: 'CEP não encontrado', timer: 2000, showConfirmButton: false });
+                            return;
+                        }
                         $('[name="company_address"]').val(data.logradouro || '');
                         if (targetDistrict) { $(targetDistrict).val(data.bairro || ''); } else { $('[name="company_district"]').val(data.bairro || ''); }
                         $('[name="company_city"]').val(data.localidade || '');
                         $('[name="company_state"]').val(data.uf || '');
-                        toastr.success('Endereço preenchido pelo CEP');
+
+                        Swal.fire({ icon: 'success', title: 'Sucesso', text: 'Endereço preenchido pelo CEP', timer: 2000, showConfirmButton: false });
+
                         if (targetNumber) { $(targetNumber).focus(); }
                         else if (targetComplement) { $(targetComplement).focus(); }
                     })
-                    .catch(() => { toastr.error('Falha ao buscar CEP'); });
+                    .catch(() => {
+                        Swal.fire({ icon: 'error', title: 'Erro', text: 'Falha ao buscar CEP', timer: 2000, showConfirmButton: false });
+                    });
             }
 
             // CEP com viacep + feedback
@@ -1528,7 +1657,7 @@
                                 confirmButtonText: 'Entendi'
                             });
                         } else {
-                            toastr.error('Arquivo excede o limite');
+                            alert('Arquivo excede o limite');
                         }
                         return;
                     }
@@ -1578,7 +1707,7 @@
                                 confirmButtonText: 'Entendi'
                             });
                         } else {
-                            toastr.error('Campo de upload não encontrado.');
+                            alert('Campo de upload não encontrado.');
                         }
                         return;
                     }
@@ -1679,12 +1808,12 @@
                 if (!cropper) return;
                 cropper.getCroppedCanvas({ fillColor: '#fff' }).toBlob(function (blob) {
                     if (!blob) {
-                        toastr.error('Falha ao gerar a imagem recortada.');
+                        Swal.fire({ icon: 'error', title: 'Erro', text: 'Falha ao gerar a imagem recortada.' });
                         return;
                     }
                     if (maxSize && blob.size > maxSize) {
                         const mb = (maxSize / 1024 / 1024).toFixed(2);
-                        toastr.error('A imagem recortada excede o limite de ' + mb + ' MB.');
+                        Swal.fire({ icon: 'error', title: 'Erro', text: 'A imagem recortada excede o limite de ' + mb + ' MB.' });
                         return;
                     }
                     const url = URL.createObjectURL(blob);
