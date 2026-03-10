@@ -362,14 +362,29 @@
             border-color: rgba(0, 123, 255, .85);
         }
 
-        .card .nav-tabs {
-            margin-bottom: .5rem;
+        /* Estilos Premium para Upload Widgets */
+        .premium-upload-box { transition: all 0.3s ease; position: relative; }
+        .drop-zone-area { 
+            border: 2px dashed #dee2e6; background: #f8f9fa; border-radius: 12px; 
+            transition: all 0.3s ease; cursor: pointer; overflow: hidden; position: relative;
         }
+        .drop-zone-area:hover { border-color: #007bff; background: #f1f7ff; }
+        .premium-upload-box.dragover .drop-zone-area { 
+            border-color: #28a745; background: #e9f7ef; transform: scale(1.01); 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+        }
+        .gap-2 { gap: 0.5rem; }
+        .x-small { font-size: 10px; }
+        .opacity-50 { opacity: 0.5; }
+        .opacity-75 { opacity: 0.75; }
+        .rounded-pill { border-radius: 50rem !important; }
+        .border-2 { border-width: 2px !important; }
     </style>
     @stack('styles')
 </head>
 
-<body class="{{ $isAdmin ? 'hold-transition sidebar-mini layout-fixed layout-navbar-fixed' : 'bg-slate-50 min-h-screen' }} {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}">
+<body
+    class="{{ $isAdmin ? 'hold-transition sidebar-mini layout-fixed layout-navbar-fixed' : 'bg-slate-50 min-h-screen' }} {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}">
     {{-- Badge de Impersonation - Flutuante discreto --}}
     @if(session()->has('impersonator_id'))
         <div id="impersonation-badge"
@@ -941,7 +956,7 @@
                                         ? window.UNNAjaxGlobal.handleJsonResponse(form, json, { preferPjax: true })
                                         : null;
                                     return;
-                                } catch (e) {}
+                                } catch (e) { }
                             }
 
                             if (responseUrl && responseUrl !== currentUrl) {
@@ -984,43 +999,43 @@
                                     const details = Object.values(json.errors).flat().join('<br>');
                                     errorMessage += '<br><br><span class="text-sm rounded">' + details + '</span>';
                                 }
-                            } catch (e) {}
+                            } catch (e) { }
                         }
 
                         if (typeof Swal !== 'undefined') {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Upload recusado',
-                                html: errorMessage,
-                                confirmButtonText: 'Entendi'
-                            });
-                        } else {
-                            alert('Erro no upload: ' + errorMessage.replace(/<br>/g, '\n').replace(/<[^>]+>/g, ''));
-                        }
-                    });
-
-                    xhr.addEventListener('error', function () {
-                        form.dataset.uploadSubmitting = 'false';
-                        setAdminUploadProgressVisible(false);
-
-                        if (typeof Swal !== 'undefined') {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Erro de conexao',
-                                text: 'O upload falhou devido a um problema de rede.',
-                                confirmButtonText: 'Tentar novamente'
-                            });
-                        }
-                    });
-
-                    xhr.addEventListener('abort', function () {
-                        form.dataset.uploadSubmitting = 'false';
-                        setAdminUploadProgressVisible(false);
-                    });
-
-                    xhr.send(formData);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Upload recusado',
+                            html: errorMessage,
+                            confirmButtonText: 'Entendi'
+                        });
+                    } else {
+                        alert('Erro no upload: ' + errorMessage.replace(/<br>/g, '\n').replace(/<[^>]+>/g, ''));
+                    }
                 });
+
+                xhr.addEventListener('error', function () {
+                    form.dataset.uploadSubmitting = 'false';
+                    setAdminUploadProgressVisible(false);
+
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro de conexao',
+                            text: 'O upload falhou devido a um problema de rede.',
+                            confirmButtonText: 'Tentar novamente'
+                        });
+                    }
+                });
+
+                xhr.addEventListener('abort', function () {
+                    form.dataset.uploadSubmitting = 'false';
+                    setAdminUploadProgressVisible(false);
+                });
+
+                xhr.send(formData);
             });
+        });
         }
 
         toastr.options = { positionClass: 'toast-top-right', timeOut: 3500, progressBar: true };
@@ -1503,7 +1518,20 @@
 
                 function handleFile(file) {
                     if (!file) return;
-                    if (file.size > maxSize) { toastr.error('Arquivo excede o limite'); return; }
+                    if (file.size > maxSize) {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Arquivo muito grande',
+                                text: 'Este arquivo excede o limite permitido.',
+                                confirmButtonColor: '#ef4444',
+                                confirmButtonText: 'Entendi'
+                            });
+                        } else {
+                            toastr.error('Arquivo excede o limite');
+                        }
+                        return;
+                    }
                     const reader = new FileReader();
                     bar.css('width', '0%');
                     progress.removeClass('d-none');
@@ -1541,7 +1569,17 @@
                 function openFileDialog() {
                     if (box.data('opening')) return;
                     if (!input.length || !input[0]) {
-                        toastr.error('Campo de upload não encontrado.');
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro no sistema',
+                                text: 'Campo de upload não encontrado.',
+                                confirmButtonColor: '#ef4444',
+                                confirmButtonText: 'Entendi'
+                            });
+                        } else {
+                            toastr.error('Campo de upload não encontrado.');
+                        }
                         return;
                     }
                     box.data('opening', true);

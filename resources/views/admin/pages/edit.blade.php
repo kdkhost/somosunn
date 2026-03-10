@@ -269,30 +269,44 @@
                                 </small>
                             </div>
                             <div class="form-group mb-0 mt-3">
-                                <label class="mb-1">Imagem de Compartilhamento (SEO)</label>
-                                <div class="custom-file custom-file-sm mb-2">
-                                    <input type="file" name="seo_image" class="custom-file-input" id="seo_image"
-                                        data-preview="prev-seo_image">
-                                    <label class="custom-file-label" for="seo_image">Escolher imagem...</label>
-                                </div>
-                                @if($data['seo_image'] ?? null)
-                                    <div class="position-relative mb-2">
-                                        <img src="{{ asset('storage/' . $data['seo_image']) }}" id="prev-seo_image"
-                                            class="img-thumbnail w-100 shadow-sm" style="max-height:150px; object-fit:cover;">
-                                        <div class="custom-control custom-checkbox position-absolute"
-                                            style="top:5px; right:10px; background:rgba(255,255,255,0.8); padding:2px 8px; border-radius:4px;">
-                                            <input type="checkbox" name="remove_seo_image" value="1"
-                                                class="custom-control-input" id="remove_seo_image">
-                                            <label class="custom-control-label text-danger small font-weight-bold"
-                                                for="remove_seo_image">Remover</label>
-                                        </div>
+                                <label class="mb-3 d-block font-weight-bold">Imagem de Compartilhamento (SEO)</label>
+
+                                <div class="upload-box premium-upload-box" data-remove-input="#remove_seo_image"
+                                    data-preview-image-id="prev-seo_image">
+                                    <input type="file" name="seo_image" class="d-none" id="seo_image" accept="image/*">
+                                    <input type="hidden" name="remove_seo_image" id="remove_seo_image" value="0">
+
+                                    <div class="upload-preview mb-3 drop-zone-area text-center"
+                                        onclick="document.getElementById('seo_image').click()">
+                                        @if($data['seo_image'] ?? null)
+                                            <img src="{{ asset('storage/' . $data['seo_image']) }}" id="prev-seo_image"
+                                                class="img-fluid rounded shadow-sm border"
+                                                style="max-height:150px; width: 100%; object-fit:cover;">
+                                        @else
+                                            <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
+                                                style="min-height: 120px;">
+                                                <i class="fas fa-search-plus fa-2x mb-2 text-primary opacity-50"></i>
+                                                <span class="small font-weight-bold">Preview SEO</span>
+                                                <span class="x-small opacity-75">Click ou arraste 1200x630px</span>
+                                            </div>
+                                            <img id="prev-seo_image" class="img-fluid rounded shadow-sm border d-none"
+                                                style="max-height:150px; width: 100%; object-fit:cover;">
+                                        @endif
                                     </div>
-                                @else
-                                    <img id="prev-seo_image" class="img-thumbnail w-100 d-none shadow-sm"
-                                        style="max-height:150px; object-fit:cover;">
-                                @endif
-                                <small class="text-muted small">Tamanho sugerido: 1200x630px. Formatos: JPG, PNG,
-                                    WEBP.</small>
+
+                                    <div class="upload-actions d-flex justify-content-center gap-2">
+                                        <button type="button" class="btn btn-xs btn-primary upload-btn rounded-pill px-3"
+                                            onclick="document.getElementById('seo_image').click()">
+                                            <i class="fas fa-upload mr-1"></i> Selecionar
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-xs btn-danger upload-remove rounded-pill px-2 {{ ($data['seo_image'] ?? null) ? '' : 'd-none' }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="text-muted d-block mt-2" style="font-size: 11px;">Formatos: JPG, PNG, WEBP.
+                                    Recomendado para Redes Sociais.</small>
                             </div>
                         </div>
                     </div>

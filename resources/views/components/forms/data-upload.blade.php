@@ -159,7 +159,21 @@
                                 progressBar.classList.add('bg-success');
                                 uploadStatus.textContent = 'Upload Concluído!';
                                 uploadStatus.classList.replace('text-primary', 'text-success');
-                                toastr.success('Arquivo salvo com sucesso!');
+
+                                if (typeof Swal !== 'undefined') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Sucesso!',
+                                        text: 'Arquivo salvo com sucesso!',
+                                        toast: true,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        timerProgressBar: true
+                                    });
+                                } else {
+                                    toastr.success('Arquivo salvo com sucesso!');
+                                }
                             } else {
                                 throw new Error(resp.message || 'Erro desconhecido');
                             }
@@ -182,7 +196,18 @@
                 progressBar.style.width = '100%';
                 uploadStatus.textContent = 'Erro: ' + msg;
                 uploadStatus.classList.replace('text-primary', 'text-danger');
-                toastr.error(msg);
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro no Upload',
+                        text: msg,
+                        confirmButtonColor: '#ef4444',
+                        confirmButtonText: 'Entendi'
+                    });
+                } else {
+                    toastr.error(msg);
+                }
             }
 
             function resetUpload() {
