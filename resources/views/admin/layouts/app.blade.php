@@ -477,6 +477,10 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
     @include('partials.global-sweetalert-confirm')
+    @php($unnAjaxAutoBind = false)
+    @php($unnAjaxPreferPjax = true)
+    @php($unnAjaxPjaxContainer = '#pjax-container')
+    @include('partials.global-ajax-crud')
     @include('admin.partials.notifications')
     @include('admin.partials.chat-widget')
 
@@ -929,19 +933,42 @@
                                 remaining: 'quase pronto'
                             });
 
+                            if (contentType.includes('application/json') && xhr.responseText && window.UNNAjaxGlobal) {
+                                try {
+                                    const json = JSON.parse(xhr.responseText);
+                                    setAdminUploadProgressVisible(false);
+                                    window.UNNAjaxGlobal.handleJsonResponse
+                                        ? window.UNNAjaxGlobal.handleJsonResponse(form, json, { preferPjax: true })
+                                        : null;
+                                    return;
+                                } catch (e) {}
+                            }
+
                             if (responseUrl && responseUrl !== currentUrl) {
-                                window.location.assign(responseUrl);
+                                if (window.UNNAjaxGlobal) {
+                                    window.UNNAjaxGlobal.navigate(responseUrl, { preferPjax: true, replaceHistory: true });
+                                } else {
+                                    window.location.assign(responseUrl);
+                                }
                                 return;
                             }
 
                             if (contentType.includes('text/html') && xhr.responseText) {
-                                document.open();
-                                document.write(xhr.responseText);
-                                document.close();
+                                if (window.UNNAjaxGlobal) {
+                                    window.UNNAjaxGlobal.replaceDocument(xhr.responseText, responseUrl || currentUrl, true);
+                                } else {
+                                    document.open();
+                                    document.write(xhr.responseText);
+                                    document.close();
+                                }
                                 return;
                             }
 
-                            window.location.reload();
+                            if (window.UNNAjaxGlobal) {
+                                window.UNNAjaxGlobal.navigate(window.location.href, { preferPjax: true, replaceHistory: true });
+                            } else {
+                                window.location.reload();
+                            }
                             return;
                         }
 
@@ -998,8 +1025,36 @@
 
         toastr.options = { positionClass: 'toast-top-right', timeOut: 3500, progressBar: true };
 
-        $(document).on('submit', '.ajax-form', function (e) {
+        $(document).on('submit', 'form', function (e) {
+            if ($(this).hasClass('ajax-form')
+                || e.isDefaultPrevented()
+                || !window.UNNAjaxGlobal
+                || !window.UNNAjaxGlobal.shouldHandleForm(this)) {
+                return;
+            }
+
             e.preventDefault();
+            window.UNNAjaxGlobal.submitForm(this, {
+                submitter: (e.originalEvent && e.originalEvent.submitter) || this.__unnAjaxSubmitter || null,
+                preferPjax: true,
+                forceAjaxHeaders: false,
+            });
+        });
+
+        $(document).on('submit', '.ajax-form', function (e) {
+            if (e.isDefaultPrevented() || !window.UNNAjaxGlobal || !window.UNNAjaxGlobal.shouldHandleForm(this)) {
+                return;
+            }
+
+            e.preventDefault();
+            window.UNNAjaxGlobal.submitForm(this, {
+                submitter: (e.originalEvent && e.originalEvent.submitter) || this.__unnAjaxSubmitter || null,
+                preferPjax: true,
+                forceAjaxHeaders: true,
+                successMessage: 'Salvo com sucesso',
+            });
+            return;
+
             const form = $(this);
             $.ajax({
                 url: form.attr('action'),

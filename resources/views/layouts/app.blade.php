@@ -2029,6 +2029,7 @@
     </script>
 
     @include('partials.global-placeholder-fix')
+    @include('partials.global-ajax-crud')
 
     {{-- scripts empilhados pelas views individuais via @push('scripts') --}}
     @stack('scripts')

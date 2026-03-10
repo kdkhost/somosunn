@@ -506,19 +506,42 @@
                                         remaining: 'quase pronto'
                                     });
 
+                                    if (contentType.includes('application/json') && xhr.responseText && window.UNNAjaxGlobal) {
+                                        try {
+                                            const json = JSON.parse(xhr.responseText);
+                                            setUploadCardVisible(false);
+                                            if (window.UNNAjaxGlobal.handleJsonResponse) {
+                                                window.UNNAjaxGlobal.handleJsonResponse(form, json, { preferPjax: false });
+                                                return;
+                                            }
+                                        } catch (e) { }
+                                    }
+
                                     if (responseUrl && responseUrl !== currentUrl) {
-                                        window.location.assign(responseUrl);
+                                        if (window.UNNAjaxGlobal) {
+                                            window.UNNAjaxGlobal.navigate(responseUrl, { preferPjax: false, replaceHistory: true });
+                                        } else {
+                                            window.location.assign(responseUrl);
+                                        }
                                         return;
                                     }
 
                                     if (contentType.includes('text/html') && xhr.responseText) {
-                                        document.open();
-                                        document.write(xhr.responseText);
-                                        document.close();
+                                        if (window.UNNAjaxGlobal) {
+                                            window.UNNAjaxGlobal.replaceDocument(xhr.responseText, responseUrl || currentUrl, true);
+                                        } else {
+                                            document.open();
+                                            document.write(xhr.responseText);
+                                            document.close();
+                                        }
                                         return;
                                     }
 
-                                    window.location.reload();
+                                    if (window.UNNAjaxGlobal) {
+                                        window.UNNAjaxGlobal.navigate(window.location.href, { preferPjax: false, replaceHistory: true });
+                                    } else {
+                                        window.location.reload();
+                                    }
                                     return;
                                 }
 
