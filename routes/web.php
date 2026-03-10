@@ -586,10 +586,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::post('testimonials/{testimonial}/approve', [\App\Http\Controllers\Panel\Admin\TestimonialController::class, 'approve'])->name('testimonials.approve');
         Route::post('testimonials/{testimonial}/reject', [\App\Http\Controllers\Panel\Admin\TestimonialController::class, 'reject'])->name('testimonials.reject');
 
-        Route::group(['prefix' => 'cms', 'as' => 'cms.'], function () {
-            Route::get('/', [\App\Http\Controllers\Panel\Admin\CMSController::class, 'index'])->name('index');
-            Route::post('/{slug}', [\App\Http\Controllers\Panel\Admin\CMSController::class, 'update'])->name('update');
-        });
+        // Gestão de Páginas (Novo Sistema)
+        Route::post('pages/{page}/toggle-section', [\App\Http\Controllers\Panel\Admin\PageController::class, 'toggleSection'])->name('pages.toggle-section');
+        Route::resource('pages', \App\Http\Controllers\Panel\Admin\PageController::class);
 
         Route::get('logs', [\App\Http\Controllers\Panel\Admin\ActivityLogController::class, 'index'])->name('logs.index');
         Route::post('logs/clear', [\App\Http\Controllers\Panel\Admin\ActivityLogController::class, 'clear'])->name('logs.clear');

@@ -258,7 +258,7 @@
         ['label' => 'Certificados', 'route' => route('panel.admin.certificates.index'), 'icon' => 'fas fa-certificate', 'active' => request()->routeIs('panel.admin.certificates.*'), 'visible' => $user->isAdmin()],
         ['label' => 'FAQ', 'route' => route('panel.admin.faqs.index'), 'icon' => 'fas fa-question-circle', 'active' => request()->routeIs('panel.admin.faqs.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Depoimentos', 'route' => route('panel.admin.testimonials.index'), 'icon' => 'fas fa-quote-left', 'active' => request()->routeIs('panel.admin.testimonials.*'), 'visible' => $user->isAdmin()],
-        ['label' => 'CMS e páginas', 'route' => route('panel.admin.cms.index'), 'icon' => 'fas fa-pencil-ruler', 'active' => request()->routeIs('panel.admin.cms.*'), 'visible' => $user->isAdmin()],
+        ['label' => 'Páginas', 'route' => route('panel.admin.pages.index'), 'icon' => 'fas fa-pencil-ruler', 'active' => request()->routeIs('panel.admin.pages.*'), 'visible' => $user->isAdmin()],
     ], fn(array $item) => $item['visible']));
 
     $adminSettingsItems = array_values(array_filter([

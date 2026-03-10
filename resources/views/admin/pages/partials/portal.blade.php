@@ -2,7 +2,16 @@
 
 {{-- ===== HERO ===== --}}
 <div class="card card-outline card-secondary">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-home mr-2"></i>Hero / Cabeçalho</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-home mr-2"></i>Hero / Cabeçalho</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-hero" data-section="hero"
+                    {{ ($data['hero_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-hero">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
 
         <div class="form-group">
@@ -39,7 +48,16 @@
 
 {{-- ===== STATS ===== --}}
 <div class="card card-outline card-info">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Estatísticas (4 cards)</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Estatísticas (4 cards)</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-stats" data-section="stats"
+                    {{ ($data['stats_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-stats">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="row">
             @for($i = 1; $i <= 4; $i++)
@@ -69,7 +87,16 @@
 
 {{-- ===== CTA FINAL ===== --}}
 <div class="card card-outline card-warning">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-bullhorn mr-2"></i>CTA Final</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-bullhorn mr-2"></i>CTA Final</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-cta" data-section="cta"
+                    {{ ($data['cta_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-cta">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
 
         <div class="form-group">

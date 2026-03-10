@@ -3,7 +3,16 @@
 
 {{-- Intro --}}
 <div id="sec-header" class="card card-outline card-primary">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-heart mr-1"></i> Cabeçalho</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-heart mr-1"></i> Cabeçalho</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-header" data-section="header"
+                    {{ ($data['header_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-header">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group mb-0">
             <label>Subtítulo do hero</label>
@@ -17,7 +26,12 @@
 <div id="sec-values" class="card card-outline card-secondary">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-list-ul mr-1"></i> Os 6 Valores</h3>
-        <div class="card-tools">
+        <div class="card-tools d-flex align-items-center">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mr-3">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-values" data-section="values"
+                    {{ ($data['values_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-values">Exibir no site</label>
+            </div>
             <span class="badge badge-secondary">JSON</span>
         </div>
     </div>
@@ -39,7 +53,16 @@
 
 {{-- Blockquote --}}
 <div id="sec-quote" class="card card-outline card-warning">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-quote-left mr-1"></i> Citação Central</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-quote-left mr-1"></i> Citação Central</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-quote" data-section="quote"
+                    {{ ($data['quote_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-quote">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group">
             <label>Texto da citação</label>
@@ -54,7 +77,16 @@
 
 {{-- CTA --}}
 <div id="sec-cta" class="card card-outline card-success">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-cta" data-section="cta"
+                    {{ ($data['cta_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-cta">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group">
             <label>Título</label>

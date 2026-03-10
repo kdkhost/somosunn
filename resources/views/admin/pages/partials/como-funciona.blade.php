@@ -3,7 +3,16 @@
 
 {{-- Intro --}}
 <div id="sec-header" class="card card-outline card-primary">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-cogs mr-1"></i> Cabeçalho</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-cogs mr-1"></i> Cabeçalho</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-header" data-section="header"
+                    {{ ($data['header_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-header">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group mb-0">
             <label>Subtítulo do hero</label>
@@ -16,7 +25,14 @@
 <div id="sec-steps" class="card card-outline card-secondary">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-list-ol mr-1"></i> Passos (4 etapas)</h3>
-        <div class="card-tools"><span class="badge badge-secondary">JSON</span></div>
+        <div class="card-tools d-flex align-items-center">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mr-3">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-steps" data-section="steps"
+                    {{ ($data['steps_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-steps">Exibir no site</label>
+            </div>
+            <span class="badge badge-secondary">JSON</span>
+        </div>
     </div>
     <div class="card-body">
         <p class="text-muted small mb-2">
@@ -37,7 +53,16 @@
 
 {{-- Planos --}}
 <div id="sec-plans" class="card card-outline card-warning">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-tags mr-1"></i> Seção Planos</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-tags mr-1"></i> Seção Planos</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-plans" data-section="plans"
+                    {{ ($data['plans_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-plans">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group">
             <label>Título</label>
@@ -52,7 +77,16 @@
 
 {{-- CTA --}}
 <div id="sec-cta" class="card card-outline card-success">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-cta" data-section="cta"
+                    {{ ($data['cta_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-cta">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group">
             <label>Título</label>

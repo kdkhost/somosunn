@@ -2,6 +2,7 @@
 
 ## Novidades Recentes (mar/2026)
 
+- **Migração Completa do CMS para Tailwind (10/03):** O sistema de gerenciamento de páginas foi totalmente migrado para o novo painel administrativo. Todos os 14 parciais institucionais (Home, Sobre, Manifesto, Valores, etc.) agora possuem interface premium baseada em Tailwind CSS, suporte a Dark Mode, editores JSON para dados estruturados e integração nativa com o uploader global. O menu "Páginas" substitui o antigo CMS no sidebar do novo painel.
 - **Controle de Visibilidade de Seções (10/03):** Implementado sistema de ativação/desativação individual de seções em todas as páginas administrativas (`/admin/pages`). O salvamento é automático via AJAX com feedback visual instantâneo através de switches e notificações SweetAlert2.
 - **Uploader Global Premium com Progresso (10/03):** Novo componente de upload refatorado com suporte a arrasta-e-solta, preview real de mídia (imagem, vídeo, áudio), barra de progresso animada e cálculo de tempo restante de envio. O upload começa automaticamente ao selecionar o arquivo, utilizando processamento por chunks para máxima confiabilidade.
 - **Integração Gateway SumUp (10/03):** Adicionado suporte ao checkout da SumUp como novo gateway de pagamento. A integração segue o padrão marketplace do sistema, permitindo que vendedores conectem suas próprias contas via Access Token, com redirecionamento seguro e processamento de transações.

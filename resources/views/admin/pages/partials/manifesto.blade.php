@@ -3,7 +3,16 @@
 
 {{-- Hero --}}
 <div id="sec-hero" class="card card-outline card-primary">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-fist-raised mr-1"></i> Hero</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-fist-raised mr-1"></i> Hero</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-hero" data-section="hero"
+                    {{ ($data['hero_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-hero">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-row">
             <div class="form-group col-md-6">
@@ -28,7 +37,16 @@
 
 {{-- Seções do manifesto --}}
 <div id="sec-sections" class="card card-outline card-secondary">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-list mr-1"></i> Seções do Manifesto</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-list mr-1"></i> Seções do Manifesto</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-sections" data-section="sections"
+                    {{ ($data['sections_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-sections">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         @foreach ([1,2,3,4,5] as $i)
         <div class="form-group">
@@ -46,7 +64,16 @@
 
 {{-- Citação final --}}
 <div id="sec-quote" class="card card-outline card-secondary">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-quote-right mr-1"></i> Citação Final</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-quote-right mr-1"></i> Citação Final</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-quote" data-section="quote"
+                    {{ ($data['quote_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-quote">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group">
             <label>Texto da citação</label>
@@ -61,7 +88,16 @@
 
 {{-- Pilares --}}
 <div id="sec-pillars" class="card card-outline card-warning">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-columns mr-1"></i> Pilares</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-columns mr-1"></i> Pilares</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-pillars" data-section="pillars"
+                    {{ ($data['pillars_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-pillars">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group">
             <label>Título da seção de pilares</label>
@@ -84,7 +120,16 @@
 
 {{-- CTA --}}
 <div id="sec-cta" class="card card-outline card-success">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-cta" data-section="cta"
+                    {{ ($data['cta_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-cta">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group">
             <label>Título</label>

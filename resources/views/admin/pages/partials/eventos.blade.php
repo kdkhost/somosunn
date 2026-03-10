@@ -3,7 +3,16 @@
 
 {{-- Hero --}}
 <div id="sec-hero" class="card card-outline card-primary">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-calendar-alt mr-1"></i> Hero</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-calendar-alt mr-1"></i> Hero</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-hero" data-section="hero"
+                    {{ ($data['hero_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-hero">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group">
             <label>Texto do badge <small class="text-muted">(pequena etiqueta acima do título)</small></label>
@@ -38,7 +47,16 @@
 
 {{-- CTA Final --}}
 <div id="sec-cta" class="card card-outline card-warning">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-cta" data-section="cta"
+                    {{ ($data['cta_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-cta">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group">
             <label>Título da seção CTA</label>

@@ -3,7 +3,16 @@
 
 {{-- Intro --}}
 <div id="sec-header" class="card card-outline card-primary">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-users mr-1"></i> Cabeçalho</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-users mr-1"></i> Cabeçalho</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-header" data-section="header"
+                    {{ ($data['header_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-header">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group">
             <label>Subtítulo do hero</label>
@@ -27,7 +36,14 @@
 <div id="sec-founders" class="card card-outline card-secondary">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-crown mr-1"></i> Fundadores</h3>
-        <div class="card-tools"><span class="badge badge-secondary">JSON</span></div>
+        <div class="card-tools d-flex align-items-center">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mr-3">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-founders" data-section="founders"
+                    {{ ($data['founders_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-founders">Exibir no site</label>
+            </div>
+            <span class="badge badge-secondary">JSON</span>
+        </div>
     </div>
     <div class="card-body">
         <div class="form-group">
@@ -51,7 +67,14 @@
 <div id="sec-team" class="card card-outline card-secondary">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-user-friends mr-1"></i> Equipe</h3>
-        <div class="card-tools"><span class="badge badge-secondary">JSON</span></div>
+        <div class="card-tools d-flex align-items-center">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mr-3">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-team" data-section="team"
+                    {{ ($data['team_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-team">Exibir no site</label>
+            </div>
+            <span class="badge badge-secondary">JSON</span>
+        </div>
     </div>
     <div class="card-body">
         <div class="form-group">
@@ -73,7 +96,16 @@
 
 {{-- Estatísticas --}}
 <div id="sec-stats" class="card card-outline card-info">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> UNN em Números</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> UNN em Números</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-stats" data-section="stats"
+                    {{ ($data['stats_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-stats">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group">
             <label>Título da seção</label>
@@ -97,7 +129,16 @@
 
 {{-- CTA --}}
 <div id="sec-cta" class="card card-outline card-success">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3>
+        <div class="card-tools">
+            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-cta" data-section="cta"
+                    {{ ($data['cta_enabled'] ?? true) ? 'checked' : '' }}>
+                <label class="custom-control-label" for="toggle-cta">Exibir no site</label>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <div class="form-group">
             <label>Título</label>
