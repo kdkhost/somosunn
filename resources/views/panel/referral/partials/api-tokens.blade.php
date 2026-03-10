@@ -161,7 +161,10 @@
                                         </button>
                                     </form>
 
-                                    <form action="{{ route('panel.referral.tokens.destroy', $token->id) }}" method="POST" onsubmit="return confirm('Revogar este token agora?');">
+                                    <form action="{{ route('panel.referral.tokens.destroy', $token->id) }}" method="POST"
+                                        data-confirm-title="Revogar token?"
+                                        data-confirm-text="Revogar este token agora?"
+                                        data-confirm-icon="warning">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-rose-700">

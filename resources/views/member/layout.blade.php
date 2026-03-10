@@ -69,6 +69,8 @@
         class="bg-white dark:bg-slate-900 text-center text-gray-500 dark:text-slate-400 text-sm p-4 border-t dark:border-slate-800 transition-colors">
         &copy; {{ date('Y') }} Grupo UNN. Todos os direitos reservados.
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @include('partials.global-sweetalert-confirm')
     @stack('scripts')
     @include('partials.global-placeholder-fix')
     <script>

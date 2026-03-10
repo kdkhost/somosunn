@@ -166,7 +166,13 @@
             }
 
             async function deleteMedia(id) {
-                if (!confirm('Tem certeza que deseja apagar esta mídia?')) return;
+                const confirmed = await window.showConfirmDialog({
+                    title: 'Excluir mídia?',
+                    text: 'Tem certeza que deseja apagar esta mídia?',
+                    icon: 'warning'
+                });
+
+                if (!confirmed) return;
 
                 try {
                     const response = await fetch(`/painel/events/{{ $event->id }}/media/${id}`, {

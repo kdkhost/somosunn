@@ -117,7 +117,9 @@
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
-                                                    onsubmit="return confirm('Deseja realmente excluir este evento?');"
+                                                    data-confirm-title="Excluir evento?"
+                                                    data-confirm-text="Deseja realmente excluir este evento?"
+                                                    data-confirm-icon="warning"
                                                     style="display:inline-block;">
                                                     @csrf
                                                     @method('DELETE')

@@ -476,6 +476,7 @@
         src="https://cdn.jsdelivr.net/npm/bootstrap-colorpicker@3.4.0/dist/js/bootstrap-colorpicker.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    @include('partials.global-sweetalert-confirm')
     @include('admin.partials.notifications')
     @include('admin.partials.chat-widget')
 

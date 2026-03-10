@@ -45,7 +45,9 @@
                 </a>
                 @if($event->exists)
                     <form method="POST" action="{{ route('panel.admin.events.destroy', $event) }}"
-                        onsubmit="return confirm('Deseja realmente excluir este evento? Esta ação não pode ser desfeita.');">
+                        data-confirm-title="Excluir evento?"
+                        data-confirm-text="Deseja realmente excluir este evento? Esta ação não pode ser desfeita."
+                        data-confirm-icon="warning">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
