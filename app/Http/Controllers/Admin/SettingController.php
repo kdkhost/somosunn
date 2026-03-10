@@ -287,9 +287,12 @@ class SettingController extends Controller
             'gateway' => [
                 'gateway_transparent_checkout',
                 'gateway_pass_tax_to_client',
+                'mercadopago_enabled',
                 'mercadopago_method_credit_card',
                 'mercadopago_method_pix',
                 'mercadopago_method_ticket',
+                'pagseguro_enabled',
+                'sumup_enabled',
             ],
             'marketplace' => ['marketplace_hero_enabled', 'marketplace_hero_autoplay', 'marketplace_exit_enabled', 'marketplace_events_popup_enabled'],
             'social' => [
@@ -610,15 +613,26 @@ class SettingController extends Controller
 
         // Garantir que checkboxes de meios de pagamento sejam salvos como 0/1
         $paymentMethodCheckboxes = [
+            'mercadopago_enabled',
             'mercadopago_method_credit_card',
             'mercadopago_method_debit_card',
             'mercadopago_method_pix',
             'mercadopago_method_ticket',
             'mercadopago_method_mercadopago',
+            'pagseguro_enabled',
+            'sumup_enabled',
         ];
-        foreach ($paymentMethodCheckboxes as $cbKey) {
-            if (array_key_exists($cbKey, $data)) {
-                $data[$cbKey] = $request->boolean($cbKey) ? '1' : '0';
+
+        if ($currentGroup === 'gateway') {
+            $mpEnabled = (int) ($data['mercadopago_enabled'] ?? $request->boolean('mercadopago_enabled') ? 1 : 0);
+            $psEnabled = (int) ($data['pagseguro_enabled'] ?? $request->boolean('pagseguro_enabled') ? 1 : 0);
+            $suEnabled = (int) ($data['sumup_enabled'] ?? $request->boolean('sumup_enabled') ? 1 : 0);
+
+            if (!$mpEnabled && !$psEnabled && !$suEnabled) {
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['success' => false, 'message' => 'Pelo menos um gateway de pagamento deve estar ativo para manter o fluxo do sistema.']);
+                }
+                return redirect()->back()->withInput()->with('error', 'Pelo menos um gateway de pagamento deve estar ativo.');
             }
         }
         if ($currentGroup === 'gateway') {
@@ -1075,7 +1089,7 @@ class SettingController extends Controller
     {
         try {
             $data = $request->validate([
-                'gateway' => 'required|in:mercadopago,pagseguro',
+                'gateway' => 'required|in:mercadopago,pagseguro,sumup',
                 'env' => 'required|in:sandbox,production',
                 'access_token' => 'nullable|string',
                 'token' => 'nullable|string',
@@ -1129,6 +1143,24 @@ class SettingController extends Controller
                         throw new \Exception("Falha na autenticação PagSeguro. Verifique E-mail e Token.");
                     }
                     throw new \Exception("Falha na conexão PagSeguro. Status: " . $response->status());
+                }
+            } elseif ($data['gateway'] === 'sumup') {
+                $token = $data['access_token'];
+                if (!$token) {
+                    throw new \Exception('Access Token não informado.');
+                }
+
+                // Teste SumUp: Get Account Info
+                $response = Http::withToken($token)->get('https://api.sumup.com/v1/me');
+
+                if ($response->successful()) {
+                    $json = $response->json();
+                    $merchantId = $json['merchant_profile']['merchant_code'] ?? 'N/A';
+                    $success = true;
+                    $message = "Conexão com SumUp realizada com sucesso! Merchant Code: {$merchantId}";
+                } else {
+                    $error = $response->json()['message'] ?? 'Erro desconhecido ou token inválido.';
+                    throw new \Exception("Falha na conexão SumUp: {$error}");
                 }
             }
 
