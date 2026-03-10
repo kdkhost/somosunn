@@ -62,22 +62,24 @@
                             </div>
 
                             @php
-                                $ticketExpired = $reg->event && $reg->event->isScannerExpired();
-                                $ticketStatusMessage = $reg->event ? $reg->event->scannerStatusMessage() : 'QR Code expirado.';
+                                $ticketState = $reg->ticketStatusState();
+                                $ticketExpired = $ticketState === 'expired';
+                                $ticketUsed = $ticketState === 'used';
+                                $ticketStatusMessage = $reg->ticketStatusMessage();
                                 $ticketPayload = [
                                     'code' => $reg->ticket_code,
                                     'title' => $reg->event->title,
                                     'date' => \Carbon\Carbon::parse($reg->event->start_at)->format('d/m/Y - H:i'),
-                                    'expired' => $ticketExpired,
+                                    'state' => $ticketState,
                                     'statusMessage' => $ticketStatusMessage,
                                 ];
                             @endphp
                             <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
                                 <div class="flex flex-col">
                                     <span class="text-[10px] uppercase font-bold text-slate-400">Status</span>
-                                    @if($reg->check_in_at)
-                                        <span class="text-xs font-bold text-green-600 flex items-center gap-1">
-                                            <i class="fas fa-check-circle"></i> Lido
+                                    @if($ticketUsed)
+                                        <span class="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                                            <i class="fas fa-check-double"></i> Ja utilizado
                                         </span>
                                     @elseif($ticketExpired)
                                         <span class="text-xs font-bold text-red-600 flex items-center gap-1">
@@ -129,8 +131,8 @@
                     do Evento</h3>
                 <p class="text-sm text-slate-500 dark:text-slate-400 mb-8" id="modalTicketDate">00/00/0000 - 00:00</p>
 
-                <div id="ticketExpiredAlert"
-                    class="hidden mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300">
+                <div id="ticketStateAlert"
+                    class="hidden mb-5 rounded-2xl px-4 py-3 text-sm font-bold">
                 </div>
 
                 <div class="relative inline-flex mb-8">
@@ -138,10 +140,10 @@
                         id="qrcode-container">
                         <!-- QR Code vai aqui via JS -->
                     </div>
-                    <div id="ticketExpiredOverlay"
-                        class="hidden absolute inset-0 rounded-3xl bg-white/90 dark:bg-slate-950/90 backdrop-blur-[1px] border-2 border-red-300 dark:border-red-700 flex items-center justify-center">
-                        <span
-                            class="rotate-[-10deg] rounded-xl border-2 border-red-600 bg-red-600/10 px-4 py-2 text-xl font-black uppercase tracking-[0.2em] text-red-700 dark:text-red-300">
+                    <div id="ticketStateOverlay"
+                        class="hidden absolute inset-0 rounded-3xl bg-white/90 dark:bg-slate-950/90 backdrop-blur-[1px] border-2 flex items-center justify-center">
+                        <span id="ticketStateOverlayLabel"
+                            class="rotate-[-10deg] rounded-xl border-2 px-4 py-2 text-center text-lg font-black uppercase tracking-[0.12em]">
                             Expirado
                         </span>
                     </div>
@@ -167,8 +169,9 @@
         let qrcodeInstance = null;
 
         window.showTicketModal = function (payload) {
-            const expiredAlert = document.getElementById('ticketExpiredAlert');
-            const expiredOverlay = document.getElementById('ticketExpiredOverlay');
+            const stateAlert = document.getElementById('ticketStateAlert');
+            const stateOverlay = document.getElementById('ticketStateOverlay');
+            const stateOverlayLabel = document.getElementById('ticketStateOverlayLabel');
 
             document.getElementById('modalTicketTitle').innerText = payload.title;
             document.getElementById('modalTicketDate').innerText = payload.date;
@@ -187,14 +190,30 @@
                 correctLevel: QRCode.CorrectLevel.H
             });
 
-            if (payload.expired) {
-                expiredAlert.textContent = payload.statusMessage || 'QR Code expirado.';
-                expiredAlert.classList.remove('hidden');
-                expiredOverlay.classList.remove('hidden');
+            stateAlert.className = 'hidden mb-5 rounded-2xl px-4 py-3 text-sm font-bold';
+            stateOverlay.className = 'hidden absolute inset-0 rounded-3xl bg-white/90 dark:bg-slate-950/90 backdrop-blur-[1px] border-2 flex items-center justify-center';
+            stateOverlayLabel.className = 'rotate-[-10deg] rounded-xl border-2 px-4 py-2 text-center text-lg font-black uppercase tracking-[0.12em]';
+
+            if (payload.state === 'used') {
+                stateAlert.textContent = payload.statusMessage || 'Ja utilizado.';
+                stateAlert.classList.add('border', 'border-emerald-200', 'bg-emerald-50', 'text-emerald-700', 'dark:border-emerald-900/40', 'dark:bg-emerald-900/20', 'dark:text-emerald-300');
+                stateAlert.classList.remove('hidden');
+                stateOverlay.classList.remove('hidden');
+                stateOverlay.classList.add('border-emerald-300', 'dark:border-emerald-700');
+                stateOverlayLabel.textContent = 'Ja utilizado';
+                stateOverlayLabel.classList.add('border-emerald-600', 'bg-emerald-600/10', 'text-emerald-700', 'dark:text-emerald-300');
+            } else if (payload.state === 'expired') {
+                stateAlert.textContent = payload.statusMessage || 'Ingresso invalido ou expirado.';
+                stateAlert.classList.add('border', 'border-red-200', 'bg-red-50', 'text-red-700', 'dark:border-red-900/40', 'dark:bg-red-900/20', 'dark:text-red-300');
+                stateAlert.classList.remove('hidden');
+                stateOverlay.classList.remove('hidden');
+                stateOverlay.classList.add('border-red-300', 'dark:border-red-700');
+                stateOverlayLabel.textContent = 'Ingresso invalido ou expirado';
+                stateOverlayLabel.classList.add('border-red-600', 'bg-red-600/10', 'text-red-700', 'dark:text-red-300');
             } else {
-                expiredAlert.textContent = '';
-                expiredAlert.classList.add('hidden');
-                expiredOverlay.classList.add('hidden');
+                stateAlert.textContent = '';
+                stateAlert.classList.add('hidden');
+                stateOverlay.classList.add('hidden');
             }
 
             modal.setAttribute('aria-hidden', 'false');

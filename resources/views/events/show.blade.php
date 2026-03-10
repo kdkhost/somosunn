@@ -240,20 +240,22 @@
 
                                 @if(isset($userRegistration) && $userRegistration)
                                     @php
-                                        $ticketExpired = $event->isScannerExpired();
-                                        $ticketStatusMessage = $event->scannerStatusMessage();
+                                        $ticketState = $userRegistration->ticketStatusState();
+                                        $ticketExpired = $ticketState === 'expired';
+                                        $ticketUsed = $ticketState === 'used';
+                                        $ticketStatusMessage = $userRegistration->ticketStatusMessage();
                                         $ticketPayload = [
                                             'code' => $userRegistration->ticket_code,
                                             'title' => $event->title,
                                             'date' => $startDate->translatedFormat('d M Y, \à\s H:i'),
-                                            'expired' => $ticketExpired,
+                                            'state' => $ticketState,
                                             'statusMessage' => $ticketStatusMessage,
                                         ];
                                     @endphp
                                     <div class="text-center">
                                         <div
-                                            class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-xl font-bold mb-4 w-full justify-center">
-                                            <i class="fas fa-check-circle"></i> Vaga Confirmada
+                                            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-bold mb-4 w-full justify-center {{ $ticketUsed ? 'bg-emerald-100 text-emerald-800' : 'bg-green-100 text-green-800' }}">
+                                            <i class="fas {{ $ticketUsed ? 'fa-check-double' : 'fa-check-circle' }}"></i> {{ $ticketUsed ? 'Ingresso ja utilizado' : 'Vaga Confirmada' }}
                                         </div>
                                         @if($event->is_ticket_enabled && $userRegistration->ticket_code)
                                             <button type="button"
@@ -261,7 +263,11 @@
                                                 class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2">
                                                 <i class="fas fa-qrcode"></i> Ver Ingresso Digital
                                             </button>
-                                            @if($ticketExpired)
+                                            @if($ticketUsed)
+                                                <p class="mt-3 text-sm font-bold text-emerald-600 flex items-center justify-center gap-2">
+                                                    <i class="fas fa-check-double"></i> {{ $ticketStatusMessage }}
+                                                </p>
+                                            @elseif($ticketExpired)
                                                 <p class="mt-3 text-sm font-bold text-red-600 flex items-center justify-center gap-2">
                                                     <i class="fas fa-ban"></i> {{ $ticketStatusMessage }}
                                                 </p>
@@ -462,8 +468,8 @@
             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Apresente este código na entrada
             </p>
 
-            <div id="ticketExpiredAlert"
-                class="hidden mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+            <div id="ticketStateAlert"
+                class="hidden mb-5 rounded-2xl px-4 py-3 text-sm font-bold">
             </div>
 
             <div class="relative inline-block mb-6">
@@ -471,10 +477,10 @@
                     id="qrcode-container">
                     <!-- QR Code vai aqui via JS -->
                 </div>
-                <div id="ticketExpiredOverlay"
-                    class="hidden absolute inset-0 rounded-xl bg-white/90 backdrop-blur-[1px] border-2 border-red-300 flex items-center justify-center">
-                    <span
-                        class="rotate-[-10deg] rounded-xl border-2 border-red-600 bg-red-600/10 px-4 py-2 text-xl font-black uppercase tracking-[0.2em] text-red-700">
+                <div id="ticketStateOverlay"
+                    class="hidden absolute inset-0 rounded-xl bg-white/90 backdrop-blur-[1px] border-2 flex items-center justify-center">
+                    <span id="ticketStateOverlayLabel"
+                        class="rotate-[-10deg] rounded-xl border-2 px-4 py-2 text-center text-lg font-black uppercase tracking-[0.12em]">
                         Expirado
                     </span>
                 </div>
@@ -516,8 +522,9 @@
         let qrcodeInstance = null;
 
         window.showTicketModal = function (payload) {
-            const expiredAlert = document.getElementById('ticketExpiredAlert');
-            const expiredOverlay = document.getElementById('ticketExpiredOverlay');
+            const stateAlert = document.getElementById('ticketStateAlert');
+            const stateOverlay = document.getElementById('ticketStateOverlay');
+            const stateOverlayLabel = document.getElementById('ticketStateOverlayLabel');
 
             document.getElementById('modalTicketTitle').innerText = payload.title;
             document.getElementById('modalTicketDate').innerText = payload.date;
@@ -536,14 +543,30 @@
                 correctLevel: QRCode.CorrectLevel.H
             });
 
-            if (payload.expired) {
-                expiredAlert.textContent = payload.statusMessage || 'QR Code expirado.';
-                expiredAlert.classList.remove('hidden');
-                expiredOverlay.classList.remove('hidden');
+            stateAlert.className = 'hidden mb-5 rounded-2xl px-4 py-3 text-sm font-bold';
+            stateOverlay.className = 'hidden absolute inset-0 rounded-xl bg-white/90 backdrop-blur-[1px] border-2 flex items-center justify-center';
+            stateOverlayLabel.className = 'rotate-[-10deg] rounded-xl border-2 px-4 py-2 text-center text-lg font-black uppercase tracking-[0.12em]';
+
+            if (payload.state === 'used') {
+                stateAlert.textContent = payload.statusMessage || 'Ja utilizado.';
+                stateAlert.classList.add('border', 'border-emerald-200', 'bg-emerald-50', 'text-emerald-700');
+                stateAlert.classList.remove('hidden');
+                stateOverlay.classList.remove('hidden');
+                stateOverlay.classList.add('border-emerald-300');
+                stateOverlayLabel.textContent = 'Ja utilizado';
+                stateOverlayLabel.classList.add('border-emerald-600', 'bg-emerald-600/10', 'text-emerald-700');
+            } else if (payload.state === 'expired') {
+                stateAlert.textContent = payload.statusMessage || 'Ingresso invalido ou expirado.';
+                stateAlert.classList.add('border', 'border-red-200', 'bg-red-50', 'text-red-700');
+                stateAlert.classList.remove('hidden');
+                stateOverlay.classList.remove('hidden');
+                stateOverlay.classList.add('border-red-300');
+                stateOverlayLabel.textContent = 'Ingresso invalido ou expirado';
+                stateOverlayLabel.classList.add('border-red-600', 'bg-red-600/10', 'text-red-700');
             } else {
-                expiredAlert.textContent = '';
-                expiredAlert.classList.add('hidden');
-                expiredOverlay.classList.add('hidden');
+                stateAlert.textContent = '';
+                stateAlert.classList.add('hidden');
+                stateOverlay.classList.add('hidden');
             }
 
             modal.setAttribute('aria-hidden', 'false');

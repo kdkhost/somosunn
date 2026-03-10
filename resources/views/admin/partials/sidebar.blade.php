@@ -166,6 +166,10 @@
                                     class="nav-link {{ $is('admin.events.list') }}"><i class="fas fa-list nav-icon"></i>
                                     <p>Gerenciar</p>
                                 </a></li>
+                            <li class="nav-item"><a href="{{ route('admin.quick-scanner') }}"
+                                    class="nav-link {{ $is('admin.quick-scanner') }}"><i class="fas fa-qrcode nav-icon"></i>
+                                    <p>Scanner universal</p>
+                                </a></li>
                             <li class="nav-item"><a href="{{ route('admin.events.create') }}"
                                     class="nav-link {{ $is('admin.events.create') }}"><i class="fas fa-plus nav-icon"></i>
                                     <p>Novo</p>

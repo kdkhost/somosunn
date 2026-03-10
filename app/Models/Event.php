@@ -13,7 +13,11 @@ class Event extends Model
 {
     use HasFactory;
 
-    public const SCANNER_LOCATION_RADIUS_METERS = 50;
+    public const SCANNER_DEFAULT_RADIUS_METERS = 50;
+    public const SCANNER_EXACT_TOLERANCE_METERS = 5;
+    public const SCANNER_RESTRICTION_DISABLED = 'disabled';
+    public const SCANNER_RESTRICTION_EXACT = 'exact';
+    public const SCANNER_RESTRICTION_RADIUS = 'radius';
 
     protected $fillable = [
         'user_id',
@@ -47,6 +51,8 @@ class Event extends Model
         'is_somos_unicas',
         'visibility',
         'is_ticket_enabled',
+        'scanner_restriction_mode',
+        'scanner_radius_meters',
     ];
 
     protected $casts = [
@@ -63,6 +69,7 @@ class Event extends Model
         'price' => 'decimal:2',
         'flash_sale_price' => 'decimal:2',
         'flash_sale_ends_at' => 'datetime',
+        'scanner_radius_meters' => 'integer',
     ];
 
     protected $appends = ['start', 'end', 'image_url', 'thumbnail_url'];
@@ -248,23 +255,39 @@ class Event extends Model
 
     public function hasScannerLocationConstraint(): bool
     {
-        return $this->latitude !== null && $this->longitude !== null;
+        return $this->scannerLocationRestrictionEnabled() && $this->hasScannerCoordinates();
     }
 
     public function scannerLocationRadiusMeters(): int
     {
-        return self::SCANNER_LOCATION_RADIUS_METERS;
+        if ($this->scannerRestrictionMode() === self::SCANNER_RESTRICTION_EXACT) {
+            return self::SCANNER_EXACT_TOLERANCE_METERS;
+        }
+
+        $radius = (int) ($this->scanner_radius_meters ?: self::SCANNER_DEFAULT_RADIUS_METERS);
+
+        return $radius > 0 ? $radius : self::SCANNER_DEFAULT_RADIUS_METERS;
     }
 
     public function scannerLocationMessage(): string
     {
-        if (!$this->hasScannerLocationConstraint()) {
-            return 'Este evento nao exige validacao por localizacao.';
+        if (!$this->scannerLocationRestrictionEnabled()) {
+            return 'Leitura liberada sem restricao de localizacao.';
         }
 
-        return 'Validacao por localizacao ativa: o scanner deve estar em ate '
-            . $this->scannerLocationRadiusMeters()
-            . 'm do ponto configurado para o evento.';
+        if ($this->scannerLocationSetupIncomplete()) {
+            return 'Cerca digital ativa, mas faltam as coordenadas exatas do evento para validar o ingresso.';
+        }
+
+        if ($this->scannerRestrictionMode() === self::SCANNER_RESTRICTION_EXACT) {
+            return 'Leitura restrita a localizacao exata do evento, com tolerancia tecnica de ate '
+                . self::SCANNER_EXACT_TOLERANCE_METERS
+                . 'm.';
+        }
+
+        return 'Leitura restrita a ate '
+            . $this->scannerFormattedRadius()
+            . ' do ponto configurado para o evento.';
     }
 
     public function distanceToScannerLocationMeters(?float $latitude, ?float $longitude): ?float
@@ -291,6 +314,74 @@ class Event extends Model
         $distance = $this->distanceToScannerLocationMeters($latitude, $longitude);
 
         return $distance !== null && $distance <= $this->scannerLocationRadiusMeters();
+    }
+
+    public function scannerRestrictionMode(): string
+    {
+        $mode = strtolower(trim((string) $this->scanner_restriction_mode));
+
+        if (in_array($mode, [
+            self::SCANNER_RESTRICTION_DISABLED,
+            self::SCANNER_RESTRICTION_EXACT,
+            self::SCANNER_RESTRICTION_RADIUS,
+        ], true)) {
+            return $mode;
+        }
+
+        return $this->hasScannerCoordinates()
+            ? self::SCANNER_RESTRICTION_RADIUS
+            : self::SCANNER_RESTRICTION_DISABLED;
+    }
+
+    public function scannerLocationRestrictionEnabled(): bool
+    {
+        return $this->scannerRestrictionMode() !== self::SCANNER_RESTRICTION_DISABLED;
+    }
+
+    public function scannerLocationSetupIncomplete(): bool
+    {
+        return $this->scannerLocationRestrictionEnabled() && !$this->hasScannerCoordinates();
+    }
+
+    public function hasScannerCoordinates(): bool
+    {
+        return $this->latitude !== null && $this->longitude !== null;
+    }
+
+    public function scannerFormattedRadius(): string
+    {
+        $meters = $this->scannerLocationRadiusMeters();
+
+        if ($meters >= 1000) {
+            $kilometers = $meters / 1000;
+            $formatted = number_format($kilometers, $kilometers === (float) (int) $kilometers ? 0 : 1, ',', '.');
+
+            return $formatted . ' km';
+        }
+
+        return $meters . ' m';
+    }
+
+    public function scannerFormRadiusValue(): string
+    {
+        $meters = $this->scannerRestrictionMode() === self::SCANNER_RESTRICTION_RADIUS
+            ? (int) ($this->scanner_radius_meters ?: self::SCANNER_DEFAULT_RADIUS_METERS)
+            : self::SCANNER_DEFAULT_RADIUS_METERS;
+
+        if ($meters >= 1000 && $meters % 1000 === 0) {
+            return (string) ($meters / 1000);
+        }
+
+        return $meters >= 1000
+            ? rtrim(rtrim(number_format($meters / 1000, 2, '.', ''), '0'), '.')
+            : (string) $meters;
+    }
+
+    public function scannerFormRadiusUnit(): string
+    {
+        $meters = (int) ($this->scanner_radius_meters ?: self::SCANNER_DEFAULT_RADIUS_METERS);
+
+        return $meters >= 1000 && $meters % 1000 === 0 ? 'km' : 'm';
     }
 
     public function isScannerOpen(?CarbonInterface $reference = null): bool

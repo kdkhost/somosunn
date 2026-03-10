@@ -880,6 +880,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             ->middleware('check.feature:events_access')->name('events.scanner');
         Route::post('events/{event}/scanner/validate', [\App\Http\Controllers\Admin\EventScannerController::class, 'validateTicket'])
             ->middleware('check.feature:events_edit')->name('events.scanner.validate');
+        Route::get('quick-scanner', [\App\Http\Controllers\Admin\QuickScannerController::class, 'index'])
+            ->middleware('check.feature:events_access')->name('quick-scanner');
+        Route::post('quick-scanner/validate', [\App\Http\Controllers\Admin\QuickScannerController::class, 'validateTicket'])
+            ->middleware('check.feature:events_edit')->name('quick-scanner.validate');
 
         // Event Media Gallery (Admin)
         Route::post('events/{event}/media', [\App\Http\Controllers\Admin\EventMediaController::class, 'store'])

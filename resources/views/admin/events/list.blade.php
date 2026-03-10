@@ -13,10 +13,16 @@
     <div class="container-fluid">
         <div class="row mb-3">
             <div class="col-12">
-                <a href="{{ route('admin.events.create') }}"
-                    class="btn btn-primary shadow-sm hover:translate-y-[-2px] transition-all">
-                    <i class="fas fa-plus mr-2"></i> Novo Evento
-                </a>
+                <div class="d-flex flex-wrap" style="gap: 10px;">
+                    <a href="{{ route('admin.quick-scanner') }}"
+                        class="btn btn-success shadow-sm hover:translate-y-[-2px] transition-all">
+                        <i class="fas fa-qrcode mr-2"></i> Scanner Universal
+                    </a>
+                    <a href="{{ route('admin.events.create') }}"
+                        class="btn btn-primary shadow-sm hover:translate-y-[-2px] transition-all">
+                        <i class="fas fa-plus mr-2"></i> Novo Evento
+                    </a>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -96,6 +102,16 @@
                                         </td>
                                         <td class="text-right">
                                             <div class="btn-group btn-group-sm">
+                                                @if($event->is_ticket_enabled)
+                                                    <a href="{{ route('admin.events.scanner', $event) }}" class="btn btn-success"
+                                                        title="Escanear Ingressos">
+                                                        <i class="fas fa-qrcode"></i>
+                                                    </a>
+                                                @else
+                                                    <button type="button" class="btn btn-light text-muted" title="QR Code desativado" disabled>
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                @endif
                                                 <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-info"
                                                     title="Editar">
                                                     <i class="fas fa-edit"></i>

@@ -61,6 +61,8 @@ class EventTicketScannerServiceTest extends TestCase
             $table->timestamp('end_at')->nullable();
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
+            $table->string('scanner_restriction_mode')->nullable();
+            $table->integer('scanner_radius_meters')->nullable();
             $table->boolean('all_day')->default(false);
             $table->boolean('published')->default(true);
             $table->boolean('is_ticket_enabled')->default(true);
@@ -158,14 +160,67 @@ class EventTicketScannerServiceTest extends TestCase
         $log = EventScannerLog::query()->first();
 
         $this->assertFalse($result['success']);
-        $this->assertStringContainsString('50m', $result['message']);
+        $this->assertStringContainsString('50 m', $result['message']);
         $this->assertSame('outside_radius', $log->status_code);
         $this->assertSame('error', $log->outcome);
         $this->assertNull($registration->fresh()->check_in_at);
         $this->assertGreaterThan(50.0, (float) $log->distance_meters);
     }
 
-    private function seedScannerScenario(string $ticketCode = 'DISTANCIA-1'): array
+    public function test_exact_mode_rejects_scan_outside_technical_tolerance(): void
+    {
+        [$event, $registration, $organizer] = $this->seedScannerScenario('EXATO-1', [
+            'scanner_restriction_mode' => Event::SCANNER_RESTRICTION_EXACT,
+            'scanner_radius_meters' => null,
+        ]);
+
+        $pointsService = $this->createMock(PointsService::class);
+        $pointsService->method('award')->willReturn(true);
+
+        $result = app(EventTicketScannerService::class)->validateForEvent(
+            $event,
+            $registration->ticket_code,
+            -22.90670,
+            -43.1729,
+            $organizer,
+            $pointsService,
+            'panel_event'
+        );
+
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('5m', $result['message']);
+        $this->assertSame('outside_radius', EventScannerLog::query()->first()->status_code);
+        $this->assertNull($registration->fresh()->check_in_at);
+    }
+
+    public function test_disabled_mode_accepts_ticket_without_gps(): void
+    {
+        [$event, $registration, $organizer] = $this->seedScannerScenario('SEM-GPS-1', [
+            'scanner_restriction_mode' => Event::SCANNER_RESTRICTION_DISABLED,
+            'scanner_radius_meters' => null,
+            'latitude' => null,
+            'longitude' => null,
+        ]);
+
+        $pointsService = $this->createMock(PointsService::class);
+        $pointsService->method('award')->willReturn(true);
+
+        $result = app(EventTicketScannerService::class)->validateForEvent(
+            $event,
+            $registration->ticket_code,
+            null,
+            null,
+            $organizer,
+            $pointsService,
+            'panel_event'
+        );
+
+        $this->assertTrue($result['success']);
+        $this->assertSame('validated', EventScannerLog::query()->first()->status_code);
+        $this->assertNotNull($registration->fresh()->check_in_at);
+    }
+
+    private function seedScannerScenario(string $ticketCode = 'DISTANCIA-1', array $eventOverrides = []): array
     {
         $organizer = User::create([
             'name' => 'Organizador',
@@ -183,16 +238,18 @@ class EventTicketScannerServiceTest extends TestCase
             'level' => 'cliente',
         ]);
 
-        $event = Event::create([
+        $event = Event::create(array_merge([
             'user_id' => $organizer->id,
             'title' => 'Evento com geolocalizacao',
             'start_at' => now()->subHour(),
             'end_at' => now()->addHour(),
             'latitude' => -22.9068,
             'longitude' => -43.1729,
+            'scanner_restriction_mode' => Event::SCANNER_RESTRICTION_RADIUS,
+            'scanner_radius_meters' => 50,
             'published' => true,
             'is_ticket_enabled' => true,
-        ]);
+        ], $eventOverrides));
 
         $registration = EventRegistration::create([
             'event_id' => $event->id,

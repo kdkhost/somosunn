@@ -90,6 +90,39 @@
                                     <label class="form-check-label font-weight-bold" style="color:#007bff;"><i class="fas fa-qrcode mr-1"></i> Habilitar Validação de Entrada por QR Code</label>
                                     <small class="d-block text-muted">Quando ativo, o sistema criará um ingresso com QR Code e pontuará organizador e participante após validação.</small>
                                 </div>
+                                <div class="card card-outline card-info mb-3">
+                                    <div class="card-body">
+                                        <div class="form-group mb-3">
+                                            <label class="font-weight-bold"><i class="fas fa-map-marked-alt mr-1"></i> Restricao de leitura do QR Code</label>
+                                            <select name="scanner_restriction_mode" id="scannerRestrictionMode" class="form-control">
+                                                <option value="disabled" {{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) === 'disabled' ? 'selected' : '' }}>Sem restricao de localizacao</option>
+                                                <option value="exact" {{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) === 'exact' ? 'selected' : '' }}>Localizacao exata do evento</option>
+                                                <option value="radius" {{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) === 'radius' ? 'selected' : '' }}>Margem de erro configuravel</option>
+                                            </select>
+                                            <small class="d-block text-muted mt-1">Use localizacao exata para exigir leitura no ponto do evento ou defina uma margem de erro em metros ou km.</small>
+                                        </div>
+                                        <div id="scannerRadiusFields" class="row mb-3">
+                                            <div class="col-md-7">
+                                                <label>Margem permitida</label>
+                                                <input type="number" step="0.1" min="0.1" name="scanner_radius_value" class="form-control"
+                                                    value="{{ old('scanner_radius_value', $event->scannerFormRadiusValue()) }}" placeholder="50">
+                                            </div>
+                                            <div class="col-md-5">
+                                                <label>Unidade</label>
+                                                <select name="scanner_radius_unit" class="form-control">
+                                                    <option value="m" {{ old('scanner_radius_unit', $event->scannerFormRadiusUnit()) === 'm' ? 'selected' : '' }}>Metros</option>
+                                                    <option value="km" {{ old('scanner_radius_unit', $event->scannerFormRadiusUnit()) === 'km' ? 'selected' : '' }}>Quilometros</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div id="scannerExactHint" class="alert alert-warning mb-0 d-none">
+                                            A localizacao exata exige leitura no ponto configurado para o evento, com tolerancia tecnica de ate 5 metros.
+                                        </div>
+                                        <div class="alert alert-secondary mt-3 mb-0">
+                                            Toda leitura, com sucesso ou erro, fica registrada no sistema para auditoria.
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="form-group mb-3">
                                     <label class="font-weight-bold"><i class="fas fa-eye mr-1"></i> Onde Exibir?</label>
                                     <select name="visibility" class="form-control" style="border-radius: 8px;">
@@ -494,6 +527,21 @@
             border: 1px solid #007bff !important;
         }
     </style>
+@endpush
+
+@push('scripts')
+    <script>
+        $(function () {
+            function syncScannerRestrictionFields() {
+                const mode = $('#scannerRestrictionMode').val() || 'disabled';
+                $('#scannerRadiusFields').toggle(mode === 'radius');
+                $('#scannerExactHint').toggleClass('d-none', mode !== 'exact');
+            }
+
+            $('#scannerRestrictionMode').on('change', syncScannerRestrictionFields);
+            syncScannerRestrictionFields();
+        });
+    </script>
 @endpush
 
 @push('scripts')

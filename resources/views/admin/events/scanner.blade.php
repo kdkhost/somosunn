@@ -84,11 +84,13 @@
         const scannerOpen = @json($scannerOpen);
         const scannerStatusMessage = @json($scannerStatusMessage);
         const requiresLocation = @json($event->hasScannerLocationConstraint());
-        const scannerRadiusMeters = @json($event->scannerLocationRadiusMeters());
+        const scannerLocationMessage = @json($event->scannerLocationMessage());
 
         document.addEventListener('DOMContentLoaded', function () {
             if (scannerOpen) {
-                captureUserLocationInBackground();
+                if (requiresLocation) {
+                    captureUserLocationInBackground();
+                }
                 startScanner();
             }
         });
@@ -134,7 +136,7 @@
             html5QrcodeScanner.pause(true);
             showOverlay('process', 'Validando ingresso...');
 
-            if ('geolocation' in navigator) {
+            if (requiresLocation && 'geolocation' in navigator) {
                 navigator.geolocation.getCurrentPosition(function (position) {
                     userCoords.lat = position.coords.latitude;
                     userCoords.lng = position.coords.longitude;
@@ -176,7 +178,7 @@
                     playBeep(false);
 
                     if (requiresLocation && (userCoords.lat === null || userCoords.lng === null)) {
-                        toastr.warning('Este evento exige validacao por localizacao em ate ' + scannerRadiusMeters + 'm do ponto do evento.');
+                        toastr.warning(scannerLocationMessage + ' Habilite o GPS para evitar recusas.');
                     }
                 })
                 .catch(function (error) {

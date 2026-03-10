@@ -81,7 +81,7 @@
                 <div
                     class="flex items-center gap-2 p-4 bg-slate-50 dark:bg-slate-900/70 text-slate-700 dark:text-slate-300 rounded-2xl text-sm font-semibold border border-slate-200 dark:border-slate-800">
                     <i class="fas fa-map-marker-alt"></i>
-                    <p>Para eventos com localizacao configurada, a validacao aceita ate 50m do ponto do evento. Toda leitura fica registrada no sistema.</p>
+                    <p>Cada evento pode exigir localizacao exata, raio configuravel em metros ou km, ou leitura livre. Toda leitura fica registrada no sistema.</p>
                 </div>
             </div>
         </div>
@@ -101,10 +101,24 @@
                                     <p class="mt-1 text-[10px] text-slate-500 font-bold uppercase tracking-wider break-words">
                                         {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y H:i') }}
                                     </p>
+                                    <p class="mt-2 text-xs text-slate-500 dark:text-slate-400 break-words">
+                                        {{ $event->scannerLocationMessage() }}
+                                    </p>
                                 </div>
+                                @php
+                                    $mode = $event->scannerRestrictionMode();
+                                    $modeLabel = $mode === \App\Models\Event::SCANNER_RESTRICTION_DISABLED
+                                        ? 'Sem restricao'
+                                        : ($mode === \App\Models\Event::SCANNER_RESTRICTION_EXACT ? 'Localizacao exata' : 'Raio ' . $event->scannerFormattedRadius());
+                                    $modeClass = $mode === \App\Models\Event::SCANNER_RESTRICTION_DISABLED
+                                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                                        : ($mode === \App\Models\Event::SCANNER_RESTRICTION_EXACT
+                                            ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/40'
+                                            : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/50');
+                                @endphp
                                 <span
-                                    class="inline-flex self-start sm:self-auto px-3 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black rounded-lg border border-emerald-100 dark:border-emerald-800/50 whitespace-nowrap">
-                                    Ativo
+                                    class="inline-flex self-start sm:self-auto px-3 py-1 text-[10px] font-black rounded-lg border whitespace-nowrap {{ $modeClass }}">
+                                    {{ $modeLabel }}
                                 </span>
                             </div>
                         </div>

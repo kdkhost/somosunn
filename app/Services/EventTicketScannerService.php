@@ -176,13 +176,35 @@ class EventTicketScannerService
         string $context,
         ?EventRegistration $registration = null
     ): ?array {
-        if (!$event->hasScannerLocationConstraint()) {
+        if (!$event->scannerLocationRestrictionEnabled()) {
             return null;
         }
 
+        if ($event->scannerLocationSetupIncomplete()) {
+            $message = 'A cerca digital deste evento esta ativa, mas o ponto exato do evento ainda nao foi configurado.';
+
+            $this->attemptLogger->log(
+                $event,
+                $registration,
+                $scannerUser,
+                $context,
+                false,
+                'location_not_configured',
+                $message,
+                $ticketCode,
+                $latitude,
+                $longitude
+            );
+
+            return $this->failure($message);
+        }
+
         if ($latitude === null || $longitude === null) {
-            $message = 'Validacao por localizacao ativa: permita o GPS. O scanner precisa estar em ate '
-                . $event->scannerLocationRadiusMeters() . 'm do ponto do evento.';
+            $message = $event->scannerRestrictionMode() === Event::SCANNER_RESTRICTION_EXACT
+                ? 'Localizacao exata ativa: permita o GPS e valide o ingresso no ponto exato do evento.'
+                : 'Validacao por localizacao ativa: permita o GPS. O scanner precisa estar em ate '
+                    . $event->scannerFormattedRadius()
+                    . ' do ponto do evento.';
 
             $this->attemptLogger->log(
                 $event,
@@ -204,9 +226,16 @@ class EventTicketScannerService
 
         if ($distanceMeters === null || !$event->isWithinScannerLocationRadius($latitude, $longitude)) {
             $roundedDistance = $distanceMeters === null ? null : (int) round($distanceMeters);
-            $message = 'Validacao por localizacao ativa: o scanner precisa estar em ate '
-                . $event->scannerLocationRadiusMeters() . 'm do ponto do evento.'
-                . ($roundedDistance !== null ? ' Distancia atual: ' . $roundedDistance . 'm.' : '');
+            $message = $event->scannerRestrictionMode() === Event::SCANNER_RESTRICTION_EXACT
+                ? 'Localizacao exata ativa: o scanner precisa estar no ponto configurado para o evento'
+                    . ' (tolerancia tecnica de ate '
+                    . Event::SCANNER_EXACT_TOLERANCE_METERS
+                    . 'm).'
+                    . ($roundedDistance !== null ? ' Distancia atual: ' . $roundedDistance . 'm.' : '')
+                : 'Validacao por localizacao ativa: o scanner precisa estar em ate '
+                    . $event->scannerFormattedRadius()
+                    . ' do ponto do evento.'
+                    . ($roundedDistance !== null ? ' Distancia atual: ' . $roundedDistance . 'm.' : '');
 
             $this->attemptLogger->log(
                 $event,
@@ -242,7 +271,7 @@ class EventTicketScannerService
         array $extraPayload = []
     ): array {
         if ($registration->check_in_at) {
-            $message = 'Este ingresso ja foi validado em ' . $registration->check_in_at->format('d/m/Y H:i');
+            $message = 'Este ingresso ja foi utilizado em ' . $registration->check_in_at->format('d/m/Y H:i') . '.';
 
             $this->attemptLogger->log(
                 $event,

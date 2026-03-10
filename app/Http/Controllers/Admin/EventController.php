@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class EventController extends Controller
 {
@@ -168,6 +169,9 @@ class EventController extends Controller
             'visibility' => 'nullable|string|in:ambos,somos_unn,somos_unicas',
             'event_url' => 'nullable|url|max:255',
             'is_ticket_enabled' => 'nullable|boolean',
+            'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
+            'scanner_radius_value' => 'nullable|numeric|min:0.001',
+            'scanner_radius_unit' => 'nullable|string|in:m,km',
         ]);
 
         $validated['published'] = $request->has('published')
@@ -201,6 +205,7 @@ class EventController extends Controller
         $data['user_id'] = Auth::id();
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
+        $data = $this->applyScannerRestrictionPayload($request, $data);
         $data = $this->applyVisibilityData($request, $data, null, false, 'events');
 
         if ($request->hasFile('certificate_bg')) {
@@ -282,6 +287,9 @@ class EventController extends Controller
             'visibility' => 'nullable|string|in:ambos,somos_unn,somos_unicas',
             'event_url' => 'nullable|url|max:255',
             'is_ticket_enabled' => 'nullable|boolean',
+            'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
+            'scanner_radius_value' => 'nullable|numeric|min:0.001',
+            'scanner_radius_unit' => 'nullable|string|in:m,km',
         ]);
 
         if ($request->has('published')) {
@@ -321,6 +329,8 @@ class EventController extends Controller
         if ($request->has('is_certificate_enabled')) {
             $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         }
+        $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
+        $data = $this->applyScannerRestrictionPayload($request, $data);
         $data = $this->applyVisibilityData(
             $request,
             $data,
@@ -576,6 +586,57 @@ class EventController extends Controller
     /**
      * Verifica se o usuário tem permissão ou é admin.
      */
+    private function applyScannerRestrictionPayload(Request $request, array $data): array
+    {
+        $mode = (string) ($request->input('scanner_restriction_mode') ?: Event::SCANNER_RESTRICTION_DISABLED);
+        if (!in_array($mode, [
+            Event::SCANNER_RESTRICTION_DISABLED,
+            Event::SCANNER_RESTRICTION_EXACT,
+            Event::SCANNER_RESTRICTION_RADIUS,
+        ], true)) {
+            $mode = Event::SCANNER_RESTRICTION_DISABLED;
+        }
+
+        $data['scanner_restriction_mode'] = $mode;
+        $data['scanner_radius_meters'] = null;
+
+        if ($mode === Event::SCANNER_RESTRICTION_DISABLED) {
+            return $data;
+        }
+
+        if (($data['latitude'] ?? null) === null || ($data['longitude'] ?? null) === null) {
+            throw ValidationException::withMessages([
+                'scanner_restriction_mode' => 'Configure latitude e longitude do evento para ativar a cerca digital do QR Code.',
+            ]);
+        }
+
+        if ($mode === Event::SCANNER_RESTRICTION_EXACT) {
+            return $data;
+        }
+
+        $radiusValue = $request->input('scanner_radius_value');
+        if (!is_numeric($radiusValue) || (float) $radiusValue <= 0) {
+            throw ValidationException::withMessages([
+                'scanner_radius_value' => 'Informe a margem de erro da cerca digital em metros ou quilometros.',
+            ]);
+        }
+
+        $unit = $request->input('scanner_radius_unit') === 'km' ? 'km' : 'm';
+        $meters = $unit === 'km'
+            ? (int) round(((float) $radiusValue) * 1000)
+            : (int) round((float) $radiusValue);
+
+        if ($meters < 1) {
+            throw ValidationException::withMessages([
+                'scanner_radius_value' => 'A margem da cerca digital precisa ser maior que zero.',
+            ]);
+        }
+
+        $data['scanner_radius_meters'] = $meters;
+
+        return $data;
+    }
+
     protected function ensurePermission(string $permission): void
     {
         $user = Auth::user();

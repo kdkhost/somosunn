@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class EventRegistration extends Model
 {
@@ -49,5 +50,45 @@ class EventRegistration extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function isTicketUsed(): bool
+    {
+        return $this->check_in_at !== null;
+    }
+
+    public function isTicketExpired(): bool
+    {
+        return !$this->isTicketUsed() && (bool) $this->event?->isScannerExpired();
+    }
+
+    public function ticketStatusState(): string
+    {
+        if ($this->isTicketUsed()) {
+            return 'used';
+        }
+
+        if ($this->isTicketExpired()) {
+            return 'expired';
+        }
+
+        return 'valid';
+    }
+
+    public function ticketStatusMessage(): string
+    {
+        if ($this->isTicketUsed()) {
+            $checkInAt = $this->check_in_at instanceof Carbon
+                ? $this->check_in_at
+                : Carbon::parse($this->check_in_at);
+
+            return 'Ja utilizado em ' . $checkInAt->format('d/m/Y H:i') . '.';
+        }
+
+        if ($this->isTicketExpired()) {
+            return 'Ingresso invalido ou expirado. ' . ($this->event?->scannerStatusMessage() ?? '');
+        }
+
+        return 'Ingresso valido para leitura.';
     }
 }

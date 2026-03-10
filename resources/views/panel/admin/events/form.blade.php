@@ -8,7 +8,12 @@
 
 @section('panel_content')
     <div
-        x-data="{ tab: 'general', certificateEnabled: {{ old('is_certificate_enabled', $event->is_certificate_enabled) ? 'true' : 'false' }} }"
+        x-data="{
+            tab: 'general',
+            certificateEnabled: {{ old('is_certificate_enabled', $event->is_certificate_enabled) ? 'true' : 'false' }},
+            ticketEnabled: {{ old('is_ticket_enabled', $event->is_ticket_enabled) ? 'true' : 'false' }},
+            scannerMode: '{{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) }}'
+        }"
         x-effect="if (!certificateEnabled && tab === 'certificate') { tab = 'general'; }"
         class="space-y-6">
         {{-- Header --}}
@@ -228,6 +233,64 @@
             <div x-show="tab === 'location'" class="max-w-4xl space-y-6">
                 <div
                     class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6 transition-colors duration-300">
+                    <div
+                        class="rounded-2xl border border-blue-100 dark:border-blue-900/40 bg-blue-50 dark:bg-blue-950/20 p-6 space-y-5 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" name="is_ticket_enabled" id="is_ticket_enabled" value="1"
+                                x-model="ticketEnabled" @checked(old('is_ticket_enabled', $event->is_ticket_enabled))
+                                class="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 bg-white dark:bg-slate-950">
+                            <div>
+                                <label for="is_ticket_enabled"
+                                    class="block text-sm font-black text-slate-900 dark:text-white transition-colors">Ativar ingresso digital com QR Code</label>
+                                <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Quando ativo, cada reserva gera um ingresso com QR Code para leitura no check-in.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" x-show="ticketEnabled" x-cloak>
+                            <div class="md:col-span-2">
+                                <label
+                                    class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Restricao
+                                    de leitura</label>
+                                <select name="scanner_restriction_mode" x-model="scannerMode"
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-900/40 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-semibold">
+                                    <option value="disabled">Sem restricao de localizacao</option>
+                                    <option value="exact">Localizacao exata do evento</option>
+                                    <option value="radius">Margem de erro configuravel</option>
+                                </select>
+                            </div>
+                            <div x-show="scannerMode === 'radius'" x-cloak>
+                                <label
+                                    class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Margem</label>
+                                <div class="grid grid-cols-[minmax(0,1fr)_112px] gap-3">
+                                    <input type="number" step="0.1" min="0.1" name="scanner_radius_value"
+                                        value="{{ old('scanner_radius_value', $event->scannerFormRadiusValue()) }}"
+                                        class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-900/40 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-semibold"
+                                        placeholder="50">
+                                    <select name="scanner_radius_unit"
+                                        class="w-full px-3 py-3 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-900/40 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-semibold">
+                                        <option value="m" @selected(old('scanner_radius_unit', $event->scannerFormRadiusUnit()) === 'm')>metros</option>
+                                        <option value="km" @selected(old('scanner_radius_unit', $event->scannerFormRadiusUnit()) === 'km')>km</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div x-show="ticketEnabled && scannerMode === 'exact'" x-cloak
+                            class="rounded-2xl border border-amber-200 dark:border-amber-900/40 bg-amber-50 dark:bg-amber-950/20 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
+                            O modo exato exige leitura no ponto configurado para o evento, com tolerancia tecnica de ate 5 metros.
+                        </div>
+
+                        <div x-show="ticketEnabled && scannerMode === 'radius'" x-cloak
+                            class="rounded-2xl border border-emerald-200 dark:border-emerald-900/40 bg-emerald-50 dark:bg-emerald-950/20 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-300">
+                            Use a margem em metros ou quilometros para permitir a leitura dentro do raio configurado ao redor do evento.
+                        </div>
+
+                        <div
+                            class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/70 px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                            Toda tentativa de leitura, com sucesso ou erro, fica auditada no sistema para seguranca.
+                        </div>
+                    </div>
+
                     <div>
                         <label
                             class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Nome
@@ -255,6 +318,33 @@
                                 class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-bold"
                                 placeholder="Ex: 100 (0 para ilimitado)">
                         </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Latitude
+                                exata</label>
+                            <input type="number" step="any" name="latitude"
+                                value="{{ old('latitude', $event->latitude) }}"
+                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
+                                placeholder="-23.550520">
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Longitude
+                                exata</label>
+                            <input type="number" step="any" name="longitude"
+                                value="{{ old('longitude', $event->longitude) }}"
+                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
+                                placeholder="-46.633308">
+                        </div>
+                    </div>
+
+                    <div
+                        class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/70 px-4 py-4 text-sm text-slate-600 dark:text-slate-400">
+                        <p class="font-bold text-slate-800 dark:text-slate-200">Ponto oficial da leitura</p>
+                        <p class="mt-1">Se o evento usar cerca digital, estas coordenadas definem o ponto de leitura do QR Code. Sem latitude e longitude, a restricao de localizacao nao pode ser aplicada.</p>
                     </div>
                 </div>
             </div>

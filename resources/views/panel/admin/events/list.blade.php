@@ -29,6 +29,11 @@
                     <i class="fas fa-plus"></i>
                     <span>Novo Evento</span>
                 </a>
+                <a href="{{ route('panel.admin.quick-scanner') }}"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 border border-transparent rounded-xl text-sm font-semibold text-white hover:bg-emerald-700 transition-all shadow-sm shadow-emerald-200">
+                    <i class="fas fa-qrcode"></i>
+                    <span>Scanner Universal</span>
+                </a>
             </div>
         </div>
 
@@ -102,11 +107,19 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex items-center justify-end gap-2 text-slate-400 dark:text-slate-500 transition-opacity">
-                                        <a href="{{ route('panel.admin.events.scanner', $event) }}"
-                                            class="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-lg transition-colors border border-transparent hover:border-emerald-100 dark:hover:border-emerald-800/50"
-                                            title="Escanear Ingressos">
-                                            <i class="fas fa-qrcode"></i>
-                                        </a>
+                                        @if($event->is_ticket_enabled)
+                                            <a href="{{ route('panel.admin.events.scanner', $event) }}"
+                                                class="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-lg transition-colors border border-transparent hover:border-emerald-100 dark:hover:border-emerald-800/50"
+                                                title="Escanear Ingressos">
+                                                <i class="fas fa-qrcode"></i>
+                                            </a>
+                                        @else
+                                            <span
+                                                class="p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed"
+                                                title="QR Code desativado">
+                                                <i class="fas fa-ban"></i>
+                                            </span>
+                                        @endif
 
                                         <a href="{{ route('panel.admin.events.edit', $event) }}"
                                             class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors border border-transparent hover:border-blue-100 dark:hover:border-blue-800/50"

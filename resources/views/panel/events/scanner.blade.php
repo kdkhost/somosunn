@@ -46,11 +46,13 @@
                             <i class="fas fa-camera"></i>
                         </div>
                         <h3 class="text-lg font-black text-gray-900 mb-1">Permissoes de validacao</h3>
-                        <p class="text-xs text-gray-500 mb-6">
-                            Clique abaixo para habilitar a camera e os alertas sonoros.
-                            @if($event->hasScannerLocationConstraint())
-                                O GPS sera usado para confirmar a presenca em ate {{ $event->scannerLocationRadiusMeters() }}m do evento.
-                            @endif
+                    <p class="text-xs text-gray-500 mb-6">
+                        Clique abaixo para habilitar a camera e os alertas sonoros.
+                        @if($event->scannerLocationRestrictionEnabled())
+                            O GPS sera usado conforme a regra configurada: {{ $event->scannerLocationMessage() }}
+                        @else
+                            Este evento nao exige geolocalizacao para validar o ingresso.
+                        @endif
                         </p>
                         <button onclick="initializeScanner()"
                             {{ $scannerOpen ? '' : 'disabled' }}
@@ -109,7 +111,7 @@
         const scannerOpen = @json($scannerOpen);
         const scannerStatusMessage = @json($scannerStatusMessage);
         const requiresLocation = @json($event->hasScannerLocationConstraint());
-        const scannerRadiusMeters = @json($event->scannerLocationRadiusMeters());
+        const scannerLocationMessage = @json($event->scannerLocationMessage());
 
         async function initializeScanner() {
             if (!scannerOpen) {
@@ -140,7 +142,9 @@
             startBtn.disabled = true;
             startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AUTORIZANDO...';
 
-            captureUserLocationInBackground();
+            if (requiresLocation) {
+                captureUserLocationInBackground();
+            }
             document.getElementById('start-screen').classList.add('hidden');
             await startScanner();
             setTimeout(() => playBeep(true), 100);
@@ -216,7 +220,7 @@
             isProcessing = true;
             showOverlay('process', 'Processando...', 'Validando ingresso no sistema...');
 
-            if ('geolocation' in navigator) {
+            if (requiresLocation && 'geolocation' in navigator) {
                 navigator.geolocation.getCurrentPosition(function (position) {
                     userCoords.lat = position.coords.latitude;
                     userCoords.lng = position.coords.longitude;
@@ -260,7 +264,7 @@
                     if (requiresLocation && (userCoords.lat === null || userCoords.lng === null)) {
                         Swal.fire({
                             title: 'GPS recomendado',
-                            text: 'Este evento exige validacao por localizacao em ate ' + scannerRadiusMeters + 'm. Habilite o GPS para evitar recusas.',
+                            text: scannerLocationMessage + ' Habilite o GPS para evitar recusas.',
                             icon: 'warning',
                             confirmButtonColor: '#1F5EDB'
                         });

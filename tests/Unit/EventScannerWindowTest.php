@@ -47,4 +47,28 @@ class EventScannerWindowTest extends TestCase
         $this->assertStringContainsString('23:59', $message);
         $this->assertStringContainsString('09/03/2026', $message);
     }
+
+    public function test_scanner_location_messages_reflect_mode_configuration(): void
+    {
+        $exactEvent = new Event([
+            'latitude' => -23.550520,
+            'longitude' => -46.633308,
+            'scanner_restriction_mode' => Event::SCANNER_RESTRICTION_EXACT,
+        ]);
+
+        $radiusEvent = new Event([
+            'latitude' => -23.550520,
+            'longitude' => -46.633308,
+            'scanner_restriction_mode' => Event::SCANNER_RESTRICTION_RADIUS,
+            'scanner_radius_meters' => 1500,
+        ]);
+
+        $disabledEvent = new Event([
+            'scanner_restriction_mode' => Event::SCANNER_RESTRICTION_DISABLED,
+        ]);
+
+        $this->assertStringContainsString('5m', $exactEvent->scannerLocationMessage());
+        $this->assertSame('1,5 km', $radiusEvent->scannerFormattedRadius());
+        $this->assertStringContainsString('sem restricao', strtolower($disabledEvent->scannerLocationMessage()));
+    }
 }

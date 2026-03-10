@@ -8,6 +8,7 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class EventController extends Controller
 {
@@ -136,6 +137,7 @@ class EventController extends Controller
         $data['published'] = $request->boolean('published');
         $data['all_day'] = $request->boolean('all_day');
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+        $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
         $data['user_id'] = Auth::id();
         $data = $this->applyVisibilityData($request, $data, null, false, 'events');
 
@@ -170,6 +172,7 @@ class EventController extends Controller
         $data['published'] = $request->boolean('published');
         $data['all_day'] = $request->boolean('all_day');
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
+        $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
         $data = $this->applyVisibilityData(
             $request,
             $data,
@@ -239,7 +242,7 @@ class EventController extends Controller
             }
         }
 
-        return $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'start_at' => 'required|date',
             'end_at' => 'nullable|date|after_or_equal:start_at',
@@ -249,6 +252,8 @@ class EventController extends Controller
             'remove_image' => 'nullable|boolean',
             'location' => 'nullable|string',
             'address' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'price' => 'nullable|numeric|min:0',
             'flash_sale_price' => 'nullable|numeric|min:0',
             'flash_sale_ends_at' => 'nullable|date',
@@ -256,9 +261,15 @@ class EventController extends Controller
             'published' => 'nullable|boolean',
             'all_day' => 'nullable|boolean',
             'is_certificate_enabled' => 'nullable|boolean',
+            'is_ticket_enabled' => 'nullable|boolean',
             'visibility' => $this->visibilityRule(),
             'certificate_settings' => 'nullable|json',
+            'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
+            'scanner_radius_value' => 'nullable|numeric|min:0.001',
+            'scanner_radius_unit' => 'nullable|string|in:m,km',
         ]);
+
+        return $this->applyScannerRestrictionPayload($request, $validated);
     }
 
     private function resolveImageRule(Request $request, ?Event $event = null): string
@@ -341,5 +352,56 @@ class EventController extends Controller
         if ((int) $event->user_id !== (int) Auth::id()) {
             abort(403);
         }
+    }
+
+    private function applyScannerRestrictionPayload(Request $request, array $data): array
+    {
+        $mode = (string) ($request->input('scanner_restriction_mode') ?: Event::SCANNER_RESTRICTION_DISABLED);
+        if (!in_array($mode, [
+            Event::SCANNER_RESTRICTION_DISABLED,
+            Event::SCANNER_RESTRICTION_EXACT,
+            Event::SCANNER_RESTRICTION_RADIUS,
+        ], true)) {
+            $mode = Event::SCANNER_RESTRICTION_DISABLED;
+        }
+
+        $data['scanner_restriction_mode'] = $mode;
+        $data['scanner_radius_meters'] = null;
+
+        if ($mode === Event::SCANNER_RESTRICTION_DISABLED) {
+            return $data;
+        }
+
+        if (($data['latitude'] ?? null) === null || ($data['longitude'] ?? null) === null) {
+            throw ValidationException::withMessages([
+                'scanner_restriction_mode' => 'Configure latitude e longitude do evento para ativar a cerca digital do QR Code.',
+            ]);
+        }
+
+        if ($mode === Event::SCANNER_RESTRICTION_EXACT) {
+            return $data;
+        }
+
+        $radiusValue = $request->input('scanner_radius_value');
+        if (!is_numeric($radiusValue) || (float) $radiusValue <= 0) {
+            throw ValidationException::withMessages([
+                'scanner_radius_value' => 'Informe a margem de erro da cerca digital em metros ou quilometros.',
+            ]);
+        }
+
+        $unit = $request->input('scanner_radius_unit') === 'km' ? 'km' : 'm';
+        $meters = $unit === 'km'
+            ? (int) round(((float) $radiusValue) * 1000)
+            : (int) round((float) $radiusValue);
+
+        if ($meters < 1) {
+            throw ValidationException::withMessages([
+                'scanner_radius_value' => 'A margem da cerca digital precisa ser maior que zero.',
+            ]);
+        }
+
+        $data['scanner_radius_meters'] = $meters;
+
+        return $data;
     }
 }

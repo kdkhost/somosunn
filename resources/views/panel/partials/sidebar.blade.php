@@ -200,6 +200,13 @@
             'visible' => $canAccessInstructorArea && ($user->hasPermission('events.view') || $user->canAccessFeature('events_access')),
         ],
         [
+            'label' => 'Scanner de ingressos',
+            'route' => route('panel.admin.quick-scanner'),
+            'icon' => 'fas fa-qrcode',
+            'active' => request()->routeIs('panel.admin.quick-scanner'),
+            'visible' => $canAccessInstructorArea && ($user->hasPermission('events.view') || $user->canAccessFeature('events_access')),
+        ],
+        [
             'label' => 'Certificados',
             'route' => route('panel.admin.certificates.index'),
             'icon' => 'fas fa-certificate',
