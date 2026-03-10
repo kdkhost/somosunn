@@ -1267,7 +1267,7 @@
             $('.mask-date').inputmask('99/99/9999');
             $('.mask-datetime').inputmask('99/99/9999 99:99');
             $('.mask-time').inputmask('99:99');
-            $('.mask-phone').inputmask({ 'mask': ['(99) 99999-9999', '(99) 9999-9999'], keepStatic: true });
+            $('.mask-phone').inputmask('(99) 9999[9]-9999');
             $('.mask-money').inputmask('currency', {
                 prefix: 'R$ ',
                 radixPoint: ',',

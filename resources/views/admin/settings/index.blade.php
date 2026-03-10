@@ -83,7 +83,7 @@
             });
 
             // Initialize InputMask
-            $('.mask-phone').inputmask('(99) 99999-9999');
+            $('.mask-phone').inputmask('(99) 9999[9]-9999');
             $('.mask-cep').inputmask('99999-999');
         });
     </script>

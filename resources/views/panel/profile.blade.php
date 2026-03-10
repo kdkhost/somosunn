@@ -94,7 +94,7 @@
             if (window.Inputmask) {
                 var phone = document.getElementById('profile_phone');
                 if (phone) {
-                    Inputmask({ mask: ['(99) 99999-9999', '(99) 9999-9999'], keepStatic: true }).mask(phone);
+                    Inputmask('(99) 9999[9]-9999').mask(phone);
                 }
                 var doc = document.getElementById('profile_doc');
                 if (doc) {

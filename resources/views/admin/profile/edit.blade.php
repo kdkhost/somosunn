@@ -449,7 +449,7 @@
             // $('#profileTabs a:first').tab('show');
 
             // Máscaras
-            $('.mask-phone').inputmask({ mask: ['(99) 99999-9999', '(99) 9999-9999'], keepStatic: true });
+            $('.mask-phone').inputmask('(99) 9999[9]-9999');
             $('.mask-cep').mask('00000-000');
             $('.mask-cpf-cnpj').on('input', function () {
                 var value = $(this).val().replace(/\D/g, '');
