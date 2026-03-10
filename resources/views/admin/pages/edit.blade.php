@@ -77,6 +77,8 @@
         ],
         'membros' => [
             'sec-hero' => ['icon' => 'fa-users', 'label' => 'Hero'],
+            'sec-stats' => ['icon' => 'fa-chart-bar', 'label' => 'Estatísticas'],
+            'sec-cta' => ['icon' => 'fa-bullhorn', 'label' => 'CTA Final'],
         ],
         'vagas-abertas' => [
             'sec-hero' => ['icon' => 'fa-briefcase', 'label' => 'Hero & Badge'],
@@ -265,6 +267,32 @@
                                     <span>Recomendado: até 160 car.</span>
                                     <span><span id="seo-desc-count">0</span>/320</span>
                                 </small>
+                            </div>
+                            <div class="form-group mb-0 mt-3">
+                                <label class="mb-1">Imagem de Compartilhamento (SEO)</label>
+                                <div class="custom-file custom-file-sm mb-2">
+                                    <input type="file" name="seo_image" class="custom-file-input" id="seo_image"
+                                        data-preview="prev-seo_image">
+                                    <label class="custom-file-label" for="seo_image">Escolher imagem...</label>
+                                </div>
+                                @if($data['seo_image'] ?? null)
+                                    <div class="position-relative mb-2">
+                                        <img src="{{ asset('storage/' . $data['seo_image']) }}" id="prev-seo_image"
+                                            class="img-thumbnail w-100 shadow-sm" style="max-height:150px; object-fit:cover;">
+                                        <div class="custom-control custom-checkbox position-absolute"
+                                            style="top:5px; right:10px; background:rgba(255,255,255,0.8); padding:2px 8px; border-radius:4px;">
+                                            <input type="checkbox" name="remove_seo_image" value="1"
+                                                class="custom-control-input" id="remove_seo_image">
+                                            <label class="custom-control-label text-danger small font-weight-bold"
+                                                for="remove_seo_image">Remover</label>
+                                        </div>
+                                    </div>
+                                @else
+                                    <img id="prev-seo_image" class="img-thumbnail w-100 d-none shadow-sm"
+                                        style="max-height:150px; object-fit:cover;">
+                                @endif
+                                <small class="text-muted small">Tamanho sugerido: 1200x630px. Formatos: JPG, PNG,
+                                    WEBP.</small>
                             </div>
                         </div>
                     </div>

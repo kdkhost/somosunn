@@ -31,28 +31,35 @@
         @endif
 
         <!-- Stats -->
-        <section class="pb-8 px-4 md:px-12 lg:px-24">
-            <div class="max-w-7xl mx-auto">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                    <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                        <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">500+</p>
-                        <p class="text-xs sm:text-sm text-gray-500 break-words">Empreendedores</p>
-                    </div>
-                    <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                        <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">50+</p>
-                        <p class="text-xs sm:text-sm text-gray-500">Mentores</p>
-                    </div>
-                    <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                        <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">27</p>
-                        <p class="text-xs sm:text-sm text-gray-500">Estados</p>
-                    </div>
-                    <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                        <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">1.2k+</p>
-                        <p class="text-xs sm:text-sm text-gray-500">Conexões feitas</p>
+        @if($pageData['stats_enabled'] ?? true)
+            <section class="pb-8 px-4 md:px-12 lg:px-24">
+                <div class="max-w-7xl mx-auto">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                        <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                            <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">
+                                {{ $pageData['stat_1_value'] ?? '500+' }}</p>
+                            <p class="text-xs sm:text-sm text-gray-500 break-words">
+                                {{ $pageData['stat_1_label'] ?? 'Empreendedores' }}</p>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                            <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">
+                                {{ $pageData['stat_2_value'] ?? '50+' }}</p>
+                            <p class="text-xs sm:text-sm text-gray-500">{{ $pageData['stat_2_label'] ?? 'Mentores' }}</p>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                            <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">
+                                {{ $pageData['stat_3_value'] ?? '27' }}</p>
+                            <p class="text-xs sm:text-sm text-gray-500">{{ $pageData['stat_3_label'] ?? 'Estados' }}</p>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
+                            <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">
+                                {{ $pageData['stat_4_value'] ?? '1.2k+' }}</p>
+                            <p class="text-xs sm:text-sm text-gray-500">{{ $pageData['stat_4_label'] ?? 'Conexões feitas' }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        @endif
 
         <!-- Members Grid -->
         <section class="pb-20 px-6 md:px-12 lg:px-24">
@@ -165,11 +172,11 @@
                                         @endif
                                     @else
                                         <button onclick="Swal.fire({
-                                                    title: 'Perfil Demo',
-                                                    text: 'Este é um perfil de demonstração.',
-                                                    icon: 'info',
-                                                    confirmButtonColor: '#1F5EDB'
-                                                })"
+                                                                title: 'Perfil Demo',
+                                                                text: 'Este é um perfil de demonstração.',
+                                                                icon: 'info',
+                                                                confirmButtonColor: '#1F5EDB'
+                                                            })"
                                             class="block w-full bg-[#1F5EDB] text-white py-2.5 rounded-lg font-bold text-sm opacity-75 cursor-not-allowed">
                                             Ver Perfil
                                         </button>
@@ -302,20 +309,21 @@
         @endpush
 
         <!-- CTA Section -->
-        <section class="py-16 px-6 md:px-12 lg:px-24"
-            style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
-            <div class="max-w-4xl mx-auto text-center text-white">
-                <h2 class="text-3xl lg:text-4xl font-black mb-4">Faça parte desta comunidade</h2>
-                <p class="text-lg opacity-90 mb-8">Conecte-se com empreendedores de sucesso e expanda sua rede de negócios.
-                </p>
-                <a href="{{ route('register') }}"
-                    class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition"
-                    style="color: var(--unn-azul-1)">
-                    <i class="fas fa-rocket"></i>
-                    Quero fazer parte
-                </a>
-            </div>
-        </section>
+        @if($pageData['cta_enabled'] ?? true)
+            <section class="py-16 px-6 md:px-12 lg:px-24"
+                style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
+                <div class="max-w-4xl mx-auto text-center text-white">
+                    <h2 class="text-3xl lg:text-4xl font-black mb-4">{{ $pageData['cta_title'] ?? 'Faça parte desta comunidade' }}</h2>
+                    <p class="text-lg opacity-90 mb-8">{!! $pageData['cta_subtitle'] ?? 'Conecte-se com empreendedores de sucesso e expanda sua rede de negócios.' !!}</p>
+                    <a href="{{ route('register') }}"
+                        class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition"
+                        style="color: var(--unn-azul-1)">
+                        <i class="fas fa-rocket"></i>
+                        {{ $pageData['cta_btn'] ?? 'Quero fazer parte' }}
+                    </a>
+                </div>
+            </section>
+        @endif
     </div>
 
     <style>

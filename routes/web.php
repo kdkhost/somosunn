@@ -680,6 +680,11 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     // Wishlist
     Route::get('/minha-lista', [\App\Http\Controllers\Panel\WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/minha-lista/toggle/{course}', [\App\Http\Controllers\Panel\WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
+    // Galeria Unificada (Tailwind)
+    Route::get('/galeria', [\App\Http\Controllers\Panel\GalleryController::class, 'index'])->name('gallery.index');
+    Route::post('/galeria/upload', [\App\Http\Controllers\Panel\GalleryController::class, 'upload'])->name('gallery.upload');
+    Route::delete('/galeria/{media}', [\App\Http\Controllers\Panel\GalleryController::class, 'destroy'])->name('gallery.destroy');
 });
 
 // Payments (legacy) - redireciona para o painel do marketplace (admin)
@@ -745,6 +750,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     // Perfil (Acessível a membros para completar cadastro)
     Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+
+    // Galeria Unificada (AdminLTE)
+    Route::get('/galeria', [\App\Http\Controllers\Admin\GalleryController::class, 'index'])->name('gallery.index');
+    Route::delete('/galeria/{media}', [\App\Http\Controllers\Admin\GalleryController::class, 'destroy'])->name('gallery.destroy');
 
     // Marketplace (Admin - visão interna)
     Route::prefix('marketplace')->name('marketplace.')->group(function () {

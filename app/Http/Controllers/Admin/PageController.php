@@ -173,6 +173,17 @@ class PageController extends Controller
             'seo_description',
             'hero_title',
             'hero_subtitle',
+            'stat_1_value',
+            'stat_1_label',
+            'stat_2_value',
+            'stat_2_label',
+            'stat_3_value',
+            'stat_3_label',
+            'stat_4_value',
+            'stat_4_label',
+            'cta_title',
+            'cta_subtitle',
+            'cta_btn',
         ],
         'vagas-abertas' => [
             'seo_title',
@@ -248,15 +259,21 @@ class PageController extends Controller
      * O valor armazenado é o path relativo ao disco 'public'.
      */
     private const SLUG_IMAGE_FIELDS = [
-        'home' => ['hero_image'],
-        'sobre' => ['hero_image'],
-        'quem-somos' => ['cover_image'],
-        'eventos' => ['hero_image'],
-        'cursos' => ['hero_image'],
-        'portal' => ['hero_image'],
-        'premium' => ['hero_image'],
-        'somos-unicas' => ['hero_image'],
-        'somos-unicas-sobre' => ['hero_image', 'networking_image'],
+        'home' => ['hero_image', 'seo_image'],
+        'sobre' => ['hero_image', 'seo_image'],
+        'manifesto' => ['seo_image'],
+        'valores' => ['seo_image'],
+        'como-funciona' => ['seo_image'],
+        'quem-somos' => ['cover_image', 'seo_image'],
+        'eventos' => ['hero_image', 'seo_image'],
+        'membros' => ['seo_image'],
+        'vagas-abertas' => ['seo_image'],
+        'cursos' => ['hero_image', 'seo_image'],
+        'portal' => ['hero_image', 'seo_image'],
+        'premium' => ['hero_image', 'seo_image'],
+        'feed' => ['seo_image'],
+        'somos-unicas' => ['hero_image', 'seo_image'],
+        'somos-unicas-sobre' => ['hero_image', 'networking_image', 'seo_image'],
     ];
 
     /** Campos JSON (arrays) por slug - enviados como textarea JSON no form. */

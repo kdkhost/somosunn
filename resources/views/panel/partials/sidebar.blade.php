@@ -68,6 +68,13 @@
             'visible' => true,
         ],
         [
+            'label' => 'Galeria',
+            'route' => route('panel.gallery.index'),
+            'icon' => 'fas fa-images',
+            'active' => request()->routeIs('panel.gallery.index'),
+            'visible' => true,
+        ],
+        [
             'label' => 'Portal',
             'route' => route('portal'),
             'icon' => 'fas fa-home',

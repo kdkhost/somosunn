@@ -338,6 +338,13 @@
                                     <p>Páginas do Site</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.gallery.index') }}"
+                                    class="nav-link {{ $is('admin.gallery.index') }}">
+                                    <i class="fas fa-images nav-icon"></i>
+                                    <p>Galeria de Fotos</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
 
