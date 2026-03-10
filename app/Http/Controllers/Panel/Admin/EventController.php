@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Panel\Admin;
 use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Support\UploadStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -134,6 +135,22 @@ class EventController extends Controller
             $data['image'] = $request->file('image')->store('event-images', 'public');
         }
 
+        if ($request->hasFile('certificate_bg')) {
+            $data['certificate_bg'] = UploadStorage::storeUploadedFile(
+                $request->file('certificate_bg'),
+                'uploads/certificates',
+                'cert_bg_' . time() . '_' . uniqid() . '.' . $request->file('certificate_bg')->getClientOriginalExtension()
+            );
+        }
+
+        if ($request->hasFile('instructor_signature')) {
+            $data['instructor_signature'] = UploadStorage::storeUploadedFile(
+                $request->file('instructor_signature'),
+                'uploads/signatures',
+                'sig_' . time() . '_' . uniqid() . '.' . $request->file('instructor_signature')->getClientOriginalExtension()
+            );
+        }
+
         $data['published'] = $request->boolean('published');
         $data['all_day'] = $request->boolean('all_day');
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
@@ -167,6 +184,24 @@ class EventController extends Controller
             }
 
             $data['image'] = $request->file('image')->store('event-images', 'public');
+        }
+
+        if ($request->hasFile('certificate_bg')) {
+            UploadStorage::delete($event->certificate_bg);
+            $data['certificate_bg'] = UploadStorage::storeUploadedFile(
+                $request->file('certificate_bg'),
+                'uploads/certificates',
+                'cert_bg_' . time() . '_' . uniqid() . '.' . $request->file('certificate_bg')->getClientOriginalExtension()
+            );
+        }
+
+        if ($request->hasFile('instructor_signature')) {
+            UploadStorage::delete($event->instructor_signature);
+            $data['instructor_signature'] = UploadStorage::storeUploadedFile(
+                $request->file('instructor_signature'),
+                'uploads/signatures',
+                'sig_' . time() . '_' . uniqid() . '.' . $request->file('instructor_signature')->getClientOriginalExtension()
+            );
         }
 
         $data['published'] = $request->boolean('published');
@@ -216,6 +251,8 @@ class EventController extends Controller
         if ($event->image) {
             Storage::disk('public')->delete($event->image);
         }
+        UploadStorage::delete($event->certificate_bg);
+        UploadStorage::delete($event->instructor_signature);
 
         $event->delete();
 
@@ -249,6 +286,8 @@ class EventController extends Controller
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string',
             'image' => $this->resolveImageRule($request, $event),
+            'certificate_bg' => 'nullable|image|max:5120',
+            'instructor_signature' => 'nullable|image|max:2048|mimes:png,jpg,jpeg',
             'remove_image' => 'nullable|boolean',
             'location' => 'nullable|string',
             'address' => 'nullable|string',

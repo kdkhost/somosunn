@@ -87,8 +87,6 @@
             enctype="multipart/form-data">
             @csrf
             @if($course->exists) @method('PUT') @endif
-            <input type="hidden" name="certificate_settings" id="certificate_settings_input">
-
             {{-- Tab: General --}}
             <div x-show="tab === 'general'" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 space-y-8">
@@ -495,6 +493,65 @@
 
                 {{-- Tab: Certificate --}}
                 <div x-show="tab === 'certificate'" class="space-y-8">
+                    @php
+                        $courseCertificateSettings = $course->certificate_settings ?? [];
+                        $courseCertificateTitle = old(
+                            'certificate_title',
+                            data_get($courseCertificateSettings, 'meta.titleText')
+                                ?? data_get($courseCertificateSettings, 'custom_title')
+                                ?? data_get($courseCertificateSettings, 'title')
+                                ?? 'CERTIFICADO DE CONCLUSAO'
+                        );
+                        $coursePresentationText = old(
+                            'presentation_text',
+                            data_get($courseCertificateSettings, 'meta.presentationText')
+                                ?? data_get($courseCertificateSettings, 'custom_presentation_text')
+                                ?? data_get($courseCertificateSettings, 'presentation_text')
+                                ?? ''
+                        );
+                        $courseTagLabels = [
+                            'student_name' => 'Nome do Aluno',
+                            'course_name' => 'Nome do Curso',
+                            'completion_date' => 'Data de Conclusao',
+                            'certificate_code' => 'Codigo de Validacao',
+                            'author_name' => 'Nome do Autor',
+                            'workload_hours' => 'Carga Horaria',
+                            'title' => 'Titulo do Certificado',
+                            'presentation_text' => 'Texto de Apresentacao',
+                            'instructor_signature' => 'Assinatura do Instrutor',
+                            'platform_logo' => 'Logo da Plataforma',
+                        ];
+                        $courseDefaultTags = [
+                            'student_name' => ['x' => 50, 'y' => 40, 'text' => '[Nome do Aluno]', 'fontSize' => 30, 'color' => '#000000', 'fontWeight' => 'bold', 'fontFamily' => 'Arial, sans-serif'],
+                            'course_name' => ['x' => 50, 'y' => 55, 'text' => '[Nome do Curso]', 'fontSize' => 24, 'color' => '#333333', 'fontWeight' => 'bold', 'fontFamily' => 'Arial, sans-serif'],
+                            'completion_date' => ['x' => 50, 'y' => 65, 'text' => 'Concluido em: 01/01/2024', 'fontSize' => 16, 'color' => '#555555', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif'],
+                            'certificate_code' => ['x' => 50, 'y' => 85, 'text' => 'Validacao: ABC-123', 'fontSize' => 12, 'color' => '#999999', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif'],
+                            'author_name' => ['x' => 30, 'y' => 90, 'text' => $course->author_name ?? 'Instrutor', 'fontSize' => 18, 'color' => '#333333', 'fontWeight' => 'bold', 'fontFamily' => 'Arial, sans-serif', 'zIndex' => 10],
+                            'workload_hours' => ['x' => 70, 'y' => 90, 'text' => 'Carga Horaria: ' . ((int) ($course->total_hours ?? 0)) . 'h', 'fontSize' => 14, 'color' => '#666666', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif', 'zIndex' => 10],
+                            'title' => ['x' => 10, 'y' => 18, 'text' => $courseCertificateTitle, 'fontSize' => 34, 'color' => '#000000', 'fontWeight' => 'bold', 'fontFamily' => 'Arial, sans-serif', 'zIndex' => 15, 'visible' => false, 'multiline' => true, 'maxWidth' => 700, 'textAlign' => 'center'],
+                            'presentation_text' => ['x' => 10, 'y' => 28, 'text' => $coursePresentationText, 'fontSize' => 16, 'color' => '#333333', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif', 'zIndex' => 15, 'visible' => false, 'multiline' => true, 'maxWidth' => 700, 'textAlign' => 'center'],
+                            'instructor_signature' => ['x' => 70, 'y' => 80, 'text' => 'Assinatura do Instrutor', 'fontSize' => 12, 'color' => '#6c757d', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif', 'width' => 200, 'height' => 60, 'zIndex' => 10, 'visible' => (bool) $course->instructor_signature],
+                            'platform_logo' => ['x' => 50, 'y' => 10, 'text' => 'LOGO UNN', 'fontSize' => 36, 'color' => '#0066cc', 'fontWeight' => 'bold', 'fontFamily' => 'Georgia, serif', 'width' => 120, 'height' => 60, 'mandatory' => true, 'zIndex' => 20],
+                        ];
+                    @endphp
+
+                    @include('panel.admin.partials.certificate-editor', [
+                        'entity' => $course,
+                        'formId' => 'courseForm',
+                        'previewUrl' => route('panel.admin.courses.certificate.preview', $course),
+                        'titleInput' => $courseCertificateTitle,
+                        'presentationInput' => $coursePresentationText,
+                        'defaultTags' => $courseDefaultTags,
+                        'tagLabels' => $courseTagLabels,
+                        'backgroundLabel' => 'Fundo do Certificado',
+                        'backgroundHint' => 'Recomendado: 1920x1080px (PNG/JPG).',
+                        'signatureLabel' => 'Assinatura do Instrutor',
+                        'signatureHint' => 'Use PNG com fundo transparente para o melhor resultado.',
+                        'autoInfoLabel' => 'Carga horaria atual',
+                        'autoInfoValue' => ((int) ($course->total_hours ?? 0)) . ' horas',
+                        'saveLabel' => 'Salvar Certificado',
+                    ])
+                    @if(false)
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                             <h3 class="text-2xl font-black text-slate-800 dark:text-white transition-colors">Editor de
@@ -644,6 +701,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                 </div>
             @endif
         </form>
@@ -654,12 +712,10 @@
         <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <script>
-            const isExistingCourse = @json($course->exists);
             const lessonReorderUrl = @json($course->exists ? route('panel.admin.courses.lessons.reorder', $course) : null);
             const lessonStoreUrl = @json($course->exists ? route('panel.admin.courses.lessons.store', $course) : null);
             const lessonBaseUrl = lessonStoreUrl;
             const lessonContentImageUploadUrl = @json($course->exists ? route('panel.admin.courses.lessons.content-image', $course) : null);
-            const certificatePreviewUrl = @json($course->exists ? route('panel.admin.courses.certificate.preview', $course) : null);
 
             document.addEventListener('DOMContentLoaded', function () {
                 // Sortable logic for lessons
@@ -1294,6 +1350,89 @@
                 }, 200);
             }
 
+            @if($course->exists)
+                @include('panel.admin.partials.certificate-editor-script', [
+                    'entity' => $course,
+                    'formId' => 'courseForm',
+                    'previewUrl' => route('panel.admin.courses.certificate.preview', $course),
+                    'defaultTags' => $courseDefaultTags,
+                    'tagLabels' => $courseTagLabels,
+                ])
+            @endif
+
+            window.confirmAction = function (event, title, text) {
+                event.preventDefault();
+                const form = event.target.closest('form') || event.target;
+
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3b82f6',
+                    cancelButtonColor: '#ef4444',
+                    confirmButtonText: 'Sim, confirmar!',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'rounded-[2rem] dark:bg-slate-900 border-none shadow-2xl',
+                        title: 'text-2xl font-black text-slate-800 dark:text-white',
+                        htmlContainer: 'text-sm font-medium text-slate-500 dark:text-slate-400',
+                        confirmButton: 'rounded-xl px-6 py-3 font-bold',
+                        cancelButton: 'rounded-xl px-6 py-3 font-bold'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+                return false;
+            };
+
+            window.confirmDeleteLesson = function (url) {
+                Swal.fire({
+                    title: 'Excluir aula?',
+                    text: 'Deseja realmente remover esta aula?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3b82f6',
+                    cancelButtonColor: '#ef4444',
+                    confirmButtonText: 'Sim, confirmar!',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'rounded-[2rem] dark:bg-slate-900 border-none shadow-2xl',
+                        title: 'text-2xl font-black text-slate-800 dark:text-white',
+                        htmlContainer: 'text-sm font-medium text-slate-500 dark:text-slate-400',
+                        confirmButton: 'rounded-xl px-6 py-3 font-bold',
+                        cancelButton: 'rounded-xl px-6 py-3 font-bold'
+                    }
+                }).then((result) => {
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            _method: 'DELETE'
+                        },
+                        success: function () {
+                            toastr.success('Aula removida com sucesso.');
+                            window.location.reload();
+                        },
+                        error: function () {
+                            toastr.error('Nao foi possivel remover a aula.');
+                        }
+                    });
+                });
+
+                return false;
+            };
+
+            @if(false)
             // Certificate Editor Logic
             $(document).ready(function () {
                 if (!isExistingCourse || !certificatePreviewUrl) return;
@@ -1450,6 +1589,7 @@
                     form.target = originalTarget;
                 };
             });
+            @endif
         </script>
     @endpush
 

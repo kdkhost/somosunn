@@ -265,6 +265,81 @@
             {{-- Tab: Certificate --}}
             @if($mentorship->exists)
                 <div x-show="tab === 'certificate'" class="space-y-6">
+                    <div class="max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
+                        <label class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Status</p>
+                                <h4 class="mt-2 text-sm font-black text-slate-800 dark:text-white">Certificado habilitado</h4>
+                                <p class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">Ative ou desative a emissao do certificado desta mentoria.</p>
+                            </div>
+                            <span class="relative inline-flex items-center">
+                                <input type="checkbox" name="is_certificate_enabled" value="1" @checked(old('is_certificate_enabled', $mentorship->is_certificate_enabled))
+                                    class="peer sr-only">
+                                <span class="h-7 w-14 rounded-full bg-slate-200 transition-all peer-checked:bg-blue-600 dark:bg-slate-700"></span>
+                                <span class="pointer-events-none absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow transition-all peer-checked:translate-x-7"></span>
+                            </span>
+                        </label>
+                    </div>
+
+                    @php
+                        $mentorshipCertificateSettings = $mentorship->certificate_settings ?? [];
+                        $mentorshipCertificateTitle = old(
+                            'certificate_title',
+                            data_get($mentorshipCertificateSettings, 'meta.titleText')
+                                ?? data_get($mentorshipCertificateSettings, 'custom_title')
+                                ?? data_get($mentorshipCertificateSettings, 'title')
+                                ?? 'CERTIFICADO DE CONCLUSAO'
+                        );
+                        $mentorshipPresentationText = old(
+                            'presentation_text',
+                            data_get($mentorshipCertificateSettings, 'meta.presentationText')
+                                ?? data_get($mentorshipCertificateSettings, 'custom_presentation_text')
+                                ?? data_get($mentorshipCertificateSettings, 'presentation_text')
+                                ?? ''
+                        );
+                        $mentorshipTagLabels = [
+                            'student_name' => 'Nome do Aluno',
+                            'course_name' => 'Nome da Mentoria',
+                            'completion_date' => 'Data Conclusao',
+                            'certificate_code' => 'Cod. Validacao',
+                            'author_name' => 'Nome do Mentor',
+                            'workload_hours' => 'Horas',
+                            'title' => 'Titulo do Certificado',
+                            'presentation_text' => 'Texto de Apresentacao',
+                            'instructor_signature' => 'Assinatura do Mentor',
+                            'platform_logo' => 'Logo da Plataforma',
+                        ];
+                        $mentorshipDefaultTags = [
+                            'student_name' => ['x' => 50, 'y' => 40, 'text' => '[Nome do Aluno]', 'fontSize' => 30, 'color' => '#000000', 'fontWeight' => 'bold', 'fontFamily' => 'Arial, sans-serif'],
+                            'course_name' => ['x' => 50, 'y' => 55, 'text' => $mentorship->title ?: '[Nome da Mentoria]', 'fontSize' => 24, 'color' => '#333333', 'fontWeight' => 'bold', 'fontFamily' => 'Arial, sans-serif'],
+                            'completion_date' => ['x' => 50, 'y' => 65, 'text' => 'Concluido em: 01/01/2026', 'fontSize' => 16, 'color' => '#555555', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif'],
+                            'certificate_code' => ['x' => 50, 'y' => 85, 'text' => 'Validacao: ABC-123', 'fontSize' => 12, 'color' => '#999999', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif'],
+                            'author_name' => ['x' => 30, 'y' => 90, 'text' => $mentorship->mentor->name ?? 'Mentor', 'fontSize' => 18, 'color' => '#333333', 'fontWeight' => 'bold', 'fontFamily' => 'Arial, sans-serif', 'zIndex' => 10],
+                            'workload_hours' => ['x' => 70, 'y' => 90, 'text' => 'Mentoria', 'fontSize' => 14, 'color' => '#666666', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif', 'zIndex' => 10],
+                            'title' => ['x' => 10, 'y' => 18, 'text' => $mentorshipCertificateTitle, 'fontSize' => 34, 'color' => '#000000', 'fontWeight' => 'bold', 'fontFamily' => 'Arial, sans-serif', 'zIndex' => 15, 'visible' => false, 'multiline' => true, 'maxWidth' => 700, 'textAlign' => 'center'],
+                            'presentation_text' => ['x' => 10, 'y' => 28, 'text' => $mentorshipPresentationText, 'fontSize' => 16, 'color' => '#333333', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif', 'zIndex' => 15, 'visible' => false, 'multiline' => true, 'maxWidth' => 700, 'textAlign' => 'center'],
+                            'instructor_signature' => ['x' => 70, 'y' => 80, 'text' => 'Assinatura do Mentor', 'fontSize' => 12, 'color' => '#6c757d', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif', 'width' => 200, 'height' => 60, 'zIndex' => 10, 'visible' => (bool) $mentorship->instructor_signature],
+                            'platform_logo' => ['x' => 50, 'y' => 10, 'text' => 'LOGO', 'fontSize' => 36, 'color' => '#0066cc', 'fontWeight' => 'bold', 'fontFamily' => 'Georgia, serif', 'width' => 120, 'height' => 60, 'mandatory' => true, 'zIndex' => 20],
+                        ];
+                    @endphp
+
+                    @include('panel.admin.partials.certificate-editor', [
+                        'entity' => $mentorship,
+                        'formId' => 'mentorshipForm',
+                        'previewUrl' => null,
+                        'titleInput' => $mentorshipCertificateTitle,
+                        'presentationInput' => $mentorshipPresentationText,
+                        'defaultTags' => $mentorshipDefaultTags,
+                        'tagLabels' => $mentorshipTagLabels,
+                        'backgroundLabel' => 'Fundo do Certificado',
+                        'backgroundHint' => 'Recomendado: 1920x1080px (PNG/JPG).',
+                        'signatureLabel' => 'Assinatura do Mentor',
+                        'signatureHint' => 'Use PNG com fundo transparente para o melhor resultado.',
+                        'autoInfoLabel' => 'Referencia automatica',
+                        'autoInfoValue' => $mentorship->mentor->name ?? 'Mentor',
+                        'saveLabel' => 'Salvar Certificado',
+                    ])
+                    @if(false)
                     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         {{-- Preview Canvas --}}
                         <div
@@ -342,6 +417,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                 </div>
             @endif
         </form>
@@ -380,6 +456,17 @@
                 });
             });
 
+            @if($mentorship->exists)
+                @include('panel.admin.partials.certificate-editor-script', [
+                    'entity' => $mentorship,
+                    'formId' => 'mentorshipForm',
+                    'previewUrl' => null,
+                    'defaultTags' => $mentorshipDefaultTags,
+                    'tagLabels' => $mentorshipTagLabels,
+                ])
+            @endif
+
+            @if(false)
             // Certificate Editor Logic (Simplified for this view)
             $(document).ready(function () {
                 if ('{{ $mentorship->exists }}' == '') return;
@@ -453,6 +540,7 @@
                     $('#certificate_settings_input').val(JSON.stringify(certDoc));
                 });
             });
+            @endif
         </script>
     @endpush
 

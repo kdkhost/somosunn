@@ -6,6 +6,7 @@ use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Mentorship;
 use App\Models\User;
+use App\Support\UploadStorage;
 use App\Services\PointsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -66,6 +67,22 @@ class MentorshipController extends Controller
             $fileName = 'mentorship_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/mentorship-images'), $fileName);
             $data['image'] = 'uploads/mentorship-images/' . $fileName;
+        }
+
+        if ($request->hasFile('certificate_bg')) {
+            $data['certificate_bg'] = UploadStorage::storeUploadedFile(
+                $request->file('certificate_bg'),
+                'uploads/certificates',
+                'cert_bg_' . time() . '_' . uniqid() . '.' . $request->file('certificate_bg')->getClientOriginalExtension()
+            );
+        }
+
+        if ($request->hasFile('instructor_signature')) {
+            $data['instructor_signature'] = UploadStorage::storeUploadedFile(
+                $request->file('instructor_signature'),
+                'uploads/signatures',
+                'sig_' . time() . '_' . uniqid() . '.' . $request->file('instructor_signature')->getClientOriginalExtension()
+            );
         }
 
         if ($request->has('certificate_settings')) {
@@ -130,6 +147,24 @@ class MentorshipController extends Controller
             $data['image'] = 'uploads/mentorship-images/' . $fileName;
         }
 
+        if ($request->hasFile('certificate_bg')) {
+            UploadStorage::delete($mentorship->certificate_bg);
+            $data['certificate_bg'] = UploadStorage::storeUploadedFile(
+                $request->file('certificate_bg'),
+                'uploads/certificates',
+                'cert_bg_' . time() . '_' . uniqid() . '.' . $request->file('certificate_bg')->getClientOriginalExtension()
+            );
+        }
+
+        if ($request->hasFile('instructor_signature')) {
+            UploadStorage::delete($mentorship->instructor_signature);
+            $data['instructor_signature'] = UploadStorage::storeUploadedFile(
+                $request->file('instructor_signature'),
+                'uploads/signatures',
+                'sig_' . time() . '_' . uniqid() . '.' . $request->file('instructor_signature')->getClientOriginalExtension()
+            );
+        }
+
         if ($request->has('certificate_settings')) {
             $data['certificate_settings'] = is_string($request->certificate_settings) ? json_decode($request->certificate_settings, true) : $request->certificate_settings;
         }
@@ -144,6 +179,9 @@ class MentorshipController extends Controller
         $this->ensurePermission('mentorships.delete');
         $this->ensureOwnership($mentorship);
 
+        $this->deletePublicImageIfExists($mentorship->image);
+        UploadStorage::delete($mentorship->certificate_bg);
+        UploadStorage::delete($mentorship->instructor_signature);
         $mentorship->delete();
 
         return redirect()->route('panel.admin.mentorships.index')->with('success', 'Mentoria removida com sucesso.');
@@ -160,6 +198,8 @@ class MentorshipController extends Controller
             'slots' => 'nullable|integer|min:1',
             'description' => 'nullable|string',
             'image' => ($isCreate ? 'required' : 'nullable') . '|image|max:5120',
+            'certificate_bg' => 'nullable|image|max:5120',
+            'instructor_signature' => 'nullable|image|max:2048|mimes:png,jpg,jpeg',
             'remove_image' => 'nullable|boolean',
             'schedule_json' => 'nullable|string',
             'type' => 'required|in:online,presencial',

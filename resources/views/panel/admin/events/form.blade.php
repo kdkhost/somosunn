@@ -397,6 +397,65 @@
             {{-- Tab: Certificate --}}
             @if($event->exists)
                 <div x-show="tab === 'certificate'" class="space-y-6">
+                    @php
+                        $eventCertificateSettings = $event->certificate_settings ?? [];
+                        $eventCertificateTitle = old(
+                            'certificate_title',
+                            data_get($eventCertificateSettings, 'meta.titleText')
+                                ?? data_get($eventCertificateSettings, 'custom_title')
+                                ?? data_get($eventCertificateSettings, 'title')
+                                ?? 'CERTIFICADO DE PARTICIPACAO'
+                        );
+                        $eventPresentationText = old(
+                            'presentation_text',
+                            data_get($eventCertificateSettings, 'meta.presentationText')
+                                ?? data_get($eventCertificateSettings, 'custom_presentation_text')
+                                ?? data_get($eventCertificateSettings, 'presentation_text')
+                                ?? ''
+                        );
+                        $eventTagLabels = [
+                            'student_name' => 'Nome do Participante',
+                            'course_name' => 'Nome do Evento',
+                            'completion_date' => 'Data do Evento',
+                            'certificate_code' => 'Cod. Validacao',
+                            'author_name' => 'Organizador',
+                            'workload_hours' => 'Info Extra',
+                            'title' => 'Titulo do Certificado',
+                            'presentation_text' => 'Texto de Apresentacao',
+                            'instructor_signature' => 'Assinatura do Organizador',
+                            'platform_logo' => 'Logo da Plataforma',
+                        ];
+                        $eventDefaultTags = [
+                            'student_name' => ['x' => 50, 'y' => 40, 'text' => '[Nome do Participante]', 'fontSize' => 30, 'color' => '#000000', 'fontWeight' => 'bold', 'fontFamily' => 'Arial, sans-serif'],
+                            'course_name' => ['x' => 50, 'y' => 55, 'text' => $event->title ?: '[Nome do Evento]', 'fontSize' => 24, 'color' => '#333333', 'fontWeight' => 'bold', 'fontFamily' => 'Arial, sans-serif'],
+                            'completion_date' => ['x' => 50, 'y' => 65, 'text' => 'Participou em: ' . ($event->start_at ? $event->start_at->format('d/m/Y') : '01/01/2026'), 'fontSize' => 16, 'color' => '#555555', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif'],
+                            'certificate_code' => ['x' => 50, 'y' => 85, 'text' => 'Validacao: ABC-123', 'fontSize' => 12, 'color' => '#999999', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif'],
+                            'author_name' => ['x' => 50, 'y' => 90, 'text' => 'UNN Eventos', 'fontSize' => 18, 'color' => '#333333', 'fontWeight' => 'bold', 'fontFamily' => 'Arial, sans-serif', 'zIndex' => 10],
+                            'workload_hours' => ['x' => 80, 'y' => 90, 'text' => 'Evento', 'fontSize' => 14, 'color' => '#666666', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif', 'zIndex' => 10],
+                            'title' => ['x' => 10, 'y' => 18, 'text' => $eventCertificateTitle, 'fontSize' => 34, 'color' => '#000000', 'fontWeight' => 'bold', 'fontFamily' => 'Arial, sans-serif', 'zIndex' => 15, 'visible' => false, 'multiline' => true, 'maxWidth' => 700, 'textAlign' => 'center'],
+                            'presentation_text' => ['x' => 10, 'y' => 28, 'text' => $eventPresentationText, 'fontSize' => 16, 'color' => '#333333', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif', 'zIndex' => 15, 'visible' => false, 'multiline' => true, 'maxWidth' => 700, 'textAlign' => 'center'],
+                            'instructor_signature' => ['x' => 70, 'y' => 80, 'text' => 'Assinatura do Organizador', 'fontSize' => 12, 'color' => '#6c757d', 'fontWeight' => 'normal', 'fontFamily' => 'Arial, sans-serif', 'width' => 200, 'height' => 60, 'zIndex' => 10, 'visible' => (bool) $event->instructor_signature],
+                            'platform_logo' => ['x' => 50, 'y' => 10, 'text' => 'LOGO', 'fontSize' => 36, 'color' => '#0066cc', 'fontWeight' => 'bold', 'fontFamily' => 'Georgia, serif', 'width' => 120, 'height' => 60, 'mandatory' => true, 'zIndex' => 20],
+                        ];
+                    @endphp
+
+                    @include('panel.admin.partials.certificate-editor', [
+                        'entity' => $event,
+                        'formId' => 'eventForm',
+                        'previewUrl' => null,
+                        'titleInput' => $eventCertificateTitle,
+                        'presentationInput' => $eventPresentationText,
+                        'defaultTags' => $eventDefaultTags,
+                        'tagLabels' => $eventTagLabels,
+                        'backgroundLabel' => 'Fundo do Certificado',
+                        'backgroundHint' => 'Recomendado: 1920x1080px (PNG/JPG).',
+                        'signatureLabel' => 'Assinatura do Organizador',
+                        'signatureHint' => 'Use PNG com fundo transparente para o melhor resultado.',
+                        'autoInfoLabel' => 'Referencia automatica',
+                        'autoInfoValue' => $event->start_at ? $event->start_at->format('d/m/Y H:i') : 'Data definida apos o cadastro',
+                        'saveLabel' => 'Salvar Certificado',
+                    ])
+                    @if(false)
                     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         {{-- Preview Canvas --}}
                         <div
@@ -450,6 +509,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                 </div>
             @endif
         </form>
@@ -488,6 +548,17 @@
                 });
             });
 
+            @if($event->exists)
+                @include('panel.admin.partials.certificate-editor-script', [
+                    'entity' => $event,
+                    'formId' => 'eventForm',
+                    'previewUrl' => null,
+                    'defaultTags' => $eventDefaultTags,
+                    'tagLabels' => $eventTagLabels,
+                ])
+            @endif
+
+            @if(false)
             // Certificate Editor (Simple)
             $(document).ready(function () {
                 if ('{{ $event->exists }}' == '') return;
@@ -561,6 +632,7 @@
                     $('#certificate_settings_input').val(JSON.stringify(certDoc));
                 });
             });
+            @endif
         </script>
     @endpush
 
