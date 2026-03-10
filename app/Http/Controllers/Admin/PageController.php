@@ -388,4 +388,21 @@ class PageController extends Controller
             ->route('admin.pages.index')
             ->with('success', 'Página "' . $slug . '" salva com sucesso.');
     }
+
+    public function toggleSection(Request $request, Page $page)
+    {
+        $section = $request->input('section');
+        $status = $request->boolean('status');
+
+        $data = $page->data ?: [];
+        $data["{$section}_enabled"] = $status;
+
+        $page->data = $data;
+        $page->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Visibilidade da seção atualizada com sucesso!'
+        ]);
+    }
 }

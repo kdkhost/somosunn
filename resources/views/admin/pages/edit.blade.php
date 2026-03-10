@@ -461,6 +461,50 @@
                 wrap.appendChild(btnCopy);
                 ta.after(wrap);
             });
+
+            /* AJAX Toggle de Seção */
+            document.querySelectorAll('.section-toggle').forEach(sw => {
+                sw.addEventListener('change', function () {
+                    const section = this.dataset.section;
+                    const status = this.checked;
+                    const url = "{{ route('admin.pages.toggle-section', $page) }}";
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ section, status })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sucesso!',
+                                    text: data.message,
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                });
+                            } else {
+                                throw new Error(data.message || 'Erro ao atualizar visibilidade');
+                            }
+                        })
+                        .catch(error => {
+                            this.checked = !status; // reverte o switch
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro!',
+                                text: error.message,
+                                confirmButtonText: 'Entendido'
+                            });
+                        });
+                });
+            });
         })();
     </script>
 @endpush

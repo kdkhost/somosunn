@@ -2,190 +2,266 @@
     use Illuminate\Support\Str;
 
     $instance = 'upload-global-' . Str::slug($name ?? 'file', '-') . '-' . Str::random(6);
-    $label = $label ?? 'Upload de arquivo, imagem, video ou audio';
-    $help = $help ?? 'O envio real acontece ao salvar o formulario. O progresso global aparece automaticamente no topo da tela.';
+    $label = $label ?? 'Upload de arquivo, imagem, vídeo ou áudio';
+    $help = $help ?? 'O envio começa automaticamente ao selecionar o arquivo.';
+    $existing = $value ?? null;
 @endphp
 
-<div class="upload-global-wrapper" data-upload-global-instance="{{ $instance }}">
-    <label class="font-weight-bold mb-2 d-block">{{ $label }}</label>
-    <div class="upload-drop-area" data-upload-drop-area>
-        <span class="d-block mb-2">Arraste e solte arquivos aqui ou clique para selecionar</span>
-        <input
-            type="file"
-            id="{{ $instance }}-input"
-            name="{{ $name ?? 'file' }}"
-            accept="{{ $accept ?? '*' }}"
-            data-upload-input
-            hidden
-        >
-        <button type="button" class="btn btn-outline-primary btn-sm" data-upload-trigger>Selecionar arquivo</button>
-        <p class="upload-global-help text-muted small mb-0 mt-3">{{ $help }}</p>
+<div class="upload-global-wrapper" id="{{ $instance }}" data-upload-global-instance="{{ $instance }}">
+    @if($label)
+        <label class="font-weight-bold mb-2 d-block">{{ $label }}</label>
+    @endif
+
+    <div class="upload-drop-area @if($existing) d-none @endif" data-upload-drop-area>
+        <div class="upload-icon mb-2">
+            <i class="fas fa-cloud-upload-alt fa-2x text-primary"></i>
+        </div>
+        <span class="d-block mb-2 font-weight-medium">Arraste e solte arquivos aqui</span>
+        <span class="text-muted small d-block mb-3">ou clique para selecionar</span>
+
+        <input type="file" id="{{ $instance }}-input" accept="{{ $accept ?? '*' }}" data-upload-input hidden>
+        <button type="button" class="btn btn-primary btn-sm px-4 shadow-sm" data-upload-trigger>Selecionar
+            Arquivo</button>
+
+        @if($help)
+            <p class="upload-global-help text-muted small mb-0 mt-3">{{ $help }}</p>
+        @endif
     </div>
-    <div class="upload-preview mt-3 d-none" data-upload-preview></div>
-    <div class="d-flex align-items-center justify-content-between mt-2">
-        <div class="upload-meta text-muted small" data-upload-meta>Nenhum arquivo selecionado.</div>
-        <button type="button" class="btn btn-sm btn-outline-danger d-none" data-upload-clear>Remover</button>
+
+    {{-- Progresso --}}
+    <div class="upload-progress-container d-none mt-3" data-upload-progress-container>
+        <div class="d-flex justify-content-between mb-1 small font-weight-bold">
+            <span class="text-primary" data-upload-status>Enviando...</span>
+            <span class="text-muted" data-upload-percent>0%</span>
+        </div>
+        <div class="progress progress-sm shadow-sm" style="height: 8px; border-radius: 4px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar"
+                style="width: 0%" data-upload-progress-bar></div>
+        </div>
+        <div class="d-flex justify-content-between mt-2 small text-muted">
+            <span data-upload-speed>0 KB/s</span>
+            <span data-upload-time-remaining>Calculando tempo...</span>
+        </div>
     </div>
+
+    {{-- Preview --}}
+    <div class="upload-preview-container @if(!$existing) d-none @endif mt-3" data-upload-preview-container>
+        <div class="upload-preview-card p-2 rounded border bg-white shadow-sm position-relative">
+            <div class="upload-preview-content mb-2 text-center" data-upload-preview-content>
+                @if($existing)
+                    @php
+                        $ext = strtolower(pathinfo($existing, PATHINFO_EXTENSION));
+                        $isImg = in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg']);
+                        $isVid = in_array($ext, ['mp4', 'webm', 'ogg']);
+                        $isAud = in_array($ext, ['mp3', 'wav', 'ogg']);
+                    @endphp
+                    @if($isImg)
+                        <img src="{{ $existing }}" class="img-fluid rounded" style="max-height: 200px;">
+                    @elseif($isVid)
+                        <video src="{{ $existing }}" controls class="w-100 rounded" style="max-height: 200px;"></video>
+                    @elseif($isAud)
+                        <audio src="{{ $existing }}" controls class="w-100"></audio>
+                    @else
+                        <div class="p-4 bg-light rounded text-muted">
+                            <i class="fas fa-file-alt fa-3x mb-2"></i>
+                            <div class="small text-truncate">{{ basename($existing) }}</div>
+                        </div>
+                    @endif
+                @endif
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded">
+                <div class="text-truncate small pr-3" data-upload-filename>
+                    {{ $existing ? basename($existing) : 'Arquivo enviado' }}
+                </div>
+                <button type="button" class="btn btn-xs btn-danger" data-upload-clear title="Remover">
+                    <i class="fas fa-trash-alt mr-1"></i> Remover
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Hidden Input para o formulário --}}
+    <input type="hidden" name="{{ $name }}" value="{{ $existing }}" data-upload-path-input>
 </div>
 
 <script>
     (function () {
-        const root = document.querySelector('[data-upload-global-instance="{{ $instance }}"]');
-
-        if (!root || root.dataset.uploadReady === 'true') {
-            return;
-        }
-
-        root.dataset.uploadReady = 'true';
+        const instanceId = "{{ $instance }}";
+        const root = document.getElementById(instanceId);
+        if (!root || root.dataset.initialized === 'true') return;
+        root.dataset.initialized = 'true';
 
         const dropArea = root.querySelector('[data-upload-drop-area]');
         const input = root.querySelector('[data-upload-input]');
         const trigger = root.querySelector('[data-upload-trigger]');
-        const preview = root.querySelector('[data-upload-preview]');
-        const meta = root.querySelector('[data-upload-meta]');
-        const clearButton = root.querySelector('[data-upload-clear]');
+        const progressContainer = root.querySelector('[data-upload-progress-container]');
+        const progressBar = root.querySelector('[data-upload-progress-bar]');
+        const percentText = root.querySelector('[data-upload-percent]');
+        const statusText = root.querySelector('[data-upload-status]');
+        const speedText = root.querySelector('[data-upload-speed]');
+        const timeText = root.querySelector('[data-upload-time-remaining]');
+        const previewContainer = root.querySelector('[data-upload-preview-container]');
+        const previewContent = root.querySelector('[data-upload-preview-content]');
+        const filenameText = root.querySelector('[data-upload-filename]');
+        const pathInput = root.querySelector('[data-upload-path-input]');
+        const clearBtn = root.querySelector('[data-upload-clear]');
+
+        let startTime, uploadedBytes = 0;
+        const CHUNK_SIZE = 2 * 1024 * 1024; // 2MB por chunk
 
         function formatBytes(bytes) {
-            if (!bytes || bytes <= 0) {
-                return '0 B';
-            }
-
-            const units = ['B', 'KB', 'MB', 'GB'];
-            const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
-            const value = bytes / Math.pow(1024, exponent);
-
-            return value.toFixed(value >= 100 || exponent === 0 ? 0 : 1) + ' ' + units[exponent];
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         }
 
-        function dispatchFormChange() {
-            const form = input.closest('form');
+        async function uploadFile(file) {
+            dropArea.classList.add('d-none');
+            progressContainer.classList.remove('d-none');
+            previewContainer.classList.add('d-none');
 
-            if (form) {
-                form.dispatchEvent(new Event('change', { bubbles: true }));
+            startTime = Date.now();
+            uploadedBytes = 0;
+            const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+            const uploadId = 'up_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+
+            try {
+                for (let i = 0; i < totalChunks; i++) {
+                    const start = i * CHUNK_SIZE;
+                    const end = Math.min(start + CHUNK_SIZE, file.size);
+                    const chunk = file.slice(start, end);
+
+                    const formData = new FormData();
+                    formData.append('file', chunk);
+                    formData.append('upload_id', uploadId);
+                    formData.append('chunk_index', i);
+                    formData.append('total_chunks', totalChunks);
+
+                    await fetch("{{ route('admin.upload.chunk') }}", {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        body: formData
+                    });
+
+                    uploadedBytes += chunk.size;
+                    updateProgress(uploadedBytes, file.size);
+                }
+
+                // Finalizar (Assemble)
+                statusText.textContent = "Finalizando...";
+                const res = await fetch("{{ route('admin.upload.assemble') }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    body: JSON.stringify({ upload_id: uploadId, filename: file.name, total_chunks: totalChunks })
+                });
+
+                const data = await res.json();
+                if (data.ok) {
+                    showPreview(file, data.url, data.path);
+                    Swal.fire({ icon: 'success', title: 'Upload concluído!', toast: true, position: 'top-end', timer: 3000, showConfirmButton: false });
+                } else {
+                    throw new Error(data.error || 'Erro no processamento');
+                }
+            } catch (err) {
+                console.error(err);
+                Swal.fire({ icon: 'error', title: 'Erro no upload', text: err.message });
+                resetUploader();
             }
         }
 
-        function renderPreview(file) {
-            const objectUrl = URL.createObjectURL(file);
-            const safeName = file.name || 'arquivo';
-            const safeType = file.type || 'arquivo';
+        function updateProgress(uploaded, total) {
+            const percent = Math.round((uploaded / total) * 100);
+            progressBar.style.width = percent + '%';
+            percentText.textContent = percent + '%';
+
+            const elapsed = (Date.now() - startTime) / 1000;
+            const speed = uploaded / elapsed;
+            speedText.textContent = formatBytes(speed) + '/s';
+
+            if (speed > 0) {
+                const remaining = (total - uploaded) / speed;
+                const m = Math.floor(remaining / 60);
+                const s = Math.round(remaining % 60);
+                timeText.textContent = `Restante: ${m > 0 ? m + 'm ' : ''}${s}s`;
+            }
+        }
+
+        function showPreview(file, url, path) {
+            progressContainer.classList.add('d-none');
+            previewContainer.classList.remove('d-none');
+            pathInput.value = path;
+            filenameText.textContent = file.name;
+
+            const type = file.type;
             let html = '';
+            if (type.startsWith('image/')) html = `<img src="${url}" class="img-fluid rounded" style="max-height: 200px;">`;
+            else if (type.startsWith('video/')) html = `<video src="${url}" controls class="w-100 rounded" style="max-height: 200px;"></video>`;
+            else if (type.startsWith('audio/')) html = `<audio src="${url}" controls class="w-100"></audio>`;
+            else html = `<div class="p-4 bg-light rounded text-muted"><i class="fas fa-file-alt fa-3x mb-2"></i><div>${file.name}</div></div>`;
 
-            if (safeType.startsWith('image/')) {
-                html = '<img src="' + objectUrl + '" alt="' + safeName + '" class="img-fluid rounded shadow-sm" style="max-height:180px;">';
-            } else if (safeType.startsWith('video/')) {
-                html = '<video src="' + objectUrl + '" controls class="w-100 rounded shadow-sm" style="max-height:220px;"></video>';
-            } else if (safeType.startsWith('audio/')) {
-                html = '<audio src="' + objectUrl + '" controls class="w-100"></audio>';
-            } else {
-                html = '<div class="upload-file-chip"><i class="fas fa-file-alt mr-2"></i>' + safeName + '</div>';
-            }
+            previewContent.innerHTML = html;
 
-            preview.innerHTML = html;
-            preview.classList.remove('d-none');
-            meta.textContent = safeName + ' • ' + formatBytes(file.size);
-            clearButton.classList.remove('d-none');
+            // Dispara evento de mudança para habilitar o "Salvar" do form
+            root.closest('form')?.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
-        function clearSelection() {
+        function resetUploader() {
             input.value = '';
-            preview.innerHTML = '';
-            preview.classList.add('d-none');
-            meta.textContent = 'Nenhum arquivo selecionado.';
-            clearButton.classList.add('d-none');
-            dispatchFormChange();
+            pathInput.value = '';
+            dropArea.classList.remove('d-none');
+            progressContainer.classList.add('d-none');
+            previewContainer.classList.add('d-none');
+            progressBar.style.width = '0%';
         }
 
-        function handleFiles(fileList) {
-            const file = fileList && fileList.length ? fileList[0] : null;
+        trigger.addEventListener('click', () => input.click());
+        input.addEventListener('change', () => { if (input.files.length) uploadFile(input.files[0]); });
+        clearBtn.addEventListener('click', resetUploader);
 
-            if (!file) {
-                clearSelection();
-                return;
-            }
-
-            renderPreview(file);
-            dispatchFormChange();
-        }
-
-        trigger.addEventListener('click', function (event) {
-            event.preventDefault();
-            input.click();
-        });
-
-        dropArea.addEventListener('click', function () {
-            input.click();
-        });
-
-        dropArea.addEventListener('dragover', function (event) {
-            event.preventDefault();
-            dropArea.classList.add('is-dragover');
-        });
-
-        dropArea.addEventListener('dragleave', function (event) {
-            event.preventDefault();
-            dropArea.classList.remove('is-dragover');
-        });
-
-        dropArea.addEventListener('drop', function (event) {
-            event.preventDefault();
-            dropArea.classList.remove('is-dragover');
-
-            if (!event.dataTransfer || !event.dataTransfer.files || !event.dataTransfer.files.length) {
-                return;
-            }
-
-            if (typeof DataTransfer !== 'undefined') {
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(event.dataTransfer.files[0]);
-                input.files = dataTransfer.files;
-            }
-
-            handleFiles(event.dataTransfer.files);
-        });
-
-        input.addEventListener('change', function () {
-            handleFiles(input.files);
-        });
-
-        clearButton.addEventListener('click', function (event) {
-            event.preventDefault();
-            clearSelection();
+        dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('active'); });
+        dropArea.addEventListener('dragleave', () => dropArea.classList.remove('active'));
+        dropArea.addEventListener('drop', e => {
+            e.preventDefault();
+            dropArea.classList.remove('active');
+            if (e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]);
         });
     })();
 </script>
 
 <style>
-    .upload-global-wrapper img,
-    .upload-global-wrapper video {
-        display: block;
-    }
-
-    .upload-drop-area {
-        border: 2px dashed #1f5edb;
-        padding: 1.4rem;
+    .upload-global-wrapper .upload-drop-area {
+        border: 2px dashed #cbd5e0;
+        border-radius: 12px;
+        padding: 30px;
         text-align: center;
         background: #f8fafc;
+        transition: all 0.3s ease;
         cursor: pointer;
-        border-radius: 0.9rem;
-        transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
     }
 
-    .upload-drop-area:hover,
-    .upload-drop-area.is-dragover {
-        background: #eff6ff;
-        border-color: #1d4ed8;
-        transform: translateY(-1px);
+    .upload-global-wrapper .upload-drop-area:hover,
+    .upload-global-wrapper .upload-drop-area.active {
+        border-color: #3182ce;
+        background: #ebf8ff;
     }
 
-    .upload-file-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-        padding: 0.75rem 0.9rem;
-        border-radius: 0.9rem;
-        background: #eff6ff;
-        color: #1e3a8a;
-        font-weight: 600;
+    .upload-global-wrapper .btn-primary {
+        background-color: #3182ce;
+        border-color: #3182ce;
+    }
+
+    .upload-global-wrapper .progress {
+        background-color: #edf2f7;
+    }
+
+    .upload-preview-card {
+        transition: transform 0.2s ease;
+    }
+
+    .upload-preview-card:hover {
+        transform: translateY(-2px);
     }
 </style>

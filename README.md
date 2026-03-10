@@ -2,6 +2,9 @@
 
 ## Novidades Recentes (mar/2026)
 
+- **Controle de Visibilidade de Seções (10/03):** Implementado sistema de ativação/desativação individual de seções em todas as páginas administrativas (`/admin/pages`). O salvamento é automático via AJAX com feedback visual instantâneo através de switches e notificações SweetAlert2.
+- **Uploader Global Premium com Progresso (10/03):** Novo componente de upload refatorado com suporte a arrasta-e-solta, preview real de mídia (imagem, vídeo, áudio), barra de progresso animada e cálculo de tempo restante de envio. O upload começa automaticamente ao selecionar o arquivo, utilizando processamento por chunks para máxima confiabilidade.
+- **Integração Gateway SumUp (10/03):** Adicionado suporte ao checkout da SumUp como novo gateway de pagamento. A integração segue o padrão marketplace do sistema, permitindo que vendedores conectem suas próprias contas via Access Token, com redirecionamento seguro e processamento de transações.
 - **Correção de Layout e Notificações Mobile (09/03):** Otimizada a interface do cabeçalho e do scanner para dispositivos de pequena largura (320px+). Implementada a limpeza instantânea de notificações no frontend (Alpine.js), garantindo feedback imediato ao usuário.
 - **Múltiplos Ingressos e QR Codes Individuais (09/03):** Refatorado o sistema de reservas para criar registros individuais de inscrição quando a quantidade for maior que 1. Cada ingresso agora possui seu próprio QR Code e o sistema envia e-mails detalhados e individuais para o comprador com as informações de cada vaga garantida.
 

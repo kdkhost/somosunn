@@ -988,7 +988,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         Route::get('pages', [\App\Http\Controllers\Admin\PageController::class, 'index'])->name('pages.index');
         Route::get('pages/{page}/edit', [\App\Http\Controllers\Admin\PageController::class, 'edit'])->name('pages.edit');
         Route::put('pages/{page}', [\App\Http\Controllers\Admin\PageController::class, 'update'])->name('pages.update');
+        Route::post('pages/{page}/toggle-section', [\App\Http\Controllers\Admin\PageController::class, 'toggleSection'])->name('pages.toggle-section');
     });
 });
-
-

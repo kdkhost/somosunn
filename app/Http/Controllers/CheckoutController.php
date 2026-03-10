@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Exceptions\PaymentGatewayException;
 use App\Models\Course;
 use App\Models\Order;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\CouponService;
 use App\Services\OrderSettlementService;
 use App\Services\Payment\MercadoPagoService;
+use App\Services\SumUpService;
 use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -59,6 +61,7 @@ class CheckoutController extends Controller
         Request $request,
         Course $course,
         MercadoPagoService $mpService,
+        SumUpService $suService,
         \App\Services\Payment\PagSeguroService $psService,
         CouponService $couponService,
         OrderSettlementService $orderSettlementService
@@ -76,7 +79,7 @@ class CheckoutController extends Controller
 
         $request->validate([
             'coupon_code' => 'nullable|string|max:40',
-            'gateway_provider' => 'nullable|string|in:mercadopago,pagseguro',
+            'gateway_provider' => 'nullable|string|in:mercadopago,pagseguro,sumup',
         ]);
 
         $effectiveTotal = round((float) ($course->effective_price ?? ($course->price ?? 0)), 2);
@@ -93,12 +96,17 @@ class CheckoutController extends Controller
             $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
             $gatewayProvider = $request->input('gateway_provider', $gateways['preferredGateway'] ?? 'mercadopago');
 
-            if (($gatewayProvider === 'mercadopago' && !$gateways['mpEnabled'])
-                || ($gatewayProvider === 'pagseguro' && !$gateways['psEnabled'])) {
+            if (
+                ($gatewayProvider === 'mercadopago' && !$gateways['mpEnabled'])
+                || ($gatewayProvider === 'pagseguro' && !$gateways['psEnabled'])
+                || ($gatewayProvider === 'sumup' && !($gateways['suEnabled'] ?? false))
+            ) {
                 if ($gateways['mpEnabled']) {
                     $gatewayProvider = 'mercadopago';
                 } elseif ($gateways['psEnabled']) {
                     $gatewayProvider = 'pagseguro';
+                } elseif ($gateways['suEnabled'] ?? false) {
+                    $gatewayProvider = 'sumup';
                 } else {
                     return back()->with('error', 'Metodo de pagamento nao disponivel para este produto. O vendedor ainda nao configurou um gateway.');
                 }
@@ -137,6 +145,8 @@ class CheckoutController extends Controller
                 }
 
                 $finalTotal = max(0, round($originalTotal - $discountAmount, 2));
+                $suEnabled = $gateways['suEnabled'] ?? false;
+                $suToken = $gateways['suToken'] ?? null;
                 $platformFeePercent = MarketplaceFee::percent();
                 $platformFeeAmount = MarketplaceFee::amount($finalTotal);
 
@@ -151,6 +161,7 @@ class CheckoutController extends Controller
                     'gateway' => $finalTotal <= 0 ? 'free' : $gatewayProvider,
                     'gateway_account_id' => null,
                     'metadata' => [
+                        'sumup_token' => ($gatewayProvider === 'sumup') ? $suToken : null,
                         'context' => 'course',
                         'sale_type' => 'course',
                         'public_token' => Str::random(40),
@@ -220,6 +231,25 @@ class CheckoutController extends Controller
 
         try {
             $order->load('items', 'user');
+
+            if ($gatewayProvider === 'sumup') {
+                $suToken = $order->metadata['sumup_token'] ?? Setting::get('sumup_access_token');
+                $checkout = $suService->createCheckout($order, (string) $suToken);
+
+                if (!$checkout || empty($checkout['id'])) {
+                    return back()->with('error', 'Falha ao criar checkout na SumUp. Tente outro metodo.');
+                }
+
+                $order->update([
+                    'transaction_id' => $checkout['id'],
+                    'metadata' => array_merge($order->metadata ?? [], [
+                        'sumup_checkout_id' => $checkout['id'],
+                        'sumup_checkout_url' => "https://checkout.sumup.com/checkouts/{$checkout['id']}",
+                    ]),
+                ]);
+
+                return redirect("https://checkout.sumup.com/checkouts/{$checkout['id']}");
+            }
 
             if ($gatewayProvider === 'pagseguro') {
                 return view('checkout.pagseguro_transparent', [
