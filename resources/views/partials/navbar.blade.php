@@ -128,7 +128,7 @@
                                                         total: 0,
                                                         items: [],
                                                         loading: true,
-                                                        csrfToken: document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || @json(csrf_token()),
+                                                        csrfToken: document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || '{{ csrf_token() }}',
                                                         syncState(data) {
                                                             this.total = Number(data?.total || 0);
                                                             this.items = (data?.items || []).filter(item => Number(item.count || 0) > 0);
