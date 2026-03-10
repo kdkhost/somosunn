@@ -1,26 +1,27 @@
 @extends('panel.layouts.app')
 
-@section('title', 'Meu Histórico de Resgates')
+@section('title', 'Meu Historico de Resgates')
+
+@php
+    $coinName = (string) ($exchangeSettings['coin_name'] ?? 'UNNBIT');
+    $statusClasses = [
+        'pending' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+        'processing' => 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+        'shipped' => 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300',
+        'completed' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+        'cancelled' => 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+    ];
+
+    $statusLabels = [
+        'pending' => 'Pendente',
+        'processing' => 'Em separacao',
+        'shipped' => 'Enviado',
+        'completed' => 'Concluido',
+        'cancelled' => 'Cancelado',
+    ];
+@endphp
 
 @section('panel_content')
-    @php
-        $statusClasses = [
-            'pending' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-            'processing' => 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-            'shipped' => 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300',
-            'completed' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-            'cancelled' => 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-        ];
-
-        $statusLabels = [
-            'pending' => 'Pendente',
-            'processing' => 'Em separação',
-            'shipped' => 'Enviado',
-            'completed' => 'Concluído',
-            'cancelled' => 'Cancelado',
-        ];
-    @endphp
-
     <div class="space-y-8">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -28,7 +29,7 @@
                     Meus Resgates
                 </h1>
                 <p class="mt-1 font-medium text-slate-500 dark:text-slate-400">
-                    Acompanhe aprovação, envio, prazo e responsável pela entrega dos seus resgates.
+                    Acompanhe aprovacao, envio, prazo e responsavel pela entrega dos seus resgates em {{ $coinName }}.
                 </p>
             </div>
 
@@ -41,14 +42,14 @@
 
         <div class="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <div class="overflow-x-auto">
-                <table class="w-full min-w-[1100px] text-left">
+                <table class="w-full min-w-[1180px] text-left">
                     <thead>
                         <tr class="border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-950/50">
                             <th class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Item</th>
-                            <th class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 text-center">Pontos</th>
+                            <th class="px-8 py-5 text-center text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ $coinName }}</th>
                             <th class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Data do pedido</th>
                             <th class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Entrega</th>
-                            <th class="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 text-center">Status</th>
+                            <th class="px-8 py-5 text-center text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -58,7 +59,7 @@
                                     <div class="flex items-center gap-4">
                                         <div class="h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800">
                                             @if($redemption->item && $redemption->item->image)
-                                                <img src="{{ asset('storage/' . $redemption->item->image) }}" alt="{{ $redemption->item->name }}" class="h-full w-full object-cover">
+                                                <img src="{{ \App\Support\UploadStorage::url($redemption->item->image) }}" alt="{{ $redemption->item->name }}" class="h-full w-full object-cover">
                                             @else
                                                 <div class="flex h-full items-center justify-center">
                                                     <i class="fas fa-gift text-lg"></i>
@@ -70,17 +71,17 @@
                                                 {{ $redemption->item->name ?? 'Item removido' }}
                                             </div>
                                             <div class="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
-                                                Cód. #{{ $redemption->id }}
+                                                Cod. #{{ $redemption->id }} · {{ $redemption->item_type_label }}
                                             </div>
                                             <div class="mt-1 text-xs text-slate-400 dark:text-slate-500">
-                                                Vendido/distribuído por: {{ $redemption->provider_label }}
+                                                Fornecedor: {{ $redemption->provider_label }}
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-8 py-6 text-center">
                                     <span class="font-black text-blue-600 dark:text-blue-400">
-                                        {{ number_format((int) $redemption->points_spent, 0, ',', '.') }} pts
+                                        {{ number_format((int) $redemption->points_spent, 0, ',', '.') }} {{ $coinName }}
                                     </span>
                                     @if($redemption->reference_value !== null)
                                         <div class="mt-1 text-xs text-slate-400 dark:text-slate-500">
@@ -93,15 +94,15 @@
                                         {{ $redemption->created_at->format('d/m/Y') }}
                                     </div>
                                     <div class="text-xs text-slate-400 dark:text-slate-500">
-                                        às {{ $redemption->created_at->format('H:i') }}
+                                        as {{ $redemption->created_at->format('H:i') }}
                                     </div>
                                 </td>
                                 <td class="px-8 py-6">
                                     <div class="space-y-1 text-xs text-slate-500 dark:text-slate-400">
                                         <div>
-                                            Previsão:
+                                            Previsao:
                                             <span class="font-semibold text-slate-700 dark:text-slate-300">
-                                                {{ optional($redemption->estimated_delivery_at)->format('d/m/Y') ?: 'Não informada' }}
+                                                {{ optional($redemption->estimated_delivery_at)->format('d/m/Y') ?: 'Nao informada' }}
                                             </span>
                                         </div>
                                         @if($redemption->tracking_code)
@@ -117,7 +118,11 @@
                                                 <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
                                             </a>
                                         @endif
-                                        @if($redemption->delivery_notes)
+                                        @if($redemption->fulfillment_instructions)
+                                            <div class="line-clamp-2">
+                                                {{ strip_tags((string) $redemption->fulfillment_instructions) }}
+                                            </div>
+                                        @elseif($redemption->delivery_notes)
                                             <div class="line-clamp-2">
                                                 {{ $redemption->delivery_notes }}
                                             </div>
@@ -136,11 +141,11 @@
                                     <div class="mb-4 text-6xl text-slate-300 opacity-10 dark:text-slate-700">
                                         <i class="fas fa-history"></i>
                                     </div>
-                                    <p class="text-lg font-bold text-slate-500 dark:text-slate-400">Você ainda não realizou nenhum resgate.</p>
-                                    <p class="mt-1 text-sm text-slate-400 dark:text-slate-600">Comece a acumular pontos para ganhar prêmios.</p>
+                                    <p class="text-lg font-bold text-slate-500 dark:text-slate-400">Voce ainda nao realizou nenhum resgate.</p>
+                                    <p class="mt-1 text-sm text-slate-400 dark:text-slate-600">Comece a acumular {{ $coinName }} para ganhar premios.</p>
                                     <a href="{{ route('panel.redemptions.shop') }}"
                                         class="mt-6 inline-flex text-sm font-black text-blue-600 transition-all hover:underline dark:text-blue-400">
-                                        Ver itens disponíveis
+                                        Ver itens disponiveis
                                     </a>
                                 </td>
                             </tr>

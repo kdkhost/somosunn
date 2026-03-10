@@ -37,16 +37,16 @@ class RedemptionStatusUpdated extends Notification implements ShouldQueue
         $itemName = (string) ($this->redemption->item->name ?? 'Item resgatado');
 
         $mail = (new MailMessage)
-            ->subject('Atualização no seu Resgate: ' . $payload['label'])
-            ->greeting('Olá, ' . $notifiable->name . '!')
+            ->subject('Atualizacao no seu resgate: ' . $payload['label'])
+            ->greeting('Ola, ' . $notifiable->name . '!')
             ->line(str_replace(':item', $itemName, $payload['message']));
 
         if ($this->redemption->provider_name) {
-            $mail->line('Responsável: **' . $this->redemption->provider_name . '**');
+            $mail->line('Responsavel: **' . $this->redemption->provider_name . '**');
         }
 
         if ($this->redemption->tracking_code) {
-            $mail->line('Código de rastreio: **' . $this->redemption->tracking_code . '**');
+            $mail->line('Codigo de rastreio: **' . $this->redemption->tracking_code . '**');
         }
 
         if ($this->redemption->tracking_url) {
@@ -54,7 +54,7 @@ class RedemptionStatusUpdated extends Notification implements ShouldQueue
         }
 
         return $mail
-            ->action('Ver Meus Resgates', route('panel.redemptions.history'))
+            ->action('Ver meus resgates', route('panel.redemptions.history'))
             ->line('Obrigado por fazer parte da nossa comunidade.')
             ->salutation('Atenciosamente, Equipe SOMOS UNN');
     }
@@ -67,7 +67,7 @@ class RedemptionStatusUpdated extends Notification implements ShouldQueue
             'message' => str_replace(':item', (string) ($this->redemption->item->name ?? 'item'), $payload['message']),
             'type' => 'redemption_update',
             'action_url' => route('panel.redemptions.history'),
-            'action_label' => 'Ver Histórico',
+            'action_label' => 'Ver historico',
             'status' => $this->redemption->status,
             'provider_name' => $this->redemption->provider_name,
             'tracking_code' => $this->redemption->tracking_code,
@@ -78,24 +78,24 @@ class RedemptionStatusUpdated extends Notification implements ShouldQueue
     {
         return match ((string) $this->redemption->status) {
             'processing' => [
-                'label' => 'Em separação',
-                'message' => 'Seu pedido de resgate do item **:item** foi aprovado e está em separação.',
+                'label' => 'Em separacao',
+                'message' => 'Seu pedido de resgate do item **:item** foi aprovado e esta em separacao.',
             ],
             'shipped' => [
                 'label' => 'Enviado',
                 'message' => 'Seu pedido de resgate do item **:item** foi enviado.',
             ],
             'completed' => [
-                'label' => 'Concluído',
-                'message' => 'Seu pedido de resgate do item **:item** foi entregue/concluído.',
+                'label' => 'Concluido',
+                'message' => 'Seu pedido de resgate do item **:item** foi entregue/concluido.',
             ],
             'cancelled' => [
                 'label' => 'Cancelado',
-                'message' => 'Seu pedido de resgate do item **:item** foi cancelado. Seus pontos foram devolvidos ao seu saldo.',
+                'message' => 'Seu pedido de resgate do item **:item** foi cancelado. Os UNNBIT consumidos foram devolvidos ao seu saldo.',
             ],
             default => [
                 'label' => 'Atualizado',
-                'message' => 'Seu pedido de resgate do item **:item** recebeu uma atualização.',
+                'message' => 'Seu pedido de resgate do item **:item** recebeu uma atualizacao.',
             ],
         };
     }

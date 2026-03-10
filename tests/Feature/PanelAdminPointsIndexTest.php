@@ -70,6 +70,14 @@ class PanelAdminPointsIndexTest extends TestCase
             $table->integer('max_daily')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('settings', function (Blueprint $table) {
+            $table->id();
+            $table->string('key')->unique();
+            $table->text('value')->nullable();
+            $table->string('group')->nullable();
+            $table->timestamps();
+        });
     }
 
     protected function tearDown(): void
@@ -94,9 +102,9 @@ class PanelAdminPointsIndexTest extends TestCase
 
         PointsRule::create([
             'key' => 'login_diario',
-            'label' => 'Login diário',
+            'label' => 'Login diario',
             'category' => 'engajamento',
-            'description' => 'Pontua o usuário ao entrar na plataforma.',
+            'description' => 'Pontua o usuario ao entrar na plataforma.',
             'points' => 10,
             'active' => true,
             'icon' => 'fa-star',
@@ -109,7 +117,8 @@ class PanelAdminPointsIndexTest extends TestCase
             ->actingAs($admin)
             ->get(route('panel.admin.points-rules.index'))
             ->assertOk()
+            ->assertSee('UNNBIT')
             ->assertSee('Engajamento')
-            ->assertSee('Login diário');
+            ->assertSee('Login diario');
     }
 }

@@ -1,280 +1,208 @@
 @extends('panel.layouts.app')
 
-@section('title', 'Regras de Pontuação')
+@section('title', 'Regras de Pontuacao')
 
 @section('panel_breadcrumb')
-    <a href="{{ route('panel.admin.points-rules.index') }}" class="hover:underline">Gamificação</a>
+    <a href="{{ route('panel.admin.points-rules.index') }}" class="hover:underline">Gamificacao</a>
 @endsection
 
-@section('panel_content')
 @php
+    $coinName = (string) ($exchangeSettings['coin_name'] ?? 'UNNBIT');
+    $unitValue = (float) ($exchangeSettings['unit_value_brl'] ?? $exchangeSettings['point_value'] ?? 0.01);
+    $valuationTable = $exchangeSettings['valuation_table'] ?? [];
     $rulesTotal = (int) ($totalRules ?? $rulesGrouped->flatten(1)->count());
-
-    $categoryThemes = [
-        'engajamento' => [
-            'icon_wrap' => 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300',
-            'section_ring' => 'border-blue-200/80 dark:border-blue-800/80',
-            'section_bg' => 'bg-white dark:bg-slate-900',
-            'section_head' => 'bg-gradient-to-r from-blue-50 via-white to-white dark:from-blue-950/40 dark:via-slate-900 dark:to-slate-900',
-            'row_accent' => 'bg-blue-500',
-            'row_hover' => 'hover:bg-blue-50/50 dark:hover:bg-blue-950/20',
-            'badge' => 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-800/60',
-            'points' => 'bg-blue-600 text-white shadow-blue-500/20',
-            'action' => 'text-blue-600 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30',
-        ],
-        'aprendizado' => [
-            'icon_wrap' => 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300',
-            'section_ring' => 'border-emerald-200/80 dark:border-emerald-800/80',
-            'section_bg' => 'bg-white dark:bg-slate-900',
-            'section_head' => 'bg-gradient-to-r from-emerald-50 via-white to-white dark:from-emerald-950/40 dark:via-slate-900 dark:to-slate-900',
-            'row_accent' => 'bg-emerald-500',
-            'row_hover' => 'hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20',
-            'badge' => 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-800/60',
-            'points' => 'bg-emerald-600 text-white shadow-emerald-500/20',
-            'action' => 'text-emerald-600 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30',
-        ],
-        'comunidade' => [
-            'icon_wrap' => 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-300',
-            'section_ring' => 'border-cyan-200/80 dark:border-cyan-800/80',
-            'section_bg' => 'bg-white dark:bg-slate-900',
-            'section_head' => 'bg-gradient-to-r from-cyan-50 via-white to-white dark:from-cyan-950/40 dark:via-slate-900 dark:to-slate-900',
-            'row_accent' => 'bg-cyan-500',
-            'row_hover' => 'hover:bg-cyan-50/50 dark:hover:bg-cyan-950/20',
-            'badge' => 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border-cyan-100 dark:border-cyan-800/60',
-            'points' => 'bg-cyan-600 text-white shadow-cyan-500/20',
-            'action' => 'text-cyan-600 dark:text-cyan-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/30',
-        ],
-        'conquistas' => [
-            'icon_wrap' => 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300',
-            'section_ring' => 'border-amber-200/80 dark:border-amber-800/80',
-            'section_bg' => 'bg-white dark:bg-slate-900',
-            'section_head' => 'bg-gradient-to-r from-amber-50 via-white to-white dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900',
-            'row_accent' => 'bg-amber-500',
-            'row_hover' => 'hover:bg-amber-50/50 dark:hover:bg-amber-950/20',
-            'badge' => 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-100 dark:border-amber-800/60',
-            'points' => 'bg-amber-500 text-slate-950 shadow-amber-500/20',
-            'action' => 'text-amber-600 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/30',
-        ],
-        'bonus' => [
-            'icon_wrap' => 'bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-300',
-            'section_ring' => 'border-rose-200/80 dark:border-rose-800/80',
-            'section_bg' => 'bg-white dark:bg-slate-900',
-            'section_head' => 'bg-gradient-to-r from-rose-50 via-white to-white dark:from-rose-950/40 dark:via-slate-900 dark:to-slate-900',
-            'row_accent' => 'bg-rose-500',
-            'row_hover' => 'hover:bg-rose-50/50 dark:hover:bg-rose-950/20',
-            'badge' => 'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border-rose-100 dark:border-rose-800/60',
-            'points' => 'bg-rose-600 text-white shadow-rose-500/20',
-            'action' => 'text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-900/30',
-        ],
-        'outros' => [
-            'icon_wrap' => 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300',
-            'section_ring' => 'border-slate-200 dark:border-slate-800',
-            'section_bg' => 'bg-white dark:bg-slate-900',
-            'section_head' => 'bg-gradient-to-r from-slate-50 via-white to-white dark:from-slate-800/70 dark:via-slate-900 dark:to-slate-900',
-            'row_accent' => 'bg-slate-500',
-            'row_hover' => 'hover:bg-slate-50/60 dark:hover:bg-slate-800/50',
-            'badge' => 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
-            'points' => 'bg-slate-700 text-white shadow-slate-500/20',
-            'action' => 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800',
-        ],
-    ];
-
-    $statusBadge = [
-        true => 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-800/60',
-        false => 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700',
-    ];
 @endphp
 
-<div class="space-y-6">
-    <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-        <div class="space-y-2">
-            <div class="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-300">
-                <i class="fas fa-star text-[10px]"></i>
-                Gamificação
-            </div>
-            <div>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">Regras de Pontuação</h1>
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">Uma lista visual por tipo para diferenciar melhor as ações, bônus e recorrências.</p>
-            </div>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-3">
-            <div class="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                    <i class="fas fa-list-check"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Total</p>
-                    <p class="text-lg font-black text-slate-900 dark:text-white">{{ $rulesTotal }}</p>
-                </div>
-            </div>
-            <a href="{{ route('panel.admin.ranking.index') }}"
-               class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition-all hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-amber-800 dark:hover:bg-amber-900/20 dark:hover:text-amber-300">
-                <i class="fas fa-trophy"></i>
-                Ver Ranking
-            </a>
-            <a href="{{ route('panel.admin.points-rules.create') }}"
-               class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700 hover:shadow-blue-500/30">
-                <i class="fas fa-plus"></i>
-                Nova Regra
-            </a>
-        </div>
-    </div>
-
-    <section class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div class="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+@section('panel_content')
+    <div class="space-y-6">
+        <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
             <div class="space-y-2">
-                <div class="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300">
-                    <i class="fas fa-money-bill-wave text-[10px]"></i>
-                    Cotação dos Pontos
+                <div class="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-300">
+                    <i class="fas fa-coins text-[10px]"></i>
+                    {{ $coinName }}
                 </div>
                 <div>
-                    <h2 class="text-lg font-black text-slate-900 dark:text-white">Conversão financeira da troca de pontos</h2>
-                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                        Cada <strong>{{ number_format((int) ($exchangeSettings['base_points'] ?? 0), 0, ',', '.') }} pontos</strong> valem
-                        <strong>R$ {{ number_format((float) ($exchangeSettings['base_amount'] ?? 0), 2, ',', '.') }}</strong>.
-                        Valor unitário atual: <strong>R$ {{ number_format((float) ($exchangeSettings['point_value'] ?? 0), 4, ',', '.') }}</strong> por ponto.
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">Regras de pontuacao e cotacao</h1>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
+                        Administre como os membros ganham {{ $coinName }} e quanto cada unidade vale em reais.
                     </p>
                 </div>
             </div>
 
-            <form action="{{ route('panel.admin.points-rules.exchange-settings') }}" method="POST" class="grid gap-3 sm:grid-cols-3 xl:min-w-[560px]">
-                @csrf
-                <label class="space-y-2">
-                    <span class="block text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Base em pontos</span>
-                    <input type="number" name="base_points" min="1" value="{{ old('base_points', (int) ($exchangeSettings['base_points'] ?? 100)) }}"
-                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
-                        {{ $canManageExchange ? '' : 'readonly' }}>
-                </label>
-                <label class="space-y-2">
-                    <span class="block text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Base em reais</span>
-                    <input type="text" name="base_amount" value="{{ old('base_amount', number_format((float) ($exchangeSettings['base_amount'] ?? 1), 2, ',', '.')) }}"
-                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
-                        {{ $canManageExchange ? '' : 'readonly' }}>
-                </label>
-                <div class="flex items-end">
-                    @if($canManageExchange)
-                        <button type="submit"
-                            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700">
-                            <i class="fas fa-save"></i>
-                            Atualizar cotação
-                        </button>
-                    @else
-                        <div class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-semibold text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
-                            Somente o admin altera a cotação
-                        </div>
-                    @endif
-                </div>
-            </form>
-        </div>
-    </section>
-
-    @if($rulesTotal > 0)
-        <div class="flex flex-wrap gap-2">
-            @foreach($rulesGrouped as $category => $rules)
-                @php
-                    $categoryKey = is_string($category) && $category !== '' ? $category : 'outros';
-                    $categoryMeta = $categories[$categoryKey] ?? null;
-                    $categoryLabel = is_array($categoryMeta)
-                        ? ($categoryMeta['label'] ?? ucfirst($categoryKey))
-                        : (is_string($categoryMeta) ? $categoryMeta : ucfirst($categoryKey));
-                    $categoryIcon = is_array($categoryMeta)
-                        ? ($categoryMeta['icon'] ?? 'fas fa-tags')
-                        : 'fas fa-tags';
-                    $theme = $categoryThemes[$categoryKey] ?? $categoryThemes['outros'];
-                @endphp
-                <span class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold {{ $theme['badge'] }}">
-                    <i class="{{ $categoryIcon }}"></i>
-                    {{ $categoryLabel }}
-                    <span class="rounded-full bg-white/80 px-2 py-0.5 text-[10px] dark:bg-slate-950/60">{{ $rules->count() }}</span>
-                </span>
-            @endforeach
-        </div>
-    @endif
-
-    @forelse($rulesGrouped as $category => $rules)
-        @php
-            $categoryKey = is_string($category) && $category !== '' ? $category : 'outros';
-            $categoryMeta = $categories[$categoryKey] ?? null;
-            $categoryLabel = is_array($categoryMeta)
-                ? ($categoryMeta['label'] ?? ucfirst($categoryKey))
-                : (is_string($categoryMeta) ? $categoryMeta : ucfirst($categoryKey));
-            $categoryIcon = is_array($categoryMeta)
-                ? ($categoryMeta['icon'] ?? 'fas fa-tags')
-                : 'fas fa-tags';
-            $theme = $categoryThemes[$categoryKey] ?? $categoryThemes['outros'];
-        @endphp
-
-        <section class="overflow-hidden rounded-[2rem] border {{ $theme['section_ring'] }} {{ $theme['section_bg'] }} shadow-sm">
-            <div class="flex flex-col gap-3 border-b border-slate-100 px-6 py-5 dark:border-slate-800 md:flex-row md:items-center md:justify-between {{ $theme['section_head'] }}">
-                <div class="flex items-center gap-4">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl {{ $theme['icon_wrap'] }}">
-                        <i class="{{ $categoryIcon }} text-lg"></i>
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                        <i class="fas fa-list-check"></i>
                     </div>
                     <div>
-                        <h2 class="text-lg font-black text-slate-900 dark:text-white">{{ $categoryLabel }}</h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Regras deste tipo para destacar ações semelhantes no programa de pontos.</p>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Total</p>
+                        <p class="text-lg font-black text-slate-900 dark:text-white">{{ $rulesTotal }}</p>
                     </div>
                 </div>
-                <div class="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/80 px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200">
-                    <i class="fas fa-layer-group text-slate-400 dark:text-slate-500"></i>
-                    {{ $rules->count() }} {{ $rules->count() === 1 ? 'regra' : 'regras' }}
-                </div>
+                <a href="{{ route('panel.admin.ranking.index') }}"
+                   class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition-all hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-amber-800 dark:hover:bg-amber-900/20 dark:hover:text-amber-300">
+                    <i class="fas fa-trophy"></i>
+                    Ver Ranking
+                </a>
+                <a href="{{ route('panel.admin.points-rules.create') }}"
+                   class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700 hover:shadow-blue-500/30">
+                    <i class="fas fa-plus"></i>
+                    Nova Regra
+                </a>
             </div>
+        </div>
 
-            <div class="divide-y divide-slate-100 dark:divide-slate-800">
-                @foreach($rules as $rule)
-                    <article class="group relative flex min-w-0 gap-0 transition-colors {{ $theme['row_hover'] }}">
-                        <div class="w-1.5 shrink-0 {{ $theme['row_accent'] }}"></div>
-                        <div class="flex min-w-0 flex-1 flex-col gap-5 px-5 py-5 lg:flex-row lg:items-center lg:justify-between">
-                            <div class="min-w-0 flex-1">
-                                <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                                    <div class="min-w-0">
-                                        <div class="flex flex-wrap items-center gap-3">
-                                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl {{ $theme['icon_wrap'] }}">
-                                                <i class="fas {{ $rule->icon ?: 'fa-star' }}"></i>
-                                            </div>
-                                            <div class="min-w-0">
-                                                <h3 class="truncate text-base font-black text-slate-900 dark:text-white">{{ $rule->label }}</h3>
-                                                <div class="mt-1 flex flex-wrap items-center gap-2">
-                                                    <code class="rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-300">{{ $rule->key }}</code>
-                                                    <span class="rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] {{ $statusBadge[$rule->active] }}">
-                                                        {{ $rule->active ? 'Ativa' : 'Inativa' }}
-                                                    </span>
-                                                    @if($rule->repeatable)
-                                                        <span class="rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-700 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300">
-                                                            Repetível
-                                                        </span>
-                                                    @endif
-                                                    @if($rule->max_daily)
-                                                        <span class="rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-700 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-                                                            Máx {{ $rule->max_daily }}/dia
-                                                        </span>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
+        <section class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div class="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+                <div class="space-y-4">
+                    <div>
+                        <div class="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300">
+                            <i class="fas fa-money-bill-wave text-[10px]"></i>
+                            Cotacao do {{ $coinName }}
+                        </div>
+                        <h2 class="mt-3 text-lg font-black text-slate-900 dark:text-white">Tabela de valores administravel</h2>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                            O admin define o valor em reais do {{ $coinName }} e pode revisar a referencia em dolar conforme inflacao/deflacao do mercado.
+                        </p>
+                    </div>
 
-                                        <p class="mt-4 max-w-3xl text-sm leading-6 text-slate-500 dark:text-slate-400">
-                                            {{ $rule->description ?: 'Sem descrição informada para esta regra.' }}
-                                        </p>
-                                    </div>
+                    <form action="{{ route('panel.admin.points-rules.exchange-settings') }}" method="POST" class="grid gap-4 md:grid-cols-2">
+                        @csrf
+                        <label class="space-y-2">
+                            <span class="block text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Lote de referencia</span>
+                            <input type="number" name="base_points" min="1" value="{{ old('base_points', (int) ($exchangeSettings['base_points'] ?? 100)) }}"
+                                class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
+                                {{ $canManageExchange ? '' : 'readonly' }}>
+                        </label>
 
-                                    @php
-                                        $pointsValue = (int) $rule->points;
-                                        $pointsLabel = ($pointsValue > 0 ? '+' : '') . $pointsValue . ' pts';
-                                    @endphp
-                                    <div class="lg:pl-6">
-                                        <div class="inline-flex min-w-[110px] items-center justify-center rounded-2xl px-4 py-3 text-sm font-black shadow-lg {{ $theme['points'] }}">
-                                            {{ $pointsLabel }}
-                                        </div>
-                                    </div>
-                                </div>
+                        <label class="space-y-2">
+                            <span class="block text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Valor de 1 {{ $coinName }} (R$)</span>
+                            <input type="text" name="unit_value" value="{{ old('unit_value', number_format($unitValue, 4, ',', '.')) }}"
+                                class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
+                                {{ $canManageExchange ? '' : 'readonly' }}>
+                        </label>
+
+                        <label class="space-y-2">
+                            <span class="block text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Cotacao USD/BRL usada como referencia</span>
+                            <input type="text" name="usd_reference_rate" value="{{ old('usd_reference_rate', number_format((float) ($exchangeSettings['usd_reference_rate'] ?? 1), 4, ',', '.')) }}"
+                                class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
+                                {{ $canManageExchange ? '' : 'readonly' }}>
+                        </label>
+
+                        <div class="space-y-2">
+                            <span class="block text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Resultado do lote</span>
+                            <div class="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-black text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-300">
+                                {{ number_format((int) ($exchangeSettings['base_points'] ?? 0), 0, ',', '.') }} {{ $coinName }} = R$ {{ number_format((float) ($exchangeSettings['base_amount'] ?? 0), 2, ',', '.') }}
+                            </div>
+                        </div>
+
+                        <label class="space-y-2 md:col-span-2">
+                            <span class="block text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Observacao de mercado</span>
+                            <textarea name="market_note" rows="3"
+                                class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
+                                {{ $canManageExchange ? '' : 'readonly' }}>{{ old('market_note', $exchangeSettings['market_note'] ?? '') }}</textarea>
+                        </label>
+
+                        <div class="md:col-span-2 flex items-center justify-between gap-4">
+                            <div class="text-xs text-slate-400 dark:text-slate-500">
+                                @if(!empty($exchangeSettings['last_repriced_at']))
+                                    Ultima revisao: {{ \Carbon\Carbon::parse($exchangeSettings['last_repriced_at'])->format('d/m/Y H:i') }}
+                                @else
+                                    Ainda sem revisao registrada.
+                                @endif
                             </div>
 
-                            <div class="flex shrink-0 flex-wrap items-center gap-2 lg:pl-4">
+                            @if($canManageExchange)
+                                <button type="submit"
+                                    class="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700">
+                                    <i class="fas fa-save"></i>
+                                    Atualizar cotacao
+                                </button>
+                            @else
+                                <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-semibold text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
+                                    Somente o admin altera a cotacao
+                                </div>
+                            @endif
+                        </div>
+                    </form>
+                </div>
+
+                <div class="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Tabela de equivalencia</p>
+                    <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-950/50">
+                                    <th class="px-4 py-3 text-left font-black text-slate-500 dark:text-slate-400">{{ $coinName }}</th>
+                                    <th class="px-4 py-3 text-right font-black text-slate-500 dark:text-slate-400">Valor em reais</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                @foreach($valuationTable as $row)
+                                    <tr>
+                                        <td class="px-4 py-3 font-bold text-slate-900 dark:text-white">{{ number_format((int) $row['units'], 0, ',', '.') }} {{ $coinName }}</td>
+                                        <td class="px-4 py-3 text-right font-black text-blue-600 dark:text-blue-300">R$ {{ number_format((float) $row['amount'], 2, ',', '.') }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        @forelse($rulesGrouped as $category => $rules)
+            @php
+                $categoryKey = is_string($category) && $category !== '' ? $category : 'outros';
+                $categoryMeta = $categories[$categoryKey] ?? null;
+                $categoryLabel = is_array($categoryMeta)
+                    ? ($categoryMeta['label'] ?? ucfirst($categoryKey))
+                    : (is_string($categoryMeta) ? $categoryMeta : ucfirst($categoryKey));
+                $categoryIcon = is_array($categoryMeta)
+                    ? ($categoryMeta['icon'] ?? 'fas fa-tags')
+                    : 'fas fa-tags';
+            @endphp
+
+            <section class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <div class="flex items-center justify-between gap-4 border-b border-slate-100 px-6 py-5 dark:border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                            <i class="{{ $categoryIcon }}"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-black text-slate-900 dark:text-white">{{ $categoryLabel }}</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">{{ $rules->count() }} {{ $rules->count() === 1 ? 'regra' : 'regras' }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divide-y divide-slate-100 dark:divide-slate-800">
+                    @foreach($rules as $rule)
+                        <article class="flex flex-col gap-4 px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h3 class="text-base font-black text-slate-900 dark:text-white">{{ $rule->label }}</h3>
+                                    <code class="rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-300">{{ $rule->key }}</code>
+                                    <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] {{ $rule->active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300' }}">
+                                        {{ $rule->active ? 'Ativa' : 'Inativa' }}
+                                    </span>
+                                    @if($rule->repeatable)
+                                        <span class="rounded-full bg-indigo-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300">
+                                            Repetivel{{ $rule->max_daily ? ' · max ' . $rule->max_daily . '/dia' : '' }}
+                                        </span>
+                                    @endif
+                                </div>
+                                <p class="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                                    {{ $rule->description ?: 'Sem descricao informada para esta regra.' }}
+                                </p>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-3">
+                                <div class="rounded-2xl bg-blue-600 px-4 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20">
+                                    {{ ($rule->points > 0 ? '+' : '') . (int) $rule->points }} {{ $coinName }}
+                                </div>
                                 <a href="{{ route('panel.admin.points-rules.edit', $rule) }}"
-                                   class="inline-flex items-center gap-2 rounded-xl border border-transparent px-3 py-2 text-xs font-bold transition-all {{ $theme['action'] }}">
+                                   class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 transition-all hover:bg-slate-100 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800">
                                     <i class="fas fa-pen"></i>
                                     Editar
                                 </a>
@@ -288,32 +216,31 @@
                                     </button>
                                 </form>
                             </div>
-                        </div>
-                    </article>
-                @endforeach
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+        @empty
+            <div class="rounded-[2rem] border border-dashed border-slate-300 bg-white px-8 py-16 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500">
+                    <i class="fas fa-star text-2xl"></i>
+                </div>
+                <h3 class="mt-5 text-lg font-black text-slate-900 dark:text-white">Nenhuma regra cadastrada</h3>
+                <p class="mx-auto mt-2 max-w-md text-sm text-slate-500 dark:text-slate-400">
+                    Crie a primeira regra para definir como os usuarios acumulam {{ $coinName }} em cada tipo de interacao.
+                </p>
+                <a href="{{ route('panel.admin.points-rules.create') }}"
+                   class="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700">
+                    <i class="fas fa-plus"></i>
+                    Criar primeira regra
+                </a>
             </div>
-        </section>
-    @empty
-        <div class="rounded-[2rem] border border-dashed border-slate-300 bg-white px-8 py-16 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
-            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500">
-                <i class="fas fa-star text-2xl"></i>
-            </div>
-            <h3 class="mt-5 text-lg font-black text-slate-900 dark:text-white">Nenhuma regra cadastrada</h3>
-            <p class="mx-auto mt-2 max-w-md text-sm text-slate-500 dark:text-slate-400">
-                Crie a primeira regra para definir como os usuários acumulam pontos em cada tipo de interação.
-            </p>
-            <a href="{{ route('panel.admin.points-rules.create') }}"
-               class="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700">
-                <i class="fas fa-plus"></i>
-                Criar primeira regra
-            </a>
-        </div>
-    @endforelse
+        @endforelse
 
-    @if(isset($rulesPaginator) && $rulesPaginator->hasPages())
-        <div class="rounded-[2rem] border border-slate-200 bg-white px-6 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            {{ $rulesPaginator->links() }}
-        </div>
-    @endif
-</div>
+        @if(isset($rulesPaginator) && $rulesPaginator->hasPages())
+            <div class="rounded-[2rem] border border-slate-200 bg-white px-6 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                {{ $rulesPaginator->links() }}
+            </div>
+        @endif
+    </div>
 @endsection

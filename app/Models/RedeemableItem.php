@@ -10,6 +10,12 @@ class RedeemableItem extends Model
 {
     use HasFactory;
 
+    public const ITEM_TYPES = [
+        'physical' => 'Produto fisico',
+        'digital' => 'Produto digital',
+        'service' => 'Servico',
+    ];
+
     protected $fillable = [
         'name',
         'description',
@@ -20,6 +26,8 @@ class RedeemableItem extends Model
         'provider_type',
         'provider_user_id',
         'provider_name',
+        'item_type',
+        'fulfillment_instructions',
         'reference_value',
         'delivery_lead_days',
     ];
@@ -45,6 +53,13 @@ class RedeemableItem extends Model
     public function getProviderLabelAttribute(): string
     {
         return trim((string) ($this->provider_name ?: config('app.name', 'SOMOS UNN')));
+    }
+
+    public function getItemTypeLabelAttribute(): string
+    {
+        $type = strtolower((string) ($this->item_type ?: 'service'));
+
+        return self::ITEM_TYPES[$type] ?? self::ITEM_TYPES['service'];
     }
 
     public function canBeManagedBy(User $user): bool

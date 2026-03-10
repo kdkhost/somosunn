@@ -3,14 +3,16 @@
 @section('title', $item->exists ? 'Editar Item' : 'Novo Item de Resgate')
 
 @php
+    $coinName = (string) ($exchangeSettings['coin_name'] ?? 'UNNBIT');
     $basePoints = (int) ($exchangeSettings['base_points'] ?? 100);
     $baseAmount = (float) ($exchangeSettings['base_amount'] ?? 1);
-    $pointValue = (float) ($exchangeSettings['point_value'] ?? 0.01);
+    $unitValue = (float) ($exchangeSettings['unit_value_brl'] ?? $exchangeSettings['point_value'] ?? 0.01);
     $referenceValue = old('reference_value');
+
     if ($referenceValue === null) {
         $referenceValue = $item->reference_value !== null
             ? number_format((float) $item->reference_value, 2, ',', '.')
-            : number_format((float) (($item->points_cost ?? 0) * $pointValue), 2, ',', '.');
+            : number_format((float) (($item->points_cost ?? 0) * $unitValue), 2, ',', '.');
     }
 @endphp
 
@@ -22,7 +24,7 @@
                     {{ $item->exists ? 'Editar Item de Resgate' : 'Criar Item de Resgate' }}
                 </h1>
                 <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    Cadastre produtos ou serviços para troca de pontos com rastreio, prazo e responsável fixo pela entrega.
+                    Cadastre produtos fisicos, digitais ou servicos para troca com {{ $coinName }}, mantendo valor de referencia e regras de entrega.
                 </p>
             </div>
             <a href="{{ route('panel.admin.redemptions.index') }}"
@@ -47,7 +49,7 @@
                                 <div class="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950">
                                     <div class="aspect-square w-full">
                                         @if($item->image)
-                                            <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover">
+                                            <img src="{{ \App\Support\UploadStorage::url($item->image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover">
                                         @else
                                             <div class="flex h-full items-center justify-center text-slate-300 dark:text-slate-700">
                                                 <i class="fas fa-image text-4xl"></i>
@@ -69,23 +71,33 @@
                                         <label class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Nome do item</label>
                                         <input type="text" name="name" value="{{ old('name', $item->name) }}" required
                                             class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3.5 text-base font-bold text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
-                                            placeholder="Ex.: Mentoria Exclusiva (1h)">
+                                            placeholder="Ex.: Consultoria exclusiva, e-book premium, kit fisico">
                                     </div>
 
                                     <div>
-                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Valor de referência</label>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Tipo do item</label>
+                                        <select name="item_type"
+                                            class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3.5 text-base font-bold text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white">
+                                            @foreach(\App\Models\RedeemableItem::ITEM_TYPES as $typeValue => $typeLabel)
+                                                <option value="{{ $typeValue }}" @selected(old('item_type', $item->item_type ?? 'service') === $typeValue)>{{ $typeLabel }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Valor de referencia</label>
                                         <input type="text" name="reference_value" id="reference_value" value="{{ $referenceValue }}" required
                                             class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3.5 text-base font-bold text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
                                             placeholder="0,00">
                                         <p class="mt-2 text-xs text-slate-400 dark:text-slate-500">
-                                            A pontuação é calculada automaticamente pela cotação definida pelo admin.
+                                            O custo em {{ $coinName }} e calculado automaticamente pela cotacao definida pelo admin.
                                         </p>
                                     </div>
 
                                     <div>
-                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Custo em pontos</label>
+                                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Custo em {{ $coinName }}</label>
                                         <input type="text" id="points_cost_preview"
-                                            value="{{ number_format((int) old('points_cost', $item->points_cost ?? 0), 0, ',', '.') }} pts"
+                                            value="{{ number_format((int) old('points_cost', $item->points_cost ?? 0), 0, ',', '.') }} {{ $coinName }}"
                                             readonly
                                             class="w-full rounded-2xl border border-blue-200 bg-blue-50 px-5 py-3.5 text-base font-black text-blue-700 outline-none dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-300">
                                     </div>
@@ -103,7 +115,7 @@
                                         <input type="number" name="delivery_lead_days" value="{{ old('delivery_lead_days', $item->delivery_lead_days ?? 7) }}" required min="1" max="365"
                                             class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3.5 text-base font-bold text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
                                             placeholder="7">
-                                        <p class="mt-2 text-xs text-slate-400 dark:text-slate-500">Este prazo entra no acompanhamento e na saúde do membro vendedor.</p>
+                                        <p class="mt-2 text-xs text-slate-400 dark:text-slate-500">Este prazo entra na previsao do comprador e do fornecedor.</p>
                                     </div>
 
                                     <div class="md:col-span-2">
@@ -117,12 +129,22 @@
                     </section>
 
                     <section class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Descrição detalhada</label>
+                        <label class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Descricao detalhada</label>
                         <textarea id="redemptionDescription" name="description" rows="5"
                             class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white">{{ old('description', $item->description) }}</textarea>
                         <p class="mt-2 text-[11px] text-slate-400 dark:text-slate-500">
-                            Use formatação rica para explicar regras, prazos, logística e condições. Envio de imagens e arquivos segue bloqueado neste campo.
+                            Use formatacao rica para explicar regras, prazos, logistica e condicoes. Envio de imagens e arquivos segue bloqueado neste campo.
                         </p>
+
+                        <div class="mt-6">
+                            <label class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Regras de entrega/fornecimento</label>
+                            <textarea name="fulfillment_instructions" rows="4"
+                                class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
+                                placeholder="Explique como o comprador vai receber o item ou como o servico sera combinado.">{{ old('fulfillment_instructions', $item->fulfillment_instructions) }}</textarea>
+                            <p class="mt-2 text-[11px] text-slate-400 dark:text-slate-500">
+                                Este texto tambem entra no aviso automatico enviado ao fornecedor no momento do resgate.
+                            </p>
+                        </div>
                     </section>
                 </div>
 
@@ -130,13 +152,13 @@
                     <section class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                         <div class="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-sky-700 dark:border-sky-900/50 dark:bg-sky-950/30 dark:text-sky-300">
                             <i class="fas fa-user-shield"></i>
-                            Responsável fixo
+                            Responsavel fixo
                         </div>
                         <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Vendido/distribuído por</p>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Vendido/distribuido por</p>
                             <p class="mt-2 text-lg font-black text-slate-900 dark:text-white">{{ $providerLabel }}</p>
                             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                                Esta informação é travada no cadastro para preservar a responsabilidade sobre a entrega.
+                                Esta informacao e travada no cadastro para preservar a responsabilidade sobre a entrega.
                             </p>
                         </div>
                     </section>
@@ -144,18 +166,18 @@
                     <section class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                         <div class="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-300">
                             <i class="fas fa-coins"></i>
-                            Cotação vigente
+                            Cotacao vigente
                         </div>
                         <div class="mt-4 space-y-3">
                             <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
                                 <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Regra atual</p>
-                                <p class="mt-2 text-lg font-black text-slate-900 dark:text-white">{{ number_format($basePoints, 0, ',', '.') }} pontos = R$ {{ number_format($baseAmount, 2, ',', '.') }}</p>
-                                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Cada ponto vale R$ {{ number_format($pointValue, 4, ',', '.') }}.</p>
+                                <p class="mt-2 text-lg font-black text-slate-900 dark:text-white">{{ number_format($basePoints, 0, ',', '.') }} {{ $coinName }} = R$ {{ number_format($baseAmount, 2, ',', '.') }}</p>
+                                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Cada {{ $coinName }} vale R$ {{ number_format($unitValue, 4, ',', '.') }}.</p>
                             </div>
                             <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
                                 <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Como o sistema calcula</p>
                                 <p class="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                                    O vendedor acompanha esta cotação, informa o valor real do item e o sistema converte automaticamente para pontos.
+                                    O vendedor informa o valor real do item e o sistema converte automaticamente para {{ $coinName }}, respeitando a cotacao definida pelo admin.
                                 </p>
                             </div>
                         </div>
@@ -165,7 +187,7 @@
                         <label class="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
                             <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $item->is_active ?? true))
                                 class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                            Disponível para resgate
+                            Disponivel para resgate
                         </label>
                         <button type="submit"
                             class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-500/20 transition-all hover:bg-blue-700">
@@ -187,7 +209,7 @@
                     $descriptionField.summernote({
                         height: 260,
                         lang: 'pt-BR',
-                        placeholder: 'Detalhe o item de resgate, regras de uso, entrega e condições...',
+                        placeholder: 'Detalhe o item de resgate, regras de uso, entrega e condicoes...',
                         disableDragAndDrop: true,
                         toolbar: [
                             ['style', ['style']],
@@ -227,8 +249,8 @@
 
                 const referenceInput = document.getElementById('reference_value');
                 const pointsPreview = document.getElementById('points_cost_preview');
-                const basePoints = {{ $basePoints }};
-                const baseAmount = {{ number_format($baseAmount, 2, '.', '') }};
+                const unitValue = {{ number_format($unitValue, 4, '.', '') }};
+                const coinName = @json($coinName);
 
                 const parseMoney = (value) => {
                     let normalized = String(value || '').replace(/[R$\s]/g, '');
@@ -238,22 +260,22 @@
                     return Math.max(0, parseFloat(normalized || '0') || 0);
                 };
 
-                const formatPoints = (value) => new Intl.NumberFormat('pt-BR').format(value) + ' pts';
+                const formatUnits = (value) => new Intl.NumberFormat('pt-BR').format(value) + ' ' + coinName;
 
-                const refreshPoints = () => {
+                const refreshUnits = () => {
                     if (!referenceInput || !pointsPreview) {
                         return;
                     }
 
                     const money = parseMoney(referenceInput.value);
-                    const points = money > 0 && baseAmount > 0 ? Math.ceil((money / baseAmount) * basePoints) : 0;
-                    pointsPreview.value = formatPoints(points);
+                    const units = money > 0 && unitValue > 0 ? Math.ceil(money / unitValue) : 0;
+                    pointsPreview.value = formatUnits(units);
                 };
 
                 if (referenceInput) {
-                    referenceInput.addEventListener('input', refreshPoints);
-                    referenceInput.addEventListener('change', refreshPoints);
-                    refreshPoints();
+                    referenceInput.addEventListener('input', refreshUnits);
+                    referenceInput.addEventListener('change', refreshUnits);
+                    refreshUnits();
                 }
             });
         </script>

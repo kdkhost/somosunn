@@ -6,9 +6,11 @@ use App\Models\Plan;
 use App\Models\RedeemableItem;
 use App\Models\Redemption;
 use App\Models\User;
+use App\Notifications\RedemptionRequestedForProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -76,6 +78,14 @@ class PanelAdminSellerRedemptionsTest extends TestCase
             $table->timestamps();
         });
 
+        Schema::create('settings', function (Blueprint $table) {
+            $table->id();
+            $table->string('key')->unique();
+            $table->text('value')->nullable();
+            $table->string('group')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('redeemable_items', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -87,6 +97,8 @@ class PanelAdminSellerRedemptionsTest extends TestCase
             $table->string('provider_type', 20)->default('platform');
             $table->unsignedBigInteger('provider_user_id')->nullable();
             $table->string('provider_name')->nullable();
+            $table->string('item_type', 20)->default('service');
+            $table->text('fulfillment_instructions')->nullable();
             $table->decimal('reference_value', 10, 2)->nullable();
             $table->unsignedInteger('delivery_lead_days')->default(7);
             $table->timestamps();
@@ -99,10 +111,12 @@ class PanelAdminSellerRedemptionsTest extends TestCase
             $table->string('provider_type', 20)->default('platform');
             $table->unsignedBigInteger('provider_user_id')->nullable();
             $table->string('provider_name')->nullable();
+            $table->string('item_type', 20)->nullable();
             $table->integer('points_spent');
             $table->decimal('reference_value', 10, 2)->nullable();
             $table->string('status')->default('pending');
             $table->text('admin_notes')->nullable();
+            $table->text('fulfillment_instructions')->nullable();
             $table->text('delivery_notes')->nullable();
             $table->string('tracking_code')->nullable();
             $table->string('tracking_url')->nullable();
@@ -157,11 +171,13 @@ class PanelAdminSellerRedemptionsTest extends TestCase
         $this->actingAs($seller)
             ->post(route('panel.admin.redemptions.store'), [
                 'name' => 'Kit Premium',
-                'description' => 'Produto físico para teste.',
+                'description' => 'Produto fisico para teste.',
                 'reference_value' => '10,00',
                 'stock' => 5,
                 'delivery_lead_days' => 7,
                 'is_active' => 1,
+                'item_type' => 'physical',
+                'fulfillment_instructions' => 'Enviar apos combinar endereco.',
             ])
             ->assertRedirect(route('panel.admin.redemptions.index'));
 
@@ -171,16 +187,20 @@ class PanelAdminSellerRedemptionsTest extends TestCase
         $this->assertSame($seller->id, $item->provider_user_id);
         $this->assertSame($seller->name, $item->provider_name);
         $this->assertSame(1000, (int) $item->points_cost);
+        $this->assertSame('physical', $item->item_type);
+        $this->assertSame('Enviar apos combinar endereco.', $item->fulfillment_instructions);
 
         $this->actingAs($seller)
             ->put(route('panel.admin.redemptions.update', $item), [
                 'name' => 'Kit Premium Atualizado',
-                'description' => 'Produto físico atualizado.',
+                'description' => 'Produto fisico atualizado.',
                 'reference_value' => '12,00',
                 'stock' => 8,
                 'delivery_lead_days' => 10,
                 'is_active' => 1,
                 'provider_name' => 'Outro Nome',
+                'item_type' => 'digital',
+                'fulfillment_instructions' => 'Liberar download apos confirmacao.',
             ])
             ->assertRedirect(route('panel.admin.redemptions.index'));
 
@@ -188,10 +208,14 @@ class PanelAdminSellerRedemptionsTest extends TestCase
 
         $this->assertSame($seller->name, $item->provider_name);
         $this->assertSame(1200, (int) $item->points_cost);
+        $this->assertSame('digital', $item->item_type);
+        $this->assertSame('Liberar download apos confirmacao.', $item->fulfillment_instructions);
     }
 
-    public function test_redemption_snapshots_provider_and_delivery_window(): void
+    public function test_redemption_snapshots_provider_delivery_window_and_notifies_provider(): void
     {
+        Notification::fake();
+
         $plan = Plan::create([
             'name' => 'Plano Ativo',
             'slug' => 'plano-ativo',
@@ -230,6 +254,8 @@ class PanelAdminSellerRedemptionsTest extends TestCase
             'provider_type' => 'seller',
             'provider_user_id' => $seller->id,
             'provider_name' => $seller->name,
+            'item_type' => 'digital',
+            'fulfillment_instructions' => 'Entregar o acesso por email.',
             'delivery_lead_days' => 9,
         ]);
 
@@ -237,12 +263,28 @@ class PanelAdminSellerRedemptionsTest extends TestCase
             ->post(route('panel.redemptions.redeem', $item))
             ->assertRedirect(route('panel.redemptions.shop'));
 
-        $redemption = Redemption::firstOrFail();
+        $redemption = Redemption::with(['providerUser'])->firstOrFail();
 
         $this->assertSame($seller->id, $redemption->provider_user_id);
         $this->assertSame($seller->name, $redemption->provider_name);
         $this->assertSame(12.00, (float) $redemption->reference_value);
         $this->assertNotNull($redemption->estimated_delivery_at);
         $this->assertSame('pending', $redemption->status);
+        $this->assertSame('digital', $redemption->item_type);
+        $this->assertSame('Entregar o acesso por email.', $redemption->fulfillment_instructions);
+        $this->assertSame(3800, (int) $buyer->fresh()->points);
+        $this->assertSame(2, (int) $item->fresh()->stock);
+
+        Notification::assertSentTo(
+            $seller,
+            RedemptionRequestedForProvider::class,
+            function (RedemptionRequestedForProvider $notification) use ($redemption): bool {
+                $payload = $notification->toArray($redemption->providerUser);
+
+                return $payload['redemption_id'] === $redemption->id
+                    && $payload['item_type'] === 'digital'
+                    && $payload['points_spent'] === 1200;
+            }
+        );
     }
 }

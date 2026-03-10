@@ -3,41 +3,59 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\PointsLog;
 use App\Models\RedeemableItem;
 use App\Models\Redemption;
-use App\Models\PointsLog;
+use App\Models\Setting;
+use App\Notifications\RedemptionStatusUpdated;
+use App\Services\PointsExchangeService;
+use App\Support\UploadStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class RedemptionController extends Controller
 {
+    public function __construct(private readonly PointsExchangeService $exchangeService)
+    {
+    }
+
     public function index()
     {
         $this->authorizeAdmin();
+
         $items = RedeemableItem::withCount('redemptions')->latest()->get();
         $pendingRedemptions = Redemption::with(['user', 'item'])->where('status', 'pending')->latest()->get();
-        return view('admin.redemptions.index', compact('items', 'pendingRedemptions'));
+
+        return view('admin.redemptions.index', [
+            'items' => $items,
+            'pendingRedemptions' => $pendingRedemptions,
+            'exchangeSettings' => $this->exchangeService->settings(),
+        ]);
     }
 
     public function create()
     {
         $this->authorizeAdmin();
-        return view('admin.redemptions.form', ['item' => new RedeemableItem()]);
+
+        return view('admin.redemptions.form', [
+            'item' => new RedeemableItem(),
+            'exchangeSettings' => $this->exchangeService->settings(),
+            'providerLabel' => $this->platformProviderName(),
+        ]);
     }
 
     public function store(Request $request)
     {
         $this->authorizeAdmin();
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'points_cost' => 'required|integer|min:1',
-            'stock' => 'required|integer',
-            'is_active' => 'boolean',
-        ]);
+
+        $data = $this->validatedItemData($request);
+        $data['provider_type'] = 'platform';
+        $data['provider_user_id'] = null;
+        $data['provider_name'] = $this->platformProviderName();
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('redemptions', 'public');
+            $data['image'] = UploadStorage::storeUploadedFile($request->file('image'), 'redemptions');
         }
 
         RedeemableItem::create($data);
@@ -48,23 +66,34 @@ class RedemptionController extends Controller
     public function edit(RedeemableItem $redemption)
     {
         $this->authorizeAdmin();
-        // Laravel injected RedeemableItem as $redemption because of the resource name
-        return view('admin.redemptions.form', ['item' => $redemption]);
+
+        return view('admin.redemptions.form', [
+            'item' => $redemption,
+            'exchangeSettings' => $this->exchangeService->settings(),
+            'providerLabel' => $redemption->provider_label,
+        ]);
     }
 
     public function update(Request $request, RedeemableItem $redemption)
     {
         $this->authorizeAdmin();
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'points_cost' => 'required|integer|min:1',
-            'stock' => 'required|integer',
-            'is_active' => 'boolean',
-        ]);
+
+        $data = $this->validatedItemData($request);
+        $data['provider_type'] = $redemption->provider_type ?: 'platform';
+        $data['provider_user_id'] = $redemption->provider_user_id;
+        $data['provider_name'] = $redemption->provider_name ?: $this->platformProviderName();
+
+        if ($request->boolean('remove_image') && $redemption->image) {
+            UploadStorage::delete($redemption->image);
+            $data['image'] = null;
+        }
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('redemptions', 'public');
+            if ($redemption->image) {
+                UploadStorage::delete($redemption->image);
+            }
+
+            $data['image'] = UploadStorage::storeUploadedFile($request->file('image'), 'redemptions');
         }
 
         $redemption->update($data);
@@ -75,8 +104,11 @@ class RedemptionController extends Controller
     public function approve(Redemption $redemption)
     {
         $this->authorizeAdmin();
+
         $redemption->update(['status' => 'completed']);
-        return back()->with('success', 'Resgate concluído!');
+        $redemption->user?->notify(new RedemptionStatusUpdated($redemption));
+
+        return back()->with('success', 'Resgate concluido!');
     }
 
     public function cancel(Redemption $redemption)
@@ -86,9 +118,13 @@ class RedemptionController extends Controller
         $user = $redemption->user;
         $user->increment('points', $redemption->points_spent);
 
-        $redemption->update(['status' => 'cancelled']);
+        if ($redemption->item && (int) $redemption->item->stock >= 0) {
+            $redemption->item->increment('stock');
+        }
 
-        // Log the return of points
+        $redemption->update(['status' => 'cancelled']);
+        $user->notify(new RedemptionStatusUpdated($redemption));
+
         PointsLog::create([
             'user_id' => $user->id,
             'action_key' => 'redemption_cancelled',
@@ -96,14 +132,76 @@ class RedemptionController extends Controller
             'meta' => json_encode([
                 'redemption_id' => $redemption->id,
                 'item_id' => $redemption->redeemable_item_id,
-                'item_name' => $redemption->item->name ?? 'Item removido'
-            ])
+                'item_name' => $redemption->item->name ?? 'Item removido',
+                'coin_name' => $this->exchangeService->settings()['coin_name'],
+                'provider_name' => $redemption->provider_label,
+            ]),
         ]);
 
-        return back()->with('success', 'Resgate cancelado e pontos devolvidos!');
+        return back()->with('success', 'Resgate cancelado, estoque devolvido e saldo em UNNBIT estornado!');
     }
 
-    private function authorizeAdmin()
+    private function validatedItemData(Request $request): array
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'reference_value' => 'nullable',
+            'points_cost' => 'nullable|integer|min:1',
+            'stock' => 'required|integer|min:-1',
+            'delivery_lead_days' => 'required|integer|min:1|max:365',
+            'is_active' => 'nullable|boolean',
+            'image' => 'nullable|image|max:5120',
+            'remove_image' => 'nullable|boolean',
+            'item_type' => 'nullable|in:physical,digital,service',
+            'fulfillment_instructions' => 'nullable|string|max:5000',
+        ]);
+
+        $manualPoints = max(0, (int) ($data['points_cost'] ?? 0));
+        $referenceValue = $request->filled('reference_value')
+            ? $this->normalizeMoney($request->input('reference_value'))
+            : $this->exchangeService->pointsToMoney($manualPoints);
+
+        $data['reference_value'] = $referenceValue;
+        $data['points_cost'] = $manualPoints > 0
+            ? $manualPoints
+            : $this->exchangeService->moneyToPoints($referenceValue);
+        $data['is_active'] = $request->boolean('is_active', true);
+
+        if (!Schema::hasColumn('redeemable_items', 'item_type')) {
+            unset($data['item_type']);
+        } else {
+            $data['item_type'] = $data['item_type'] ?? ($request->input('item_type') ?: 'service');
+        }
+
+        if (!Schema::hasColumn('redeemable_items', 'fulfillment_instructions')) {
+            unset($data['fulfillment_instructions']);
+        }
+
+        return $data;
+    }
+
+    private function normalizeMoney(mixed $value): float
+    {
+        $value = trim((string) $value);
+        $value = str_replace(['R$', ' ', "\u{00A0}"], '', $value);
+
+        if (str_contains($value, ',')) {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        }
+
+        return max(0.01, round((float) $value, 2));
+    }
+
+    private function platformProviderName(): string
+    {
+        return (string) (Setting::get('company_name')
+            ?: Setting::get('app_name')
+            ?: config('app.name', 'SOMOS UNN'));
+    }
+
+    private function authorizeAdmin(): void
     {
         if (!Auth::user()->isAdmin()) {
             abort(403);

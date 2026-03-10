@@ -16,10 +16,12 @@ class Redemption extends Model
         'provider_type',
         'provider_user_id',
         'provider_name',
+        'item_type',
         'points_spent',
         'reference_value',
         'status',
         'admin_notes',
+        'fulfillment_instructions',
         'delivery_notes',
         'tracking_code',
         'tracking_url',
@@ -66,5 +68,12 @@ class Redemption extends Model
     public function getProviderLabelAttribute(): string
     {
         return trim((string) ($this->provider_name ?: config('app.name', 'SOMOS UNN')));
+    }
+
+    public function getItemTypeLabelAttribute(): string
+    {
+        $type = strtolower((string) ($this->item_type ?: ($this->item->item_type ?? 'service')));
+
+        return RedeemableItem::ITEM_TYPES[$type] ?? RedeemableItem::ITEM_TYPES['service'];
     }
 }

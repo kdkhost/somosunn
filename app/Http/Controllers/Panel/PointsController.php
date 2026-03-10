@@ -6,10 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\PointsLog;
 use App\Models\PointsRule;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Services\PointsExchangeService;
 
 class PointsController extends Controller
 {
+    public function __construct(private readonly PointsExchangeService $exchangeService)
+    {
+    }
+
     public function index()
     {
         $user = auth()->user();
@@ -29,7 +33,7 @@ class PointsController extends Controller
         $totalRanked = User::where('points', '>', 0)->count();
 
         // Pontos ganhos este mês
-        $pontosEsteMes = PointsLog::where('user_id', $user->id)
+        $unnbitThisMonth = PointsLog::where('user_id', $user->id)
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->sum('points');
@@ -40,14 +44,17 @@ class PointsController extends Controller
             ->limit(10)
             ->get();
 
+        $exchangeSettings = $this->exchangeService->settings();
+
         return view('panel.points.index', compact(
             'user',
             'logs',
             'rules',
             'rankPosition',
             'totalRanked',
-            'pontosEsteMes',
-            'topUsers'
+            'unnbitThisMonth',
+            'topUsers',
+            'exchangeSettings'
         ));
     }
 }

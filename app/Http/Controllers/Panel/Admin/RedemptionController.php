@@ -9,9 +9,10 @@ use App\Models\Redemption;
 use App\Models\Setting;
 use App\Notifications\RedemptionStatusUpdated;
 use App\Services\PointsExchangeService;
+use App\Support\UploadStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 
 class RedemptionController extends Controller
 {
@@ -79,7 +80,7 @@ class RedemptionController extends Controller
         $data = array_merge($data, $this->providerPayloadForUser($user));
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('redemptions', 'public');
+            $data['image'] = UploadStorage::storeUploadedFile($request->file('image'), 'redemptions');
         }
 
         RedeemableItem::create($data);
@@ -114,16 +115,16 @@ class RedemptionController extends Controller
         $data = array_merge($data, $this->providerPayloadForUser(Auth::user(), $redemption));
 
         if ($request->boolean('remove_image') && $redemption->image) {
-            Storage::disk('public')->delete($redemption->image);
+            UploadStorage::delete($redemption->image);
             $data['image'] = null;
         }
 
         if ($request->hasFile('image')) {
             if ($redemption->image) {
-                Storage::disk('public')->delete($redemption->image);
+                UploadStorage::delete($redemption->image);
             }
 
-            $data['image'] = $request->file('image')->store('redemptions', 'public');
+            $data['image'] = UploadStorage::storeUploadedFile($request->file('image'), 'redemptions');
         }
 
         $redemption->update($data);
@@ -136,7 +137,7 @@ class RedemptionController extends Controller
         $this->ensureCanManageItem($redemption);
 
         if ($redemption->image) {
-            Storage::disk('public')->delete($redemption->image);
+            UploadStorage::delete($redemption->image);
         }
 
         $redemption->delete();
@@ -246,10 +247,11 @@ class RedemptionController extends Controller
                 'item_id' => $redemption->redeemable_item_id,
                 'item_name' => $redemption->item->name ?? 'Item removido',
                 'provider_name' => $redemption->provider_label,
+                'coin_name' => $this->exchangeService->settings()['coin_name'],
             ]),
         ]);
 
-        return back()->with('success', 'Resgate cancelado, estoque devolvido e pontos estornados.');
+        return back()->with('success', 'Resgate cancelado, estoque devolvido e saldo em UNNBIT estornado.');
     }
 
     private function managedItemsQuery($user)
@@ -283,11 +285,23 @@ class RedemptionController extends Controller
             'is_active' => 'nullable|boolean',
             'image' => 'nullable|image|max:5120',
             'remove_image' => 'nullable|boolean',
+            'item_type' => 'nullable|in:physical,digital,service',
+            'fulfillment_instructions' => 'nullable|string|max:5000',
         ]);
 
         $data['reference_value'] = $referenceValue;
         $data['points_cost'] = $this->exchangeService->moneyToPoints($referenceValue);
         $data['is_active'] = $request->boolean('is_active', true);
+
+        if (!Schema::hasColumn('redeemable_items', 'item_type')) {
+            unset($data['item_type']);
+        } else {
+            $data['item_type'] = $data['item_type'] ?? ($request->input('item_type') ?: 'service');
+        }
+
+        if (!Schema::hasColumn('redeemable_items', 'fulfillment_instructions')) {
+            unset($data['fulfillment_instructions']);
+        }
 
         return $data;
     }

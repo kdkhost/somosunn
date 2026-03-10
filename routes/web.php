@@ -895,7 +895,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
             ->middleware('check.feature:events_access')->names('events');
 
         // Points Rules
-        Route::post('points-rules/exchange-settings', [\App\Http\Controllers\Panel\Admin\PointsRuleController::class, 'updateExchangeSettings'])
+        Route::post('points-rules/exchange-settings', [\App\Http\Controllers\Admin\PointsRuleController::class, 'updateExchangeSettings'])
             ->middleware('check.feature:points_access')->name('points-rules.exchange-settings');
         Route::resource('points-rules', \App\Http\Controllers\Admin\PointsRuleController::class)
             ->middleware('check.feature:points_access')->names('points-rules');
