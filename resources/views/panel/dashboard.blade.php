@@ -40,6 +40,13 @@
             </div>
 
             <div class="flex flex-wrap justify-center lg:justify-end gap-5 w-full lg:w-auto">
+                <button onclick="window.openQuickUploadModal()"
+                    class="group/btn relative px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black backdrop-blur-xl transition-all border border-white/20 overflow-hidden shadow-xl">
+                    <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:animate-shimmer"></div>
+                    <span class="relative flex items-center gap-3">
+                        <i class="fas fa-camera text-blue-300"></i> Registrar Fotos
+                    </span>
+                </button>
                 <a href="{{ route('panel.profile.edit') }}"
                     class="group/btn relative px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black backdrop-blur-xl transition-all border border-white/20 overflow-hidden shadow-xl">
                     <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:animate-shimmer"></div>

@@ -464,11 +464,35 @@
                             <h4 class="mb-3">Galeria de Fotos e Vídeos do Evento</h4>
                             <p class="text-muted mb-4">Faça o upload de fotos ou vídeos do evento. As imagens receberão uma marca d'água automaticamente com o nome da plataforma e do organizador.</p>
                             
-                            <div class="mb-4 d-flex gap-3 align-items-center">
-                                <input type="file" id="adminGalleryInput" multiple accept="image/*,video/*" class="form-control-file w-auto">
-                                <button type="button" onclick="uploadAdminGallery()" id="btnUploadAdminGallery" class="btn btn-success ml-3">
-                                    <i class="fas fa-upload mr-1"></i> Enviar Arquivos
-                                </button>
+                            <div class="premium-upload-box mb-4" id="eventMediaUploadBox">
+                                <div class="drop-zone-area p-5 text-center border-2 border-dashed rounded-lg bg-light position-relative" id="eventDropZone">
+                                    <input type="file" id="adminGalleryInput" multiple accept="image/*,video/*" class="position-absolute w-100 h-100 opacity-0" style="top:0; left:0; cursor:pointer;">
+                                    <div class="drop-zone-content">
+                                        <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                                        <h5 class="font-weight-bold">Arraste fotos e vídeos aqui</h5>
+                                        <p class="text-muted mb-3">ou clique para selecionar do seu dispositivo</p>
+                                        <div class="d-flex justify-content-center gap-2 mb-2">
+                                            <span class="badge badge-pill badge-primary px-3">Imagens (JPG, PNG)</span>
+                                            <span class="badge badge-pill badge-info px-3">Vídeos (MP4)</span>
+                                        </div>
+                                        <small class="text-secondary opacity-75">As imagens receberão marca d'água automaticamente</small>
+                                    </div>
+                                </div>
+
+                                <!-- Progresso de Upload -->
+                                <div id="eventUploadProgress" class="mt-3 d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small font-weight-bold text-primary" id="eventUploadStatus">Enviando arquivos...</span>
+                                        <span class="small font-weight-bold" id="eventUploadPercent">0%</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px; border-radius: 5px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" id="eventUploadProgressBar" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-1">
+                                        <small class="text-muted" id="eventUploadDetails">0 / 0 arquivos</small>
+                                        <small class="text-muted" id="eventUploadRemaining">calculando...</small>
+                                    </div>
+                                </div>
                             </div>
 
                             <hr>
@@ -547,51 +571,114 @@
 @push('scripts')
 @if($event->exists)
 <script>
-async function uploadAdminGallery() {
-    const input = document.getElementById('adminGalleryInput');
-    if (!input.files || input.files.length === 0) {
-        Swal.fire('Aviso', 'Selecione pelo menos um arquivo.', 'warning');
-        return;
-    }
+async function uploadAdminGallery(files) {
+    if (!files || files.length === 0) return;
 
     const formData = new FormData();
-    for(let i=0; i < input.files.length; i++) {
-        formData.append('files[]', input.files[i]);
+    for (let i = 0; i < files.length; i++) {
+        formData.append('files[]', files[i]);
     }
 
-    const btn = document.getElementById('btnUploadAdminGallery');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Enviando...';
-    btn.disabled = true;
+    const progressBox = document.getElementById('eventUploadProgress');
+    const progressBar = document.getElementById('eventUploadProgressBar');
+    const percentText = document.getElementById('eventUploadPercent');
+    const statusText = document.getElementById('eventUploadStatus');
+    const detailsText = document.getElementById('eventUploadDetails');
+    const remainingText = document.getElementById('eventUploadRemaining');
+
+    progressBox.classList.remove('d-none');
+    progressBar.style.width = '0%';
+    percentText.innerText = '0%';
+    statusText.innerText = 'Preparando envio...';
+    detailsText.innerText = `0 / ${files.length} arquivos`;
+
+    const startedAt = Date.now();
 
     try {
-        const response = await fetch('{{ route("admin.events.media.store", $event) }}', {
-            method: 'POST',
-            body: formData,
+        const response = await axios.post('{{ route("admin.events.media.store", $event) }}', formData, {
             headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
+                'Content-Type': 'multipart/form-data',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            onUploadProgress: (progressEvent) => {
+                const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                progressBar.style.width = percent + '%';
+                percentText.innerText = percent + '%';
+                
+                const elapsedSeconds = (Date.now() - startedAt) / 1000;
+                const speed = progressEvent.loaded / elapsedSeconds;
+                const remainingSeconds = speed > 0 ? (progressEvent.total - progressEvent.loaded) / speed : 0;
+                
+                statusText.innerText = percent < 100 ? 'Enviando arquivos...' : 'Processando no servidor...';
+                detailsText.innerText = `${(progressEvent.loaded / 1024 / 1024).toFixed(2)} MB / ${(progressEvent.total / 1024 / 1024).toFixed(2)} MB`;
+                
+                if (percent < 100) {
+                    const min = Math.floor(remainingSeconds / 60);
+                    const sec = Math.round(remainingSeconds % 60);
+                    remainingText.innerText = `restam ${min}m ${sec}s`;
+                } else {
+                    remainingText.innerText = 'quase pronto';
+                }
             }
         });
 
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-            Swal.fire('Sucesso!', data.message, 'success').then(() => {
-                location.reload(); 
+        if (response.data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Sucesso!',
+                text: response.data.message || 'Arquivos enviados com sucesso.',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                location.reload();
             });
         } else {
-            Swal.fire('Erro', data.message || 'Erro ao enviar arquivos.', 'error');
+            throw new Error(response.data.message || 'Erro no upload');
         }
-    } catch (e) {
-        console.error(e);
-        Swal.fire('Erro', 'Ocorreu um erro na requisição.', 'error');
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-        input.value = '';
+    } catch (error) {
+        console.error(error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro no Upload',
+            text: error.response?.data?.message || error.message || 'Ocorreu um erro ao enviar os arquivos.',
+            confirmButtonText: 'Tentar novamente',
+            confirmButtonColor: '#3085d6'
+        });
+        progressBox.classList.add('d-none');
     }
 }
+
+// Inicialização do Drag & Drop
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('eventDropZone');
+    const input = document.getElementById('adminGalleryInput');
+
+    if (!dropZone || !input) return;
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, false);
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('bg-primary-light', 'border-primary'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('bg-primary-light', 'border-primary'), false);
+    });
+
+    dropZone.addEventListener('drop', e => {
+        const files = e.dataTransfer.files;
+        uploadAdminGallery(files);
+    });
+
+    input.addEventListener('change', function() {
+        uploadAdminGallery(this.files);
+    });
+});
 
 async function deleteAdminMedia(id) {
     const confirmed = await window.showConfirmDialog({

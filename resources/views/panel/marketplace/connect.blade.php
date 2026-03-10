@@ -57,13 +57,17 @@
             <div class="flex-1 space-y-6">
                 <!-- OAuth -->
                 <div class="bg-blue-50 dark:bg-blue-900/10 rounded-2xl p-5 border border-blue-100 dark:border-blue-800/50">
-                    <h4 class="font-bold text-blue-900 dark:text-blue-300 mb-1 text-sm">Conexão via OAuth <span class="ml-1 text-xs font-normal text-blue-500">(opcional)</span></h4>
+                    <h4 class="font-bold text-blue-900 dark:text-blue-300 mb-1 text-sm">Conexão via OAuth <span
+                            class="ml-1 text-xs font-normal text-blue-500">(opcional)</span></h4>
                     <p class="text-xs text-blue-700 dark:text-blue-400 mb-1 leading-relaxed">
-                        Autorize o app da plataforma a processar pagamentos em seu nome com <strong>split automático</strong>.
-                        Necessário apenas se quiser que sua taxa de plataforma seja descontada automaticamente pelo MercadoPago.
+                        Autorize o app da plataforma a processar pagamentos em seu nome com <strong>split
+                            automático</strong>.
+                        Necessário apenas se quiser que sua taxa de plataforma seja descontada automaticamente pelo
+                        MercadoPago.
                     </p>
                     <p class="text-xs text-blue-500 dark:text-blue-500 mb-4">
-                        Se você já configurou seu token manualmente abaixo, os pagamentos <strong>já funcionam</strong> sem OAuth.
+                        Se você já configurou seu token manualmente abaixo, os pagamentos <strong>já funcionam</strong> sem
+                        OAuth.
                     </p>
 
                     @if($mercadopago->enabled && $mercadopago->access_token && $mercadopago->provider == 'mercadopago')
@@ -256,7 +260,8 @@
 
                 {{-- Form separado para testar (evita nesting de forms) --}}
                 @if($pagseguro->enabled && $pagseguro->access_token)
-                    <form id="ps-test-form" action="{{ route('panel.marketplace.payments.test') }}" method="POST" style="display:none">
+                    <form id="ps-test-form" action="{{ route('panel.marketplace.payments.test') }}" method="POST"
+                        style="display:none">
                         @csrf
                         <input type="hidden" name="provider" value="pagseguro">
                     </form>
@@ -271,6 +276,71 @@
 
                         @if($pagseguro->enabled && $pagseguro->access_token)
                             <button type="submit" form="ps-test-form"
+                                class="shrink-0 inline-flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white px-5 py-3.5 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all whitespace-nowrap">
+                                <i class="fas fa-sync-alt mr-2"></i> Testar Conexão
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUMUP -->
+        <div
+            class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 transition-colors duration-300 flex flex-col h-full">
+            <div class="flex items-center gap-4 mb-6">
+                <div
+                    class="w-12 h-12 bg-sky-500/10 rounded-xl flex items-center justify-center p-2 text-sky-600 dark:text-sky-400">
+                    <i class="fas fa-credit-card text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">SumUp</h3>
+                    <div class="flex items-center gap-2 text-sm mt-0.5">
+                        @if($sumup->enabled && $sumup->access_token)
+                            <span class="inline-flex items-center text-emerald-600 dark:text-emerald-400 font-bold">
+                                <i class="fas fa-check-circle mr-1"></i> Ativo
+                            </span>
+                        @else
+                            <span class="inline-flex items-center text-slate-500 dark:text-slate-500">
+                                <i class="fas fa-circle mr-1 text-[8px]"></i> Inativo
+                            </span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1">
+                <form id="sumup-save-form" action="{{ route('settings.payment.update') }}" method="POST" class="space-y-5">
+                    @csrf
+                    <input type="hidden" name="provider" value="sumup">
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Access Token</label>
+                        <input type="password" name="sumup_access_token" value="{{ $sumup->access_token }}"
+                            class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-3 outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all"
+                            placeholder="sup_at_..." required>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Obtenha seu token de afiliado/vendedor no
+                            painel da SumUp.</p>
+                    </div>
+                </form>
+
+                @if($sumup->enabled && $sumup->access_token)
+                    <form id="sumup-test-form" action="{{ route('panel.marketplace.payments.test') }}" method="POST"
+                        style="display:none">
+                        @csrf
+                        <input type="hidden" name="provider" value="sumup">
+                    </form>
+                @endif
+
+                <div class="pt-4">
+                    <div class="flex flex-wrap gap-3">
+                        <button type="submit" form="sumup-save-form"
+                            class="flex-1 min-w-[140px] inline-flex items-center justify-center rounded-xl bg-sky-600 text-white px-5 py-3.5 text-sm font-bold hover:bg-sky-700 transition-all shadow-lg shadow-sky-500/20 hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
+                            <i class="fas fa-save mr-2"></i> Salvar SumUp
+                        </button>
+
+                        @if($sumup->enabled && $sumup->access_token)
+                            <button type="submit" form="sumup-test-form"
                                 class="shrink-0 inline-flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white px-5 py-3.5 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all whitespace-nowrap">
                                 <i class="fas fa-sync-alt mr-2"></i> Testar Conexão
                             </button>

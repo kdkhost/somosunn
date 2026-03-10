@@ -108,6 +108,9 @@
                     <div class="col-12">
                         <div class="card shadow-sm border-0">
                             <div class="card-body p-2 d-flex flex-wrap justify-content-center">
+                                <button type="button" onclick="window.openQuickUploadModal()" class="btn btn-primary btn-sm rounded-pill px-3 m-1 shadow-sm">
+                                    <i class="fas fa-camera-retro mr-1"></i> Registrar Fotos
+                                </button>
                                 <a href="{{ route('admin.courses.create') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 m-1">
                                     <i class="fas fa-plus mr-1"></i> Novo Curso
                                 </a>

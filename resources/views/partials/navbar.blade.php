@@ -124,79 +124,85 @@
             <div class="flex items-center gap-2 sm:gap-4">
                 @if($isLogged)
                     <div class="relative" x-data="{
-                                                        open: false,
-                                                        total: 0,
-                                                        items: [],
-                                                        loading: true,
-                                                        csrfToken: document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || '{{ csrf_token() }}',
-                                                        syncState(data) {
-                                                            this.total = Number(data?.total || 0);
-                                                            this.items = (data?.items || []).filter(item => Number(item.count || 0) > 0);
-                                                        },
-                                                        async fetchNotifications() {
-                                                            try {
-                                                                const r = await fetch('{{ route('notifications.hub') }}', {
-                                                                    credentials: 'same-origin',
-                                                                    cache: 'no-store',
-                                                                    headers: {
-                                                                        'Accept': 'application/json',
-                                                                        'X-Requested-With': 'XMLHttpRequest'
-                                                                    }
-                                                                });
-                                                                if (!r.ok) return;
-                                                                const data = await r.json();
-                                                                this.syncState(data);
-                                                            } catch(e) {
-                                                                console.error('Notification hub failed:', e);
-                                                            } finally {
-                                                                this.loading = false;
-                                                            }
-                                                        },
-                                                        recalculateTotal() {
-                                                            this.items = this.items.filter(item => Number(item.count || 0) > 0);
-                                                            this.total = this.items.reduce((sum, item) => sum + Number(item.count || 0), 0);
-                                                        },
-                                                        async acknowledgeAndGo(item) {
-                                                            if (!item?.route) {
-                                                                return;
-                                                            }
-
-                                                            item.count = 0;
-                                                            this.recalculateTotal();
-                                                            this.open = false;
-
-                                                            try {
-                                                                const response = await fetch('{{ route('notifications.hub.acknowledge') }}', {
-                                                                    method: 'POST',
-                                                                    credentials: 'same-origin',
-                                                                    cache: 'no-store',
-                                                                    keepalive: true,
-                                                                    headers: {
-                                                                        'Accept': 'application/json',
-                                                                        'Content-Type': 'application/json',
-                                                                        'X-CSRF-TOKEN': this.csrfToken,
-                                                                        'X-Requested-With': 'XMLHttpRequest',
-                                                                    },
-                                                                    body: JSON.stringify({
-                                                                        type: item.type,
-                                                                    }),
-                                                                });
-
-                                                                if (response.ok) {
-                                                                    const data = await response.json();
+                                                            open: false,
+                                                            total: 0,
+                                                            items: [],
+                                                            loading: true,
+                                                            csrfToken: document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || '{{ csrf_token() }}',
+                                                            syncState(data) {
+                                                                this.total = Number(data?.total || 0);
+                                                                this.items = (data?.items || []).filter(item => Number(item.count || 0) > 0);
+                                                            },
+                                                            async fetchNotifications() {
+                                                                try {
+                                                                    const r = await fetch('{{ route('notifications.hub') }}', {
+                                                                        credentials: 'same-origin',
+                                                                        cache: 'no-store',
+                                                                        headers: {
+                                                                            'Accept': 'application/json',
+                                                                            'X-Requested-With': 'XMLHttpRequest'
+                                                                        }
+                                                                    });
+                                                                    if (!r.ok) return;
+                                                                    const data = await r.json();
                                                                     this.syncState(data);
-                                                                } else {
+                                                                } catch(e) {
+                                                                    console.error('Notification hub failed:', e);
+                                                                } finally {
+                                                                    this.loading = false;
+                                                                }
+                                                            },
+                                                            recalculateTotal() {
+                                                                this.items = this.items.filter(item => Number(item.count || 0) > 0);
+                                                                this.total = this.items.reduce((sum, item) => sum + Number(item.count || 0), 0);
+                                                            },
+                                                            async acknowledgeAndGo(item) {
+                                                                if (!item?.route) {
+                                                                    return;
+                                                                }
+
+                                                                item.count = 0;
+                                                                this.recalculateTotal();
+                                                                this.open = false;
+
+                                                                try {
+                                                                    const response = await fetch('{{ route('notifications.hub.acknowledge') }}', {
+                                                                        method: 'POST',
+                                                                        credentials: 'same-origin',
+                                                                        cache: 'no-store',
+                                                                        keepalive: true,
+                                                                        headers: {
+                                                                            'Accept': 'application/json',
+                                                                            'Content-Type': 'application/json',
+                                                                            'X-CSRF-TOKEN': this.csrfToken,
+                                                                            'X-Requested-With': 'XMLHttpRequest',
+                                                                        },
+                                                                        body: JSON.stringify({
+                                                                            type: item.type,
+                                                                        }),
+                                                                    });
+
+                                                                    if (response.ok) {
+                                                                        const data = await response.json();
+                                                                        this.syncState(data);
+                                                                    } else {
+                                                                        await this.fetchNotifications();
+                                                                    }
+                                                                } catch (e) {
+                                                                    console.error('Notification acknowledge failed:', e);
                                                                     await this.fetchNotifications();
                                                                 }
-                                                            } catch (e) {
-                                                                console.error('Notification acknowledge failed:', e);
-                                                                await this.fetchNotifications();
-                                                            }
 
-                                                            window.location.href = item.route;
-                                                        }
-                                                    }"
+                                                                window.location.href = item.route;
+                                                            }
+                                                        }"
                         x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
+
+                        <button onclick="window.openQuickUploadModal()"
+                            class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition relative p-2 focus:outline-none"
+                            title="Registrar Fotos">
+                            <i class="fas fa-camera text-xl"></i>
+                        </button>
 
                         <button @click="open = !open; fetchNotifications()"
                             class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition relative p-2 focus:outline-none">

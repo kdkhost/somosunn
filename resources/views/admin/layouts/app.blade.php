@@ -517,6 +517,7 @@
 
             @include('admin.partials.control-sidebar')
             @include('admin.partials.footer')
+            @include('admin.partials.quick-upload-modal')
         </div>
     @else
         @include('partials.header')

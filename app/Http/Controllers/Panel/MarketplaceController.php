@@ -73,8 +73,9 @@ class MarketplaceController extends Controller
     {
         $mercadopago = \App\Models\GatewayAccount::firstOrNew(['user_id' => Auth::id(), 'provider' => 'mercadopago']);
         $pagseguro = \App\Models\GatewayAccount::firstOrNew(['user_id' => Auth::id(), 'provider' => 'pagseguro']);
+        $sumup = \App\Models\GatewayAccount::firstOrNew(['user_id' => Auth::id(), 'provider' => 'sumup']);
 
-        return view('panel.marketplace.connect', compact('mercadopago', 'pagseguro'));
+        return view('panel.marketplace.connect', compact('mercadopago', 'pagseguro', 'sumup'));
     }
 
     public function sales()
@@ -102,6 +103,15 @@ class MarketplaceController extends Controller
             if ($provider === 'pagseguro') {
                 $service = new PagSeguroService();
                 $service->validateCredentials(auth()->id());
+            } elseif ($provider === 'sumup') {
+                $account = \App\Models\GatewayAccount::where('user_id', Auth::id())->where('provider', 'sumup')->first();
+                if (!$account || !$account->access_token) {
+                    throw new \Exception('Access Token não configurado.');
+                }
+                $response = \Illuminate\Support\Facades\Http::withToken($account->access_token)->get('https://api.sumup.com/v1/me');
+                if (!$response->successful()) {
+                    throw new \Exception('Falha na conexão SumUp: ' . ($response->json()['message'] ?? 'Token inválido.'));
+                }
             } else {
                 $service = new MercadoPagoService();
                 $service->validateCredentials(auth()->id());

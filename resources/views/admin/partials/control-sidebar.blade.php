@@ -30,6 +30,14 @@
         <h5 class="mb-2">Painel rápido</h5>
         <p class="text-muted small mb-3">Ajustes de layout e atalhos para reduzir o tamanho do menu lateral.</p>
 
+        <!-- Atalho de Upload Rápido -->
+        <div class="mb-4">
+            <button type="button" class="btn btn-primary btn-block btn-lg shadow-sm rounded-pill font-weight-bold"
+                onclick="window.openQuickUploadModal()">
+                <i class="fas fa-camera-retro mr-2"></i> Registrar Fotos
+            </button>
+        </div>
+
         <div class="mb-4">
             <div class="custom-control custom-switch mb-2">
                 <input type="checkbox" class="custom-control-input" id="unn_toggle_nav_compact">
