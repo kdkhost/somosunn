@@ -560,6 +560,56 @@
                 });
         });
 
+        // --- SUMUP TEST ---
+        document.getElementById('btn-test-sumup')?.addEventListener('click', function () {
+            const btn = this;
+            const msg = document.getElementById('msg-test-sumup');
+            const token = document.querySelector('input[name="sumup_access_token"]').value;
+            const env = document.querySelector('select[name="sumup_env"]').value;
+
+            if (!token) {
+                toastr.error('Preencha o Access Token antes de testar.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando...';
+            msg.textContent = '';
+
+            fetch('{{ route("admin.settings.test-gateway") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    gateway: 'sumup',
+                    access_token: token,
+                    env: env
+                })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        toastr.success(data.message);
+                        msg.textContent = 'Sucesso: ' + data.message;
+                        msg.className = 'ml-2 text-sm font-weight-bold text-success';
+                    } else {
+                        toastr.error(data.message);
+                        msg.textContent = 'Erro: ' + data.message;
+                        msg.className = 'ml-2 text-sm font-weight-bold text-danger';
+                    }
+                })
+                .catch(err => {
+                    toastr.error('Erro ao testar conexão.');
+                    console.error(err);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-plug mr-1"></i> Testar Conexão SumUp';
+                });
+        });
+
     });
 </script>
 

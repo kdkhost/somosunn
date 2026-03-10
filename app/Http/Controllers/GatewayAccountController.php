@@ -32,6 +32,15 @@ class GatewayAccountController extends Controller
                 'access_token' => $validated['token'],
                 'enabled' => true,
             ];
+        } else if ($provider === 'sumup') {
+            $validated = $request->validate([
+                'sumup_access_token' => 'required|string',
+            ]);
+
+            $data = [
+                'access_token' => $validated['sumup_access_token'],
+                'enabled' => true,
+            ];
         } else {
             // Mercado Pago
             $validated = $request->validate([
@@ -94,17 +103,17 @@ class GatewayAccountController extends Controller
         $codeChallenge = rtrim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '=');
 
         session([
-            'mp_oauth_state'         => $state,
+            'mp_oauth_state' => $state,
             'mp_oauth_code_verifier' => $codeVerifier,
         ]);
 
         $params = http_build_query([
-            'client_id'             => $appId,
-            'response_type'         => 'code',
-            'platform_id'           => 'mp',
-            'state'                 => $state,
-            'redirect_uri'          => $redirectUri,
-            'code_challenge'        => $codeChallenge,
+            'client_id' => $appId,
+            'response_type' => 'code',
+            'platform_id' => 'mp',
+            'state' => $state,
+            'redirect_uri' => $redirectUri,
+            'code_challenge' => $codeChallenge,
             'code_challenge_method' => 'S256',
         ]);
 
@@ -124,16 +133,16 @@ class GatewayAccountController extends Controller
             return redirect()->route('panel.marketplace.payments')->with('error', 'Código de autorização não recebido.');
         }
 
-        $clientId     = config('payments.mercadopago.client_id');
+        $clientId = config('payments.mercadopago.client_id');
         $clientSecret = config('payments.mercadopago.client_secret');
-        $redirectUri  = config('payments.mercadopago.redirect_uri');
+        $redirectUri = config('payments.mercadopago.redirect_uri');
 
         Log::info('OAuth MP callback iniciado', [
-            'user_id'      => Auth::id(),
-            'client_id'    => $clientId,
-            'has_secret'   => !empty($clientSecret),
+            'user_id' => Auth::id(),
+            'client_id' => $clientId,
+            'has_secret' => !empty($clientSecret),
             'redirect_uri' => $redirectUri,
-            'code_length'  => strlen($code),
+            'code_length' => strlen($code),
         ]);
 
         if (empty($clientId) || empty($clientSecret)) {
@@ -151,10 +160,10 @@ class GatewayAccountController extends Controller
         try {
             $payload = [
                 'client_secret' => $clientSecret,
-                'client_id'     => $clientId,
-                'grant_type'    => 'authorization_code',
-                'code'          => $code,
-                'redirect_uri'  => $redirectUri,
+                'client_id' => $clientId,
+                'grant_type' => 'authorization_code',
+                'code' => $code,
+                'redirect_uri' => $redirectUri,
             ];
 
             if (!empty($codeVerifier)) {
@@ -165,7 +174,7 @@ class GatewayAccountController extends Controller
 
             Log::info('OAuth MP resposta', [
                 'status' => $response->status(),
-                'body'   => $response->body(),
+                'body' => $response->body(),
             ]);
 
             if ($response->successful()) {
@@ -189,7 +198,7 @@ class GatewayAccountController extends Controller
 
             Log::error('Erro OAuth Mercado Pago', [
                 'status' => $response->status(),
-                'body'   => $response->body(),
+                'body' => $response->body(),
             ]);
             $mpError = $response->json('error_description') ?? $response->json('message') ?? 'Erro desconhecido';
             return redirect()->route('panel.marketplace.payments')->with('error', 'Erro ao conectar: ' . $mpError);

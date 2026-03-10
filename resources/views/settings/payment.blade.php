@@ -54,6 +54,33 @@
                     <p class="text-xs text-gray-500 mt-1">Token de produção.</p>
                 </div>
 
+                @if($gateway->provider == 'sumup' || true)
+                    <div class="mt-8 pt-6 border-t border-gray-100">
+                        <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                            <i class="fas fa-credit-card text-blue-600"></i> SumUp
+                        </h3>
+                        <p class="text-sm text-gray-600 mb-4">Caso prefira usar a SumUp como seu gateway de recebimento.</p>
+
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                            <div class="flex items-center gap-4">
+                                <input type="radio" name="provider" value="sumup" id="provider_sumup" {{ ($gateway->provider ?? '') == 'sumup' ? 'checked' : '' }}>
+                                <label for="provider_sumup" class="font-bold text-gray-700">Ativar SumUp como meu
+                                    Gateway</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">SumUp Access Token</label>
+                            @php
+                                $sumupAccount = \App\Models\GatewayAccount::where('user_id', auth()->id())->where('provider', 'sumup')->first();
+                            @endphp
+                            <input type="password" name="sumup_access_token" value="{{ $sumupAccount->access_token ?? '' }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Insira seu token da SumUp aqui.</p>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="flex justify-end">
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">Salvar
                         Credenciais</button>
