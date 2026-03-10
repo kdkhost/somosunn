@@ -128,18 +128,63 @@
                                                         total: 0,
                                                         items: [],
                                                         loading: true,
+                                                        csrfToken: document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || '',
+                                                        syncState(data) {
+                                                            this.total = Number(data?.total || 0);
+                                                            this.items = (data?.items || []).filter(item => Number(item.count || 0) > 0);
+                                                        },
                                                         async fetchNotifications() {
                                                             try {
-                                                                const r = await fetch('{{ route('notifications.hub') }}');
+                                                                const r = await fetch('{{ route('notifications.hub') }}', {
+                                                                    headers: {
+                                                                        'Accept': 'application/json'
+                                                                    }
+                                                                });
                                                                 if (!r.ok) return;
                                                                 const data = await r.json();
-                                                                this.total = data.total || 0;
-                                                                this.items = (data.items || []).filter(i => i.count > 0);
+                                                                this.syncState(data);
                                                             } catch(e) {
                                                                 console.error('Notification hub failed:', e);
                                                             } finally {
                                                                 this.loading = false;
                                                             }
+                                                        },
+                                                        recalculateTotal() {
+                                                            this.items = this.items.filter(item => Number(item.count || 0) > 0);
+                                                            this.total = this.items.reduce((sum, item) => sum + Number(item.count || 0), 0);
+                                                        },
+                                                        async acknowledgeAndGo(item) {
+                                                            if (!item?.route) {
+                                                                return;
+                                                            }
+
+                                                            try {
+                                                                const response = await fetch('{{ route('notifications.hub.acknowledge') }}', {
+                                                                    method: 'POST',
+                                                                    headers: {
+                                                                        'Accept': 'application/json',
+                                                                        'Content-Type': 'application/json',
+                                                                        'X-CSRF-TOKEN': this.csrfToken,
+                                                                    },
+                                                                    body: JSON.stringify({
+                                                                        type: item.type,
+                                                                    }),
+                                                                });
+
+                                                                if (response.ok) {
+                                                                    const data = await response.json();
+                                                                    this.syncState(data);
+                                                                } else {
+                                                                    item.count = 0;
+                                                                    this.recalculateTotal();
+                                                                }
+                                                            } catch (e) {
+                                                                console.error('Notification acknowledge failed:', e);
+                                                                item.count = 0;
+                                                                this.recalculateTotal();
+                                                            }
+
+                                                            window.location.href = item.route;
                                                         }
                                                     }"
                         x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
@@ -172,7 +217,7 @@
                                 </template>
 
                                 <template x-for="item in items" :key="item.type">
-                                    <a :href="item.route" @click="total = Math.max(0, total - item.count); item.count = 0"
+                                    <a :href="item.route" @click.prevent="acknowledgeAndGo(item)"
                                         class="flex items-center gap-4 px-4 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border-b border-slate-50 dark:border-slate-800 last:border-0">
                                         <div :class="item.bg + ' ' + item.color"
                                             class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
