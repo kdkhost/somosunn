@@ -21,11 +21,11 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+    <div class="max-w-2xl mt-6">
 
         <!-- MERCADO PAGO -->
         <div
-            class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 transition-colors duration-300 flex flex-col h-full">
+            class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 transition-colors duration-300 flex flex-col">
             <div class="flex items-center gap-4 mb-6">
                 <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center p-2">
                     <img src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.18.9/mercadolibre/logo__small.png"
