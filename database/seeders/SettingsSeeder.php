@@ -20,9 +20,6 @@ class SettingsSeeder extends Seeder
             'payments.mercadopago.fee_percentage' => '4.99',
             'payments.mercadopago.fee_fixed' => '0',
             'payments.mercadopago.pass_fee' => '1',
-            'payments.pagseguro.fee_percentage' => '5.49',
-            'payments.pagseguro.fee_fixed' => '0',
-            'payments.pagseguro.pass_fee' => '1',
         ];
 
         foreach($defaults as $k => $v){

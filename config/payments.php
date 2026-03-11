@@ -40,16 +40,4 @@ return [
          */
         'platform_id' => env('MERCADOPAGO_PLATFORM_ID', ''),
     ],
-
-    'pagseguro' => [
-        /**
-         * E-mail principal da conta PagSeguro.
-         */
-        'email' => env('PAGSEGURO_EMAIL'),
-
-        /**
-         * Token de integração gerado no painel da conta.
-         */
-        'token' => env('PAGSEGURO_TOKEN'),
-    ],
 ];

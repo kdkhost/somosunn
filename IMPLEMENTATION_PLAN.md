@@ -12,7 +12,6 @@ Este documento lista as próximas tarefas para completar a plataforma com os req
 
 3) Pagamentos (Gateways)
    - MercadoPago: SDK instalado e serviço helper criado; webhook handler placeholder implementado — ✅ (sandbox handlers pending testing)
-   - PagSeguro: placeholder service created; webhook handler placeholder implemented — ✅ (needs webhook validation implementation)
    - Implementar orders, payments table (migrations created) and retry logic — ✅ (migrations present)
 
 4) E-mail
@@ -40,7 +39,7 @@ Este documento lista as próximas tarefas para completar a plataforma com os req
    - `php artisan storage:link`
 
 Próximos passos prioritários:
-- Testar integrações MercadoPago / PagSeguro em sandbox e implementar validação de notificações
+- Testar integrações MercadoPago em sandbox e implementar validação de notificações
 - Implementar testes automatizados para fluxos críticos (registro, pagamento, webhook)
 - Adicionar proteção de rota admin (middleware auth + roles)
 

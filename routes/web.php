@@ -290,7 +290,6 @@ Route::post('/upload', [\App\Http\Controllers\UploadController::class, 'upload']
 // Webhooks and payments endpoints (placeholders)
 Route::post('/webhook/mercadopago', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])
     ->defaults('seller_id', 'platform');
-Route::post('/webhook/pagseguro', [\App\Http\Controllers\PaymentWebhookController::class, 'pagSeguro']);
 
 // Installer
 Route::get('/install', [\App\Http\Controllers\InstallController::class, 'index'])->name('install.index');

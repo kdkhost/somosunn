@@ -79,18 +79,8 @@ class OrderRefundService
         return match ((string) $order->gateway) {
             'mercadopago' => app(\App\Services\Payment\MercadoPagoService::class)
                 ->refundPayment($order, $isPartial ? $requestedAmount : null),
-            'pagseguro' => $this->refundOnPagSeguro($order, $isPartial),
             default => throw new RuntimeException('Gateway nao suportado para reembolso automatico.'),
         };
-    }
-
-    private function refundOnPagSeguro(Order $order, bool $isPartial): array
-    {
-        if ($isPartial) {
-            throw new RuntimeException('Estorno parcial esta disponivel apenas para pagamentos via Mercado Pago.');
-        }
-
-        return app(\App\Services\Payment\PagSeguroService::class)->refundPayment($order);
     }
 
     private function resolveProcessedAmount(array $response, float $fallbackAmount): float

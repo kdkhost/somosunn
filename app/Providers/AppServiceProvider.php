@@ -271,12 +271,11 @@ class AppServiceProvider extends ServiceProvider
                 // Silently fail if table doesnt exist yet
             }
 
-            // Carregar configurações de Pagamento (Mercado Pago / PagSeguro)
+            // Carregar configurações de Pagamento (Mercado Pago)
             try {
                 $paymentSettings = DB::table('settings')->whereIn('key', [
                     // Config Env
                     'mercadopago_env',
-                    'pagseguro_env',
                     // Mercado Pago OAuth (App Credentials)
                     'mercadopago_client_id',
                     'mercadopago_client_secret',
@@ -292,11 +291,6 @@ class AppServiceProvider extends ServiceProvider
                     // Rastreamento de qualidade / integrador
                     'mercadopago_integrator_id',
                     'mercadopago_platform_id',
-                    // PagSeguro
-                    'pagseguro_email',
-                    'pagseguro_token',
-                    'pagseguro_sandbox_token',
-                    'pagseguro_prod_token',
                 ])->pluck('value', 'key')->toArray();
 
                 // 1. Mercado Pago App Credentials (OAuth) - Always needed for splits
@@ -332,25 +326,6 @@ class AppServiceProvider extends ServiceProvider
                 }
                 if (!empty($paymentSettings['mercadopago_platform_id'])) {
                     config(['payments.mercadopago.platform_id' => $paymentSettings['mercadopago_platform_id']]);
-                }
-
-                // 4. PagSeguro Platform
-                if (!empty($paymentSettings['pagseguro_email'])) {
-                    config(['payments.pagseguro.email' => $paymentSettings['pagseguro_email']]);
-                }
-
-                $psEnv = $paymentSettings['pagseguro_env'] ?? 'sandbox';
-                if ($psEnv === 'production') {
-                    if (!empty($paymentSettings['pagseguro_prod_token'])) {
-                        config(['payments.pagseguro.token' => $paymentSettings['pagseguro_prod_token']]);
-                    }
-                } else {
-                    if (!empty($paymentSettings['pagseguro_sandbox_token'])) {
-                        config(['payments.pagseguro.token' => $paymentSettings['pagseguro_sandbox_token']]);
-                    } elseif (!empty($paymentSettings['pagseguro_token'])) {
-                        // Fallback legacy
-                        config(['payments.pagseguro.token' => $paymentSettings['pagseguro_token']]);
-                    }
                 }
 
             } catch (\Throwable $e) {

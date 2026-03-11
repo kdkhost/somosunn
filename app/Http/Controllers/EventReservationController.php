@@ -32,7 +32,6 @@ class EventReservationController extends Controller
 
         $isPaid = (float) $event->effective_price > 0;
         $mpEnabled = false;
-        $psEnabled = false;
         $preferredGateway = null;
         if ($isPaid) {
             $seller = $event->user ?: User::find($event->user_id);
@@ -42,22 +41,17 @@ class EventReservationController extends Controller
                     ->with('error', 'Este organizador não está habilitado para vender no marketplace.');
             }
 
-            // Verificar gateways configurados pelo vendedor (tabela gateway_accounts)
             $gateways = \App\Models\GatewayAccount::resolveForSeller($seller ? (int) $seller->id : 0);
             $mpEnabled = $gateways['mpEnabled'];
-            $psEnabled = $gateways['psEnabled'];
-            $preferredGateway = $gateways['preferredGateway'];
+            $preferredGateway = 'mercadopago';
 
-            // Lógica igual ao painel: permite compra se credenciais globais do MercadoPago estão configuradas
-            // Buscar credenciais globais mapeadas pelo AppServiceProvider
-            if (!$mpEnabled && !$psEnabled) {
+            if (!$mpEnabled) {
                 \Illuminate\Support\Facades\Log::warning('EventCheckout: organizador sem gateway configurado', [
                     'event_id' => $event->id,
                     'event_user_id' => $event->user_id,
                     'seller_id' => $seller ? $seller->id : null,
                     'seller_found' => $seller !== null,
                     'mp_enabled' => $mpEnabled,
-                    'ps_enabled' => $psEnabled,
                     'gateway_source' => $gateways['source'] ?? null,
                 ]);
                 return redirect()
@@ -73,7 +67,7 @@ class EventReservationController extends Controller
                 ->first();
         }
 
-        return view('events.checkout', compact('event', 'registration', 'mpEnabled', 'psEnabled', 'preferredGateway'));
+        return view('events.checkout', compact('event', 'registration', 'mpEnabled', 'preferredGateway'));
     }
 
     public function reserve(Request $request, Event $event, CouponService $couponService, \App\Services\Payment\MercadoPagoService $mpService, OrderSettlementService $orderSettlementService)
@@ -100,10 +94,8 @@ class EventReservationController extends Controller
         $sellerId = $seller ? (int) $seller->id : (int) ($event->user_id ?? 0);
         $gateways = [
             'mpEnabled' => false,
-            'psEnabled' => false,
             'preferredGateway' => null,
             'mpPublicKey' => '',
-            'psPublicKey' => '',
         ];
 
         // Determinar gateways disponíveis e gateway selecionado pelo comprador
@@ -111,17 +103,9 @@ class EventReservationController extends Controller
         $gatewayProvider = 'mercadopago';
         if ($isPaid) {
             $gateways = \App\Models\GatewayAccount::resolveForSeller($sellerId);
-            $paymentsConfigured = $gateways['mpEnabled'] || $gateways['psEnabled'];
+            $paymentsConfigured = $gateways['mpEnabled'];
 
-            $defaultGateway = $gateways['preferredGateway'] ?? ($gateways['mpEnabled'] ? 'mercadopago' : 'pagseguro');
-            $requestedGateway = $request->input('gateway_provider', $defaultGateway);
-            if ($requestedGateway === 'pagseguro' && $gateways['psEnabled']) {
-                $gatewayProvider = 'pagseguro';
-            } elseif ($gateways['mpEnabled']) {
-                $gatewayProvider = 'mercadopago';
-            } elseif ($gateways['psEnabled']) {
-                $gatewayProvider = 'pagseguro';
-            }
+            $gatewayProvider = 'mercadopago';
         }
 
         if ($isPaid) {

@@ -12,19 +12,10 @@
         $remaining = $event->remaining_seats;
         $alreadyConfirmed = $registration && in_array($registration->status, \App\Models\EventRegistration::COUNTED_STATUSES, true);
         $mpOptionEnabled = (bool) ($mpEnabled ?? false);
-        $psOptionEnabled = (bool) ($psEnabled ?? false);
         $selectedGateway = old('gateway_provider');
 
         if (!$selectedGateway) {
-            $selectedGateway = ($preferredGateway ?? null) ?: ($mpOptionEnabled ? 'mercadopago' : 'pagseguro');
-        }
-
-        if ($selectedGateway === 'pagseguro' && !$psOptionEnabled) {
-            $selectedGateway = 'mercadopago';
-        }
-
-        if ($selectedGateway !== 'pagseguro' && !$mpOptionEnabled && $psOptionEnabled) {
-            $selectedGateway = 'pagseguro';
+            $selectedGateway = ($preferredGateway ?? null) ?: 'mercadopago';
         }
 
         $fieldLabelClasses = 'mb-2 block text-[11px] font-black uppercase tracking-[0.24em] text-slate-500';
@@ -288,7 +279,7 @@
                         return;
                     }
 
-                    display.innerText = selected.value === 'pagseguro' ? 'PagSeguro' : 'Mercado Pago';
+                    display.innerText = 'Mercado Pago';
                 }
 
                 radios.forEach((radio) => {

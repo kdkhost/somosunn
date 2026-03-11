@@ -29,7 +29,7 @@ return new class extends Migration
         Schema::create('gateway_accounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('provider'); // mercadopago|pagseguro
+            $table->string('provider'); // mercadopago
             $table->string('public_key')->nullable();
             $table->string('access_token')->nullable();
             $table->string('client_id')->nullable();

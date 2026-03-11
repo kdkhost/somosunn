@@ -61,7 +61,7 @@
                 </div>
                 <div class="space-y-2">
                     <p class="font-semibold text-white">Integrações</p>
-                    <p>Teste os webhooks MercadoPago/PagSeguro e monitore os logs em storage/logs/laravel.log.</p>
+                    <p>Teste os webhooks MercadoPago e monitore os logs em storage/logs/laravel.log.</p>
                 </div>
                 <div class="space-y-2">
                     <p class="font-semibold text-white">Portal</p>

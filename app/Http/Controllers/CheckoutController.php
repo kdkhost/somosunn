@@ -36,10 +36,9 @@ class CheckoutController extends Controller
         $effectiveTotal = round((float) ($course->effective_price ?? ($course->price ?? 0)), 2);
         if ($effectiveTotal <= 0) {
             $mpEnabled = false;
-            $psEnabled = false;
             $preferredGateway = null;
 
-            return view('checkout.index', compact('course', 'mpEnabled', 'psEnabled', 'preferredGateway'));
+            return view('checkout.index', compact('course', 'mpEnabled', 'preferredGateway'));
         }
 
         $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
@@ -81,10 +80,8 @@ class CheckoutController extends Controller
         $effectiveTotal = round((float) ($course->effective_price ?? ($course->price ?? 0)), 2);
         $gateways = [
             'mpEnabled' => false,
-            'psEnabled' => false,
             'preferredGateway' => null,
             'mpPublicKey' => '',
-            'psPublicKey' => '',
         ];
         $gatewayProvider = 'free';
 
@@ -333,7 +330,7 @@ class CheckoutController extends Controller
             return response()->json([
                 'error' => $e->getMessage(),
                 'error_code' => $e->errorCode(),
-                'pix_disabled' => $e->errorCode() === 'pagseguro_pix_whitelist_required',
+                'pix_disabled' => false,
             ], $e->httpStatus());
         } catch (\Throwable $e) {
             Log::error('Erro Checkout', [

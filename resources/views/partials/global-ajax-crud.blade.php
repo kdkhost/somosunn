@@ -18,7 +18,6 @@
             /\/checkout(?:\/|$)/i,
             /\/payment/i,
             /mercadopago/i,
-            /pagseguro/i,
             /\/subscription/i,
             /\/export/i,
             /\/download/i,

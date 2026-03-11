@@ -47,4 +47,4 @@ Se o servidor usa LiteSpeed:
 - Laravel suporta isso via Filesystem, mas exige configurar o disco e instalar o driver S3 quando necessário.
 
 ## 8) Webhooks
-Configure webhooks (MercadoPago/PagSeguro) apontando para `/webhook/...` no painel do gateway.
+Configure webhooks (MercadoPago) apontando para `/webhook/...` no painel do gateway.

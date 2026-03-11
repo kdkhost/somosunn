@@ -11,12 +11,12 @@
         $isFreeCheckout = $effectiveTotal <= 0;
 
         if (!$selectedGateway) {
-            $selectedGateway = ($preferredGateway ?? null) ?: (($mpEnabled ?? true) ? 'mercadopago' : 'pagseguro');
+            $selectedGateway = ($preferredGateway ?? null) ?: 'mercadopago';
         }
 
         $selectedGatewaySummary = $isFreeCheckout
             ? 'Liberacao imediata sem pagamento.'
-            : ($selectedGateway === 'pagseguro' ? 'Pagamento via PagSeguro.' : 'Pagamento via Mercado Pago.');
+            : 'Pagamento via Mercado Pago.';
     @endphp
     <div class="min-h-screen bg-slate-50 pt-28 pb-20 px-4">
         <div class="max-w-4xl mx-auto">
@@ -94,27 +94,6 @@
                                                     <div>
                                                         <p class="font-bold text-gray-900">Mercado Pago</p>
                                                         <p class="text-xs text-gray-500">Cartão, Pix, Boleto</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    @endif
-
-                                    @if($psEnabled ?? false)
-                                        <label class="cursor-pointer">
-                                            <input type="radio" name="gateway_provider" value="pagseguro" class="peer sr-only"
-                                                data-gateway-summary="Pagamento via PagSeguro."
-                                                {{ $selectedGateway === 'pagseguro' ? 'checked' : '' }}>
-                                            <div
-                                                class="p-4 rounded-xl border-2 border-gray-200 hover:border-green-500 peer-checked:border-green-600 peer-checked:bg-green-50 transition-all">
-                                                <div class="flex items-center gap-3">
-                                                    <div
-                                                        class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
-                                                        <i class="fas fa-credit-card"></i>
-                                                    </div>
-                                                    <div>
-                                                        <p class="font-bold text-gray-900">PagSeguro</p>
-                                                        <p class="text-xs text-gray-500">Cartão, Pix</p>
                                                     </div>
                                                 </div>
                                             </div>

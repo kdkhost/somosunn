@@ -138,9 +138,8 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 - O menu principal está 100% funcional em smartphones e tablets, com navegação fluida e acessível
 
 ### Webhooks de Pagamento
-Configure as URLs no seu gateway (MercadoPago/PagSeguro):
+Configure as URLs no seu gateway (MercadoPago):
 - `YOUR_DOMAIN/api/v1/webhooks/mercadopago`
-- `YOUR_DOMAIN/api/v1/webhooks/pagseguro`
 
 ### SMTP e Emails
 Configure as credenciais no painel admin em **Configurações > SMTP**. Use a ferramenta de "Teste de Envio" para validar.

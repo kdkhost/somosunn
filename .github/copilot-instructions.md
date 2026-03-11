@@ -33,9 +33,9 @@ php artisan serve
 - **Slugs**: auto-gerados com sufixo `uniqid()` no boot do model.
 
 ## Integrações
-- **Pagamentos**: MercadoPago/PagSeguro via `app/Services/MercadoPagoService.php`, config em `.env`.
+- **Pagamentos**: MercadoPago via `app/Services/MercadoPagoService.php`, config em `.env`.
 - **Model GatewayAccount**: tokens encriptados (`'encrypted'` cast) por vendedor.
-- **Webhooks**: `/webhook/mercadopago`, `/webhook/pagseguro`.
+- **Webhooks**: `/webhook/mercadopago`.
 
 ## Segurança
 - Credenciais em `.env` — nunca commitar.

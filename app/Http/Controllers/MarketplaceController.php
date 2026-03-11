@@ -87,7 +87,7 @@ class MarketplaceController extends Controller
             ->get();
 
         $platformGateways = GatewayAccount::resolveForSeller(0);
-        $platformPaymentsEnabled = (bool) ($platformGateways['mpEnabled'] || $platformGateways['psEnabled']);
+        $platformPaymentsEnabled = (bool) ($platformGateways['mpEnabled']);
         $paymentsConfigured = $platformPaymentsEnabled;
 
         $canSellByUserId = [];
@@ -96,19 +96,19 @@ class MarketplaceController extends Controller
         foreach ($courses->pluck('creator')->filter()->unique('id') as $seller) {
             $canSellByUserId[(int) $seller->id] = (bool) $seller->canSellOnMarketplace();
             $gateways = GatewayAccount::resolveForSeller((int) $seller->id);
-            $paymentsEnabledByUserId[(int) $seller->id] = (bool) ($gateways['mpEnabled'] || $gateways['psEnabled']);
+            $paymentsEnabledByUserId[(int) $seller->id] = (bool) ($gateways['mpEnabled']);
             $paymentsConfigured = $paymentsConfigured || $paymentsEnabledByUserId[(int) $seller->id];
         }
         foreach ($mentorships->pluck('mentor')->filter()->unique('id') as $seller) {
             $canSellByUserId[(int) $seller->id] = (bool) $seller->canSellOnMarketplace();
             $gateways = GatewayAccount::resolveForSeller((int) $seller->id);
-            $paymentsEnabledByUserId[(int) $seller->id] = (bool) ($gateways['mpEnabled'] || $gateways['psEnabled']);
+            $paymentsEnabledByUserId[(int) $seller->id] = (bool) ($gateways['mpEnabled']);
             $paymentsConfigured = $paymentsConfigured || $paymentsEnabledByUserId[(int) $seller->id];
         }
         foreach ($events->pluck('user')->filter()->unique('id') as $seller) {
             $canSellByUserId[(int) $seller->id] = (bool) $seller->canSellOnMarketplace();
             $gateways = GatewayAccount::resolveForSeller((int) $seller->id);
-            $paymentsEnabledByUserId[(int) $seller->id] = (bool) ($gateways['mpEnabled'] || $gateways['psEnabled']);
+            $paymentsEnabledByUserId[(int) $seller->id] = (bool) ($gateways['mpEnabled']);
             $paymentsConfigured = $paymentsConfigured || $paymentsEnabledByUserId[(int) $seller->id];
         }
 

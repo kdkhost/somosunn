@@ -171,7 +171,7 @@ class MarketplacePaymentAvailabilityTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_marketplace_keeps_future_event_buy_action_enabled_with_pagseguro_seller_gateway(): void
+    public function test_marketplace_keeps_future_event_buy_action_enabled_with_seller_gateway(): void
     {
         $seller = User::create([
             'name' => 'Organizador Teste',
@@ -183,14 +183,15 @@ class MarketplacePaymentAvailabilityTest extends TestCase
 
         GatewayAccount::create([
             'user_id' => $seller->id,
-            'provider' => 'pagseguro',
-            'access_token' => 'PAGSEGURO-TOKEN-123',
+            'provider' => 'mercadopago',
+            'public_key' => 'TEST-PUBLIC-KEY-123',
+            'access_token' => 'TEST-ACCESS-TOKEN-123',
             'enabled' => true,
         ]);
 
         $event = Event::create([
             'user_id' => $seller->id,
-            'title' => 'Evento futuro com PagSeguro',
+            'title' => 'Evento futuro com MercadoPago',
             'description' => 'Evento disponível para compra',
             'start_at' => now()->addDays(4)->setTime(13, 0),
             'published' => true,
@@ -200,7 +201,7 @@ class MarketplacePaymentAvailabilityTest extends TestCase
         $response = $this->get(route('marketplace.index'));
 
         $response->assertOk();
-        $response->assertSee('Evento futuro com PagSeguro');
+        $response->assertSee('Evento futuro com MercadoPago');
         $response->assertSee(route('events.checkout', $event), false);
         $response->assertDontSee('Compras pagas indisponíveis no momento');
     }
@@ -240,8 +241,9 @@ class MarketplacePaymentAvailabilityTest extends TestCase
 
         GatewayAccount::create([
             'user_id' => $seller->id,
-            'provider' => 'pagseguro',
-            'access_token' => 'PAGSEGURO-TOKEN-456',
+            'provider' => 'mercadopago',
+            'public_key' => 'TEST-PUBLIC-KEY-456',
+            'access_token' => 'TEST-ACCESS-TOKEN-456',
             'enabled' => true,
         ]);
 

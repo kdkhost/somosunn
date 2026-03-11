@@ -118,17 +118,11 @@
                                 </td>
 
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($order->gateway === 'mercadopago')
+                                    @elseif($order->gateway === 'mercadopago')
                                         <div
                                             class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50 transition-colors">
                                             <i class="fas fa-handshake text-[10px]"></i>
                                             MercadoPago
-                                        </div>
-                                    @elseif($order->gateway === 'pagseguro')
-                                        <div
-                                            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-800/50 transition-colors">
-                                            <i class="fas fa-credit-card text-[10px]"></i>
-                                            PagSeguro
                                         </div>
                                     @else
                                         <div

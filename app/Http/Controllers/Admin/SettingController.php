@@ -291,7 +291,6 @@ class SettingController extends Controller
                 'mercadopago_method_credit_card',
                 'mercadopago_method_pix',
                 'mercadopago_method_ticket',
-                'pagseguro_enabled',
                 'sumup_enabled',
                 'sumup_client_id',
                 'sumup_client_secret',
@@ -621,16 +620,14 @@ class SettingController extends Controller
             'mercadopago_method_pix',
             'mercadopago_method_ticket',
             'mercadopago_method_mercadopago',
-            'pagseguro_enabled',
             'sumup_enabled',
         ];
 
         if ($currentGroup === 'gateway') {
             $mpEnabled = (int) ($data['mercadopago_enabled'] ?? $request->boolean('mercadopago_enabled') ? 1 : 0);
-            $psEnabled = (int) ($data['pagseguro_enabled'] ?? $request->boolean('pagseguro_enabled') ? 1 : 0);
             $suEnabled = (int) ($data['sumup_enabled'] ?? $request->boolean('sumup_enabled') ? 1 : 0);
 
-            if (!$mpEnabled && !$psEnabled && !$suEnabled) {
+            if (!$mpEnabled && !$suEnabled) {
                 if ($request->wantsJson() || $request->ajax()) {
                     return response()->json(['success' => false, 'message' => 'Pelo menos um gateway de pagamento deve estar ativo para manter o fluxo do sistema.']);
                 }
@@ -1091,7 +1088,7 @@ class SettingController extends Controller
     {
         try {
             $data = $request->validate([
-                'gateway' => 'required|in:mercadopago,pagseguro,sumup',
+                'gateway' => 'required|in:mercadopago,sumup',
                 'env' => 'required|in:sandbox,production',
                 'access_token' => 'nullable|string',
                 'token' => 'nullable|string',
@@ -1120,32 +1117,6 @@ class SettingController extends Controller
                     throw new \Exception("Falha na conexão MP: {$error}");
                 }
 
-            } elseif ($data['gateway'] === 'pagseguro') {
-                $token = $data['token'];
-                $email = $data['email'];
-
-                if (!$token) {
-                    throw new \Exception('Token não informado.');
-                }
-
-                // URL base depende do ambiente
-                $baseUrl = $data['env'] === 'sandbox'
-                    ? 'https://ws.sandbox.pagseguro.uol.com.br'
-                    : 'https://ws.pagseguro.uol.com.br';
-
-                // Teste PagSeguro V2 Session
-                $response = Http::asForm()->post("{$baseUrl}/v2/sessions?email={$email}&token={$token}");
-
-                if ($response->successful()) {
-                    $success = true;
-                    $message = "Conexão com PagSeguro [{$data['env']}] realizada com sucesso!";
-                } else {
-                    $body = $response->body();
-                    if (str_contains($body, 'Unauthorized') || $response->status() == 401) {
-                        throw new \Exception("Falha na autenticação PagSeguro. Verifique E-mail e Token.");
-                    }
-                    throw new \Exception("Falha na conexão PagSeguro. Status: " . $response->status());
-                }
             } elseif ($data['gateway'] === 'sumup') {
                 $token = $data['access_token'];
                 if (!$token) {
