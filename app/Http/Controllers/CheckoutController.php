@@ -10,7 +10,7 @@ use App\Models\User;
 use App\Services\CouponService;
 use App\Services\OrderSettlementService;
 use App\Services\Payment\MercadoPagoService;
-use App\Services\SumUpService;
+use App\Services\Payment\SumUpService;
 use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -240,15 +240,17 @@ class CheckoutController extends Controller
                     return back()->with('error', 'Falha ao criar checkout na SumUp. Tente outro metodo.');
                 }
 
+                $checkoutUrl = $checkout['checkout_url'] ?? "https://pay.sumup.com/b2c/pay?checkout_id={$checkout['id']}";
+
                 $order->update([
                     'transaction_id' => $checkout['id'],
-                    'metadata' => array_merge($order->metadata ?? [], [
-                        'sumup_checkout_id' => $checkout['id'],
-                        'sumup_checkout_url' => "https://checkout.sumup.com/checkouts/{$checkout['id']}",
+                    'metadata'       => array_merge($order->metadata ?? [], [
+                        'sumup_checkout_id'  => $checkout['id'],
+                        'sumup_checkout_url' => $checkoutUrl,
                     ]),
                 ]);
 
-                return redirect("https://checkout.sumup.com/checkouts/{$checkout['id']}");
+                return redirect($checkoutUrl);
             }
 
             if ($gatewayProvider === 'pagseguro') {

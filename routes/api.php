@@ -59,4 +59,6 @@ Route::prefix('v1/webhooks')->withoutMiddleware([\Illuminate\Routing\Middleware\
         ->name('api.webhooks.mercadopago');
     Route::match(['get', 'post'], '/pagseguro', [App\Http\Controllers\PaymentWebhookController::class, 'pagSeguro'])
         ->name('api.webhooks.pagseguro');
+    Route::post('/sumup', [App\Http\Controllers\PaymentWebhookController::class, 'sumup'])
+        ->name('api.webhooks.sumup');
 });

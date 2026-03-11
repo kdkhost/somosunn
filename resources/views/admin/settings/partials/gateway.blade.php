@@ -169,12 +169,16 @@
                 <label class="custom-control-label" for="sumup_enabled"></label>
             </div>
 
-            <h3 class="card-title font-weight-bold text-primary"><i class="fas fa-credit-card mr-2"></i> SumUp</h3>
+            <h3 class="card-title font-weight-bold text-primary">
+                <i class="fas fa-credit-card mr-2"></i> SumUp
+            </h3>
 
             <div class="ml-auto mr-3">
                 @php
                     $hasSumUp = !empty($settings['sumup_access_token']);
                 @endphp
+
+                <span class="badge badge-success"><i class="fas fa-rocket mr-1"></i> Produção</span>
 
                 @if($hasSumUp)
                     <span class="badge badge-primary"><i class="fas fa-check mr-1"></i> Configurado</span>
@@ -189,29 +193,51 @@
             </div>
         </div>
         <div class="card-body" style="display: none;">
+            <div class="alert alert-info py-2 mb-3">
+                <i class="fas fa-info-circle mr-1"></i>
+                A SumUp suporta pagamentos com <strong>cartão de crédito e débito</strong>.
+                O cliente é redirecionado para a página segura de checkout da SumUp.
+                <a href="https://me.sumup.com/br-pt/developers" target="_blank" rel="noopener">
+                    Obtenha sua chave de API aqui &rarr;
+                </a>
+            </div>
             <div class="row">
-                <div class="col-md-6 form-group">
-                    <label>Ambiente</label>
-                    <select name="sumup_env" class="form-control">
-                        <option value="production" {{ ($settings['sumup_env'] ?? 'production') == 'production' ? 'selected' : '' }}>Produção</option>
-                        <option value="sandbox" {{ ($settings['sumup_env'] ?? 'production') == 'sandbox' ? 'selected' : '' }}>Sandbox</option>
-                    </select>
-                </div>
-                <div class="col-md-6 form-group">
-                    <label>Access Token (Affiliate/Merchant)</label>
-                    <input type="text" name="sumup_access_token" class="form-control"
-                        value="{{ $settings['sumup_access_token'] ?? '' }}" placeholder="sup_at_...">
-                    <small class="text-muted">Obtenha em: <a href="https://me.sumup.com/br-pt/developers"
-                            target="_blank">Desenvolvedores SumUp</a></small>
+                <div class="col-md-12 form-group">
+                    <label for="sumup_access_token">API Private Key <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="password" name="sumup_access_token" id="sumup_access_token" class="form-control"
+                            value="{{ $settings['sumup_access_token'] ?? '' }}"
+                            placeholder="sup_pk_...">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button"
+                                onclick="this.previousElementSibling.type = this.previousElementSibling.type === 'password' ? 'text' : 'password'; this.innerHTML = this.previousElementSibling.type === 'password' ? '<i class=\'fas fa-eye\'></i>' : '<i class=\'fas fa-eye-slash\'></i>'">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <small class="text-muted">Formato: <code>sup_pk_xxxxxxxxxxxxxxxxx</code> — encontre em <a href="https://me.sumup.com/br-pt/developers" target="_blank">me.sumup.com → Chaves de API</a></small>
                 </div>
             </div>
 
             <!-- Botão de Teste SumUp -->
-            <div class="mt-3">
-                <button type="button" class="btn btn-outline-primary" id="btn-test-sumup">
+            <div class="mt-3 d-flex align-items-center">
+                <button type="button" class="btn btn-outline-primary mr-3" id="btn-test-sumup">
                     <i class="fas fa-plug mr-1"></i> Testar Conexão SumUp
                 </button>
-                <span id="msg-test-sumup" class="ml-2 text-sm font-weight-bold"></span>
+                <span id="msg-test-sumup" class="text-sm font-weight-bold"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <label>Webhook URL <span class="text-muted">(configure no painel SumUp → Desenvolvedor)</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control bg-white" readonly value="{{ route('api.webhooks.sumup') }}">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button"
+                            onclick="navigator.clipboard.writeText(this.parentElement.previousElementSibling.value); toastr.success('Copiado!')">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

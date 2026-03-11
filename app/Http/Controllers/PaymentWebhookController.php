@@ -179,6 +179,81 @@ class PaymentWebhookController extends Controller
         }
     }
 
+    public function sumup(Request $request)
+    {
+        Log::info('SumUp webhook received', $request->all());
+
+        try {
+            // SumUp envia eventos como: checkout.success, checkout.failed, payment.received
+            $eventType = $request->input('event_type') ?? $request->input('type') ?? '';
+
+            // Também suportamos o formato simplificado com checkout_id direto no payload
+            $checkoutId = $request->input('id')
+                ?? $request->input('checkout_id')
+                ?? data_get($request->all(), 'payload.id');
+
+            // checkout_reference é o nosso order_id
+            $checkoutRef = $request->input('checkout_reference')
+                ?? data_get($request->all(), 'payload.checkout_reference')
+                ?? data_get($request->all(), 'payload.merchant_reference');
+
+            // Status pode vir em diferentes formatos da SumUp
+            $status = strtoupper(
+                $request->input('status')
+                ?? data_get($request->all(), 'payload.status')
+                ?? ''
+            );
+
+            // Se não vier checkout_reference, tentamos buscar via checkoutId na API
+            if (empty($checkoutRef) && !empty($checkoutId)) {
+                try {
+                    $suService = app(\App\Services\Payment\SumUpService::class);
+                    $checkout  = $suService->getCheckout($checkoutId);
+                    $checkoutRef = $checkout['merchant_reference'] ?? $checkout['checkout_reference'] ?? null;
+                    if (empty($status)) {
+                        $status = strtoupper($checkout['status'] ?? '');
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('SumUp webhook: falha ao buscar checkout via API', [
+                        'checkout_id' => $checkoutId,
+                        'error'       => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            // Extrair apenas a parte numérica do reference (pode vir como 'order-123')
+            if (!empty($checkoutRef)) {
+                $orderId = preg_replace('/\D/', '', (string) $checkoutRef);
+            } else {
+                Log::warning('SumUp webhook: checkout_reference não encontrado', $request->all());
+                return response('OK', 200);
+            }
+
+            // Só processar pagamentos confirmados
+            if (!in_array($status, ['PAID', 'SUCCESSFUL', 'COMPLETED'], true)) {
+                Log::info("SumUp webhook: status '{$status}' não requer ação para order #{$orderId}");
+                return response('OK', 200);
+            }
+
+            $order = Order::find($orderId);
+            if (!$order) {
+                Log::warning("SumUp webhook: pedido #{$orderId} não encontrado");
+                return response('OK', 200);
+            }
+
+            $transactionId = $checkoutId ?? $order->transaction_id ?? 'SUMUP-' . $orderId;
+            $this->processPaidOrder($order, $transactionId, $request->all());
+
+        } catch (\Throwable $e) {
+            Log::error('SumUp Webhook Error: ' . $e->getMessage(), [
+                'payload' => $request->all(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
+        }
+
+        return response('OK', 200);
+    }
+
     public function pagSeguro(Request $request)
     {
         Log::info('PagSeguro webhook', $request->all());
