@@ -283,6 +283,7 @@
         function showPreview(file, url, path) {
             progressContainer.classList.add('d-none');
             previewContainer.classList.remove('d-none');
+            input.value = '';
             pathInput.value = path;
             if (removeInput) removeInput.value = '0';
             filenameText.textContent = file.name;

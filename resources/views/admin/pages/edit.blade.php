@@ -164,7 +164,8 @@
         <strong>Alterações não salvas.</strong> Clique em "Salvar alterações" para publicar.
     </div>
 
-    <form id="page-form" method="POST" action="{{ route('admin.pages.update', $page) }}" enctype="multipart/form-data">
+    <form id="page-form" method="POST" action="{{ route('admin.pages.update', $page) }}" enctype="multipart/form-data"
+        data-upload-progress="false">
         @csrf
         @method('PUT')
 
@@ -270,42 +271,20 @@
                             </div>
                             <div class="form-group mb-0 mt-3">
                                 <label class="mb-3 d-block font-weight-bold">Imagem de Compartilhamento (SEO)</label>
-
-                                <div class="upload-box premium-upload-box" data-remove-input="#remove_seo_image"
-                                    data-preview-image-id="prev-seo_image">
-                                    <input type="file" name="seo_image" class="d-none" id="seo_image" accept="image/*">
-                                    <input type="hidden" name="remove_seo_image" id="remove_seo_image" value="0">
-
-                                    <div class="upload-preview mb-3 drop-zone-area text-center"
-                                        onclick="document.getElementById('seo_image').click()">
-                                        @if($data['seo_image'] ?? null)
-                                            <img src="{{ asset('storage/' . $data['seo_image']) }}" id="prev-seo_image"
-                                                class="img-fluid rounded shadow-sm border"
-                                                style="max-height:150px; width: 100%; object-fit:cover;">
-                                        @else
-                                            <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
-                                                style="min-height: 120px;">
-                                                <i class="fas fa-search-plus fa-2x mb-2 text-primary opacity-50"></i>
-                                                <span class="small font-weight-bold">Preview SEO</span>
-                                                <span class="x-small opacity-75">Click ou arraste 1200x630px</span>
-                                            </div>
-                                            <img id="prev-seo_image" class="img-fluid rounded shadow-sm border d-none"
-                                                style="max-height:150px; width: 100%; object-fit:cover;">
-                                        @endif
-                                    </div>
-
-                                    <div class="upload-actions d-flex justify-content-center gap-2">
-                                        <button type="button" class="btn btn-xs btn-primary upload-btn rounded-pill px-3"
-                                            onclick="document.getElementById('seo_image').click()">
-                                            <i class="fas fa-upload mr-1"></i> Selecionar
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-xs btn-danger upload-remove rounded-pill px-2 {{ ($data['seo_image'] ?? null) ? '' : 'd-none' }}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <small class="text-muted d-block mt-2" style="font-size: 11px;">Formatos: JPG, PNG, WEBP.
+                                @include('admin.components.upload-global', [
+                                    'name' => 'seo_image',
+                                    'path' => $data['seo_image'] ?? null,
+                                    'preview_url' => !empty($data['seo_image']) ? asset('storage/' . $data['seo_image']) : null,
+                                    'remove_name' => 'remove_seo_image',
+                                    'accept' => 'image/*',
+                                    'max_size' => 6291456,
+                                    'label' => null,
+                                    'help' => 'PNG, JPG, WebP, GIF ou SVG - maximo de 6 MB. Recomendado: 1200x630px.',
+                                ])
+                                @error('seo_image')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted d-block mt-2" style="font-size: 11px;">Formatos: JPG, PNG, WEBP, GIF ou SVG.
                                     Recomendado para Redes Sociais.</small>
                             </div>
                         </div>
