@@ -5,14 +5,19 @@
     $label = $label ?? 'Upload de arquivo, imagem, vídeo ou áudio';
     $help = $help ?? 'O envio começa automaticamente ao selecionar o arquivo.';
     $existing = $value ?? null;
+    $existingPath = $path ?? $existing;
+    $previewUrl = $preview_url ?? $existing;
+    $removeName = $remove_name ?? null;
+    $maxSizeBytes = (int) ($max_size ?? 0);
 @endphp
 
-<div class="upload-global-wrapper" id="{{ $instance }}" data-upload-global-instance="{{ $instance }}">
+<div class="upload-global-wrapper" id="{{ $instance }}" data-upload-global-instance="{{ $instance }}"
+    data-upload-max-size="{{ $maxSizeBytes }}">
     @if($label)
         <label class="font-weight-bold mb-2 d-block">{{ $label }}</label>
     @endif
 
-    <div class="upload-drop-area @if($existing) d-none @endif" data-upload-drop-area>
+    <div class="upload-drop-area @if($previewUrl) d-none @endif" data-upload-drop-area>
         <div class="upload-icon mb-2">
             <i class="fas fa-cloud-upload-alt fa-2x text-primary"></i>
         </div>
@@ -45,26 +50,26 @@
     </div>
 
     {{-- Preview --}}
-    <div class="upload-preview-container @if(!$existing) d-none @endif mt-3" data-upload-preview-container>
+    <div class="upload-preview-container @if(!$previewUrl) d-none @endif mt-3" data-upload-preview-container>
         <div class="upload-preview-card p-2 rounded border bg-white shadow-sm position-relative">
             <div class="upload-preview-content mb-2 text-center" data-upload-preview-content>
-                @if($existing)
+                @if($previewUrl)
                     @php
-                        $ext = strtolower(pathinfo($existing, PATHINFO_EXTENSION));
+                        $ext = strtolower(pathinfo($existingPath ?: $previewUrl, PATHINFO_EXTENSION));
                         $isImg = in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg']);
                         $isVid = in_array($ext, ['mp4', 'webm', 'ogg']);
                         $isAud = in_array($ext, ['mp3', 'wav', 'ogg']);
                     @endphp
                     @if($isImg)
-                        <img src="{{ $existing }}" class="img-fluid rounded" style="max-height: 200px;">
+                        <img src="{{ $previewUrl }}" class="img-fluid rounded" style="max-height: 200px;">
                     @elseif($isVid)
-                        <video src="{{ $existing }}" controls class="w-100 rounded" style="max-height: 200px;"></video>
+                        <video src="{{ $previewUrl }}" controls class="w-100 rounded" style="max-height: 200px;"></video>
                     @elseif($isAud)
-                        <audio src="{{ $existing }}" controls class="w-100"></audio>
+                        <audio src="{{ $previewUrl }}" controls class="w-100"></audio>
                     @else
                         <div class="p-4 bg-light rounded text-muted">
                             <i class="fas fa-file-alt fa-3x mb-2"></i>
-                            <div class="small text-truncate">{{ basename($existing) }}</div>
+                            <div class="small text-truncate">{{ basename($existingPath ?: $previewUrl) }}</div>
                         </div>
                     @endif
                 @endif
@@ -72,7 +77,7 @@
 
             <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded">
                 <div class="text-truncate small pr-3" data-upload-filename>
-                    {{ $existing ? basename($existing) : 'Arquivo enviado' }}
+                    {{ $existingPath ? basename($existingPath) : 'Arquivo enviado' }}
                 </div>
                 <button type="button" class="btn btn-xs btn-danger" data-upload-clear title="Remover">
                     <i class="fas fa-trash-alt mr-1"></i> Remover
@@ -82,7 +87,10 @@
     </div>
 
     {{-- Hidden Input para o formulário --}}
-    <input type="hidden" name="{{ $name }}" value="{{ $existing }}" data-upload-path-input>
+    <input type="hidden" name="{{ $name }}" value="{{ $existingPath }}" data-upload-path-input>
+    @if($removeName)
+        <input type="hidden" name="{{ $removeName }}" value="0" data-upload-remove-input>
+    @endif
 </div>
 
 <script>
@@ -105,10 +113,12 @@
         const previewContent = root.querySelector('[data-upload-preview-content]');
         const filenameText = root.querySelector('[data-upload-filename]');
         const pathInput = root.querySelector('[data-upload-path-input]');
+        const removeInput = root.querySelector('[data-upload-remove-input]');
         const clearBtn = root.querySelector('[data-upload-clear]');
 
         let startTime, uploadedBytes = 0;
         const CHUNK_SIZE = 2 * 1024 * 1024; // 2MB por chunk
+        const maxSizeBytes = parseInt(root.dataset.uploadMaxSize || '0', 10);
 
         function formatBytes(bytes) {
             if (bytes === 0) return '0 B';
@@ -119,6 +129,15 @@
         }
 
         async function uploadFile(file) {
+            if (maxSizeBytes > 0 && file.size > maxSizeBytes) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Arquivo muito grande',
+                    text: 'A imagem nao pode ultrapassar ' + formatBytes(maxSizeBytes) + '.'
+                });
+                return;
+            }
+
             dropArea.classList.add('d-none');
             progressContainer.classList.remove('d-none');
             previewContainer.classList.add('d-none');
@@ -193,6 +212,7 @@
             progressContainer.classList.add('d-none');
             previewContainer.classList.remove('d-none');
             pathInput.value = path;
+            if (removeInput) removeInput.value = '0';
             filenameText.textContent = file.name;
 
             const type = file.type;
@@ -211,6 +231,7 @@
         function resetUploader() {
             input.value = '';
             pathInput.value = '';
+            if (removeInput) removeInput.value = '1';
             dropArea.classList.remove('d-none');
             progressContainer.classList.add('d-none');
             previewContainer.classList.add('d-none');

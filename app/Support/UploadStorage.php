@@ -237,6 +237,34 @@ class UploadStorage
         return false;
     }
 
+    public static function size(?string $path): ?int
+    {
+        $normalized = self::normalizePath($path);
+        if ($normalized === null) {
+            return null;
+        }
+
+        try {
+            $size = self::disk()->size($normalized);
+            if (is_numeric($size) && (int) $size >= 0) {
+                return (int) $size;
+            }
+        } catch (\Throwable $e) {
+            // noop
+        }
+
+        foreach (self::publicCandidates($normalized) as $candidate) {
+            if (is_file($candidate)) {
+                $size = @filesize($candidate);
+                if (is_int($size) && $size >= 0) {
+                    return $size;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public static function delete(?string $path): bool
     {
         $normalized = self::normalizePath($path);
@@ -396,9 +424,18 @@ class UploadStorage
 
     private static function publicCandidates(string $normalized): array
     {
+        $configuredRoot = trim((string) config(
+            'filesystems.disks.public.root',
+            is_dir(public_path('storage')) ? public_path('storage') : storage_path('app/public')
+        ));
+
         $candidates = [
             public_path($normalized),
         ];
+
+        if ($configuredRoot !== '') {
+            $candidates[] = rtrim($configuredRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $normalized);
+        }
 
         if (!str_starts_with($normalized, 'uploads/')) {
             $candidates[] = public_path('uploads/' . $normalized);

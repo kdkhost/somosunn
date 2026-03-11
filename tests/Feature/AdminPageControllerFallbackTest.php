@@ -186,9 +186,9 @@ class AdminPageControllerFallbackTest extends TestCase
         $this->assertStringContainsString('name="remove_hero_image"', $html);
         $this->assertStringContainsString('name="content_title"', $html);
         $this->assertStringContainsString('name="content_body"', $html);
-        $this->assertStringContainsString('upload-box premium-upload-box', $html);
-        $this->assertStringContainsString('drop-zone-area', $html);
-        $this->assertStringNotContainsString('custom-file-input', $html);
+        $this->assertStringContainsString('data-upload-global-instance', $html);
+        $this->assertStringContainsString('data-upload-path-input', $html);
+        $this->assertStringContainsString('data-upload-remove-input', $html);
     }
 
     public function test_update_persists_premium_scalar_fields(): void
@@ -291,6 +291,61 @@ class AdminPageControllerFallbackTest extends TestCase
         $this->assertNotEmpty($page->data['networking_image'] ?? null);
         $this->assertFileExists($fakeDiskRoot . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $page->data['hero_image']));
         $this->assertFileExists($fakeDiskRoot . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $page->data['networking_image']));
+        $this->assertSame(302, $response->getStatusCode());
+    }
+
+    public function test_update_accepts_chunked_uploaded_image_paths_for_pages(): void
+    {
+        Schema::create('pages', function (Blueprint $table) {
+            $table->id();
+            $table->string('slug', 120)->unique();
+            $table->string('title', 255)->nullable();
+            $table->json('data')->nullable();
+            $table->timestamps();
+        });
+
+        $fakeDiskRoot = storage_path('framework/testing/admin-pages-chunked-' . uniqid());
+        if (!is_dir($fakeDiskRoot)) {
+            mkdir($fakeDiskRoot, 0777, true);
+        }
+        config()->set('filesystems.disks.public.root', $fakeDiskRoot);
+
+        $page = Page::query()->create([
+            'slug' => 'somos-unicas-sobre',
+            'title' => 'Somos Unicas Sobre',
+            'data' => [
+                'hero_image' => 'pages/somos-unicas-sobre/old-hero.jpg',
+            ],
+        ]);
+
+        $networkingPath = $fakeDiskRoot . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'networking-final.png';
+        $heroPath = $fakeDiskRoot . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'hero-final.png';
+        if (!is_dir(dirname($networkingPath))) {
+            mkdir(dirname($networkingPath), 0777, true);
+        }
+
+        file_put_contents($networkingPath, str_repeat('n', 1024));
+        file_put_contents($heroPath, str_repeat('h', 2048));
+
+        $request = Request::create('/admin/pages/' . $page->id, 'PUT', [
+            'title' => 'Somos Unicas Sobre',
+            'theme_color' => '#6d28d9',
+            'hero_title' => 'Sobre a Somos Unicas',
+            'hero_subtitle' => 'Uma introducao institucional.',
+            'content_title' => 'Nossa jornada',
+            'content_body' => '<p>Conteudo completo.</p>',
+            'hero_image' => 'uploads/hero-final.png',
+            'networking_image' => 'uploads/networking-final.png',
+        ]);
+
+        $request->setLaravelSession(app('session.store'));
+
+        $response = app(PageController::class)->update($request, $page);
+
+        $page->refresh();
+
+        $this->assertSame('uploads/hero-final.png', $page->data['hero_image'] ?? null);
+        $this->assertSame('uploads/networking-final.png', $page->data['networking_image'] ?? null);
         $this->assertSame(302, $response->getStatusCode());
     }
 }

@@ -9,11 +9,16 @@ use App\Support\UploadStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Throwable;
 
 class PageController extends Controller
 {
+    private const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'];
+    private const MAX_IMAGE_BYTES = 6144 * 1024;
+
     /**
      * Campos escalares editáveis por slug.
      * Campos de array JSON são tratados separadamente via SLUG_JSON_FIELDS.
@@ -345,7 +350,7 @@ class PageController extends Controller
         ];
 
         foreach ($imageFields as $field) {
-            $rules[$field] = ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif,svg', 'max:6144'];
+            $rules[$field] = ['nullable'];
             $rules['remove_' . $field] = ['nullable', 'boolean'];
         }
 
@@ -366,6 +371,7 @@ class PageController extends Controller
         foreach ($imageFields as $field) {
             $removeKey = 'remove_' . $field;
             $currentPath = $newData[$field] ?? null;
+            $uploadedPath = $this->resolveChunkedImagePath($request, $field);
 
             try {
                 if ($request->boolean($removeKey)) {
@@ -378,12 +384,27 @@ class PageController extends Controller
                 }
 
                 if ($request->hasFile($field)) {
+                    $this->validateUploadedImageFile($request, $field);
+
                     if ($currentPath) {
                         UploadStorage::delete($currentPath);
                     }
 
                     $newData[$field] = UploadStorage::storeUploadedFile($request->file($field), 'pages/' . $slug);
+                    continue;
                 }
+
+                if ($uploadedPath !== null) {
+                    $this->validateStoredImagePath($field, $uploadedPath);
+
+                    if ($currentPath && UploadStorage::normalizePath($currentPath) !== $uploadedPath) {
+                        UploadStorage::delete($currentPath);
+                    }
+
+                    $newData[$field] = $uploadedPath;
+                }
+            } catch (ValidationException $exception) {
+                throw $exception;
             } catch (Throwable $exception) {
                 Log::error('Falha ao salvar imagem da pagina CMS.', [
                     'page_id' => $page->id,
@@ -426,6 +447,58 @@ class PageController extends Controller
         return redirect()
             ->route('admin.pages.index')
             ->with('success', 'Página "' . $slug . '" salva com sucesso.');
+    }
+
+    private function validateUploadedImageFile(Request $request, string $field): void
+    {
+        Validator::make(
+            [$field => $request->file($field)],
+            [$field => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif,svg', 'max:6144']],
+            [
+                "{$field}.image" => 'O arquivo deve ser uma imagem.',
+                "{$field}.mimes" => 'Formato de imagem nao permitido.',
+                "{$field}.max" => 'A imagem nao pode ultrapassar 6 MB.',
+            ]
+        )->validate();
+    }
+
+    private function resolveChunkedImagePath(Request $request, string $field): ?string
+    {
+        if ($request->hasFile($field)) {
+            return null;
+        }
+
+        $value = $request->input($field);
+        if (!is_string($value) || trim($value) === '') {
+            return null;
+        }
+
+        return UploadStorage::normalizePath($value);
+    }
+
+    private function validateStoredImagePath(string $field, string $path): void
+    {
+        $normalizedPath = UploadStorage::normalizePath($path);
+        $extension = strtolower(pathinfo((string) $normalizedPath, PATHINFO_EXTENSION));
+
+        if ($normalizedPath === null || !in_array($extension, self::ALLOWED_IMAGE_EXTENSIONS, true)) {
+            throw ValidationException::withMessages([
+                $field => 'Formato de imagem nao permitido.',
+            ]);
+        }
+
+        if (!UploadStorage::exists($normalizedPath)) {
+            throw ValidationException::withMessages([
+                $field => 'A imagem enviada nao foi encontrada no servidor.',
+            ]);
+        }
+
+        $size = UploadStorage::size($normalizedPath);
+        if ($size !== null && $size > self::MAX_IMAGE_BYTES) {
+            throw ValidationException::withMessages([
+                $field => 'A imagem nao pode ultrapassar 6 MB.',
+            ]);
+        }
     }
 
     public function toggleSection(Request $request, Page $page)

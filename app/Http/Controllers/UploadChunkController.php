@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\UploadStorage;
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
-use App\Support\UploadStorage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class UploadChunkController extends Controller
 {
+    private const ALLOWED_IMAGE_FORMATS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'];
+    private const ALLOWED_AUDIO_FORMATS = ['mp3', 'wav', 'ogg', 'm4a', 'aac', 'flac'];
+
     public function storeChunk(Request $request)
     {
         $request->validate([
             'file' => 'required|file',
             'upload_id' => 'required|string',
             'chunk_index' => 'required|integer',
-            'total_chunks' => 'sometimes|integer'
+            'total_chunks' => 'sometimes|integer',
         ]);
 
         $uploadId = $request->input('upload_id');
@@ -35,15 +38,20 @@ class UploadChunkController extends Controller
         $request->validate([
             'upload_id' => 'required|string',
             'filename' => 'required|string',
-            'total_chunks' => 'required|integer'
+            'total_chunks' => 'required|integer',
         ]);
 
         $uploadId = $request->input('upload_id');
-        $total = $request->input('total_chunks');
-        $filename = Str::slug(pathinfo($request->input('filename'), PATHINFO_FILENAME)) . '-' . time() . '.' . pathinfo($request->input('filename'), PATHINFO_EXTENSION);
+        $total = (int) $request->input('total_chunks');
+        $originalName = (string) $request->input('filename');
+        $filename = Str::slug(pathinfo($originalName, PATHINFO_FILENAME))
+            . '-' . time()
+            . '.' . pathinfo($originalName, PATHINFO_EXTENSION);
 
         $dir = storage_path("app/uploads/tmp/{$uploadId}");
-        if(!is_dir($dir)) return response()->json(['error' => 'Upload não encontrado'], 404);
+        if (!is_dir($dir)) {
+            return response()->json(['error' => 'Upload nao encontrado'], 404);
+        }
 
         $targetDisk = (string) config('uploads.disk', 'public');
         if ($targetDisk === '') {
@@ -61,16 +69,18 @@ class UploadChunkController extends Controller
 
         $out = fopen($outPath, 'wb');
         if (!$out) {
-            return response()->json(['error' => 'Falha ao criar arquivo de saída'], 500);
+            return response()->json(['error' => 'Falha ao criar arquivo de saida'], 500);
         }
 
-        for($i=0;$i<$total;$i++){
+        for ($i = 0; $i < $total; $i++) {
             $chunkFile = $dir . "/chunk_{$i}";
-            if(!file_exists($chunkFile)){
+            if (!file_exists($chunkFile)) {
                 fclose($out);
                 @unlink($outPath);
+
                 return response()->json(['error' => "Chunk {$i} faltando"], 422);
             }
+
             $in = fopen($chunkFile, 'rb');
             stream_copy_to_stream($in, $out);
             fclose($in);
@@ -78,33 +88,38 @@ class UploadChunkController extends Controller
 
         fclose($out);
 
-        // Clean up chunks
         array_map('unlink', glob("{$dir}/*"));
         rmdir($dir);
 
-        // Valida extensão + tamanho (de acordo com config/uploads.php)
         $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-        $allowedV = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_video_formats', [])));
-        $allowedD = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_document_formats', [])));
+        $allowedVideoFormats = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_video_formats', [])));
+        $allowedDocumentFormats = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_document_formats', [])));
 
-        $isVideo = in_array($ext, $allowedV, true);
-        $isDoc = in_array($ext, $allowedD, true);
+        $isImage = in_array($ext, self::ALLOWED_IMAGE_FORMATS, true);
+        $isVideo = in_array($ext, $allowedVideoFormats, true);
+        $isDocument = in_array($ext, $allowedDocumentFormats, true);
+        $isAudio = in_array($ext, self::ALLOWED_AUDIO_FORMATS, true);
 
-        if (!$isVideo && !$isDoc) {
+        if (!$isImage && !$isVideo && !$isDocument && !$isAudio) {
             $publicDisk->delete($outRelativePath);
-            return response()->json(['error' => 'Formato de arquivo não permitido'], 422);
+
+            return response()->json(['error' => 'Formato de arquivo nao permitido'], 422);
         }
 
-        $maxMb = (int) ($isVideo ? config('uploads.video_max_mb', 1024) : config('uploads.document_max_mb', 50));
+        $maxMb = (int) match (true) {
+            $isImage => 6,
+            $isVideo => config('uploads.video_max_mb', 1024),
+            default => config('uploads.document_max_mb', 50),
+        };
         $maxBytes = max(1, $maxMb) * 1024 * 1024;
         $size = (int) (@filesize($outPath) ?: 0);
 
         if ($size > $maxBytes) {
             $publicDisk->delete($outRelativePath);
+
             return response()->json(['error' => 'Arquivo excede o limite de tamanho'], 422);
         }
 
-        // Upload para o disco final (public/local ou S3)
         $finalDisk = $targetDisk;
         $finalPath = $outRelativePath;
 
@@ -118,6 +133,7 @@ class UploadChunkController extends Controller
         }
 
         $url = UploadStorage::url($finalPath);
+
         return response()->json(['ok' => true, 'url' => $url, 'path' => $finalPath]);
     }
 }
