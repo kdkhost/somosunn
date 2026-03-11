@@ -3,11 +3,12 @@
     class="fixed inset-0 z-[9999] hidden items-center justify-center p-4"
     hidden
     aria-hidden="true"
+    style="display: none;"
     role="dialog" aria-modal="true" aria-labelledby="panelQuickUploadTitle">
 
     <div id="panelQuickUploadOverlay"
         class="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onclick="window.closePanelQuickUpload()"></div>
+        onclick="window.closePanelQuickUpload ? window.closePanelQuickUpload() : ((this.closest('#panelQuickUploadModal').style.display='none'), this.closest('#panelQuickUploadModal').setAttribute('hidden', 'hidden'), this.closest('#panelQuickUploadModal').classList.add('hidden'), this.closest('#panelQuickUploadModal').classList.remove('flex'), document.body.style.overflow='')"></div>
 
     <div class="relative z-10 w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
         <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800">
@@ -20,7 +21,7 @@
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Selecione um evento e envie as fotos</p>
                 </div>
             </div>
-            <button type="button" onclick="window.closePanelQuickUpload()"
+            <button type="button" onclick="window.closePanelQuickUpload ? window.closePanelQuickUpload() : ((this.closest('#panelQuickUploadModal').style.display='none'), this.closest('#panelQuickUploadModal').setAttribute('hidden', 'hidden'), this.closest('#panelQuickUploadModal').classList.add('hidden'), this.closest('#panelQuickUploadModal').classList.remove('flex'), document.body.style.overflow='')"
                 class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                 <i class="fas fa-times text-sm"></i>
             </button>
@@ -86,7 +87,7 @@
         </div>
 
         <div class="px-6 pb-6">
-            <button type="button" onclick="window.closePanelQuickUpload()"
+            <button type="button" onclick="window.closePanelQuickUpload ? window.closePanelQuickUpload() : ((this.closest('#panelQuickUploadModal').style.display='none'), this.closest('#panelQuickUploadModal').setAttribute('hidden', 'hidden'), this.closest('#panelQuickUploadModal').classList.add('hidden'), this.closest('#panelQuickUploadModal').classList.remove('flex'), document.body.style.overflow='')"
                 class="w-full py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                 Fechar
             </button>
@@ -94,7 +95,6 @@
     </div>
 </div>
 
-@push('scripts')
 <script>
 (function () {
     let selectedEventId = null;
@@ -123,6 +123,7 @@
         modal.classList.toggle('hidden', !isOpen);
         modal.classList.toggle('flex', isOpen);
         modal.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        modal.style.display = isOpen ? 'flex' : 'none';
     }
 
     function show(element) {
@@ -326,4 +327,3 @@
     window.closePanelQuickUpload();
 })();
 </script>
-@endpush
