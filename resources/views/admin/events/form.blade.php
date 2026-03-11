@@ -459,23 +459,26 @@
                 <!-- TAB GALERIA -->
                 @if($event->exists)
                 <div class="tab-pane fade" id="gallery" role="tabpanel" aria-labelledby="gallery-tab">
-                    <div class="card shadow-sm border-0 mt-3">
+                    <div class="card shadow-sm border-0 mt-3" style="overflow:hidden">
                         <div class="card-body">
                             <h4 class="mb-3">Galeria de Fotos e Vídeos do Evento</h4>
                             <p class="text-muted mb-4">Faça o upload de fotos ou vídeos do evento. As imagens receberão uma marca d'água automaticamente com o nome da plataforma e do organizador.</p>
-                            
+
+                            {{-- Input real oculto, acionado via JS ao clicar na drop-zone --}}
+                            <input type="file" id="adminGalleryInput" multiple accept="image/*,video/*" style="display:none;">
+
                             <div class="premium-upload-box mb-4" id="eventMediaUploadBox">
-                                <div class="drop-zone-area p-5 text-center border-2 border-dashed rounded-lg bg-light position-relative" id="eventDropZone">
-                                    <input type="file" id="adminGalleryInput" multiple accept="image/*,video/*" class="position-absolute w-100 h-100 opacity-0" style="top:0; left:0; cursor:pointer;">
+                                <div class="drop-zone-area p-5 text-center rounded" id="eventDropZone"
+                                    style="border: 2px dashed #d0dae8; background: #f8fafc; cursor:pointer; transition: all 0.2s;">
                                     <div class="drop-zone-content">
-                                        <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                                        <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3 d-block"></i>
                                         <h5 class="font-weight-bold">Arraste fotos e vídeos aqui</h5>
-                                        <p class="text-muted mb-3">ou clique para selecionar do seu dispositivo</p>
-                                        <div class="d-flex justify-content-center gap-2 mb-2">
+                                        <p class="text-muted mb-3">ou <span class="text-primary" style="text-decoration:underline;">clique para selecionar</span> do seu dispositivo</p>
+                                        <div class="d-flex justify-content-center flex-wrap gap-2 mb-2">
                                             <span class="badge badge-pill badge-primary px-3">Imagens (JPG, PNG)</span>
                                             <span class="badge badge-pill badge-info px-3">Vídeos (MP4)</span>
                                         </div>
-                                        <small class="text-secondary opacity-75">As imagens receberão marca d'água automaticamente</small>
+                                        <small class="text-secondary">As imagens receberão marca d'água automaticamente</small>
                                     </div>
                                 </div>
 
@@ -571,6 +574,33 @@
 @push('scripts')
 @if($event->exists)
 <script>
+// Conectar clique na drop-zone ao input file real
+(function() {
+    const dropZone = document.getElementById('eventDropZone');
+    const fileInput = document.getElementById('adminGalleryInput');
+    if (dropZone && fileInput) {
+        dropZone.addEventListener('click', function() { fileInput.click(); });
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            dropZone.style.borderColor = '#3b82f6';
+            dropZone.style.background = '#eff6ff';
+        });
+        dropZone.addEventListener('dragleave', function() {
+            dropZone.style.borderColor = '#d0dae8';
+            dropZone.style.background = '#f8fafc';
+        });
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dropZone.style.borderColor = '#d0dae8';
+            dropZone.style.background = '#f8fafc';
+            if (e.dataTransfer.files.length) uploadAdminGallery(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', function() {
+            if (this.files.length) uploadAdminGallery(this.files);
+        });
+    }
+})();
+
 async function uploadAdminGallery(files) {
     if (!files || files.length === 0) return;
 
@@ -648,37 +678,7 @@ async function uploadAdminGallery(files) {
     }
 }
 
-// Inicialização do Drag & Drop
-document.addEventListener('DOMContentLoaded', function() {
-    const dropZone = document.getElementById('eventDropZone');
-    const input = document.getElementById('adminGalleryInput');
 
-    if (!dropZone || !input) return;
-
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, e => {
-            e.preventDefault();
-            e.stopPropagation();
-        }, false);
-    });
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => dropZone.classList.add('bg-primary-light', 'border-primary'), false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => dropZone.classList.remove('bg-primary-light', 'border-primary'), false);
-    });
-
-    dropZone.addEventListener('drop', e => {
-        const files = e.dataTransfer.files;
-        uploadAdminGallery(files);
-    });
-
-    input.addEventListener('change', function() {
-        uploadAdminGallery(this.files);
-    });
-});
 
 async function deleteAdminMedia(id) {
     const confirmed = await window.showConfirmDialog({

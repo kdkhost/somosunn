@@ -48,6 +48,13 @@
             </div>
         </li>
 
+        <!-- Quick Upload Icon -->
+        <li class="nav-item mr-2">
+            <a class="nav-link" href="#" onclick="event.preventDefault(); window.openQuickUploadModal()" title="Registrar Fotos de Evento">
+                <i class="fas fa-camera"></i>
+            </a>
+        </li>
+
         <!-- Bell Icon (Notifications) -->
         <li class="nav-item dropdown mr-2">
             <a class="nav-link" data-toggle="dropdown" href="#">

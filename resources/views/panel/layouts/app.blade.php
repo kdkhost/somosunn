@@ -673,7 +673,7 @@
                                 });
             })();
         </script>
-        @include('admin.partials.quick-upload-modal')
+        @include('panel.partials.quick-upload-modal')
         @include('partials.form-draft-autosave')
     @endprepend
 @endsection
