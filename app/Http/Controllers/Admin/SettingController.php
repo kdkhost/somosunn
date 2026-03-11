@@ -293,6 +293,8 @@ class SettingController extends Controller
                 'mercadopago_method_ticket',
                 'pagseguro_enabled',
                 'sumup_enabled',
+                'sumup_client_id',
+                'sumup_client_secret',
             ],
             'marketplace' => ['marketplace_hero_enabled', 'marketplace_hero_autoplay', 'marketplace_exit_enabled', 'marketplace_events_popup_enabled'],
             'social' => [
@@ -1153,18 +1155,15 @@ class SettingController extends Controller
                 // Personal API Keys (sup_pk_*) usam endpoint v0.1
                 $response = Http::withToken($token)->get('https://api.sumup.com/v0.1/me');
 
-                if ($response->successful()) {
-                    $json       = $response->json();
-                    $merchantId = $json['merchant_profile']['merchant_code'] ?? 'N/A';
-                    $name       = $json['merchant_profile']['legal_name'] ?? ($json['email'] ?? 'N/A');
-                    $success    = true;
-                    $message    = "Conexão com SumUp realizada com sucesso! Merchant: {$name} ({$merchantId})";
+            } elseif ($data['gateway'] === 'sumup') {
+                $service = app(\App\Services\Payment\SumUpService::class);
+                $result  = $service->testConnection($data['access_token'] ?? null);
+
+                if ($result['success']) {
+                    $success = true;
+                    $message = "Conexão com SumUp realizada com sucesso! Método: {$result['method']} | Merchant: {$result['merchant']} ({$result['code']})";
                 } else {
-                    $error = $response->json('message')
-                        ?? $response->json('error_message')
-                        ?? $response->json('error')
-                        ?? 'Token inválido ou sem permissão.';
-                    throw new \Exception("Falha na conexão SumUp: {$error}");
+                    throw new \Exception("Falha na conexão SumUp.");
                 }
             }
 

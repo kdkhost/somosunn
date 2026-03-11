@@ -196,26 +196,61 @@
             <div class="alert alert-info py-2 mb-3">
                 <i class="fas fa-info-circle mr-1"></i>
                 A SumUp suporta pagamentos com <strong>cartão de crédito e débito</strong>.
-                O cliente é redirecionado para a página segura de checkout da SumUp.
-                <a href="https://me.sumup.com/br-pt/developers" target="_blank" rel="noopener">
-                    Obtenha sua chave de API aqui &rarr;
-                </a>
+                O sistema usa <strong>OAuth 2.0</strong> (preferido) ou <strong>Personal API Key</strong> como fallback.
             </div>
+
+            {{-- OAuth 2.0 (preferido) --}}
+            <div class="card border-0 bg-light mb-3">
+                <div class="card-body py-3">
+                    <h6 class="font-weight-bold text-primary mb-3">
+                        <i class="fas fa-shield-alt mr-1"></i> OAuth 2.0 — Client Credentials
+                        <span class="badge badge-success ml-2">Recomendado</span>
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6 form-group mb-2">
+                            <label for="sumup_client_id" class="small font-weight-bold">Client ID</label>
+                            <input type="text" name="sumup_client_id" id="sumup_client_id" class="form-control form-control-sm"
+                                value="{{ $settings['sumup_client_id'] ?? '' }}"
+                                placeholder="cc_classic_...">
+                        </div>
+                        <div class="col-md-6 form-group mb-2">
+                            <label for="sumup_client_secret" class="small font-weight-bold">Client Secret</label>
+                            <div class="input-group input-group-sm">
+                                <input type="password" name="sumup_client_secret" id="sumup_client_secret" class="form-control"
+                                    value="{{ $settings['sumup_client_secret'] ?? '' }}"
+                                    placeholder="cc_sk_classic_...">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary btn-sm" type="button"
+                                        onclick="var i=this.previousElementSibling; i.type=i.type==='password'?'text':'password'">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <small class="text-muted">Obtenha em: <a href="https://me.sumup.com/br-pt/developers/oauth" target="_blank">me.sumup.com → OAuth2 Aplicativos</a></small>
+                </div>
+            </div>
+
+            {{-- Personal API Key (fallback) --}}
             <div class="row">
                 <div class="col-md-12 form-group">
-                    <label for="sumup_access_token">API Private Key <span class="text-danger">*</span></label>
+                    <label for="sumup_access_token" class="small font-weight-bold">
+                        <i class="fas fa-key mr-1 text-secondary"></i> Personal API Key
+                        <span class="badge badge-secondary ml-1">Fallback</span>
+                    </label>
                     <div class="input-group">
                         <input type="password" name="sumup_access_token" id="sumup_access_token" class="form-control"
                             value="{{ $settings['sumup_access_token'] ?? '' }}"
                             placeholder="sup_pk_...">
                         <div class="input-group-append">
                             <button class="btn btn-outline-secondary" type="button"
-                                onclick="this.previousElementSibling.type = this.previousElementSibling.type === 'password' ? 'text' : 'password'; this.innerHTML = this.previousElementSibling.type === 'password' ? '<i class=\'fas fa-eye\'></i>' : '<i class=\'fas fa-eye-slash\'></i>'">
+                                onclick="var i=this.previousElementSibling; i.type=i.type==='password'?'text':'password'; this.innerHTML=i.type==='password'?'<i class=\'fas fa-eye\'></i>':'<i class=\'fas fa-eye-slash\'></i>'">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
                     </div>
-                    <small class="text-muted">Formato: <code>sup_pk_xxxxxxxxxxxxxxxxx</code> — encontre em <a href="https://me.sumup.com/br-pt/developers" target="_blank">me.sumup.com → Chaves de API</a></small>
+                    <small class="text-muted">Formato: <code>sup_pk_xxxxxxxxxxxxxxxxx</code> — usado quando OAuth não está configurado</small>
                 </div>
             </div>
 
