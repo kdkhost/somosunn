@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventMedia;
 use App\Services\WatermarkService;
+use App\Support\UploadStorage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
@@ -18,25 +18,35 @@ class GalleryController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $query = EventMedia::with(['event', 'user'])->latest();
+        $baseQuery = EventMedia::query();
 
-        // Permission check: Members only see their own uploads in the management view
         if (!$user->isAdmin()) {
-            $query->where('user_id', $user->id);
+            $baseQuery->where('user_id', $user->id);
         }
 
-        if ($request->event_id) {
+        $query = (clone $baseQuery)->with(['event', 'user'])->latest();
+
+        if ($request->filled('event_id')) {
             $query->where('event_id', $request->event_id);
         }
 
         $media = $query->paginate(20);
 
-        // Active events for filtering/uploading
         $events = Event::where('published', true)
             ->orderBy('start_at', 'desc')
             ->get();
 
-        return view('panel.gallery.index', compact('media', 'events'));
+        $selectedEvent = $request->filled('event_id')
+            ? $events->firstWhere('id', (int) $request->event_id)
+            : null;
+
+        $stats = [
+            'visible_total' => (clone $baseQuery)->count(),
+            'event_coverage' => (clone $baseQuery)->distinct()->count('event_id'),
+            'my_uploads' => EventMedia::query()->where('user_id', $user->id)->count(),
+        ];
+
+        return view('panel.gallery.index', compact('media', 'events', 'selectedEvent', 'stats'));
     }
 
     /**
@@ -47,7 +57,7 @@ class GalleryController extends Controller
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'files' => 'required|array',
-            'files.*' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240', // 10MB per file
+            'files.*' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
         ]);
 
         $event = Event::findOrFail($request->event_id);
@@ -56,7 +66,6 @@ class GalleryController extends Controller
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
                 try {
-                    // Process image with event watermark
                     $path = $watermarkService->processEventImage($file, $event);
 
                     EventMedia::create([
@@ -64,30 +73,56 @@ class GalleryController extends Controller
                         'user_id' => auth()->id(),
                         'file_path' => $path,
                         'type' => 'image',
-                        'watermarked' => true
+                        'watermarked' => true,
                     ]);
+
                     $uploadedCount++;
-                } catch (\Exception $e) {
-                    \Log::error("Gallery upload error: " . $e->getMessage());
-                    // Fallback to simple store if watermark fails
+                } catch (\Throwable $exception) {
+                    \Log::error('Gallery upload error: ' . $exception->getMessage());
+
                     try {
-                        $path = $file->store('events/' . $event->id . '/gallery', 'public');
+                        $path = UploadStorage::storeUploadedFile($file, 'events/' . $event->id . '/gallery');
+
                         EventMedia::create([
                             'event_id' => $event->id,
                             'user_id' => auth()->id(),
                             'file_path' => $path,
                             'type' => 'image',
-                            'watermarked' => false
+                            'watermarked' => false,
                         ]);
+
                         $uploadedCount++;
-                    } catch (\Exception $e2) {
-                        \Log::error("Gallery upload fallback error: " . $e2->getMessage());
+                    } catch (\Throwable $fallbackException) {
+                        \Log::error('Gallery upload fallback error: ' . $fallbackException->getMessage());
                     }
                 }
             }
         }
 
-        return back()->with('success', "Sucesso! $uploadedCount foto(s) foram enviadas para a galeria.");
+        if ($uploadedCount === 0) {
+            $message = 'Nenhuma foto conseguiu ser enviada para a galeria.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
+            return back()->with('error', $message);
+        }
+
+        $message = "Sucesso! {$uploadedCount} foto(s) foram enviadas para a galeria.";
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'uploaded_count' => $uploadedCount,
+            ]);
+        }
+
+        return back()->with('success', $message);
     }
 
     /**
@@ -97,17 +132,16 @@ class GalleryController extends Controller
     {
         $user = auth()->user();
 
-        // Owners can delete their own, Admins can delete anything
         if ($media->user_id !== $user->id && !$user->isAdmin()) {
-            return back()->with('error', 'Você não tem permissão para excluir esta mídia.');
+            return back()->with('error', 'Voce nao tem permissao para excluir esta midia.');
         }
 
-        if ($media->file_path && Storage::disk('public')->exists($media->file_path)) {
-            Storage::disk('public')->delete($media->file_path);
+        if ($media->file_path) {
+            UploadStorage::delete($media->file_path);
         }
 
         $media->delete();
 
-        return back()->with('success', 'Mídia excluída da galeria com sucesso.');
+        return back()->with('success', 'Midia excluida da galeria com sucesso.');
     }
 }
