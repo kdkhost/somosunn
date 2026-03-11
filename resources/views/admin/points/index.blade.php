@@ -127,6 +127,13 @@
                                             @if($r->description ?? null)
                                                 <div class="small text-muted mt-1">{{ $r->description }}</div>
                                             @endif
+                                            @if($r->repeatable)
+                                                <div class="mt-2">
+                                                    <span class="badge badge-info">
+                                                        Recorrente{{ $r->max_daily ? ' · max ' . $r->max_daily . '/dia' : '' }}
+                                                    </span>
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="text-center">
                                             <span class="badge badge-{{ $r->points > 0 ? 'success' : 'danger' }} px-2 py-1">
