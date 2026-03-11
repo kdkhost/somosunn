@@ -4,15 +4,14 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Support\MarketplaceFee;
-use Illuminate\Support\Facades\Auth;
-
-use Illuminate\Http\Request;
 use App\Services\Payment\MercadoPagoService;
+use App\Support\MarketplaceFee;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MarketplaceController extends Controller
 {
-    public function index(\App\Services\Payment\MercadoPagoService $mpService)
+    public function index(MercadoPagoService $mpService)
     {
         $userId = (int) Auth::id();
 
@@ -98,9 +97,27 @@ class MarketplaceController extends Controller
             $service = new MercadoPagoService();
             $service->validateCredentials(auth()->id());
 
-            return redirect()->back()->with('success', 'Conexão testada com sucesso! Credenciais válidas.');
+            $message = 'Conexao testada com sucesso! Credenciais validas.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                ]);
+            }
+
+            return redirect()->back()->with('success', $message);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Falha na conexão: ' . $e->getMessage());
+            $message = 'Falha na conexao: ' . $e->getMessage();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
+            return redirect()->back()->with('error', $message);
         }
     }
 }

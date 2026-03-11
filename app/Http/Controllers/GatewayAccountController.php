@@ -6,14 +6,15 @@ use App\Models\GatewayAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class GatewayAccountController extends Controller
 {
     public function index()
     {
         $gateway = GatewayAccount::firstOrNew(['user_id' => Auth::id(), 'provider' => 'mercadopago']);
+
         return view('settings.payment', compact('gateway'));
     }
 
@@ -21,24 +22,29 @@ class GatewayAccountController extends Controller
     {
         $provider = $request->input('provider', 'mercadopago');
 
-        // Mercado Pago
         $validated = $request->validate([
             'public_key' => 'nullable|string',
             'access_token' => 'nullable|string',
             'max_installments' => 'nullable|integer|min:1|max:12',
             'pass_fee' => 'nullable|boolean',
-            'methods' => 'nullable|array'
+            'methods' => 'nullable|array',
         ]);
 
-        if ($request->has('public_key'))
+        $data = [];
+
+        if ($request->has('public_key')) {
             $data['public_key'] = $validated['public_key'];
-        if ($request->has('access_token'))
+        }
+
+        if ($request->has('access_token')) {
             $data['access_token'] = $validated['access_token'];
+        }
 
-        // Store advanced settings in 'extra' JSON column
-        $account = GatewayAccount::where('user_id', Auth::id())->where('provider', 'mercadopago')->first();
+        $account = GatewayAccount::where('user_id', Auth::id())
+            ->where('provider', 'mercadopago')
+            ->first();
+
         $extra = $account ? (array) $account->extra : [];
-
         $extra['max_installments'] = (int) ($validated['max_installments'] ?? 12);
         $extra['pass_fee'] = (bool) ($validated['pass_fee'] ?? false);
         $extra['enabled_methods'] = $validated['methods'] ?? ['credit_card', 'pix', 'ticket'];
@@ -50,7 +56,6 @@ class GatewayAccountController extends Controller
             $data
         );
 
-        // Se for o Admin principal, sincronizar com os Settings globais para que o checkout também use essas chaves
         if ($provider === 'mercadopago' && Auth::user()->isAdmin()) {
             $mpEnv = \App\Models\Setting::get('mercadopago_env', 'sandbox');
             $prefix = $mpEnv === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
@@ -58,27 +63,31 @@ class GatewayAccountController extends Controller
             if (!empty($data['public_key'])) {
                 \App\Models\Setting::updateOrCreate(['key' => $prefix . 'public_key'], ['value' => $data['public_key']]);
             }
+
             if (!empty($data['access_token'])) {
                 \App\Models\Setting::updateOrCreate(['key' => $prefix . 'access_token'], ['value' => $data['access_token']]);
             }
         }
 
-        return back()->with('success', 'Configurações de ' . ucfirst($provider) . ' salvas com sucesso.');
+        return back()->with('success', 'Configuracoes de ' . ucfirst($provider) . ' salvas com sucesso.');
     }
 
-    public function connect()
+    public function connect(Request $request)
     {
         $appId = config('payments.mercadopago.client_id');
         $redirectUri = config('payments.mercadopago.redirect_uri');
         $state = Str::random(40);
+        $popup = $request->boolean('popup');
+        $returnRoute = $request->input('return_route', 'panel.marketplace.payments');
 
-        // PKCE: gera code_verifier e code_challenge (S256)
         $codeVerifier = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
         $codeChallenge = rtrim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '=');
 
         session([
             'mp_oauth_state' => $state,
             'mp_oauth_code_verifier' => $codeVerifier,
+            'mp_oauth_popup' => $popup,
+            'mp_oauth_return_route' => $returnRoute,
         ]);
 
         $params = http_build_query([
@@ -97,14 +106,26 @@ class GatewayAccountController extends Controller
     public function callback(Request $request)
     {
         $state = session('mp_oauth_state');
+        $popup = (bool) session('mp_oauth_popup', false);
+        $returnRoute = (string) session('mp_oauth_return_route', 'panel.marketplace.payments');
 
         if (!$state || $request->input('state') !== $state) {
-            return redirect()->route('panel.marketplace.payments')->with('error', 'Estado inválido na autenticação. Tente novamente.');
+            return $this->oauthResultResponse(
+                false,
+                'Estado invalido na autenticacao. Tente novamente.',
+                $popup,
+                $returnRoute
+            );
         }
 
         $code = $request->input('code');
         if (!$code) {
-            return redirect()->route('panel.marketplace.payments')->with('error', 'Código de autorização não recebido.');
+            return $this->oauthResultResponse(
+                false,
+                'Codigo de autorizacao nao recebido.',
+                $popup,
+                $returnRoute
+            );
         }
 
         $clientId = config('payments.mercadopago.client_id');
@@ -117,19 +138,21 @@ class GatewayAccountController extends Controller
             'has_secret' => !empty($clientSecret),
             'redirect_uri' => $redirectUri,
             'code_length' => strlen($code),
+            'popup' => $popup,
         ]);
 
         if (empty($clientId) || empty($clientSecret)) {
-            Log::error('OAuth MP: client_id ou client_secret não configurados no .env');
-            return redirect()->route('panel.marketplace.payments')
-                ->with('error', 'Configuração OAuth incompleta no servidor (client_id/client_secret ausente). Contate o administrador.');
+            Log::error('OAuth MP: client_id ou client_secret nao configurados no .env');
+
+            return $this->oauthResultResponse(
+                false,
+                'Configuracao OAuth incompleta no servidor. Contate o administrador.',
+                $popup,
+                $returnRoute
+            );
         }
 
         $codeVerifier = session('mp_oauth_code_verifier');
-
-        Log::info('OAuth MP PKCE', [
-            'has_code_verifier' => !empty($codeVerifier),
-        ]);
 
         try {
             $payload = [
@@ -167,19 +190,70 @@ class GatewayAccountController extends Controller
                     ]
                 );
 
-                return redirect()->route('panel.marketplace.payments')->with('success', 'Conta do Mercado Pago conectada com sucesso!');
+                return $this->oauthResultResponse(
+                    true,
+                    'Conta do Mercado Pago conectada com sucesso!',
+                    $popup,
+                    $returnRoute,
+                    [
+                        'public_key' => $data['public_key'] ?? null,
+                        'user_id_mp' => $data['user_id'] ?? null,
+                    ]
+                );
             }
 
             Log::error('Erro OAuth Mercado Pago', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
-            $mpError = $response->json('error_description') ?? $response->json('message') ?? 'Erro desconhecido';
-            return redirect()->route('panel.marketplace.payments')->with('error', 'Erro ao conectar: ' . $mpError);
 
+            $mpError = $response->json('error_description') ?? $response->json('message') ?? 'Erro desconhecido';
+
+            return $this->oauthResultResponse(
+                false,
+                'Erro ao conectar: ' . $mpError,
+                $popup,
+                $returnRoute
+            );
         } catch (\Exception $e) {
-            Log::error('Exceção OAuth MP: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return redirect()->route('panel.marketplace.payments')->with('error', 'Erro interno: ' . $e->getMessage());
+            Log::error('Excecao OAuth MP: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return $this->oauthResultResponse(
+                false,
+                'Erro interno: ' . $e->getMessage(),
+                $popup,
+                $returnRoute
+            );
         }
+    }
+
+    private function oauthResultResponse(
+        bool $success,
+        string $message,
+        bool $popup,
+        string $returnRoute,
+        array $payload = []
+    ) {
+        session()->forget([
+            'mp_oauth_state',
+            'mp_oauth_code_verifier',
+            'mp_oauth_popup',
+            'mp_oauth_return_route',
+        ]);
+
+        $safeRoute = \Illuminate\Support\Facades\Route::has($returnRoute)
+            ? $returnRoute
+            : 'panel.marketplace.payments';
+
+        if ($popup) {
+            return response()->view('gateway.mercadopago.popup-result', [
+                'success' => $success,
+                'message' => $message,
+                'payload' => $payload,
+                'redirectUrl' => route($safeRoute),
+            ]);
+        }
+
+        return redirect()->route($safeRoute)->with($success ? 'success' : 'error', $message);
     }
 }
