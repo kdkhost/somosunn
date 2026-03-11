@@ -340,7 +340,7 @@ class PageController extends Controller
             ]);
         }
 
-        CmsPageCatalog::createMissing();
+        CmsPageCatalog::upsertDefaults();
 
         $pages = Page::orderBy('slug')->get();
 
@@ -352,6 +352,11 @@ class PageController extends Controller
 
     public function edit(Page $page): View
     {
+        if (Page::tableAvailable()) {
+            CmsPageCatalog::upsertDefaults();
+            $page->refresh();
+        }
+
         $data = $page->data ?? [];
 
         return view('admin.pages.edit', compact('page', 'data'));

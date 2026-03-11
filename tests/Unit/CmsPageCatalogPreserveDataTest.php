@@ -78,4 +78,31 @@ class CmsPageCatalogPreserveDataTest extends TestCase
         $this->assertArrayHasKey('seo_title', $page->data);
         $this->assertArrayHasKey('plans_subtitle', $page->data);
     }
+
+    public function test_upsert_defaults_backfills_missing_portal_editor_fields(): void
+    {
+        Page::query()->create([
+            'slug' => 'portal',
+            'title' => 'Portal Customizado',
+            'data' => [
+                'hero_title' => 'Portal Customizado',
+            ],
+        ]);
+
+        CmsPageCatalog::upsertDefaults();
+
+        $page = Page::query()->where('slug', 'portal')->firstOrFail();
+
+        $this->assertSame('Portal Customizado', $page->title);
+        $this->assertSame('Portal Customizado', $page->data['hero_title'] ?? null);
+        $this->assertSame('120+', $page->data['stat_1_value'] ?? null);
+        $this->assertSame('Palestras', $page->data['stat_1_label'] ?? null);
+        $this->assertSame('Niveis da Comunidade', $page->data['community_title'] ?? null);
+        $this->assertSame('Iniciante', $page->data['community_level_1_name'] ?? null);
+        $this->assertSame('1.200', $page->data['community_level_1_count'] ?? null);
+        $this->assertSame('Top Networkers', $page->data['ranking_title'] ?? null);
+        $this->assertSame('Ranking baseado em conexoes', $page->data['ranking_subtitle'] ?? null);
+        $this->assertSame('Desbloqueie todos os recursos', $page->data['cta_title'] ?? null);
+        $this->assertSame('Conhecer planos Premium', $page->data['cta_btn'] ?? null);
+    }
 }
