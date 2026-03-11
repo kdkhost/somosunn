@@ -272,12 +272,6 @@ class HomeController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
-    public function webhookPagSeguro(Request $request)
-    {
-        Log::info('PagSeguro webhook', $request->all());
-
-        return response()->json(['status' => 'ok']);
-    }
 
     private function networkingOverview(): array
     {

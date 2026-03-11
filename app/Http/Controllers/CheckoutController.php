@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Services\CouponService;
 use App\Services\OrderSettlementService;
 use App\Services\Payment\MercadoPagoService;
-use App\Services\Payment\SumUpService;
 use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,24 +44,21 @@ class CheckoutController extends Controller
 
         $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
         $mpEnabled = $gateways['mpEnabled'];
-        $psEnabled = $gateways['psEnabled'];
-        $preferredGateway = $gateways['preferredGateway'];
+        $preferredGateway = 'mercadopago';
 
-        if (!$mpEnabled && !$psEnabled) {
+        if (!$mpEnabled) {
             return redirect()
                 ->route('courses.show', $course->slug ?: $course->id)
-                ->with('error', 'Este curso nao esta disponivel para compra: o criador ainda nao configurou um metodo de pagamento.');
+                ->with('error', 'Este curso nao esta disponivel para compra: o criador ainda nao configurou o MercadoPago.');
         }
 
-        return view('checkout.index', compact('course', 'mpEnabled', 'psEnabled', 'preferredGateway'));
+        return view('checkout.index', compact('course', 'mpEnabled', 'preferredGateway'));
     }
 
     public function process(
         Request $request,
         Course $course,
         MercadoPagoService $mpService,
-        SumUpService $suService,
-        \App\Services\Payment\PagSeguroService $psService,
         CouponService $couponService,
         OrderSettlementService $orderSettlementService
     ) {
@@ -79,7 +75,7 @@ class CheckoutController extends Controller
 
         $request->validate([
             'coupon_code' => 'nullable|string|max:40',
-            'gateway_provider' => 'nullable|string|in:mercadopago,pagseguro,sumup',
+            'gateway_provider' => 'nullable|string|in:mercadopago',
         ]);
 
         $effectiveTotal = round((float) ($course->effective_price ?? ($course->price ?? 0)), 2);
@@ -94,22 +90,10 @@ class CheckoutController extends Controller
 
         if ($effectiveTotal > 0) {
             $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
-            $gatewayProvider = $request->input('gateway_provider', $gateways['preferredGateway'] ?? 'mercadopago');
+            $gatewayProvider = 'mercadopago';
 
-            if (
-                ($gatewayProvider === 'mercadopago' && !$gateways['mpEnabled'])
-                || ($gatewayProvider === 'pagseguro' && !$gateways['psEnabled'])
-                || ($gatewayProvider === 'sumup' && !($gateways['suEnabled'] ?? false))
-            ) {
-                if ($gateways['mpEnabled']) {
-                    $gatewayProvider = 'mercadopago';
-                } elseif ($gateways['psEnabled']) {
-                    $gatewayProvider = 'pagseguro';
-                } elseif ($gateways['suEnabled'] ?? false) {
-                    $gatewayProvider = 'sumup';
-                } else {
-                    return back()->with('error', 'Metodo de pagamento nao disponivel para este produto. O vendedor ainda nao configurou um gateway.');
-                }
+            if (!$gateways['mpEnabled']) {
+                return back()->with('error', 'MercadoPago nao configurado pelo vendedor.');
             }
         } else {
             $existingFreeOrder = $this->findExistingFreeOrder((int) Auth::id(), 'course', (int) $course->id);
@@ -145,8 +129,6 @@ class CheckoutController extends Controller
                 }
 
                 $finalTotal = max(0, round($originalTotal - $discountAmount, 2));
-                $suEnabled = $gateways['suEnabled'] ?? false;
-                $suToken = $gateways['suToken'] ?? null;
                 $platformFeePercent = MarketplaceFee::percent();
                 $platformFeeAmount = MarketplaceFee::amount($finalTotal);
 
@@ -158,10 +140,9 @@ class CheckoutController extends Controller
                     'fee_amount' => 0,
                     'platform_fee_amount' => $platformFeeAmount,
                     'currency' => 'BRL',
-                    'gateway' => $finalTotal <= 0 ? 'free' : $gatewayProvider,
+                    'gateway' => $finalTotal <= 0 ? 'free' : 'mercadopago',
                     'gateway_account_id' => null,
                     'metadata' => [
-                        'sumup_token' => ($gatewayProvider === 'sumup') ? $suToken : null,
                         'context' => 'course',
                         'sale_type' => 'course',
                         'public_token' => Str::random(40),
@@ -232,35 +213,6 @@ class CheckoutController extends Controller
         try {
             $order->load('items', 'user');
 
-            if ($gatewayProvider === 'sumup') {
-                $suToken = $order->metadata['sumup_token'] ?? Setting::get('sumup_access_token');
-                $checkout = $suService->createCheckout($order, (string) $suToken);
-
-                if (!$checkout || empty($checkout['id'])) {
-                    return back()->with('error', 'Falha ao criar checkout na SumUp. Tente outro metodo.');
-                }
-
-                $checkoutUrl = $checkout['checkout_url'] ?? "https://pay.sumup.com/b2c/pay?checkout_id={$checkout['id']}";
-
-                $order->update([
-                    'transaction_id' => $checkout['id'],
-                    'metadata'       => array_merge($order->metadata ?? [], [
-                        'sumup_checkout_id'  => $checkout['id'],
-                        'sumup_checkout_url' => $checkoutUrl,
-                    ]),
-                ]);
-
-                return redirect($checkoutUrl);
-            }
-
-            if ($gatewayProvider === 'pagseguro') {
-                return view('checkout.pagseguro_transparent', [
-                    'order' => $order,
-                    'publicKey' => $gateways['psPublicKey'] ?? config('payments.pagseguro.public_key'),
-                    'pixAvailable' => $psService->isPixAvailable($order),
-                ]);
-            }
-
             if ($course->is_recurring && !empty($course->mp_plan_id)) {
                 $subscription = $mpService->subscribeUser($course->mp_plan_id, [
                     'email' => Auth::user()->email,
@@ -303,7 +255,7 @@ class CheckoutController extends Controller
         }
     }
 
-    public function processPayment(Request $request, MercadoPagoService $mpService, \App\Services\Payment\PagSeguroService $psService)
+    public function processPayment(Request $request, MercadoPagoService $mpService)
     {
         $request->validate([
             'order_id' => 'required|exists:orders,id',
@@ -326,38 +278,6 @@ class CheckoutController extends Controller
 
         try {
             $paymentResult = [];
-
-            if ($gateway === 'pagseguro') {
-                if ($paymentMethod === 'pix') {
-                    $paymentResult = $psService->createPixPayment($order);
-                } else {
-                    $paymentResult = $psService->createCreditCardPayment($order, [
-                        'encrypted_card' => $formData['encrypted_card'] ?? null,
-                        'installments' => $formData['installments'] ?? 1,
-                    ]);
-                }
-
-                $status = $paymentResult['charges'][0]['status'] ?? $paymentResult['status'] ?? 'UNKNOWN';
-
-                if (isset($paymentResult['qr_codes'])) {
-                    $qrCode = $paymentResult['qr_codes'][0]['text'] ?? null;
-
-                    return response()->json([
-                        'success' => true,
-                        'status' => 'pending',
-                        'qr_code' => $qrCode,
-                        'qr_code_base64' => null,
-                        'redirect' => null
-                    ]);
-                }
-
-                if ($status === 'PAID') {
-                    app(PaymentWebhookController::class)->processPaidOrder($order, $paymentResult['id'] ?? null, $paymentResult);
-                    return response()->json(['success' => true, 'redirect' => route('checkout.success', $order)]);
-                }
-
-                return response()->json(['error' => 'Pagamento nao aprovado: ' . $status], 400);
-            }
 
             if ($paymentMethod === 'pix') {
                 $paymentResult = $mpService->createPixPayment($order, [
@@ -400,13 +320,6 @@ class CheckoutController extends Controller
             $detail = $paymentResult['status_detail'] ?? $paymentResult['status'] ?? 'unknown';
             return response()->json(['error' => 'Pagamento nao aprovado: ' . $detail], 400);
         } catch (PaymentGatewayException $e) {
-            if (
-                $gateway === 'pagseguro'
-                && $paymentMethod === 'pix'
-                && $e->errorCode() === 'pagseguro_pix_whitelist_required'
-            ) {
-                $psService->markPixAsUnavailable($order);
-            }
 
             Log::warning('Falha controlada no checkout', [
                 'message' => $e->getMessage(),
@@ -438,21 +351,11 @@ class CheckoutController extends Controller
                 }
             }
 
-            $errorCode = null;
-            if (Str::contains(Str::lower($message), 'access_denied') && Str::contains(Str::lower($message), 'whitelist')) {
-                if ($gateway === 'pagseguro' && $paymentMethod === 'pix') {
-                    $psService->markPixAsUnavailable($order);
-                }
-
-                $message = 'O Pix do PagSeguro nao esta liberado para esta conta no momento. Solicite a liberacao de whitelist no PagSeguro ou use outro metodo de pagamento disponivel.';
-                $errorCode = 'pagseguro_pix_whitelist_required';
-            }
-
             return response()->json([
                 'error' => $message !== '' ? $message : 'Nao foi possivel processar o pagamento no momento.',
-                'error_code' => $errorCode,
-                'pix_disabled' => $errorCode === 'pagseguro_pix_whitelist_required',
-            ], $errorCode ? 422 : 500);
+                'error_code' => null,
+                'pix_disabled' => false,
+            ], 500);
         }
     }
 

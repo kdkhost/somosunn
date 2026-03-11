@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
 use App\Services\Payment\MercadoPagoService;
-use App\Services\Payment\PagSeguroService; // Ensure this class exists namespace
 
 class MarketplaceController extends Controller
 {
@@ -72,10 +71,8 @@ class MarketplaceController extends Controller
     public function editPayment()
     {
         $mercadopago = \App\Models\GatewayAccount::firstOrNew(['user_id' => Auth::id(), 'provider' => 'mercadopago']);
-        $pagseguro = \App\Models\GatewayAccount::firstOrNew(['user_id' => Auth::id(), 'provider' => 'pagseguro']);
-        $sumup = \App\Models\GatewayAccount::firstOrNew(['user_id' => Auth::id(), 'provider' => 'sumup']);
 
-        return view('panel.marketplace.connect', compact('mercadopago', 'pagseguro', 'sumup'));
+        return view('panel.marketplace.connect', compact('mercadopago'));
     }
 
     public function sales()
@@ -97,23 +94,9 @@ class MarketplaceController extends Controller
 
     public function testCredentials(Request $request)
     {
-        $provider = $request->input('provider', 'mercadopago');
-
         try {
-            if ($provider === 'pagseguro') {
-                $service = new PagSeguroService();
-                $service->validateCredentials(auth()->id());
-            } elseif ($provider === 'sumup') {
-                $service = app(\App\Services\Payment\SumUpService::class);
-                $result  = $service->testConnection();
-
-                if (!$result['success']) {
-                    throw new \Exception('Falha na conexão SumUp.');
-                }
-            } else {
-                $service = new MercadoPagoService();
-                $service->validateCredentials(auth()->id());
-            }
+            $service = new MercadoPagoService();
+            $service->validateCredentials(auth()->id());
 
             return redirect()->back()->with('success', 'Conexão testada com sucesso! Credenciais válidas.');
         } catch (\Exception $e) {

@@ -91,16 +91,6 @@
                                     </div>
                                 @endif
 
-                                @if($mpOptionEnabled || $psOptionEnabled)
-                                    <div
-                                        class="mt-4 flex flex-col gap-2 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
-                                        <span class="text-sm text-gray-500">Você está pagando com:</span>
-                                        <span id="display_selected_gateway"
-                                            class="rounded-full bg-gray-100 px-3 py-1 text-center text-sm font-bold text-gray-900">
-                                            {{ $selectedGateway === 'pagseguro' ? 'PagSeguro' : 'Mercado Pago' }}
-                                        </span>
-                                    </div>
-                                @endif
                             @else
                                 <p class="text-sm text-gray-500">Entrada</p>
                                 <p class="text-3xl font-black text-green-600">Gratuita</p>
@@ -171,57 +161,6 @@
                                         @enderror
                                         <p class="{{ $fieldHintClasses }}">Opcional. Aplique o cupom antes de seguir para o pagamento.</p>
                                     </div>
-
-                                    @if($mpOptionEnabled || $psOptionEnabled)
-                                        <div class="border-t border-gray-100 pt-4">
-                                            <div class="{{ $fieldPanelClasses }}">
-                                                <label class="{{ $fieldLabelClasses }} mb-3">Forma de pagamento</label>
-                                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                                    @if($mpOptionEnabled)
-                                                        <label class="cursor-pointer">
-                                                            <input type="radio" name="gateway_provider" value="mercadopago"
-                                                                class="peer sr-only"
-                                                                {{ $selectedGateway === 'mercadopago' ? 'checked' : '' }}>
-                                                            <div
-                                                                class="rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-blue-400 hover:bg-blue-50/50 peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:ring-4 peer-checked:ring-blue-100">
-                                                                <div class="flex items-center gap-3">
-                                                                    <div
-                                                                        class="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
-                                                                        <i class="fas fa-hand-holding-dollar"></i>
-                                                                    </div>
-                                                                    <div>
-                                                                        <p class="font-bold text-gray-900">Mercado Pago</p>
-                                                                        <p class="text-xs text-gray-500">Cartão, Pix, Boleto</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </label>
-                                                    @endif
-
-                                                    @if($psOptionEnabled)
-                                                        <label class="cursor-pointer">
-                                                            <input type="radio" name="gateway_provider" value="pagseguro"
-                                                                class="peer sr-only"
-                                                                {{ $selectedGateway === 'pagseguro' ? 'checked' : '' }}>
-                                                            <div
-                                                                class="rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-green-400 hover:bg-green-50/50 peer-checked:border-green-600 peer-checked:bg-green-50 peer-checked:ring-4 peer-checked:ring-green-100">
-                                                                <div class="flex items-center gap-3">
-                                                                    <div
-                                                                        class="flex h-10 w-10 items-center justify-center rounded-2xl bg-green-100 text-green-600">
-                                                                        <i class="fas fa-credit-card"></i>
-                                                                    </div>
-                                                                    <div>
-                                                                        <p class="font-bold text-gray-900">PagSeguro</p>
-                                                                        <p class="text-xs text-gray-500">Cartão, Pix</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </label>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
                                 @endif
 
                                 @guest

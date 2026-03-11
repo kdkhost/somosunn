@@ -76,7 +76,7 @@ class EventReservationController extends Controller
         return view('events.checkout', compact('event', 'registration', 'mpEnabled', 'psEnabled', 'preferredGateway'));
     }
 
-    public function reserve(Request $request, Event $event, CouponService $couponService, \App\Services\Payment\MercadoPagoService $mpService, \App\Services\Payment\PagSeguroService $psService, OrderSettlementService $orderSettlementService)
+    public function reserve(Request $request, Event $event, CouponService $couponService, \App\Services\Payment\MercadoPagoService $mpService, OrderSettlementService $orderSettlementService)
     {
         $this->abortIfDisabledOrUnpublished($event);
 
@@ -546,20 +546,8 @@ class EventReservationController extends Controller
             return redirect()->route('events.show', $event)->with('success', 'Vaga confirmada com sucesso!');
         }
 
-        if (!$paymentsConfigured) {
-            return redirect()->route('events.show', $event)->with('error', 'Pagamento indisponível: o organizador ainda não configurou um método de pagamento.');
-        }
-
         try {
             $order->load('items', 'user');
-
-            if ($gatewayProvider === 'pagseguro') {
-                return view('checkout.pagseguro_transparent', [
-                    'order' => $order,
-                    'publicKey' => $gateways['psPublicKey'] ?? config('payments.pagseguro.public_key'),
-                    'pixAvailable' => $psService->isPixAvailable($order),
-                ]);
-            }
 
             // MercadoPago — usa o token correto do vendedor via MercadoPagoService
             $preference = $mpService->createPreference($order, [
@@ -589,7 +577,6 @@ class EventReservationController extends Controller
             \Log::error('Falha ao iniciar pagamento de evento', [
                 'event_id' => $event->id,
                 'order_id' => $order?->id,
-                'gateway_provider' => $gatewayProvider,
                 'message' => $e->getMessage(),
             ]);
 
@@ -597,9 +584,7 @@ class EventReservationController extends Controller
             $rawMessage = (string) $e->getMessage();
 
             if (str_contains($rawMessage, 'PA_UNAUTHORIZED_RESULT_FROM_POLICIES') || str_contains($rawMessage, 'PolicyAgent')) {
-                $friendlyMessage = !empty($gateways['psEnabled'])
-                    ? 'Mercado Pago indisponivel no momento. Selecione PagSeguro para concluir o pagamento.'
-                    : 'Mercado Pago indisponivel no momento. Tente novamente em instantes.';
+                $friendlyMessage = 'Mercado Pago indisponivel no momento. Tente novamente em instantes.';
             } elseif (str_contains($rawMessage, 'MercadoPago Preference Error')) {
                 $friendlyMessage = 'Nao foi possivel gerar a sessao de pagamento no Mercado Pago.';
             }

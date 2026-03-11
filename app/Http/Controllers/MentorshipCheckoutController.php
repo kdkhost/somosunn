@@ -39,31 +39,28 @@ class MentorshipCheckoutController extends Controller
         $effectiveTotal = round((float) ($mentorship->effective_price ?? ($mentorship->price ?? 0)), 2);
         if ($effectiveTotal <= 0) {
             $mpEnabled = false;
-            $psEnabled = false;
             $preferredGateway = null;
 
-            return view('checkout.mentorship', compact('mentorship', 'mpEnabled', 'psEnabled', 'preferredGateway'));
+            return view('checkout.mentorship', compact('mentorship', 'mpEnabled', 'preferredGateway'));
         }
 
         $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
         $mpEnabled = $gateways['mpEnabled'];
-        $psEnabled = $gateways['psEnabled'];
-        $preferredGateway = $gateways['preferredGateway'];
+        $preferredGateway = 'mercadopago';
 
-        if (!$mpEnabled && !$psEnabled) {
+        if (!$mpEnabled) {
             return redirect()
                 ->route('mentorships.show', $mentorship)
                 ->with('error', 'Esta mentoria nao esta disponivel para compra: o mentor ainda nao configurou um metodo de pagamento.');
         }
 
-        return view('checkout.mentorship', compact('mentorship', 'mpEnabled', 'psEnabled', 'preferredGateway'));
+        return view('checkout.mentorship', compact('mentorship', 'mpEnabled', 'preferredGateway'));
     }
 
     public function process(
         Request $request,
         Mentorship $mentorship,
         MercadoPagoService $mpService,
-        \App\Services\Payment\PagSeguroService $psService,
         CouponService $couponService,
         OrderSettlementService $orderSettlementService
     ) {
@@ -86,32 +83,17 @@ class MentorshipCheckoutController extends Controller
 
         $request->validate([
             'coupon_code' => 'nullable|string|max:40',
-            'gateway_provider' => 'nullable|string|in:mercadopago,pagseguro',
         ]);
 
         $effectiveTotal = round((float) ($mentorship->effective_price ?? ($mentorship->price ?? 0)), 2);
-        $gateways = [
-            'mpEnabled' => false,
-            'psEnabled' => false,
-            'preferredGateway' => null,
-            'mpPublicKey' => '',
-            'psPublicKey' => '',
-        ];
         $gatewayProvider = 'free';
 
         if ($effectiveTotal > 0) {
             $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
-            $gatewayProvider = $request->input('gateway_provider', $gateways['preferredGateway'] ?? 'mercadopago');
+            $gatewayProvider = 'mercadopago';
 
-            if (($gatewayProvider === 'mercadopago' && !$gateways['mpEnabled'])
-                || ($gatewayProvider === 'pagseguro' && !$gateways['psEnabled'])) {
-                if ($gateways['mpEnabled']) {
-                    $gatewayProvider = 'mercadopago';
-                } elseif ($gateways['psEnabled']) {
-                    $gatewayProvider = 'pagseguro';
-                } else {
-                    return back()->with('error', 'Metodo de pagamento nao disponivel para esta mentoria. O mentor ainda nao configurou um gateway.');
-                }
+            if (!$gateways['mpEnabled']) {
+                return back()->with('error', 'Metodo de pagamento nao disponivel para esta mentoria. O mentor ainda nao configurou um gateway.');
             }
         } else {
             $existingFreeOrder = $this->findExistingFreeOrder((int) Auth::id(), 'mentorship', (int) $mentorship->id);
@@ -228,16 +210,7 @@ class MentorshipCheckoutController extends Controller
                 ->with('success', 'Mentoria liberada com sucesso.');
         }
 
-        try {
             $order->load('items', 'user');
-
-            if ($gatewayProvider === 'pagseguro') {
-                return view('checkout.pagseguro_transparent', [
-                    'order' => $order,
-                    'publicKey' => $gateways['psPublicKey'] ?? config('payments.pagseguro.public_key'),
-                    'pixAvailable' => $psService->isPixAvailable($order),
-                ]);
-            }
 
             $preference = $mpService->createPreference($order, [
                 'statement_descriptor' => 'UNN MENTORIAS',
@@ -256,9 +229,6 @@ class MentorshipCheckoutController extends Controller
                 'preferenceId' => $preference['id'] ?? '',
                 'publicKey' => $gateways['mpPublicKey'] ?: config('payments.mercadopago.public_key'),
             ]);
-        } catch (\Exception $e) {
-            return back()->with('error', 'Erro ao processar pagamento: ' . $e->getMessage());
-        }
     }
 
     private function findExistingFreeOrder(int $userId, string $itemType, int $itemId): ?Order

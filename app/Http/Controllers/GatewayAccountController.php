@@ -21,55 +21,29 @@ class GatewayAccountController extends Controller
     {
         $provider = $request->input('provider', 'mercadopago');
 
-        if ($provider === 'pagseguro') {
-            $validated = $request->validate([
-                'email' => 'required|email',
-                'token' => 'required|string',
-            ]);
+        // Mercado Pago
+        $validated = $request->validate([
+            'public_key' => 'nullable|string',
+            'access_token' => 'nullable|string',
+            'max_installments' => 'nullable|integer|min:1|max:12',
+            'pass_fee' => 'nullable|boolean',
+            'methods' => 'nullable|array'
+        ]);
 
-            $data = [
-                'client_id' => $validated['email'],
-                'access_token' => $validated['token'],
-                'enabled' => true,
-            ];
-        } else if ($provider === 'sumup') {
-            $validated = $request->validate([
-                'sumup_access_token' => 'required|string',
-            ]);
+        if ($request->has('public_key'))
+            $data['public_key'] = $validated['public_key'];
+        if ($request->has('access_token'))
+            $data['access_token'] = $validated['access_token'];
 
-            $data = [
-                'access_token' => $validated['sumup_access_token'],
-                'enabled' => true,
-            ];
-        } else {
-            // Mercado Pago
-            $validated = $request->validate([
-                'public_key' => 'nullable|string',
-                'access_token' => 'nullable|string',
-                'max_installments' => 'nullable|integer|min:1|max:12',
-                'pass_fee' => 'nullable|boolean',
-                'methods' => 'nullable|array'
-            ]);
+        // Store advanced settings in 'extra' JSON column
+        $account = GatewayAccount::where('user_id', Auth::id())->where('provider', 'mercadopago')->first();
+        $extra = $account ? (array) $account->extra : [];
 
-            $data = [
-                'enabled' => true,
-            ];
+        $extra['max_installments'] = (int) ($validated['max_installments'] ?? 12);
+        $extra['pass_fee'] = (bool) ($validated['pass_fee'] ?? false);
+        $extra['enabled_methods'] = $validated['methods'] ?? ['credit_card', 'pix', 'ticket'];
 
-            if ($request->has('public_key'))
-                $data['public_key'] = $validated['public_key'];
-            if ($request->has('access_token'))
-                $data['access_token'] = $validated['access_token'];
-
-            // Store advanced settings in 'extra' JSON column
-            $account = GatewayAccount::where('user_id', Auth::id())->where('provider', 'mercadopago')->first();
-            $extra = $account ? (array) $account->extra : [];
-
-            $extra['max_installments'] = (int) ($validated['max_installments'] ?? 12);
-            $extra['pass_fee'] = (bool) ($validated['pass_fee'] ?? false);
-            $extra['enabled_methods'] = $validated['methods'] ?? ['credit_card', 'pix', 'ticket'];
-
-            $data['extra'] = $extra;
-        }
+        $data['extra'] = $extra;
 
         GatewayAccount::updateOrCreate(
             ['user_id' => Auth::id(), 'provider' => $provider],
