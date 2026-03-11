@@ -809,6 +809,8 @@
             });
         };
 
+        window.UNN_ADMIN_UPLOAD_MAX_BYTES = @json(\App\Support\UploadStorage::effectiveUploadLimitBytes());
+
         $(function () {
             const container = '#pjax-container';
             $(document).pjax('a[data-pjax="true"]', container, { timeout: 8000 });
@@ -1113,6 +1115,19 @@
                         setAdminUploadProgressVisible(false);
 
                         let errorMessage = 'Falha ao enviar arquivo. Verifique o tamanho ou o formato e tente novamente.';
+                        const serverLimit = parseInt(window.UNN_ADMIN_UPLOAD_MAX_BYTES || 0, 10);
+
+                        if (xhr.status === 413) {
+                            errorMessage = 'O servidor recusou o upload porque o arquivo excede o limite permitido'
+                                + (serverLimit > 0 ? ' (' + formatUploadBytes(serverLimit) + ')' : '')
+                                + '. Envie uma imagem menor e tente novamente.';
+                        } else if (xhr.status === 419) {
+                            errorMessage = 'Sua sessao expirou. Recarregue a pagina e tente novamente.';
+                        } else if (xhr.status === 403) {
+                            errorMessage = 'O servidor bloqueou o upload. Verifique permissoes ou regras de seguranca.';
+                        } else if (xhr.status >= 500) {
+                            errorMessage = 'O servidor encontrou um erro interno ao processar o upload. Verifique os logs da aplicacao.';
+                        }
                         if (contentType.includes('application/json')) {
                             try {
                                 const json = JSON.parse(xhr.responseText);
@@ -1538,7 +1553,12 @@
                 const removeBtn = box.find('.upload-remove');
                 const progress = box.find('.upload-progress');
                 const bar = progress.find('.progress-bar');
-                const maxSize = parseInt(box.data('max-size') || (5 * 1024 * 1024));
+                const configuredMaxSize = parseInt(box.data('max-size') || 0, 10);
+                const serverMaxSize = parseInt(window.UNN_ADMIN_UPLOAD_MAX_BYTES || 0, 10);
+                const maxSizeCandidates = [configuredMaxSize, serverMaxSize].filter(function (value) {
+                    return Number.isFinite(value) && value > 0;
+                });
+                const maxSize = maxSizeCandidates.length ? Math.min.apply(Math, maxSizeCandidates) : (5 * 1024 * 1024);
                 const crop = box.data('crop') === 1 || box.data('crop') === '1';
                 const existingUrl = box.data('existing-url');
                 const removeInputSelector = box.data('remove-input');

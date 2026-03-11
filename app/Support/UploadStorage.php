@@ -107,6 +107,56 @@ class UploadStorage
         return self::effectiveDisk() !== 's3';
     }
 
+    public static function effectiveUploadLimitBytes(?int $applicationMaxBytes = null, ?string $uploadMax = null, ?string $postMax = null): ?int
+    {
+        $limits = [];
+
+        $uploadLimit = self::parseIniSizeToBytes($uploadMax ?? ini_get('upload_max_filesize'));
+        if ($uploadLimit !== null && $uploadLimit > 0) {
+            $limits[] = $uploadLimit;
+        }
+
+        $postLimit = self::parseIniSizeToBytes($postMax ?? ini_get('post_max_size'));
+        if ($postLimit !== null && $postLimit > 0) {
+            $limits[] = $postLimit;
+        }
+
+        if ($applicationMaxBytes !== null && $applicationMaxBytes > 0) {
+            $limits[] = $applicationMaxBytes;
+        }
+
+        if ($limits === []) {
+            return null;
+        }
+
+        return min($limits);
+    }
+
+    public static function parseIniSizeToBytes(?string $value): ?int
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        if (!preg_match('/^(\d+)([kmgtp]?)(b)?$/i', $value, $matches)) {
+            return is_numeric($value) ? (int) $value : null;
+        }
+
+        $bytes = (int) $matches[1];
+        $unit = strtolower($matches[2] ?? '');
+        $multipliers = [
+            '' => 1,
+            'k' => 1024,
+            'm' => 1024 ** 2,
+            'g' => 1024 ** 3,
+            't' => 1024 ** 4,
+            'p' => 1024 ** 5,
+        ];
+
+        return isset($multipliers[$unit]) ? $bytes * $multipliers[$unit] : $bytes;
+    }
+
     public static function normalizePath(?string $path): ?string
     {
         $value = trim((string) $path);
