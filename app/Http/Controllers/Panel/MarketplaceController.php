@@ -106,11 +106,17 @@ class MarketplaceController extends Controller
             } elseif ($provider === 'sumup') {
                 $account = \App\Models\GatewayAccount::where('user_id', Auth::id())->where('provider', 'sumup')->first();
                 if (!$account || !$account->access_token) {
-                    throw new \Exception('Access Token não configurado.');
+                    throw new \Exception('API Key da SumUp não configurada.');
                 }
-                $response = \Illuminate\Support\Facades\Http::withToken($account->access_token)->get('https://api.sumup.com/v1/me');
+                // Personal API Keys (sup_pk_*) usam endpoint v0.1
+                $response = \Illuminate\Support\Facades\Http::withToken($account->access_token)
+                    ->get('https://api.sumup.com/v0.1/me');
                 if (!$response->successful()) {
-                    throw new \Exception('Falha na conexão SumUp: ' . ($response->json()['message'] ?? 'Token inválido.'));
+                    $error = $response->json('message')
+                        ?? $response->json('error_message')
+                        ?? $response->json('error')
+                        ?? 'Token inválido.';
+                    throw new \Exception('Falha na conexão SumUp: ' . $error);
                 }
             } else {
                 $service = new MercadoPagoService();

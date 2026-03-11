@@ -1147,19 +1147,23 @@ class SettingController extends Controller
             } elseif ($data['gateway'] === 'sumup') {
                 $token = $data['access_token'];
                 if (!$token) {
-                    throw new \Exception('Access Token não informado.');
+                    throw new \Exception('API Key não informada.');
                 }
 
-                // Teste SumUp: Get Account Info
-                $response = Http::withToken($token)->get('https://api.sumup.com/v1/me');
+                // Personal API Keys (sup_pk_*) usam endpoint v0.1
+                $response = Http::withToken($token)->get('https://api.sumup.com/v0.1/me');
 
                 if ($response->successful()) {
-                    $json = $response->json();
+                    $json       = $response->json();
                     $merchantId = $json['merchant_profile']['merchant_code'] ?? 'N/A';
-                    $success = true;
-                    $message = "Conexão com SumUp realizada com sucesso! Merchant Code: {$merchantId}";
+                    $name       = $json['merchant_profile']['legal_name'] ?? ($json['email'] ?? 'N/A');
+                    $success    = true;
+                    $message    = "Conexão com SumUp realizada com sucesso! Merchant: {$name} ({$merchantId})";
                 } else {
-                    $error = $response->json()['message'] ?? 'Erro desconhecido ou token inválido.';
+                    $error = $response->json('message')
+                        ?? $response->json('error_message')
+                        ?? $response->json('error')
+                        ?? 'Token inválido ou sem permissão.';
                     throw new \Exception("Falha na conexão SumUp: {$error}");
                 }
             }
