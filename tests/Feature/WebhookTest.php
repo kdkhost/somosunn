@@ -5,14 +5,14 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Setting;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class WebhookTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_mercadopago_webhook_approves_order()
     {

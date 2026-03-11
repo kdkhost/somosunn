@@ -35,6 +35,7 @@ class AdminPageControllerFallbackTest extends TestCase
         }
 
         touch($this->sqlitePath);
+        clearstatcache(true, $this->sqlitePath);
 
         $this->refreshApplication();
 

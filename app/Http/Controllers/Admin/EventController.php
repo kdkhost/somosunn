@@ -63,7 +63,9 @@ class EventController extends Controller
 
         // Todos os membros podem ver todos os eventos publicados
         // Admins veem todos, membros veem apenas os publicados
-        if (!Auth::user()->isAdmin()) {
+        $user = Auth::user();
+
+        if (!$user || !$user->isAdmin()) {
             $query->where('published', true);
         }
 

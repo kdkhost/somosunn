@@ -169,7 +169,7 @@ class SettingController extends Controller
             'uploads/imagens/marketplace/exit',
         ];
         foreach ($dirs as $dir) {
-            $this->ensurePublicDir($dir);
+            $this->preparePublicDir($dir);
         }
 
         $removals = [
@@ -200,70 +200,70 @@ class SettingController extends Controller
         }
 
         if ($request->hasFile('pwa_icon_192')) {
-            $this->replaceFile('pwa_icon_192', $this->storePublic($request->file('pwa_icon_192'), 'uploads/imagens/pwa'));
+            $this->replaceFile('pwa_icon_192', $this->storeUploadedPublicFile($request->file('pwa_icon_192'), 'uploads/imagens/pwa'));
         }
         if ($request->hasFile('pwa_icon_512')) {
-            $this->replaceFile('pwa_icon_512', $this->storePublic($request->file('pwa_icon_512'), 'uploads/imagens/pwa'));
+            $this->replaceFile('pwa_icon_512', $this->storeUploadedPublicFile($request->file('pwa_icon_512'), 'uploads/imagens/pwa'));
         }
         if ($request->hasFile('pwa_splash')) {
-            $this->replaceFile('pwa_splash', $this->storePublic($request->file('pwa_splash'), 'uploads/imagens/pwa'));
+            $this->replaceFile('pwa_splash', $this->storeUploadedPublicFile($request->file('pwa_splash'), 'uploads/imagens/pwa'));
         }
         if ($request->hasFile('pwa_banner')) {
-            $this->replaceFile('pwa_banner', $this->storePublic($request->file('pwa_banner'), 'uploads/imagens/pwa'));
+            $this->replaceFile('pwa_banner', $this->storeUploadedPublicFile($request->file('pwa_banner'), 'uploads/imagens/pwa'));
         }
         if ($request->hasFile('preloader_image')) {
-            $this->replaceFile('preloader_image', $this->storePublic($request->file('preloader_image'), 'uploads/imagens/preloader'));
+            $this->replaceFile('preloader_image', $this->storeUploadedPublicFile($request->file('preloader_image'), 'uploads/imagens/preloader'));
         }
         if ($request->hasFile('logo_image')) {
-            $this->replaceFile('logo_image', $this->storePublic($request->file('logo_image'), 'uploads/imagens/geral'));
+            $this->replaceFile('logo_image', $this->storeUploadedPublicFile($request->file('logo_image'), 'uploads/imagens/geral'));
         }
         if ($request->hasFile('favicon_image')) {
-            $this->replaceFile('favicon_image', $this->storePublic($request->file('favicon_image'), 'uploads/imagens/geral'));
+            $this->replaceFile('favicon_image', $this->storeUploadedPublicFile($request->file('favicon_image'), 'uploads/imagens/geral'));
         }
         if ($request->hasFile('logo_admin')) {
-            $this->replaceFile('logo_admin', $this->storePublic($request->file('logo_admin'), 'uploads/imagens/administrativo'));
+            $this->replaceFile('logo_admin', $this->storeUploadedPublicFile($request->file('logo_admin'), 'uploads/imagens/administrativo'));
         }
         if ($request->hasFile('logo_auth')) {
-            $this->replaceFile('logo_auth', $this->storePublic($request->file('logo_auth'), 'uploads/imagens/logins'));
+            $this->replaceFile('logo_auth', $this->storeUploadedPublicFile($request->file('logo_auth'), 'uploads/imagens/logins'));
         }
         if ($request->hasFile('logo_front')) {
-            $this->replaceFile('logo_front', $this->storePublic($request->file('logo_front'), 'uploads/imagens/frontend'));
+            $this->replaceFile('logo_front', $this->storeUploadedPublicFile($request->file('logo_front'), 'uploads/imagens/frontend'));
         }
         if ($request->hasFile('watermark_image')) {
-            $this->replaceFile('watermark_image', $this->storePublic($request->file('watermark_image'), 'uploads/imagens/watermark'));
+            $this->replaceFile('watermark_image', $this->storeUploadedPublicFile($request->file('watermark_image'), 'uploads/imagens/watermark'));
         }
         if ($request->hasFile('hero_image')) {
-            $this->replaceFile('hero_image', $this->storePublic($request->file('hero_image'), 'uploads/imagens/frontend'));
+            $this->replaceFile('hero_image', $this->storeUploadedPublicFile($request->file('hero_image'), 'uploads/imagens/frontend'));
         }
         if ($request->hasFile('site_bg_image')) {
-            $this->replaceFile('site_bg_image', $this->storePublic($request->file('site_bg_image'), 'uploads/imagens/frontend'));
+            $this->replaceFile('site_bg_image', $this->storeUploadedPublicFile($request->file('site_bg_image'), 'uploads/imagens/frontend'));
         }
         if ($request->hasFile('seo_og_image')) {
-            $this->replaceFile('seo_og_image', $this->storePublic($request->file('seo_og_image'), 'uploads/imagens/seo'));
+            $this->replaceFile('seo_og_image', $this->storeUploadedPublicFile($request->file('seo_og_image'), 'uploads/imagens/seo'));
         }
         if ($request->hasFile('seo_twitter_image')) {
-            $this->replaceFile('seo_twitter_image', $this->storePublic($request->file('seo_twitter_image'), 'uploads/imagens/seo'));
+            $this->replaceFile('seo_twitter_image', $this->storeUploadedPublicFile($request->file('seo_twitter_image'), 'uploads/imagens/seo'));
         }
         if ($request->hasFile('marketplace_hero_slide_1_image')) {
-            $this->replaceFile('marketplace_hero_slide_1_image', $this->storePublic($request->file('marketplace_hero_slide_1_image'), 'uploads/imagens/marketplace/hero'));
+            $this->replaceFile('marketplace_hero_slide_1_image', $this->storeUploadedPublicFile($request->file('marketplace_hero_slide_1_image'), 'uploads/imagens/marketplace/hero'));
         }
         if ($request->hasFile('marketplace_hero_slide_1_image_mobile')) {
-            $this->replaceFile('marketplace_hero_slide_1_image_mobile', $this->storePublic($request->file('marketplace_hero_slide_1_image_mobile'), 'uploads/imagens/marketplace/hero'));
+            $this->replaceFile('marketplace_hero_slide_1_image_mobile', $this->storeUploadedPublicFile($request->file('marketplace_hero_slide_1_image_mobile'), 'uploads/imagens/marketplace/hero'));
         }
         if ($request->hasFile('marketplace_hero_slide_2_image')) {
-            $this->replaceFile('marketplace_hero_slide_2_image', $this->storePublic($request->file('marketplace_hero_slide_2_image'), 'uploads/imagens/marketplace/hero'));
+            $this->replaceFile('marketplace_hero_slide_2_image', $this->storeUploadedPublicFile($request->file('marketplace_hero_slide_2_image'), 'uploads/imagens/marketplace/hero'));
         }
         if ($request->hasFile('marketplace_hero_slide_2_image_mobile')) {
-            $this->replaceFile('marketplace_hero_slide_2_image_mobile', $this->storePublic($request->file('marketplace_hero_slide_2_image_mobile'), 'uploads/imagens/marketplace/hero'));
+            $this->replaceFile('marketplace_hero_slide_2_image_mobile', $this->storeUploadedPublicFile($request->file('marketplace_hero_slide_2_image_mobile'), 'uploads/imagens/marketplace/hero'));
         }
         if ($request->hasFile('marketplace_hero_slide_3_image')) {
-            $this->replaceFile('marketplace_hero_slide_3_image', $this->storePublic($request->file('marketplace_hero_slide_3_image'), 'uploads/imagens/marketplace/hero'));
+            $this->replaceFile('marketplace_hero_slide_3_image', $this->storeUploadedPublicFile($request->file('marketplace_hero_slide_3_image'), 'uploads/imagens/marketplace/hero'));
         }
         if ($request->hasFile('marketplace_hero_slide_3_image_mobile')) {
-            $this->replaceFile('marketplace_hero_slide_3_image_mobile', $this->storePublic($request->file('marketplace_hero_slide_3_image_mobile'), 'uploads/imagens/marketplace/hero'));
+            $this->replaceFile('marketplace_hero_slide_3_image_mobile', $this->storeUploadedPublicFile($request->file('marketplace_hero_slide_3_image_mobile'), 'uploads/imagens/marketplace/hero'));
         }
         if ($request->hasFile('marketplace_exit_banner_image')) {
-            $this->replaceFile('marketplace_exit_banner_image', $this->storePublic($request->file('marketplace_exit_banner_image'), 'uploads/imagens/marketplace/exit'));
+            $this->replaceFile('marketplace_exit_banner_image', $this->storeUploadedPublicFile($request->file('marketplace_exit_banner_image'), 'uploads/imagens/marketplace/exit'));
         }
 
         // Mapeamento de booleanos por grupo para garantir que desativar (unchecked) funcione
@@ -1114,6 +1114,45 @@ class SettingController extends Controller
         }
     }
 
+    private function preparePublicDir(string $dir): void
+    {
+        if (!UploadStorage::isLocal()) {
+            $this->ensurePublicDir($dir);
+            return;
+        }
+
+        $targetDir = public_path(trim(str_replace('\\', '/', $dir), '/'));
+
+        if (!is_dir($targetDir) && !@mkdir($targetDir, 0775, true) && !is_dir($targetDir)) {
+            throw new \RuntimeException('Nao foi possivel preparar o diretorio ' . $dir . ' para upload.');
+        }
+    }
+
+    private function storeUploadedPublicFile($file, string $relativeDir): string
+    {
+        if (!UploadStorage::isLocal()) {
+            return $this->storePublic($file, $relativeDir);
+        }
+
+        if (!$file || !$file->isValid()) {
+            throw new \RuntimeException('Arquivo de imagem invalido ou corrompido.');
+        }
+
+        $relativeDir = trim(str_replace('\\', '/', $relativeDir), '/');
+        $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
+        $name = uniqid('', true) . '.' . $ext;
+
+        $this->preparePublicDir($relativeDir);
+
+        try {
+            $file->move(public_path($relativeDir), $name);
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('Nao foi possivel salvar a imagem em ' . $relativeDir . ': ' . $e->getMessage(), 0, $e);
+        }
+
+        return $relativeDir . '/' . $name;
+    }
+
     public function uploadFile(Request $request)
     {
         try {
@@ -1139,10 +1178,10 @@ class SettingController extends Controller
             if (str_contains($key, 'pwa'))
                 $directory = 'uploads/imagens/pwa';
 
-            $this->ensurePublicDir($directory);
+            $this->preparePublicDir($directory);
 
             // Generate filename
-            $path = $this->storePublic($file, $directory);
+            $path = $this->storeUploadedPublicFile($file, $directory);
 
             // Remove old file if exists
             $this->removeFile($key, false);

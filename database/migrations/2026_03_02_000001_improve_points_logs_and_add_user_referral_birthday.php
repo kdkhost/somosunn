@@ -31,11 +31,19 @@ return new class extends Migration
         });
 
         // 3. Gera código de referência para usuários já existentes
-        DB::statement("
-            UPDATE users
-            SET referral_code = CONCAT('UNN', LPAD(id, 7, '0'))
-            WHERE referral_code IS NULL
-        ");
+        DB::table('users')
+            ->whereNull('referral_code')
+            ->orderBy('id')
+            ->select('id')
+            ->chunkById(500, function ($users): void {
+                foreach ($users as $user) {
+                    DB::table('users')
+                        ->where('id', $user->id)
+                        ->update([
+                            'referral_code' => sprintf('UNN%07d', (int) $user->id),
+                        ]);
+                }
+            });
     }
 
     public function down(): void

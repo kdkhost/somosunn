@@ -258,6 +258,8 @@ class PageController extends Controller
      * Campos de imagem por slug - recebidos via file input no form.
      * O valor armazenado é o path relativo ao disco 'public'.
      */
+    private const SHARED_IMAGE_FIELDS = ['seo_image'];
+
     private const SLUG_IMAGE_FIELDS = [
         'home' => ['hero_image', 'seo_image'],
         'sobre' => ['hero_image', 'seo_image'],
@@ -272,8 +274,8 @@ class PageController extends Controller
         'portal' => ['hero_image', 'seo_image'],
         'premium' => ['hero_image', 'seo_image'],
         'feed' => ['seo_image'],
-        'somos-unicas' => ['hero_image', 'seo_image'],
-        'somos-unicas-sobre' => ['hero_image', 'networking_image', 'seo_image'],
+        'somos-unicas' => ['hero_image'],
+        'somos-unicas-sobre' => ['hero_image', 'networking_image'],
     ];
 
     /** Campos JSON (arrays) por slug - enviados como textarea JSON no form. */
@@ -330,7 +332,10 @@ class PageController extends Controller
         $slug = $page->slug;
         $scalarFields = self::SLUG_SCALAR_FIELDS[$slug] ?? [];
         $jsonFields = self::SLUG_JSON_FIELDS[$slug] ?? [];
-        $imageFields = self::SLUG_IMAGE_FIELDS[$slug] ?? [];
+        $imageFields = array_values(array_unique(array_merge(
+            self::SHARED_IMAGE_FIELDS,
+            self::SLUG_IMAGE_FIELDS[$slug] ?? []
+        )));
 
         $rules = [
             'title' => ['nullable', 'string', 'max:255'],

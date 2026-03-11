@@ -64,8 +64,6 @@
                         </a>
                         @php
                             $sections = [];
-                            // Esta lista deve ser preenchida dinamicamente ou passada pelo controller se possível.
-                            // Como estamos portando do AdminLTE, vamos usar uma lógica baseada no slug.
                             $slugSections = [
                                 'home' => ['Hero', 'Estatísticas', 'Sobre', 'Eventos', 'Comunidade', 'Ranking', 'Depoimentos', 'CTA'],
                                 'sobre' => ['Hero', 'Estatísticas', 'História', 'Diferenciais', 'CTA'],
@@ -109,7 +107,6 @@
 
             <!-- Área Central do Editor -->
             <main class="xl:col-span-3 space-y-8">
-                <!-- SEO Section -->
                 <section id="sec-seo"
                     class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden scroll-mt-24">
                     <div
@@ -126,24 +123,48 @@
                     <div class="p-8 space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
-                                <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1">Título da Página
-                                    (SEO)</label>
+                                <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1">Título interno da
+                                    página</label>
                                 <input type="text" name="title" value="{{ old('title', $page->title) }}"
                                     class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium"
                                     placeholder="Ex: Home - Somos UNN">
                             </div>
                             <div class="space-y-2">
+                                <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1">Meta Title</label>
+                                <input type="text" name="seo_title" value="{{ old('seo_title', $data['seo_title'] ?? '') }}"
+                                    class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium"
+                                    placeholder="Ex: Sobre a Somos UNN">
+                            </div>
+                            <div class="space-y-2 md:col-span-2">
                                 <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1">Meta
                                     Descrição</label>
-                                <textarea name="seo_description" rows="1"
+                                <textarea name="seo_description" rows="2"
                                     class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium"
                                     placeholder="Breve resumo para resultados de busca (Google)">{{ old('seo_description', $data['seo_description'] ?? '') }}</textarea>
                             </div>
                         </div>
+
+                        <div class="space-y-3">
+                            <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1">Imagem de
+                                compartilhamento (SEO)</label>
+                            <input type="file" name="seo_image" accept="image/*"
+                                class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium">
+                            @if (!empty($data['seo_image']))
+                                <div class="rounded-[1.5rem] overflow-hidden border border-slate-200 dark:border-slate-800">
+                                    <img src="{{ Storage::url($data['seo_image']) }}" alt="Preview SEO"
+                                        class="w-full h-48 object-cover">
+                                </div>
+                                <label
+                                    class="inline-flex items-center gap-2 text-sm font-semibold text-rose-600 dark:text-rose-400">
+                                    <input type="checkbox" name="remove_seo_image" value="1"
+                                        class="rounded border-slate-300 text-rose-600 focus:ring-rose-500">
+                                    Remover imagem atual
+                                </label>
+                            @endif
+                        </div>
                     </div>
                 </section>
 
-                <!-- Seções Dinâmicas (Portadas do AdminLTE) -->
                 <div id="dynamic-sections" class="space-y-8">
                     @if(view()->exists("panel.admin.pages.partials.{$page->slug}"))
                         @include("panel.admin.pages.partials.{$page->slug}")
@@ -172,15 +193,12 @@
     @prepend('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Toggle de Visibilidade (AJAX)
                 const toggles = document.querySelectorAll('.section-toggle');
                 toggles.forEach(toggle => {
                     toggle.addEventListener('change', function () {
                         const section = this.dataset.section;
                         const status = this.checked;
-                        const pageId = {{ $page->id }};
 
-                        // Loading state
                         const label = this.closest('label');
                         if (label) label.style.opacity = '0.5';
 
@@ -208,7 +226,7 @@
                                     });
                                 }
                             })
-                            .catch(error => {
+                            .catch(() => {
                                 if (label) label.style.opacity = '1';
                                 Swal.fire({
                                     icon: 'error',
@@ -219,7 +237,6 @@
                     });
                 });
 
-                // Sync Sidebar Active State
                 const sections = document.querySelectorAll('section[id], div[id^="sec-"]');
                 const navLinks = document.querySelectorAll('#section-nav a');
 

@@ -95,7 +95,7 @@ class CertificateFontCssGenerator
         }
 
         $absPath = public_path($relPath);
-        if (!is_file($absPath)) {
+        if (!$isPreview && !is_file($absPath)) {
             Log::warning("Certificate font skipped: file not found", [
                 "font_id" => $font->id,
                 "font_family" => $font->font_family,

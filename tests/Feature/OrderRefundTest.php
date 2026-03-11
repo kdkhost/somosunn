@@ -7,13 +7,13 @@ use App\Models\OrderItem;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\OrderRefundService;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class OrderRefundTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_partial_refund_tracks_metadata_and_keeps_order_paid(): void
     {

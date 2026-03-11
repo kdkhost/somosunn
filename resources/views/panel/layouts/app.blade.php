@@ -252,6 +252,8 @@
         </div>
     </div>
 
+    @include('panel.partials.quick-upload-modal')
+
     @prepend('scripts')
         <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-image-preview.js') }}?v=3"></script>
         <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-size.js') }}?v=3"></script>
@@ -673,7 +675,6 @@
                                 });
             })();
         </script>
-        @include('panel.partials.quick-upload-modal')
         @include('partials.form-draft-autosave')
     @endprepend
 @endsection

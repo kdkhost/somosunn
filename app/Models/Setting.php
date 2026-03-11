@@ -40,6 +40,16 @@ class Setting extends Model
                 return static::$runtimeCache[$key];
             }
 
+            if (static::$runtimeCacheLoaded) {
+                $freshValue = static::query()->where('key', $key)->value('value');
+
+                if ($freshValue !== null) {
+                    static::$runtimeCache[$key] = $freshValue;
+
+                    return $freshValue;
+                }
+            }
+
             return $default;
         } catch (\Throwable $e) {
             \Log::warning('Configuracao indisponivel, fallback aplicado: ' . $e->getMessage());
