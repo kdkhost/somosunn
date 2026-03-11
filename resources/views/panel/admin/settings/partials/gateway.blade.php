@@ -1,345 +1,163 @@
 <div class="space-y-6">
-    <div
-        class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700/50 rounded-2xl p-4 flex items-start gap-3 shadow-sm transition-all">
-        <i class="fas fa-credit-card text-blue-500 dark:text-blue-400 mt-1"></i>
-        <div class="text-sm text-blue-800 dark:text-blue-100">
-            Configure os métodos de pagamento aceitos na plataforma. Webhooks são essenciais para aprovação automática.
-            <br>
-            <strong>Nota:</strong> Configure URLs de Webhook no painel do seu gateway.
+
+    {{-- ===== SEÇÃO 1: MERCADOPAGO — GATEWAY PRINCIPAL ===== --}}
+    <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <i class="fas fa-handshake text-blue-600 dark:text-blue-400"></i>
+            </div>
+            MercadoPago
+        </h3>
+        <label class="relative inline-flex items-center cursor-pointer">
+            <input type="hidden" name="mercadopago_enabled" value="0">
+            <input type="checkbox" class="sr-only peer" name="mercadopago_enabled" value="1"
+                onchange="toggleSetting('mercadopago_enabled', this.checked)" {{ ($settings['mercadopago_enabled'] ?? 1) ? 'checked' : '' }}>
+            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+        </label>
+    </div>
+
+    {{-- Ambiente --}}
+    <div>
+        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Ambiente de Execução</label>
+        <select name="mercadopago_env"
+            class="gateway-env-select w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium"
+            data-gateway="mercadopago">
+            <option value="sandbox" {{ ($settings['mercadopago_env'] ?? 'sandbox') == 'sandbox' ? 'selected' : '' }}>Sandbox (Ambiente de Testes)</option>
+            <option value="production" {{ ($settings['mercadopago_env'] ?? 'sandbox') == 'production' ? 'selected' : '' }}>Produção (Ambiente Real)</option>
+        </select>
+    </div>
+
+    {{-- Credenciais Sandbox --}}
+    <div class="env-sandbox p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800" id="mercadopago_card">
+        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">
+            <i class="fas fa-tools mr-1"></i> Credenciais de Sandbox
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Public Key (Sandbox)</label>
+                <input type="text" name="mercadopago_sandbox_public_key"
+                    value="{{ $settings['mercadopago_sandbox_public_key'] ?? '' }}"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Access Token (Sandbox)</label>
+                <input type="text" name="mercadopago_sandbox_access_token"
+                    value="{{ $settings['mercadopago_sandbox_access_token'] ?? '' }}"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+            </div>
         </div>
     </div>
 
-    <!-- MercadoPago -->
-    <div class="border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden transition-colors">
-        <div class="bg-slate-50 dark:bg-slate-950 px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-4 cursor-pointer" onclick="toggleCard('mercadopago_card')">
-                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <i class="fas fa-handshake text-blue-500"></i> MercadoPago
-                </h3>
-                <i class="fas fa-chevron-down text-slate-400 dark:text-slate-500 transition-transform"
-                    id="mercadopago_card_icon"></i>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-                <input type="hidden" name="mercadopago_enabled" value="0">
-                <input type="checkbox" class="sr-only peer" name="mercadopago_enabled" value="1"
-                    onchange="toggleSetting('mercadopago_enabled', this.checked)" {{ ($settings['mercadopago_enabled'] ?? 1) ? 'checked' : '' }}>
-                <div
-                    class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
-                </div>
-            </label>
-        </div>
-        <div id="mercadopago_card" class="hidden p-6 border-t border-slate-200 dark:border-slate-800">
-            <div class="mb-6">
-                <label
-                    class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 transition-colors">Ambiente
-                    de
-                    Execução</label>
-                <select name="mercadopago_env"
-                    class="gateway-env-select w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium"
-                    data-gateway="mercadopago">
-                    <option value="sandbox" {{ ($settings['mercadopago_env'] ?? 'sandbox') == 'sandbox' ? 'selected' : '' }}>Sandbox (Ambiente de Testes)</option>
-                    <option value="production" {{ ($settings['mercadopago_env'] ?? 'sandbox') == 'production' ? 'selected' : '' }}>Produção (Ambiente Real)</option>
-                </select>
-            </div>
-
-            <!-- Sandbox -->
-            <div
-                class="env-sandbox mb-4 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
-                <h4 class="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-4"><i
-                        class="fas fa-tools mr-1"></i> Credenciais de Sandbox</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label
-                            class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Public
-                            Key
-                            (Sandbox)</label>
-                        <input type="text" name="mercadopago_sandbox_public_key"
-                            value="{{ $settings['mercadopago_sandbox_public_key'] ?? '' }}"
-                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
-                    </div>
-                    <div>
-                        <label
-                            class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Access
-                            Token
-                            (Sandbox)</label>
-                        <input type="text" name="mercadopago_sandbox_access_token"
-                            value="{{ $settings['mercadopago_sandbox_access_token'] ?? '' }}"
-                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Production -->
-            <div
-                class="env-production mb-4 p-4 bg-green-50 dark:bg-green-900/10 rounded-2xl border border-green-200 dark:border-green-800/30 hidden">
-                <h4 class="text-xs font-bold text-green-700 dark:text-green-500 uppercase tracking-wider mb-4"><i
-                        class="fas fa-check-circle mr-1"></i> Credenciais de Produção</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label
-                            class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Public
-                            Key
-                            (Produção)</label>
-                        <input type="text" name="mercadopago_prod_public_key"
-                            value="{{ $settings['mercadopago_prod_public_key'] ?? '' }}"
-                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
-                    </div>
-                    <div>
-                        <label
-                            class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Access
-                            Token
-                            (Produção)</label>
-                        <div class="flex gap-2">
-                            <input type="text" name="mercadopago_prod_access_token"
-                                value="{{ $settings['mercadopago_prod_access_token'] ?? '' }}"
-                                class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
-                            <button type="button" onclick="testGatewayConnection('mercadopago')"
-                                class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl font-bold hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors whitespace-nowrap">
-                                <i class="fas fa-plug mr-2"></i> Testar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+    {{-- Credenciais Produção --}}
+    <div class="env-production p-4 bg-green-50 dark:bg-green-900/10 rounded-2xl border border-green-200 dark:border-green-800/30 hidden">
+        <h4 class="text-xs font-bold text-green-700 dark:text-green-500 uppercase tracking-wider mb-4">
+            <i class="fas fa-check-circle mr-1"></i> Credenciais de Produção
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Webhook
-                    URL</label>
-                <div class="flex">
-                    <input type="text" readonly value="{{ route('api.webhooks.mercadopago') }}"
-                        class="w-full px-4 py-2 rounded-l-2xl border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm focus:outline-none transition-colors">
-                    <button type="button" onclick="copyToClipboard('{{ route('api.webhooks.mercadopago') }}')"
-                        class="bg-slate-100 dark:bg-slate-800 h-10 hover:bg-slate-200 dark:hover:bg-slate-750 border border-l-0 border-slate-200 dark:border-slate-800 rounded-r-2xl px-4 text-slate-600 dark:text-slate-300 font-medium transition-colors">
-                        <i class="fas fa-copy"></i>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Public Key (Produção)</label>
+                <input type="text" name="mercadopago_prod_public_key"
+                    value="{{ $settings['mercadopago_prod_public_key'] ?? '' }}"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Access Token (Produção)</label>
+                <div class="flex gap-2">
+                    <input type="text" name="mercadopago_prod_access_token"
+                        value="{{ $settings['mercadopago_prod_access_token'] ?? '' }}"
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                    <button type="button" onclick="testGatewayConnection('mercadopago')"
+                        class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl font-bold hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors whitespace-nowrap">
+                        <i class="fas fa-plug mr-2"></i> Testar
                     </button>
                 </div>
             </div>
-
-            {{-- Meios de Pagamento Aceitos --}}
-            <div
-                class="mt-6 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
-                <h4 class="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-4">
-                    <i class="fas fa-list-check mr-1"></i> Meios de Pagamento Aceitos (Checkout)
-                </h4>
-                <p class="text-xs text-slate-400 mb-6 font-medium">Ative ou desative os métodos que estarão dispiníveis
-                    no checkout. As alterações são salvas automaticamente.</p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Cartão de Crédito -->
-                    <div
-                        class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500">
-                                <i class="fas fa-credit-card"></i>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-slate-800 dark:text-white text-sm">Cartão de Crédito</h5>
-                            </div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="hidden" name="mercadopago_method_credit_card" value="0">
-                            <input type="checkbox" class="sr-only peer" name="mercadopago_method_credit_card" value="1"
-                                onchange="toggleSetting('mercadopago_method_credit_card', this.checked)" {{ ($settings['mercadopago_method_credit_card'] ?? 1) ? 'checked' : '' }}>
-                            <div
-                                class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- Cartão de Débito -->
-                    <div
-                        class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500">
-                                <i class="fas fa-credit-card"></i>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-slate-800 dark:text-white text-sm">Cartão de Débito</h5>
-                            </div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="hidden" name="mercadopago_method_debit_card" value="0">
-                            <input type="checkbox" class="sr-only peer" name="mercadopago_method_debit_card" value="1"
-                                onchange="toggleSetting('mercadopago_method_debit_card', this.checked)" {{ ($settings['mercadopago_method_debit_card'] ?? 0) ? 'checked' : '' }}>
-                            <div
-                                class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- Pix -->
-                    <div
-                        class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="flex-shrink-0 w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-500">
-                                <i class="fa-brands fa-pix"></i>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-slate-800 dark:text-white text-sm">Pix</h5>
-                            </div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="hidden" name="mercadopago_method_pix" value="0">
-                            <input type="checkbox" class="sr-only peer" name="mercadopago_method_pix" value="1"
-                                onchange="toggleSetting('mercadopago_method_pix', this.checked)" {{ ($settings['mercadopago_method_pix'] ?? 1) ? 'checked' : '' }}>
-                            <div
-                                class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600">
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- Boleto -->
-                    <div
-                        class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="flex-shrink-0 w-10 h-10 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-500">
-                                <i class="fas fa-barcode"></i>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-slate-800 dark:text-white text-sm">Boleto (Ticket)</h5>
-                            </div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="hidden" name="mercadopago_method_ticket" value="0">
-                            <input type="checkbox" class="sr-only peer" name="mercadopago_method_ticket" value="1"
-                                onchange="toggleSetting('mercadopago_method_ticket', this.checked)" {{ ($settings['mercadopago_method_ticket'] ?? 0) ? 'checked' : '' }}>
-                            <div
-                                class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 dark:peer-focus:ring-orange-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-orange-500">
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- Carteira MP -->
-                    <div
-                        class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500">
-                                <i class="fas fa-wallet"></i>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-slate-800 dark:text-white text-sm">Carteira MP</h5>
-                            </div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="hidden" name="mercadopago_method_mercadopago" value="0">
-                            <input type="checkbox" class="sr-only peer" name="mercadopago_method_mercadopago" value="1"
-                                onchange="toggleSetting('mercadopago_method_mercadopago', this.checked)" {{ ($settings['mercadopago_method_mercadopago'] ?? 0) ? 'checked' : '' }}>
-                            <div
-                                class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-500">
-                            </div>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Credenciais de Aplicativo (OAuth) --}}
-            <div
-                class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-200 dark:border-blue-800/30">
-                <h4
-                    class="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider mb-1 flex items-center gap-2">
-                    <i class="fas fa-key"></i> Credenciais de Aplicativo (OAuth)
-                </h4>
-                <p class="text-xs text-slate-400 mb-4">Necessário para que vendedores conectem suas contas via OAuth e
-                    habilitem split de pagamento automático.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Client ID (App
-                            ID)</label>
-                        <input type="text" name="mercadopago_client_id"
-                            value="{{ $settings['mercadopago_client_id'] ?? '' }}"
-                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
-                        <p class="text-[10px] text-slate-400 mt-1">Obtenha em: <a
-                                href="https://www.mercadopago.com.br/developers/panel/applications" target="_blank"
-                                class="text-blue-500 hover:underline">Painel MP → Aplicação → Detalhes</a></p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Client
-                            Secret</label>
-                        <input type="password" name="mercadopago_client_secret"
-                            value="{{ $settings['mercadopago_client_secret'] ?? '' }}"
-                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
-                        <p class="text-[10px] text-red-500 mt-1 font-bold">Obrigatório para Split de Pagamento (OAuth
-                            marketplace).</p>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Identificação da Plataforma --}}
-            <div
-                class="mt-4 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
-                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-2">
-                    <i class="fas fa-fingerprint"></i> Identificação da Plataforma (Opcional)
-                </h4>
-                <p class="text-xs text-slate-400 mb-4">IDs de rastreamento de qualidade do MercadoPago.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Integrator
-                            ID</label>
-                        <input type="text" name="mercadopago_integrator_id"
-                            value="{{ $settings['mercadopago_integrator_id'] ?? '' }}" placeholder="ex: dev_1234567890"
-                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Platform
-                            ID</label>
-                        <input type="text" name="mercadopago_platform_id"
-                            value="{{ $settings['mercadopago_platform_id'] ?? '' }}" placeholder="ex: plat_1234567890"
-                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
-                    </div>
-                </div>
-            </div>
-
-            {{-- Customização do Checkout --}}
-            <div
-                class="mt-4 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
-                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-2">
-                    <i class="fas fa-magic"></i> Customização do Checkout Transparente
-                </h4>
-                <p class="text-xs text-slate-400 mb-4">Personalize a aparência do checkout para combinar com sua marca.
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Tema do
-                            Checkout</label>
-                        <select name="gateway_checkout_theme"
-                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium">
-                            <option value="default" {{ ($settings['gateway_checkout_theme'] ?? 'default') == 'default' ? 'selected' : '' }}>Padrão (Mercado Pago)</option>
-                            <option value="dark" {{ ($settings['gateway_checkout_theme'] ?? '') == 'dark' ? 'selected' : '' }}>Escuro (Dark)</option>
-                            <option value="bootstrap" {{ ($settings['gateway_checkout_theme'] ?? '') == 'bootstrap' ? 'selected' : '' }}>Bootstrap</option>
-                            <option value="flat" {{ ($settings['gateway_checkout_theme'] ?? '') == 'flat' ? 'selected' : '' }}>Flat (Moderno)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Cor Primária
-                            (Botões)</label>
-                        <div class="flex gap-2">
-                            <input type="color" name="gateway_checkout_primary_color"
-                                value="{{ $settings['gateway_checkout_primary_color'] ?? '#1F5EDB' }}"
-                                class="h-12 w-14 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer"
-                                oninput="document.getElementById('gateway_color_text').value = this.value">
-                            <input type="text" id="gateway_color_text"
-                                value="{{ $settings['gateway_checkout_primary_color'] ?? '#1F5EDB' }}" readonly
-                                class="flex-1 px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-sm font-mono outline-none">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 
-    <!-- General Billing Settings -->
-    <div class="pt-6 border-t border-slate-100 dark:border-slate-800">
-        <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+    {{-- Webhook --}}
+    <div>
+        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Webhook URL</label>
+        <div class="flex">
+            <input type="text" readonly value="{{ route('api.webhooks.mercadopago') }}"
+                class="w-full px-4 py-2 rounded-l-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm focus:outline-none">
+            <button type="button" onclick="copyToClipboard('{{ route('api.webhooks.mercadopago') }}')"
+                class="bg-slate-100 dark:bg-slate-800 h-10 hover:bg-slate-200 dark:hover:bg-slate-750 border border-l-0 border-slate-200 dark:border-slate-800 rounded-r-2xl px-4 text-slate-600 dark:text-slate-300 font-medium transition-colors">
+                <i class="fas fa-copy"></i>
+            </button>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-1">Copie e cole no painel do MercadoPago.</p>
+    </div>
+
+    {{-- ===== SEÇÃO 2: MEIOS DE PAGAMENTO ===== --}}
+    <div class="pt-5 border-t border-slate-100 dark:border-slate-800">
+        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+            <i class="fas fa-list-check mr-1"></i> Meios de Pagamento Aceitos (Checkout)
+        </h4>
+        <p class="text-xs text-slate-400 mb-4 font-medium">Ative ou desative os métodos disponíveis no checkout.</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            @php
+                $methods = [
+                    ['name' => 'mercadopago_method_credit_card', 'label' => 'Cartão de Crédito', 'icon' => 'fa-credit-card', 'color' => 'blue', 'default' => 1],
+                    ['name' => 'mercadopago_method_debit_card', 'label' => 'Cartão de Débito', 'icon' => 'fa-credit-card', 'color' => 'blue', 'default' => 0],
+                    ['name' => 'mercadopago_method_pix', 'label' => 'Pix', 'icon' => 'fa-pix', 'color' => 'green', 'default' => 1, 'brand' => true],
+                    ['name' => 'mercadopago_method_ticket', 'label' => 'Boleto (Ticket)', 'icon' => 'fa-barcode', 'color' => 'orange', 'default' => 0],
+                    ['name' => 'mercadopago_method_mercadopago', 'label' => 'Carteira MP', 'icon' => 'fa-wallet', 'color' => 'blue', 'default' => 0],
+                ];
+            @endphp
+            @foreach($methods as $m)
+                <div class="flex items-center justify-between p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
+                    <div class="flex items-center gap-3">
+                        <div class="flex-shrink-0 w-9 h-9 rounded-full bg-{{ $m['color'] }}-50 dark:bg-{{ $m['color'] }}-900/20 flex items-center justify-center text-{{ $m['color'] }}-500">
+                            <i class="{{ !empty($m['brand']) ? 'fa-brands' : 'fas' }} {{ $m['icon'] }} text-sm"></i>
+                        </div>
+                        <span class="font-bold text-slate-800 dark:text-white text-sm">{{ $m['label'] }}</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="{{ $m['name'] }}" value="0">
+                        <input type="checkbox" class="sr-only peer" name="{{ $m['name'] }}" value="1"
+                            onchange="toggleSetting('{{ $m['name'] }}', this.checked)" {{ ($settings[$m['name']] ?? $m['default']) ? 'checked' : '' }}>
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-{{ $m['color'] }}-300 dark:peer-focus:ring-{{ $m['color'] }}-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-{{ $m['color'] }}-600"></div>
+                    </label>
+                </div>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- ===== SEÇÃO 3: OAUTH / MARKETPLACE ===== --}}
+    <div class="pt-5 border-t border-slate-100 dark:border-slate-800">
+        <div class="p-4 bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-200 dark:border-blue-800/30">
+            <h4 class="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider mb-1 flex items-center gap-2">
+                <i class="fas fa-key"></i> Credenciais de Aplicativo (OAuth)
+            </h4>
+            <p class="text-xs text-slate-400 mb-4">Necessário para vendedores conectarem via OAuth e habilitarem split de pagamento.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Client ID (App ID)</label>
+                    <input type="text" name="mercadopago_client_id"
+                        value="{{ $settings['mercadopago_client_id'] ?? '' }}"
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                    <p class="text-[10px] text-slate-400 mt-1">Obtenha em: <a href="https://www.mercadopago.com.br/developers/panel/applications" target="_blank" class="text-blue-500 hover:underline">Painel MP → Aplicação → Detalhes</a></p>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Client Secret</label>
+                    <input type="password" name="mercadopago_client_secret"
+                        value="{{ $settings['mercadopago_client_secret'] ?? '' }}"
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                    <p class="text-[10px] text-red-500 mt-1 font-bold">Obrigatório para Split de Pagamento (OAuth marketplace).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ===== SEÇÃO 4: CONFIGURAÇÕES GERAIS DE COBRANÇA ===== --}}
+    <div class="pt-5 border-t border-slate-100 dark:border-slate-800">
+        <h3 class="text-base font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
             <i class="fas fa-sliders-h text-blue-500"></i> Configurações Gerais de Cobrança
         </h3>
 
-        <div class="mb-6 flex items-start gap-3">
+        <div class="mb-5 flex items-start gap-3">
             <div class="flex h-5 items-center">
                 <input type="hidden" name="gateway_transparent_checkout" value="0">
                 <input id="gateway_transparent_checkout" name="gateway_transparent_checkout" type="checkbox" value="1"
@@ -347,20 +165,14 @@
                     {{ ($settings['gateway_transparent_checkout'] ?? 0) ? 'checked' : '' }}>
             </div>
             <div class="text-sm">
-                <label for="gateway_transparent_checkout"
-                    class="font-bold text-slate-700 dark:text-slate-300 transition-colors">Habilitar
-                    Checkout Transparente</label>
-                <p class="text-slate-500 dark:text-slate-400 transition-colors">Se desativado, o usuário será
-                    redirecionado para a página
-                    de pagamento do gateway.</p>
+                <label for="gateway_transparent_checkout" class="font-bold text-slate-700 dark:text-slate-300">Habilitar Checkout Transparente (Manter usuário no site)</label>
+                <p class="text-slate-500 dark:text-slate-400">Se desativado, o usuário será redirecionado para a página de pagamento do gateway.</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Juros
-                    de Parcelamento (%
-                    a.m.)</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Juros de Parcelamento (% a.m.)</label>
                 <div class="relative">
                     <input type="number" step="0.01" name="gateway_installment_tax"
                         value="{{ $settings['gateway_installment_tax'] ?? '0.00' }}"
@@ -369,37 +181,94 @@
                         <span class="text-slate-500 dark:text-slate-400">%</span>
                     </div>
                 </div>
+                <p class="text-[10px] text-slate-400 mt-1">Deixe 0.00 para usar configuração do gateway.</p>
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Máx.
-                    Parcelas sem
-                    Juros</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Máx. Parcelas sem Juros</label>
                 <input type="number" name="gateway_max_installments_no_interest"
                     value="{{ $settings['gateway_max_installments_no_interest'] ?? '1' }}"
                     class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
             </div>
             <div>
-                <label
-                    class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Repassar
-                    Taxas ao
-                    Cliente?</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Repassar Taxas ao Cliente?</label>
                 <select name="gateway_pass_tax_to_client"
                     class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
-                    <option value="0" {{ ($settings['gateway_pass_tax_to_client'] ?? 0) == 0 ? 'selected' : '' }}>Não
-                        (Empresa absorve)</option>
-                    <option value="1" {{ ($settings['gateway_pass_tax_to_client'] ?? 0) == 1 ? 'selected' : '' }}>Sim
-                        (Cliente paga)</option>
+                    <option value="0" {{ ($settings['gateway_pass_tax_to_client'] ?? 0) == 0 ? 'selected' : '' }}>Não (Empresa absorve)</option>
+                    <option value="1" {{ ($settings['gateway_pass_tax_to_client'] ?? 0) == 1 ? 'selected' : '' }}>Sim (Cliente paga)</option>
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Taxa da
-                    Plataforma - Marketplace (%)</label>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Taxa Marketplace (%)</label>
                 <div class="relative">
                     <input type="number" step="0.01" name="marketplace_fee"
                         value="{{ $settings['marketplace_fee'] ?? '10.00' }}"
                         class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white pr-8">
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <span class="text-slate-500 dark:text-slate-400">%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ===== SEÇÃO 5: CUSTOMIZAÇÃO DO CHECKOUT ===== --}}
+    <div class="pt-5 border-t border-slate-100 dark:border-slate-800">
+        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-2">
+            <i class="fas fa-magic"></i> Customização do Checkout
+        </h4>
+        <p class="text-xs text-slate-400 mb-4">Personalize a aparência do checkout para combinar com sua marca.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Tema do Checkout</label>
+                <select name="gateway_checkout_theme"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium">
+                    <option value="default" {{ ($settings['gateway_checkout_theme'] ?? 'default') == 'default' ? 'selected' : '' }}>Padrão (Mercado Pago)</option>
+                    <option value="dark" {{ ($settings['gateway_checkout_theme'] ?? '') == 'dark' ? 'selected' : '' }}>Escuro (Dark)</option>
+                    <option value="bootstrap" {{ ($settings['gateway_checkout_theme'] ?? '') == 'bootstrap' ? 'selected' : '' }}>Bootstrap</option>
+                    <option value="flat" {{ ($settings['gateway_checkout_theme'] ?? '') == 'flat' ? 'selected' : '' }}>Flat (Moderno)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Cor Primária (Botões)</label>
+                <div class="flex gap-2">
+                    <input type="color" name="gateway_checkout_primary_color"
+                        value="{{ $settings['gateway_checkout_primary_color'] ?? '#1F5EDB' }}"
+                        class="h-12 w-14 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer"
+                        oninput="document.getElementById('gateway_color_text').value = this.value">
+                    <input type="text" id="gateway_color_text"
+                        value="{{ $settings['gateway_checkout_primary_color'] ?? '#1F5EDB' }}" readonly
+                        class="flex-1 px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-sm font-mono outline-none">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ===== SEÇÃO 6: AVANÇADO (Colapsável) ===== --}}
+    <div class="pt-5 border-t border-slate-100 dark:border-slate-800">
+        <div class="cursor-pointer flex items-center justify-between mb-3" onclick="toggleCard('advanced_gateway')">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                <i class="fas fa-cog"></i> Configurações Avançadas
+            </h4>
+            <i class="fas fa-chevron-down text-slate-400 text-xs transition-transform" id="advanced_gateway_icon"></i>
+        </div>
+        <div id="advanced_gateway" class="hidden space-y-4">
+            <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-2">
+                    <i class="fas fa-fingerprint"></i> Identificação da Plataforma (Opcional)
+                </h4>
+                <p class="text-xs text-slate-400 mb-4">IDs de rastreamento de qualidade do MercadoPago.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Integrator ID</label>
+                        <input type="text" name="mercadopago_integrator_id"
+                            value="{{ $settings['mercadopago_integrator_id'] ?? '' }}" placeholder="ex: dev_1234567890"
+                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Platform ID</label>
+                        <input type="text" name="mercadopago_platform_id"
+                            value="{{ $settings['mercadopago_platform_id'] ?? '' }}" placeholder="ex: plat_1234567890"
+                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
                     </div>
                 </div>
             </div>
@@ -496,9 +365,9 @@
             // Init Gateway Environment UI
             document.querySelectorAll('.gateway-env-select').forEach(select => {
                 select.addEventListener('change', function () {
-                    const parent = this.closest('div[id$="_card"]'); // Find nearest Parent card content
-                    const sandbox = parent.querySelector('.env-sandbox');
-                    const production = parent.querySelector('.env-production');
+                    const container = this.closest('.space-y-6');
+                    const sandbox = container.querySelector('.env-sandbox');
+                    const production = container.querySelector('.env-production');
 
                     if (this.value === 'sandbox') {
                         if (sandbox) sandbox.classList.remove('hidden');
