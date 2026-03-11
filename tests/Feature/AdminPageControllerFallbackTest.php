@@ -167,6 +167,32 @@ class AdminPageControllerFallbackTest extends TestCase
         $this->assertSame(['hero_image', 'networking_image'], $controllerConstants['somos-unicas-sobre']);
     }
 
+    public function test_somos_unicas_editor_renders_expected_sections_and_fields(): void
+    {
+        $html = view('admin.pages.partials.somos-unicas', [
+            'data' => [
+                'hero_image' => 'pages/somos-unicas/hero.jpg',
+            ],
+            'errors' => new ViewErrorBag(),
+        ])->render();
+
+        $this->assertStringContainsString('id="sec-identity"', $html);
+        $this->assertStringContainsString('id="sec-hero"', $html);
+        $this->assertStringContainsString('id="sec-headers"', $html);
+        $this->assertStringContainsString('id="sec-empty"', $html);
+        $this->assertStringContainsString('name="theme_color"', $html);
+        $this->assertStringContainsString('name="hero_title"', $html);
+        $this->assertStringContainsString('name="hero_subtitle"', $html);
+        $this->assertStringContainsString('name="hero_image"', $html);
+        $this->assertStringContainsString('name="remove_hero_image"', $html);
+        $this->assertStringContainsString('name="courses_title"', $html);
+        $this->assertStringContainsString('name="events_title"', $html);
+        $this->assertStringContainsString('name="mentorships_title"', $html);
+        $this->assertStringContainsString('name="empty_title"', $html);
+        $this->assertStringContainsString('name="empty_description"', $html);
+        $this->assertStringNotContainsString('value="Em breve!">', $html);
+    }
+
     public function test_somos_unicas_about_editor_renders_expected_fields(): void
     {
         $html = view('admin.pages.partials.somos-unicas-sobre', [
@@ -189,6 +215,31 @@ class AdminPageControllerFallbackTest extends TestCase
         $this->assertStringContainsString('data-upload-global-instance', $html);
         $this->assertStringContainsString('data-upload-path-input', $html);
         $this->assertStringContainsString('data-upload-remove-input', $html);
+    }
+
+    public function test_portal_editor_uses_top_level_field_names_expected_by_controller(): void
+    {
+        $html = view('admin.pages.partials.portal', [
+            'data' => [
+                'hero_image' => 'pages/portal/hero.jpg',
+            ],
+            'errors' => new ViewErrorBag(),
+        ])->render();
+
+        $this->assertStringContainsString('name="hero_title"', $html);
+        $this->assertStringContainsString('name="hero_subtitle"', $html);
+        $this->assertStringContainsString('name="hero_image"', $html);
+        $this->assertStringContainsString('name="remove_hero_image"', $html);
+        $this->assertStringContainsString('name="stat_1_value"', $html);
+        $this->assertStringContainsString('name="stat_4_label"', $html);
+        $this->assertStringContainsString('name="cta_title"', $html);
+        $this->assertStringContainsString('name="cta_subtitle"', $html);
+        $this->assertStringContainsString('name="cta_btn"', $html);
+
+        $this->assertStringNotContainsString('name="data[hero_title]"', $html);
+        $this->assertStringNotContainsString('name="data[cta_title]"', $html);
+        $this->assertStringNotContainsString('name="images[hero_image]"', $html);
+        $this->assertStringNotContainsString('name="remove_image[hero_image]"', $html);
     }
 
     public function test_update_persists_premium_scalar_fields(): void
