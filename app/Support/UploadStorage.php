@@ -132,6 +132,28 @@ class UploadStorage
         return min($limits);
     }
 
+    public static function recommendedChunkSizeBytes(?int $applicationMaxBytes = null): int
+    {
+        $effectiveLimit = self::effectiveUploadLimitBytes($applicationMaxBytes);
+        $fallback = 1024 * 1024;
+        $minimum = 256 * 1024;
+        $maximum = 5 * 1024 * 1024;
+        $safetyMargin = 512 * 1024;
+
+        if ($effectiveLimit === null || $effectiveLimit <= 0) {
+            return $applicationMaxBytes !== null && $applicationMaxBytes > 0
+                ? max($minimum, min($fallback, $applicationMaxBytes))
+                : $fallback;
+        }
+
+        $chunkSize = $effectiveLimit - $safetyMargin;
+        if ($applicationMaxBytes !== null && $applicationMaxBytes > 0) {
+            $chunkSize = min($chunkSize, $applicationMaxBytes);
+        }
+
+        return max($minimum, min($chunkSize, $maximum));
+    }
+
     public static function parseIniSizeToBytes(?string $value): ?int
     {
         $value = trim((string) $value);

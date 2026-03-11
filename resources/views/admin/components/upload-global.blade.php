@@ -1,4 +1,5 @@
 @php
+    use App\Support\UploadStorage;
     use Illuminate\Support\Str;
 
     $instance = 'upload-global-' . Str::slug($name ?? 'file', '-') . '-' . Str::random(6);
@@ -9,10 +10,12 @@
     $previewUrl = $preview_url ?? $existing;
     $removeName = $remove_name ?? null;
     $maxSizeBytes = (int) ($max_size ?? 0);
+    $chunkSizeBytes = UploadStorage::recommendedChunkSizeBytes($maxSizeBytes > 0 ? $maxSizeBytes : null);
 @endphp
 
 <div class="upload-global-wrapper" id="{{ $instance }}" data-upload-global-instance="{{ $instance }}"
-    data-upload-max-size="{{ $maxSizeBytes }}">
+    data-upload-max-size="{{ $maxSizeBytes }}"
+    data-upload-chunk-size="{{ $chunkSizeBytes }}">
     @if($label)
         <label class="font-weight-bold mb-2 d-block">{{ $label }}</label>
     @endif
@@ -117,7 +120,7 @@
         const clearBtn = root.querySelector('[data-upload-clear]');
 
         let startTime, uploadedBytes = 0;
-        const CHUNK_SIZE = 2 * 1024 * 1024; // 2MB por chunk
+        const CHUNK_SIZE = Math.max(262144, parseInt(root.dataset.uploadChunkSize || '1048576', 10));
         const maxSizeBytes = parseInt(root.dataset.uploadMaxSize || '0', 10);
 
         function formatBytes(bytes) {
@@ -126,6 +129,26 @@
             const sizes = ['B', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        async function parseUploadResponse(response, fallbackMessage) {
+            const contentType = response.headers.get('content-type') || '';
+
+            if (contentType.includes('application/json')) {
+                const json = await response.json();
+                if (!response.ok) {
+                    throw new Error(json.error || json.message || fallbackMessage);
+                }
+
+                return json;
+            }
+
+            const text = await response.text();
+            if (!response.ok) {
+                throw new Error((text || fallbackMessage).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+            }
+
+            return { ok: true, raw: text };
         }
 
         async function uploadFile(file) {
@@ -159,11 +182,16 @@
                     formData.append('chunk_index', i);
                     formData.append('total_chunks', totalChunks);
 
-                    await fetch("{{ route('admin.upload.chunk') }}", {
+                    const chunkResponse = await fetch("{{ route('admin.upload.chunk') }}", {
                         method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
                         body: formData
                     });
+                    await parseUploadResponse(chunkResponse, 'Falha ao enviar uma parte do arquivo.');
 
                     uploadedBytes += chunk.size;
                     updateProgress(uploadedBytes, file.size);
@@ -173,11 +201,16 @@
                 statusText.textContent = "Finalizando...";
                 const res = await fetch("{{ route('admin.upload.assemble') }}", {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify({ upload_id: uploadId, filename: file.name, total_chunks: totalChunks })
                 });
 
-                const data = await res.json();
+                const data = await parseUploadResponse(res, 'Falha ao finalizar o upload.');
                 if (data.ok) {
                     showPreview(file, data.url, data.path);
                     Swal.fire({ icon: 'success', title: 'Upload concluído!', toast: true, position: 'top-end', timer: 3000, showConfirmButton: false });
