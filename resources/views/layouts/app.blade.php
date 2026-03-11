@@ -24,8 +24,30 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', \App\Models\Setting::get('seo_meta_title') ?: config('app.name', 'UNN'))</title>
     @php
+        $resolvePublicAsset = function ($value) {
+            $value = trim((string) $value);
+            if ($value === '') {
+                return null;
+            }
+
+            if (preg_match('#^https?://#i', $value)) {
+                return $value;
+            }
+
+            $normalized = ltrim(str_replace('\\', '/', $value), '/');
+            $candidate = public_path($normalized);
+
+            if (file_exists($candidate)) {
+                return asset($normalized);
+            }
+
+            return null;
+        };
+
         $logo = \App\Models\Setting::getUrl('logo_front') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg');
         $favicon = \App\Models\Setting::getUrl('favicon_image') ?: asset('favicon.ico');
+        $preloaderImage = $resolvePublicAsset(\App\Models\Setting::get('preloader_image')) ?: $logo;
+        $preloaderEnabled = (string) \App\Models\Setting::get('preloader_enabled', '1') === '1';
         $pwaEnabled = (string) \App\Models\Setting::get('pwa_enabled', '1') === '1';
         $pwaPromptEnabled = (string) \App\Models\Setting::get('pwa_prompt_enabled', '1') === '1';
         $pwaPromptSnoozeDays = (int) \App\Models\Setting::get('pwa_prompt_snooze_days', '7');
@@ -826,20 +848,11 @@
 </head>
 
 <body class="bg-slate-50 min-h-screen">
-    @php
-        $user = auth()->user();
-        $isStaff = $user && (
-            in_array($user->role, ['admin', 'superadmin']) ||
-            in_array($user->level, ['admin', 'superadmin', 'sucesso'])
-        );
-        $showPreloader = !$isStaff;
-    @endphp
-
-    @if($showPreloader)
+    @if($preloaderEnabled)
         <div id="preloader"
             class="fixed inset-0 z-[99999] flex items-center justify-center bg-white transition-opacity duration-500">
             <div class="relative">
-                <img src="{{ $logo }}" alt="Loading..." class="h-20 w-20 animate-pulse object-contain">
+                <img src="{{ $preloaderImage }}" alt="Loading..." class="h-20 w-20 animate-pulse object-contain">
                 <div class="absolute -inset-4 border-2 border-unn-azul-1/30 border-t-unn-azul-1 rounded-full animate-spin">
                 </div>
             </div>
