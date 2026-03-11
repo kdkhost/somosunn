@@ -186,6 +186,9 @@ class AdminPageControllerFallbackTest extends TestCase
         $this->assertStringContainsString('name="remove_hero_image"', $html);
         $this->assertStringContainsString('name="content_title"', $html);
         $this->assertStringContainsString('name="content_body"', $html);
+        $this->assertStringContainsString('upload-box premium-upload-box', $html);
+        $this->assertStringContainsString('drop-zone-area', $html);
+        $this->assertStringNotContainsString('custom-file-input', $html);
     }
 
     public function test_update_persists_premium_scalar_fields(): void

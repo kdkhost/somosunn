@@ -28,12 +28,47 @@
                     </div>
                     <div class="col-lg-8">
                         <div class="form-group mb-0">
-                            <label class="font-weight-bold" for="networking_image">Imagem da secao Comunidade</label>
-                            <div class="custom-file">
+                            <label class="font-weight-bold d-block mb-3">Imagem da secao Comunidade</label>
+                            @php
+                                $networkingImageUrl = !empty($data['networking_image'])
+                                    ? asset('storage/' . $data['networking_image'])
+                                    : '';
+                            @endphp
+                            <div class="upload-box premium-upload-box" data-max-size="6291456"
+                                data-remove-input="#remove_networking_image"
+                                data-preview-image-class="img-fluid rounded shadow-sm border"
+                                data-preview-image-style="max-height: 220px; width: 100%; object-fit: cover;"
+                                data-existing-url="{{ $networkingImageUrl }}">
                                 <input type="file" name="networking_image" id="networking_image"
-                                    class="custom-file-input @error('networking_image') is-invalid @enderror"
-                                    accept="image/*" data-preview="prev-networking_image">
-                                <label class="custom-file-label" for="networking_image">Escolher imagem...</label>
+                                    class="d-none @error('networking_image') is-invalid @enderror" accept="image/*">
+                                <input type="hidden" name="remove_networking_image" id="remove_networking_image" value="0">
+                                <div class="upload-preview mb-3 drop-zone-area text-center">
+                                    @if($networkingImageUrl !== '')
+                                        <img src="{{ $networkingImageUrl }}" class="img-fluid rounded shadow-sm border"
+                                            style="max-height: 220px; width: 100%; object-fit: cover;">
+                                    @else
+                                        <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
+                                            style="min-height: 150px;">
+                                            <i class="fas fa-image fa-2x mb-2 text-primary opacity-50"></i>
+                                            <span class="small font-weight-bold">Imagem da Comunidade</span>
+                                            <span class="small opacity-75">Arraste e solte ou clique para selecionar</span>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="upload-meta text-muted small mb-2 text-center"></div>
+                                <small class="text-muted upload-help d-block text-center mb-3"></small>
+                                <div class="progress upload-progress progress-sm d-none mb-3">
+                                    <div class="progress-bar bg-primary" style="width:0%"></div>
+                                </div>
+                                <div class="upload-actions d-flex justify-content-center gap-2">
+                                    <button type="button" class="btn btn-xs btn-primary upload-btn rounded-pill px-3">
+                                        <i class="fas fa-upload mr-1"></i> Selecionar imagem
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-xs btn-danger upload-remove rounded-pill px-2 {{ $networkingImageUrl ? '' : 'd-none' }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                             @error('networking_image')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -42,28 +77,6 @@
                             <small class="text-muted d-block mt-2">
                                 Esta imagem e usada na secao Comunidade da pagina <strong>/somos-unicas/sobre</strong>.
                             </small>
-
-                            @if(!empty($data['networking_image']))
-                                <div class="custom-control custom-checkbox mt-3">
-                                    <input type="checkbox" class="custom-control-input" id="remove_networking_image"
-                                        name="remove_networking_image" value="1">
-                                    <label class="custom-control-label text-danger" for="remove_networking_image">
-                                        Remover imagem atual
-                                    </label>
-                                </div>
-                            @endif
-
-                            @php
-                                $networkingImageUrl = !empty($data['networking_image'])
-                                    ? asset('storage/' . $data['networking_image'])
-                                    : '';
-                            @endphp
-                            <div class="mt-3">
-                                <img id="prev-networking_image" src="{{ $networkingImageUrl }}"
-                                    class="img-fluid rounded shadow-sm border {{ $networkingImageUrl ? '' : 'd-none' }}"
-                                    alt="Preview da imagem da secao Comunidade"
-                                    style="max-height: 220px; width: 100%; object-fit: cover;">
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -134,11 +147,46 @@
                     <div class="col-xl-5 mt-4 mt-xl-0">
                         <div class="border rounded p-3 bg-light h-100">
                             <label class="font-weight-bold d-block" for="hero_image">Imagem de destaque (banner)</label>
-                            <div class="custom-file">
+                            @php
+                                $heroImageUrl = !empty($data['hero_image'])
+                                    ? asset('storage/' . $data['hero_image'])
+                                    : '';
+                            @endphp
+                            <div class="upload-box premium-upload-box" data-max-size="6291456"
+                                data-remove-input="#remove_hero_image"
+                                data-preview-image-class="img-fluid rounded shadow-sm border"
+                                data-preview-image-style="max-height: 280px; width: 100%; object-fit: cover;"
+                                data-existing-url="{{ $heroImageUrl }}">
                                 <input type="file" name="hero_image" id="hero_image"
-                                    class="custom-file-input @error('hero_image') is-invalid @enderror"
-                                    accept="image/*" data-preview="prev-hero_image">
-                                <label class="custom-file-label" for="hero_image">Escolher imagem...</label>
+                                    class="d-none @error('hero_image') is-invalid @enderror" accept="image/*">
+                                <input type="hidden" name="remove_hero_image" id="remove_hero_image" value="0">
+                                <div class="upload-preview mb-3 drop-zone-area text-center">
+                                    @if($heroImageUrl !== '')
+                                        <img src="{{ $heroImageUrl }}" class="img-fluid rounded shadow-sm border"
+                                            style="max-height: 280px; width: 100%; object-fit: cover;">
+                                    @else
+                                        <div class="text-muted p-4 border-2 border-dashed rounded bg-white d-flex flex-column align-items-center justify-content-center"
+                                            style="min-height: 220px;">
+                                            <i class="fas fa-image fa-3x mb-3 text-primary opacity-50"></i>
+                                            <span class="font-weight-bold">Banner da pagina</span>
+                                            <span class="small opacity-75">Arraste e solte ou clique para selecionar</span>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="upload-meta text-muted small mb-2 text-center"></div>
+                                <small class="text-muted upload-help d-block text-center mb-3"></small>
+                                <div class="progress upload-progress progress-sm d-none mb-3">
+                                    <div class="progress-bar bg-primary" style="width:0%"></div>
+                                </div>
+                                <div class="text-center">
+                                    <button type="button" class="btn btn-sm btn-primary upload-btn rounded-pill px-4 shadow-sm">
+                                        <i class="fas fa-images mr-1"></i> Selecionar imagem
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-sm btn-danger upload-remove rounded-pill px-3 shadow-sm {{ $heroImageUrl ? '' : 'd-none' }}">
+                                        <i class="fas fa-trash mr-1"></i> Remover
+                                    </button>
+                                </div>
                             </div>
                             @error('hero_image')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -147,28 +195,6 @@
                             <small class="text-muted d-block mt-2">
                                 Esta imagem sera exibida ao lado do titulo principal. Recomendado: 800x600px.
                             </small>
-
-                            @if(!empty($data['hero_image']))
-                                <div class="custom-control custom-checkbox mt-3">
-                                    <input type="checkbox" class="custom-control-input" id="remove_hero_image"
-                                        name="remove_hero_image" value="1">
-                                    <label class="custom-control-label text-danger" for="remove_hero_image">
-                                        Remover imagem atual
-                                    </label>
-                                </div>
-                            @endif
-
-                            @php
-                                $heroImageUrl = !empty($data['hero_image'])
-                                    ? asset('storage/' . $data['hero_image'])
-                                    : '';
-                            @endphp
-                            <div class="mt-3">
-                                <img id="prev-hero_image" src="{{ $heroImageUrl }}"
-                                    class="img-fluid rounded shadow-sm border {{ $heroImageUrl ? '' : 'd-none' }}"
-                                    alt="Preview do banner da pagina"
-                                    style="max-height: 280px; width: 100%; object-fit: cover;">
-                            </div>
                         </div>
                     </div>
                 </div>
