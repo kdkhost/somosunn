@@ -1,7 +1,8 @@
 {{-- Modal Quick Upload - Painel (Tailwind + JS Puro) --}}
 <div id="panelQuickUploadModal"
-    class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+    class="fixed inset-0 z-[9999] hidden items-center justify-center p-4"
     hidden
+    aria-hidden="true"
     role="dialog" aria-modal="true" aria-labelledby="panelQuickUploadTitle">
 
     <div id="panelQuickUploadOverlay"
@@ -117,6 +118,13 @@
         return;
     }
 
+    function setModalVisibility(isOpen) {
+        modal.hidden = !isOpen;
+        modal.classList.toggle('hidden', !isOpen);
+        modal.classList.toggle('flex', isOpen);
+        modal.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    }
+
     function show(element) {
         element.hidden = false;
     }
@@ -143,13 +151,14 @@
 
     window.openQuickUploadModal = function () {
         resetQuickUploadState();
-        show(modal);
+        setModalVisibility(true);
         document.body.style.overflow = 'hidden';
         searchInput.focus();
     };
 
     window.closePanelQuickUpload = function () {
-        hide(modal);
+        resetQuickUploadState();
+        setModalVisibility(false);
         document.body.style.overflow = '';
     };
 
@@ -162,6 +171,10 @@
         if (event.key === 'Escape' && !modal.hidden) {
             window.closePanelQuickUpload();
         }
+    });
+
+    window.addEventListener('pageshow', function () {
+        window.closePanelQuickUpload();
     });
 
     searchInput.addEventListener('input', function () {
@@ -309,6 +322,8 @@
             hide(progress);
         }
     }
+
+    window.closePanelQuickUpload();
 })();
 </script>
 @endpush
