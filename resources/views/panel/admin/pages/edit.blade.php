@@ -72,7 +72,7 @@
                                 'como-funciona' => ['Hero', 'Planos', 'Passos', 'CTA'],
                                 'quem-somos' => ['Hero', 'Fundadores', 'Time', 'Estatísticas', 'CTA'],
                                 'eventos' => ['Hero', 'Listagem', 'CTA'],
-                                'portal' => ['Hero', 'Estatísticas', 'CTA'],
+                                'portal' => ['Hero', 'Estatísticas', 'Niveis da Comunidade', 'Top Networkers', 'CTA'],
                                 'premium' => ['Hero', 'Planos'],
                                 'somos-unicas' => ['Identidade', 'Banner', 'Conteúdo'],
                                 'somos-unicas-sobre' => ['Identidade', 'Conteúdo'],

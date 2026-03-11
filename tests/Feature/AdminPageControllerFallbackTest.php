@@ -295,6 +295,77 @@ class AdminPageControllerFallbackTest extends TestCase
         $this->assertSame(302, $response->getStatusCode());
     }
 
+    public function test_update_persists_portal_scalar_fields(): void
+    {
+        Schema::create('pages', function (Blueprint $table) {
+            $table->id();
+            $table->string('slug', 120)->unique();
+            $table->string('title', 255)->nullable();
+            $table->json('data')->nullable();
+            $table->timestamps();
+        });
+
+        $page = Page::query()->create([
+            'slug' => 'portal',
+            'title' => 'Portal',
+            'data' => [],
+        ]);
+
+        $request = Request::create('/admin/pages/' . $page->id, 'PUT', [
+            'title' => 'Portal Atualizado',
+            'hero_title' => 'Novo Portal',
+            'hero_subtitle' => 'Descricao de portal',
+            'stat_1_value' => '120',
+            'stat_1_label' => 'Palestras',
+            'community_title' => 'Niveis da Comunidade',
+            'community_level_1_name' => 'Iniciante',
+            'community_level_1_count' => '1.200',
+            'community_level_1_icon' => 'seedling',
+            'community_level_1_color' => '#10B981',
+            'community_level_1_desc' => 'Comecando a jornada',
+            'community_level_4_name' => 'Mentor',
+            'community_level_4_count' => '150',
+            'community_level_4_icon' => 'crown',
+            'community_level_4_color' => '#F59E0B',
+            'community_level_4_desc' => 'Elite da comunidade',
+            'ranking_title' => 'Top Networkers',
+            'ranking_subtitle' => 'Ranking baseado em conexoes',
+            'cta_title' => 'CTA Portal',
+            'cta_subtitle' => 'Descricao final',
+            'cta_btn' => 'Conhecer planos',
+            'seo_title' => 'SEO portal',
+            'seo_description' => 'Descricao SEO portal',
+        ]);
+
+        $request->setLaravelSession(app('session.store'));
+
+        $response = app(PageController::class)->update($request, $page);
+
+        $page->refresh();
+
+        $this->assertSame('Portal Atualizado', $page->title);
+        $this->assertSame('Novo Portal', $page->data['hero_title'] ?? null);
+        $this->assertSame('Niveis da Comunidade', $page->data['community_title'] ?? null);
+        $this->assertSame('Iniciante', $page->data['community_level_1_name'] ?? null);
+        $this->assertSame('1.200', $page->data['community_level_1_count'] ?? null);
+        $this->assertSame('seedling', $page->data['community_level_1_icon'] ?? null);
+        $this->assertSame('#10B981', $page->data['community_level_1_color'] ?? null);
+        $this->assertSame('Comecando a jornada', $page->data['community_level_1_desc'] ?? null);
+        $this->assertSame('Mentor', $page->data['community_level_4_name'] ?? null);
+        $this->assertSame('150', $page->data['community_level_4_count'] ?? null);
+        $this->assertSame('crown', $page->data['community_level_4_icon'] ?? null);
+        $this->assertSame('#F59E0B', $page->data['community_level_4_color'] ?? null);
+        $this->assertSame('Elite da comunidade', $page->data['community_level_4_desc'] ?? null);
+        $this->assertSame('Top Networkers', $page->data['ranking_title'] ?? null);
+        $this->assertSame('Ranking baseado em conexoes', $page->data['ranking_subtitle'] ?? null);
+        $this->assertSame('CTA Portal', $page->data['cta_title'] ?? null);
+        $this->assertSame('Descricao final', $page->data['cta_subtitle'] ?? null);
+        $this->assertSame('Conhecer planos', $page->data['cta_btn'] ?? null);
+        $this->assertSame('SEO portal', $page->data['seo_title'] ?? null);
+        $this->assertSame('Descricao SEO portal', $page->data['seo_description'] ?? null);
+        $this->assertSame(302, $response->getStatusCode());
+    }
+
     public function test_update_persists_somos_unicas_about_uploaded_images(): void
     {
         Schema::create('pages', function (Blueprint $table) {
