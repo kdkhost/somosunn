@@ -164,7 +164,8 @@
         <strong>Alterações não salvas.</strong> Clique em "Salvar alterações" para publicar.
     </div>
 
-    <form id="page-form" method="POST" action="{{ route('admin.pages.update', $page) }}" enctype="multipart/form-data">
+    <form id="page-form" method="POST" action="{{ route('admin.pages.update', $page) }}" enctype="multipart/form-data"
+        data-upload-progress="false">
         @csrf
         @method('PUT')
 

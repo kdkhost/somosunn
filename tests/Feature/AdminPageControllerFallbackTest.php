@@ -8,6 +8,7 @@ use App\Support\CmsPageCatalog;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ViewErrorBag;
@@ -166,6 +167,27 @@ class AdminPageControllerFallbackTest extends TestCase
         $this->assertSame(['hero_image', 'networking_image'], $controllerConstants['somos-unicas-sobre']);
     }
 
+    public function test_somos_unicas_about_editor_renders_expected_fields(): void
+    {
+        $html = view('admin.pages.partials.somos-unicas-sobre', [
+            'data' => [
+                'hero_image' => 'pages/somos-unicas-sobre/hero.jpg',
+                'networking_image' => 'pages/somos-unicas-sobre/networking.jpg',
+            ],
+            'errors' => new ViewErrorBag(),
+        ])->render();
+
+        $this->assertStringContainsString('name="theme_color"', $html);
+        $this->assertStringContainsString('name="networking_image"', $html);
+        $this->assertStringContainsString('name="remove_networking_image"', $html);
+        $this->assertStringContainsString('name="hero_title"', $html);
+        $this->assertStringContainsString('name="hero_subtitle"', $html);
+        $this->assertStringContainsString('name="hero_image"', $html);
+        $this->assertStringContainsString('name="remove_hero_image"', $html);
+        $this->assertStringContainsString('name="content_title"', $html);
+        $this->assertStringContainsString('name="content_body"', $html);
+    }
+
     public function test_update_persists_premium_scalar_fields(): void
     {
         Schema::create('pages', function (Blueprint $table) {
@@ -211,6 +233,61 @@ class AdminPageControllerFallbackTest extends TestCase
         $this->assertSame('Invista no seu crescimento', $page->data['plans_subtitle'] ?? null);
         $this->assertSame('SEO premium', $page->data['seo_title'] ?? null);
         $this->assertSame('Descricao premium', $page->data['seo_description'] ?? null);
+        $this->assertSame(302, $response->getStatusCode());
+    }
+
+    public function test_update_persists_somos_unicas_about_uploaded_images(): void
+    {
+        Schema::create('pages', function (Blueprint $table) {
+            $table->id();
+            $table->string('slug', 120)->unique();
+            $table->string('title', 255)->nullable();
+            $table->json('data')->nullable();
+            $table->timestamps();
+        });
+
+        $fakeDiskRoot = storage_path('framework/testing/admin-pages-upload-' . uniqid());
+        if (!is_dir($fakeDiskRoot)) {
+            mkdir($fakeDiskRoot, 0777, true);
+        }
+        config()->set('filesystems.disks.public.root', $fakeDiskRoot);
+
+        $page = Page::query()->create([
+            'slug' => 'somos-unicas-sobre',
+            'title' => 'Somos Unicas Sobre',
+            'data' => [],
+        ]);
+
+        $heroImage = UploadedFile::fake()->image('hero.jpg', 1200, 630);
+        $networkingImage = UploadedFile::fake()->image('networking.jpg', 1200, 630);
+
+        $request = Request::create('/admin/pages/' . $page->id, 'PUT', [
+            'title' => 'Somos Unicas Sobre',
+            'theme_color' => '#6d28d9',
+            'hero_title' => 'Sobre a Somos Unicas',
+            'hero_subtitle' => 'Uma introducao institucional.',
+            'content_title' => 'Nossa jornada',
+            'content_body' => '<p>Conteudo completo.</p>',
+        ], [], [
+            'hero_image' => $heroImage,
+            'networking_image' => $networkingImage,
+        ]);
+
+        $request->setLaravelSession(app('session.store'));
+
+        $response = app(PageController::class)->update($request, $page);
+
+        $page->refresh();
+
+        $this->assertSame('#6d28d9', $page->data['theme_color'] ?? null);
+        $this->assertSame('Sobre a Somos Unicas', $page->data['hero_title'] ?? null);
+        $this->assertSame('Uma introducao institucional.', $page->data['hero_subtitle'] ?? null);
+        $this->assertSame('Nossa jornada', $page->data['content_title'] ?? null);
+        $this->assertSame('<p>Conteudo completo.</p>', $page->data['content_body'] ?? null);
+        $this->assertNotEmpty($page->data['hero_image'] ?? null);
+        $this->assertNotEmpty($page->data['networking_image'] ?? null);
+        $this->assertFileExists($fakeDiskRoot . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $page->data['hero_image']));
+        $this->assertFileExists($fakeDiskRoot . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $page->data['networking_image']));
         $this->assertSame(302, $response->getStatusCode());
     }
 }

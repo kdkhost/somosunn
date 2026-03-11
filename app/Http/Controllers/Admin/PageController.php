@@ -8,7 +8,9 @@ use App\Support\CmsPageCatalog;
 use App\Support\UploadStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use Throwable;
 
 class PageController extends Controller
 {
@@ -365,21 +367,36 @@ class PageController extends Controller
             $removeKey = 'remove_' . $field;
             $currentPath = $newData[$field] ?? null;
 
-            if ($request->boolean($removeKey)) {
-                if ($currentPath) {
-                    UploadStorage::delete($currentPath);
+            try {
+                if ($request->boolean($removeKey)) {
+                    if ($currentPath) {
+                        UploadStorage::delete($currentPath);
+                    }
+
+                    $newData[$field] = null;
+                    continue;
                 }
 
-                $newData[$field] = null;
-                continue;
-            }
+                if ($request->hasFile($field)) {
+                    if ($currentPath) {
+                        UploadStorage::delete($currentPath);
+                    }
 
-            if ($request->hasFile($field)) {
-                if ($currentPath) {
-                    UploadStorage::delete($currentPath);
+                    $newData[$field] = UploadStorage::storeUploadedFile($request->file($field), 'pages/' . $slug);
                 }
+            } catch (Throwable $exception) {
+                Log::error('Falha ao salvar imagem da pagina CMS.', [
+                    'page_id' => $page->id,
+                    'slug' => $slug,
+                    'field' => $field,
+                    'message' => $exception->getMessage(),
+                ]);
 
-                $newData[$field] = UploadStorage::storeUploadedFile($request->file($field), 'pages/' . $slug);
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        $field => 'Nao foi possivel salvar a imagem selecionada. Verifique o storage do servidor e tente novamente.',
+                    ]);
             }
         }
 

@@ -1,9 +1,8 @@
 <div class="row">
-    {{-- Seção de Identidade e Cores --}}
-    <div class="col-md-12 mb-4">
+    <div class="col-12 mb-4" id="sec-identity">
         <div class="card card-outline card-purple shadow-sm">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h3 class="card-title text-purple font-weight-bold">
+                <h3 class="card-title text-purple font-weight-bold mb-0">
                     <i class="fas fa-palette mr-2"></i> Identidade Visual e Imagens Extras
                 </h3>
                 <div class="card-tools">
@@ -16,90 +15,54 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-4 border-right">
+                    <div class="col-lg-4 border-lg-right mb-4 mb-lg-0">
                         <div class="form-group mb-0">
-                            <label class="font-weight-bold">Cor do Tema (Página Sobre)</label>
-                            <div class="input-group">
-                                <input type="color" name="theme_color" class="form-control form-control-color w-100"
-                                    value="{{ $data['theme_color'] ?? '#6d28d9' }}" style="height: 45px;">
-                            </div>
+                            <label class="font-weight-bold">Cor do Tema (Pagina Sobre)</label>
+                            <input type="color" name="theme_color" class="form-control form-control-color w-100"
+                                value="{{ old('theme_color', $data['theme_color'] ?? '#6d28d9') }}"
+                                style="height: 45px;">
                             <small class="text-muted d-block mt-2">
-                                Esta cor será aplicada aos gradientes e elementos decorativos da página Sobre.
+                                Esta cor sera aplicada aos gradientes e elementos decorativos da pagina.
                             </small>
                         </div>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-lg-8">
                         <div class="form-group mb-0">
-                            <label class="font-weight-bold">Imagem da Seção "Comunidade" desta página</label>
-                            <div class="upload-box border rounded p-2 bg-light text-center" id="networkingImageBox"
-                                style="min-height: 120px;" data-max-size="4194304"
-                                data-existing-url="{{ isset($data['networking_image']) ? asset('storage/' . $data['networking_image']) : '' }}"
-                                data-remove-input="[name='remove_networking_image']">
-                                <input type="file" name="networking_image" id="networking_image" accept="image/*"
-                                    class="d-none">
-                                <input type="hidden" name="remove_networking_image" value="0">
-                                <div class="upload-preview mb-1 mx-auto"
-                                    style="max-width: 150px; height: 80px; overflow: hidden; border-radius: 8px;"></div>
-                                <button type="button" class="btn btn-xs btn-primary upload-trigger">
-                                    <i class="fas fa-upload mr-1"></i> Trocar Imagem da Seção
-                                </button>
-                                placeholder="Ex: Sobre a Somos Únicas..." value="{{ $data['hero_title'] ?? '' }}">
+                            <label class="font-weight-bold" for="networking_image">Imagem da secao Comunidade</label>
+                            <div class="custom-file">
+                                <input type="file" name="networking_image" id="networking_image"
+                                    class="custom-file-input @error('networking_image') is-invalid @enderror"
+                                    accept="image/*" data-preview="prev-networking_image">
+                                <label class="custom-file-label" for="networking_image">Escolher imagem...</label>
                             </div>
-                            <div class="form-group">
-                                <label class="font-weight-bold">Subtítulo / Introdução</label>
-                                <textarea name="hero_subtitle" class="form-control summernote" rows="4"
-                                    placeholder="Breve introdução da página sobre...">{{ $data['hero_subtitle'] ?? '' }}</textarea>
-                            </div>
+                            @error('networking_image')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
 
-                            <hr class="my-4">
+                            <small class="text-muted d-block mt-2">
+                                Esta imagem e usada na secao Comunidade da pagina <strong>/somos-unicas/sobre</strong>.
+                            </small>
 
-                            <div class="form-group">
-                                <label class="font-weight-bold text-lg"><i class="fas fa-file-alt mr-1"></i> Conteúdo
-                                    Detalhado</label>
-                                <div class="form-group mt-2">
-                                    <label>Título da Seção de Conteúdo</label>
-                                    <input type="text" name="content_title" class="form-control"
-                                        placeholder="Ex: Nossa Jornada" value="{{ $data['content_title'] ?? '' }}">
+                            @if(!empty($data['networking_image']))
+                                <div class="custom-control custom-checkbox mt-3">
+                                    <input type="checkbox" class="custom-control-input" id="remove_networking_image"
+                                        name="remove_networking_image" value="1">
+                                    <label class="custom-control-label text-danger" for="remove_networking_image">
+                                        Remover imagem atual
+                                    </label>
                                 </div>
-                                <div class="form-group">
-                                    <label>Corpo do Texto (Completo)</label>
-                                    <textarea name="content_body" class="form-control summernote"
-                                        rows="12">{{ $data['content_body'] ?? '' }}</textarea>
-                                </div>
-                            </div>
-                        </div>
+                            @endif
 
-                        <div class="col-md-5">
-                            <div class="form-group text-center">
-                                <label class="font-weight-bold">Imagem de Destaque (Banner)</label>
-                                <div class="upload-box border rounded p-3 bg-light" id="heroAboutImageBox"
-                                    data-max-size="6291456"
-                                    data-existing-url="{{ isset($data['hero_image']) ? asset('storage/' . $data['hero_image']) : '' }}"
-                                    data-remove-input="[name='remove_hero_image']">
-                                    <input type="file" name="hero_image" id="hero_image" accept="image/*"
-                                        class="d-none">
-                                    <input type="hidden" name="remove_hero_image" value="0">
-                                    <div class="upload-preview mb-2 mx-auto"
-                                        style="max-width: 100%; height: 250px; overflow: hidden; border-radius: 15px;">
-                                    </div>
-                                    <div class="upload-meta text-muted mb-2"></div>
-                                    <div class="progress upload-progress progress-sm d-none mb-3">
-                                        <div class="progress-bar bg-primary" style="width:0%"></div>
-                                    </div>
-                                    <div class="d-flex justify-content-center gap-2">
-                                        <button type="button"
-                                            class="btn btn-sm btn-outline-danger upload-remove d-none">
-                                            <i class="fas fa-trash mr-1"></i> Remover Imagem
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-primary upload-trigger">
-                                            <i class="fas fa-upload mr-1"></i> Escolher Imagem
-                                        </button>
-                                    </div>
-                                </div>
-                                <small class="text-muted d-block mt-3 px-4">
-                                    Esta imagem será exibida ao lado do título principal. Recomendado: 800x600px ou
-                                    similar.
-                                </small>
+                            @php
+                                $networkingImageUrl = !empty($data['networking_image'])
+                                    ? asset('storage/' . $data['networking_image'])
+                                    : '';
+                            @endphp
+                            <div class="mt-3">
+                                <img id="prev-networking_image" src="{{ $networkingImageUrl }}"
+                                    class="img-fluid rounded shadow-sm border {{ $networkingImageUrl ? '' : 'd-none' }}"
+                                    alt="Preview da imagem da secao Comunidade"
+                                    style="max-height: 220px; width: 100%; object-fit: cover;">
                             </div>
                         </div>
                     </div>
@@ -108,38 +71,132 @@
         </div>
     </div>
 
-    <style>
-        .card-purple {
-            border-top: 3px solid #6d28d9 !important;
-        }
+    <div class="col-12" id="sec-content">
+        <div class="card card-outline card-pink shadow-sm">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h3 class="card-title text-pink font-weight-bold mb-0">
+                    <i class="fas fa-file-alt mr-2"></i> Hero e Conteudo Principal
+                </h3>
+                <div class="card-tools">
+                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                        <input type="checkbox" class="custom-control-input section-toggle" id="toggle-content"
+                            data-section="content" {{ ($data['content_enabled'] ?? true) ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="toggle-content">Ativo</label>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xl-7">
+                        <div class="form-group">
+                            <label class="font-weight-bold" for="hero_title">Titulo principal</label>
+                            <input type="text" name="hero_title" id="hero_title"
+                                class="form-control @error('hero_title') is-invalid @enderror"
+                                value="{{ old('hero_title', $data['hero_title'] ?? '') }}"
+                                placeholder="Ex: Sobre a Somos Unicas...">
+                            @error('hero_title')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-        .text-purple {
-            color: #6d28d9 !important;
-        }
+                        <div class="form-group">
+                            <label class="font-weight-bold" for="hero_subtitle">Subtitulo / Introducao</label>
+                            <textarea name="hero_subtitle" id="hero_subtitle" class="form-control summernote-sm @error('hero_subtitle') is-invalid @enderror"
+                                rows="4" placeholder="Breve introducao da pagina sobre...">{{ old('hero_subtitle', $data['hero_subtitle'] ?? '') }}</textarea>
+                            @error('hero_subtitle')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-        .upload-box {
-            min-height: 300px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 2px dashed #ddd !important;
-            transition: all 0.3s;
-            background: #fafafa !important;
-        }
+                        <hr class="my-4">
 
-        .upload-box:hover {
-            border-color: #db2777 !important;
-            background: #fff5f7 !important;
-        }
+                        <div class="form-group">
+                            <label class="font-weight-bold" for="content_title">Titulo da secao de conteudo</label>
+                            <input type="text" name="content_title" id="content_title"
+                                class="form-control @error('content_title') is-invalid @enderror"
+                                value="{{ old('content_title', $data['content_title'] ?? '') }}"
+                                placeholder="Ex: Nossa Jornada">
+                            @error('content_title')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-        .upload-preview img {
-            max-width: 100%;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
+                        <div class="form-group mb-0">
+                            <label class="font-weight-bold" for="content_body">Corpo do texto</label>
+                            <textarea name="content_body" id="content_body" class="form-control summernote @error('content_body') is-invalid @enderror"
+                                rows="12">{{ old('content_body', $data['content_body'] ?? '') }}</textarea>
+                            @error('content_body')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
 
-        .gap-2 {
-            gap: 0.5rem;
+                    <div class="col-xl-5 mt-4 mt-xl-0">
+                        <div class="border rounded p-3 bg-light h-100">
+                            <label class="font-weight-bold d-block" for="hero_image">Imagem de destaque (banner)</label>
+                            <div class="custom-file">
+                                <input type="file" name="hero_image" id="hero_image"
+                                    class="custom-file-input @error('hero_image') is-invalid @enderror"
+                                    accept="image/*" data-preview="prev-hero_image">
+                                <label class="custom-file-label" for="hero_image">Escolher imagem...</label>
+                            </div>
+                            @error('hero_image')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+
+                            <small class="text-muted d-block mt-2">
+                                Esta imagem sera exibida ao lado do titulo principal. Recomendado: 800x600px.
+                            </small>
+
+                            @if(!empty($data['hero_image']))
+                                <div class="custom-control custom-checkbox mt-3">
+                                    <input type="checkbox" class="custom-control-input" id="remove_hero_image"
+                                        name="remove_hero_image" value="1">
+                                    <label class="custom-control-label text-danger" for="remove_hero_image">
+                                        Remover imagem atual
+                                    </label>
+                                </div>
+                            @endif
+
+                            @php
+                                $heroImageUrl = !empty($data['hero_image'])
+                                    ? asset('storage/' . $data['hero_image'])
+                                    : '';
+                            @endphp
+                            <div class="mt-3">
+                                <img id="prev-hero_image" src="{{ $heroImageUrl }}"
+                                    class="img-fluid rounded shadow-sm border {{ $heroImageUrl ? '' : 'd-none' }}"
+                                    alt="Preview do banner da pagina"
+                                    style="max-height: 280px; width: 100%; object-fit: cover;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-purple {
+        border-top: 3px solid #6d28d9 !important;
+    }
+
+    .card-pink {
+        border-top: 3px solid #db2777 !important;
+    }
+
+    .text-purple {
+        color: #6d28d9 !important;
+    }
+
+    .text-pink {
+        color: #db2777 !important;
+    }
+
+    @media (min-width: 992px) {
+        .border-lg-right {
+            border-right: 1px solid #dee2e6;
         }
-    </style>
+    }
+</style>

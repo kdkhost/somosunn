@@ -5,6 +5,8 @@ namespace App\Support;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
+use Throwable;
 
 class UploadStorage
 {
@@ -70,8 +72,29 @@ class UploadStorage
     public static function storeUploadedFile(UploadedFile $file, string $directory, ?string $filename = null): string
     {
         $directory = trim(str_replace('\\', '/', $directory), '/');
-        $options = ['visibility' => 'public'];
+        if (!$file->isValid()) {
+            throw new RuntimeException('Arquivo enviado invalido ou corrompido.');
+        }
 
+        if (self::isLocal()) {
+            $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
+            $name = ($filename !== null && $filename !== '') ? $filename : uniqid('', true) . '.' . $extension;
+            $targetDirectory = self::localTargetDirectory($directory);
+
+            if (!is_dir($targetDirectory) && !@mkdir($targetDirectory, 0755, true) && !is_dir($targetDirectory)) {
+                throw new RuntimeException('Nao foi possivel preparar o diretorio de upload: ' . $directory);
+            }
+
+            try {
+                $file->move($targetDirectory, $name);
+            } catch (Throwable $exception) {
+                throw new RuntimeException('Nao foi possivel salvar o arquivo enviado.', 0, $exception);
+            }
+
+            return ltrim(($directory !== '' ? $directory . '/' : '') . $name, '/');
+        }
+
+        $options = ['visibility' => 'public'];
         if ($filename !== null && $filename !== '') {
             return (string) self::disk()->putFileAs($directory, $file, $filename, $options);
         }
@@ -336,6 +359,16 @@ class UploadStorage
         }
 
         return array_values(array_unique($candidates));
+    }
+
+    private static function localTargetDirectory(string $directory): string
+    {
+        $root = (string) config(
+            'filesystems.disks.public.root',
+            is_dir(public_path('storage')) ? public_path('storage') : storage_path('app/public')
+        );
+
+        return $directory !== '' ? rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $directory) : $root;
     }
 
     private static function mimeType(string $path): string
