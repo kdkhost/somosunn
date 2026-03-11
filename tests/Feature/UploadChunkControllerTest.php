@@ -86,4 +86,24 @@ class UploadChunkControllerTest extends TestCase
         $this->assertNotEmpty($payload['path'] ?? null);
         $this->assertFileExists($this->publicRoot . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $payload['path']));
     }
+
+    public function test_chunk_can_be_stored_from_base64_payload(): void
+    {
+        $uploadId = 'test_' . uniqid();
+        $request = Request::create('/upload/chunk', 'POST', [
+            'upload_id' => $uploadId,
+            'chunk_index' => 0,
+            'total_chunks' => 1,
+            'chunk_data' => 'data:application/octet-stream;base64,' . base64_encode('abc123'),
+        ]);
+
+        $response = app(UploadChunkController::class)->storeChunk($request);
+        $payload = $response->getData(true);
+        $chunkPath = storage_path('app/uploads/tmp/' . $uploadId . '/chunk_0');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertTrue($payload['ok'] ?? false);
+        $this->assertFileExists($chunkPath);
+        $this->assertSame('abc123', file_get_contents($chunkPath));
+    }
 }

@@ -131,6 +131,20 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         }
 
+        function blobToDataUrl(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Falha ao preparar o chunk para envio.'));
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        function shouldRetryChunkAsJson(response) {
+            const contentType = response.headers.get('content-type') || '';
+            return response.status === 403 && !contentType.includes('application/json');
+        }
+
         async function parseUploadResponse(response, fallbackMessage) {
             const contentType = response.headers.get('content-type') || '';
 
@@ -149,6 +163,26 @@
             }
 
             return { ok: true, raw: text };
+        }
+
+        async function sendChunkAsBase64(chunk, uploadId, chunkIndex, totalChunks) {
+            const chunkData = await blobToDataUrl(chunk);
+
+            return fetch("{{ route('admin.upload.chunk') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    upload_id: uploadId,
+                    chunk_index: chunkIndex,
+                    total_chunks: totalChunks,
+                    chunk_data: chunkData
+                })
+            });
         }
 
         async function uploadFile(file) {
@@ -182,7 +216,7 @@
                     formData.append('chunk_index', i);
                     formData.append('total_chunks', totalChunks);
 
-                    const chunkResponse = await fetch("{{ route('admin.upload.chunk') }}", {
+                    let chunkResponse = await fetch("{{ route('admin.upload.chunk') }}", {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -191,6 +225,11 @@
                         },
                         body: formData
                     });
+
+                    if (shouldRetryChunkAsJson(chunkResponse)) {
+                        chunkResponse = await sendChunkAsBase64(chunk, uploadId, i, totalChunks);
+                    }
+
                     await parseUploadResponse(chunkResponse, 'Falha ao enviar uma parte do arquivo.');
 
                     uploadedBytes += chunk.size;

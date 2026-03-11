@@ -8,6 +8,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class UploadChunkController extends Controller
@@ -17,30 +18,52 @@ class UploadChunkController extends Controller
 
     public function storeChunk(Request $request)
     {
-        $request->validate([
-            'file' => 'required|file',
+        $validator = Validator::make($request->all(), [
             'upload_id' => 'required|string',
             'chunk_index' => 'required|integer',
             'total_chunks' => 'sometimes|integer',
+            'file' => 'nullable|file',
+            'chunk_data' => 'nullable|string',
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            if (!$request->hasFile('file') && blank($request->input('chunk_data'))) {
+                $validator->errors()->add('file', 'Nenhum chunk foi enviado.');
+            }
+        });
+
+        $validator->validate();
 
         $uploadId = $request->input('upload_id');
         $chunkIndex = $request->input('chunk_index');
 
         $dir = storage_path("app/uploads/tmp/{$uploadId}");
-        $file = $request->file('file');
         $filename = "chunk_{$chunkIndex}";
-
-        if (!$file instanceof UploadedFile || !$file->isValid()) {
-            return response()->json(['error' => 'Chunk de upload invalido'], 422);
-        }
 
         if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
             return response()->json(['error' => 'Nao foi possivel preparar o diretorio temporario'], 500);
         }
 
+        $chunkPath = $dir . DIRECTORY_SEPARATOR . $filename;
+
         try {
-            $file->move($dir, $filename);
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                if (!$file instanceof UploadedFile || !$file->isValid()) {
+                    return response()->json(['error' => 'Chunk de upload invalido'], 422);
+                }
+
+                $file->move($dir, $filename);
+            } else {
+                $chunkData = $this->decodeChunkData((string) $request->input('chunk_data'));
+                if ($chunkData === null) {
+                    return response()->json(['error' => 'Chunk em formato invalido'], 422);
+                }
+
+                if (@file_put_contents($chunkPath, $chunkData, LOCK_EX) === false) {
+                    throw new \RuntimeException('Nao foi possivel gravar o chunk em disco.');
+                }
+            }
         } catch (\Throwable $e) {
             Log::error('Failed to store upload chunk.', [
                 'upload_id' => $uploadId,
@@ -52,7 +75,6 @@ class UploadChunkController extends Controller
             return response()->json(['error' => 'Falha ao gravar o chunk enviado'], 500);
         }
 
-        $chunkPath = $dir . DIRECTORY_SEPARATOR . $filename;
         clearstatcache(true, $chunkPath);
         if (!is_file($chunkPath)) {
             Log::error('Upload chunk file was not persisted after move.', [
@@ -65,6 +87,22 @@ class UploadChunkController extends Controller
         }
 
         return response()->json(['ok' => true, 'chunk' => $chunkIndex]);
+    }
+
+    private function decodeChunkData(string $chunkData): ?string
+    {
+        $chunkData = trim($chunkData);
+        if ($chunkData === '') {
+            return null;
+        }
+
+        if (str_contains($chunkData, ',')) {
+            [, $chunkData] = explode(',', $chunkData, 2);
+        }
+
+        $decoded = base64_decode($chunkData, true);
+
+        return $decoded !== false ? $decoded : null;
     }
 
     public function assemble(Request $request)
