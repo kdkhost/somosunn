@@ -333,57 +333,6 @@
         </div>
     </div>
 
-    <!-- SumUp -->
-    <div class="border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden transition-colors">
-        <div class="bg-slate-50 dark:bg-slate-950 px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-4 cursor-pointer" onclick="toggleCard('sumup_card')">
-                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <i class="fas fa-credit-card text-sky-500"></i> SumUp
-                </h3>
-                <i class="fas fa-chevron-down text-slate-400 dark:text-slate-500 transition-transform"
-                    id="sumup_card_icon"></i>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-                <input type="hidden" name="sumup_enabled" value="0">
-                <input type="checkbox" class="sr-only peer" name="sumup_enabled" value="1"
-                    onchange="toggleSetting('sumup_enabled', this.checked)" {{ ($settings['sumup_enabled'] ?? 0) ? 'checked' : '' }}>
-                <div
-                    class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-sky-300 dark:peer-focus:ring-sky-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-sky-600">
-                </div>
-            </label>
-        </div>
-        <div id="sumup_card" class="hidden p-6 border-t border-slate-200 dark:border-slate-800">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                    <label
-                        class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Ambiente</label>
-                    <select name="sumup_env"
-                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium">
-                        <option value="production" {{ ($settings['sumup_env'] ?? 'production') == 'production' ? 'selected' : '' }}>Produção</option>
-                        <option value="sandbox" {{ ($settings['sumup_env'] ?? 'production') == 'sandbox' ? 'selected' : '' }}>Sandbox</option>
-                    </select>
-                </div>
-                <div>
-                    <label
-                        class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Access
-                        Token</label>
-                    <div class="flex gap-2">
-                        <input type="text" name="sumup_access_token" value="{{ $settings['sumup_access_token'] ?? '' }}"
-                            placeholder="sup_at_..."
-                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
-                        <button type="button" onclick="testGatewayConnection('sumup')"
-                            class="px-4 py-2 bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 rounded-2xl font-bold hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-colors whitespace-nowrap">
-                            <i class="fas fa-plug mr-2"></i> Testar
-                        </button>
-                    </div>
-                    <p class="text-[10px] text-slate-400 mt-1">Obtenha em: <a
-                            href="https://me.sumup.com/br-pt/developers" target="_blank"
-                            class="text-blue-500 hover:underline">SumUp Developers</a></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- General Billing Settings -->
     <div class="pt-6 border-t border-slate-100 dark:border-slate-800">
         <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
@@ -585,9 +534,6 @@
                     if (data.env === 'sandbox') {
                         data.access_token = document.querySelector('input[name="mercadopago_sandbox_access_token"]').value;
                     }
-                } else if (gateway === 'sumup') {
-                    data.access_token = document.querySelector('input[name="sumup_access_token"]').value;
-                    data.env = document.querySelector('select[name="sumup_env"]').value;
                 }
 
                 // Call test route

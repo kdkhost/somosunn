@@ -291,9 +291,6 @@ class SettingController extends Controller
                 'mercadopago_method_credit_card',
                 'mercadopago_method_pix',
                 'mercadopago_method_ticket',
-                'sumup_enabled',
-                'sumup_client_id',
-                'sumup_client_secret',
             ],
             'marketplace' => ['marketplace_hero_enabled', 'marketplace_hero_autoplay', 'marketplace_exit_enabled', 'marketplace_events_popup_enabled'],
             'social' => [
@@ -620,19 +617,10 @@ class SettingController extends Controller
             'mercadopago_method_pix',
             'mercadopago_method_ticket',
             'mercadopago_method_mercadopago',
-            'sumup_enabled',
         ];
 
         if ($currentGroup === 'gateway') {
-            $mpEnabled = (int) ($data['mercadopago_enabled'] ?? $request->boolean('mercadopago_enabled') ? 1 : 0);
-            $suEnabled = (int) ($data['sumup_enabled'] ?? $request->boolean('sumup_enabled') ? 1 : 0);
 
-            if (!$mpEnabled && !$suEnabled) {
-                if ($request->wantsJson() || $request->ajax()) {
-                    return response()->json(['success' => false, 'message' => 'Pelo menos um gateway de pagamento deve estar ativo para manter o fluxo do sistema.']);
-                }
-                return redirect()->back()->withInput()->with('error', 'Pelo menos um gateway de pagamento deve estar ativo.');
-            }
         }
         if ($currentGroup === 'gateway') {
             // Remover chaves ANTIGAS e lixo que não pertencem ao gateway
@@ -1088,7 +1076,7 @@ class SettingController extends Controller
     {
         try {
             $data = $request->validate([
-                'gateway' => 'required|in:mercadopago,sumup',
+                'gateway' => 'required|in:mercadopago',
                 'env' => 'required|in:sandbox,production',
                 'access_token' => 'nullable|string',
                 'token' => 'nullable|string',
@@ -1117,25 +1105,6 @@ class SettingController extends Controller
                     throw new \Exception("Falha na conexão MP: {$error}");
                 }
 
-            } elseif ($data['gateway'] === 'sumup') {
-                $token = $data['access_token'];
-                if (!$token) {
-                    throw new \Exception('API Key não informada.');
-                }
-
-                // Personal API Keys (sup_pk_*) usam endpoint v0.1
-                $response = Http::withToken($token)->get('https://api.sumup.com/v0.1/me');
-
-            } elseif ($data['gateway'] === 'sumup') {
-                $service = app(\App\Services\Payment\SumUpService::class);
-                $result  = $service->testConnection($data['access_token'] ?? null);
-
-                if ($result['success']) {
-                    $success = true;
-                    $message = "Conexão com SumUp realizada com sucesso! Método: {$result['method']} | Merchant: {$result['merchant']} ({$result['code']})";
-                } else {
-                    throw new \Exception("Falha na conexão SumUp.");
-                }
             }
 
             return response()->json(['success' => $success, 'message' => $message]);
