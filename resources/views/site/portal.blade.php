@@ -3,22 +3,47 @@
 @section('title', ($pageData['seo_title'] ?? null) ?: 'Portal de Networking - UNN')
 
 @section('content')
-    @php $pageData = $pageData ?? []; @endphp
+    @php
+        $pageData = $pageData ?? [];
+        $communityLevelDefaults = [
+            1 => ['name' => 'Iniciante', 'count' => '1.200', 'icon' => 'seedling', 'color' => '#10B981', 'desc' => 'Comecando a jornada'],
+            2 => ['name' => 'Empreendedor', 'count' => '2.500', 'icon' => 'rocket', 'color' => '#3B82F6', 'desc' => 'Em crescimento'],
+            3 => ['name' => 'Empresario', 'count' => '800', 'icon' => 'building', 'color' => '#8B5CF6', 'desc' => 'Consolidado'],
+            4 => ['name' => 'Mentor', 'count' => '150', 'icon' => 'crown', 'color' => '#F59E0B', 'desc' => 'Elite da comunidade'],
+        ];
+        $communityLevels = collect($communityLevelDefaults)->map(function (array $defaults, int $position) use ($pageData) {
+            $prefix = "community_level_{$position}_";
+
+            return [
+                'name' => trim((string) ($pageData[$prefix . 'name'] ?? $defaults['name'])) ?: $defaults['name'],
+                'count' => trim((string) ($pageData[$prefix . 'count'] ?? $defaults['count'])) ?: $defaults['count'],
+                'icon' => trim((string) ($pageData[$prefix . 'icon'] ?? $defaults['icon'])) ?: $defaults['icon'],
+                'color' => trim((string) ($pageData[$prefix . 'color'] ?? $defaults['color'])) ?: $defaults['color'],
+                'desc' => trim((string) ($pageData[$prefix . 'desc'] ?? $defaults['desc'])) ?: $defaults['desc'],
+            ];
+        })->values();
+        $communityTitle = trim((string) ($pageData['community_title'] ?? '')) ?: 'Niveis da Comunidade';
+        $rankingTitle = trim((string) ($pageData['ranking_title'] ?? '')) ?: 'Top Networkers';
+        $rankingSubtitle = trim((string) ($pageData['ranking_subtitle'] ?? '')) ?: 'Ranking baseado em conexoes';
+    @endphp
     <div class="min-h-screen bg-gradient-to-br from-slate-50 to-white">
         <!-- Hero Section -->
-        <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
-            <div class="max-w-7xl mx-auto text-center">
-                <h1
-                    class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient">
-                    {{ ($pageData['hero_title'] ?? null) ?: 'Portal de Networking' }}
-                </h1>
-                <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                    {!! ($pageData['hero_subtitle'] ?? null) ?: 'Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.' !!}
-                </p>
-            </div>
-        </section>
+        @if($pageData['hero_enabled'] ?? true)
+            <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
+                <div class="max-w-7xl mx-auto text-center">
+                    <h1
+                        class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient">
+                        {{ ($pageData['hero_title'] ?? null) ?: 'Portal de Networking' }}
+                    </h1>
+                    <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                        {!! ($pageData['hero_subtitle'] ?? null) ?: 'Acesse palestras, mentorias premium e recursos exclusivos para potencializar seu crescimento empreendedor.' !!}
+                    </p>
+                </div>
+            </section>
+        @endif
 
         <!-- Stats -->
+        @if($pageData['stats_enabled'] ?? true)
         <section class="pb-12 px-4 md:px-12 lg:px-24">
             <div class="max-w-7xl mx-auto">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -44,11 +69,13 @@
                         <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">
                             {{ ($pageData['stat_4_value'] ?? null) ?: '95%' }}</p>
                         <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                            {{ ($pageData['stat_4_label'] ?? null) ?: 'Satisfação' }}</p>
+                            {{ ($pageData['stat_4_label'] ?? null) ?: 'Satisfacao' }}</p>
                     </div>
                 </div>
             </div>
         </section>
+
+        @endif
 
         <!-- Quick Access -->
         <section class="py-12 px-6 md:px-12 lg:px-24">
@@ -292,101 +319,111 @@
         @endif
 
         <!-- Comunidade Segmentada -->
-        <section class="py-16 px-6 md:px-12 lg:px-24">
-            <div class="max-w-7xl mx-auto">
-                <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">Níveis da Comunidade</h2>
+        @if($pageData['community_enabled'] ?? true)
+            <section class="py-16 px-6 md:px-12 lg:px-24">
+                <div class="max-w-7xl mx-auto">
+                    <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">{{ $communityTitle }}</h2>
 
-                <div class="grid md:grid-cols-4 gap-6">
-                    @php
-                        $levels = [
-                            ['name' => 'Iniciante', 'count' => 1200, 'icon' => 'seedling', 'color' => '#10B981', 'desc' => 'Começando a jornada'],
-                            ['name' => 'Empreendedor', 'count' => 2500, 'icon' => 'rocket', 'color' => '#3B82F6', 'desc' => 'Em crescimento'],
-                            ['name' => 'Empresário', 'count' => 800, 'icon' => 'building', 'color' => '#8B5CF6', 'desc' => 'Consolidado'],
-                            ['name' => 'Mentor', 'count' => 150, 'icon' => 'crown', 'color' => '#F59E0B', 'desc' => 'Elite da comunidade'],
-                        ];
-                    @endphp
-
-                    @foreach($levels as $level)
-                        <div class="bg-white rounded-3xl p-6 text-center shadow-lg">
-                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-                                style="background: {{ $level['color'] }}20">
-                                <i class="fas fa-{{ $level['icon'] }} text-2xl" style="color: {{ $level['color'] }}"></i>
+                    <div class="grid md:grid-cols-4 gap-6">
+                        @foreach($communityLevels as $level)
+                            <div class="bg-white rounded-3xl p-6 text-center shadow-lg">
+                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                                    style="background: {{ $level['color'] }}20">
+                                    <i class="fas fa-{{ $level['icon'] }} text-2xl" style="color: {{ $level['color'] }}"></i>
+                                </div>
+                                <h3 class="font-bold text-gray-900 mb-1">{{ $level['name'] }}</h3>
+                                <p class="text-3xl font-black mb-2" style="color: {{ $level['color'] }}">
+                                    {{ $level['count'] }}</p>
+                                <p class="text-xs text-gray-500">{{ $level['desc'] }}</p>
                             </div>
-                            <h3 class="font-bold text-gray-900 mb-1">{{ $level['name'] }}</h3>
-                            <p class="text-3xl font-black mb-2" style="color: {{ $level['color'] }}">
-                                {{ number_format($level['count'], 0, '', '.') }}</p>
-                            <p class="text-xs text-gray-500">{{ $level['desc'] }}</p>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        @endif
 
         <!-- Ranking -->
-        <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
-            <div class="max-w-7xl mx-auto">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-3xl font-black text-gray-900">Top Networkers</h2>
-                    <span class="text-sm text-gray-500">Ranking baseado em conexões</span>
-                </div>
+        @if($pageData['ranking_enabled'] ?? true)
+            <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex justify-between items-center mb-8">
+                        <h2 class="text-3xl font-black text-gray-900">{{ $rankingTitle }}</h2>
+                        <span class="text-sm text-gray-500">{{ $rankingSubtitle }}</span>
+                    </div>
 
-                <div class="grid md:grid-cols-3 gap-6">
-                    @forelse($topRankings as $rank)
-                        <div
-                            class="bg-gradient-to-br from-slate-50 to-white rounded-3xl p-6 border border-gray-100 relative overflow-hidden">
-                            @if($loop->index === 0)
-                                <div class="absolute top-4 right-4">
-                                    <i class="fas fa-trophy text-2xl text-yellow-500"></i>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        @forelse($topRankings as $rank)
+                            @php
+                                $userName = optional($rank->user)->name ?? 'Empreendedor';
+                                $userAvatar = optional($rank->user)->profile_photo_url ?? null;
+                                $showUserAvatar = $userAvatar && !str_contains((string) $userAvatar, 'default-user.svg');
+                            @endphp
+                            <div
+                                class="bg-gradient-to-br from-slate-50 to-white rounded-3xl p-6 border border-gray-100 relative overflow-hidden">
+                                @if($loop->index === 0)
+                                    <div class="absolute top-4 right-4">
+                                        <i class="fas fa-trophy text-2xl text-yellow-500"></i>
+                                    </div>
+                                @endif
+                                <div class="flex items-center gap-4 mb-4">
+                                    @if($showUserAvatar)
+                                        <img src="{{ $userAvatar }}" alt="{{ $userName }}"
+                                            class="w-14 h-14 rounded-full object-cover shadow-sm">
+                                    @else
+                                        <div
+                                            class="w-14 h-14 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl">
+                                            {{ strtoupper(substr($userName, 0, 1)) }}
+                                        </div>
+                                    @endif
+                                    <div>
+                                        <h3 class="font-bold text-gray-900">{{ $userName }}</h3>
+                                        <p class="text-sm text-gray-500">{{ ucfirst($rank->level) }}</p>
+                                    </div>
                                 </div>
-                            @endif
-                            <div class="flex items-center gap-4 mb-4">
-                                <div
-                                    class="w-14 h-14 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl">
-                                    {{ substr(optional($rank->user)->name ?? 'E', 0, 1) }}
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-gray-900">{{ optional($rank->user)->name ?? 'Empreendedor' }}</h3>
-                                    <p class="text-sm text-gray-500">{{ ucfirst($rank->level) }}</p>
+                                <div class="grid grid-cols-2 gap-4 mt-4">
+                                    <div class="text-center p-3 bg-slate-50 rounded-xl">
+                                        <p class="text-xl font-bold" style="color: var(--unn-azul-1)">
+                                            {{ number_format($rank->score, 0, '', '.') }}</p>
+                                        <p class="text-xs text-gray-500">Pontos</p>
+                                    </div>
+                                    <div class="text-center p-3 bg-slate-50 rounded-xl">
+                                        <p class="text-xl font-bold" style="color: var(--unn-azul-1)">
+                                            {{ $rank->interactions_count }}</p>
+                                        <p class="text-xs text-gray-500">Conexoes</p>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-4 mt-4">
-                                <div class="text-center p-3 bg-slate-50 rounded-xl">
-                                    <p class="text-xl font-bold" style="color: var(--unn-azul-1)">
-                                        {{ number_format($rank->score, 0, '', '.') }}</p>
-                                    <p class="text-xs text-gray-500">Pontos</p>
-                                </div>
-                                <div class="text-center p-3 bg-slate-50 rounded-xl">
-                                    <p class="text-xl font-bold" style="color: var(--unn-azul-1)">
-                                        {{ $rank->interactions_count }}</p>
-                                    <p class="text-xs text-gray-500">Conexões</p>
-                                </div>
+                        @empty
+                            <div class="col-span-3 text-center py-12 text-gray-500 text-lg">
+                                Nenhum ranking disponivel ainda.<br>
+                                Participe de conexoes e avaliacoes para aparecer aqui!
                             </div>
-                        </div>
-                    @empty
-                        <div class="col-span-3 text-center py-12 text-gray-500 text-lg">
-                            Nenhum ranking disponível ainda.<br>
-                            Participe de conexões e avaliações para aparecer aqui!
-                        </div>
-                    @endforelse
+                        @endforelse
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        @endif
 
         <!-- CTA Premium -->
-        <section class="py-16 px-6 md:px-12 lg:px-24"
-            style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
-            <div class="max-w-4xl mx-auto text-center text-white">
-                <h2 class="text-3xl lg:text-4xl font-black mb-4">Desbloqueie todos os recursos</h2>
-                <p class="text-lg opacity-90 mb-8">Torne-se Premium e tenha acesso ilimitado a mentorias, cursos e eventos
-                    exclusivos.</p>
-                <a href="{{ route('planos') }}"
-                    class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition"
-                    style="color: var(--unn-azul-1)">
-                    <i class="fas fa-crown"></i>
-                    Conhecer planos Premium
-                </a>
-            </div>
-        </section>
+        @if($pageData['cta_enabled'] ?? true)
+            <section class="py-16 px-6 md:px-12 lg:px-24"
+                style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
+                <div class="max-w-4xl mx-auto text-center text-white">
+                    <h2 class="text-3xl lg:text-4xl font-black mb-4">
+                        {{ ($pageData['cta_title'] ?? null) ?: 'Desbloqueie todos os recursos' }}
+                    </h2>
+                    <p class="text-lg opacity-90 mb-8">
+                        {!! ($pageData['cta_subtitle'] ?? null) ?: 'Torne-se Premium e tenha acesso ilimitado a mentorias, cursos e eventos exclusivos.' !!}
+                    </p>
+                    <a href="{{ route('planos') }}"
+                        class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition"
+                        style="color: var(--unn-azul-1)">
+                        <i class="fas fa-crown"></i>
+                        {{ ($pageData['cta_btn'] ?? null) ?: 'Conhecer planos Premium' }}
+                    </a>
+                </div>
+            </section>
+        @endif
     </div>
 
     <style>

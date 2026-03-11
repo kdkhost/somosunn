@@ -89,6 +89,8 @@
         'portal' => [
             'sec-hero' => ['icon' => 'fa-network-wired', 'label' => 'Hero'],
             'sec-stats' => ['icon' => 'fa-chart-bar', 'label' => 'Estatísticas'],
+            'sec-community' => ['icon' => 'fa-layer-group', 'label' => 'Niveis da Comunidade'],
+            'sec-ranking' => ['icon' => 'fa-trophy', 'label' => 'Top Networkers'],
             'sec-cta' => ['icon' => 'fa-bullhorn', 'label' => 'CTA Final'],
         ],
         'premium' => [

@@ -232,6 +232,11 @@ class AdminPageControllerFallbackTest extends TestCase
         $this->assertStringContainsString('name="remove_hero_image"', $html);
         $this->assertStringContainsString('name="stat_1_value"', $html);
         $this->assertStringContainsString('name="stat_4_label"', $html);
+        $this->assertStringContainsString('name="community_title"', $html);
+        $this->assertStringContainsString('name="community_level_1_name"', $html);
+        $this->assertStringContainsString('name="community_level_4_desc"', $html);
+        $this->assertStringContainsString('name="ranking_title"', $html);
+        $this->assertStringContainsString('name="ranking_subtitle"', $html);
         $this->assertStringContainsString('name="cta_title"', $html);
         $this->assertStringContainsString('name="cta_subtitle"', $html);
         $this->assertStringContainsString('name="cta_btn"', $html);
