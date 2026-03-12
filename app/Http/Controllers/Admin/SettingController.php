@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -126,6 +127,16 @@ class SettingController extends Controller
             'remove_marketplace_hero_slide_3_image_mobile',
             'remove_marketplace_exit_banner_image',
         ]);
+
+        if ($request->has('ads_code_html_encoded')) {
+            $data['ads_code_html'] = $this->decodeEncodedSettingField($request->input('ads_code_html_encoded'));
+            unset($data['ads_code_html_encoded']);
+        }
+
+        if ($request->has('ads_inter_feed_code_encoded')) {
+            $data['ads_inter_feed_code'] = $this->decodeEncodedSettingField($request->input('ads_inter_feed_code_encoded'));
+            unset($data['ads_inter_feed_code_encoded']);
+        }
 
         if ($request->hasFile('seo_og_image') && $this->imageIsSmallerThan($request->file('seo_og_image'), 1200, 630)) {
             return redirect()->back()->withInput()->with('error', 'A imagem OpenGraph precisa ter pelo menos 1200×630px.');
@@ -850,7 +861,29 @@ class SettingController extends Controller
 
         $extension = strtolower((string) ($file->getClientOriginalExtension() ?: $file->extension() ?: ''));
 
-        return in_array($extension, ['png', 'webp'], true);
+        if (!in_array($extension, ['png', 'webp'], true)) {
+            return false;
+        }
+
+        return app(WatermarkService::class)->isTransparentWatermarkFile($file);
+    }
+
+    private function decodeEncodedSettingField(mixed $value): string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+
+        $normalized = strtr($value, '-_', '+/');
+        $padding = strlen($normalized) % 4;
+        if ($padding > 0) {
+            $normalized .= str_repeat('=', 4 - $padding);
+        }
+
+        $decoded = base64_decode($normalized, true);
+
+        return $decoded === false ? (string) $value : $decoded;
     }
 
     private function buildRecaptchaStatus(array $settings): array

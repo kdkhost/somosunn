@@ -207,7 +207,7 @@
                             </button>
                         </div>
                         <small class="d-block text-muted mt-2">
-                            Recomendado: logo horizontal, fundo transparente, ate 1600x900px.
+                            Obrigatorio: logo isolada em PNG ou WEBP, com fundo 100% transparente, ate 1600x900px.
                         </small>
                     </div>
                 </div>

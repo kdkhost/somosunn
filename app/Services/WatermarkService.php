@@ -218,8 +218,6 @@ class WatermarkService
                 $targetLogoHeight,
                 $opacity
             );
-        } else {
-            $this->applyTextWatermark($image, $width, $height, $settings);
         }
 
         $destinationDirectory = dirname($destinationPath);
@@ -275,7 +273,7 @@ class WatermarkService
             }
         }
 
-        return true;
+        return $this->hasTransparentImageWatermark();
     }
 
     public function isWatermarkableImage(UploadedFile|string $file): bool
@@ -285,6 +283,27 @@ class WatermarkService
         }
 
         return $this->isRasterExtension(strtolower((string) pathinfo($file, PATHINFO_EXTENSION)));
+    }
+
+    public function hasTransparentImageWatermark(): bool
+    {
+        return $this->resolveWatermarkLogoPath() !== null;
+    }
+
+    public function isTransparentWatermarkFile(UploadedFile|string $file): bool
+    {
+        if ($file instanceof UploadedFile) {
+            $path = $file->getRealPath();
+        } else {
+            $value = trim((string) $file);
+            $path = is_file($value) ? $value : $this->resolvePhysicalPath($value);
+        }
+
+        if (!$path || !is_file($path)) {
+            return false;
+        }
+
+        return $this->imageHasTransparency($path);
     }
 
     private function loadRasterImage(string $absolutePath): array
@@ -324,7 +343,11 @@ class WatermarkService
 
         foreach ($candidates as $candidate) {
             $path = $this->resolvePhysicalPath((string) $candidate);
-            if ($path !== null && $this->isRasterExtension((string) pathinfo($path, PATHINFO_EXTENSION))) {
+            if (
+                $path !== null
+                && $this->isRasterExtension((string) pathinfo($path, PATHINFO_EXTENSION))
+                && $this->imageHasTransparency($path)
+            ) {
                 return $path;
             }
         }
@@ -480,6 +503,64 @@ class WatermarkService
         imagedestroy($image);
 
         return [$canvas, $targetWidth, $targetHeight];
+    }
+
+    private function imageHasTransparency(string $absolutePath): bool
+    {
+        $imageInfo = @getimagesize($absolutePath);
+        if (!is_array($imageInfo) || !isset($imageInfo[2])) {
+            return false;
+        }
+
+        $image = match ((int) $imageInfo[2]) {
+            IMAGETYPE_PNG => @imagecreatefrompng($absolutePath),
+            IMAGETYPE_GIF => @imagecreatefromgif($absolutePath),
+            IMAGETYPE_WEBP => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($absolutePath) : false,
+            default => false,
+        };
+
+        if (!$image) {
+            return false;
+        }
+
+        try {
+            $width = imagesx($image);
+            $height = imagesy($image);
+
+            if ($width <= 0 || $height <= 0) {
+                return false;
+            }
+
+            $points = [
+                [0, 0],
+                [$width - 1, 0],
+                [0, $height - 1],
+                [$width - 1, $height - 1],
+                [(int) floor($width / 2), (int) floor($height / 2)],
+            ];
+
+            $stepX = max(1, (int) floor($width / 24));
+            $stepY = max(1, (int) floor($height / 24));
+
+            for ($x = 0; $x < $width; $x += $stepX) {
+                for ($y = 0; $y < $height; $y += $stepY) {
+                    $points[] = [$x, $y];
+                }
+            }
+
+            foreach ($points as [$x, $y]) {
+                $rgba = imagecolorat($image, max(0, $x), max(0, $y));
+                $alpha = ($rgba >> 24) & 0x7F;
+
+                if ($alpha > 0) {
+                    return true;
+                }
+            }
+
+            return false;
+        } finally {
+            imagedestroy($image);
+        }
     }
 
     private function imagecopymergeAlpha(

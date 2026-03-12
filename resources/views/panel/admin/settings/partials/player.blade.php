@@ -194,7 +194,7 @@
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
-                    <p class="w-full text-xs text-slate-500 dark:text-slate-400">Recomendado: arquivo horizontal, fundo transparente, ate 1600x900px.</p>
+                    <p class="w-full text-xs text-slate-500 dark:text-slate-400">Obrigatorio: logo isolada em PNG ou WEBP, com fundo 100% transparente, ate 1600x900px.</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">

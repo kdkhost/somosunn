@@ -12,6 +12,8 @@ use Tests\TestCase;
 class AdminSettingsImagesTest extends TestCase
 {
     private string $sqlitePath;
+    /** @var array<int, string> */
+    private array $tempFiles = [];
 
     protected function setUp(): void
     {
@@ -43,6 +45,12 @@ class AdminSettingsImagesTest extends TestCase
     protected function tearDown(): void
     {
         DB::disconnect('sqlite');
+
+        foreach ($this->tempFiles as $tempFile) {
+            if (is_file($tempFile)) {
+                @unlink($tempFile);
+            }
+        }
 
         if (isset($this->sqlitePath) && file_exists($this->sqlitePath)) {
             @unlink($this->sqlitePath);
@@ -110,5 +118,62 @@ class AdminSettingsImagesTest extends TestCase
         ])->assertRedirect()->assertSessionHas('error');
 
         $this->assertNull(Setting::where('key', 'watermark_image')->value('value'));
+    }
+
+    public function test_admin_settings_rejects_opaque_png_watermark(): void
+    {
+        $this->withoutMiddleware();
+
+        $file = $this->makeWatermarkUpload(false);
+
+        $this->post(route('admin.settings.update'), [
+            'current_group' => 'player',
+            'watermark_image' => $file,
+        ])->assertRedirect()->assertSessionHas('error');
+
+        $this->assertNull(Setting::where('key', 'watermark_image')->value('value'));
+    }
+
+    public function test_admin_settings_accepts_transparent_png_watermark(): void
+    {
+        $this->withoutMiddleware();
+
+        $file = $this->makeWatermarkUpload(true);
+
+        $this->post(route('admin.settings.update'), [
+            'current_group' => 'player',
+            'watermark_image' => $file,
+        ])->assertRedirect();
+
+        $savedPath = (string) Setting::where('key', 'watermark_image')->value('value');
+
+        $this->assertNotSame('', $savedPath);
+        $this->assertFileExists(public_path($savedPath));
+    }
+
+    private function makeWatermarkUpload(bool $transparent): UploadedFile
+    {
+        $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'wm_' . bin2hex(random_bytes(6)) . '.png';
+        $this->tempFiles[] = $path;
+
+        $image = imagecreatetruecolor(180, 90);
+
+        if ($transparent) {
+            imagealphablending($image, false);
+            imagesavealpha($image, true);
+            $background = imagecolorallocatealpha($image, 0, 0, 0, 127);
+            imagefilledrectangle($image, 0, 0, 179, 89, $background);
+            $accent = imagecolorallocatealpha($image, 21, 101, 255, 0);
+        } else {
+            $background = imagecolorallocate($image, 12, 18, 40);
+            imagefilledrectangle($image, 0, 0, 179, 89, $background);
+            $accent = imagecolorallocate($image, 21, 101, 255);
+        }
+
+        imagefilledellipse($image, 90, 45, 120, 48, $accent);
+        imagepng($image, $path);
+        imagedestroy($image);
+
+        return new UploadedFile($path, 'watermark.png', 'image/png', null, true);
     }
 }
