@@ -574,15 +574,72 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::get('events/{event}/scanner', [\App\Http\Controllers\Admin\EventScannerController::class, 'index'])->name('events.scanner');
     Route::post('events/{event}/scanner/validate', [\App\Http\Controllers\Admin\EventScannerController::class, 'validateTicket'])->name('events.scanner.validate');
     Route::get('users/{user}/impersonate', [\App\Http\Controllers\Admin\ImpersonateController::class, 'impersonate'])->name('users.impersonate');
+    Route::get('courses/available', [\App\Http\Controllers\Admin\CourseController::class, 'available'])->name('courses.available');
+    Route::get('mentorships/available', [\App\Http\Controllers\Admin\MentorshipController::class, 'available'])->name('mentorships.available');
+    Route::get('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+
+    Route::prefix('marketplace')->name('marketplace.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\MarketplaceController::class, 'index'])->name('index');
+        Route::get('/payments', [\App\Http\Controllers\Admin\MarketplaceController::class, 'payments'])->name('payments');
+        Route::get('/sales', [\App\Http\Controllers\Admin\MarketplaceController::class, 'sales'])->name('sales');
+    });
+
+    Route::get('splits', [\App\Http\Controllers\Admin\SplitController::class, 'index'])->name('splits.index');
+    Route::post('splits/{split}/pay', [\App\Http\Controllers\Admin\SplitController::class, 'pay'])->name('splits.pay');
+
+    Route::prefix('chat')->name('chat.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ChatController::class, 'index'])->name('index');
+        Route::get('/start/{user}', [\App\Http\Controllers\Admin\ChatController::class, 'start'])->name('start');
+        Route::get('/list', [\App\Http\Controllers\Admin\ChatController::class, 'list'])->name('list');
+        Route::get('/{conversation}/messages', [\App\Http\Controllers\Admin\ChatController::class, 'getMessages'])->name('messages');
+        Route::post('/{conversation}/message', [\App\Http\Controllers\Admin\ChatController::class, 'storeMessage'])->name('message.store');
+        Route::get('/{conversation}', [\App\Http\Controllers\Admin\ChatController::class, 'show'])->name('show');
+    });
+
+    Route::get('social', [\App\Http\Controllers\Admin\SocialController::class, 'index'])->name('social.feed.internal');
+    Route::delete('social/{post}', [\App\Http\Controllers\Admin\SocialController::class, 'destroy'])->name('social.destroy');
+
+    Route::get('reviews', [\App\Http\Controllers\Admin\ItemReviewController::class, 'index'])->name('reviews.index');
+    Route::post('reviews/{review}/approve', [\App\Http\Controllers\Admin\ItemReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('reviews/{review}/reject', [\App\Http\Controllers\Admin\ItemReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('reviews/{review}', [\App\Http\Controllers\Admin\ItemReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    Route::post('testimonials/import-google', [\App\Http\Controllers\Admin\TestimonialController::class, 'importGoogle'])->name('testimonials.import-google');
+    Route::post('testimonials/{testimonial}/toggle', [\App\Http\Controllers\Admin\TestimonialController::class, 'toggle'])->name('testimonials.toggle');
+    Route::post('testimonials/{testimonial}/approve', [\App\Http\Controllers\Admin\TestimonialController::class, 'approve'])->name('testimonials.approve');
+    Route::post('testimonials/{testimonial}/reject', [\App\Http\Controllers\Admin\TestimonialController::class, 'reject'])->name('testimonials.reject');
+
+    Route::get('referrals', [\App\Http\Controllers\Admin\ReferralController::class, 'index'])->name('referrals.index');
+    Route::get('referrals/export', [\App\Http\Controllers\Admin\ReferralController::class, 'export'])->name('referrals.export');
+    Route::post('referrals/track', [\App\Http\Controllers\Admin\ReferralController::class, 'track'])->name('referrals.track');
+    Route::post('referrals/tokens', [\App\Http\Controllers\Admin\ReferralController::class, 'storeToken'])->name('referrals.tokens.store');
+    Route::put('referrals/tokens/{tokenId}', [\App\Http\Controllers\Admin\ReferralController::class, 'updateToken'])->name('referrals.tokens.update');
+    Route::delete('referrals/tokens/{tokenId}', [\App\Http\Controllers\Admin\ReferralController::class, 'destroyToken'])->name('referrals.tokens.destroy');
+    Route::put('referrals/sandbox/{sandboxRequest}', [\App\Http\Controllers\Admin\ReferralController::class, 'updateSandboxRequest'])->name('referrals.sandbox.update');
 
     // Traditional Admin Resources
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
     Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class);
+    Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class)->except(['show']);
     Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class);
     Route::post('courses/{course}/lessons/content-image', [\App\Http\Controllers\LessonController::class, 'uploadContentImage'])->name('courses.lessons.content-image');
     Route::post('courses/{course}/lessons/reorder', [\App\Http\Controllers\Admin\CourseController::class, 'reorderLessons'])->name('courses.lessons.reorder');
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
     Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class);
+    Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'pdf'])->name('invoices.pdf');
+    Route::post('invoices/{invoice}/send', [\App\Http\Controllers\Admin\InvoiceController::class, 'send'])->name('invoices.send');
+    Route::resource('invoices', \App\Http\Controllers\Admin\InvoiceController::class);
+    Route::resource('jobs', \App\Http\Controllers\Admin\JobController::class)->except(['show']);
+    Route::resource('faqs', \App\Http\Controllers\Admin\FaqController::class)->except(['show']);
+    Route::resource('pages', \App\Http\Controllers\Admin\PageController::class)->only(['index', 'edit', 'update']);
+    Route::post('pages/{page}/toggle-section', [\App\Http\Controllers\Admin\PageController::class, 'toggleSection'])->name('pages.toggle-section');
+    Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class)->except(['show']);
+    Route::post('points-rules/exchange-settings', [\App\Http\Controllers\Admin\PointsRuleController::class, 'updateExchangeSettings'])->name('points-rules.exchange-settings');
+    Route::resource('points-rules', \App\Http\Controllers\Admin\PointsRuleController::class)->except(['show']);
+    Route::post('redemptions/{redemption}/approve', [\App\Http\Controllers\Admin\RedemptionController::class, 'approve'])->name('redemptions.approve');
+    Route::post('redemptions/{redemption}/cancel', [\App\Http\Controllers\Admin\RedemptionController::class, 'cancel'])->name('redemptions.cancel');
+    Route::resource('redemptions', \App\Http\Controllers\Admin\RedemptionController::class)->except(['show', 'destroy']);
     Route::get('fonts/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])->name('fonts.api.active');
     Route::resource('fonts', \App\Http\Controllers\Admin\CustomFontController::class);
     Route::post('gallery/upload', [\App\Http\Controllers\Admin\GalleryController::class, 'upload'])->name('gallery.upload');
@@ -590,6 +647,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::post('gallery/media/{media}/cover', [\App\Http\Controllers\Admin\GalleryController::class, 'setCoverFromMedia'])->name('gallery.cover.media');
     Route::delete('gallery/events/{event}/cover', [\App\Http\Controllers\Admin\GalleryController::class, 'clearCover'])->name('gallery.cover.clear');
     Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class);
+    Route::post('mailtemplates/{mailtemplate}/sendpreview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
+    Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class)->except(['show']);
+    Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class)->except(['show']);
 
     // Media Routes (Standardized)
     Route::post('events/{event}/media', [\App\Http\Controllers\Admin\EventMediaController::class, 'store'])->name('events.media.store');
