@@ -26,19 +26,25 @@
 
                     <div class="form-group">
                         <label>Arquivos</label>
-                        <div class="gallery-admin-dropzone text-center p-5" id="adminDropzone">
-                            <div class="mb-3 text-primary">
-                                <i class="fas fa-cloud-upload-alt fa-3x"></i>
-                            </div>
-                            <h5 class="font-weight-bold mb-2">Clique ou arraste as fotos aqui</h5>
-                            <p class="text-muted mb-0">JPG, PNG e WEBP com ate 10 MB por arquivo.</p>
+                        <div class="gallery-admin-dropzone text-center p-5 position-relative" id="adminDropzone" role="button" tabindex="0" aria-controls="adminFileInput">
                             <input type="file"
                                 name="files[]"
                                 multiple
                                 required
                                 accept="image/jpeg,image/png,image/jpg,image/webp"
                                 id="adminFileInput"
-                                class="d-none">
+                                class="sr-only">
+
+                            <label for="adminFileInput" class="gallery-admin-dropzone-label mb-0 d-flex flex-column align-items-center justify-content-center">
+                                <div class="mb-3 text-primary">
+                                    <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                                </div>
+                                <h5 class="font-weight-bold mb-2">Clique ou arraste as fotos aqui</h5>
+                                <p class="text-muted mb-3">JPG, PNG e WEBP com ate 10 MB por arquivo.</p>
+                                <span class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-folder-open mr-1"></i>Selecionar arquivos
+                                </span>
+                            </label>
                         </div>
                     </div>
 

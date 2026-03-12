@@ -156,6 +156,12 @@
             transition: border-color .2s ease, background-color .2s ease;
         }
 
+        .gallery-admin-dropzone-label {
+            min-height: 220px;
+            width: 100%;
+            cursor: pointer;
+        }
+
         .gallery-admin-dropzone.dragover {
             border-color: #007bff;
             background: #eef5ff;

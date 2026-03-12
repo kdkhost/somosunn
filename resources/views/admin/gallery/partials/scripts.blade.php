@@ -15,6 +15,21 @@
         const $selectedSummary = $('#adminSelectedSummary');
         const $selectedSize = $('#adminSelectedSize');
         const $selectedList = $('#adminSelectedList');
+        const fileInputElement = document.getElementById('adminFileInput');
+
+        function syncSelectedFiles(files) {
+            if (!fileInputElement) {
+                return;
+            }
+
+            if (typeof DataTransfer === 'undefined') {
+                return;
+            }
+
+            const transfer = new DataTransfer();
+            files.forEach((file) => transfer.items.add(file));
+            fileInputElement.files = transfer.files;
+        }
 
         function formatBytes(bytes) {
             if (!bytes) {
@@ -29,7 +44,7 @@
         }
 
         function updateSelectedFiles() {
-            const files = Array.from($fileInput[0].files || []);
+            const files = Array.from(fileInputElement?.files || []);
 
             if (files.length === 0) {
                 $selectedFiles.addClass('d-none');
@@ -59,12 +74,32 @@
             $progressLabel.text(label);
         }
 
-        $dropzone.on('click', function(e) {
-            if ($(e.target).closest('button, a, input').length) {
+        function appendFiles(files) {
+            const incomingFiles = Array.from(files || []);
+            if (incomingFiles.length === 0 || !fileInputElement) {
                 return;
             }
 
-            $fileInput.trigger('click');
+            const currentFiles = Array.from(fileInputElement.files || []);
+            syncSelectedFiles(currentFiles.concat(incomingFiles));
+            updateSelectedFiles();
+        }
+
+        $dropzone.on('click', function(e) {
+            if ($(e.target).closest('input, label, button, a').length) {
+                return;
+            }
+
+            fileInputElement?.click();
+        });
+
+        $dropzone.on('keydown', function(e) {
+            if (e.key !== 'Enter' && e.key !== ' ') {
+                return;
+            }
+
+            e.preventDefault();
+            fileInputElement?.click();
         });
 
         $fileInput.on('change', updateSelectedFiles);
@@ -87,16 +122,13 @@
                 return;
             }
 
-            const transfer = new DataTransfer();
-            droppedFiles.forEach((file) => transfer.items.add(file));
-            $fileInput[0].files = transfer.files;
-            updateSelectedFiles();
+            appendFiles(droppedFiles);
         });
 
         $form.on('submit', function(e) {
             e.preventDefault();
 
-            if ($fileInput[0].files.length === 0) {
+            if (!fileInputElement || fileInputElement.files.length === 0) {
                 Swal.fire({ icon: 'warning', title: 'Atencao', text: 'Selecione pelo menos uma imagem.' });
                 return;
             }
@@ -164,6 +196,16 @@
             });
 
             xhr.send(formData);
+        });
+
+        $('#uploadModal').on('hidden.bs.modal', function() {
+            $form[0].reset();
+            $selectedFiles.addClass('d-none');
+            $selectedSummary.text('');
+            $selectedSize.text('');
+            $selectedList.html('');
+            setProgress(0, 'Aguardando selecao dos arquivos.');
+            $dropzone.removeClass('dragover');
         });
 
         $('.delete-form').on('submit', function(e) {
