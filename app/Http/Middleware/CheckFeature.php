@@ -49,7 +49,7 @@ class CheckFeature
             }
 
             return redirect()
-                ->route('premium', ['feature' => $feature])
+                ->route('planos', ['feature' => $feature])
                 ->with('warning', 'Seu plano atual nao inclui este recurso. Veja os planos recomendados para liberar o acesso.');
         }
 

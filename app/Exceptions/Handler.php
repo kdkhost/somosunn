@@ -47,7 +47,7 @@ class Handler extends ExceptionHandler
             $feature = $this->resolveFeatureFromRequest($request);
 
             return redirect()
-                ->route('premium', array_filter([
+                ->route('planos', array_filter([
                     'feature' => $feature,
                 ]))
                 ->with('warning', 'Seu plano atual nao inclui este recurso. Veja os planos recomendados para liberar o acesso.');
@@ -58,7 +58,7 @@ class Handler extends ExceptionHandler
 
     private function shouldSuggestPlanUpgrade(Request $request): bool
     {
-        if ($request->routeIs('premium') || $request->routeIs('subscription.*')) {
+        if ($request->routeIs('planos') || $request->routeIs('subscription.*')) {
             return false;
         }
 
