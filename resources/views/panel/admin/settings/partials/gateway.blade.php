@@ -624,7 +624,7 @@
 @push('scripts')
     <script>
         function toggleSetting(key, checked) {
-            const url = "{{ route('admin.settings.toggle') }}";
+            const url = "{{ route('panel.admin.settings.toggle') }}";
             const value = checked ? 1 : 0;
 
             fetch(url, {

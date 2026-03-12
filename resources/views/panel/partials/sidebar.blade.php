@@ -485,7 +485,7 @@
             document.documentElement.classList.remove('dark');
         }
 
-        fetch('{{ route("panel.theme.toggle") }}', {
+        fetch('{{ route("theme.toggle") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

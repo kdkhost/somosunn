@@ -328,6 +328,9 @@ Route::middleware(['auth'])->prefix('gateway/mercadopago')->name('gateway.mercad
 
 // Auth Required Group
 Route::middleware(['auth', 'check.plan'])->group(function () {
+    Route::get('/settings/payment', [\App\Http\Controllers\GatewayAccountController::class, 'index'])->name('settings.payment.index');
+    Route::post('/settings/payment', [\App\Http\Controllers\GatewayAccountController::class, 'update'])->name('settings.payment.update');
+
     // Social / Community
     Route::middleware(['check.feature:community'])->group(function () {
         Route::get('/feed', [\App\Http\Controllers\SocialController::class, 'feed'])->name('social.feed');
@@ -408,6 +411,12 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::get('/indicacoes', [\App\Http\Controllers\Panel\ReferralController::class, 'index'])->name('referral.index');
     Route::get('/indicacoes/exportar', [\App\Http\Controllers\Panel\ReferralController::class, 'export'])->name('referral.export');
     Route::get('/indicacoes/dados', [\App\Http\Controllers\Panel\ReferralController::class, 'stats'])->name('referral.stats');
+    Route::post('/indicacoes/track', [\App\Http\Controllers\Panel\ReferralController::class, 'track'])->name('referral.track');
+    Route::post('/indicacoes/sandbox', [\App\Http\Controllers\Panel\ReferralController::class, 'storeSandboxRequest'])->name('referral.sandbox.store');
+    Route::post('/indicacoes/playground', [\App\Http\Controllers\Panel\ReferralController::class, 'playground'])->name('referral.playground.execute');
+    Route::post('/indicacoes/tokens', [\App\Http\Controllers\Panel\ReferralController::class, 'storeToken'])->name('referral.tokens.store');
+    Route::put('/indicacoes/tokens/{tokenId}', [\App\Http\Controllers\Panel\ReferralController::class, 'updateToken'])->name('referral.tokens.update');
+    Route::delete('/indicacoes/tokens/{tokenId}', [\App\Http\Controllers\Panel\ReferralController::class, 'destroyToken'])->name('referral.tokens.destroy');
 
     Route::get('/resgate', [\App\Http\Controllers\RedemptionItemController::class, 'index'])->name('redemptions.shop');
     Route::get('/resgate/historico', [\App\Http\Controllers\RedemptionItemController::class, 'history'])->name('redemptions.history');
@@ -422,6 +431,13 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::post('/galeria/media/{media}/capa', [\App\Http\Controllers\Panel\GalleryController::class, 'setCoverFromMedia'])->name('gallery.cover.media');
     Route::delete('/galeria/eventos/{event}/capa', [\App\Http\Controllers\Panel\GalleryController::class, 'clearCover'])->name('gallery.cover.clear');
     Route::delete('/galeria/{media}', [\App\Http\Controllers\Panel\GalleryController::class, 'destroy'])->name('gallery.destroy');
+    Route::resource('coupons', \App\Http\Controllers\Panel\CouponController::class)->except(['show']);
+    Route::resource('courses', \App\Http\Controllers\Panel\CourseController::class)->except(['show']);
+    Route::resource('events', \App\Http\Controllers\Panel\EventController::class);
+    Route::post('events/{event}/media', [\App\Http\Controllers\Panel\EventMediaController::class, 'store'])->name('events.media.store');
+    Route::delete('events/{event}/media/{media}', [\App\Http\Controllers\Panel\EventMediaController::class, 'destroy'])->name('events.media.destroy');
+    Route::get('events/{event}/scanner', [\App\Http\Controllers\Panel\EventScannerController::class, 'index'])->name('events.scanner');
+    Route::post('events/{event}/scanner/validate', [\App\Http\Controllers\Panel\EventScannerController::class, 'validateTicket'])->name('events.scanner.validate');
 
     // Instructor Area
     Route::prefix('instrutor')->name('instructor.')->middleware([\App\Http\Middleware\EnsureInstructorAccess::class])->group(function () {
@@ -437,6 +453,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         // Settings
         Route::get('/settings/{group?}', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
         Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+        Route::post('/settings/toggle', [\App\Http\Controllers\Admin\SettingController::class, 'toggle'])->name('settings.toggle');
         Route::post('/settings/test-smtp', [\App\Http\Controllers\Admin\SettingController::class, 'testSmtp'])->name('settings.test-smtp');
         Route::post('/settings/test-gateway', [\App\Http\Controllers\Admin\SettingController::class, 'testGateway'])->name('settings.test_gateway');
 
@@ -445,6 +462,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
             Route::get('/', [\App\Http\Controllers\Panel\Admin\CronController::class, 'index'])->name('index');
             Route::get('/create', [\App\Http\Controllers\Panel\Admin\CronController::class, 'create'])->name('create');
             Route::post('/', [\App\Http\Controllers\Panel\Admin\CronController::class, 'store'])->name('store');
+            Route::get('/{task}/logs', [\App\Http\Controllers\Panel\Admin\CronController::class, 'logs'])->name('logs');
             Route::get('/{task}/edit', [\App\Http\Controllers\Panel\Admin\CronController::class, 'edit'])->name('edit');
             Route::put('/{task}', [\App\Http\Controllers\Panel\Admin\CronController::class, 'update'])->name('update');
             Route::delete('/{task}', [\App\Http\Controllers\Panel\Admin\CronController::class, 'destroy'])->name('destroy');
@@ -455,21 +473,36 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::post('plans/{plan}/toggle-active', [\App\Http\Controllers\Panel\Admin\PlanController::class, 'toggleActive'])->name('plans.toggle-active');
         Route::resource('plans', \App\Http\Controllers\Panel\Admin\PlanController::class);
         Route::resource('orders', \App\Http\Controllers\Panel\Admin\OrderController::class)->only(['index', 'show']);
+        Route::post('orders/{order}/refund', [\App\Http\Controllers\Panel\Admin\OrderController::class, 'refund'])->name('orders.refund');
         Route::post('orders/{order}/invoice', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'issueForOrder'])->name('orders.invoice');
         Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'pdf'])->name('invoices.pdf');
+        Route::post('invoices/{invoice}/send', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'send'])->name('invoices.send');
         Route::resource('invoices', \App\Http\Controllers\Panel\Admin\InvoiceController::class);
         Route::resource('coupons', \App\Http\Controllers\Panel\Admin\CouponController::class);
+        Route::post('courses/{course}/certificate/preview', [\App\Http\Controllers\Panel\Admin\CourseController::class, 'certificatePreview'])->name('courses.certificate.preview');
+        Route::post('courses/{course}/lessons', [\App\Http\Controllers\LessonController::class, 'store'])->name('courses.lessons.store');
+        Route::post('courses/{course}/lessons/content-image', [\App\Http\Controllers\LessonController::class, 'uploadContentImage'])->name('courses.lessons.content-image');
         Route::resource('courses', \App\Http\Controllers\Panel\Admin\CourseController::class);
         Route::post('courses/{course}/lessons/reorder', [\App\Http\Controllers\Panel\Admin\CourseController::class, 'reorderLessons'])->name('courses.lessons.reorder');
+        Route::get('cms/{slug?}', [\App\Http\Controllers\Admin\CMSController::class, 'index'])->name('cms.index');
+        Route::post('cms/{slug}', [\App\Http\Controllers\Admin\CMSController::class, 'update'])->name('cms.update');
         Route::resource('pages', \App\Http\Controllers\Panel\Admin\PageController::class);
         Route::post('pages/{page}/toggle-section', [\App\Http\Controllers\Panel\Admin\PageController::class, 'toggleSection'])->name('pages.toggle-section');
         Route::resource('faqs', \App\Http\Controllers\Panel\Admin\FaqController::class);
+        Route::post('testimonials/{testimonial}/approve', [\App\Http\Controllers\Panel\Admin\TestimonialController::class, 'approve'])->name('testimonials.approve');
+        Route::post('testimonials/{testimonial}/reject', [\App\Http\Controllers\Panel\Admin\TestimonialController::class, 'reject'])->name('testimonials.reject');
         Route::resource('testimonials', \App\Http\Controllers\Panel\Admin\TestimonialController::class);
         Route::get('logs', [\App\Http\Controllers\Panel\Admin\ActivityLogController::class, 'index'])->name('logs.index');
+        Route::post('logs/clear', [\App\Http\Controllers\Panel\Admin\ActivityLogController::class, 'clear'])->name('logs.clear');
         Route::get('referrals', [\App\Http\Controllers\Panel\Admin\ReferralAnalyticsController::class, 'index'])->name('referrals.index');
+        Route::get('referrals/export', [\App\Http\Controllers\Panel\Admin\ReferralAnalyticsController::class, 'export'])->name('referrals.export');
+        Route::put('referrals/sandbox/{sandboxRequest}', [\App\Http\Controllers\Panel\Admin\ReferralAnalyticsController::class, 'updateSandboxRequest'])->name('referrals.sandbox.update');
 
         // Events
+        Route::get('events/feed', [\App\Http\Controllers\Panel\Admin\EventController::class, 'feed'])->name('events.feed');
         Route::get('events/list', [\App\Http\Controllers\Panel\Admin\EventController::class, 'list'])->name('events.list');
+        Route::get('events/{event}/scanner', [\App\Http\Controllers\Panel\EventScannerController::class, 'index'])->name('events.scanner');
+        Route::post('events/{event}/toggle-published', [\App\Http\Controllers\Panel\Admin\EventController::class, 'togglePublished'])->name('events.toggle-published');
         Route::resource('events', \App\Http\Controllers\Panel\Admin\EventController::class);
         Route::post('events/{event}/media', [\App\Http\Controllers\Panel\EventMediaController::class, 'store'])->name('events.media.store');
         Route::delete('events/{event}/media/{media}', [\App\Http\Controllers\Panel\EventMediaController::class, 'destroy'])->name('events.media.destroy');
@@ -484,13 +517,20 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::resource('certificates', \App\Http\Controllers\Panel\Admin\CertificateController::class);
 
         Route::resource('jobs', \App\Http\Controllers\Panel\Admin\JobController::class);
+        Route::post('points-rules/exchange-settings', [\App\Http\Controllers\Panel\Admin\PointsRuleController::class, 'updateExchangeSettings'])->name('points-rules.exchange-settings');
         Route::resource('points-rules', \App\Http\Controllers\Panel\Admin\PointsRuleController::class);
+        Route::post('redemptions/{redemption}/approve', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'approve'])->name('redemptions.approve');
+        Route::post('redemptions/{redemption}/ship', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'ship'])->name('redemptions.ship');
+        Route::post('redemptions/{redemption}/complete', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'complete'])->name('redemptions.complete');
+        Route::post('redemptions/{redemption}/cancel', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'cancel'])->name('redemptions.cancel');
         Route::resource('redemptions', \App\Http\Controllers\Panel\Admin\RedemptionController::class);
         Route::get('fonts/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])->name('fonts.api.active');
         Route::resource('fonts', \App\Http\Controllers\Admin\CustomFontController::class);
         Route::get('ranking', [\App\Http\Controllers\Panel\Admin\RankingController::class, 'index'])->name('ranking.index');
+        Route::post('quick-scanner/validate', [\App\Http\Controllers\Admin\QuickScannerController::class, 'validateTicket'])->name('quick-scanner.validate');
 
         // Mail Templates (Tailwind)
+        Route::post('mailtemplates/{mailtemplate}/sendpreview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
         Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class);
     });
 });
@@ -503,13 +543,34 @@ Route::post('/theme/toggle', [\App\Http\Controllers\Panel\ThemeController::class
 
 // Legacy Admin Routes (AdminLTE)
 Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class, \App\Http\Middleware\EnsureUserIsAdmin::class])->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/settings/{group?}', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
+    Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+    Route::post('/settings/toggle', [\App\Http\Controllers\Admin\SettingController::class, 'toggle'])->name('settings.toggle');
+    Route::post('/settings/test-smtp', [\App\Http\Controllers\Admin\SettingController::class, 'testSmtp'])->name('settings.test-smtp');
+    Route::post('/settings/test-gateway', [\App\Http\Controllers\Admin\SettingController::class, 'testGateway'])->name('settings.test_gateway');
     Route::post('/settings/upload', [\App\Http\Controllers\Admin\SettingController::class, 'uploadFile'])->name('settings.upload');
     Route::get('/balance', [\App\Http\Controllers\Admin\DashboardController::class, 'getMpBalance'])->name('dashboard.balance');
+    Route::get('/certificates', [\App\Http\Controllers\Admin\CertificateController::class, 'index'])->name('certificates.index');
+    Route::post('/certificates/generate', [\App\Http\Controllers\Admin\CertificateController::class, 'generate'])->name('certificates.generate');
+    Route::post('/certificates/{certificate}/regenerate', [\App\Http\Controllers\Admin\CertificateController::class, 'regenerate'])->name('certificates.regenerate');
+    Route::post('/certificates/{certificate}/send', [\App\Http\Controllers\Admin\CertificateController::class, 'sendEmail'])->name('certificates.send');
+    Route::delete('/certificates/{certificate}', [\App\Http\Controllers\Admin\CertificateController::class, 'destroy'])->name('certificates.destroy');
+    Route::get('/certificates/{hash}', [\App\Http\Controllers\Admin\CertificateController::class, 'view'])->name('certificates.view');
+    Route::get('/quick-scanner', [\App\Http\Controllers\Admin\QuickScannerController::class, 'index'])->name('quick-scanner');
+    Route::post('/quick-scanner/validate', [\App\Http\Controllers\Admin\QuickScannerController::class, 'validateTicket'])->name('quick-scanner.validate');
+    Route::get('events/feed', [\App\Http\Controllers\Admin\EventController::class, 'feed'])->name('events.feed');
+    Route::get('events/list', [\App\Http\Controllers\Admin\EventController::class, 'list'])->name('events.list');
+    Route::get('events/{event}/scanner', [\App\Http\Controllers\Admin\EventScannerController::class, 'index'])->name('events.scanner');
+    Route::post('events/{event}/scanner/validate', [\App\Http\Controllers\Admin\EventScannerController::class, 'validateTicket'])->name('events.scanner.validate');
+    Route::get('users/{user}/impersonate', [\App\Http\Controllers\Admin\ImpersonateController::class, 'impersonate'])->name('users.impersonate');
 
     // Traditional Admin Resources
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
     Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class);
     Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class);
+    Route::post('courses/{course}/lessons/content-image', [\App\Http\Controllers\LessonController::class, 'uploadContentImage'])->name('courses.lessons.content-image');
+    Route::post('courses/{course}/lessons/reorder', [\App\Http\Controllers\Admin\CourseController::class, 'reorderLessons'])->name('courses.lessons.reorder');
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
     Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class);
     Route::get('fonts/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])->name('fonts.api.active');

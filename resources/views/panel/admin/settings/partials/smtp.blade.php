@@ -261,7 +261,7 @@
             const formData = new FormData(form);
             formData.append('smtp_test_email', email);
 
-            fetch('{{ route("admin.settings.test-smtp") }}', {
+            fetch('{{ route("panel.admin.settings.test-smtp") }}', {
                 method: 'POST',
                 body: formData,
                 headers: {
