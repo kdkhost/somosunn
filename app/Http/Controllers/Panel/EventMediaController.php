@@ -33,16 +33,22 @@ class EventMediaController extends Controller
         foreach ($this->validatedFiles($request->file('files')) as $fileData) {
             $file = $fileData['file'];
             $type = $fileData['type'];
+            $targetDirectory = $type === 'image'
+                ? 'events/' . $event->id . '/gallery'
+                : 'events/' . $event->id . '/gallery/videos';
+            $shouldWatermark = $type === 'image'
+                && $watermarkService->isWatermarkableImage($file)
+                && $watermarkService->shouldWatermarkUpload($targetDirectory);
 
             try {
                 try {
                     if ($type === 'image') {
                         $path = $watermarkService->processEventImage($file, $event);
-                        $watermarked = true;
+                        $watermarked = $shouldWatermark;
                     } else {
                         $path = UploadStorage::storeUploadedFile(
                             $file,
-                            'events/' . $event->id . '/gallery/videos'
+                            $targetDirectory
                         );
                         $watermarked = false;
                     }
@@ -54,12 +60,8 @@ class EventMediaController extends Controller
                         'message' => $exception->getMessage(),
                     ]);
 
-                    $targetDirectory = $type === 'image'
-                        ? 'events/' . $event->id . '/gallery'
-                        : 'events/' . $event->id . '/gallery/videos';
-
                     $path = UploadStorage::storeUploadedFile($file, $targetDirectory);
-                    $watermarked = false;
+                    $watermarked = $shouldWatermark;
                 }
 
                 $uploadedMedia[] = EventMedia::create([

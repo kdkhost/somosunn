@@ -137,6 +137,7 @@ class EventGalleryManagementTest extends TestCase
         $this->assertSame(1, (int) ($payload['uploaded_count'] ?? 0));
         $this->assertCount(1, $payload['media'] ?? []);
         $this->assertSame(1, EventMedia::query()->count());
+        $this->assertTrue((bool) EventMedia::query()->value('watermarked'));
     }
 
     public function test_panel_organizer_can_define_album_cover_from_existing_media(): void

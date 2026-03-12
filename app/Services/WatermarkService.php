@@ -158,6 +158,8 @@ class WatermarkService
     public function applyWatermarkToAbsolutePath(string $sourcePath, string $destinationPath): void
     {
         [$image, $width, $height] = $this->loadRasterImage($sourcePath);
+        $destinationExtension = strtolower((string) pathinfo($destinationPath, PATHINFO_EXTENSION));
+        [$image, $width, $height] = $this->optimizeRasterImage($image, $width, $height, $destinationExtension);
         $logoPath = $this->resolveWatermarkLogoPath();
         $settings = $this->imageWatermarkSettings();
         $logo = null;
@@ -228,13 +230,15 @@ class WatermarkService
             throw new RuntimeException('Nao foi possivel preparar o destino da imagem com marca d\'agua.');
         }
 
-        $extension = strtolower((string) pathinfo($destinationPath, PATHINFO_EXTENSION));
-        $saved = match ($extension) {
-            'jpg', 'jpeg' => imagejpeg($image, $destinationPath, 88),
-            'png' => imagepng($image, $destinationPath, 6),
+        $quality = $this->imageOptimizationSettings();
+        $saved = match ($destinationExtension) {
+            'jpg', 'jpeg' => tap($image, static fn ($resource) => imageinterlace($resource, true))
+                && imagejpeg($image, $destinationPath, $quality['jpeg_quality']),
+            'png' => imagepng($image, $destinationPath, $quality['png_compression']),
             'gif' => imagegif($image, $destinationPath),
-            'webp' => function_exists('imagewebp') ? imagewebp($image, $destinationPath, 88) : false,
-            default => imagejpeg($image, $destinationPath, 88),
+            'webp' => function_exists('imagewebp') ? imagewebp($image, $destinationPath, $quality['webp_quality']) : false,
+            default => tap($image, static fn ($resource) => imageinterlace($resource, true))
+                && imagejpeg($image, $destinationPath, $quality['jpeg_quality']),
         };
 
         imagedestroy($image);
@@ -424,6 +428,17 @@ class WatermarkService
         ];
     }
 
+    private function imageOptimizationSettings(): array
+    {
+        return [
+            'max_width' => max(1200, min(5000, (int) Setting::get('image_upload_optimize_max_width', 2400))),
+            'max_height' => max(1200, min(5000, (int) Setting::get('image_upload_optimize_max_height', 2400))),
+            'jpeg_quality' => max(65, min(92, (int) Setting::get('image_upload_jpeg_quality', 84))),
+            'webp_quality' => max(65, min(92, (int) Setting::get('image_upload_webp_quality', 84))),
+            'png_compression' => max(0, min(9, (int) Setting::get('image_upload_png_compression', 7))),
+        ];
+    }
+
     private function resolvePosition(
         string $position,
         int $imageWidth,
@@ -442,6 +457,41 @@ class WatermarkService
             ],
             default => [$imageWidth - $logoWidth - $margin, $imageHeight - $logoHeight - $margin],
         };
+    }
+
+    private function optimizeRasterImage($image, int $width, int $height, string $extension): array
+    {
+        $settings = $this->imageOptimizationSettings();
+        $maxWidth = max(1, (int) $settings['max_width']);
+        $maxHeight = max(1, (int) $settings['max_height']);
+
+        if ($width <= $maxWidth && $height <= $maxHeight) {
+            return [$image, $width, $height];
+        }
+
+        $scale = min($maxWidth / max(1, $width), $maxHeight / max(1, $height));
+        if ($scale >= 1) {
+            return [$image, $width, $height];
+        }
+
+        $targetWidth = max(1, (int) round($width * $scale));
+        $targetHeight = max(1, (int) round($height * $scale));
+        $canvas = imagecreatetruecolor($targetWidth, $targetHeight);
+
+        if (in_array($extension, ['png', 'gif', 'webp'], true)) {
+            imagealphablending($canvas, false);
+            imagesavealpha($canvas, true);
+            $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+            imagefilledrectangle($canvas, 0, 0, $targetWidth, $targetHeight, $transparent);
+        } else {
+            $background = imagecolorallocate($canvas, 255, 255, 255);
+            imagefilledrectangle($canvas, 0, 0, $targetWidth, $targetHeight, $background);
+        }
+
+        imagecopyresampled($canvas, $image, 0, 0, 0, 0, $targetWidth, $targetHeight, $width, $height);
+        imagedestroy($image);
+
+        return [$canvas, $targetWidth, $targetHeight];
     }
 
     private function imagecopymergeAlpha(

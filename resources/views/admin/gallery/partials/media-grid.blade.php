@@ -37,7 +37,7 @@
                                 </a>
                             @else
                                 <a href="{{ $assetUrl }}" target="_blank" rel="noopener">
-                                    <img src="{{ $assetUrl }}" alt="{{ $eventTitle }}">
+                                    <img src="{{ $assetUrl }}" alt="{{ $eventTitle }}" loading="lazy" decoding="async">
                                 </a>
                             @endif
                         </div>

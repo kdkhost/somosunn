@@ -112,7 +112,9 @@
         }
 
         .gallery-admin-thumb img {
-            object-fit: cover;
+            object-fit: contain;
+            background: #fff;
+            padding: .5rem;
         }
 
         .gallery-admin-video-link {

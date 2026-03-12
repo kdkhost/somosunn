@@ -72,6 +72,10 @@ class GalleryController extends Controller
         $failedFiles = [];
 
         foreach ($request->file('files', []) as $file) {
+            $targetDirectory = 'events/' . $event->id . '/gallery';
+            $shouldWatermark = $watermarkService->isWatermarkableImage($file)
+                && $watermarkService->shouldWatermarkUpload($targetDirectory);
+
             try {
                 $path = $watermarkService->processEventImage($file, $event);
                 $uploadedMedia[] = EventMedia::create([
@@ -79,7 +83,7 @@ class GalleryController extends Controller
                     'user_id' => auth()->id(),
                     'file_path' => $path,
                     'type' => 'image',
-                    'watermarked' => true,
+                    'watermarked' => $shouldWatermark,
                 ]);
             } catch (\Throwable $exception) {
                 \Log::error('Gallery upload error: ' . $exception->getMessage(), [
@@ -90,12 +94,9 @@ class GalleryController extends Controller
                 try {
                     $path = UploadStorage::storeUploadedFile(
                         $file,
-                        'events/' . $event->id . '/gallery',
+                        $targetDirectory,
                         null,
-                        [
-                            'prefix' => 'gallery-media',
-                            'watermark' => false,
-                        ]
+                        ['prefix' => 'gallery-media']
                     );
 
                     $uploadedMedia[] = EventMedia::create([
@@ -103,7 +104,7 @@ class GalleryController extends Controller
                         'user_id' => auth()->id(),
                         'file_path' => $path,
                         'type' => 'image',
-                        'watermarked' => false,
+                        'watermarked' => $shouldWatermark,
                     ]);
                 } catch (\Throwable $fallbackException) {
                     \Log::error('Gallery upload fallback error: ' . $fallbackException->getMessage(), [
