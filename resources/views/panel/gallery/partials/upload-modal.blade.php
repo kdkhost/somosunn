@@ -38,6 +38,7 @@
                 method="POST"
                 enctype="multipart/form-data"
                 data-panel-upload-progress="false"
+                novalidate
                 class="flex min-h-0 flex-1 flex-col">
                 @csrf
 
@@ -49,7 +50,7 @@
                                     Evento associado
                                 </label>
                                 <div class="relative">
-                                    <select id="gallery-upload-event" name="event_id" required
+                                    <select id="gallery-upload-event" name="event_id"
                                         class="w-full appearance-none rounded-[1.6rem] border border-slate-200 bg-slate-50 px-5 py-4 pr-12 text-sm font-bold text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-blue-500 dark:focus:ring-blue-500/10">
                                         <option value="">Selecione um evento...</option>
                                         @foreach($events as $event)
@@ -67,7 +68,7 @@
                             <div id="gallery-dropzone"
                                 class="gallery-dropzone rounded-[2rem] border-2 border-dashed border-slate-200 bg-slate-50 p-6 transition dark:border-slate-700 dark:bg-slate-950">
                                 <input id="gallery-files-input" type="file" name="files[]" accept="image/jpeg,image/png,image/jpg,image/webp" multiple
-                                    required class="hidden" data-filepond-ignore="true">
+                                    class="hidden" data-filepond-ignore="true">
 
                                 <div class="flex flex-col items-center justify-center text-center">
                                     <div class="flex h-16 w-16 items-center justify-center rounded-[1.6rem] bg-blue-600 text-2xl text-white shadow-lg shadow-blue-500/20">
