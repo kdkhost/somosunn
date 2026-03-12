@@ -15,13 +15,13 @@
                 </p>
             </div>
 
-            <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+            <div id="panel-gallery-total-pill" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
                 <i class="fas fa-layer-group text-blue-500"></i>
-                {{ $media->total() }} registro(s)
+                <span id="panel-gallery-total-value">{{ $media->total() }}</span> registro(s)
             </div>
         </div>
 
-        <div class="grid gap-6 lg:grid-cols-2 2xl:grid-cols-3">
+        <div id="panel-gallery-grid" class="grid gap-6 lg:grid-cols-2 2xl:grid-cols-3">
             @foreach($items as $item)
                 @php
                     $imageUrl = \App\Support\UploadStorage::url($item->file_path, asset('img/default-user.svg'));
@@ -117,7 +117,7 @@
         </div>
     </section>
 @else
-    <section class="overflow-hidden rounded-[2.5rem] border border-dashed border-slate-300 bg-white/90 p-8 shadow-sm shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-900">
+    <section id="panel-gallery-empty-state" class="overflow-hidden rounded-[2.5rem] border border-dashed border-slate-300 bg-white/90 p-8 shadow-sm shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-900">
         <div class="mx-auto max-w-3xl text-center">
             <div class="mx-auto flex h-28 w-28 items-center justify-center rounded-[2rem] bg-slate-100 text-4xl text-slate-300 shadow-inner dark:bg-slate-800 dark:text-slate-600">
                 <i class="fas fa-camera"></i>

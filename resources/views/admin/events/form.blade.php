@@ -653,14 +653,38 @@ async function uploadAdminGallery(files) {
         });
 
         if (response.data.success) {
+            const container = document.getElementById('adminGalleryContainer');
+            const emptyState = document.getElementById('noMediaMessage');
+
+            if (container && Array.isArray(response.data.media)) {
+                response.data.media.slice().reverse().forEach((media) => {
+                    const preview = media.type === 'image'
+                        ? `<a href="${media.url}" data-fancybox="gallery"><img src="${media.url}" class="card-img-top object-cover" style="height: 150px; object-fit: cover;"></a>`
+                        : `<div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 150px;"><i class="fas fa-video text-white fa-3x"></i></div>`;
+
+                    container.insertAdjacentHTML('afterbegin', `
+                        <div class="col-6 col-md-4 col-lg-3 mb-4" id="admin-media-${media.id}">
+                            <div class="card h-100 position-relative group">
+                                ${preview}
+                                <button type="button" onclick="deleteAdminMedia(${media.id})" class="btn btn-danger btn-sm position-absolute" style="top: 5px; right: 5px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            if (emptyState) {
+                emptyState.remove();
+            }
+
             Swal.fire({
                 icon: 'success',
                 title: 'Sucesso!',
                 text: response.data.message || 'Arquivos enviados com sucesso.',
                 timer: 2000,
                 showConfirmButton: false
-            }).then(() => {
-                location.reload();
             });
         } else {
             throw new Error(response.data.message || 'Erro no upload');
@@ -701,6 +725,14 @@ async function deleteAdminMedia(id) {
         const data = await response.json();
         if (response.ok && data.success) {
             document.getElementById(`admin-media-${id}`).remove();
+            const container = document.getElementById('adminGalleryContainer');
+            if (container && container.children.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12" id="noMediaMessage">
+                        <div class="alert alert-light text-center border">Nenhuma midia enviada ainda.</div>
+                    </div>
+                `;
+            }
         } else {
             Swal.fire('Erro', data.message || 'Erro ao excluir mídia.', 'error');
         }

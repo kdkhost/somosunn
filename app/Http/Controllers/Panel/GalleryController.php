@@ -83,7 +83,7 @@ class GalleryController extends Controller
                     try {
                         $path = UploadStorage::storeUploadedFile($file, 'events/' . $event->id . '/gallery');
 
-                        EventMedia::create([
+                        $uploadedMedia[] = EventMedia::create([
                             'event_id' => $event->id,
                             'user_id' => auth()->id(),
                             'file_path' => $path,
@@ -115,10 +115,21 @@ class GalleryController extends Controller
         $message = "Sucesso! {$uploadedCount} foto(s) foram enviadas para a galeria.";
 
         if ($request->expectsJson()) {
+            $user = auth()->user();
+
             return response()->json([
                 'success' => true,
                 'message' => $message,
                 'uploaded_count' => $uploadedCount,
+                'media' => $this->serializeMediaCollection($uploadedMedia),
+                'stats' => [
+                    'visible_total' => EventMedia::query()
+                        ->when(!$user->isAdmin(), function ($query) use ($user) {
+                            $query->where('user_id', $user->id);
+                        })
+                        ->count(),
+                    'my_uploads' => EventMedia::query()->where('user_id', $user->id)->count(),
+                ],
             ]);
         }
 
@@ -143,5 +154,30 @@ class GalleryController extends Controller
         $media->delete();
 
         return back()->with('success', 'Midia excluida da galeria com sucesso.');
+    }
+
+    /**
+     * @param  array<int, EventMedia>  $mediaItems
+     * @return array<int, array<string, mixed>>
+     */
+    private function serializeMediaCollection(array $mediaItems): array
+    {
+        return array_map(function (EventMedia $media) {
+            $media->loadMissing(['event', 'user']);
+
+            return [
+                'id' => $media->id,
+                'type' => $media->type,
+                'url' => UploadStorage::url($media->file_path, asset('img/default-user.svg')),
+                'watermarked' => (bool) $media->watermarked,
+                'event_title' => optional($media->event)->title ?: 'Evento sem titulo',
+                'event_date' => optional(optional($media->event)->start_at)?->format('d/m/Y'),
+                'owner_name' => optional($media->user)->name ?: 'Sistema',
+                'owner_avatar' => optional($media->user)->profile_photo_url ?: '',
+                'uploaded_at' => $media->created_at?->format('d/m/Y H:i'),
+                'can_delete' => auth()->user()->isAdmin() || (int) $media->user_id === (int) auth()->id(),
+                'delete_url' => route('panel.gallery.destroy', $media),
+            ];
+        }, $mediaItems);
     }
 }

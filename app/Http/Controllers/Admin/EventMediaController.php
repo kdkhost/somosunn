@@ -96,7 +96,7 @@ class EventMediaController extends Controller
             'uploaded_count' => count($uploadedMedia),
             'failed_count' => count($failedFiles),
             'failed_files' => $failedFiles,
-            'media' => $uploadedMedia,
+            'media' => $this->serializeMediaCollection($event, $uploadedMedia),
         ]);
     }
 
@@ -167,5 +167,23 @@ class EventMediaController extends Controller
         $configured = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_video_formats', [])));
 
         return array_values(array_unique(array_merge($configured, ['mp4', 'mov', 'm4v', 'webm'])));
+    }
+
+    /**
+     * @param  array<int, EventMedia>  $mediaItems
+     * @return array<int, array<string, mixed>>
+     */
+    private function serializeMediaCollection(Event $event, array $mediaItems): array
+    {
+        return array_map(function (EventMedia $media) use ($event) {
+            return [
+                'id' => $media->id,
+                'type' => $media->type,
+                'url' => UploadStorage::url($media->file_path),
+                'watermarked' => (bool) $media->watermarked,
+                'uploaded_at' => $media->created_at?->format('d/m/Y H:i'),
+                'delete_url' => route('admin.events.media.destroy', [$event, $media]),
+            ];
+        }, $mediaItems);
     }
 }

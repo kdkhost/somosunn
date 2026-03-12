@@ -17,6 +17,10 @@
         const submitButton = document.getElementById('gallery-upload-submit');
         const lightboxImage = document.getElementById('gallery-lightbox-image');
         const lightboxTitle = document.getElementById('gallery-lightbox-title');
+        let galleryGrid = document.getElementById('panel-gallery-grid');
+        let galleryEmptyState = document.getElementById('panel-gallery-empty-state');
+        const totalValue = document.getElementById('panel-gallery-total-value');
+        const selectedFilter = document.getElementById('gallery-event-filter');
 
         function setBodyLocked(locked) {
             body.classList.toggle('overflow-hidden', locked);
@@ -132,25 +136,30 @@
             return Promise.resolve();
         }
 
-        document.querySelectorAll('[data-gallery-open-upload]').forEach((button) => {
-            button.addEventListener('click', openUploadModal);
-        });
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
 
-        document.querySelectorAll('[data-gallery-close-upload]').forEach((button) => {
-            button.addEventListener('click', closeUploadModal);
-        });
+        function bindLightboxTrigger(button) {
+            if (!button) {
+                return;
+            }
 
-        document.querySelectorAll('[data-gallery-close-lightbox]').forEach((button) => {
-            button.addEventListener('click', closeLightbox);
-        });
-
-        document.querySelectorAll('[data-lightbox-src]').forEach((button) => {
             button.addEventListener('click', function () {
                 openLightbox(this.dataset.lightboxSrc || '', this.dataset.lightboxTitle || '');
             });
-        });
+        }
 
-        document.querySelectorAll('.gallery-delete-form').forEach((form) => {
+        function bindDeleteForm(form) {
+            if (!form) {
+                return;
+            }
+
             form.addEventListener('submit', function (event) {
                 const prompt = 'Esta foto sera removida da galeria. Deseja continuar?';
 
@@ -177,7 +186,132 @@
                     }
                 });
             });
+        }
+
+        function ensureGalleryGrid() {
+            if (galleryGrid) {
+                return galleryGrid;
+            }
+
+            if (!galleryEmptyState) {
+                return null;
+            }
+
+            const section = document.createElement('section');
+            section.className = 'space-y-5';
+            section.innerHTML = `
+                <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-[0.22em] text-blue-600 dark:text-blue-400">Colecao</p>
+                        <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white">Painel de fotos publicadas</h2>
+                        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Novas midias publicadas aparecem aqui imediatamente, sem recarregar a tela.</p>
+                    </div>
+                </div>
+                <div id="panel-gallery-grid" class="grid gap-6 lg:grid-cols-2 2xl:grid-cols-3"></div>
+            `;
+
+            galleryEmptyState.replaceWith(section);
+            galleryGrid = section.querySelector('#panel-gallery-grid');
+            galleryEmptyState = null;
+
+            return galleryGrid;
+        }
+
+        function shouldAppendUploadedMedia(eventId) {
+            if (!selectedFilter || !selectedFilter.value) {
+                return true;
+            }
+
+            return String(selectedFilter.value) === String(eventId || '');
+        }
+
+        function renderPanelGalleryCard(item) {
+            const avatarMarkup = item.owner_avatar
+                ? `<img src="${escapeHtml(item.owner_avatar)}" alt="${escapeHtml(item.owner_name)}" class="h-full w-full object-cover" onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">`
+                : `<span class="flex h-full w-full items-center justify-center text-sm font-black uppercase">${escapeHtml((item.owner_name || 'S').trim().charAt(0) || 'S')}</span>`;
+
+            const deleteMarkup = item.can_delete
+                ? `
+                    <form method="POST" action="${escapeHtml(item.delete_url)}" class="gallery-delete-form shrink-0">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 text-rose-600 transition hover:border-rose-300 hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-900/20 dark:text-rose-300">
+                            <i class="fas fa-trash-can"></i>
+                        </button>
+                    </form>
+                `
+                : '';
+
+            return `
+                <article class="group overflow-hidden rounded-[2rem] border border-slate-200/70 bg-white shadow-sm shadow-slate-200/60 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/70 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-slate-950">
+                        <button type="button"
+                            data-lightbox-src="${escapeHtml(item.url)}"
+                            data-lightbox-title="${escapeHtml(item.event_title)}"
+                            class="h-full w-full text-left">
+                            <img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.event_title)}"
+                                class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-transparent opacity-90"></div>
+                            <div class="absolute left-5 right-5 top-5 flex items-start justify-between gap-4">
+                                <span class="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-white backdrop-blur">
+                                    ${escapeHtml(item.event_title)}
+                                </span>
+                                ${item.watermarked ? '<span class="rounded-full border border-cyan-400/25 bg-cyan-400/12 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-100 backdrop-blur">Watermark</span>' : ''}
+                            </div>
+                            <div class="absolute inset-x-5 bottom-5 flex items-end justify-between gap-3">
+                                <div>
+                                    <p class="text-xs font-black uppercase tracking-[0.18em] text-blue-200">Abrir foto</p>
+                                    <p class="mt-1 text-lg font-black text-white">${escapeHtml(item.owner_name)}</p>
+                                </div>
+                                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-white backdrop-blur transition group-hover:bg-white/20">
+                                    <i class="fas fa-up-right-and-down-left-from-center"></i>
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="flex min-w-0 items-center gap-3">
+                                <div class="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 text-white shadow-lg shadow-blue-500/20">
+                                    ${avatarMarkup}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="truncate text-sm font-black text-slate-900 dark:text-white">${escapeHtml(item.owner_name)}</p>
+                                    <p class="mt-1 truncate text-xs font-medium text-slate-500 dark:text-slate-400">Enviado em ${escapeHtml(item.uploaded_at || '--')}</p>
+                                </div>
+                            </div>
+                            ${deleteMarkup}
+                        </div>
+                        <div class="mt-5 grid grid-cols-2 gap-3 text-sm">
+                            <div class="rounded-[1.4rem] bg-slate-50 px-4 py-3 dark:bg-slate-950">
+                                <p class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Evento</p>
+                                <p class="mt-1 line-clamp-2 font-bold text-slate-800 dark:text-slate-100">${escapeHtml(item.event_title)}</p>
+                            </div>
+                            <div class="rounded-[1.4rem] bg-slate-50 px-4 py-3 dark:bg-slate-950">
+                                <p class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Data base</p>
+                                <p class="mt-1 font-bold text-slate-800 dark:text-slate-100">${escapeHtml(item.event_date || '--/--/----')}</p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        document.querySelectorAll('[data-gallery-open-upload]').forEach((button) => {
+            button.addEventListener('click', openUploadModal);
         });
+
+        document.querySelectorAll('[data-gallery-close-upload]').forEach((button) => {
+            button.addEventListener('click', closeUploadModal);
+        });
+
+        document.querySelectorAll('[data-gallery-close-lightbox]').forEach((button) => {
+            button.addEventListener('click', closeLightbox);
+        });
+
+        document.querySelectorAll('[data-lightbox-src]').forEach(bindLightboxTrigger);
+        document.querySelectorAll('.gallery-delete-form').forEach(bindDeleteForm);
 
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
@@ -291,10 +425,28 @@
                     if (xhr.status >= 200 && xhr.status < 300 && payload && payload.success) {
                         setUploadProgress(100, 'Upload concluido');
                         closeUploadModal();
-                        notify('success', 'Galeria atualizada', payload.message || 'As fotos foram publicadas com sucesso.')
-                            .then(function () {
-                                window.location.reload();
-                            });
+                        if (shouldAppendUploadedMedia(eventField.value) && Array.isArray(payload.media) && payload.media.length > 0) {
+                            const grid = ensureGalleryGrid();
+                            if (grid) {
+                                payload.media.slice().reverse().forEach(function (item) {
+                                    const wrapper = document.createElement('div');
+                                    wrapper.innerHTML = renderPanelGalleryCard(item);
+                                    const card = wrapper.firstElementChild;
+
+                                    if (card) {
+                                        grid.prepend(card);
+                                        card.querySelectorAll('[data-lightbox-src]').forEach(bindLightboxTrigger);
+                                        card.querySelectorAll('.gallery-delete-form').forEach(bindDeleteForm);
+                                    }
+                                });
+                            }
+                        }
+
+                        if (totalValue && payload?.stats?.visible_total !== undefined) {
+                            totalValue.textContent = String(payload.stats.visible_total);
+                        }
+
+                        notify('success', 'Galeria atualizada', payload.message || 'As fotos foram publicadas com sucesso.');
                         return;
                     }
 

@@ -111,6 +111,9 @@
                         </div>
                     @endforeach
                 </div>
+                <div id="galleryEmptyState" class="@if($event->media->isNotEmpty()) hidden @endif mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm font-medium text-slate-500">
+                    Nenhuma midia enviada ainda.
+                </div>
             </div>
         @endif
     </div>
@@ -119,6 +122,39 @@
 @if($event->exists)
     @push('scripts')
         <script>
+            function renderGalleryMediaCard(media) {
+                const preview = media.type === 'image'
+                    ? `<img src="${media.url}" class="w-full h-32 object-cover rounded">`
+                    : `<div class="w-full h-32 flex items-center justify-center bg-gray-800 rounded"><i class="fas fa-video text-white text-3xl"></i></div>`;
+
+                return `
+                    <div class="relative bg-gray-100 rounded border group" id="media-${media.id}">
+                        ${preview}
+                        <button type="button" onclick="deleteMedia(${media.id})"
+                            class="absolute top-2 right-2 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            function appendGalleryMedia(mediaItems) {
+                const container = document.getElementById('galleryContainer');
+                const emptyState = document.getElementById('galleryEmptyState');
+
+                if (!container || !Array.isArray(mediaItems) || mediaItems.length === 0) {
+                    return;
+                }
+
+                mediaItems.slice().reverse().forEach((media) => {
+                    container.insertAdjacentHTML('afterbegin', renderGalleryMediaCard(media));
+                });
+
+                if (emptyState) {
+                    emptyState.classList.add('hidden');
+                }
+            }
+
             async function uploadGallery() {
                 const input = document.getElementById('galleryInput');
                 if (!input.files || input.files.length === 0) {
@@ -149,9 +185,8 @@
                     const data = await response.json();
 
                     if (response.ok && data.success) {
-                        Swal.fire('Sucesso!', data.message, 'success').then(() => {
-                            location.reload(); // Recarrega para exibir a nova galeria
-                        });
+                        appendGalleryMedia(data.media || []);
+                        Swal.fire('Sucesso!', data.message, 'success');
                     } else {
                         Swal.fire('Erro', data.message || 'Erro ao enviar arquivos.', 'error');
                     }
@@ -186,6 +221,11 @@
                     const data = await response.json();
                     if (response.ok && data.success) {
                         document.getElementById(`media-${id}`).remove();
+                        const container = document.getElementById('galleryContainer');
+                        const emptyState = document.getElementById('galleryEmptyState');
+                        if (container && emptyState && container.children.length === 0) {
+                            emptyState.classList.remove('hidden');
+                        }
                     } else {
                         Swal.fire('Erro', data.message || 'Erro ao excluir mídia.', 'error');
                     }

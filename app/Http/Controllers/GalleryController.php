@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use App\Models\EventMedia;
 use Illuminate\Http\Request;
 
 class GalleryController extends Controller
@@ -13,13 +12,12 @@ class GalleryController extends Controller
      */
     public function index()
     {
-        // Pega eventos que possuem pelo menos uma mídia, ordenados pelos mais recentes
         $events = Event::has('media')
             ->where('published', true)
             ->with([
                 'media' => function ($query) {
                     $query->where('type', 'image')->orderBy('created_at', 'asc');
-                }
+                },
             ])
             ->orderBy('start_at', 'desc')
             ->paginate(12);
@@ -30,21 +28,63 @@ class GalleryController extends Controller
     /**
      * Display the gallery for a specific event.
      */
-    public function show(Event $event)
+    public function show(Request $request, Event $event)
     {
         if (!$event->published) {
             abort(404);
         }
 
-        $media = $event->media()
-            ->orderBy('type', 'asc') // Imagens primeiro, depois vídeos
-            ->orderBy('created_at', 'asc')
-            ->paginate(24);
+        $photosQuery = $event->media()
+            ->with('user')
+            ->where('type', 'image')
+            ->latest();
 
-        if ($media->isEmpty()) {
-            return redirect()->route('gallery.index')->with('info', 'Este evento ainda não possui fotos na galeria.');
+        $videosQuery = $event->media()
+            ->with('user')
+            ->where('type', 'video')
+            ->latest();
+
+        $photoCount = (clone $photosQuery)->count();
+        $videoCount = (clone $videosQuery)->count();
+        $totalMedia = $photoCount + $videoCount;
+
+        if ($totalMedia === 0) {
+            return redirect()
+                ->route('gallery.index')
+                ->with('info', 'Este evento ainda nao possui midias na galeria.');
         }
 
-        return view('site.gallery.show', compact('event', 'media'));
+        $photos = $photosQuery
+            ->paginate(18, ['*'], 'fotos')
+            ->appends($request->query());
+
+        $videos = $videosQuery
+            ->paginate(8, ['*'], 'videos')
+            ->appends($request->query());
+
+        $featuredPhoto = $photos->first();
+
+        $relatedEvents = Event::has('media')
+            ->where('published', true)
+            ->whereKeyNot($event->getKey())
+            ->with([
+                'media' => function ($query) {
+                    $query->where('type', 'image')->latest();
+                },
+            ])
+            ->orderBy('start_at', 'desc')
+            ->take(3)
+            ->get();
+
+        return view('site.gallery.show', compact(
+            'event',
+            'photos',
+            'videos',
+            'photoCount',
+            'videoCount',
+            'totalMedia',
+            'featuredPhoto',
+            'relatedEvents'
+        ));
     }
 }
