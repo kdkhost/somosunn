@@ -136,7 +136,7 @@
             @endforeach
         </div>
 
-        <div class="pt-2">
+        <div class="pt-2 gallery-panel-pagination">
             {{ $media->appends(request()->query())->links() }}
         </div>
     </section>

@@ -16,9 +16,9 @@
                         <i class="fas fa-camera-retro"></i>
                     </div>
                     <div>
-                        <h1 class="text-3xl font-black tracking-tight text-white md:text-5xl">Galeria coletiva com cara de painel premium</h1>
+                        <h1 class="text-3xl font-black tracking-tight text-white md:text-5xl">Galeria coletiva para reviver cada encontro</h1>
                         <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-300 md:text-base">
-                            Centralize os registros dos eventos, acompanhe a cobertura por evento e publique novas fotos sem sair do shell padrao do sistema.
+                            Centralize os registros dos eventos, acompanhe a cobertura por album e publique novas fotos em uma experiencia coerente com a vitrine publica da galeria.
                         </p>
                     </div>
                 </div>

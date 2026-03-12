@@ -1,10 +1,10 @@
-<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade gallery-admin-modal" id="uploadModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content border-0 rounded-xl overflow-hidden shadow-2xl">
-            <div class="modal-header bg-white border-0 pt-4 px-4">
+            <div class="modal-header gallery-admin-modal__header border-0 pt-4 px-4">
                 <div class="d-flex flex-column">
                     <h4 class="modal-title font-weight-bold text-dark">Novas Fotos</h4>
-                    <p class="text-muted small mb-0">Selecione o evento e carregue as imagens da cobertura.</p>
+                    <p class="text-muted small mb-0">Selecione o evento e carregue as imagens da cobertura com a mesma linguagem visual da galeria premium.</p>
                 </div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="font-size: 2rem; padding: 1.5rem;">
                     <span aria-hidden="true">&times;</span>
@@ -60,12 +60,12 @@
                         </div>
                     </div>
 
-                    <button type="submit" id="adminSubmitBtn" class="btn btn-primary btn-lg btn-block font-weight-bold rounded-pill shadow-lg py-3">
+                    <button type="submit" id="adminSubmitBtn" class="gallery-admin-primary-btn border-0 w-100 justify-content-center">
                         <i class="fas fa-rocket mr-2"></i> PUBLICAR NA GALERIA
                     </button>
 
                     <p class="text-center small text-muted font-weight-bold mt-3 mb-0">
-                        <i class="fas fa-wand-magic-sparkles text-primary mr-1"></i> Marca d'agua automatica aplicada quando disponivel
+                        <i class="fas fa-magic text-primary mr-1"></i> Marca d'agua automatica aplicada quando disponivel
                     </p>
                 </form>
             </div>
