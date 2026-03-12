@@ -81,10 +81,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateActionState() {
-        const hasEvent = Boolean(String(eventField?.value || '').trim());
-        const hasFiles = queue.length > 0;
         if (submitButton) {
-            submitButton.disabled = !hasEvent || !hasFiles || isUploading;
+            submitButton.disabled = isUploading;
             submitButton.innerHTML = isUploading
                 ? '<i class="fas fa-spinner fa-spin"></i> Enviando...'
                 : '<i class="fas fa-paper-plane"></i> Publicar na galeria';
