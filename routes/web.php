@@ -485,6 +485,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
 
         Route::resource('jobs', \App\Http\Controllers\Panel\Admin\JobController::class);
         Route::resource('points-rules', \App\Http\Controllers\Panel\Admin\PointsRuleController::class);
+        Route::resource('redemptions', \App\Http\Controllers\Panel\Admin\RedemptionController::class);
         Route::get('ranking', [\App\Http\Controllers\Panel\Admin\RankingController::class, 'index'])->name('ranking.index');
 
         // Mail Templates (Tailwind)
