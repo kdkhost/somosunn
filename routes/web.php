@@ -486,6 +486,8 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::resource('jobs', \App\Http\Controllers\Panel\Admin\JobController::class);
         Route::resource('points-rules', \App\Http\Controllers\Panel\Admin\PointsRuleController::class);
         Route::resource('redemptions', \App\Http\Controllers\Panel\Admin\RedemptionController::class);
+        Route::get('fonts/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])->name('fonts.api.active');
+        Route::resource('fonts', \App\Http\Controllers\Admin\CustomFontController::class);
         Route::get('ranking', [\App\Http\Controllers\Panel\Admin\RankingController::class, 'index'])->name('ranking.index');
 
         // Mail Templates (Tailwind)
@@ -510,6 +512,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class);
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
     Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class);
+    Route::get('fonts/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])->name('fonts.api.active');
+    Route::resource('fonts', \App\Http\Controllers\Admin\CustomFontController::class);
     Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class);
 
     // Media Routes (Standardized)
