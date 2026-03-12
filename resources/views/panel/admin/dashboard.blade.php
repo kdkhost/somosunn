@@ -38,6 +38,7 @@
         ];
         $totalUsersHealth = array_sum($customerHealth ?? []);
         $highHealthPercent = $totalUsersHealth > 0 ? (($customerHealth['Alta'] ?? 0) / $totalUsersHealth) * 100 : 0;
+        $legacyAdminDashboardUrl = app('router')->has('admin.dashboard') ? route('admin.dashboard') : null;
     @endphp
 
     <div class="space-y-8">
@@ -283,8 +284,8 @@
                     </a>
                 @endforeach
 
-                @if(auth()->user()->isSuperAdmin())
-                    <a href="{{ route('admin.dashboard') }}" target="_blank" class="group bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 border-dashed hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-all duration-300">
+                @if(auth()->user()->isSuperAdmin() && $legacyAdminDashboardUrl)
+                    <a href="{{ $legacyAdminDashboardUrl }}" target="_blank" class="group bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 border-dashed hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-all duration-300">
                         <div class="w-13 h-13 rounded-2xl bg-white dark:bg-slate-900 text-slate-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
                             <i class="fas fa-external-link-alt text-lg"></i>
                         </div>
