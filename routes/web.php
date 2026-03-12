@@ -418,6 +418,10 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
 
     Route::get('/galeria', [\App\Http\Controllers\Panel\GalleryController::class, 'index'])->name('gallery.index');
     Route::post('/galeria/upload', [\App\Http\Controllers\Panel\GalleryController::class, 'upload'])->name('gallery.upload');
+    Route::post('/galeria/eventos/{event}/capa/upload', [\App\Http\Controllers\Panel\GalleryController::class, 'uploadCover'])->name('gallery.cover.upload');
+    Route::post('/galeria/media/{media}/capa', [\App\Http\Controllers\Panel\GalleryController::class, 'setCoverFromMedia'])->name('gallery.cover.media');
+    Route::delete('/galeria/eventos/{event}/capa', [\App\Http\Controllers\Panel\GalleryController::class, 'clearCover'])->name('gallery.cover.clear');
+    Route::delete('/galeria/{media}', [\App\Http\Controllers\Panel\GalleryController::class, 'destroy'])->name('gallery.destroy');
 
     // Instructor Area
     Route::prefix('instrutor')->name('instructor.')->middleware([\App\Http\Middleware\EnsureInstructorAccess::class])->group(function () {
@@ -487,25 +491,28 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     });
 });
 
+// Marketplace (Público)
+Route::get('/marketplace', [\App\Http\Controllers\MarketplaceController::class, 'index'])->name('marketplace.index');
+
 // Theme Toggle
 Route::post('/theme/toggle', [\App\Http\Controllers\Panel\ThemeController::class, 'update'])->name('theme.toggle');
 
 // Legacy Admin Routes (AdminLTE)
 Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class, \App\Http\Middleware\EnsureUserIsAdmin::class])->group(function () {
-    Route::post('/settings/upload', [\App\Http\Controllers\Admin\SettingController::class, 'uploadFile'])->name('settings.upload.legacy');
-    Route::get('/balance', [\App\Http\Controllers\Admin\DashboardController::class, 'getMpBalance'])->name('dashboard.balance.legacy');
+    Route::post('/settings/upload', [\App\Http\Controllers\Admin\SettingController::class, 'uploadFile'])->name('settings.upload');
+    Route::get('/balance', [\App\Http\Controllers\Admin\DashboardController::class, 'getMpBalance'])->name('dashboard.balance');
 
     // Traditional Admin Resources
-    Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('users.legacy');
-    Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class)->names('plans.legacy');
-    Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class)->names('courses.legacy');
-    Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events.legacy');
-    Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class)->names('mentorships.legacy');
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+    Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class);
+    Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class);
+    Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
+    Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class);
 });
 
 // Checkout process
-Route::post('/checkout/process-payment', [\App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('checkout.process_payment_final');
-Route::get('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show_final');
+Route::post('/checkout/process-payment', [\App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('checkout.process_payment');
+Route::get('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show');
 
 // Impersonate Stop
-Route::get('/admin/stop-impersonating', [\App\Http\Controllers\Admin\ImpersonateController::class, 'stop'])->middleware(['auth'])->name('admin.impersonate.stop_final');
+Route::get('/admin/stop-impersonating', [\App\Http\Controllers\Admin\ImpersonateController::class, 'stop'])->middleware(['auth'])->name('admin.impersonate.stop');
