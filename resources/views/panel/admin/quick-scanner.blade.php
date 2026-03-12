@@ -42,33 +42,42 @@
                 <div id="reader" class="w-full h-full min-h-[19rem] sm:min-h-[26rem]"></div>
 
                 <div id="scanner-overlay"
-                    class="absolute inset-0 z-50 hidden flex-col items-center justify-center bg-white/95 dark:bg-slate-900/95 transition-all overflow-hidden border-4 border-slate-50 dark:border-slate-800 rounded-2xl sm:rounded-3xl">
+                    class="absolute inset-0 z-50 hidden flex-col items-center justify-between bg-white/95 dark:bg-slate-900/95 transition-all overflow-hidden border-4 border-slate-50 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
+                    <div class="absolute inset-x-4 top-4 sm:top-6 z-20 pointer-events-none">
                     <div id="validation-stripe"
-                        class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center bg-emerald-600 py-6 shadow-2xl -rotate-12 scale-150 opacity-0 transition-all duration-500 z-20 pointer-events-none">
+                        class="flex items-center justify-center rounded-2xl bg-emerald-600 py-3 sm:py-4 shadow-2xl opacity-0 -translate-y-4 transition-all duration-500 sm:rotate-[-8deg]">
                         <span
-                            class="text-white text-4xl sm:text-5xl font-black tracking-[0.2em] whitespace-nowrap">VALIDADO</span>
+                            class="text-white text-xl sm:text-3xl font-black tracking-[0.16em] whitespace-nowrap">VALIDADO</span>
                     </div>
 
                     <div id="error-stripe"
-                        class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center bg-rose-600 py-6 shadow-2xl rotate-12 scale-150 opacity-0 transition-all duration-500 z-20 pointer-events-none">
+                        class="flex items-center justify-center rounded-2xl bg-rose-600 py-3 sm:py-4 shadow-2xl opacity-0 -translate-y-4 transition-all duration-500 sm:rotate-[8deg]">
                         <span id="error-stripe-text"
-                            class="text-white text-lg sm:text-2xl font-black text-center px-4 uppercase tracking-tight sm:tracking-tighter whitespace-normal sm:whitespace-nowrap">INVALIDO</span>
+                            class="text-white text-base sm:text-2xl font-black text-center px-4 uppercase tracking-tight sm:tracking-tighter whitespace-normal sm:whitespace-nowrap">INVALIDO</span>
+                    </div>
                     </div>
 
-                    <div id="overlay-content" class="relative z-10 flex flex-col items-center justify-center">
+                    <div id="overlay-content"
+                        class="relative z-10 flex w-full max-w-md flex-1 flex-col items-center justify-center pt-20 sm:pt-24 text-center">
                         <div id="overlay-icon-wrapper"
                             class="w-24 h-24 rounded-full flex items-center justify-center mb-6 transition-transform scale-0 duration-300">
                             <i id="overlay-icon" class="fas fa-check text-4xl"></i>
                         </div>
-                        <h2 id="overlay-status" class="text-xl sm:text-2xl font-black text-center px-6">Processando...</h2>
-                        <p id="overlay-detail" class="text-sm sm:text-base text-slate-500 mt-2 text-center px-8 font-bold">
-                        </p>
+                        <h2 id="overlay-status" class="text-xl sm:text-2xl font-black text-center px-6 leading-tight">Processando...</h2>
+                        <div id="overlay-detail-card"
+                            class="hidden mt-4 w-full rounded-[1.75rem] border border-slate-200 bg-white/85 px-4 py-4 shadow-lg shadow-slate-900/5 backdrop-blur dark:border-slate-700 dark:bg-slate-950/80">
+                            <p id="overlay-detail"
+                                class="text-sm sm:text-base text-slate-600 dark:text-slate-300 text-center font-bold leading-relaxed break-words">
+                            </p>
+                        </div>
                     </div>
 
-                    <button id="resume-btn" type="button" onclick="resumeScanning()"
-                        class="mt-10 px-10 py-4 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-extrabold rounded-2xl shadow-xl transition-all active:scale-95 z-30 hidden opacity-0">
-                        CONTINUAR ESCANEANDO
-                    </button>
+                    <div class="relative z-10 w-full max-w-md">
+                        <button id="resume-btn" type="button" onclick="resumeScanning()"
+                            class="w-full px-6 py-4 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-extrabold rounded-2xl shadow-xl transition-all active:scale-95 hidden opacity-0">
+                            CONTINUAR ESCANEANDO
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -340,9 +349,11 @@
             const icon = document.getElementById('overlay-icon');
             const statusEl = document.getElementById('overlay-status');
             const detailEl = document.getElementById('overlay-detail');
+            const detailCard = document.getElementById('overlay-detail-card');
             const validationStripe = document.getElementById('validation-stripe');
             const errorStripe = document.getElementById('error-stripe');
             const resumeBtn = document.getElementById('resume-btn');
+            const hasDetail = String(detail || '').trim() !== '';
 
             overlay.classList.remove('hidden');
             overlay.classList.add('flex');
@@ -350,33 +361,49 @@
             detailEl.innerHTML = detail;
             iconWrapper.classList.remove('scale-0');
             iconWrapper.classList.add('scale-100');
+            statusEl.className = 'text-xl sm:text-2xl font-black text-center px-6 leading-tight text-slate-900 dark:text-white';
+            detailEl.className = 'text-sm sm:text-base text-slate-600 dark:text-slate-300 text-center font-bold leading-relaxed break-words';
+            detailCard.className = hasDetail
+                ? 'mt-4 w-full rounded-[1.75rem] border border-slate-200 bg-white/85 px-4 py-4 shadow-lg shadow-slate-900/5 backdrop-blur dark:border-slate-700 dark:bg-slate-950/80'
+                : 'hidden';
 
-            validationStripe.classList.add('opacity-0', 'scale-150');
-            validationStripe.classList.remove('opacity-100', 'scale-100');
-            errorStripe.classList.add('opacity-0', 'scale-150');
-            errorStripe.classList.remove('opacity-100', 'scale-100');
+            validationStripe.classList.add('opacity-0', '-translate-y-4');
+            validationStripe.classList.remove('opacity-100', 'translate-y-0');
+            errorStripe.classList.add('opacity-0', '-translate-y-4');
+            errorStripe.classList.remove('opacity-100', 'translate-y-0');
             resumeBtn.classList.add('hidden', 'opacity-0');
             resumeBtn.classList.remove('opacity-100');
 
             if (type === 'loading') {
                 iconWrapper.className = 'w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-blue-100 dark:bg-blue-900/30 text-blue-600';
                 icon.className = 'fas fa-spinner fa-spin text-4xl';
+                statusEl.className = 'text-xl sm:text-2xl font-black text-center px-6 leading-tight text-blue-600 dark:text-blue-300';
                 return;
             }
 
             if (type === 'success') {
                 iconWrapper.className = 'w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600';
                 icon.className = 'fas fa-check text-4xl';
+                statusEl.className = 'text-xl sm:text-2xl font-black text-center px-6 leading-tight text-emerald-600 dark:text-emerald-300';
+                detailCard.className = hasDetail
+                    ? 'mt-4 w-full rounded-[1.75rem] border border-emerald-200 bg-emerald-50/90 px-4 py-4 shadow-lg shadow-emerald-900/5 backdrop-blur dark:border-emerald-800/60 dark:bg-emerald-900/30'
+                    : 'hidden';
+                detailEl.className = 'text-sm sm:text-base text-emerald-700 dark:text-emerald-200 text-center font-bold leading-relaxed break-words';
 
                 setTimeout(() => {
-                    validationStripe.classList.remove('opacity-0', 'scale-150');
-                    validationStripe.classList.add('opacity-100', 'scale-100', 'rotate-[-12deg]');
+                    validationStripe.classList.remove('opacity-0', '-translate-y-4');
+                    validationStripe.classList.add('opacity-100', 'translate-y-0');
                 }, 50);
                 return;
             }
 
             iconWrapper.className = 'w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-rose-100 dark:bg-rose-900/30 text-rose-600';
             icon.className = 'fas fa-times text-4xl';
+            statusEl.className = 'text-xl sm:text-2xl font-black text-center px-6 leading-tight text-rose-600 dark:text-rose-300';
+            detailCard.className = hasDetail
+                ? 'mt-4 w-full rounded-[1.75rem] border border-rose-200 bg-rose-50/90 px-4 py-4 shadow-lg shadow-rose-900/5 backdrop-blur dark:border-rose-800/60 dark:bg-rose-900/30'
+                : 'hidden';
+            detailEl.className = 'text-sm sm:text-base text-rose-700 dark:text-rose-200 text-center font-bold leading-relaxed break-words';
             resumeBtn.classList.remove('hidden');
 
             setTimeout(() => {
@@ -391,8 +418,8 @@
                 } else {
                     errorTextEl.innerText = 'ACESSO NEGADO';
                 }
-                errorStripe.classList.remove('opacity-0', 'scale-150');
-                errorStripe.classList.add('opacity-100', 'scale-100', 'rotate-[12deg]');
+                errorStripe.classList.remove('opacity-0', '-translate-y-4');
+                errorStripe.classList.add('opacity-100', 'translate-y-0');
             }, 50);
         }
 
@@ -405,11 +432,11 @@
             overlay.classList.add('hidden');
             overlay.classList.remove('flex');
 
-            validationStripe.classList.remove('opacity-100', 'scale-100');
-            validationStripe.classList.add('opacity-0', 'scale-150');
+            validationStripe.classList.remove('opacity-100', 'translate-y-0');
+            validationStripe.classList.add('opacity-0', '-translate-y-4');
 
-            errorStripe.classList.remove('opacity-100', 'scale-100');
-            errorStripe.classList.add('opacity-0', 'scale-150');
+            errorStripe.classList.remove('opacity-100', 'translate-y-0');
+            errorStripe.classList.add('opacity-0', '-translate-y-4');
 
             resumeBtn.classList.add('hidden', 'opacity-0');
             resumeBtn.classList.remove('opacity-100');
