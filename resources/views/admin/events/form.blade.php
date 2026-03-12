@@ -1057,24 +1057,32 @@ async function deleteAdminMedia(id) {
             $('#cert-grid-step').on('change', updateGridOverlay);
             updateGridOverlay();
 
-            // Load Custom Fonts
-            $.ajax({
-                url: '{{ route("admin.fonts.api.active") }}',
-                type: 'GET',
-                success: function (fonts) {
-                    customFonts = fonts;
-                    fonts.forEach(font => {
-                        $('#style-font-family').append(`<option value="${font.font_family}">${font.name}</option>`);
+            const fontsApiUrl = @json(
+                app('router')->has('admin.fonts.api.active')
+                    ? route('admin.fonts.api.active')
+                    : (app('router')->has('panel.admin.fonts.api.active') ? route('panel.admin.fonts.api.active') : null)
+            );
 
-                        if (font.type === 'google_link' && font.google_font_url) {
-                            $('head').append(`<link href="${font.google_font_url}" rel="stylesheet">`);
-                        } else if (font.type === 'file' && font.file_path) {
-                            const fontUrl = '{{ asset('')}}' + font.file_path;
-                            $('head').append(`<style>@font-face { font-family: '${font.font_family}'; src: url('${fontUrl}'); }</style>`);
-                        }
-                    });
-                }
-            });
+            // Load Custom Fonts
+            if (fontsApiUrl) {
+                $.ajax({
+                    url: fontsApiUrl,
+                    type: 'GET',
+                    success: function (fonts) {
+                        customFonts = fonts;
+                        fonts.forEach(font => {
+                            $('#style-font-family').append(`<option value="${font.font_family}">${font.name}</option>`);
+
+                            if (font.type === 'google_link' && font.google_font_url) {
+                                $('head').append(`<link href="${font.google_font_url}" rel="stylesheet">`);
+                            } else if (font.type === 'file' && font.file_path) {
+                                const fontUrl = '{{ asset('')}}' + font.file_path;
+                                $('head').append(`<style>@font-face { font-family: '${font.font_family}'; src: url('${fontUrl}'); }</style>`);
+                            }
+                        });
+                    }
+                });
+            }
 
             function updateLayersList() {
                 const $list = $('#cert-layers');
