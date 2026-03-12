@@ -511,6 +511,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
     Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class);
     Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class);
+
+    // Media Routes (Standardized)
+    Route::post('events/{event}/media', [\App\Http\Controllers\Panel\EventMediaController::class, 'store'])->name('events.media.store');
+    Route::delete('events/{event}/media/{media}', [\App\Http\Controllers\Panel\EventMediaController::class, 'destroy'])->name('events.media.destroy');
+    Route::post('mentorships/{mentorship}/media', [\App\Http\Controllers\Panel\MentorshipMediaController::class, 'store'])->name('mentorships.media.store');
+    Route::delete('mentorships/{mentorship}/media/{media}', [\App\Http\Controllers\Panel\MentorshipMediaController::class, 'destroy'])->name('mentorships.media.destroy');
 });
 
 // Checkout process
