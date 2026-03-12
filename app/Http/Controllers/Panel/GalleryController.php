@@ -61,10 +61,28 @@ class GalleryController extends Controller
      */
     public function upload(Request $request, WatermarkService $watermarkService)
     {
+        $perFileLimitBytes = UploadStorage::effectiveUploadLimitBytes(10 * 1024 * 1024)
+            ?? (10 * 1024 * 1024);
+        $perFileLimitKilobytes = max(1, (int) ceil($perFileLimitBytes / 1024));
+        $perFileLimitMegabytes = number_format($perFileLimitBytes / 1024 / 1024, 2, '.', '');
+
+        if (!$request->hasFile('files')) {
+            $message = "Nenhum arquivo chegou ao servidor. Verifique o limite de {$perFileLimitMegabytes} MB por arquivo e tente novamente com menos imagens por vez.";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
+            return back()->with('error', $message);
+        }
+
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'files' => 'required|array|min:1',
-            'files.*' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
+            'files.*' => "required|image|mimes:jpeg,png,jpg,webp|max:{$perFileLimitKilobytes}",
         ]);
 
         $event = Event::findOrFail($request->event_id);
