@@ -125,68 +125,9 @@
             <h3 class="card-title font-weight-bold"><i class="fas fa-hdd mr-2"></i> Armazenamento (Filesystem)</h3>
         </div>
         <div class="card-body">
-            <div class="form-group">
-                <label>Disco Principal de Uploads</label>
-                <select name="uploads_storage_disk" class="form-control" id="storage_disk_select">
-                    <option value="public" {{ ($settings['uploads_storage_disk'] ?? 'public') === 'public' ? 'selected' : '' }}>
-                        Local (Public Storage) - Padrão</option>
-                    <option value="s3" {{ ($settings['uploads_storage_disk'] ?? '') === 's3' ? 'selected' : '' }}>
-                        Amazon S3 / Compatível (MinIO, DigitalOcean Spaces, etc)</option>
-                </select>
-            </div>
-
-            <div id="s3_config_container" class="mt-4 p-3 bg-light rounded border"
-                style="{{ ($settings['uploads_storage_disk'] ?? 'public') === 's3' ? '' : 'display:none;' }}">
-                <h6 class="text-primary font-weight-bold mb-3"><i class="fab fa-aws mr-1"></i> Configurações S3</h6>
-                <div class="row">
-                    <div class="col-md-6 form-group">
-                        <label>Access Key ID</label>
-                        <input type="text" name="s3_key" class="form-control" value="{{ $settings['s3_key'] ?? '' }}">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Secret Access Key</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-key"></i></span>
-                            </div>
-                            <input type="password" name="s3_secret" class="form-control"
-                                value="{{ $settings['s3_secret'] ?? '' }}">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4 form-group">
-                        <label>Bucket Name</label>
-                        <input type="text" name="s3_bucket" class="form-control"
-                            value="{{ $settings['s3_bucket'] ?? '' }}">
-                    </div>
-                    <div class="col-md-4 form-group">
-                        <label>Region (Ex: us-east-1)</label>
-                        <input type="text" name="s3_region" class="form-control"
-                            value="{{ $settings['s3_region'] ?? '' }}">
-                    </div>
-                    <div class="col-md-4 form-group">
-                        <label>Endpoint (Opcional)</label>
-                        <input type="text" name="s3_endpoint" class="form-control"
-                            value="{{ $settings['s3_endpoint'] ?? '' }}">
-                        <small class="text-muted">Para S3 compatível. Ex.: <code>https://s3.ca-east-1.idrivee2.com</code>.</small>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 form-group">
-                        <label>Public URL / CDN (Opcional)</label>
-                        <input type="text" name="s3_url" class="form-control" value="{{ $settings['s3_url'] ?? '' }}">
-                        <small class="text-muted">URL base para acesso público aos arquivos (ex:
-                            https://cdn.meusite.com). Se vazio, usa a URL padrão do S3.</small>
-                    </div>
-                </div>
-                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                    <input type="hidden" name="s3_path_style" value="0">
-                    <input type="checkbox" class="custom-control-input" id="s3_path_style" name="s3_path_style"
-                        value="1" {{ ($settings['s3_path_style'] ?? 0) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="s3_path_style">Forçar Path-Style Endpoint (Necessário para
-                        MinIO)</label>
-                </div>
+            <div class="alert alert-info mb-0">
+                <strong>Armazenamento remoto desativado.</strong>
+                <div class="mt-2">Todos os uploads do sistema passam a usar somente o armazenamento local em <code>public/storage</code>.</div>
             </div>
         </div>
     </div>
@@ -353,14 +294,6 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            $('#storage_disk_select').change(function () {
-                if ($(this).val() === 's3') {
-                    $('#s3_config_container').slideDown();
-                } else {
-                    $('#s3_config_container').slideUp();
-                }
-            });
-
             $('[data-maintenance-action]').on('click', function () {
                 const action = $(this).data('maintenance-action');
                 const $manual = $('#maintenance_enabled');

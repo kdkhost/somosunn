@@ -320,7 +320,6 @@ class SettingController extends Controller
                 'email_queue_schedule_enabled',
             ],
             'system' => [
-                's3_path_style',
                 'maintenance_enabled',
                 'maintenance_auto_enabled',
             ],
@@ -473,12 +472,6 @@ class SettingController extends Controller
         foreach ([
             'recaptcha_v3_site_key',
             'recaptcha_v3_secret_key',
-            's3_key',
-            's3_secret',
-            's3_region',
-            's3_bucket',
-            's3_url',
-            's3_endpoint',
             'smtp_host',
             'smtp_port',
             'smtp_username',
@@ -582,33 +575,6 @@ class SettingController extends Controller
             $data[$key] = implode(',', $parts);
         }
 
-        if (array_key_exists('uploads_storage_disk', $data)) {
-            $raw = trim((string) $data['uploads_storage_disk']);
-            if ($raw === '') {
-                $data['uploads_storage_disk'] = '';
-            } else {
-                $data['uploads_storage_disk'] = in_array($raw, ['public', 's3'], true) ? $raw : 'public';
-            }
-        }
-
-        foreach (['s3_endpoint', 's3_url'] as $key) {
-            if (!array_key_exists($key, $data)) {
-                continue;
-            }
-
-            $raw = trim((string) $data[$key]);
-            if ($raw === '') {
-                $data[$key] = '';
-                continue;
-            }
-
-            if (!preg_match('#^https?://#i', $raw)) {
-                $raw = 'https://' . $raw;
-            }
-
-            $data[$key] = rtrim($raw, '/');
-        }
-
         foreach ([
             'maintenance_title',
             'maintenance_subtitle',
@@ -648,9 +614,11 @@ class SettingController extends Controller
             }
         }
 
-        if ($request->has('s3_path_style')) {
-            $data['s3_path_style'] = $request->boolean('s3_path_style') ? 1 : 0;
+        $data['uploads_storage_disk'] = 'public';
+        foreach (['s3_key', 's3_secret', 's3_region', 's3_bucket', 's3_url', 's3_endpoint'] as $key) {
+            $data[$key] = '';
         }
+        $data['s3_path_style'] = 0;
 
         // Garantir que checkboxes de meios de pagamento sejam salvos como 0/1
         $paymentMethodCheckboxes = [
@@ -921,19 +889,8 @@ class SettingController extends Controller
 
     private function buildStorageStatus(array $settings): array
     {
-        $uploadsDisk = trim((string) ($settings['uploads_storage_disk'] ?? config('uploads.disk', 'public')));
-        if (!in_array($uploadsDisk, ['public', 's3'], true)) {
-            $uploadsDisk = 'public';
-        }
-
-        $s3Key = trim((string) ($settings['s3_key'] ?? config('filesystems.disks.s3.key', '')));
-        $s3Secret = trim((string) ($settings['s3_secret'] ?? config('filesystems.disks.s3.secret', '')));
-        $s3Region = trim((string) ($settings['s3_region'] ?? config('filesystems.disks.s3.region', '')));
-        $s3Bucket = trim((string) ($settings['s3_bucket'] ?? config('filesystems.disks.s3.bucket', '')));
-        $s3Endpoint = trim((string) ($settings['s3_endpoint'] ?? config('filesystems.disks.s3.endpoint', '')));
-
-        $s3Configured = ($s3Key !== '' && $s3Secret !== '' && $s3Region !== '' && $s3Bucket !== '');
-        $isConfigured = $uploadsDisk === 'public' ? true : $s3Configured;
+        $uploadsDisk = 'public';
+        $isConfigured = true;
 
         $uploadedFiles = 0;
         $uploadedBytes = 0;
@@ -958,10 +915,10 @@ class SettingController extends Controller
         return [
             'disk' => $uploadsDisk,
             'is_configured' => $isConfigured,
-            's3_configured' => $s3Configured,
-            's3_bucket' => $s3Bucket !== '' ? $s3Bucket : '-',
-            's3_region' => $s3Region !== '' ? $s3Region : '-',
-            's3_endpoint' => $s3Endpoint !== '' ? $s3Endpoint : '-',
+            's3_configured' => false,
+            's3_bucket' => '-',
+            's3_region' => '-',
+            's3_endpoint' => '-',
             'uploaded_files' => $uploadedFiles,
             'uploaded_bytes' => $uploadedBytes,
             'uploaded_size_human' => $this->formatBytes($uploadedBytes),

@@ -14,34 +14,16 @@ class UploadStorage
     public static function applyRuntimeConfig(array $settings = []): void
     {
         $localConfig = self::localPublicDiskConfig();
-        $selectedDisk = self::selectedDisk($settings);
+        $selectedDisk = 'public';
         $effectiveDisk = 'public';
 
-        if ($selectedDisk === 's3' && self::s3Configured($settings) && self::s3DriverAvailable()) {
-            $s3Config = self::s3DiskConfig($settings);
-            $effectiveDisk = 's3';
-
-            config([
-                'uploads.disk' => 's3',
-                'filesystems.cloud' => 's3',
-                'filesystems.disks.public' => $s3Config,
-                'filesystems.disks.uploads' => $s3Config,
-                'filesystems.disks.local_public' => $localConfig,
-                'filesystems.disks.s3' => array_merge((array) config('filesystems.disks.s3', []), $s3Config),
-            ]);
-        } else {
-            config([
-                'uploads.disk' => 'public',
-                'filesystems.cloud' => 'public',
-                'filesystems.disks.public' => $localConfig,
-                'filesystems.disks.uploads' => $localConfig,
-                'filesystems.disks.local_public' => $localConfig,
-            ]);
-
-            if ($selectedDisk === 's3' && self::s3Configured($settings) && !self::s3DriverAvailable()) {
-                Log::warning('S3 selecionado para uploads, mas o driver AwsS3V3 nao esta disponivel neste ambiente. Aplicando fallback para armazenamento local.');
-            }
-        }
+        config([
+            'uploads.disk' => 'public',
+            'filesystems.cloud' => 'public',
+            'filesystems.disks.public' => $localConfig,
+            'filesystems.disks.uploads' => $localConfig,
+            'filesystems.disks.local_public' => $localConfig,
+        ]);
 
         config([
             'uploads.selected_disk' => $selectedDisk,
@@ -53,16 +35,12 @@ class UploadStorage
 
     public static function selectedDisk(array $settings = []): string
     {
-        $value = trim((string) ($settings['uploads_storage_disk'] ?? config('uploads.selected_disk', config('uploads.disk', 'public'))));
-
-        return in_array($value, ['public', 's3'], true) ? $value : 'public';
+        return 'public';
     }
 
     public static function effectiveDisk(): string
     {
-        $value = trim((string) config('uploads.effective_disk', config('uploads.disk', 'public')));
-
-        return in_array($value, ['public', 's3'], true) ? $value : 'public';
+        return 'public';
     }
 
     public static function disk()
@@ -126,7 +104,7 @@ class UploadStorage
 
     public static function isLocal(): bool
     {
-        return self::effectiveDisk() !== 's3';
+        return true;
     }
 
     public static function effectiveUploadLimitBytes(?int $applicationMaxBytes = null, ?string $uploadMax = null, ?string $postMax = null): ?int
@@ -543,25 +521,7 @@ class UploadStorage
 
     private static function distinctPublicBaseUrl(): ?string
     {
-        if (self::effectiveDisk() !== 's3') {
-            return null;
-        }
-
-        $configured = trim((string) config('filesystems.disks.public.url', config('filesystems.disks.s3.url', '')));
-        if ($configured === '' || !filter_var($configured, FILTER_VALIDATE_URL)) {
-            return null;
-        }
-
-        $configured = rtrim($configured, '/');
-        $appUrl = trim((string) config('app.url', ''));
-        $configuredHost = strtolower((string) parse_url($configured, PHP_URL_HOST));
-        $appHost = strtolower((string) parse_url($appUrl, PHP_URL_HOST));
-
-        if ($configuredHost === '' || ($appHost !== '' && $configuredHost === $appHost)) {
-            return null;
-        }
-
-        return $configured;
+        return null;
     }
 
     private static function resolveS3PublicBaseUrl(array $settings, ?string $endpoint, string $bucket, bool $pathStyle): ?string
