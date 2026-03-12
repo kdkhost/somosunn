@@ -345,14 +345,14 @@
                 const baseUrl = '{{ request()->routeIs("panel.*") ? url("/painel/admin/events") : url("/admin/events") }}';
                 const url = baseUrl + '/' + selectedEventId + '/media';
 
-                return axios.post(url, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    },
-                    onUploadProgress: function (progressEvent) {
+                return new Promise(function (resolve, reject) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', url, true);
+                    xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                    xhr.setRequestHeader('Accept', 'application/json');
+
+                    xhr.upload.addEventListener('progress', function (progressEvent) {
                         const fraction = progressEvent.total > 0
                             ? (progressEvent.loaded / progressEvent.total)
                             : 0;
@@ -363,7 +363,37 @@
                         statusText.text('Enviando ' + (fileIndex + 1) + ' de ' + totalFiles + ': ' + file.name);
                         detailsText.text((fileIndex + 1) + ' / ' + totalFiles + ' arquivos em processamento');
                         remainingText.text(fileKind(file) === 'video' ? 'processando video...' : 'processando imagem...');
-                    }
+                    });
+
+                    xhr.addEventListener('load', function () {
+                        let payload = {};
+
+                        try {
+                            payload = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+                        } catch (error) {
+                            payload = {};
+                        }
+
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            resolve({ data: payload });
+                            return;
+                        }
+
+                        reject({
+                            response: { data: payload },
+                            message: payload.message || ('Falha no upload (HTTP ' + xhr.status + ')')
+                        });
+                    });
+
+                    xhr.addEventListener('error', function () {
+                        reject(new Error('Falha de conexao durante o upload.'));
+                    });
+
+                    xhr.addEventListener('abort', function () {
+                        reject(new Error('Upload cancelado.'));
+                    });
+
+                    xhr.send(formData);
                 });
             }
 

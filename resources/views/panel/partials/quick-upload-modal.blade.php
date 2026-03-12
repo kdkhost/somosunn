@@ -483,14 +483,14 @@
         const formData = new FormData();
         formData.append('files[]', file);
 
-        return axios.post(`{{ url('/painel/admin/events') }}/${selectedEventId}/media`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            },
-            onUploadProgress: function (event) {
+        return new Promise(function (resolve, reject) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', `{{ url('/painel/admin/events') }}/${selectedEventId}/media`, true);
+            xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.setRequestHeader('Accept', 'application/json');
+
+            xhr.upload.addEventListener('progress', function (event) {
                 const total = Number(event.total || 0);
                 const loaded = Number(event.loaded || 0);
                 const fraction = total > 0 ? loaded / total : 0;
@@ -501,7 +501,37 @@
                 progressStatus.textContent = `Enviando ${fileIndex + 1} de ${totalFiles}: ${file.name}`;
                 progressDetails.textContent = `${fileIndex + 1} / ${totalFiles} arquivos em processamento`;
                 progressRemaining.textContent = fileKind(file) === 'video' ? 'processando video...' : 'processando imagem...';
-            }
+            });
+
+            xhr.addEventListener('load', function () {
+                let payload = {};
+
+                try {
+                    payload = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+                } catch (error) {
+                    payload = {};
+                }
+
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve({ data: payload });
+                    return;
+                }
+
+                reject({
+                    response: { data: payload },
+                    message: payload.message || ('Falha no upload (HTTP ' + xhr.status + ')')
+                });
+            });
+
+            xhr.addEventListener('error', function () {
+                reject(new Error('Falha de conexao durante o upload.'));
+            });
+
+            xhr.addEventListener('abort', function () {
+                reject(new Error('Upload cancelado.'));
+            });
+
+            xhr.send(formData);
         });
     }
 
