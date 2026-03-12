@@ -25,11 +25,25 @@
                         <label>Publisher ID (Pub-ID)</label>
                         <input type="text" name="adsense_publisher_id" class="form-control"
                             value="{{ $settings['adsense_publisher_id'] ?? '' }}" placeholder="ca-pub-000000000000">
+                        <small class="form-text text-muted">
+                            Pegue isso no AdSense em <strong>Conta &gt; Configuracoes &gt; Informacoes da conta</strong>.
+                            <a href="https://support.google.com/adsense/answer/105516?hl=pt-BR" target="_blank" rel="noopener noreferrer">Ajuda oficial</a>
+                            ou
+                            <a href="https://www.google.com/adsense/start/" target="_blank" rel="noopener noreferrer">abrir AdSense</a>.
+                        </small>
                     </div>
                     <div class="form-group">
                         <label>Slot ID</label>
                         <input type="text" name="adsense_slot_id" class="form-control"
                             value="{{ $settings['adsense_slot_id'] ?? '' }}" placeholder="1234567890">
+                        <small class="form-text text-muted">
+                            Crie ou abra uma unidade de anuncio no AdSense e copie o numero de
+                            <code>data-ad-slot</code> do codigo gerado. Exemplo:
+                            <code>data-ad-slot="1234567890"</code>.
+                            <a href="https://support.google.com/adsense/answer/9190028?hl=pt-BR" target="_blank" rel="noopener noreferrer">Ajuda oficial</a>
+                            ou
+                            <a href="https://www.google.com/adsense/start/" target="_blank" rel="noopener noreferrer">abrir AdSense</a>.
+                        </small>
                     </div>
                     <div class="form-group">
                         <label>Formato do anuncio</label>

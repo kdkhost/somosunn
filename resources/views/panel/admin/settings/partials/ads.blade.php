@@ -29,12 +29,27 @@
                         <input type="text" name="adsense_publisher_id"
                             value="{{ $settings['adsense_publisher_id'] ?? '' }}" placeholder="ca-pub-000000000000"
                             class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                        <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                            Pegue isso no AdSense em <strong>Conta &gt; Configuracoes &gt; Informacoes da conta</strong>.
+                            <a href="https://support.google.com/adsense/answer/105516?hl=pt-BR" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline">Ajuda oficial</a>
+                            ou
+                            <a href="https://www.google.com/adsense/start/" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline">abrir AdSense</a>.
+                        </p>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Slot ID</label>
                         <input type="text" name="adsense_slot_id" value="{{ $settings['adsense_slot_id'] ?? '' }}"
                             placeholder="1234567890"
                             class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                        <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                            Crie ou abra uma unidade de anuncio no AdSense e copie o numero de
+                            <code class="rounded bg-slate-100 px-1 py-0.5 dark:bg-slate-800">data-ad-slot</code>
+                            do codigo gerado. Exemplo:
+                            <code class="rounded bg-slate-100 px-1 py-0.5 dark:bg-slate-800">data-ad-slot="1234567890"</code>.
+                            <a href="https://support.google.com/adsense/answer/9190028?hl=pt-BR" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline">Ajuda oficial</a>
+                            ou
+                            <a href="https://www.google.com/adsense/start/" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline">abrir AdSense</a>.
+                        </p>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Formato</label>
