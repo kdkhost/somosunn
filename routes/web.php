@@ -432,6 +432,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\EnsureUserIsAdmin::class])->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/stats', [\App\Http\Controllers\Admin\DashboardController::class, 'stats'])->name('dashboard.stats');
+        Route::get('/quick-scanner', [\App\Http\Controllers\Admin\QuickScannerController::class, 'index'])->name('quick-scanner');
 
         // Settings
         Route::get('/settings/{group?}', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
@@ -487,7 +488,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::get('ranking', [\App\Http\Controllers\Panel\Admin\RankingController::class, 'index'])->name('ranking.index');
 
         // Mail Templates (Tailwind)
-        Route::resource('mailtemplates', \App\Http\Controllers\Panel\Admin\MailTemplateController::class);
+        Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class);
     });
 });
 
@@ -508,6 +509,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class);
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
     Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class);
+    Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class);
 });
 
 // Checkout process
