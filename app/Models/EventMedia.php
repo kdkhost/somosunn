@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\UploadStorage;
 
 class EventMedia extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'event_id',
         'user_id',
@@ -14,6 +17,13 @@ class EventMedia extends Model
         'type', // 'image' ou 'video'
         'watermarked'
     ];
+
+    protected $appends = ['url'];
+
+    public function getUrlAttribute(): ?string
+    {
+        return UploadStorage::url($this->file_path);
+    }
 
     public function event()
     {

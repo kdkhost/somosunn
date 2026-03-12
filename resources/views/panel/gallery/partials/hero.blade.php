@@ -49,7 +49,7 @@
                         <span class="inline-flex h-9 w-9 items-center justify-center rounded-full {{ $isAdmin ? 'bg-emerald-400/20 text-emerald-200' : 'bg-blue-500/20 text-blue-200' }}">
                             <i class="fas {{ $isAdmin ? 'fa-shield-halved' : 'fa-user-circle' }}"></i>
                         </span>
-                        {{ $isAdmin ? 'Modo admin ativo: voce enxerga toda a galeria.' : 'Modo pessoal: apenas suas fotos aparecem aqui.' }}
+                        {{ $isAdmin ? 'Modo admin ativo: voce enxerga toda a galeria.' : 'Modo painel: voce ve seus uploads e as midias dos eventos que organiza.' }}
                     </div>
                 </div>
             </div>

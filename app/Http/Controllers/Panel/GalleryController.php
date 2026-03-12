@@ -7,24 +7,21 @@ use App\Models\Event;
 use App\Models\EventMedia;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class GalleryController extends Controller
 {
     /**
      * Display gallery media.
-     * Members see only their own uploads. Admins see everything.
+     * Members see their own uploads and organizers can manage media from their own events.
      */
     public function index(Request $request)
     {
         $user = auth()->user();
-        $baseQuery = EventMedia::query();
-
-        if (!$user->isAdmin()) {
-            $baseQuery->where('user_id', $user->id);
-        }
-
-        $query = (clone $baseQuery)->with(['event', 'user'])->latest();
+        $baseQuery = $this->baseVisibleQuery($user);
+        $query = (clone $baseQuery)->with(['event.galleryCoverMedia', 'user'])->latest();
 
         if ($request->filled('event_id')) {
             $query->where('event_id', $request->event_id);
@@ -33,6 +30,8 @@ class GalleryController extends Controller
         $media = $query->paginate(20);
 
         $events = Event::where('published', true)
+            ->with('galleryCoverMedia')
+            ->withCount('media')
             ->orderBy('start_at', 'desc')
             ->get();
 
@@ -46,7 +45,15 @@ class GalleryController extends Controller
             'my_uploads' => EventMedia::query()->where('user_id', $user->id)->count(),
         ];
 
-        return view('panel.gallery.index', compact('media', 'events', 'selectedEvent', 'stats'));
+        $canManageSelectedEvent = $selectedEvent ? $this->canManageEvent($selectedEvent) : false;
+
+        return view('panel.gallery.index', compact(
+            'media',
+            'events',
+            'selectedEvent',
+            'stats',
+            'canManageSelectedEvent'
+        ));
     }
 
     /**
@@ -56,63 +63,77 @@ class GalleryController extends Controller
     {
         $request->validate([
             'event_id' => 'required|exists:events,id',
-            'files' => 'required|array',
+            'files' => 'required|array|min:1',
             'files.*' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
         ]);
 
         $event = Event::findOrFail($request->event_id);
-        $uploadedCount = 0;
+        $uploadedMedia = [];
+        $failedFiles = [];
 
-        if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
+        foreach ($request->file('files', []) as $file) {
+            try {
+                $path = $watermarkService->processEventImage($file, $event);
+                $uploadedMedia[] = EventMedia::create([
+                    'event_id' => $event->id,
+                    'user_id' => auth()->id(),
+                    'file_path' => $path,
+                    'type' => 'image',
+                    'watermarked' => true,
+                ]);
+            } catch (\Throwable $exception) {
+                \Log::error('Gallery upload error: ' . $exception->getMessage(), [
+                    'event_id' => $event->id,
+                    'file' => $file->getClientOriginalName(),
+                ]);
+
                 try {
-                    $path = $watermarkService->processEventImage($file, $event);
+                    $path = UploadStorage::storeUploadedFile(
+                        $file,
+                        'events/' . $event->id . '/gallery',
+                        null,
+                        [
+                            'prefix' => 'gallery-media',
+                            'watermark' => false,
+                        ]
+                    );
 
-                    EventMedia::create([
+                    $uploadedMedia[] = EventMedia::create([
                         'event_id' => $event->id,
                         'user_id' => auth()->id(),
                         'file_path' => $path,
                         'type' => 'image',
-                        'watermarked' => true,
+                        'watermarked' => false,
+                    ]);
+                } catch (\Throwable $fallbackException) {
+                    \Log::error('Gallery upload fallback error: ' . $fallbackException->getMessage(), [
+                        'event_id' => $event->id,
+                        'file' => $file->getClientOriginalName(),
                     ]);
 
-                    $uploadedCount++;
-                } catch (\Throwable $exception) {
-                    \Log::error('Gallery upload error: ' . $exception->getMessage());
-
-                    try {
-                        $path = UploadStorage::storeUploadedFile($file, 'events/' . $event->id . '/gallery');
-
-                        $uploadedMedia[] = EventMedia::create([
-                            'event_id' => $event->id,
-                            'user_id' => auth()->id(),
-                            'file_path' => $path,
-                            'type' => 'image',
-                            'watermarked' => false,
-                        ]);
-
-                        $uploadedCount++;
-                    } catch (\Throwable $fallbackException) {
-                        \Log::error('Gallery upload fallback error: ' . $fallbackException->getMessage());
-                    }
+                    $failedFiles[] = $file->getClientOriginalName();
                 }
             }
         }
 
-        if ($uploadedCount === 0) {
-            $message = 'Nenhuma foto conseguiu ser enviada para a galeria.';
+        if ($uploadedMedia === []) {
+            $message = 'Nenhuma imagem conseguiu ser enviada para a galeria.';
 
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => $message,
+                    'failed_files' => $failedFiles,
                 ], 422);
             }
 
             return back()->with('error', $message);
         }
 
-        $message = "Sucesso! {$uploadedCount} foto(s) foram enviadas para a galeria.";
+        $message = count($uploadedMedia) . ' imagem(ns) enviada(s) com sucesso.';
+        if ($failedFiles !== []) {
+            $message .= ' ' . count($failedFiles) . ' arquivo(s) falharam.';
+        }
 
         if ($request->expectsJson()) {
             $user = auth()->user();
@@ -120,14 +141,12 @@ class GalleryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $message,
-                'uploaded_count' => $uploadedCount,
+                'uploaded_count' => count($uploadedMedia),
+                'failed_count' => count($failedFiles),
+                'failed_files' => $failedFiles,
                 'media' => $this->serializeMediaCollection($uploadedMedia),
                 'stats' => [
-                    'visible_total' => EventMedia::query()
-                        ->when(!$user->isAdmin(), function ($query) use ($user) {
-                            $query->where('user_id', $user->id);
-                        })
-                        ->count(),
+                    'visible_total' => $this->baseVisibleQuery($user)->count(),
                     'my_uploads' => EventMedia::query()->where('user_id', $user->id)->count(),
                 ],
             ]);
@@ -136,21 +155,112 @@ class GalleryController extends Controller
         return back()->with('success', $message);
     }
 
+    public function uploadCover(Request $request, Event $event, WatermarkService $watermarkService)
+    {
+        $this->abortUnlessCanManageEvent($event);
+
+        $request->validate([
+            'cover_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
+        ]);
+
+        $oldCustomCover = $event->gallery_cover_image;
+
+        try {
+            $path = $watermarkService->processStorageImage(
+                $request->file('cover_image'),
+                'events/' . $event->id . '/gallery/covers',
+                null,
+                ['prefix' => 'gallery-cover']
+            );
+        } catch (\Throwable $exception) {
+            \Log::error('Panel gallery custom cover upload error: ' . $exception->getMessage(), [
+                'event_id' => $event->id,
+            ]);
+
+            $path = UploadStorage::storeUploadedFile(
+                $request->file('cover_image'),
+                'events/' . $event->id . '/gallery/covers',
+                null,
+                ['prefix' => 'gallery-cover']
+            );
+        }
+
+        if (!blank($oldCustomCover) && $oldCustomCover !== $path) {
+            UploadStorage::delete($oldCustomCover);
+        }
+
+        $event->forceFill([
+            'gallery_cover_image' => $path,
+            'gallery_cover_media_id' => null,
+        ])->save();
+
+        return $this->coverResponse($request, $event, 'Capa personalizada do album atualizada com sucesso.');
+    }
+
+    public function setCoverFromMedia(Request $request, EventMedia $media)
+    {
+        $media->loadMissing('event');
+        $event = $media->event;
+
+        abort_if(!$event, 404);
+        $this->abortUnlessCanManageEvent($event);
+
+        if ($media->type !== 'image') {
+            throw ValidationException::withMessages([
+                'media' => 'A capa do album precisa ser uma imagem.',
+            ]);
+        }
+
+        if (!blank($event->gallery_cover_image)) {
+            UploadStorage::delete($event->gallery_cover_image);
+        }
+
+        $event->forceFill([
+            'gallery_cover_image' => null,
+            'gallery_cover_media_id' => $media->id,
+        ])->save();
+
+        return $this->coverResponse($request, $event, 'Capa do album definida a partir da foto selecionada.');
+    }
+
+    public function clearCover(Request $request, Event $event)
+    {
+        $this->abortUnlessCanManageEvent($event);
+
+        if (!blank($event->gallery_cover_image)) {
+            UploadStorage::delete($event->gallery_cover_image);
+        }
+
+        $event->forceFill([
+            'gallery_cover_image' => null,
+            'gallery_cover_media_id' => null,
+        ])->save();
+
+        return $this->coverResponse($request, $event, 'A capa personalizada do album foi removida.');
+    }
+
     /**
      * Remove the specified media from storage.
      */
-    public function destroy(EventMedia $media)
+    public function destroy(Request $request, EventMedia $media)
     {
+        $media->loadMissing('event');
+        $event = $media->event;
         $user = auth()->user();
 
-        if ($media->user_id !== $user->id && !$user->isAdmin()) {
+        $canDelete = $user->isAdmin()
+            || (int) $media->user_id === (int) $user->id
+            || ($event && (int) $event->user_id === (int) $user->id);
+
+        if (!$canDelete) {
             return back()->with('error', 'Voce nao tem permissao para excluir esta midia.');
         }
 
-        if ($media->file_path) {
-            UploadStorage::delete($media->file_path);
+        if ($event && (int) $event->gallery_cover_media_id === (int) $media->id) {
+            $event->forceFill(['gallery_cover_media_id' => null])->save();
         }
 
+        UploadStorage::delete($media->file_path);
         $media->delete();
 
         return back()->with('success', 'Midia excluida da galeria com sucesso.');
@@ -162,22 +272,75 @@ class GalleryController extends Controller
      */
     private function serializeMediaCollection(array $mediaItems): array
     {
-        return array_map(function (EventMedia $media) {
-            $media->loadMissing(['event', 'user']);
+        $user = auth()->user();
+
+        return array_map(function (EventMedia $media) use ($user) {
+            $media->loadMissing(['event.galleryCoverMedia', 'user']);
+            $event = $media->event;
+            $isEventOwner = $event && (int) $event->user_id === (int) $user->id;
 
             return [
                 'id' => $media->id,
+                'event_id' => $media->event_id,
                 'type' => $media->type,
                 'url' => UploadStorage::url($media->file_path, asset('img/default-user.svg')),
                 'watermarked' => (bool) $media->watermarked,
-                'event_title' => optional($media->event)->title ?: 'Evento sem titulo',
-                'event_date' => optional(optional($media->event)->start_at)?->format('d/m/Y'),
+                'event_title' => optional($event)->title ?: 'Evento sem titulo',
+                'event_date' => optional(optional($event)->start_at)?->format('d/m/Y'),
                 'owner_name' => optional($media->user)->name ?: 'Sistema',
                 'owner_avatar' => optional($media->user)->profile_photo_url ?: '',
                 'uploaded_at' => $media->created_at?->format('d/m/Y H:i'),
-                'can_delete' => auth()->user()->isAdmin() || (int) $media->user_id === (int) auth()->id(),
+                'can_delete' => $user->isAdmin()
+                    || (int) $media->user_id === (int) $user->id
+                    || $isEventOwner,
+                'can_set_cover' => $user->isAdmin() || $isEventOwner,
+                'is_cover' => $event
+                    ? (blank($event->gallery_cover_image) && (int) $event->gallery_cover_media_id === (int) $media->id)
+                    : false,
                 'delete_url' => route('panel.gallery.destroy', $media),
+                'set_cover_url' => route('panel.gallery.cover.media', $media),
             ];
         }, $mediaItems);
+    }
+
+    private function baseVisibleQuery($user): Builder
+    {
+        return EventMedia::query()
+            ->when(!$user->isAdmin(), function (Builder $query) use ($user) {
+                $query->where(function (Builder $scope) use ($user) {
+                    $scope->where('user_id', $user->id)
+                        ->orWhereHas('event', function (Builder $eventQuery) use ($user) {
+                            $eventQuery->where('user_id', $user->id);
+                        });
+                });
+            });
+    }
+
+    private function canManageEvent(Event $event): bool
+    {
+        $user = auth()->user();
+
+        return $user->isAdmin() || (int) $event->user_id === (int) $user->id;
+    }
+
+    private function abortUnlessCanManageEvent(Event $event): void
+    {
+        if (!$this->canManageEvent($event)) {
+            abort(403);
+        }
+    }
+
+    private function coverResponse(Request $request, Event $event, string $message)
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'cover_url' => $event->fresh()->gallery_cover_url,
+                'event_id' => $event->id,
+            ]);
+        }
+
+        return back()->with('success', $message);
     }
 }

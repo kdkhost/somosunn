@@ -31,14 +31,10 @@
             @else
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     @foreach($events as $event)
-                        @php
-                            $cover = $event->media->where('type', 'image')->first();
-                            $coverPath = $cover ? asset('storage/' . $cover->file_path) : asset('storage/' . $event->image);
-                        @endphp
                         <a href="{{ route('gallery.show', $event) }}"
                             class="group block bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border border-slate-100">
                             <div class="relative aspect-video overflow-hidden">
-                                <img src="{{ $coverPath }}" alt="{{ $event->title }}"
+                                <img src="{{ $event->gallery_cover_url ?: asset('img/logo.svg') }}" alt="{{ $event->title }}"
                                     class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
                                 <div
                                     class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
@@ -48,7 +44,7 @@
                                 </div>
                                 <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold shadow-sm"
                                     style="color: var(--unn-azul-1)">
-                                    {{ $event->media->count() }} itens
+                                    {{ $event->media_count }} itens
                                 </div>
                             </div>
                             <div class="p-6">

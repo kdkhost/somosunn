@@ -230,6 +230,23 @@
                 ? `<img src="${escapeHtml(item.owner_avatar)}" alt="${escapeHtml(item.owner_name)}" class="h-full w-full object-cover" onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">`
                 : `<span class="flex h-full w-full items-center justify-center text-sm font-black uppercase">${escapeHtml((item.owner_name || 'S').trim().charAt(0) || 'S')}</span>`;
 
+            const coverBadgeMarkup = item.is_cover
+                ? '<span class="rounded-full border border-amber-300/25 bg-amber-400/20 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-amber-100 backdrop-blur">Capa do album</span>'
+                : '';
+
+            const setCoverMarkup = item.can_set_cover
+                ? `
+                    <form method="POST" action="${escapeHtml(item.set_cover_url)}">
+                        @csrf
+                        <button type="submit"
+                            class="inline-flex h-11 items-center justify-center rounded-2xl border px-4 text-xs font-black uppercase tracking-[0.14em] transition ${item.is_cover ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200' : 'border-blue-200 bg-blue-50 text-blue-700 hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-900/20 dark:text-blue-300'}">
+                            <i class="fas fa-star mr-2"></i>
+                            ${item.is_cover ? 'Capa ativa' : 'Definir capa'}
+                        </button>
+                    </form>
+                `
+                : '';
+
             const deleteMarkup = item.can_delete
                 ? `
                     <form method="POST" action="${escapeHtml(item.delete_url)}" class="gallery-delete-form shrink-0">
@@ -257,7 +274,10 @@
                                 <span class="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-white backdrop-blur">
                                     ${escapeHtml(item.event_title)}
                                 </span>
-                                ${item.watermarked ? '<span class="rounded-full border border-cyan-400/25 bg-cyan-400/12 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-100 backdrop-blur">Watermark</span>' : ''}
+                                <div class="flex flex-col items-end gap-2">
+                                    ${item.watermarked ? '<span class="rounded-full border border-cyan-400/25 bg-cyan-400/12 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-100 backdrop-blur">Watermark</span>' : ''}
+                                    ${coverBadgeMarkup}
+                                </div>
                             </div>
                             <div class="absolute inset-x-5 bottom-5 flex items-end justify-between gap-3">
                                 <div>
@@ -281,7 +301,10 @@
                                     <p class="mt-1 truncate text-xs font-medium text-slate-500 dark:text-slate-400">Enviado em ${escapeHtml(item.uploaded_at || '--')}</p>
                                 </div>
                             </div>
-                            ${deleteMarkup}
+                            <div class="flex items-center gap-2 shrink-0">
+                                ${setCoverMarkup}
+                                ${deleteMarkup}
+                            </div>
                         </div>
                         <div class="mt-5 grid grid-cols-2 gap-3 text-sm">
                             <div class="rounded-[1.4rem] bg-slate-50 px-4 py-3 dark:bg-slate-950">

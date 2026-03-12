@@ -14,11 +14,8 @@ class GalleryController extends Controller
     {
         $events = Event::has('media')
             ->where('published', true)
-            ->with([
-                'media' => function ($query) {
-                    $query->where('type', 'image')->orderBy('created_at', 'asc');
-                },
-            ])
+            ->with('galleryCoverMedia')
+            ->withCount('media')
             ->orderBy('start_at', 'desc')
             ->paginate(12);
 
@@ -33,6 +30,8 @@ class GalleryController extends Controller
         if (!$event->published) {
             abort(404);
         }
+
+        $event->loadMissing('galleryCoverMedia');
 
         $photosQuery = $event->media()
             ->with('user')
@@ -67,11 +66,8 @@ class GalleryController extends Controller
         $relatedEvents = Event::has('media')
             ->where('published', true)
             ->whereKeyNot($event->getKey())
-            ->with([
-                'media' => function ($query) {
-                    $query->where('type', 'image')->latest();
-                },
-            ])
+            ->with('galleryCoverMedia')
+            ->withCount('media')
             ->orderBy('start_at', 'desc')
             ->take(3)
             ->get();

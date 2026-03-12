@@ -25,6 +25,8 @@ class Event extends Model
         'speaker',
         'description',
         'image',
+        'gallery_cover_image',
+        'gallery_cover_media_id',
         'start_at',
         'end_at',
         'location',
@@ -72,7 +74,7 @@ class Event extends Model
         'scanner_radius_meters' => 'integer',
     ];
 
-    protected $appends = ['start', 'end', 'image_url', 'thumbnail_url'];
+    protected $appends = ['start', 'end', 'image_url', 'thumbnail_url', 'gallery_cover_url'];
 
     public function getImageUrlAttribute(): ?string
     {
@@ -81,6 +83,31 @@ class Event extends Model
 
     public function getThumbnailUrlAttribute(): ?string
     {
+        return $this->image_url;
+    }
+
+    public function getGalleryCoverUrlAttribute(): ?string
+    {
+        if (!blank($this->gallery_cover_image)) {
+            return UploadStorage::url($this->gallery_cover_image, $this->image_url);
+        }
+
+        $coverMedia = $this->relationLoaded('galleryCoverMedia')
+            ? $this->galleryCoverMedia
+            : ($this->gallery_cover_media_id ? $this->galleryCoverMedia()->first() : null);
+
+        if ($coverMedia?->file_path) {
+            return UploadStorage::url($coverMedia->file_path, $this->image_url);
+        }
+
+        $fallbackMedia = $this->relationLoaded('media')
+            ? $this->media->firstWhere('type', 'image')
+            : $this->media()->where('type', 'image')->oldest('created_at')->first();
+
+        if ($fallbackMedia?->file_path) {
+            return UploadStorage::url($fallbackMedia->file_path, $this->image_url);
+        }
+
         return $this->image_url;
     }
 
@@ -506,6 +533,11 @@ class Event extends Model
     public function media()
     {
         return $this->hasMany(EventMedia::class);
+    }
+
+    public function galleryCoverMedia()
+    {
+        return $this->belongsTo(EventMedia::class, 'gallery_cover_media_id');
     }
 
     public function user()

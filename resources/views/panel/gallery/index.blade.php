@@ -19,6 +19,7 @@
     <div class="space-y-6">
         @include('panel.gallery.partials.hero')
         @include('panel.gallery.partials.filter-bar')
+        @include('panel.gallery.partials.cover-manager')
         @include('panel.gallery.partials.media-grid')
     </div>
 

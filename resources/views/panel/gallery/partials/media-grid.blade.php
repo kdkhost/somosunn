@@ -30,7 +30,11 @@
                     $ownerInitial = strtoupper(\Illuminate\Support\Str::substr($ownerName, 0, 1));
                     $avatarUrl = optional($item->user)->profile_photo_url ?? null;
                     $showAvatar = $avatarUrl && !str_contains((string) $avatarUrl, 'default-user.svg');
-                    $canDelete = $isAdmin || (int) $item->user_id === (int) auth()->id();
+                    $isEventOwner = (int) optional($item->event)->user_id === (int) auth()->id();
+                    $canDelete = $isAdmin || (int) $item->user_id === (int) auth()->id() || $isEventOwner;
+                    $canSetCover = $isAdmin || $isEventOwner;
+                    $isCover = blank(optional($item->event)->gallery_cover_image)
+                        && (int) optional($item->event)->gallery_cover_media_id === (int) $item->id;
                     $eventDate = optional(optional($item->event)->start_at)?->format('d/m/Y');
                 @endphp
 
@@ -47,11 +51,18 @@
                                 <span class="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-white backdrop-blur">
                                     {{ \Illuminate\Support\Str::limit($eventTitle, 28) }}
                                 </span>
-                                @if($item->watermarked)
-                                    <span class="rounded-full border border-cyan-400/25 bg-cyan-400/12 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-100 backdrop-blur">
-                                        Watermark
-                                    </span>
-                                @endif
+                                <div class="flex flex-col items-end gap-2">
+                                    @if($item->watermarked)
+                                        <span class="rounded-full border border-cyan-400/25 bg-cyan-400/12 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-100 backdrop-blur">
+                                            Watermark
+                                        </span>
+                                    @endif
+                                    @if($isCover)
+                                        <span class="rounded-full border border-amber-300/25 bg-amber-400/20 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-amber-100 backdrop-blur">
+                                            Capa do album
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
 
                             <div class="absolute inset-x-5 bottom-5 flex items-end justify-between gap-3">
@@ -86,14 +97,27 @@
                             </div>
 
                             @if($canDelete)
-                                <form method="POST" action="{{ route('panel.gallery.destroy', $item) }}" class="gallery-delete-form shrink-0">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 text-rose-600 transition hover:border-rose-300 hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-900/20 dark:text-rose-300">
-                                        <i class="fas fa-trash-can"></i>
-                                    </button>
-                                </form>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    @if($canSetCover)
+                                        <form method="POST" action="{{ route('panel.gallery.cover.media', $item) }}">
+                                            @csrf
+                                            <button type="submit"
+                                                class="inline-flex h-11 items-center justify-center rounded-2xl border px-4 text-xs font-black uppercase tracking-[0.14em] transition {{ $isCover ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200' : 'border-blue-200 bg-blue-50 text-blue-700 hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-900/20 dark:text-blue-300' }}">
+                                                <i class="fas fa-star mr-2"></i>
+                                                {{ $isCover ? 'Capa ativa' : 'Definir capa' }}
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    <form method="POST" action="{{ route('panel.gallery.destroy', $item) }}" class="gallery-delete-form shrink-0">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 text-rose-600 transition hover:border-rose-300 hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-900/20 dark:text-rose-300">
+                                            <i class="fas fa-trash-can"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             @endif
                         </div>
 

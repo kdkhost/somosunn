@@ -3,9 +3,11 @@
 @section('title', 'Galeria: ' . $event->title . ' - SOMOS UNN')
 
 @php
-    $coverUrl = $featuredPhoto
+    $coverUrl = $event->gallery_cover_url ?: (
+        $featuredPhoto
         ? \App\Support\UploadStorage::url($featuredPhoto->file_path)
-        : ($event->image_url ?: asset('img/logo.svg'));
+        : ($event->image_url ?: asset('img/logo.svg'))
+    );
     $speakerName = $event->speaker ?: optional($event->user)->name ?: 'SOMOS UNN';
     $eventDate = $event->start_at
         ? \Carbon\Carbon::parse($event->start_at)->translatedFormat('d \d\e F \d\e Y')
@@ -295,15 +297,10 @@
 
                     <div class="mt-8 grid gap-5 lg:grid-cols-3">
                         @foreach($relatedEvents as $relatedEvent)
-                            @php
-                                $relatedCover = optional($relatedEvent->media->first())->file_path
-                                    ? \App\Support\UploadStorage::url(optional($relatedEvent->media->first())->file_path)
-                                    : ($relatedEvent->image_url ?: asset('img/logo.svg'));
-                            @endphp
                             <a href="{{ route('gallery.show', $relatedEvent) }}"
                                 class="group overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-950 text-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_60px_rgba(15,23,42,0.18)]">
                                 <div class="relative h-56 overflow-hidden">
-                                    <img src="{{ $relatedCover }}" alt="{{ $relatedEvent->title }}"
+                                    <img src="{{ $relatedEvent->gallery_cover_url ?: asset('img/logo.svg') }}" alt="{{ $relatedEvent->title }}"
                                         class="h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-[1.04] group-hover:opacity-100">
                                     <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.08),rgba(15,23,42,0.82))]"></div>
                                     <div class="absolute inset-x-5 bottom-5">

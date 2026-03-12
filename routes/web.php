@@ -683,6 +683,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     // Galeria Unificada (Tailwind)
     Route::get('/galeria', [\App\Http\Controllers\Panel\GalleryController::class, 'index'])->name('gallery.index');
     Route::post('/galeria/upload', [\App\Http\Controllers\Panel\GalleryController::class, 'upload'])->name('gallery.upload');
+    Route::post('/galeria/eventos/{event}/capa/upload', [\App\Http\Controllers\Panel\GalleryController::class, 'uploadCover'])->name('gallery.cover.upload');
+    Route::post('/galeria/media/{media}/capa', [\App\Http\Controllers\Panel\GalleryController::class, 'setCoverFromMedia'])->name('gallery.cover.media');
+    Route::delete('/galeria/eventos/{event}/capa', [\App\Http\Controllers\Panel\GalleryController::class, 'clearCover'])->name('gallery.cover.clear');
     Route::delete('/galeria/{media}', [\App\Http\Controllers\Panel\GalleryController::class, 'destroy'])->name('gallery.destroy');
 });
 
@@ -753,6 +756,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     // Galeria Unificada (AdminLTE)
     Route::get('/galeria', [\App\Http\Controllers\Admin\GalleryController::class, 'index'])->name('gallery.index');
     Route::post('/galeria/upload', [\App\Http\Controllers\Admin\GalleryController::class, 'upload'])->name('gallery.upload');
+    Route::post('/galeria/eventos/{event}/capa/upload', [\App\Http\Controllers\Admin\GalleryController::class, 'uploadCover'])->name('gallery.cover.upload');
+    Route::post('/galeria/media/{media}/capa', [\App\Http\Controllers\Admin\GalleryController::class, 'setCoverFromMedia'])->name('gallery.cover.media');
+    Route::delete('/galeria/eventos/{event}/capa', [\App\Http\Controllers\Admin\GalleryController::class, 'clearCover'])->name('gallery.cover.clear');
     Route::delete('/galeria/{media}', [\App\Http\Controllers\Admin\GalleryController::class, 'destroy'])->name('gallery.destroy');
 
     // Marketplace (Admin - visão interna)
