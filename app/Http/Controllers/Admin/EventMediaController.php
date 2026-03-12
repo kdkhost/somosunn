@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 class EventMediaController extends Controller
 {
-    private const DIRECT_UPLOAD_MAX_MB = 20;
+    public const DIRECT_UPLOAD_MAX_MB = 50;
     private const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
 
     public function store(Request $request, Event $event, WatermarkService $watermarkService)

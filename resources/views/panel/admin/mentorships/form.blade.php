@@ -56,23 +56,31 @@
                         : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
                 class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                 <i class="fas fa-calendar-alt"></i>
-                <span>Agenda & Links</span>
+                <span>Agenda</span>
             </button>
             @if($mentorship->exists)
-                <button type="button" @click="tab = 'certificate'"
-                    :class="tab === 'certificate' 
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
-                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
-                    class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
-                    <i class="fas fa-certificate"></i>
-                    <span>Certificado</span>
-                </button>
+            <button type="button" @click="tab = 'gallery'"
+                :class="tab === 'gallery' 
+                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
+                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
+                class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
+                <i class="fas fa-images"></i>
+                <span>Galeria</span>
+            </button>
+            <button type="button" @click="tab = 'certificate'"
+                :class="tab === 'certificate' 
+                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
+                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
+                class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
+                <i class="fas fa-certificate"></i>
+                <span>Certificado</span>
+            </button>
             @endif
         </div>
 
-        <form id="mentorshipForm"
+        <form method="POST" id="mentorshipForm"
             action="{{ $mentorship->exists ? route('panel.admin.mentorships.update', $mentorship) : route('panel.admin.mentorships.store') }}"
-            method="POST" enctype="multipart/form-data">
+            enctype="multipart/form-data">
             @csrf
             @if($mentorship->exists) @method('PUT') @endif
 
@@ -256,7 +264,7 @@
                             class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl font-mono text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-700 dark:text-slate-300"
                             placeholder='{"timezone":"America/Sao_Paulo","sessions":[{"date":"2026-03-10","time":"19:00","link":"..."}] }'>{{ old('schedule_json', $mentorship->schedule ? json_encode($mentorship->schedule, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : '') }}</textarea>
                         <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-2 italic transition-colors">* Use este
-                            campo para definir datas e horários
+                            campo para definir das e horários
                             fixos das sessões.</p>
                     </div>
                 </div>
@@ -264,6 +272,13 @@
 
             {{-- Tab: Certificate --}}
             @if($mentorship->exists)
+                <div x-show="tab === 'gallery'" class="space-y-6">
+                    @include('panel.admin.partials.gallery', [
+                        'model' => $mentorship,
+                        'uploadUrl' => route('panel.admin.mentorships.media.store', $mentorship),
+                        'deleteUrlPattern' => route('panel.admin.mentorships.media.destroy', [$mentorship, ':media'])
+                    ])
+                </div>
                 <div x-show="tab === 'certificate'" class="space-y-6">
                     <div class="max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
                         <label class="flex items-center justify-between gap-4">
@@ -339,85 +354,6 @@
                         'autoInfoValue' => $mentorship->mentor->name ?? 'Mentor',
                         'saveLabel' => 'Salvar Certificado',
                     ])
-                    @if(false)
-                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                        {{-- Preview Canvas --}}
-                        <div
-                            class="xl:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 min-h-[600px] flex flex-col transition-colors">
-                            <div class="flex items-center justify-between mb-6">
-                                <h3
-                                    class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider transition-colors">
-                                    Editor do Certificado</h3>
-                                <div class="flex items-center gap-2">
-                                    {{-- Add zoom controls if needed --}}
-                                </div>
-                            </div>
-
-                            <div
-                                class="flex-1 bg-slate-100 dark:bg-slate-800 rounded-2xl p-8 flex items-center justify-center overflow-auto border-2 border-dashed border-slate-200 dark:border-slate-700 transition-colors">
-                                <div id="cert-canvas" class="relative bg-white shadow-2xl overflow-hidden shrink-0"
-                                    style="width: 842px; height: 595px;">
-                                    @if($mentorship->certificate_bg)
-                                        <img src="{{ asset($mentorship->certificate_bg) }}" id="cert-bg-img"
-                                            class="absolute inset-0 w-full h-full object-cover z-0">
-                                    @endif
-                                    <div id="cert-elements-layer" class="absolute inset-0 z-10"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Certificate Settings --}}
-                        <div class="space-y-6">
-                            <div
-                                class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
-                                <div class="flex items-center gap-3 mb-6">
-                                    <div
-                                        class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors">
-                                        <i class="fas fa-cog"></i>
-                                    </div>
-                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase transition-colors">
-                                        Configurações</h3>
-                                </div>
-
-                                <div class="space-y-6">
-                                    <div
-                                        class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 transition-colors">
-                                        <span
-                                            class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase transition-colors">Habilitar
-                                            Certificado</span>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" name="is_certificate_enabled" value="1"
-                                                @checked($mentorship->is_certificate_enabled) class="sr-only peer">
-                                            <div
-                                                class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors">
-                                            </div>
-                                        </label>
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Imagem
-                                            de
-                                            Fundo</label>
-                                        <input type="file" name="certificate_bg"
-                                            class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50 cursor-pointer">
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Assinatura
-                                            do
-                                            Mentor</label>
-                                        <input type="file" name="instructor_signature"
-                                            class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50 cursor-pointer">
-                                    </div>
-
-                                    <input type="hidden" name="certificate_settings" id="certificate_settings_input">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
                 </div>
             @endif
         </form>
@@ -464,82 +400,6 @@
                     'defaultTags' => $mentorshipDefaultTags,
                     'tagLabels' => $mentorshipTagLabels,
                 ])
-            @endif
-
-            @if(false)
-            // Certificate Editor Logic (Simplified for this view)
-            $(document).ready(function () {
-                if ('{{ $mentorship->exists }}' == '') return;
-
-                let rawCertSettings = {!! $mentorship->certificate_settings ? json_encode($mentorship->certificate_settings) : '{}' !!};
-                let certDoc = (rawCertSettings && rawCertSettings.schemaVersion === 2) ? rawCertSettings : { schemaVersion: 2, meta: {}, elements: {} };
-                let certSettings = certDoc.elements;
-
-                const platformLogoUrl = "{{ \App\Models\Setting::get('logo_auth') ? asset(ltrim(\App\Models\Setting::get('logo_auth'), '/')) : asset('img/logo.svg') }}";
-
-                const defaultTags = {
-                    'student_name': { x: 50, y: 40, text: '[Nome do Aluno]', fontSize: 30, color: '#000000', fontWeight: 'bold' },
-                    'course_name': { x: 50, y: 55, text: '{{ $mentorship->title }}', fontSize: 24, color: '#333333', fontWeight: 'bold' },
-                    'completion_date': { x: 50, y: 65, text: 'Data: 01/01/2026', fontSize: 16, color: '#555555', fontWeight: 'normal' },
-                    'platform_logo': { x: 50, y: 10, text: 'LOGO', width: 120, height: 60, mandatory: true }
-                };
-
-                $.each(defaultTags, function (key, val) {
-                    if (!certSettings[key]) certSettings[key] = val;
-                });
-
-                const $canvasLayer = $('#cert-elements-layer');
-
-                function renderCertElements() {
-                    $canvasLayer.empty();
-                    $.each(certSettings, function (key, data) {
-                        if (!data || data.x === undefined) return;
-
-                        let $el = $('<div>')
-                            .addClass('absolute cursor-move select-none p-2 border border-transparent hover:border-blue-400')
-                            .attr('id', 'cert-el-' + key)
-                            .css({
-                                left: data.x + '%',
-                                top: data.y + '%',
-                                fontSize: (data.fontSize || 16) + 'px',
-                                color: data.color || '#000000',
-                                fontWeight: data.fontWeight || 'normal',
-                                zIndex: 10
-                            });
-
-                        if (key === 'platform_logo') {
-                            $el.css({
-                                width: (data.width || 120) + 'px',
-                                height: (data.height || 60) + 'px',
-                                backgroundImage: `url("${platformLogoUrl}")`,
-                                backgroundSize: 'contain',
-                                backgroundRepeat: 'no-repeat',
-                                backgroundPosition: 'center'
-                            }).text('');
-                        } else {
-                            $el.text(data.text);
-                        }
-
-                        $el.draggable({
-                            containment: '#cert-canvas',
-                            stop: function (event, ui) {
-                                let parentW = $('#cert-canvas').width();
-                                let parentH = $('#cert-canvas').height();
-                                certSettings[key].x = (ui.position.left / parentW) * 100;
-                                certSettings[key].y = (ui.position.top / parentH) * 100;
-                            }
-                        });
-
-                        $canvasLayer.append($el);
-                    });
-                }
-
-                renderCertElements();
-
-                $('#mentorshipForm').on('submit', function () {
-                    $('#certificate_settings_input').val(JSON.stringify(certDoc));
-                });
-            });
             @endif
         </script>
     @endpush

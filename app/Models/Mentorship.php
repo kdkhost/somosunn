@@ -130,6 +130,11 @@ class Mentorship extends Model
         return $this->hasMany(Certificate::class);
     }
 
+    public function media()
+    {
+        return $this->hasMany(MentorshipMedia::class);
+    }
+
     private function extractScheduleMoments(mixed $payload, ?string $timezone = null): array
     {
         if (!is_array($payload)) {

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Event;
+use App\Models\Mentorship;
 use App\Models\Setting;
 use App\Support\UploadStorage;
 use Illuminate\Http\UploadedFile;
@@ -34,6 +35,16 @@ class WatermarkService
             'events/' . $event->id . '/gallery',
             null,
             ['prefix' => 'event-media']
+        );
+    }
+
+    public function processMentorshipImage(UploadedFile $file, Mentorship $mentorship): string
+    {
+        return $this->processStorageImage(
+            $file,
+            'mentorships/' . $mentorship->id . '/gallery',
+            null,
+            ['prefix' => 'mentorship-media']
         );
     }
 

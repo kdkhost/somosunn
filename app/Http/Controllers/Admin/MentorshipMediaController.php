@@ -1,27 +1,23 @@
 <?php
 
-namespace App\Http\Controllers\Panel;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Event;
-use App\Models\EventMedia;
+use App\Models\Mentorship;
+use App\Models\MentorshipMedia;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 
-class EventMediaController extends Controller
+class MentorshipMediaController extends Controller
 {
-    private const DIRECT_UPLOAD_MAX_MB = 50;
+    public const DIRECT_UPLOAD_MAX_MB = 50;
     private const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
 
-    public function store(Request $request, Event $event, WatermarkService $watermarkService)
+    public function store(Request $request, Mentorship $mentorship, WatermarkService $watermarkService)
     {
-        if ($event->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
-            return response()->json(['success' => false, 'message' => 'Acesso negado.'], 403);
-        }
-
         $request->validate([
             'files' => 'required|array|min:1',
             'files.*' => 'required|file',
@@ -34,8 +30,9 @@ class EventMediaController extends Controller
             $file = $fileData['file'];
             $type = $fileData['type'];
             $targetDirectory = $type === 'image'
-                ? 'events/' . $event->id . '/gallery'
-                : 'events/' . $event->id . '/gallery/videos';
+                ? 'mentorships/' . $mentorship->id . '/gallery'
+                : 'mentorships/' . $mentorship->id . '/gallery/videos';
+            
             $shouldWatermark = $type === 'image'
                 && $watermarkService->isWatermarkableImage($file)
                 && $watermarkService->shouldWatermarkUpload($targetDirectory);
@@ -43,18 +40,15 @@ class EventMediaController extends Controller
             try {
                 try {
                     if ($type === 'image') {
-                        $path = $watermarkService->processEventImage($file, $event);
+                        $path = $watermarkService->processMentorshipImage($file, $mentorship);
                         $watermarked = $shouldWatermark;
                     } else {
-                        $path = UploadStorage::storeUploadedFile(
-                            $file,
-                            $targetDirectory
-                        );
+                        $path = UploadStorage::storeUploadedFile($file, $targetDirectory);
                         $watermarked = false;
                     }
                 } catch (\Throwable $exception) {
-                    \Log::error('Erro ao processar midia de evento (panel).', [
-                        'event_id' => $event->id,
+                    \Log::error('Erro ao processar midia de mentoria.', [
+                        'mentorship_id' => $mentorship->id,
                         'file' => $file->getClientOriginalName(),
                         'type' => $type,
                         'message' => $exception->getMessage(),
@@ -64,16 +58,16 @@ class EventMediaController extends Controller
                     $watermarked = $shouldWatermark;
                 }
 
-                $uploadedMedia[] = EventMedia::create([
-                    'event_id' => $event->id,
+                $uploadedMedia[] = MentorshipMedia::create([
+                    'mentorship_id' => $mentorship->id,
                     'user_id' => auth()->id(),
                     'file_path' => $path,
                     'type' => $type,
                     'watermarked' => $watermarked,
                 ]);
             } catch (\Throwable $exception) {
-                \Log::error('Falha definitiva ao salvar midia de evento (panel).', [
-                    'event_id' => $event->id,
+                \Log::error('Falha definitiva ao salvar midia de mentoria.', [
+                    'mentorship_id' => $mentorship->id,
                     'file' => $file->getClientOriginalName(),
                     'type' => $type,
                     'message' => $exception->getMessage(),
@@ -102,17 +96,13 @@ class EventMediaController extends Controller
             'uploaded_count' => count($uploadedMedia),
             'failed_count' => count($failedFiles),
             'failed_files' => $failedFiles,
-            'media' => $this->serializeMediaCollection($event, $uploadedMedia),
+            'media' => $this->serializeMediaCollection($mentorship, $uploadedMedia),
         ]);
     }
 
-    public function destroy(Event $event, EventMedia $media)
+    public function destroy(Mentorship $mentorship, MentorshipMedia $media)
     {
-        if ($event->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
-            return response()->json(['success' => false, 'message' => 'Acesso negado.'], 403);
-        }
-
-        if ($media->event_id !== $event->id) {
+        if ($media->mentorship_id !== $mentorship->id) {
             return response()->json(['success' => false, 'message' => 'Midia invalida.'], 404);
         }
 
@@ -122,10 +112,6 @@ class EventMediaController extends Controller
         return response()->json(['success' => true, 'message' => 'Midia apagada.']);
     }
 
-    /**
-     * @param  array<int, UploadedFile>|null  $files
-     * @return array<int, array{file: UploadedFile, type: string}>
-     */
     private function validatedFiles(?array $files): array
     {
         $files = array_values(array_filter($files ?? []));
@@ -161,38 +147,28 @@ class EventMediaController extends Controller
         }
 
         if ($errors !== []) {
-            throw ValidationException::withMessages([
-                'files' => $errors,
-            ]);
+            throw ValidationException::withMessages(['files' => $errors]);
         }
 
         return $validated;
     }
 
-    /**
-     * @return array<int, string>
-     */
     private function allowedVideoExtensions(): array
     {
         $configured = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_video_formats', [])));
-
         return array_values(array_unique(array_merge($configured, ['mp4', 'mov', 'm4v', 'webm'])));
     }
 
-    /**
-     * @param  array<int, EventMedia>  $mediaItems
-     * @return array<int, array<string, mixed>>
-     */
-    private function serializeMediaCollection(Event $event, array $mediaItems): array
+    private function serializeMediaCollection(Mentorship $mentorship, array $mediaItems): array
     {
-        return array_map(function (EventMedia $media) use ($event) {
+        return array_map(function (MentorshipMedia $media) use ($mentorship) {
             return [
                 'id' => $media->id,
                 'type' => $media->type,
                 'url' => UploadStorage::url($media->file_path),
                 'watermarked' => (bool) $media->watermarked,
                 'uploaded_at' => $media->created_at?->format('d/m/Y H:i'),
-                'delete_url' => route('panel.events.media.destroy', [$event, $media]),
+                'delete_url' => route('admin.mentorships.media.destroy', [$mentorship, $media]),
             ];
         }, $mediaItems);
     }
