@@ -42,6 +42,11 @@ class GalleryController extends Controller
     /**
      * Upload new media to the gallery.
      */
+    public function store(Request $request, WatermarkService $watermarkService)
+    {
+        return $this->upload($request, $watermarkService);
+    }
+
     public function upload(Request $request, WatermarkService $watermarkService)
     {
         $request->validate([

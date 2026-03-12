@@ -11,7 +11,7 @@
             </div>
 
             <div class="modal-body">
-                <form action="{{ route('admin.gallery.upload') }}" method="POST" enctype="multipart/form-data" id="adminUploadForm" data-no-ajax="true" data-upload-progress="false">
+                <form action="{{ route('admin.gallery.store') }}" method="POST" enctype="multipart/form-data" id="adminUploadForm" data-no-ajax="true" data-upload-progress="false">
                     @csrf
 
                     <div class="form-group">
